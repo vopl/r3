@@ -91,6 +91,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	sql.close();
 
+
 	return 0;
 }
 

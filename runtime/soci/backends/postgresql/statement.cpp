@@ -479,51 +479,175 @@ void postgresql_statement_backend::describe_column(int colNum, data_type & type,
     // In postgresql_ column numbers start from 0
     int const pos = colNum - 1;
 
-    unsigned long const typeOid = PQftype(result_, pos);
+	unsigned long const typeOid = PQftype(result_, pos);
+	//unsigned int const typeMod = PQfmod(result_, pos);
+	assert(!"прогнать все оиды и рассовать по правильным типам");
     switch (typeOid)
-    {
-    // Note: the following list of OIDs was taken from the pg_type table
-    // we do not claim that this list is exchaustive or even correct.
+	{
+		// Note: the following list of OIDs was taken from the pg_type table
+		// we do not claim that this list is exchaustive or even correct.
 
-               // from pg_type:
+		// from server/catalog/pg_type.h
 
-    case 25:   // text
-    case 1043: // varchar
-    case 2275: // cstring
-    case 18:   // char
-    case 1042: // bpchar
-        type = dt_string;
-        break;
+		//////////////////////////////////////////////////////////////////////////
+	case 18: //char			//single character
+	case 19: //name			//63-character type for storing system identifiers
+	case 25: //text			//variable-length string, no limit specified
+	case 1002: //_char
+	case 1003: //_name
+	case 1009: //_text
+	case 1014: //_bpchar
+	case 1015: //_varchar
+	case 1263: //_cstring
+	case 1042: //bpchar		//char(length), blank-padded string, fixed storage length
+	case 1043: //varchar	//varchar(length), non-blank-padded string, variable storage length
+	case 2275: //cstring
+		type = dt2_String;
+		break;
 
-    case 702:  // abstime
-    case 703:  // reltime
-    case 1082: // date
-    case 1083: // time
-    case 1114: // timestamp
-    case 1184: // timestamptz
-    case 1266: // timetz
-        type = dt_date;
-        break;
 
-    case 700:  // float4
-    case 701:  // float8
-    case 1700: // numeric
-        type = dt_double;
-        break;
+		//////////////////////////////////////////////////////////////////////////
+	case 1560: //bit		//fixed-length bit string
+	case 1561: //_bit
+	case 1562: //varbit		//variable-length bit string
+	case 1563: //_varbit
+		type = dt2_Bits8;
+		break;
+		//////////////////////////////////////////////////////////////////////////
+		type = dt2_Bits16;
+		break;
+		//////////////////////////////////////////////////////////////////////////
+		type = dt2_Bits32;
+		break;
+		//////////////////////////////////////////////////////////////////////////
+		type = dt2_Bits64;
+		break;
+		//////////////////////////////////////////////////////////////////////////
+		type = dt2_Bits128;
+		break;
+		//////////////////////////////////////////////////////////////////////////
+		type = dt2_Bits256;
+		break;
+		
+		//////////////////////////////////////////////////////////////////////////
+	case 17: //bytea		//variable-length string, binary values escaped
+	case 1001: //_bytea
+		type = dt2_Bytea;
+		break;
 
-    case 16:   // bool
-    case 21:   // int2
-    case 23:   // int4
-        type = dt_integer;
-        break;
 
-    case 20:   // int8
-        type = dt_long_long;
-        break;
+		//////////////////////////////////////////////////////////////////////////
+	case 16: //bool			//boolean, 'true'/'false'
+	case 1000: //_bool
+		type = dt2_Bool;
+		break;
 
-    case 26:   // oid
-        type = dt_unsigned_long;
-        break;
+		//////////////////////////////////////////////////////////////////////////
+	case 700: //float4		//single-precision floating point number, 4-byte storage
+	case 1021: //_float4
+		type = dt2_Real32;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 701: //float8	//double-precision floating point number, 8-byte storage
+	case 1022: //_float8
+	case 1231: //_numeric
+	case 1700: //numeric	//numeric(precision, decimal), arbitrary precision number
+		type = dt2_Real64;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 1016: //_int8
+		type = dt2_Int8;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 21: //int2			//-32 thousand to 32 thousand, 2-byte storage
+	case 1005: //_int2
+		type = dt2_Int16;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 23: //int4			//-2 billion to 2 billion integer, 4-byte storage
+	case 1007: //_int4
+		type = dt2_Int32;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 20: //int8			//~18 digit integer, 8-byte storage
+		type = dt2_Int64;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+		type = dt2_Uint8;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+		type = dt2_Uint16;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 26: //oid			//object identifier(oid), maximum 4 billion
+	case 1028: //_oid
+		type = dt2_Uint32;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+		type = dt2_Uint64;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 1082: //date			//date
+	case 1182: //_date
+		type = dt2_Date;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 702: //abstime			//absolute, limited-range date and time (Unix system time)
+	case 703: //reltime			//relative, limited-range time interval (Unix delta time)
+	case 1083: //time			//time of day
+	case 1183: //_time
+	case 1266: //timetz			//time of day with time zone
+	case 1270: //_timetz
+		type = dt2_Time;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 1114: //timestamp			//date and time
+	case 1115: //_timestamp
+	case 1184: //timestamptz			//date and time with time zone
+	case 1185: //_timestamptz
+		type = dt2_Timestamp;
+		break;
+
+		//////////////////////////////////////////////////////////////////////////
+	case 704: //tinterval			//(abstime,abstime), time interval
+	case 1186: //interval			//@ <number> <units>, time interval
+	case 1187: //_interval
+		type = dt2_Interval;
+		break;
+
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+	case 790: //money			//monetary amounts, $d,ddd.cc
+	case 791: //_money
+		type = dt2_Money;
+		break;
+
+
+
+
+
+
+
+
+
+
+
+
 
     default:
          throw soci_error("Unknown data type.");

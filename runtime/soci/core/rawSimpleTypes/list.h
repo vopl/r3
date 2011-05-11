@@ -39,6 +39,8 @@ RST_ENTRY(83, struct
 	boost::posix_time::ptime::time_duration_type iTime;
 }, Interval)
 
+RST_ENTRY(91, boost::uint64_t, Money)
+
 END_RST_LIST
 
 

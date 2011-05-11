@@ -578,49 +578,68 @@ namespace soci
 namespace details
 {
 
-// Map data_types to stock types for dynamic result set support
+#define RST_ENTRY(i, t, n) template<> void statement_impl::bind_into<dt2_##n>() {into_row<SF##n>();}
+#include "rawSimpleTypes/list.h"
 
-template<>
-void statement_impl::bind_into<dt_string>()
-{
-    into_row<std::string>();
-}
+// // Map data_types to stock types for dynamic result set support
+// 
+// template<>
+// void statement_impl::bind_into<dt_string>()
+// {
+//     into_row<std::string>();
+// }
+// 
+// template<>
+// void statement_impl::bind_into<dt_double>()
+// {
+//     into_row<double>();
+// }
+// 
+// template<>
+// void statement_impl::bind_into<dt_integer>()
+// {
+//     into_row<int>();
+// }
+// 
+// template<>
+// void statement_impl::bind_into<dt_unsigned_long>()
+// {
+//     into_row<unsigned long>();
+// }
+// 
+// template<>
+// void statement_impl::bind_into<dt_long_long>()
+// {
+//     into_row<long long>();
+// }
+// 
+// template<>
+// void statement_impl::bind_into<dt_unsigned_long_long>()
+// {
+//     into_row<unsigned long long>();
+// }
+// 
+// template<>
+// void statement_impl::bind_into<dt_date>()
+// {
+//     into_row<std::tm>();
+// }
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
-template<>
-void statement_impl::bind_into<dt_double>()
-{
-    into_row<double>();
-}
 
-template<>
-void statement_impl::bind_into<dt_integer>()
-{
-    into_row<int>();
-}
 
-template<>
-void statement_impl::bind_into<dt_unsigned_long>()
-{
-    into_row<unsigned long>();
-}
 
-template<>
-void statement_impl::bind_into<dt_long_long>()
-{
-    into_row<long long>();
-}
 
-template<>
-void statement_impl::bind_into<dt_unsigned_long_long>()
-{
-    into_row<unsigned long long>();
-}
 
-template<>
-void statement_impl::bind_into<dt_date>()
-{
-    into_row<std::tm>();
-}
+
+
+
+
+
+
+
 
 void statement_impl::describe()
 {
@@ -640,27 +659,31 @@ void statement_impl::describe()
 
         switch (dtype)
         {
-        case dt_string:
-            bind_into<dt_string>();
-            break;
-        case dt_double:
-            bind_into<dt_double>();
-            break;
-        case dt_integer:
-            bind_into<dt_integer>();
-            break;
-        case dt_unsigned_long:
-            bind_into<dt_unsigned_long>();
-            break;
-        case dt_long_long:
-            bind_into<dt_long_long>();
-            break;
-        case dt_unsigned_long_long:
-            bind_into<dt_unsigned_long_long>();
-            break;
-        case dt_date:
-            bind_into<dt_date>();
-            break;
+
+#define RST_ENTRY(i, t, n) case dt2_##n: bind_into<dt2_##n>(); break;
+#include "rawSimpleTypes/list.h"
+
+//         case dt_string:
+//             bind_into<dt_string>();
+//             break;
+//         case dt_double:
+//             bind_into<dt_double>();
+//             break;
+//         case dt_integer:
+//             bind_into<dt_integer>();
+//             break;
+//         case dt_unsigned_long:
+//             bind_into<dt_unsigned_long>();
+//             break;
+//         case dt_long_long:
+//             bind_into<dt_long_long>();
+//             break;
+//         case dt_unsigned_long_long:
+//             bind_into<dt_unsigned_long_long>();
+//             break;
+//         case dt_date:
+//             bind_into<dt_date>();
+//             break;
         default:
             std::ostringstream msg;
             msg << "db column type " << dtype

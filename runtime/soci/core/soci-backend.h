@@ -24,13 +24,13 @@ namespace soci
 // data types, as seen by the user
 enum data_type
 {
-    dt_string,					//std::string
-	dt_date,					//std::tm
-	dt_double,					//double
-	dt_integer,					//int
-	dt_unsigned_long,			//unsigned long
-	dt_long_long,				//long long
-	dt_unsigned_long_long,		//unsigned long long
+//     dt_string,					//std::string
+// 	dt_date,					//std::tm
+// 	dt_double,					//double
+// 	dt_integer,					//int
+// 	dt_unsigned_long,			//unsigned long
+// 	dt_long_long,				//long long
+// 	dt_unsigned_long_long,		//unsigned long long
 
 
 
@@ -58,7 +58,11 @@ enum exchange_type
 	x_stdtm, 
 	x_statement,
     x_rowid, 
-	x_blob
+	x_blob,
+
+#define RST_ENTRY(i, t, n) x2_##n = i,
+#include "rawSimpleTypes/list.h"
+
 };
 
 // type of statement (used for optimizing statement preparation)
