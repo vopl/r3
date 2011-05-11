@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "R3Decorator", "R3Decorator\R3Decorator.vcproj", "{88B5DE24-4C88-4CAC-B4A5-2BB556B527B2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{77FEBD41-CD6C-4D55-B561-3957F7151CC2} = {77FEBD41-CD6C-4D55-B561-3957F7151CC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DecoratorLib", "C:\Program Files (x86)\GME\SDK\DecoratorLib\DecoratorLib.vcproj", "{77FEBD41-CD6C-4D55-B561-3957F7151CC2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "R3Interpreter", "R3Interpreter\R3Interpreter.vcproj", "{4FE7A98B-0C5A-4EA9-9A65-90EC838A9E63}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88B5DE24-4C88-4CAC-B4A5-2BB556B527B2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{88B5DE24-4C88-4CAC-B4A5-2BB556B527B2}.Debug|Win32.Build.0 = Debug|Win32
+		{88B5DE24-4C88-4CAC-B4A5-2BB556B527B2}.Release|Win32.ActiveCfg = Release|Win32
+		{88B5DE24-4C88-4CAC-B4A5-2BB556B527B2}.Release|Win32.Build.0 = Release|Win32
+		{77FEBD41-CD6C-4D55-B561-3957F7151CC2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{77FEBD41-CD6C-4D55-B561-3957F7151CC2}.Release|Win32.ActiveCfg = Release|Win32
+		{4FE7A98B-0C5A-4EA9-9A65-90EC838A9E63}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4FE7A98B-0C5A-4EA9-9A65-90EC838A9E63}.Debug|Win32.Build.0 = Debug|Win32
+		{4FE7A98B-0C5A-4EA9-9A65-90EC838A9E63}.Release|Win32.ActiveCfg = Release|Win32
+		{4FE7A98B-0C5A-4EA9-9A65-90EC838A9E63}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

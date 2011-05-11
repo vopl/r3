@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "core\core.vcproj", "{A52B51E4-E717-4F19-BD43-4BE941420B08}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "soci", "soci", "{DCB3B714-EB28-4236-8637-ACB23B975BCB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "soci_core-static", "soci\core\soci_core-static.vcproj", "{89F0D06E-5152-4AC5-8867-54EACF360464}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "soci_postgresql-static", "soci\backends\postgresql\soci_postgresql-static.vcproj", "{C13D3E85-DC23-4402-AD62-05EB547A15D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backends", "backends", "{C74641F6-22B7-4064-A5AF-6907141A8BCE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Debug|Win32.Build.0 = Debug|Win32
+		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Release|Win32.ActiveCfg = Release|Win32
+		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Release|Win32.Build.0 = Release|Win32
+		{89F0D06E-5152-4AC5-8867-54EACF360464}.Debug|Win32.ActiveCfg = Debug|Win32
+		{89F0D06E-5152-4AC5-8867-54EACF360464}.Debug|Win32.Build.0 = Debug|Win32
+		{89F0D06E-5152-4AC5-8867-54EACF360464}.Release|Win32.ActiveCfg = Release|Win32
+		{89F0D06E-5152-4AC5-8867-54EACF360464}.Release|Win32.Build.0 = Release|Win32
+		{C13D3E85-DC23-4402-AD62-05EB547A15D6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C13D3E85-DC23-4402-AD62-05EB547A15D6}.Debug|Win32.Build.0 = Debug|Win32
+		{C13D3E85-DC23-4402-AD62-05EB547A15D6}.Release|Win32.ActiveCfg = Release|Win32
+		{C13D3E85-DC23-4402-AD62-05EB547A15D6}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{89F0D06E-5152-4AC5-8867-54EACF360464} = {DCB3B714-EB28-4236-8637-ACB23B975BCB}
+		{C74641F6-22B7-4064-A5AF-6907141A8BCE} = {DCB3B714-EB28-4236-8637-ACB23B975BCB}
+		{C13D3E85-DC23-4402-AD62-05EB547A15D6} = {C74641F6-22B7-4064-A5AF-6907141A8BCE}
+	EndGlobalSection
+EndGlobal

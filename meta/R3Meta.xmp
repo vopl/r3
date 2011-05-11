@@ -1,0 +1,380 @@
+<?xml version="1.0"?>
+<!DOCTYPE paradigm SYSTEM "edf.dtd">
+
+<paradigm name="R3Meta" guid="{B9305171-18E5-4385-811B-7DB181D05B9A}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+
+	<comment></comment>
+
+	<author></author>
+
+	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Exchange Schema" >
+		<attrdef name="Abstract" metaref = "1290" valuetype = "boolean" defvalue = "false">
+		</attrdef>
+		<attrdef name="AllowNull" metaref = "1318" valuetype = "boolean" defvalue = "true">
+		</attrdef>
+		<attrdef name="FileStoreKind" metaref = "1319" valuetype = "enum" defvalue = "blob">
+			<enumitem dispname = "bytea" value = "bytea"></enumitem>
+			<enumitem dispname = "blob" value = "blob"></enumitem>
+		</attrdef>
+		<attrdef name="IndexType" metaref = "1225" valuetype = "enum" defvalue = "tree">
+			<enumitem dispname = "tree" value = "tree"></enumitem>
+			<enumitem dispname = "hash" value = "hash"></enumitem>
+		</attrdef>
+		<attrdef name="LongDescription" metaref = "1226" valuetype = "string" defvalue = "">
+			<regnode name="multiLine" value = "6"></regnode>
+		</attrdef>
+		<attrdef name="Multiplier" metaref = "1227" valuetype = "enum" defvalue = "1">
+			<enumitem dispname = "1" value = "1"></enumitem>
+			<enumitem dispname = "n" value = "n"></enumitem>
+		</attrdef>
+		<attrdef name="Multiplier1" metaref = "1228" valuetype = "enum" defvalue = "1">
+			<dispname>1st mult</dispname>
+			<enumitem dispname = "1" value = "1"></enumitem>
+			<enumitem dispname = "n" value = "n"></enumitem>
+		</attrdef>
+		<attrdef name="Multiplier2" metaref = "1229" valuetype = "enum" defvalue = "1">
+			<dispname>2nd mult</dispname>
+			<enumitem dispname = "1" value = "1"></enumitem>
+			<enumitem dispname = "n" value = "n"></enumitem>
+		</attrdef>
+		<attrdef name="Name1" metaref = "1293" valuetype = "string" defvalue = "unnamed1">
+			<dispname>1st name</dispname>
+		</attrdef>
+		<attrdef name="Name2" metaref = "1294" valuetype = "string" defvalue = "unnamed2">
+			<dispname>2nd name</dispname>
+		</attrdef>
+		<attrdef name="NodeManager" metaref = "1317" valuetype = "string" defvalue = "disallowAll">
+		</attrdef>
+		<attrdef name="ScantyValueKey" metaref = "1320" valuetype = "integer" defvalue = "1">
+			<dispname>Key</dispname>
+		</attrdef>
+		<attrdef name="ShortDescription" metaref = "1230" valuetype = "string" defvalue = "">
+		</attrdef>
+		<attrdef name="ValueAdapter" metaref = "1308" valuetype = "string" defvalue = "unchanged">
+		</attrdef>
+		<atom name = "Audio" metaref = "1105"  attributes = "AllowNull FileStoreKind">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Bool" metaref = "1106"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Channel" metaref = "1295" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Date" metaref = "1231"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "DateTimeInterval" metaref = "1232"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Image" metaref = "1111"  attributes = "AllowNull FileStoreKind">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Index" metaref = "1233"  attributes = "IndexType">
+				<regnode name = "namePosition" value ="4"></regnode>
+		</atom>
+		<atom name = "Int16" metaref = "1234"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Int32" metaref = "1235"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Int64" metaref = "1236"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Int8" metaref = "1237"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Money" metaref = "1238"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Real32" metaref = "1239"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Real64" metaref = "1240"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "ScantyValue" metaref = "1159"  attributes = "LongDescription ShortDescription ScantyValueKey">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "String" metaref = "1115"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Time" metaref = "1241"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Timestamp" metaref = "1242"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Video" metaref = "1116"  attributes = "AllowNull FileStoreKind">
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<connection name = "CategoryInheritance" metaref = "1012" >
+				<regnode name = "color" value ="0x000077"></regnode>
+				<regnode name = "dstStyle" value ="apex"></regnode>
+				<regnode name = "srcStyle" value ="butt"></regnode>
+				<regnode name = "lineType" value ="solid"></regnode>
+			<connjoint>
+				<pointerspec name = "src">
+					<pointeritem desc = "Category"></pointeritem>
+					<pointeritem desc = "CategoryReference"></pointeritem>
+				</pointerspec>
+				<pointerspec name = "dst">
+					<pointeritem desc = "Category"></pointeritem>
+					<pointeritem desc = "CategoryReference"></pointeritem>
+				</pointerspec>
+			</connjoint>
+		</connection>
+		<connection name = "CategoryInput" metaref = "1309" attributes = "ValueAdapter NodeManager" >
+				<regnode name = "color" value ="0x000070"></regnode>
+				<regnode name = "dstStyle" value ="arrow"></regnode>
+				<regnode name = "srcStyle" value ="butt"></regnode>
+				<regnode name = "lineType" value ="solid"></regnode>
+				<regnode name= "dstLabel1" value="%NodeManager%"/>
+				<regnode name= "dstLabel2" value="%ValueAdapter%"/>
+			<connjoint>
+				<pointerspec name = "src">
+					<pointeritem desc = "Channel"></pointeritem>
+				</pointerspec>
+				<pointerspec name = "dst">
+					<pointeritem desc = "CategoryReference"></pointeritem>
+				</pointerspec>
+			</connjoint>
+		</connection>
+		<connection name = "CategoryOutput" metaref = "1310" attributes = "ValueAdapter NodeManager" >
+				<regnode name = "color" value ="0x700000"></regnode>
+				<regnode name = "dstStyle" value ="arrow"></regnode>
+				<regnode name = "srcStyle" value ="butt"></regnode>
+				<regnode name = "lineType" value ="solid"></regnode>
+				<regnode name= "srcLabel1" value="%NodeManager%"/>
+				<regnode name= "srcLabel2" value="%ValueAdapter%"/>
+			<connjoint>
+				<pointerspec name = "src">
+					<pointeritem desc = "CategoryReference"></pointeritem>
+				</pointerspec>
+				<pointerspec name = "dst">
+					<pointeritem desc = "Channel"></pointeritem>
+				</pointerspec>
+			</connjoint>
+		</connection>
+		<connection name = "CategoryRelation" metaref = "1243" attributes = "Name1 Multiplier1 Name2 Multiplier2" >
+				<regnode name = "color" value ="0x007700"></regnode>
+				<regnode name = "dstStyle" value ="arrow"></regnode>
+				<regnode name = "srcStyle" value ="arrow"></regnode>
+				<regnode name = "lineType" value ="solid"></regnode>
+				<regnode name= "srcLabel1" value="%Multiplier1%"/>
+				<regnode name= "srcLabel2" value="%Name1%"/>
+				<regnode name= "dstLabel1" value="%Multiplier2%"/>
+				<regnode name= "dstLabel2" value="%Name2%"/>
+			<connjoint>
+				<pointerspec name = "src">
+					<pointeritem desc = "Category"></pointeritem>
+					<pointeritem desc = "CategoryReference"></pointeritem>
+				</pointerspec>
+				<pointerspec name = "dst">
+					<pointeritem desc = "Category"></pointeritem>
+					<pointeritem desc = "CategoryReference"></pointeritem>
+				</pointerspec>
+			</connjoint>
+		</connection>
+		<connection name = "IndexOnCategoryField" metaref = "1244" >
+				<regnode name = "color" value ="0x000000"></regnode>
+				<regnode name = "dstStyle" value ="arrow"></regnode>
+				<regnode name = "srcStyle" value ="butt"></regnode>
+				<regnode name = "lineType" value ="dash"></regnode>
+			<connjoint>
+				<pointerspec name = "src">
+					<pointeritem desc = "Audio"></pointeritem>
+					<pointeritem desc = "Bool"></pointeritem>
+					<pointeritem desc = "Date"></pointeritem>
+					<pointeritem desc = "DateTimeInterval"></pointeritem>
+					<pointeritem desc = "Enum"></pointeritem>
+					<pointeritem desc = "Image"></pointeritem>
+					<pointeritem desc = "Int16"></pointeritem>
+					<pointeritem desc = "Int32"></pointeritem>
+					<pointeritem desc = "Int64"></pointeritem>
+					<pointeritem desc = "Int8"></pointeritem>
+					<pointeritem desc = "Money"></pointeritem>
+					<pointeritem desc = "Real32"></pointeritem>
+					<pointeritem desc = "Real64"></pointeritem>
+					<pointeritem desc = "Set"></pointeritem>
+					<pointeritem desc = "String"></pointeritem>
+					<pointeritem desc = "Time"></pointeritem>
+					<pointeritem desc = "Timestamp"></pointeritem>
+					<pointeritem desc = "Video"></pointeritem>
+				</pointerspec>
+				<pointerspec name = "dst">
+					<pointeritem desc = "Index"></pointeritem>
+				</pointerspec>
+			</connjoint>
+		</connection>
+		<reference name = "CategoryReference" metaref = "1245">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+			<pointerspec name = "ref">
+				<pointeritem desc = "Category"></pointeritem>
+			</pointerspec>
+		</reference>
+		<model name = "Category" metaref = "1014" attributes = "Abstract" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "Audio" metaref = "1118" kind = "Audio"></role>
+			<role name = "Bool" metaref = "1119" kind = "Bool"></role>
+			<role name = "Date" metaref = "1246" kind = "Date"></role>
+			<role name = "DateTimeInterval" metaref = "1247" kind = "DateTimeInterval"></role>
+			<role name = "Enum" metaref = "1160" kind = "Enum"></role>
+			<role name = "Image" metaref = "1124" kind = "Image"></role>
+			<role name = "Index" metaref = "1248" kind = "Index"></role>
+			<role name = "IndexOnCategoryField" metaref = "1249" kind = "IndexOnCategoryField"></role>
+			<role name = "Int16" metaref = "1250" kind = "Int16"></role>
+			<role name = "Int32" metaref = "1251" kind = "Int32"></role>
+			<role name = "Int64" metaref = "1252" kind = "Int64"></role>
+			<role name = "Int8" metaref = "1253" kind = "Int8"></role>
+			<role name = "Money" metaref = "1254" kind = "Money"></role>
+			<role name = "Real32" metaref = "1255" kind = "Real32"></role>
+			<role name = "Real64" metaref = "1256" kind = "Real64"></role>
+			<role name = "Set" metaref = "1162" kind = "Set"></role>
+			<role name = "String" metaref = "1128" kind = "String"></role>
+			<role name = "Time" metaref = "1257" kind = "Time"></role>
+			<role name = "Timestamp" metaref = "1258" kind = "Timestamp"></role>
+			<role name = "Video" metaref = "1129" kind = "Video"></role>
+			<aspect name = "AspectCategory" metaref = "1026" attributes = "Abstract" >
+				<part metaref = "1130" role = "Audio" primary = "yes" linked = "no"></part>
+				<part metaref = "1131" role = "Bool" primary = "yes" linked = "no"></part>
+				<part metaref = "1259" role = "Date" primary = "yes" linked = "no"></part>
+				<part metaref = "1260" role = "DateTimeInterval" primary = "yes" linked = "no"></part>
+				<part metaref = "1163" role = "Enum" primary = "yes" linked = "no"></part>
+				<part metaref = "1136" role = "Image" primary = "yes" linked = "no"></part>
+				<part metaref = "1261" role = "Index" primary = "yes" linked = "no"></part>
+				<part metaref = "1262" role = "IndexOnCategoryField" primary = "yes" linked = "no"></part>
+				<part metaref = "1263" role = "Int16" primary = "yes" linked = "no"></part>
+				<part metaref = "1264" role = "Int32" primary = "yes" linked = "no"></part>
+				<part metaref = "1265" role = "Int64" primary = "yes" linked = "no"></part>
+				<part metaref = "1266" role = "Int8" primary = "yes" linked = "no"></part>
+				<part metaref = "1267" role = "Money" primary = "yes" linked = "no"></part>
+				<part metaref = "1268" role = "Real32" primary = "yes" linked = "no"></part>
+				<part metaref = "1269" role = "Real64" primary = "yes" linked = "no"></part>
+				<part metaref = "1165" role = "Set" primary = "yes" linked = "no"></part>
+				<part metaref = "1140" role = "String" primary = "yes" linked = "no"></part>
+				<part metaref = "1270" role = "Time" primary = "yes" linked = "no"></part>
+				<part metaref = "1271" role = "Timestamp" primary = "yes" linked = "no"></part>
+				<part metaref = "1141" role = "Video" primary = "yes" linked = "no"></part>
+			</aspect>
+		</model>
+		<model name = "Enum" metaref = "1166" attributes = "AllowNull" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "ScantyValue" metaref = "1167" kind = "ScantyValue"></role>
+			<aspect name = "AspectScanty" metaref = "1168" attributes = "AllowNull" >
+				<part metaref = "1169" role = "ScantyValue" primary = "yes" linked = "no"></part>
+			</aspect>
+		</model>
+		<model name = "Exchange" metaref = "1298" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "CategoryInput" metaref = "1311" kind = "CategoryInput"></role>
+			<role name = "CategoryOutput" metaref = "1312" kind = "CategoryOutput"></role>
+			<role name = "CategoryReference" metaref = "1315" kind = "CategoryReference"></role>
+			<role name = "Channel" metaref = "1299" kind = "Channel"></role>
+			<aspect name = "AspectExchange" metaref = "1300" >
+				<part metaref = "1313" role = "CategoryInput" primary = "yes" linked = "no"></part>
+				<part metaref = "1314" role = "CategoryOutput" primary = "yes" linked = "no"></part>
+				<part metaref = "1316" role = "CategoryReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1301" role = "Channel" primary = "yes" linked = "no"></part>
+			</aspect>
+		</model>
+		<model name = "Schema" metaref = "1272" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "Category" metaref = "1273" kind = "Category"></role>
+			<role name = "CategoryInheritance" metaref = "1274" kind = "CategoryInheritance"></role>
+			<role name = "CategoryReference" metaref = "1275" kind = "CategoryReference"></role>
+			<role name = "CategoryRelation" metaref = "1276" kind = "CategoryRelation"></role>
+			<aspect name = "AspectSchema" metaref = "1224" >
+				<part metaref = "1277" role = "Category" primary = "yes" linked = "no"></part>
+				<part metaref = "1278" role = "CategoryInheritance" primary = "yes" linked = "no"></part>
+				<part metaref = "1279" role = "CategoryReference" primary = "yes" kindaspect = "AspectCategory" linked = "no"></part>
+				<part metaref = "1280" role = "CategoryRelation" primary = "yes" linked = "no"></part>
+			</aspect>
+		</model>
+		<model name = "Set" metaref = "1174" attributes = "AllowNull" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "ScantyValue" metaref = "1175" kind = "ScantyValue"></role>
+			<aspect name = "AspectScanty" metaref = "1176" attributes = "AllowNull" >
+				<part metaref = "1177" role = "ScantyValue" primary = "yes" linked = "no"></part>
+			</aspect>
+		</model>
+	</folder>
+</paradigm>
