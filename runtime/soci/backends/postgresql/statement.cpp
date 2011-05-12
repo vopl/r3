@@ -593,6 +593,8 @@ void postgresql_statement_backend::describe_column(int colNum, data_type & type,
 		break;
 
 		//////////////////////////////////////////////////////////////////////////
+	case 790: //money			//monetary amounts, $d,ddd.cc
+	case 791: //_money
 		type = dt2_Uint64;
 		break;
 
@@ -631,11 +633,6 @@ void postgresql_statement_backend::describe_column(int colNum, data_type & type,
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-	case 790: //money			//monetary amounts, $d,ddd.cc
-	case 791: //_money
-		type = dt2_Money;
-		break;
 
 
 

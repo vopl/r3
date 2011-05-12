@@ -37,77 +37,89 @@ struct exchange_traits
     };
 };
 
-template <>
-struct exchange_traits<short>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_short };
-};
+#define RST_ENTRY(i, t, n) \
+	template <> \
+	struct exchange_traits< SF##n > \
+	{ \
+		typedef basic_type_tag type_family; \
+		enum { x_type = x2_##n }; \
+	}; //\
 
-template <>
-struct exchange_traits<int>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_integer };
-};
 
-template <>
-struct exchange_traits<char>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_char };
-};
+#include "rawSimpleTypes/list.h"
 
-template <>
-struct exchange_traits<unsigned long>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_unsigned_long };
-};
 
-template <>
-struct exchange_traits<long long>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_long_long };
-};
-
-template <>
-struct exchange_traits<unsigned long long>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_unsigned_long_long };
-};
-
-#if defined (__LP64__) || ( __WORDSIZE == 64 )
-template <>
-struct exchange_traits<long int>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_long_long };
-};
-#endif // #if defined (__LP64__) || ( __WORDSIZE == 64 )
-
-template <>
-struct exchange_traits<double>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_double };
-};
-
-template <>
-struct exchange_traits<std::string>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_stdstring };
-};
-
-template <>
-struct exchange_traits<std::tm>
-{
-    typedef basic_type_tag type_family;
-    enum { x_type = x_stdtm };
-};
+// template <>
+// struct exchange_traits<short>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_short };
+// };
+// 
+// template <>
+// struct exchange_traits<int>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_integer };
+// };
+// 
+// template <>
+// struct exchange_traits<char>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_char };
+// };
+// 
+// template <>
+// struct exchange_traits<unsigned long>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_unsigned_long };
+// };
+// 
+// template <>
+// struct exchange_traits<long long>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_long_long };
+// };
+// 
+// template <>
+// struct exchange_traits<unsigned long long>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_unsigned_long_long };
+// };
+// 
+// #if defined (__LP64__) || ( __WORDSIZE == 64 )
+// template <>
+// struct exchange_traits<long int>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_long_long };
+// };
+// #endif // #if defined (__LP64__) || ( __WORDSIZE == 64 )
+// 
+// template <>
+// struct exchange_traits<double>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_double };
+// };
+// 
+// template <>
+// struct exchange_traits<std::string>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_stdstring };
+// };
+// 
+// template <>
+// struct exchange_traits<std::tm>
+// {
+//     typedef basic_type_tag type_family;
+//     enum { x_type = x_stdtm };
+// };
 
 template <typename T>
 struct exchange_traits<std::vector<T> >
