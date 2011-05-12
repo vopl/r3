@@ -331,6 +331,14 @@
 				RelativePath="..\..\core\rawSimpleTypes\list.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\core\rawSimpleTypes\types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\core\rawSimpleTypes\utils.hpp"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\..\core\StdAfx.cpp"

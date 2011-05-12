@@ -84,7 +84,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	soci::session sql(soci::postgresql, "dbname=test user=postgres password=postgres");
 
-	std::vector<std::string> str(220);
+	std::vector<bool> str(220);
 	const std::string in="2";
 	sql<<"SELECT txt FROM myt WHERE id>:one", soci::into(str), soci::use(in, "one");
 

@@ -11,6 +11,7 @@
 #include "soci-postgresql.h"
 #include "common.h"
 #include <libpq/libpq-fs.h> // libpq
+#include "rawSimpleTypes/utils.hpp"
 
 #ifdef SOCI_POSTGRESQL_NOPARAMS
 #define SOCI_POSTGRESQL_NOBINDBYNAME
@@ -47,127 +48,423 @@ void postgresql_vector_use_type_backend::pre_use(indicator const * ind)
     std::size_t const vsize = size();
     for (size_t i = 0; i != vsize; ++i)
     {
-        char * buf;
+		Oid		typ=0;		//type oid
+		int		len=0;		//length of data in bytes
+		int		fmt=0;		//text=0 or binary=1
+		char	*val=NULL;	//data
 
         // the data in vector can be either i_ok or i_null
         if (ind != NULL && ind[i] == i_null)
         {
-            buf = NULL;
+            val = NULL;
         }
         else
         {
             // allocate and fill the buffer with text-formatted client data
             switch (type_)
             {
-            case x_char:
-                {
-                    std::vector<char> * pv
-                        = static_cast<std::vector<char> *>(data_);
-                    std::vector<char> & v = *pv;
 
-                    buf = new char[2];
-                    buf[0] = v[i];
-                    buf[1] = '\0';
-                }
-                break;
-            case x_stdstring:
-                {
-                    std::vector<std::string> * pv
-                        = static_cast<std::vector<std::string> *>(data_);
-                    std::vector<std::string> & v = *pv;
+				//////////////////////////////////////////////////////////////////////////
+			case x2_String:
+				{
+					std::vector<SFString> * pv = static_cast<std::vector<SFString> *>(data_);
+					std::vector<SFString> & v = *pv;
 
-                    buf = new char[v[i].size() + 1];
-                    std::strcpy(buf, v[i].c_str());
-                }
-                break;
-            case x_short:
-                {
-                    std::vector<short> * pv
-                        = static_cast<std::vector<short> *>(data_);
-                    std::vector<short> & v = *pv;
+					typ = 1043;//varchar
+					len = v[i].size();
+					fmt = 1;
+					val = new char[len];
+					memmove(val, v[i].data(), len);
+				}
+				break;
 
-                    std::size_t const bufSize
-                        = std::numeric_limits<short>::digits10 + 3;
-                    buf = new char[bufSize];
-                    snprintf(buf, bufSize, "%d", static_cast<int>(v[i]));
-                }
-                break;
-            case x_integer:
-                {
-                    std::vector<int> * pv
-                        = static_cast<std::vector<int> *>(data_);
-                    std::vector<int> & v = *pv;
 
-                    std::size_t const bufSize
-                        = std::numeric_limits<int>::digits10 + 3;
-                    buf = new char[bufSize];
-                    snprintf(buf, bufSize, "%d", v[i]);
-                }
-                break;
-            case x_unsigned_long:
-                {
-                    std::vector<unsigned long> * pv
-                        = static_cast<std::vector<unsigned long> *>(data_);
-                    std::vector<unsigned long> & v = *pv;
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Bits8:
+				{
+					std::vector<SFBits8> * pv = static_cast<std::vector<SFBits8> *>(data_);
+					std::vector<SFBits8> & v = *pv;
 
-                    std::size_t const bufSize
-                        = std::numeric_limits<unsigned long>::digits10 + 2;
-                    buf = new char[bufSize];
-                    snprintf(buf, bufSize, "%lu", v[i]);
-                }
-                break;
-            case x_long_long:
-                {
-                    std::vector<long long>* pv
-                        = static_cast<std::vector<long long>*>(data_);
-                    std::vector<long long>& v = *pv;
+					typ = 1562;//varbit
+					len = 8;
+					fmt = 1;
+					val = new char[len/8];
+					rst::bitset2bin(v[i], val, len);
+				}
+				break;
 
-                    std::size_t const bufSize
-                        = std::numeric_limits<long long>::digits10 + 3;
-                    buf = new char[bufSize];
-                    snprintf(buf, bufSize, "%lld", v[i]);
-                }
-                break;
-            case x_unsigned_long_long:
-                {
-                    std::vector<unsigned long long>* pv
-                        = static_cast<std::vector<unsigned long long>*>(data_);
-                    std::vector<unsigned long long>& v = *pv;
 
-                    std::size_t const bufSize
-                        = std::numeric_limits<unsigned long long>::digits10 + 2;
-                    buf = new char[bufSize];
-                    snprintf(buf, bufSize, "%llu", v[i]);
-                }
-                break;
-            case x_double:
-                {
-                    // no need to overengineer it (KISS)...
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Bits16:
+				{
+					std::vector<SFBits16> * pv = static_cast<std::vector<SFBits16> *>(data_);
+					std::vector<SFBits16> & v = *pv;
 
-                    std::vector<double> * pv
-                        = static_cast<std::vector<double> *>(data_);
-                    std::vector<double> & v = *pv;
+					typ = 1562;//varbit
+					len = 16;
+					fmt = 1;
+					val = new char[len/8];
+					rst::bitset2bin(v[i], val, len);
+				}
+				break;
 
-                    std::size_t const bufSize = 100;
-                    buf = new char[bufSize];
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Bits32:
+				{
+					std::vector<SFBits32> * pv = static_cast<std::vector<SFBits32> *>(data_);
+					std::vector<SFBits32> & v = *pv;
 
-                    snprintf(buf, bufSize, "%.20g", v[i]);
-                }
-                break;
-            case x_stdtm:
-                {
-                    std::vector<std::tm> * pv
-                        = static_cast<std::vector<std::tm> *>(data_);
-                    std::vector<std::tm> & v = *pv;
+					typ = 1562;//varbit
+					len = 32;
+					fmt = 1;
 
-                    std::size_t const bufSize = 20;
-                    buf = new char[bufSize];
+					val = new char[len/8];
+					rst::bitset2bin(v[i], val, len);
+				}
+				break;
 
-                    snprintf(buf, bufSize, "%d-%02d-%02d %02d:%02d:%02d",
-                        v[i].tm_year + 1900, v[i].tm_mon + 1, v[i].tm_mday,
-                        v[i].tm_hour, v[i].tm_min, v[i].tm_sec);
-                }
-                break;
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Bits64:
+				{
+					std::vector<SFBits64> * pv = static_cast<std::vector<SFBits64> *>(data_);
+					std::vector<SFBits64> & v = *pv;
+
+					typ = 1562;//varbit
+					len = 64;
+					fmt = 1;
+
+					val = new char[len/8];
+					rst::bitset2bin(v[i], val, len);
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Bits128:
+				{
+					std::vector<SFBits128> * pv = static_cast<std::vector<SFBits128> *>(data_);
+					std::vector<SFBits128> & v = *pv;
+
+					typ = 1562;//varbit
+					len = 128;
+					fmt = 1;
+
+					val = new char[len/8];
+					rst::bitset2bin(v[i], val, len);
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Bits256:
+				{
+					std::vector<SFBits256> * pv = static_cast<std::vector<SFBits256> *>(data_);
+					std::vector<SFBits256> & v = *pv;
+
+					typ = 1562;//varbit
+					len = 256;
+					fmt = 1;
+
+					val = new char[len/8];
+					rst::bitset2bin(v[i], val, len);
+				}
+				break;
+
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Bytea:
+				{
+					std::vector<SFBytea> * pv = static_cast<std::vector<SFBytea> *>(data_);
+					std::vector<SFBytea> & v = *pv;
+
+					typ = 17;//bytea
+					len = v.size();
+					fmt = 1;
+
+					val = new char[len];
+					std::copy(v[i].begin(), v[i].end(), val);
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Bool:
+				{
+					std::vector<SFBool> * pv = static_cast<std::vector<SFBool> *>(data_);
+					std::vector<SFBool> & v = *pv;
+
+					typ = 16;//bool
+					len = 1;
+					fmt = 1;
+
+					val = new char[1];
+					*val = v[i];
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Real32:
+				{
+					std::vector<SFReal32> * pv = static_cast<std::vector<SFReal32> *>(data_);
+					std::vector<SFReal32> & v = *pv;
+
+					typ = 700;//float4
+					len = 4;
+					fmt = 1;
+
+					val = new char[4];
+					memcpy((char *)&v[i], val, 4);
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Real64:
+				{
+					std::vector<SFReal64> * pv = static_cast<std::vector<SFReal64> *>(data_);
+					std::vector<SFReal64> & v = *pv;
+
+					typ = 701;//float8
+					len = 8;
+					fmt = 1;
+
+					val = new char[8];
+					memcpy((char *)&v[i], val, 8);
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Int8:
+				{
+					std::vector<SFInt8> * pv = static_cast<std::vector<SFInt8> *>(data_);
+					std::vector<SFInt8> & v = *pv;
+
+					typ = 21;//int2
+					len = 2;
+					fmt = 1;
+
+					val = new char[2];
+					val[0] = v[i];
+					val[1] = v[i]>=0?0:0xff;
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Int16:
+				{
+					std::vector<SFInt16> * pv = static_cast<std::vector<SFInt16> *>(data_);
+					std::vector<SFInt16> & v = *pv;
+
+					typ = 21;//int2
+					len = 2;
+					fmt = 1;
+
+					val = new char[2];
+					*(SFInt16 *)val = v[i];
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Int32:
+				{
+					std::vector<SFInt32> * pv = static_cast<std::vector<SFInt32> *>(data_);
+					std::vector<SFInt32> & v = *pv;
+
+					typ = 23;//int4
+					len = 4;
+					fmt = 1;
+
+					val = new char[4];
+					*(SFInt32 *)val = v[i];
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Int64:
+				{
+					std::vector<SFInt64> * pv = static_cast<std::vector<SFInt64> *>(data_);
+					std::vector<SFInt64> & v = *pv;
+
+					typ = 20;//int8
+					len = 8;
+					fmt = 1;
+
+					val = new char[8];
+					*(SFInt64 *)val = v[i];
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Uint8:
+				{
+					std::vector<SFUint8> * pv = static_cast<std::vector<SFUint8> *>(data_);
+					std::vector<SFUint8> & v = *pv;
+
+					typ = 21;//int2
+					len = 2;
+					fmt = 1;
+
+					val = new char[2];
+					val[0] = v[i];
+					val[1] = 0;
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Uint16:
+				{
+					std::vector<SFUint16> * pv = static_cast<std::vector<SFUint16> *>(data_);
+					std::vector<SFUint16> & v = *pv;
+
+					typ = 23;//int4
+					len = 4;
+					fmt = 1;
+
+					val = new char[4];
+					*(SFInt32 *)val = (SFInt32)(SFUint32)v[i];
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Uint32:
+				{
+					std::vector<SFUint32> * pv = static_cast<std::vector<SFUint32> *>(data_);
+					std::vector<SFUint32> & v = *pv;
+
+					typ = 20;//int8
+					len = 8;
+					fmt = 1;
+
+					val = new char[8];
+					*(SFInt64 *)val = (SFInt64)(SFUint64)v[i];
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Uint64:
+				{
+					std::vector<SFUint64> * pv = static_cast<std::vector<SFUint64> *>(data_);
+					std::vector<SFUint64> & v = *pv;
+
+					if(v[i] & 0x8000000000000000)
+					{
+						typ = 0;//auto text
+						len = 0;
+						fmt = 0;
+						val = new char[22];
+						sprintf(val, "%%") лонг лонг в строку
+						memmove(val, v[i].data(), len);
+
+					}
+					else
+					{
+						typ = 20;//int8
+						len = 8;
+						fmt = 1;
+
+						val = new char[8];
+						*(SFInt64 *)val = v[i];
+					}
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Date:
+				{
+					std::vector<SFDate> * pv = static_cast<std::vector<SFDate> *>(data_);
+					std::vector<SFDate> & v = *pv;
+
+					typ = 1082;//date
+					len = 4;
+					fmt = 1;
+
+					val = new char[4];
+
+					BOOST_STATIC_ASSERT(sizeof(v[i].julian_day())==4);
+					*(boost::uint32_t *)val = v[i].julian_day();
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Time:
+				{
+					std::vector<SFTime> * pv = static_cast<std::vector<SFTime> *>(data_);
+					std::vector<SFTime> & v = *pv;
+
+					typ = 1083;//time
+					len = 8;
+					fmt = 1;
+
+					val = new char[8];
+
+					BOOST_STATIC_ASSERT(sizeof(double)==8);
+					*(double *)val = 
+						double(v[i].total_seconds()) + 
+						double(v[i].fractional_seconds())/v[i].ticks_per_second();
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Timestamp:
+				{
+					std::vector<SFTimestamp> * pv = static_cast<std::vector<SFTimestamp> *>(data_);
+					std::vector<SFTimestamp> & v = *pv;
+
+					typ = 1114;//timestamp
+					len = 8;
+					fmt = 1;
+
+					val = new char[8];
+
+					BOOST_STATIC_ASSERT(sizeof(double)==8);
+
+					const SFDate &d = v[i].date();
+					const SFTime &t = v[i].time_of_day();
+
+					*(double *)val = 
+						double(d.julian_day()*(24*60*60) + t.total_seconds()) + 
+						double(t.fractional_seconds())/t.ticks_per_second();
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Interval:
+				{
+					std::vector<SFInterval> * pv = static_cast<std::vector<SFInterval> *>(data_);
+					std::vector<SFInterval> & v = *pv;
+
+					typ = 1186;//interval
+					len = 16;
+					fmt = 1;
+
+					val = new char[16];
+
+					const boost::posix_time::ptime::date_duration_type &d = v[i].iDate;
+					const SFTime &t = v[i].iTime;
+
+					boost::uint64_t days = d.days();
+					boost::uint64_t months = days / 30;
+					days -= months*30;
+
+					*(double *)val = 
+						double(days*(24*60*60) + t.total_seconds()) + 
+						double(t.fractional_seconds())/t.ticks_per_second();
+
+					*(boost::uint64_t*)(val+8) = months;
+				}
+				break;
+
+				//////////////////////////////////////////////////////////////////////////
+			case x2_Money:
+				{
+					std::vector<SFMoney> * pv = static_cast<std::vector<SFMoney> *>(data_);
+					std::vector<SFMoney> & v = *pv;
+
+					typ = 790;//money
+					len = 8;
+					fmt = 1;
+
+					val = new char[8];
+
+					*(boost::uint64_t*)(val) = v[i]._value;
+				}
+				break;
 
             default:
                 throw soci_error(
@@ -175,7 +472,8 @@ void postgresql_vector_use_type_backend::pre_use(indicator const * ind)
             }
         }
 
-        buffers_.push_back(buf);
+		assert(!"вместе с val провести еще typ, len, fmt");
+        buffers_.push_back(val);
     }
 
     if (position_ > 0)
@@ -195,34 +493,12 @@ std::size_t postgresql_vector_use_type_backend::size()
     std::size_t sz = 0; // dummy initialization to please the compiler
     switch (type_)
     {
-        // simple cases
-    case x_char:
-        sz = get_vector_size<char>(data_);
-        break;
-    case x_short:
-        sz = get_vector_size<short>(data_);
-        break;
-    case x_integer:
-        sz = get_vector_size<int>(data_);
-        break;
-    case x_unsigned_long:
-        sz = get_vector_size<unsigned long>(data_);
-        break;
-    case x_long_long:
-        sz = get_vector_size<long long>(data_);
-        break;
-    case x_unsigned_long_long:
-        sz = get_vector_size<unsigned long long>(data_);
-        break;
-    case x_double:
-        sz = get_vector_size<double>(data_);
-        break;
-    case x_stdstring:
-        sz = get_vector_size<std::string>(data_);
-        break;
-    case x_stdtm:
-        sz = get_vector_size<std::tm>(data_);
-        break;
+
+
+
+#define RST_ENTRY(i,t,n) case x2_##n: sz = get_vector_size<SF##n>(data_);
+#include "rawSimpleTypes/list.h"
+
     default:
         throw soci_error("Use vector element used with non-supported type.");
     }

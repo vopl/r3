@@ -11,6 +11,8 @@
 #include "soci-config.h"
 #include "error.h"
 
+#include "rawSimpleTypes/types.h"
+
 namespace soci
 {
 
@@ -47,15 +49,16 @@ namespace details
 // data types, as used to describe exchange format
 enum exchange_type
 {
-    x_char, 
-	x_stdstring,
-    x_short, 
-	x_integer,
-    x_unsigned_long, 
-	x_long_long, 
-	x_unsigned_long_long,
-    x_double, 
-	x_stdtm, 
+//     x_char, 
+// 	x_stdstring,
+//     x_short, 
+// 	x_integer,
+//     x_unsigned_long, 
+// 	x_long_long, 
+// 	x_unsigned_long_long,
+//     x_double, 
+// 	x_stdtm, 
+
 	x_statement,
     x_rowid, 
 	x_blob,
