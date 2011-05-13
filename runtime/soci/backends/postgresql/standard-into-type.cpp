@@ -14,6 +14,8 @@
 #include "blob.h"
 #include <libpq/libpq-fs.h> // libpq
 
+#include "post_fetch_helper.hpp"
+
 #ifdef SOCI_POSTGRESQL_NOPARAMS
 #define SOCI_POSTGRESQL_NOBINDBYNAME
 #endif // SOCI_POSTGRESQL_NOPARAMS
@@ -73,104 +75,114 @@ void postgresql_standard_into_type_backend::post_fetch(
             }
         }
 
+		int	fformat = PQfformat(statement_.result_, pos);
+		Oid	ftype = PQftype(statement_.result_, pos);
+		int	fsize = PQfsize(statement_.result_, pos);
+		int	fmod = PQfmod(statement_.result_, pos);
+
         // raw data, in text format
-        char const * buf = PQgetvalue(statement_.result_,
-            statement_.currentRow_, pos);
+        //char const * buf = PQgetvalue(statement_.result_, statement_.currentRow_, pos);
+		char *val = PQgetvalue(statement_.result_, statement_.currentRow_, pos);
+		int	len = PQgetlength(statement_.result_, statement_.currentRow_, pos);
+
 
         switch (type_)
         {
-        case x_char:
-            {
-                char * dest = static_cast<char *>(data_);
-                *dest = *buf;
-            }
-            break;
-        case x_stdstring:
-            {
-                std::string * dest = static_cast<std::string *>(data_);
-                dest->assign(buf);
-            }
-            break;
-        case x_short:
-            {
-                short * dest = static_cast<short *>(data_);
-                *dest = string_to_integer<short>(buf);
-            }
-            break;
-        case x_integer:
-            {
-                int * dest = static_cast<int *>(data_);
-                *dest = string_to_integer<int>(buf);
-            }
-            break;
-        case x_unsigned_long:
-            {
-                unsigned long * dest = static_cast<unsigned long *>(data_);
-                *dest = string_to_unsigned_integer<unsigned long>(buf);
-            }
-            break;
-        case x_long_long:
-            {
-                long long * dest = static_cast<long long *>(data_);
-                *dest = string_to_integer<long long>(buf);
-            }
-            break;
-        case x_unsigned_long_long:
-            {
-                unsigned long long * dest = static_cast<unsigned long long *>(data_);
-                *dest = string_to_unsigned_integer<unsigned long long>(buf);
-            }
-            break;
-        case x_double:
-            {
-                double * dest = static_cast<double *>(data_);
-                *dest = string_to_double(buf);
-            }
-            break;
-        case x_stdtm:
-            {
-                // attempt to parse the string and convert to std::tm
-                std::tm * dest = static_cast<std::tm *>(data_);
-                parse_std_tm(buf, *dest);
-            }
-            break;
-        case x_rowid:
-            {
-                // RowID is internally identical to unsigned long
+#define RST_ENTRY(i,t,n) case x2_##n: fromDb2Internal(*static_cast<SF##n *>(data_), fformat, ftype, fsize, fmod, val, len); break;
+#include "rawSimpleTypes/list.h"
 
-                rowid * rid = static_cast<rowid *>(data_);
-                postgresql_rowid_backend * rbe
-                    = static_cast<postgresql_rowid_backend *>(
-                        rid->get_backend());
-
-                rbe->value_ = string_to_unsigned_integer<unsigned long>(buf);
-            }
-            break;
-        case x_blob:
-            {
-                unsigned long oid =
-                    string_to_unsigned_integer<unsigned long>(buf);
-
-                int fd = lo_open(statement_.session_.conn_, oid,
-                    INV_READ | INV_WRITE);
-                if (fd == -1)
-                {
-                    throw soci_error("Cannot open the blob object.");
-                }
-
-                blob * b = static_cast<blob *>(data_);
-                postgresql_blob_backend * bbe
-                     = static_cast<postgresql_blob_backend *>(b->get_backend());
-
-                if (bbe->fd_ != -1)
-                {
-                    lo_close(statement_.session_.conn_, bbe->fd_);
-                }
-
-                bbe->fd_ = fd;
-                bbe->oid_ = oid;
-            }
-            break;
+//         case x_char:
+//             {
+//                 char * dest = static_cast<char *>(data_);
+//                 *dest = *buf;
+//             }
+//             break;
+//         case x_stdstring:
+//             {
+//                 std::string * dest = static_cast<std::string *>(data_);
+//                 dest->assign(buf);
+//             }
+//             break;
+//         case x_short:
+//             {
+//                 short * dest = static_cast<short *>(data_);
+//                 *dest = string_to_integer<short>(buf);
+//             }
+//             break;
+//         case x_integer:
+//             {
+//                 int * dest = static_cast<int *>(data_);
+//                 *dest = string_to_integer<int>(buf);
+//             }
+//             break;
+//         case x_unsigned_long:
+//             {
+//                 unsigned long * dest = static_cast<unsigned long *>(data_);
+//                 *dest = string_to_unsigned_integer<unsigned long>(buf);
+//             }
+//             break;
+//         case x_long_long:
+//             {
+//                 long long * dest = static_cast<long long *>(data_);
+//                 *dest = string_to_integer<long long>(buf);
+//             }
+//             break;
+//         case x_unsigned_long_long:
+//             {
+//                 unsigned long long * dest = static_cast<unsigned long long *>(data_);
+//                 *dest = string_to_unsigned_integer<unsigned long long>(buf);
+//             }
+//             break;
+//         case x_double:
+//             {
+//                 double * dest = static_cast<double *>(data_);
+//                 *dest = string_to_double(buf);
+//             }
+//             break;
+//         case x_stdtm:
+//             {
+//                 // attempt to parse the string and convert to std::tm
+//                 std::tm * dest = static_cast<std::tm *>(data_);
+//                 parse_std_tm(buf, *dest);
+//             }
+//             break;
+//         case x_rowid:
+//             {
+//                 // RowID is internally identical to unsigned long
+// 
+//                 rowid * rid = static_cast<rowid *>(data_);
+//                 postgresql_rowid_backend * rbe
+//                     = static_cast<postgresql_rowid_backend *>(
+//                         rid->get_backend());
+// 
+//                 rbe->value_ = string_to_unsigned_integer<unsigned long>(buf);
+//             }
+//             break;
+//         case x_blob:
+//             {
+//                 unsigned long oid =
+//                     string_to_unsigned_integer<unsigned long>(buf);
+// 
+//                 int fd = lo_open(statement_.session_.conn_, oid,
+//                     INV_READ | INV_WRITE);
+//                 if (fd == -1)
+//                 {
+//                     throw soci_error("Cannot open the blob object.");
+//                 }
+// 
+//                 blob * b = static_cast<blob *>(data_);
+//                 postgresql_blob_backend * bbe
+//                      = static_cast<postgresql_blob_backend *>(b->get_backend());
+// 
+//                 if (bbe->fd_ != -1)
+//                 {
+//                     lo_close(statement_.session_.conn_, bbe->fd_);
+//                 }
+// 
+//                 bbe->fd_ = fd;
+//                 bbe->oid_ = oid;
+//             }
+//             break;
 
         default:
             throw soci_error("Into element used with non-supported type.");

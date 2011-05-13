@@ -12,6 +12,8 @@
 #include "common.h"
 #include <libpq/libpq-fs.h> // libpq
 
+#include "post_fetch_helper.hpp"
+
 #ifdef SOCI_POSTGRESQL_NOPARAMS
 #define SOCI_POSTGRESQL_NOBINDBYNAME
 #endif // SOCI_POSTGRESQL_NOPARAMS
@@ -47,125 +49,8 @@ namespace // anonymous
 	//     v[indx] = val;
 	// }
 
-	//////////////////////////////////////////////////////////////////////////
-	template <typename T> void set_invector2_(std::vector<T> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
+	//смотри в post_fetch_helper.hpp
 
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFString> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	template <size_t N> void set_invector2_(std::vector<std::bitset<N> > &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFBytea> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFBool> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFReal32> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFReal64> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFInt8> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFInt16> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFInt32> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFInt64> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFUint8> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFUint16> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFUint32> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFUint64> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFDate> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFTime> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFTimestamp> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFInterval> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> void set_invector2_(std::vector<SFMoney> &data, int indx, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
-	{
-		assert(!"not impl");
-	}
 
 } // namespace anonymous
 
@@ -219,7 +104,7 @@ void postgresql_vector_into_type_backend::post_fetch(bool gotData, indicator * i
 			//тут надо скрестить тип от базы с типом внутренним
             switch (type_)
             {
-#define RST_ENTRY(i,t,n) case x2_##n: set_invector2_(*static_cast<std::vector<SF##n> *>(data_), i, fformat, ftype, fsize, fmod, val, len); break;
+#define RST_ENTRY(i,t,n) case x2_##n: fromDb2Internal(static_cast<std::vector<SF##n> *>(data_)->operator[](i), fformat, ftype, fsize, fmod, val, len); break;
 #include "rawSimpleTypes/list.h"
 
 //             case x_char:
@@ -305,34 +190,36 @@ void postgresql_vector_into_type_backend::resize(std::size_t sz)
 
     switch (type_)
     {
+#define RST_ENTRY(i,t,n) case dt2_##n: resizevector_<SF##n>(data_, sz); break;
+#include "rawSimpleTypes/list.h"
         // simple cases
-    case x_char:
-        resizevector_<char>(data_, sz);
-        break;
-    case x_short:
-        resizevector_<short>(data_, sz);
-        break;
-    case x_integer:
-        resizevector_<int>(data_, sz);
-        break;
-    case x_unsigned_long:
-        resizevector_<unsigned long>(data_, sz);
-        break;
-    case x_long_long:
-        resizevector_<long long>(data_, sz);
-        break;
-    case x_unsigned_long_long:
-        resizevector_<unsigned long long>(data_, sz);
-        break;
-    case x_double:
-        resizevector_<double>(data_, sz);
-        break;
-    case x_stdstring:
-        resizevector_<std::string>(data_, sz);
-        break;
-    case x_stdtm:
-        resizevector_<std::tm>(data_, sz);
-        break;
+//     case x_char:
+//         resizevector_<char>(data_, sz);
+//         break;
+//     case x_short:
+//         resizevector_<short>(data_, sz);
+//         break;
+//     case x_integer:
+//         resizevector_<int>(data_, sz);
+//         break;
+//     case x_unsigned_long:
+//         resizevector_<unsigned long>(data_, sz);
+//         break;
+//     case x_long_long:
+//         resizevector_<long long>(data_, sz);
+//         break;
+//     case x_unsigned_long_long:
+//         resizevector_<unsigned long long>(data_, sz);
+//         break;
+//     case x_double:
+//         resizevector_<double>(data_, sz);
+//         break;
+//     case x_stdstring:
+//         resizevector_<std::string>(data_, sz);
+//         break;
+//     case x_stdtm:
+//         resizevector_<std::tm>(data_, sz);
+//         break;
     default:
         throw soci_error("Into vector element used with non-supported type.");
     }
@@ -343,34 +230,36 @@ std::size_t postgresql_vector_into_type_backend::size()
     std::size_t sz = 0; // dummy initialization to please the compiler
     switch (type_)
     {
+#define RST_ENTRY(i,t,n) case dt2_##n: sz = get_vector_size<SF##n>(data_); break;
+#include "rawSimpleTypes/list.h"
         // simple cases
-    case x_char:
-        sz = get_vector_size<char>(data_);
-        break;
-    case x_short:
-        sz = get_vector_size<short>(data_);
-        break;
-    case x_integer:
-        sz = get_vector_size<int>(data_);
-        break;
-    case x_unsigned_long:
-        sz = get_vector_size<unsigned long>(data_);
-        break;
-    case x_long_long:
-        sz = get_vector_size<long long>(data_);
-        break;
-    case x_unsigned_long_long:
-        sz = get_vector_size<unsigned long long>(data_);
-        break;
-    case x_double:
-        sz = get_vector_size<double>(data_);
-        break;
-    case x_stdstring:
-        sz = get_vector_size<std::string>(data_);
-        break;
-    case x_stdtm:
-        sz = get_vector_size<std::tm>(data_);
-        break;
+//     case x_char:
+//         sz = get_vector_size<char>(data_);
+//         break;
+//     case x_short:
+//         sz = get_vector_size<short>(data_);
+//         break;
+//     case x_integer:
+//         sz = get_vector_size<int>(data_);
+//         break;
+//     case x_unsigned_long:
+//         sz = get_vector_size<unsigned long>(data_);
+//         break;
+//     case x_long_long:
+//         sz = get_vector_size<long long>(data_);
+//         break;
+//     case x_unsigned_long_long:
+//         sz = get_vector_size<unsigned long long>(data_);
+//         break;
+//     case x_double:
+//         sz = get_vector_size<double>(data_);
+//         break;
+//     case x_stdstring:
+//         sz = get_vector_size<std::string>(data_);
+//         break;
+//     case x_stdtm:
+//         sz = get_vector_size<std::tm>(data_);
+//         break;
     default:
         throw soci_error("Into vector element used with non-supported type.");
     }

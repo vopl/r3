@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="soci_postgresql-static"
 	ProjectGUID="{C13D3E85-DC23-4402-AD62-05EB547A15D6}"
 	Keyword="Win32Proj"
@@ -340,6 +340,14 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\post_fetch_helper.hpp"
+			>
+		</File>
+		<File
+			RelativePath=".\pre_use_helper.hpp"
+			>
+		</File>
 		<File
 			RelativePath="..\..\core\StdAfx.cpp"
 			>
