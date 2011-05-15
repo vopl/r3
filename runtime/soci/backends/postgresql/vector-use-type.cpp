@@ -12,7 +12,7 @@
 #include "common.h"
 #include <libpq/libpq-fs.h> // libpq
 
-#include "pre_use_helper.hpp"
+#include "fromInternal2Db.hpp"
 
 #ifdef SOCI_POSTGRESQL_NOPARAMS
 #define SOCI_POSTGRESQL_NOBINDBYNAME
@@ -65,7 +65,16 @@ void postgresql_vector_use_type_backend::pre_use(indicator const * ind)
         else
         {
             // allocate and fill the buffer with text-formatted client data
-			pre_use_switch<true>(type_, data_, typ, len, fmt, val);
+			//pre_use_switch<true>(type_, data_, typ, len, fmt, val);
+			switch (type_)
+			{
+#define RST_ENTRY(i, t, n) case x2_##n: fromInternal2Db(static_cast<std::vector<SF##n> *>(data_)->operator[](i), typ, len, fmt, val); break;
+#include "rawSimpleTypes/list.h"
+
+		default:
+			throw soci_error("Use element used with non-supported type.");
+			};
+
         }
 
 		assert(!"גלוסעו ס val ןנמגוסעט ושו typ, len, fmt");
@@ -92,7 +101,7 @@ std::size_t postgresql_vector_use_type_backend::size()
 
 
 
-#define RST_ENTRY(i,t,n) case x2_##n: sz = get_vector_size<SF##n>(data_);
+#define RST_ENTRY(i,t,n) case x2_##n: sz = get_vector_size<SF##n>(data_); break;
 #include "rawSimpleTypes/list.h"
 
     default:

@@ -14,7 +14,7 @@
 #include <soci-platform.h>
 #include <libpq/libpq-fs.h> // libpq
 
-#include "pre_use_helper.hpp"
+#include "fromInternal2Db.hpp"
 
 #ifdef SOCI_POSTGRESQL_NOPARAMS
 #define SOCI_POSTGRESQL_NOBINDBYNAME
@@ -66,7 +66,16 @@ void postgresql_standard_use_type_backend::pre_use(indicator const * ind)
 		int len; 
 		int fmt; 
 		//char *val;
-		pre_use_switch<false>(type_, data_, typ, len, fmt, buf_);
+		//pre_use_switch<false>(type_, data_, typ, len, fmt, buf_);
+		switch (type_)
+		{
+#define RST_ENTRY(i, t, n) case x2_##n: fromInternal2Db(*static_cast<SF##n *>(data_), typ, len, fmt, buf_); break;
+#include "rawSimpleTypes/list.h"
+
+		default:
+			throw soci_error("Use element used with non-supported type.");
+		};
+
 
 //         // allocate and fill the buffer with text-formatted client data
 //         switch (type_)

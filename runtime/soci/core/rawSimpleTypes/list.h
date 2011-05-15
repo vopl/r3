@@ -35,11 +35,7 @@ RST_ENTRY(64,	boost::uint64_t,				Uint64)
 RST_ENTRY(71,	boost::posix_time::ptime::date_type,			Date)
 RST_ENTRY(72,	boost::posix_time::ptime::time_duration_type,	Time)
 RST_ENTRY(73,	boost::posix_time::ptime,						Timestamp)
-RST_ENTRY(83,	struct
-				{
-					boost::posix_time::ptime::date_duration_type iDate; 
-					boost::posix_time::ptime::time_duration_type iTime;
-				},								Interval)
+RST_ENTRY(83,	rst::Interval,					Interval)
 
 
 RST_ENTRY(91,	rst::Money,						Money)

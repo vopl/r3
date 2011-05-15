@@ -12,7 +12,7 @@
 #include "common.h"
 #include <libpq/libpq-fs.h> // libpq
 
-#include "post_fetch_helper.hpp"
+#include "fromDb2Internal.hpp"
 
 #ifdef SOCI_POSTGRESQL_NOPARAMS
 #define SOCI_POSTGRESQL_NOBINDBYNAME

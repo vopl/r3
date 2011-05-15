@@ -13,7 +13,7 @@ namespace soci
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFString &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFString &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
@@ -25,103 +25,103 @@ namespace soci
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFBytea &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFBytea &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFBool &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFBool &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFReal32 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFReal32 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFReal64 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFReal64 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFInt8 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFInt8 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFInt16 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFInt16 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFInt32 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFInt32 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFInt64 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFInt64 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFUint8 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFUint8 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFUint16 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFUint16 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFUint32 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFUint32 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFUint64 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFUint64 &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFDate &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFDate &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFTime &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFTime &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFTimestamp &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFTimestamp &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFInterval &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFInterval &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> inline void fromDb2Internal(SFMoney &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
+	inline void fromDb2Internal(SFMoney &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
 		assert(!"not impl");
 	}
