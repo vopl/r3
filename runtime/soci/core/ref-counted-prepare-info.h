@@ -43,8 +43,8 @@ private:
 
     session& session_;
 
-    std::vector<into_type_base*> intos_;
-    std::vector<use_type_base*> uses_;
+    SOCI_VECTOR_TYPE<into_type_base*> intos_;
+    SOCI_VECTOR_TYPE<use_type_base*> uses_;
 
     std::string get_query() const;
 };

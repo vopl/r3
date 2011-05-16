@@ -216,11 +216,11 @@ private:
     //TODO To make values generally usable outside of TypeConversionS,
     // these should be reference counted smart pointers
     row * row_;
-    std::vector<details::standard_use_type *> uses_;
+    SOCI_VECTOR_TYPE<details::standard_use_type *> uses_;
     std::map<details::use_type_base *, indicator *> unused_;
-    std::vector<indicator *> indicators_;
+    SOCI_VECTOR_TYPE<indicator *> indicators_;
     std::map<std::string, std::size_t> index_;
-    std::vector<details::copy_base *> deepCopies_;
+    SOCI_VECTOR_TYPE<details::copy_base *> deepCopies_;
 
     mutable std::size_t currentPos_;
 

@@ -13,6 +13,8 @@
 
 #include "rawSimpleTypes/types.h"
 
+#define SOCI_VECTOR_TYPE std::deque
+
 namespace soci
 {
 
@@ -59,12 +61,13 @@ enum exchange_type
 //     x_double, 
 // 	x_stdtm, 
 
-	x_statement,
-    x_rowid, 
-	x_blob,
 
 #define RST_ENTRY(i, t, n) x2_##n = i,
 #include "rawSimpleTypes/list.h"
+
+ 	x_statement,
+ 	x_rowid, 
+ 	x_blob,
 
 };
 

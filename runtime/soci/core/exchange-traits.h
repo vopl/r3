@@ -122,7 +122,7 @@ struct exchange_traits
 // };
 
 template <typename T>
-struct exchange_traits<std::vector<T> >
+struct exchange_traits<SOCI_VECTOR_TYPE<T> >
 {
     typedef typename exchange_traits<T>::type_family type_family;
     enum { x_type = exchange_traits<T>::x_type };

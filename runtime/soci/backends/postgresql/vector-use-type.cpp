@@ -49,18 +49,11 @@ void postgresql_vector_use_type_backend::pre_use(indicator const * ind)
     std::size_t const vsize = size();
     for (size_t i = 0; i != vsize; ++i)
     {
-		Oid		typ=0;		//type oid
-		int		len=0;		//length of data in bytes
-		int		fmt=0;		//text=0 or binary=1
-		char	*val=NULL;	//data
+		SPGTypedValue pgtv = {};
 
         // the data in vector can be either i_ok or i_null
         if (ind != NULL && ind[i] == i_null)
         {
-			typ = 0;
-			len = 0;
-			fmt = 0;
-            val = NULL;
         }
         else
         {
@@ -68,7 +61,7 @@ void postgresql_vector_use_type_backend::pre_use(indicator const * ind)
 			//pre_use_switch<true>(type_, data_, typ, len, fmt, val);
 			switch (type_)
 			{
-#define RST_ENTRY(i, t, n) case x2_##n: fromInternal2Db(static_cast<std::vector<SF##n> *>(data_)->operator[](i), typ, len, fmt, val); break;
+#define RST_ENTRY(i, t, n) case x2_##n: fromInternal2Db(static_cast<SOCI_VECTOR_TYPE<SF##n> *>(data_)->operator[](i), pgtv.typ, pgtv.len, pgtv.fmt, pgtv.val); break;
 #include "rawSimpleTypes/list.h"
 
 		default:
@@ -78,7 +71,7 @@ void postgresql_vector_use_type_backend::pre_use(indicator const * ind)
         }
 
 		assert(!"גלוסעו ס val ןנמגוסעט ושו typ, len, fmt");
-        buffers_.push_back(val);
+        buffers_.push_back(pgtv);
     }
 
     if (position_ > 0)
@@ -116,6 +109,6 @@ void postgresql_vector_use_type_backend::clean_up()
     std::size_t const bsize = buffers_.size();
     for (std::size_t i = 0; i != bsize; ++i)
     {
-        delete [] buffers_[i];
+        delete [] buffers_[i].val;
     }
 }

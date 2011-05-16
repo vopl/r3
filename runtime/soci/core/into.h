@@ -34,7 +34,7 @@ details::into_type_ptr into(T & t, indicator & ind)
 }
 
 template <typename T>
-details::into_type_ptr into(T & t, std::vector<indicator> & ind)
+details::into_type_ptr into(T & t, SOCI_VECTOR_TYPE<indicator> & ind)
 {
     return details::do_into(t, ind,
         typename details::exchange_traits<T>::type_family());

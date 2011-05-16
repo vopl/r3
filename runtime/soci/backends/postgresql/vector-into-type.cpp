@@ -42,10 +42,10 @@ namespace // anonymous
 	// template <typename T>
 	// void set_invector_(void * p, int indx, T const & val)
 	// {
-	//     std::vector<T> * dest =
-	//         static_cast<std::vector<T> *>(p);
+	//     SOCI_VECTOR_TYPE<T> * dest =
+	//         static_cast<SOCI_VECTOR_TYPE<T> *>(p);
 	// 
-	//     std::vector<T> & v = *dest;
+	//     SOCI_VECTOR_TYPE<T> & v = *dest;
 	//     v[indx] = val;
 	// }
 
@@ -104,7 +104,7 @@ void postgresql_vector_into_type_backend::post_fetch(bool gotData, indicator * i
 			//тут надо скрестить тип от базы с типом внутренним
             switch (type_)
             {
-#define RST_ENTRY(i,t,n) case x2_##n: fromDb2Internal(static_cast<std::vector<SF##n> *>(data_)->operator[](i), fformat, ftype, fsize, fmod, val, len); break;
+#define RST_ENTRY(ei,t,n) case x2_##n: fromDb2Internal(static_cast<SOCI_VECTOR_TYPE<SF##n> *>(data_)->operator[](i), fformat, ftype, fsize, fmod, val, len); break;
 #include "rawSimpleTypes/list.h"
 
 //             case x_char:
@@ -178,7 +178,7 @@ namespace // anonymous
 template <typename T>
 void resizevector_(void * p, std::size_t sz)
 {
-    std::vector<T> * v = static_cast<std::vector<T> *>(p);
+    SOCI_VECTOR_TYPE<T> * v = static_cast<SOCI_VECTOR_TYPE<T> *>(p);
     v->resize(sz);
 }
 

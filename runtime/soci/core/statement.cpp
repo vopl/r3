@@ -77,7 +77,7 @@ void statement_impl::bind(values & values)
 
     try
     {
-        for (std::vector<details::standard_use_type*>::iterator it =
+        for (SOCI_VECTOR_TYPE<details::standard_use_type*>::iterator it =
             values.uses_.begin(); it != values.uses_.end(); ++it)
         {
             // only bind those variables which are:

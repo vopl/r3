@@ -127,9 +127,9 @@ private:
 
     std::size_t find_column(std::string const& name) const;
 
-    std::vector<column_properties> columns_;
-    std::vector<details::holder*> holders_;
-    std::vector<indicator*> indicators_;
+    SOCI_VECTOR_TYPE<column_properties> columns_;
+    SOCI_VECTOR_TYPE<details::holder*> holders_;
+    SOCI_VECTOR_TYPE<indicator*> indicators_;
     std::map<std::string, std::size_t> index_;
 
     bool uppercaseColumnNames_;

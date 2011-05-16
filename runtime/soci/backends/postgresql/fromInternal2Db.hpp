@@ -12,7 +12,7 @@ namespace soci
 // 		{
 // 			T &operator()(void *data, size_t vidx)
 // 			{
-// 				std::vector<T> * pv = static_cast<std::vector<T> *>(data);
+// 				SOCI_VECTOR_TYPE<T> * pv = static_cast<SOCI_VECTOR_TYPE<T> *>(data);
 // 				return pv->operator[](vidx);
 // 			}
 // 		};

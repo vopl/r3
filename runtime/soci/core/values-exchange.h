@@ -71,7 +71,7 @@ private:
 
 // this is not supposed to be used - no support for bulk ORM
 template <>
-class use_type<std::vector<values> >
+class use_type<SOCI_VECTOR_TYPE<values> >
 {
 private:
     use_type();
@@ -100,7 +100,7 @@ private:
 
 // this is not supposed to be used - no support for bulk ORM
 template <>
-class into_type<std::vector<values> >
+class into_type<SOCI_VECTOR_TYPE<values> >
 {
 private:
     into_type();

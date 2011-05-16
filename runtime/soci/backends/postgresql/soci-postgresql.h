@@ -34,6 +34,16 @@
 namespace soci
 {
 
+	struct SPGTypedValue
+	{
+		char *val;
+		Oid typ; 
+		int len; 
+		int fmt; 
+
+	};
+
+
 class postgresql_soci_error : public soci_error
 {
 public:
@@ -93,7 +103,7 @@ struct postgresql_vector_into_type_backend : details::vector_into_type_backend
 struct postgresql_standard_use_type_backend : details::standard_use_type_backend
 {
     postgresql_standard_use_type_backend(postgresql_statement_backend & st)
-        : statement_(st), position_(0), buf_(NULL) {}
+        : statement_(st), position_(0) {}
 
     virtual void bind_by_pos(int & position,
         void * data, details::exchange_type type, bool readOnly);
@@ -111,7 +121,7 @@ struct postgresql_standard_use_type_backend : details::standard_use_type_backend
     details::exchange_type type_;
     int position_;
     std::string name_;
-    char * buf_;
+    SPGTypedValue pgtv_;
 };
 
 struct postgresql_vector_use_type_backend : details::vector_use_type_backend
@@ -136,7 +146,7 @@ struct postgresql_vector_use_type_backend : details::vector_use_type_backend
     details::exchange_type type_;
     int position_;
     std::string name_;
-    std::vector<char *> buffers_;
+    std::vector<SPGTypedValue> buffers_;
 };
 
 struct postgresql_session_backend;
@@ -189,10 +199,10 @@ struct postgresql_statement_backend : details::statement_backend
     // the following maps are used for finding data buffers according to
     // use elements specified by the user
 
-    typedef std::map<int, char **> UseByPosBuffersMap;
+    typedef std::map<int, SPGTypedValue *> UseByPosBuffersMap;
     UseByPosBuffersMap useByPosBuffers_;
 
-    typedef std::map<std::string, char **> UseByNameBuffersMap;
+    typedef std::map<std::string, SPGTypedValue *> UseByNameBuffersMap;
     UseByNameBuffersMap useByNameBuffers_;
 };
 

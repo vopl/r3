@@ -148,8 +148,8 @@ struct statement_wrapper
 
     // into elements
     int next_position;
-    std::vector<data_type> into_types; // for both single and bulk
-    std::vector<indicator> into_indicators;
+    SOCI_VECTOR_TYPE<data_type> into_types; // for both single and bulk
+    SOCI_VECTOR_TYPE<indicator> into_indicators;
 
 #define RST_ENTRY(i, t, n) std::map<int, SF##n> into_##n##s;
 #include "rawSimpleTypes/list.h"
@@ -160,15 +160,15 @@ struct statement_wrapper
 //     std::map<int, double> into_doubles;
 //     std::map<int, std::tm> into_dates;
 
-    std::vector<std::vector<indicator> > into_indicators_v;
+    SOCI_VECTOR_TYPE<SOCI_VECTOR_TYPE<indicator> > into_indicators_v;
 
-#define RST_ENTRY(i, t, n) std::map<int, std::vector<SF##n> > into_##n##s_v;
+#define RST_ENTRY(i, t, n) std::map<int, SOCI_VECTOR_TYPE<SF##n> > into_##n##s_v;
 #include "rawSimpleTypes/list.h"
-//     std::map<int, std::vector<std::string> > into_strings_v;
-//     std::map<int, std::vector<int> > into_ints_v;
-//     std::map<int, std::vector<long long> > into_longlongs_v;
-//     std::map<int, std::vector<double> > into_doubles_v;
-//     std::map<int, std::vector<std::tm> > into_dates_v;
+//     std::map<int, SOCI_VECTOR_TYPE<std::string> > into_strings_v;
+//     std::map<int, SOCI_VECTOR_TYPE<int> > into_ints_v;
+//     std::map<int, SOCI_VECTOR_TYPE<long long> > into_longlongs_v;
+//     std::map<int, SOCI_VECTOR_TYPE<double> > into_doubles_v;
+//     std::map<int, SOCI_VECTOR_TYPE<std::tm> > into_dates_v;
 
     // use elements
     std::map<std::string, indicator> use_indicators;
@@ -182,15 +182,15 @@ struct statement_wrapper
 //     std::map<std::string, double> use_doubles;
 //     std::map<std::string, std::tm> use_dates;
 
-    std::map<std::string, std::vector<indicator> > use_indicators_v;
+    std::map<std::string, SOCI_VECTOR_TYPE<indicator> > use_indicators_v;
 
-#define RST_ENTRY(i, t, n) std::map<std::string, std::vector<SF##n> > use_##n##s_v;
+#define RST_ENTRY(i, t, n) std::map<std::string, SOCI_VECTOR_TYPE<SF##n> > use_##n##s_v;
 #include "rawSimpleTypes/list.h"
-// 	std::map<std::string, std::vector<std::string> > use_strings_v;
-//     std::map<std::string, std::vector<int> > use_ints_v;
-//     std::map<std::string, std::vector<long long> > use_longlongs_v;
-//     std::map<std::string, std::vector<double> > use_doubles_v;
-//     std::map<std::string, std::vector<std::tm> > use_dates_v;
+// 	std::map<std::string, SOCI_VECTOR_TYPE<std::string> > use_strings_v;
+//     std::map<std::string, SOCI_VECTOR_TYPE<int> > use_ints_v;
+//     std::map<std::string, SOCI_VECTOR_TYPE<long long> > use_longlongs_v;
+//     std::map<std::string, SOCI_VECTOR_TYPE<double> > use_doubles_v;
+//     std::map<std::string, SOCI_VECTOR_TYPE<std::tm> > use_dates_v;
 
     // format is: "YYYY MM DD hh mm ss"
     char date_formatted[20];
@@ -305,7 +305,7 @@ bool not_null_check_failed(statement_wrapper & wrapper, int position, int index)
 
 // helper for checking the index value
 template <typename T>
-bool index_check_failed(std::vector<T> const & v,
+bool index_check_failed(SOCI_VECTOR_TYPE<T> const & v,
     statement_wrapper & wrapper, int index)
 {
     if (index < 0 || index >= static_cast<int>(v.size()))
@@ -337,7 +337,7 @@ bool name_unique_check_failed(statement_wrapper & wrapper,
         typedef std::map
             <
                 std::string,
-                std::vector<indicator>
+                SOCI_VECTOR_TYPE<indicator>
             >::const_iterator iterator;
 
         iterator const it = wrapper.use_indicators_v.find(name);
@@ -432,7 +432,7 @@ bool name_exists_check_failed(statement_wrapper & wrapper,
 #define RST_ENTRY(i, t, n) \
 		case dt2_##n: \
 		{ \
-		typedef std::map<std::string, std::vector<SF##n> >::const_iterator iterator; \
+		typedef std::map<std::string, SOCI_VECTOR_TYPE<SF##n> >::const_iterator iterator; \
 			iterator const it = wrapper.use_##n##s_v.find(name); \
 			name_exists = (it != wrapper.use_##n##s_v.end()); \
 		} //\
@@ -444,7 +444,7 @@ bool name_exists_check_failed(statement_wrapper & wrapper,
 //                 typedef std::map
 //                     <
 //                         std::string,
-//                         std::vector<std::string>
+//                         SOCI_VECTOR_TYPE<std::string>
 //                     >::const_iterator iterator;
 //                 iterator const it = wrapper.use_strings_v.find(name);
 //                 name_exists = (it != wrapper.use_strings_v.end());
@@ -455,7 +455,7 @@ bool name_exists_check_failed(statement_wrapper & wrapper,
 //                 typedef std::map
 //                     <
 //                         std::string,
-//                         std::vector<int>
+//                         SOCI_VECTOR_TYPE<int>
 //                     >::const_iterator iterator;
 //                 iterator const it = wrapper.use_ints_v.find(name);
 //                 name_exists = (it != wrapper.use_ints_v.end());
@@ -466,7 +466,7 @@ bool name_exists_check_failed(statement_wrapper & wrapper,
 //                 typedef std::map
 //                     <
 //                         std::string,
-//                         std::vector<long long>
+//                         SOCI_VECTOR_TYPE<long long>
 //                     >::const_iterator iterator;
 //                 iterator const it = wrapper.use_longlongs_v.find(name);
 //                 name_exists = (it != wrapper.use_longlongs_v.end());
@@ -475,7 +475,7 @@ bool name_exists_check_failed(statement_wrapper & wrapper,
 //         case dt_double:
 //             {
 //                 typedef std::map<std::string,
-//                     std::vector<double> >::const_iterator iterator;
+//                     SOCI_VECTOR_TYPE<double> >::const_iterator iterator;
 //                 iterator const it = wrapper.use_doubles_v.find(name);
 //                 name_exists = (it != wrapper.use_doubles_v.end());
 //             }
@@ -483,7 +483,7 @@ bool name_exists_check_failed(statement_wrapper & wrapper,
 //         case dt_date:
 //             {
 //                 typedef std::map<std::string,
-//                         std::vector<std::tm> >::const_iterator iterator;
+//                         SOCI_VECTOR_TYPE<std::tm> >::const_iterator iterator;
 //                 iterator const it = wrapper.use_dates_v.find(name);
 //                 name_exists = (it != wrapper.use_dates_v.end());
 //             }
@@ -510,14 +510,14 @@ bool name_exists_check_failed(statement_wrapper & wrapper,
 
 // helper function for resizing all vectors<T> in the map
 template <typename T>
-void resize_in_map(std::map<std::string, std::vector<T> > & m, int new_size)
+void resize_in_map(std::map<std::string, SOCI_VECTOR_TYPE<T> > & m, int new_size)
 {
-    typedef typename std::map<std::string, std::vector<T> >::iterator iterator;
+    typedef typename std::map<std::string, SOCI_VECTOR_TYPE<T> >::iterator iterator;
     iterator it = m.begin();
     iterator const end = m.end();
     for ( ; it != end; ++it)
     {
-        std::vector<T> & v = it->second;
+        SOCI_VECTOR_TYPE<T> & v = it->second;
         v.resize(new_size);
     }
 }
@@ -705,7 +705,7 @@ SOCI_DECL void soci_destroy_statement(statement_handle st)
 //     wrapper->into_kind = statement_wrapper::bulk;
 // 
 //     wrapper->into_types.push_back(dt_string);
-//     wrapper->into_indicators_v.push_back(std::vector<indicator>());
+//     wrapper->into_indicators_v.push_back(SOCI_VECTOR_TYPE<indicator>());
 //     wrapper->into_strings_v[wrapper->next_position];
 //     return wrapper->next_position++;
 // }
@@ -723,7 +723,7 @@ SOCI_DECL void soci_destroy_statement(statement_handle st)
 //     wrapper->into_kind = statement_wrapper::bulk;
 // 
 //     wrapper->into_types.push_back(dt_integer);
-//     wrapper->into_indicators_v.push_back(std::vector<indicator>());
+//     wrapper->into_indicators_v.push_back(SOCI_VECTOR_TYPE<indicator>());
 //     wrapper->into_ints_v[wrapper->next_position];
 //     return wrapper->next_position++;
 // }
@@ -741,7 +741,7 @@ SOCI_DECL void soci_destroy_statement(statement_handle st)
 //     wrapper->into_kind = statement_wrapper::bulk;
 // 
 //     wrapper->into_types.push_back(dt_long_long);
-//     wrapper->into_indicators_v.push_back(std::vector<indicator>());
+//     wrapper->into_indicators_v.push_back(SOCI_VECTOR_TYPE<indicator>());
 //     wrapper->into_longlongs_v[wrapper->next_position];
 //     return wrapper->next_position++;
 // }
@@ -759,7 +759,7 @@ SOCI_DECL void soci_destroy_statement(statement_handle st)
 //     wrapper->into_kind = statement_wrapper::bulk;
 // 
 //     wrapper->into_types.push_back(dt_double);
-//     wrapper->into_indicators_v.push_back(std::vector<indicator>());
+//     wrapper->into_indicators_v.push_back(SOCI_VECTOR_TYPE<indicator>());
 //     wrapper->into_doubles_v[wrapper->next_position];
 //     return wrapper->next_position++;
 // }
@@ -777,7 +777,7 @@ SOCI_DECL void soci_destroy_statement(statement_handle st)
 //     wrapper->into_kind = statement_wrapper::bulk;
 // 
 //     wrapper->into_types.push_back(dt_date);
-//     wrapper->into_indicators_v.push_back(std::vector<indicator>());
+//     wrapper->into_indicators_v.push_back(SOCI_VECTOR_TYPE<indicator>());
 //     wrapper->into_dates_v[wrapper->next_position];
 //     return wrapper->next_position++;
 // }
@@ -968,7 +968,7 @@ SOCI_DECL int soci_get_into_state(statement_handle st, int position)
 //         return 0;
 //     }
 // 
-//     std::vector<indicator> const & v = wrapper->into_indicators_v[position];
+//     SOCI_VECTOR_TYPE<indicator> const & v = wrapper->into_indicators_v[position];
 //     if (index_check_failed(v, *wrapper, index))
 //     {
 //         return 0;
@@ -998,7 +998,7 @@ SOCI_DECL int soci_get_into_state(statement_handle st, int position)
 //         return "";
 //     }
 // 
-//     std::vector<std::string> const & v = wrapper->into_strings_v[position];
+//     SOCI_VECTOR_TYPE<std::string> const & v = wrapper->into_strings_v[position];
 //     if (index_check_failed(v, *wrapper, index) ||
 //         not_null_check_failed(*wrapper, position, index))
 //     {
@@ -1018,7 +1018,7 @@ SOCI_DECL int soci_get_into_state(statement_handle st, int position)
 //         return 0;
 //     }
 // 
-//     std::vector<int> const & v = wrapper->into_ints_v[position];
+//     SOCI_VECTOR_TYPE<int> const & v = wrapper->into_ints_v[position];
 //     if (index_check_failed(v, *wrapper, index) ||
 //         not_null_check_failed(*wrapper, position, index))
 //     {
@@ -1038,7 +1038,7 @@ SOCI_DECL int soci_get_into_state(statement_handle st, int position)
 //         return 0;
 //     }
 // 
-//     std::vector<long long> const & v = wrapper->into_longlongs_v[position];
+//     SOCI_VECTOR_TYPE<long long> const & v = wrapper->into_longlongs_v[position];
 //     if (index_check_failed(v, *wrapper, index) ||
 //         not_null_check_failed(*wrapper, position, index))
 //     {
@@ -1058,7 +1058,7 @@ SOCI_DECL int soci_get_into_state(statement_handle st, int position)
 //         return 0.0;
 //     }
 // 
-//     std::vector<double> const & v = wrapper->into_doubles_v[position];
+//     SOCI_VECTOR_TYPE<double> const & v = wrapper->into_doubles_v[position];
 //     if (index_check_failed(v, *wrapper, index) ||
 //         not_null_check_failed(*wrapper, position, index))
 //     {
@@ -1078,7 +1078,7 @@ SOCI_DECL int soci_get_into_state(statement_handle st, int position)
 //         return "";
 //     }
 // 
-//     std::vector<std::tm> const & v = wrapper->into_dates_v[position];
+//     SOCI_VECTOR_TYPE<std::tm> const & v = wrapper->into_dates_v[position];
 //     if (index_check_failed(v, *wrapper, index) ||
 //         not_null_check_failed(*wrapper, position, index))
 //     {
@@ -1393,7 +1393,7 @@ SOCI_DECL void soci_set_use_state(statement_handle st, char const * name, int st
 //     }
 // 
 //     typedef std::map<std::string,
-//         std::vector<indicator> >::const_iterator iterator;
+//         SOCI_VECTOR_TYPE<indicator> >::const_iterator iterator;
 //     iterator const any_element = wrapper->use_indicators_v.begin();
 //     assert(any_element != wrapper->use_indicators_v.end());
 // 
@@ -1433,7 +1433,7 @@ SOCI_DECL void soci_set_use_state(statement_handle st, char const * name, int st
 // {
 //     statement_wrapper * wrapper = static_cast<statement_wrapper *>(st);
 // 
-//     typedef std::map<std::string, std::vector<indicator> >::iterator iterator;
+//     typedef std::map<std::string, SOCI_VECTOR_TYPE<indicator> >::iterator iterator;
 //     iterator const it = wrapper->use_indicators_v.find(name);
 //     if (it == wrapper->use_indicators_v.end())
 //     {
@@ -1442,7 +1442,7 @@ SOCI_DECL void soci_set_use_state(statement_handle st, char const * name, int st
 //         return;
 //     }
 // 
-//     std::vector<indicator> & v = it->second;
+//     SOCI_VECTOR_TYPE<indicator> & v = it->second;
 //     if (index_check_failed(v, *wrapper, index))
 //     {
 //         return;
@@ -1470,7 +1470,7 @@ SOCI_DECL void soci_set_use_state(statement_handle st, char const * name, int st
 //         return;
 //     }
 // 
-//     std::vector<std::string> & v = wrapper->use_strings_v[name];
+//     SOCI_VECTOR_TYPE<std::string> & v = wrapper->use_strings_v[name];
 //     if (index_check_failed(v, *wrapper, index))
 //     {
 //         return;
@@ -1491,7 +1491,7 @@ SOCI_DECL void soci_set_use_state(statement_handle st, char const * name, int st
 //         return;
 //     }
 // 
-//     std::vector<int> & v = wrapper->use_ints_v[name];
+//     SOCI_VECTOR_TYPE<int> & v = wrapper->use_ints_v[name];
 //     if (index_check_failed(v, *wrapper, index))
 //     {
 //         return;
@@ -1512,7 +1512,7 @@ SOCI_DECL void soci_set_use_state(statement_handle st, char const * name, int st
 //         return;
 //     }
 // 
-//     std::vector<long long> & v = wrapper->use_longlongs_v[name];
+//     SOCI_VECTOR_TYPE<long long> & v = wrapper->use_longlongs_v[name];
 //     if (index_check_failed(v, *wrapper, index))
 //     {
 //         return;
@@ -1533,7 +1533,7 @@ SOCI_DECL void soci_set_use_state(statement_handle st, char const * name, int st
 //         return;
 //     }
 // 
-//     std::vector<double> & v = wrapper->use_doubles_v[name];
+//     SOCI_VECTOR_TYPE<double> & v = wrapper->use_doubles_v[name];
 //     if (index_check_failed(v, *wrapper, index))
 //     {
 //         return;
@@ -1554,7 +1554,7 @@ SOCI_DECL void soci_set_use_state(statement_handle st, char const * name, int st
 //         return;
 //     }
 // 
-//     std::vector<std::tm> & v = wrapper->use_dates_v[name];
+//     SOCI_VECTOR_TYPE<std::tm> & v = wrapper->use_dates_v[name];
 //     if (index_check_failed(v, *wrapper, index))
 //     {
 //         return;
@@ -1876,14 +1876,14 @@ SOCI_DECL void soci_prepare(statement_handle st, char const * query)
 //         {
 //             // strings
 //             typedef std::map<std::string,
-//                 std::vector<std::string> >::iterator iterator;
+//                 SOCI_VECTOR_TYPE<std::string> >::iterator iterator;
 //             iterator uit = wrapper->use_strings_v.begin();
 //             iterator const uend = wrapper->use_strings_v.end();
 //             for ( ; uit != uend; ++uit)
 //             {
 //                 std::string const & use_name = uit->first;
-//                 std::vector<std::string> & use_string = uit->second;
-//                 std::vector<indicator> & use_ind =
+//                 SOCI_VECTOR_TYPE<std::string> & use_string = uit->second;
+//                 SOCI_VECTOR_TYPE<indicator> & use_ind =
 //                     wrapper->use_indicators_v[use_name];
 //                 wrapper->st.exchange(use(use_string, use_ind, use_name));
 //             }
@@ -1891,14 +1891,14 @@ SOCI_DECL void soci_prepare(statement_handle st, char const * query)
 //         {
 //             // ints
 //             typedef std::map<std::string,
-//                 std::vector<int> >::iterator iterator;
+//                 SOCI_VECTOR_TYPE<int> >::iterator iterator;
 //             iterator uit = wrapper->use_ints_v.begin();
 //             iterator const uend = wrapper->use_ints_v.end();
 //             for ( ; uit != uend; ++uit)
 //             {
 //                 std::string const & use_name = uit->first;
-//                 std::vector<int> & use_int = uit->second;
-//                 std::vector<indicator> & use_ind =
+//                 SOCI_VECTOR_TYPE<int> & use_int = uit->second;
+//                 SOCI_VECTOR_TYPE<indicator> & use_ind =
 //                     wrapper->use_indicators_v[use_name];
 //                 wrapper->st.exchange(use(use_int, use_ind, use_name));
 //             }
@@ -1906,14 +1906,14 @@ SOCI_DECL void soci_prepare(statement_handle st, char const * query)
 //         {
 //             // longlongs
 //             typedef std::map<std::string,
-//                 std::vector<long long> >::iterator iterator;
+//                 SOCI_VECTOR_TYPE<long long> >::iterator iterator;
 //             iterator uit = wrapper->use_longlongs_v.begin();
 //             iterator const uend = wrapper->use_longlongs_v.end();
 //             for ( ; uit != uend; ++uit)
 //             {
 //                 std::string const & use_name = uit->first;
-//                 std::vector<long long> & use_longlong = uit->second;
-//                 std::vector<indicator> & use_ind =
+//                 SOCI_VECTOR_TYPE<long long> & use_longlong = uit->second;
+//                 SOCI_VECTOR_TYPE<indicator> & use_ind =
 //                     wrapper->use_indicators_v[use_name];
 //                 wrapper->st.exchange(use(use_longlong, use_ind, use_name));
 //             }
@@ -1921,14 +1921,14 @@ SOCI_DECL void soci_prepare(statement_handle st, char const * query)
 //         {
 //             // doubles
 //             typedef std::map<std::string,
-//                 std::vector<double> >::iterator iterator;
+//                 SOCI_VECTOR_TYPE<double> >::iterator iterator;
 //             iterator uit = wrapper->use_doubles_v.begin();
 //             iterator const uend = wrapper->use_doubles_v.end();
 //             for ( ; uit != uend; ++uit)
 //             {
 //                 std::string const & use_name = uit->first;
-//                 std::vector<double> & use_double = uit->second;
-//                 std::vector<indicator> & use_ind =
+//                 SOCI_VECTOR_TYPE<double> & use_double = uit->second;
+//                 SOCI_VECTOR_TYPE<indicator> & use_ind =
 //                     wrapper->use_indicators_v[use_name];
 //                 wrapper->st.exchange(use(use_double, use_ind, use_name));
 //             }
@@ -1936,14 +1936,14 @@ SOCI_DECL void soci_prepare(statement_handle st, char const * query)
 //         {
 //             // dates
 //             typedef std::map<std::string,
-//                 std::vector<std::tm> >::iterator iterator;
+//                 SOCI_VECTOR_TYPE<std::tm> >::iterator iterator;
 //             iterator uit = wrapper->use_dates_v.begin();
 //             iterator const uend = wrapper->use_dates_v.end();
 //             for ( ; uit != uend; ++uit)
 //             {
 //                 std::string const & use_name = uit->first;
-//                 std::vector<std::tm> & use_date = uit->second;
-//                 std::vector<indicator> & use_ind =
+//                 SOCI_VECTOR_TYPE<std::tm> & use_date = uit->second;
+//                 SOCI_VECTOR_TYPE<indicator> & use_ind =
 //                     wrapper->use_indicators_v[use_name];
 //                 wrapper->st.exchange(use(use_date, use_ind, use_name));
 //             }

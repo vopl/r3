@@ -62,149 +62,27 @@ void postgresql_standard_use_type_backend::pre_use(indicator const * ind)
 			вынести свич в отдельную функцю, параметризовать на вектор с индексом или сырое значение
 		*/
 
-		Oid typ; 
-		int len; 
-		int fmt; 
 		//char *val;
 		//pre_use_switch<false>(type_, data_, typ, len, fmt, buf_);
 		switch (type_)
 		{
-#define RST_ENTRY(i, t, n) case x2_##n: fromInternal2Db(*static_cast<SF##n *>(data_), typ, len, fmt, buf_); break;
+#define RST_ENTRY(i, t, n) case x2_##n: fromInternal2Db(*static_cast<SF##n *>(data_), pgtv_.typ, pgtv_.len, pgtv_.fmt, pgtv_.val); break;
 #include "rawSimpleTypes/list.h"
 
 		default:
 			throw soci_error("Use element used with non-supported type.");
 		};
-
-
-//         // allocate and fill the buffer with text-formatted client data
-//         switch (type_)
-//         {
-//         case x_char:
-//             {
-//                 buf_ = new char[2];
-//                 buf_[0] = *static_cast<char *>(data_);
-//                 buf_[1] = '\0';
-//             }
-//             break;
-//         case x_stdstring:
-//             {
-//                 std::string * s = static_cast<std::string *>(data_);
-//                 buf_ = new char[s->size() + 1];
-//                 std::strcpy(buf_, s->c_str());
-//             }
-//             break;
-//         case x_short:
-//             {
-//                 std::size_t const bufSize
-//                     = std::numeric_limits<short>::digits10 + 3;
-//                 buf_ = new char[bufSize];
-//                 snprintf(buf_, bufSize, "%d",
-//                     static_cast<int>(*static_cast<short *>(data_)));
-//             }
-//             break;
-//         case x_integer:
-//             {
-//                 std::size_t const bufSize
-//                     = std::numeric_limits<int>::digits10 + 3;
-//                 buf_ = new char[bufSize];
-//                 snprintf(buf_, bufSize, "%d",
-//                     *static_cast<int *>(data_));
-//             }
-//             break;
-//         case x_unsigned_long:
-//             {
-//                 std::size_t const bufSize
-//                     = std::numeric_limits<unsigned long>::digits10 + 2;
-//                 buf_ = new char[bufSize];
-//                 snprintf(buf_, bufSize, "%lu",
-//                     *static_cast<unsigned long *>(data_));
-//             }
-//             break;
-//         case x_long_long:
-//             {
-//                 std::size_t const bufSize
-//                     = std::numeric_limits<long long>::digits10 + 3;
-//                 buf_ = new char[bufSize];
-//                 snprintf(buf_, bufSize, "%lld",
-//                     *static_cast<long long *>(data_));
-//             }
-//             break;
-//         case x_unsigned_long_long:
-//             {
-//                 std::size_t const bufSize
-//                     = std::numeric_limits<unsigned long long>::digits10 + 2;
-//                 buf_ = new char[bufSize];
-//                 snprintf(buf_, bufSize, "%llu",
-//                     *static_cast<unsigned long long *>(data_));
-//             }
-//             break;
-//         case x_double:
-//             {
-//                 // no need to overengineer it (KISS)...
-// 
-//                 std::size_t const bufSize = 100;
-//                 buf_ = new char[bufSize];
-// 
-//                 snprintf(buf_, bufSize, "%.20g",
-//                     *static_cast<double *>(data_));
-//             }
-//             break;
-//         case x_stdtm:
-//             {
-//                 std::size_t const bufSize = 20;
-//                 buf_ = new char[bufSize];
-// 
-//                 std::tm * t = static_cast<std::tm *>(data_);
-//                 snprintf(buf_, bufSize, "%d-%02d-%02d %02d:%02d:%02d",
-//                     t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-//                     t->tm_hour, t->tm_min, t->tm_sec);
-//             }
-//             break;
-//         case x_rowid:
-//             {
-//                 // RowID is internally identical to unsigned long
-// 
-//                 rowid * rid = static_cast<rowid *>(data_);
-//                 postgresql_rowid_backend * rbe
-//                     = static_cast<postgresql_rowid_backend *>(
-//                         rid->get_backend());
-// 
-//                 std::size_t const bufSize
-//                     = std::numeric_limits<unsigned long>::digits10 + 2;
-//                 buf_ = new char[bufSize];
-// 
-//                 snprintf(buf_, bufSize, "%lu", rbe->value_);
-//             }
-//             break;
-//         case x_blob:
-//             {
-//                 blob * b = static_cast<blob *>(data_);
-//                 postgresql_blob_backend * bbe =
-//                     static_cast<postgresql_blob_backend *>(b->get_backend());
-// 
-//                 std::size_t const bufSize
-//                     = std::numeric_limits<unsigned long>::digits10 + 2;
-//                 buf_ = new char[bufSize];
-//                 snprintf(buf_, bufSize, "%lu", bbe->oid_);
-//             }
-//             break;
-// 
-//         default:
-//             throw soci_error("Use element used with non-supported type.");
-//         }
     }
 
-	assert(!"вместе с буфом просунуть тип длину формат");
     if (position_ > 0)
     {
         // binding by position
-        statement_.useByPosBuffers_[position_] = &buf_;
+        statement_.useByPosBuffers_[position_] = &pgtv_;
     }
     else
     {
         // binding by name
-        statement_.useByNameBuffers_[name_] = &buf_;
+        statement_.useByNameBuffers_[name_] = &pgtv_;
     }
 }
 
@@ -223,9 +101,9 @@ void postgresql_standard_use_type_backend::post_use(
 
 void postgresql_standard_use_type_backend::clean_up()
 {
-    if (buf_ != NULL)
+    if (pgtv_.val != NULL)
     {
-        delete [] buf_;
-        buf_ = NULL;
+        delete [] pgtv_.val;
+        pgtv_.val = NULL;
     }
 }

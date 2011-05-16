@@ -83,7 +83,7 @@ public:
         : data_(data), type_(type), indVec_(NULL), backEnd_(NULL) {}
 
     vector_into_type(void * data, exchange_type type,
-        std::vector<indicator> & ind)
+        SOCI_VECTOR_TYPE<indicator> & ind)
         : data_(data), type_(type), indVec_(&ind), backEnd_(NULL) {}
 
     ~vector_into_type();
@@ -100,7 +100,7 @@ private:
 
     void * data_;
     exchange_type type_;
-    std::vector<indicator> * indVec_;
+    SOCI_VECTOR_TYPE<indicator> * indVec_;
 
     vector_into_type_backend * backEnd_;
 
@@ -123,13 +123,13 @@ public:
 };
 
 template <typename T>
-class into_type<std::vector<T> > : public vector_into_type
+class into_type<SOCI_VECTOR_TYPE<T> > : public vector_into_type
 {
 public:
-    into_type(std::vector<T> & v)
+    into_type(SOCI_VECTOR_TYPE<T> & v)
         : vector_into_type(&v,
             static_cast<exchange_type>(exchange_traits<T>::x_type)) {}
-    into_type(std::vector<T> & v, std::vector<indicator> & ind)
+    into_type(SOCI_VECTOR_TYPE<T> & v, SOCI_VECTOR_TYPE<indicator> & ind)
         : vector_into_type(&v,
             static_cast<exchange_type>(exchange_traits<T>::x_type), ind) {}
 };
@@ -149,7 +149,7 @@ into_type_ptr do_into(T & t, indicator & ind, basic_type_tag)
 }
 
 template <typename T>
-into_type_ptr do_into(T & t, std::vector<indicator> & ind, basic_type_tag)
+into_type_ptr do_into(T & t, SOCI_VECTOR_TYPE<indicator> & ind, basic_type_tag)
 {
     return into_type_ptr(new into_type<T>(t, ind));
 }

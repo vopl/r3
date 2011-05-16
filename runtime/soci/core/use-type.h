@@ -103,7 +103,7 @@ public:
     {}
 
     vector_use_type(void* data, exchange_type type,
-        std::vector<indicator> const& ind,
+        SOCI_VECTOR_TYPE<indicator> const& ind,
         std::string const& name = std::string())
         : data_(data)
         , type_(type)
@@ -123,7 +123,7 @@ private:
 
     void* data_;
     exchange_type type_;
-    std::vector<indicator> const* ind_;
+    SOCI_VECTOR_TYPE<indicator> const* ind_;
     std::string name_;
 
     vector_use_type_backend * backEnd_;
@@ -160,28 +160,28 @@ public:
 };
 
 template <typename T>
-class use_type<std::vector<T> > : public vector_use_type
+class use_type<SOCI_VECTOR_TYPE<T> > : public vector_use_type
 {
 public:
-    use_type(std::vector<T>& v, std::string const& name = std::string())
+    use_type(SOCI_VECTOR_TYPE<T>& v, std::string const& name = std::string())
         : vector_use_type(&v,
             static_cast<exchange_type>(exchange_traits<T>::x_type), name)
     {}
     
-    use_type(std::vector<T> const& v, std::string const& name = std::string())
-        : vector_use_type(const_cast<std::vector<T>*>(&v),
+    use_type(SOCI_VECTOR_TYPE<T> const& v, std::string const& name = std::string())
+        : vector_use_type(const_cast<SOCI_VECTOR_TYPE<T>*>(&v),
             static_cast<exchange_type>(exchange_traits<T>::x_type), name)
     {}
     
-    use_type(std::vector<T>& v, std::vector<indicator> const& ind,
+    use_type(SOCI_VECTOR_TYPE<T>& v, SOCI_VECTOR_TYPE<indicator> const& ind,
         std::string const& name = std::string())
         : vector_use_type(&v,
             static_cast<exchange_type>(exchange_traits<T>::x_type), ind, name)
     {}
     
-    use_type(std::vector<T> const& v, std::vector<indicator> const& ind,
+    use_type(SOCI_VECTOR_TYPE<T> const& v, SOCI_VECTOR_TYPE<indicator> const& ind,
         std::string const& name = std::string())
-        : vector_use_type(const_cast<std::vector<T> *>(&v),
+        : vector_use_type(const_cast<SOCI_VECTOR_TYPE<T> *>(&v),
             static_cast<exchange_type>(exchange_traits<T>::x_type), ind, name)
     {}
 };
@@ -215,14 +215,14 @@ use_type_ptr do_use(T const & t, indicator & ind,
 }
 
 template <typename T>
-use_type_ptr do_use(T & t, std::vector<indicator> & ind,
+use_type_ptr do_use(T & t, SOCI_VECTOR_TYPE<indicator> & ind,
     std::string const & name, basic_type_tag)
 {
     return use_type_ptr(new use_type<T>(t, ind, name));
 }
 
 template <typename T>
-use_type_ptr do_use(T const & t, std::vector<indicator> & ind,
+use_type_ptr do_use(T const & t, SOCI_VECTOR_TYPE<indicator> & ind,
     std::string const & name, basic_type_tag)
 {
     return use_type_ptr(new use_type<T>(t, ind, name));

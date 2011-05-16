@@ -15,7 +15,14 @@ namespace soci
 	//////////////////////////////////////////////////////////////////////////
 	inline void fromDb2Internal(SFString &data, int fformat, Oid ftype, int fsize, int fmod, const char *val, int len)
 	{
-		assert(!"not impl");
+		switch(ftype)
+		{
+		case 1043:
+			data.assign(val, len);
+			break;
+		default:
+			assert(!"not impl");
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

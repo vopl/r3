@@ -117,7 +117,7 @@ void parse_std_tm(char const * buf, std::tm & t);
 template <typename T>
 std::size_t get_vector_size(void * p)
 {
-    std::vector<T> * v = static_cast<std::vector<T> *>(p);
+    SOCI_VECTOR_TYPE<T> * v = static_cast<SOCI_VECTOR_TYPE<T> *>(p);
     return v->size();
 }
 

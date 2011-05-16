@@ -51,7 +51,7 @@ details::use_type_ptr use(T const & t, indicator & ind,
 }
 
 template <typename T>
-details::use_type_ptr use(T & t, std::vector<indicator> & ind,
+details::use_type_ptr use(T & t, SOCI_VECTOR_TYPE<indicator> & ind,
     std::string const & name = std::string())
 {
     return details::do_use(t, ind, name,
@@ -59,7 +59,7 @@ details::use_type_ptr use(T & t, std::vector<indicator> & ind,
 }
 
 template <typename T>
-details::use_type_ptr use(T const & t, std::vector<indicator> & ind,
+details::use_type_ptr use(T const & t, SOCI_VECTOR_TYPE<indicator> & ind,
     std::string const & name = std::string())
 {
     return details::do_use(t, ind, name,

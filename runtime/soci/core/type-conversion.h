@@ -149,30 +149,30 @@ template <typename T>
 struct base_vector_holder
 {
     base_vector_holder(std::size_t sz = 0) : vec_(sz) {}
-    mutable std::vector<typename type_conversion<T>::base_type> vec_;
+    mutable SOCI_VECTOR_TYPE<typename type_conversion<T>::base_type> vec_;
 };
 
-// Automatically create a std::vector based into_type from a type_conversion
+// Automatically create a SOCI_VECTOR_TYPE based into_type from a type_conversion
 
 template <typename T>
-class conversion_into_type<std::vector<T> >
+class conversion_into_type<SOCI_VECTOR_TYPE<T> >
     : private details::base_vector_holder<T>,
-      public into_type<std::vector<typename type_conversion<T>::base_type> >
+      public into_type<SOCI_VECTOR_TYPE<typename type_conversion<T>::base_type> >
 {
 public:
-    typedef typename std::vector
+    typedef typename SOCI_VECTOR_TYPE
         <
             typename type_conversion<T>::base_type
         > base_type;
 
-    conversion_into_type(std::vector<T> & value)
+    conversion_into_type(SOCI_VECTOR_TYPE<T> & value)
         : details::base_vector_holder<T>(value.size())
         , into_type<base_type>(details::base_vector_holder<T>::vec_, ownInd_)
         , value_(value)
         , ind_(ownInd_)
     {}
 
-    conversion_into_type(std::vector<T> & value, std::vector<indicator> & ind)
+    conversion_into_type(SOCI_VECTOR_TYPE<T> & value, SOCI_VECTOR_TYPE<indicator> & ind)
         : details::base_vector_holder<T>(value.size())
         , into_type<base_type>(details::base_vector_holder<T>::vec_, ind)
         , value_(value)
@@ -208,31 +208,31 @@ private:
         }
     }
 
-    std::vector<T> & value_;
+    SOCI_VECTOR_TYPE<T> & value_;
 
-    std::vector<indicator> ownInd_;
+    SOCI_VECTOR_TYPE<indicator> ownInd_;
 
     // ind_ refers to either ownInd_, or the one provided by the user
     // in any case, ind_ refers to some valid vector of indicators
     // and can be used by conversion routines
-    std::vector<indicator> & ind_;
+    SOCI_VECTOR_TYPE<indicator> & ind_;
 };
 
 
-// Automatically create a std::vector based use_type from a type_conversion
+// Automatically create a SOCI_VECTOR_TYPE based use_type from a type_conversion
 
 template <typename T>
-class conversion_use_type<std::vector<T> >
+class conversion_use_type<SOCI_VECTOR_TYPE<T> >
      : private details::base_vector_holder<T>,
-       public use_type<std::vector<typename type_conversion<T>::base_type> >
+       public use_type<SOCI_VECTOR_TYPE<typename type_conversion<T>::base_type> >
 {
 public:
-    typedef typename std::vector
+    typedef typename SOCI_VECTOR_TYPE
         <
             typename type_conversion<T>::base_type
         > base_type;
 
-    conversion_use_type(std::vector<T> & value,
+    conversion_use_type(SOCI_VECTOR_TYPE<T> & value,
             std::string const & name=std::string())
         : details::base_vector_holder<T>(value.size())
         , use_type<base_type>(
@@ -241,8 +241,8 @@ public:
         , ind_(ownInd_)
     {}
 
-    conversion_use_type(std::vector<T> & value,
-            std::vector<indicator> & ind,
+    conversion_use_type(SOCI_VECTOR_TYPE<T> & value,
+            SOCI_VECTOR_TYPE<indicator> & ind,
             std::string const & name = std::string())
         : details::base_vector_holder<T>(value.size())
         , use_type<base_type>(
@@ -276,14 +276,14 @@ private:
         }
     }
 
-    std::vector<T> & value_;
+    SOCI_VECTOR_TYPE<T> & value_;
 
-    std::vector<indicator> ownInd_;
+    SOCI_VECTOR_TYPE<indicator> ownInd_;
 
     // ind_ refers to either ownInd_, or the one provided by the user
     // in any case, ind_ refers to some valid vector of indicators
     // and can be used by conversion routines
-    std::vector<indicator> & ind_;
+    SOCI_VECTOR_TYPE<indicator> & ind_;
 };
 
 template <typename T>

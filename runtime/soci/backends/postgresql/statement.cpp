@@ -219,7 +219,10 @@ postgresql_statement_backend::execute(int number)
 
             for (int i = 0; i != numberOfExecutions; ++i)
             {
-                std::vector<char *> paramValues;
+				std::vector<char *>	paramVal;
+				std::vector<Oid>	paramTyp;
+				std::vector<int>	paramLen;
+				std::vector<int>	paramFmt;
 
                 if (useByPosBuffers_.empty() == false)
                 {
@@ -232,8 +235,11 @@ postgresql_statement_backend::execute(int number)
                              end = useByPosBuffers_.end();
                          it != end; ++it)
                     {
-                        char ** buffers = it->second;
-                        paramValues.push_back(buffers[i]);
+						SPGTypedValue *pgtv = it->second;
+						paramVal.push_back(pgtv[i].val);
+						paramTyp.push_back(pgtv[i].typ);
+						paramLen.push_back(pgtv[i].len);
+						paramFmt.push_back(pgtv[i].fmt);
                     }
                 }
                 else
@@ -254,8 +260,11 @@ postgresql_statement_backend::execute(int number)
                             msg += ").";
                             throw soci_error(msg);
                         }
-                        char ** buffers = b->second;
-                        paramValues.push_back(buffers[i]);
+						SPGTypedValue *pgtv = b->second;
+						paramVal.push_back(pgtv[i].val);
+						paramTyp.push_back(pgtv[i].typ);
+						paramLen.push_back(pgtv[i].len);
+						paramFmt.push_back(pgtv[i].fmt);
                     }
                 }
 
@@ -279,8 +288,8 @@ postgresql_statement_backend::execute(int number)
 
                     result_ = PQexecPrepared(session_.conn_,
                         statementName_.c_str(),
-                        static_cast<int>(paramValues.size()),
-                        &paramValues[0], NULL, NULL, 0);
+                        static_cast<int>(paramVal.size()),
+                        &paramVal[0], &paramLen[0], &paramFmt[0], 1);
                 }
                 else // stType_ == st_one_time_query
                 {
@@ -288,8 +297,8 @@ postgresql_statement_backend::execute(int number)
                     // be executed as a one-time query
 
                     result_ = PQexecParams(session_.conn_, query_.c_str(),
-                        static_cast<int>(paramValues.size()),
-                        NULL, &paramValues[0], NULL, NULL, 0);
+                        static_cast<int>(paramVal.size()),
+                        &paramTyp[0], &paramVal[0], &paramLen[0], &paramFmt[0], 0);
                 }
 
 #endif // SOCI_POSTGRESQL_NOPREPARE
