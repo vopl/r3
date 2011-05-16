@@ -86,7 +86,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	SOCI_VECTOR_TYPE<std::string> str(220);
 	const int in=0;
-	sql<<"SELECT txt FROM myt WHERE id>:one", soci::into(str), soci::use(in, "one");
+	//sql<<"SELECT txt FROM myt WHERE id>:one", soci::into(str), soci::use(in, "one");
 
 
 	soci::statement st = (sql.prepare<<"SELECT 'asdf'::varchar", soci::into(str));
@@ -97,7 +97,19 @@ int _tmain(int argc, _TCHAR* argv[])
 	/*
 	connection con("dbname=test user=postgres password=postgres");
 
-	con<<"SELECT txt FROM myt WHERE id>:one", soci::use(in, "one"), soci::into(str);
+	con.once<<"SELECT txt FROM myt WHERE id>$1" & use(in);
+	stmt s = con.prep;
+
+	s.sql("SELECT txt FROM myt WHERE id>$1");
+	s.bind(str);
+	s.exec();
+
+	while(s.hasRow())
+	{
+		s.fetch(str);
+		//use str
+	}
+
 	*/
 
 
