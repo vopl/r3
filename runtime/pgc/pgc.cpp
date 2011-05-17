@@ -115,6 +115,7 @@ void selectTestTable(pgc::Connection con)
 		assert(!strcmp(v, "4.123"));
 		res.fetch(0, "_money",			v); 
 		assert(!strcmp(v, "103200"));
+
 		res.fetch(0, "_varchar",		v); 
 		assert(!strcmp(v, "varchar text"));
 		res.fetch(0, "_char",			v); 
@@ -138,7 +139,7 @@ void selectTestTable(pgc::Connection con)
 		res.fetch(0, "_boolean",		v); 
 		assert(!strcmp(v, "true"));
 		res.fetch(0, "_mood",			v); 
-		assert(!strcmp(v, "ok"));
+		assert(!strcmp(v, ""));
 		res.fetch(0, "_bit",			v); 
 		assert(!strcmp(v, "1001010001"));
 		res.fetch(0, "_varbit",			v); 
@@ -178,7 +179,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		try
 		{
 			createTestTable(con);
-			selectTestTable(con);
+			for(size_t k(0); k<1000; k++)
+			{
+				selectTestTable(con);
+			}
 
 	// 		int i;
 	// 		con.once().sql("SELECT $1::varchar")

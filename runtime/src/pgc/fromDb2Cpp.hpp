@@ -135,6 +135,7 @@ namespace pgc
 				size_t lenCpp=0;
 				unsigned char *esc = PQescapeBytea((const unsigned char *)valDb, lenDb, &lenCpp);
 				memcpy(valCpp, esc, lenCpp);
+				PQfreemem(esc);
 				valCpp[lenCpp] = 0;
 			}
 			break;
@@ -278,13 +279,13 @@ namespace pgc
 
 
 		default:
-			size_t lenCpp=0;
-			unsigned char *esc = PQescapeBytea((const unsigned char *)valDb, lenDb, &lenCpp);
-			memcpy(valCpp, esc, lenCpp);
-			valCpp[lenCpp] = 0;
+// 			size_t lenCpp=0;
+// 			unsigned char *esc = PQescapeBytea((const unsigned char *)valDb, lenDb, &lenCpp);
+// 			memcpy(valCpp, esc, lenCpp);
+// 			valCpp[lenCpp] = 0;
 
-// 			assert(!"unsupported db type");
-// 			valCpp[0] = 0;
+//			assert(!"unsupported db type");
+			valCpp[0] = 0;
 			return false;
 
 		}
