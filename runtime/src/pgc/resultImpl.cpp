@@ -50,16 +50,16 @@ namespace pgc
 		}
 		return 0;
 	}
-	size_t ResultImpl::rows()
+	int ResultImpl::rows()
 	{
 		if(_pgres)
 		{
-			return (size_t)PQntuples(_pgres);
+			return PQntuples(_pgres);
 		}
 		return 0;
 	}
 
-	bool ResultImpl::fetch(size_t rowIdx, size_t colIdx, int typIdx, void *data)
+	bool ResultImpl::fetch(int rowIdx, int colIdx, int typIdx, void *data)
 	{
 		if(!_pgres)
 		{
@@ -87,7 +87,7 @@ namespace pgc
 
 		return fromDb2Cpp(typIdx, data, typ, len, val);
 	}
-	bool ResultImpl::fetch(size_t rowIdx, const char *colName, int typIdx, void *data)
+	bool ResultImpl::fetch(int rowIdx, const char *colName, int typIdx, void *data)
 	{
 		if(_pgres)
 		{
@@ -103,7 +103,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ResultImpl::isNull(size_t rowIdx, size_t colIdx)
+	bool ResultImpl::isNull(int rowIdx, int colIdx)
 	{
 		if(!_pgres)
 		{
@@ -114,7 +114,7 @@ namespace pgc
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	bool ResultImpl::isNull(size_t rowIdx, const char *colName)
+	bool ResultImpl::isNull(int rowIdx, const char *colName)
 	{
 		if(_pgres)
 		{
@@ -124,7 +124,7 @@ namespace pgc
 				return false;
 			}
 
-			return isNull(rowIdx, (size_t)cn);
+			return isNull(rowIdx, cn);
 		}
 
 		return true;

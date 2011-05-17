@@ -2,6 +2,11 @@
 //
 
 #include "stdafx.h"
+
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <string>
 #include <iostream>
 
@@ -89,7 +94,7 @@ void selectTestTable(pgc::Connection con)
 		"_smallint,_integer,_bigint,_numeric, _decimal, _real, _double, _money, _varchar, _char, _text, _bytea, _timestamp, _timestamptz, _interval, _date, _time, _timetz, _boolean, _mood, _bit, _varbit, _oid"
 		" FROM pgc_test").exec().throwIfError();
 
-	for(size_t i(0); i<1000000; i++)
+	for(size_t i(0); i<1000; i++)
 	{
 		char buf[4096];
 		char *			v = buf;
@@ -117,7 +122,7 @@ void selectTestTable(pgc::Connection con)
 		res.fetch(0, "_text",			v); 
 		assert(!strcmp(v, "text text"));
 		res.fetch(0, "_bytea",			v); 
-		assert(!strcmp(v, "~01234\\\\010"));
+		assert(!strcmp(v, "~01234\\010"));
 		res.fetch(0, "_timestamp",		v); 
 		assert(!strcmp(v, "2010-04-08 01:02:03"));
 		res.fetch(0, "_timestamptz",	v); 
@@ -161,43 +166,48 @@ void selectTestTable(pgc::Connection con)
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	pgc::Connection con;
-	con.open("dbname=test user=postgres password=postgres port=5432");
-
-
-	std::string str;
-
-	try
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	{
-		createTestTable(con);
-		selectTestTable(con);
 
-// 		int i;
-// 		con.once().sql("SELECT $1::varchar")
-// 			.bind(i)
-// 			.bind(220)
-// 			.bind(std::string("sdfgsd"))
-// 			.bind(str)
-// 			.exec().fetch(str);
-// 		;
+		pgc::Connection con;
+		pgc::EConnectionStatus s = con.open("dbname=test user=postgres password=postgres port=5433");
 
-		pgc::Result res = con.once().sql("SELECT '$1'::varchar").exec().throwIfError();
 
-		for(size_t row(0); row<res.rows(); row++)
+		std::string str;
+
+		try
 		{
-			char buf[4096];
-			char *tmp = buf;
-			res.fetch(row, (size_t)0, tmp);
-		}
-		
-		;
-	}
-	catch (pgc::Exception &e)
-	{
-		std::cout<<e.what()<<std::endl;
-	}
+			createTestTable(con);
+			selectTestTable(con);
 
-	con.close();
+	// 		int i;
+	// 		con.once().sql("SELECT $1::varchar")
+	// 			.bind(i)
+	// 			.bind(220)
+	// 			.bind(std::string("sdfgsd"))
+	// 			.bind(str)
+	// 			.exec().fetch(str);
+	// 		;
+
+			pgc::Result res = con.once().sql("SELECT '$1'::varchar").exec().throwIfError();
+
+			for(int row(0); row<res.rows(); row++)
+			{
+				char buf[4096];
+				char *tmp = buf;
+				res.fetch(row, 0, tmp);
+			}
+			
+			;
+		}
+		catch (pgc::Exception &e)
+		{
+			std::cout<<e.what()<<std::endl;
+		}
+
+		con.close();
+	}
+	_CrtDumpMemoryLeaks();
 
 	return 0;
 }

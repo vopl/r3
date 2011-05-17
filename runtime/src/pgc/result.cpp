@@ -9,12 +9,12 @@ namespace pgc
 	{
 	}
 
-	bool Result::fetchHelper(size_t rowIdx, size_t colIdx, int typIdx, void *data)
+	bool Result::fetchHelper(int rowIdx, int colIdx, int typIdx, void *data)
 	{
 		return _impl->fetch(rowIdx, colIdx, typIdx, data);
 	}
 	
-	bool Result::fetchHelper(size_t rowIdx, const char *colName, int typIdx, void *data)
+	bool Result::fetchHelper(int rowIdx, const char *colName, int typIdx, void *data)
 	{
 		return _impl->fetch(rowIdx, colName, typIdx, data);
 	}
@@ -38,17 +38,17 @@ namespace pgc
 		return *this;
 	}
 
-	size_t Result::rows()
+	int Result::rows()
 	{
 		return _impl->rows();
 	}
 
-	bool Result::isNull(size_t rowIdx, size_t colIdx)
+	bool Result::isNull(int rowIdx, int colIdx)
 	{
 		return _impl->isNull(rowIdx, colIdx);
 	}
 
-	bool Result::isNull(size_t rowIdx, const char *colName)
+	bool Result::isNull(int rowIdx, const char *colName)
 	{
 		return _impl->isNull(rowIdx, colName);
 	}

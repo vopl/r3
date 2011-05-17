@@ -21,12 +21,12 @@ namespace pgc
 
 		size_t cmdRows();
 
-		size_t rows();
-		bool fetch(size_t rowIdx, size_t colIdx, int typIdx, void *data);
-		bool fetch(size_t rowIdx, const char *colName, int typIdx, void *data);
+		int rows();
+		bool fetch(int rowIdx, int colIdx, int typIdx, void *data);
+		bool fetch(int rowIdx, const char *colName, int typIdx, void *data);
 
-		bool isNull(size_t rowIdx, size_t colIdx);
-		bool isNull(size_t rowIdx, const char *colName);
+		bool isNull(int rowIdx, int colIdx);
+		bool isNull(int rowIdx, const char *colName);
 
 	};
 
