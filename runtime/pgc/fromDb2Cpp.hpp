@@ -11,22 +11,43 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	template <class T>
-	inline T &revert(T &v)
+	template <bool le>
+	struct FixEndianImpl
 	{
-		unsigned char *data = (unsigned char *)&v;
-		int len = sizeof(T);
-		size_t len_2 = len/2;
-		for(size_t i=0; i<len_2; i++)
-		{	
-			size_t i2 = len - i - 1;
-			unsigned char b = data[i];
-			data[i] = data[i2];
-			data[i2] = b;
+		template <class T>
+		static T &call(T &v)
+		{
+			unsigned char *data = (unsigned char *)&v;
+			int len = sizeof(T);
+			size_t len_2 = len/2;
+			for(size_t i=0; i<len_2; i++)
+			{	
+				size_t i2 = len - i - 1;
+				unsigned char b = data[i];
+				data[i] = data[i2];
+				data[i2] = b;
+			}
+			return v;
 		}
-		return v;
-	}
+	};
 
+	template <>
+	struct FixEndianImpl<false>
+	{
+		template <class T>
+		static T &call(T &v)
+		{
+			return v;
+		}
+	};
+
+
+	template <class T>
+	inline T &fixEndian(T &v)
+	{
+		static const bool le = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
+		return FixEndianImpl<le>::call(v);
+	}
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -37,19 +58,19 @@ namespace pgc
 		case 21://int2
 			{
 				boost::int16_t v = *(boost::int16_t *)valDb;
-				_ntoa(revert(v), valCpp);
+				_ntoa(fixEndian(v), valCpp);
 			}
 			break;
 		case 23://int4
 			{
 				boost::int32_t v = *(boost::int32_t *)valDb;
-				_ntoa(revert(v), valCpp);
+				_ntoa(fixEndian(v), valCpp);
 			}
 			break;
 		case 20://int8
 			{
 				boost::int64_t v = *(boost::int64_t *)valDb;
-				_ntoa(revert(v), valCpp);
+				_ntoa(fixEndian(v), valCpp);
 			}
 			break;
 		case 1700://numeric
@@ -67,10 +88,10 @@ namespace pgc
 				memcpy(&buf.front(), valDb, lenDb);
 				NumericData &v = *(NumericData *)&buf.front();
 
-				revert(v.ndigits);
-				revert(v.weight);
-				revert(v.sign);
-				revert(v.dscale);
+				fixEndian(v.ndigits);
+				fixEndian(v.weight);
+				fixEndian(v.sign);
+				fixEndian(v.dscale);
 
 				size_t valCppPos = 0;
 				if(v.sign)
@@ -80,7 +101,7 @@ namespace pgc
 
 				for(int idx(0); idx<v.ndigits; idx++)
 				{
-					revert(v.NumericDigits[idx]);
+					fixEndian(v.NumericDigits[idx]);
 					char numStrPart[8];
 					size_t numStrPartPos=7;
 					numStrPart[numStrPartPos--] = 0;
@@ -111,21 +132,21 @@ namespace pgc
 		case 700://float4
 			{
 				float v = *(float *)valDb;
-				revert(v);
+				fixEndian(v);
 				sprintf(valCpp,"%.7g",(double)v);
 			}
 			break;
 		case 701://float8
 			{
 				double v = *(double *)valDb;
-				revert(v);
+				fixEndian(v);
 				sprintf(valCpp,"%.16g",v);
 			}
 			break;
 		case 790://money
 			{
 				boost::uint64_t v = *(boost::uint64_t *)valDb;
-				_ntoa(revert(v), valCpp);
+				_ntoa(fixEndian(v), valCpp);
 			}
 			break;
 		case 1043://varchar
@@ -159,7 +180,7 @@ namespace pgc
 			{
 				boost::int64_t		date, time;
 				time = *(boost::int64_t *)valDb;
-				revert(time);
+				fixEndian(time);
 
 				TMODULO(time, date, USECS_PER_DAY);
 
@@ -200,9 +221,9 @@ namespace pgc
 				memcpy(&buf.front(), valDb, lenDb);
 				Interval &v = *(Interval *)&buf.front();
 
-				revert(v.time);
-				revert(v.day);
-				revert(v.month);
+				fixEndian(v.time);
+				fixEndian(v.day);
+				fixEndian(v.month);
 
 				int hour, min, sec, fsec;
 				dt2time(v.time, &hour, &min, &sec, &fsec);
@@ -215,7 +236,7 @@ namespace pgc
 		case 1082://date
 			{
 				boost::int32_t v = *(boost::int32_t *)valDb;
-				revert(v);
+				fixEndian(v);
 
 				v += date2j(2000, 1, 1);
 
@@ -232,7 +253,7 @@ namespace pgc
 			{
 				boost::int64_t		time;
 				time = *(boost::int64_t *)valDb;
-				revert(time);
+				fixEndian(time);
 
 				/* Julian day routine does not work for negative Julian days */
 				int hour, min, sec, fsec;
@@ -268,7 +289,7 @@ namespace pgc
 				memcpy(&buf.front(), valDb, lenDb);
 				VarBit &v = *(VarBit *)&buf.front();
 
-				revert(v.amount);
+				fixEndian(v.amount);
 				for(size_t i(0); i<v.amount; i++)
 				{
 					if((v.bits[i/8] << i%8) & 0x80)
@@ -287,7 +308,7 @@ namespace pgc
 		case 26://oid
 			{
 				boost::uint32_t v = *(boost::uint32_t *)valDb;
-				_ntoa(revert(v), valCpp);
+				_ntoa(fixEndian(v), valCpp);
 			}
 			break;
 

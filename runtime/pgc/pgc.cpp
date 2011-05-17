@@ -89,6 +89,7 @@ void selectTestTable(pgc::Connection con)
 		"_smallint,_integer,_bigint,_numeric, _decimal, _real, _double, _money, _varchar, _char, _text, _bytea, _timestamp, _timestamptz, _interval, _date, _time, _timetz, _boolean, _mood, _bit, _varbit, _oid"
 		" FROM pgc_test").exec().throwIfError();
 
+	for(size_t i(0); i<100000; i++)
 	{
 		char buf[4096];
 		char *			v = buf;
@@ -158,8 +159,16 @@ void selectTestTable(pgc::Connection con)
 
 }
 
+unsigned
+ntohl(unsigned x)
+{
+	unsigned char *s = (unsigned char *)&x;
+	return (unsigned)(s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3]);
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
+	printf("%d", ntohl(argc));
 	pgc::Connection con;
 	con.open("dbname=test user=postgres password=postgres port=5432");
 
