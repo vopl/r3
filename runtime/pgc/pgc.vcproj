@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -60,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpq.lib"
+				AdditionalDependencies="../Debug/libpgc.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -118,6 +119,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
+				AdditionalIncludeDirectories="../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -139,7 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpq.lib"
+				AdditionalDependencies="libpgc.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -179,35 +181,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\connection.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\connectionImpl.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\exception.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\pgc.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\result.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\resultImpl.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\statement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\statementImpl.cpp"
 				>
 			</File>
 			<File
@@ -236,54 +210,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\connection.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\connectionImpl.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\cppType.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\exception.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\fixEndian.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\fromDb2Cpp.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\julianUtils.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ntoa.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\result.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\resultImpl.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\statement.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\statementImpl.hpp"
-				>
-			</File>
 			<File
 				RelativePath=".\stdafx.h"
 				>

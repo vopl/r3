@@ -2,7 +2,7 @@
 #define _PGC_CONNECTIONIMPL_HPP_
 
 #include "statementImpl.hpp"
-#include "connection.hpp"
+#include "pgc/connection.hpp"
 
 #include <libpq-fe.h>
 

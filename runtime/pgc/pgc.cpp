@@ -5,8 +5,8 @@
 #include <string>
 #include <iostream>
 
-#include "connection.hpp"
-#include "exception.hpp"
+#include "pgc/connection.hpp"
+#include "pgc/exception.hpp"
 #include <boost/cstdint.hpp>
 
 

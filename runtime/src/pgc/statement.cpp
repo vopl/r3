@@ -1,6 +1,4 @@
-#include "stdafx.h"
-
-#include "statement.hpp"
+#include "pgc/statement.hpp"
 #include "statementImpl.hpp"
 
 namespace pgc

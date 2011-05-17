@@ -1,6 +1,8 @@
 #ifndef _PGC_RESULT_HPP_
 #define _PGC_RESULT_HPP_
 
+#include "pgc/common.h"
+
 namespace pgc
 {
 	class ResultImpl;
@@ -37,6 +39,7 @@ namespace pgc
 		bool isNull(size_t rowIdx, size_t colIdx);
 		bool isNull(size_t rowIdx, const char *colName);
 	};
+	typedef boost::shared_ptr<Result> ResultPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Result &Result::fetch(size_t rowIdx, size_t colIdx, T &v)

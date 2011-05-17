@@ -1,7 +1,7 @@
 #ifndef _PGC_CONNECTION_HPP_
 #define _PGC_CONNECTION_HPP_
 
-#include "statement.hpp"
+#include "pgc/statement.hpp"
 
 namespace pgc
 {

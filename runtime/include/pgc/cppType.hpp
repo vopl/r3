@@ -1,7 +1,7 @@
 #ifndef _PGC_CPPDATATYPE_HPP_
 #define _PGC_CPPDATATYPE_HPP_
 
-#include <boost/cstdint.hpp>
+#include "pgc/common.h"
 
 namespace pgc
 {

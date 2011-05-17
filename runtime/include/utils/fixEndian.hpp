@@ -1,7 +1,7 @@
-#ifndef _PGC_FIXENDIAN_H_
-#define _PGC_FIXENDIAN_H_
+#ifndef _UTILS_FIXENDIAN_H_
+#define _UTILS_FIXENDIAN_H_
 
-namespace pgc
+namespace utils
 {
 	namespace impl
 	{

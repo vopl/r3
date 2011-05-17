@@ -1,8 +1,8 @@
 #ifndef _PGC_STATEMENT_HPP_
 #define _PGC_STATEMENT_HPP_
 
-#include "cppType.hpp"
-#include "result.hpp"
+#include "pgc/cppType.hpp"
+#include "pgc/result.hpp"
 
 namespace pgc
 {

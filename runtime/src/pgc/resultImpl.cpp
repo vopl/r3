@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "resultImpl.hpp"
 #include "fromDb2Cpp.hpp"
 

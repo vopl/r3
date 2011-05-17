@@ -1,7 +1,7 @@
-#ifndef _PGC_JULIANUTILS_H_
-#define _PGC_JULIANUTILS_H_
+#ifndef _UTILS_JULIANUTILS_H_
+#define _UTILS_JULIANUTILS_H_
 
-namespace pgc
+namespace utils
 {
 	//////////////////////////////////////////////////////////////////////////
 	int

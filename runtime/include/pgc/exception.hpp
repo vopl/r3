@@ -1,6 +1,8 @@
 #ifndef _PGC_EXCEPTION_HPP_
 #define _PGC_EXCEPTION_HPP_
 
+#include "pgc/common.h"
+
 namespace pgc
 {
 	class ResultImpl;

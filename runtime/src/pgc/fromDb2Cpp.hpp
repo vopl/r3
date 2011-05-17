@@ -1,16 +1,18 @@
 #ifndef _PGC_FROMDB2CPP_HPP_
 #define _PGC_FROMDB2CPP_HPP_
 
-#include "cppType.hpp"
+#include "pgc/cppType.hpp"
 #include <pgtypes_numeric.h>
 #include <vector>
 #include <strstream>
-#include "julianUtils.h"
-#include "ntoa.hpp"
-#include "fixEndian.hpp"
+#include "utils/julian.h"
+#include "utils/ntoa.hpp"
+#include "utils/fixEndian.hpp"
 
 namespace pgc
 {
+	using namespace utils;
+
 	//////////////////////////////////////////////////////////////////////////
 	bool fromDb2Cpp(char *&valCpp, Oid typDb, int lenDb, const char *valDb)
 	{

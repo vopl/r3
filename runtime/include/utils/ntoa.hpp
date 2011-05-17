@@ -1,8 +1,8 @@
-#ifndef _PGC_NTOA_HPP_
-#define _PGC_NTOA_HPP_
+#ifndef _UTILS_NTOA_HPP_
+#define _UTILS_NTOA_HPP_
 
 //////////////////////////////////////////////////////////////////////////
-namespace pgc
+namespace utils
 {
 	namespace impl
 	{

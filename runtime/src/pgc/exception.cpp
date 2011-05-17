@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include "exception.hpp"
+#include "pgc/exception.hpp"
 #include "resultImpl.hpp"
 
 namespace pgc

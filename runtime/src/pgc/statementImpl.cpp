@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "statementImpl.hpp"
 #include "connectionImpl.hpp"
 

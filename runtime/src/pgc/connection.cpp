@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include "connection.hpp"
+#include "pgc/connection.hpp"
 #include "connectionImpl.hpp"
 
 namespace pgc

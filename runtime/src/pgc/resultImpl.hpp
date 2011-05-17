@@ -1,8 +1,9 @@
 #ifndef _PGC_RESULTIMPL_HPP_
 #define _PGC_RESULTIMPL_HPP_
 
+#include <boost/enable_shared_from_this.hpp>
 #include <libpq-fe.h>
-#include "result.hpp"
+#include "pgc/result.hpp"
 
 namespace pgc
 {
