@@ -78,7 +78,7 @@ void createTestTable(pgc::Connection con)
 		"INSERT INTO pgc_test("
 		"_smallint,_integer,_bigint,_numeric, _decimal, _real, _double, _money, _varchar, _char, _text, _bytea, _timestamp, _timestamptz, _interval, _date, _time, _timetz, _boolean, _mood, _bit, _varbit, _oid"
 		")VALUES("
-		"1,2,3,12.23445,55654.69,3.123,4.123,'1000,32'::money,'varchar text','char txt','text text',E'\\17601234\\010','2010-04-08 01:02:03','2010-01-15 23:23:32','1 12:59:10','2010-01-15','23:23:32','23:23:32',true,'ok',B'1010101010',B'10101',220"
+		"1,2,3,12.23445,55654.69,3.123,4.123,'1032'::money,'varchar text','char txt','text text',E'\\17601234\\010','2010-04-08 01:02:03','2010-01-15 23:23:32','4 month 5 days 12:59:10','2010-01-15','23:23:32','23:23:33',true,'ok',B'1001010001',B'10101',220"
 		")").exec().throwIfError();
 }
 
@@ -91,31 +91,54 @@ void selectTestTable(pgc::Connection con)
 
 	{
 		char buf[4096];
-		char *			v_pchar = buf;
+		char *			v = buf;
 
-		res.fetch(0, "_smallint", v_pchar);
-		res.fetch(0, "_integer", v_pchar);
-		res.fetch(0, "_bigint", v_pchar);
-		res.fetch(0, "_numeric", v_pchar);
-		res.fetch(0, "_decimal", v_pchar);
-		res.fetch(0, "_real", v_pchar);
-		res.fetch(0, "_double", v_pchar);
-		res.fetch(0, "_money", v_pchar);
-		res.fetch(0, "_varchar", v_pchar);
-		res.fetch(0, "_char", v_pchar);
-		res.fetch(0, "_text", v_pchar);
-		res.fetch(0, "_bytea", v_pchar);
-		res.fetch(0, "_timestamp", v_pchar);
-		res.fetch(0, "_timestamptz", v_pchar);
-		res.fetch(0, "_interval", v_pchar);
-		res.fetch(0, "_date", v_pchar);
-		res.fetch(0, "_time", v_pchar);
-		res.fetch(0, "_timetz", v_pchar);
-		res.fetch(0, "_boolean", v_pchar);
-		res.fetch(0, "_mood", v_pchar);
-		res.fetch(0, "_bit", v_pchar);
-		res.fetch(0, "_varbit", v_pchar);
-		res.fetch(0, "_oid", v_pchar);
+		res.fetch(0, "_smallint",		v);
+		assert(!strcmp(v, "1"));
+		res.fetch(0, "_integer",		v); 
+		assert(!strcmp(v, "2"));
+		res.fetch(0, "_bigint",			v); 
+		assert(!strcmp(v, "3"));
+		res.fetch(0, "_numeric",		v); 
+		assert(!strcmp(v, "12.23445"));
+		res.fetch(0, "_decimal",		v); 
+		assert(!strcmp(v, "55654.69"));
+		res.fetch(0, "_real",			v); 
+		assert(!strcmp(v, "3.123"));
+		res.fetch(0, "_double",			v); 
+		assert(!strcmp(v, "4.123"));
+		res.fetch(0, "_money",			v); 
+		assert(!strcmp(v, "103200"));
+		res.fetch(0, "_varchar",		v); 
+		assert(!strcmp(v, "varchar text"));
+		res.fetch(0, "_char",			v); 
+		assert(!strcmp(v, "char txt  "));
+		res.fetch(0, "_text",			v); 
+		assert(!strcmp(v, "text text"));
+		res.fetch(0, "_bytea",			v); 
+		assert(!strcmp(v, "~01234\\\\010"));
+		res.fetch(0, "_timestamp",		v); 
+		assert(!strcmp(v, "2010-04-08 01:02:03"));
+		res.fetch(0, "_timestamptz",	v); 
+		assert(!strcmp(v, "2010-01-15 20:23:32"));
+		res.fetch(0, "_interval",		v); 
+		assert(!strcmp(v, "4 month 5 day 12:59:10"));
+		res.fetch(0, "_date",			v); 
+		assert(!strcmp(v, "2010-01-15"));
+		res.fetch(0, "_time",			v); 
+		assert(!strcmp(v, "23:23:32"));
+		res.fetch(0, "_timetz",			v); 
+		assert(!strcmp(v, "23:23:33"));
+		res.fetch(0, "_boolean",		v); 
+		assert(!strcmp(v, "true"));
+		res.fetch(0, "_mood",			v); 
+		assert(!strcmp(v, "ok"));
+		res.fetch(0, "_bit",			v); 
+		assert(!strcmp(v, "1001010001"));
+		res.fetch(0, "_varbit",			v); 
+		assert(!strcmp(v, "10101"));
+		res.fetch(0, "_oid",			v); 
+		assert(!strcmp(v, "220"));
 	}
 
 
@@ -129,25 +152,16 @@ void selectTestTable(pgc::Connection con)
 	boost::uint16_t	v_uint16;
 	boost::uint32_t	v_uint32;
 	boost::uint64_t	v_uint64;
+	float			v_real;
+	double			v_double;
 	std::tm			v_stdtm;
 
-// 	res.fetch(0, "_smallint", v_stdstring);
-// 	res.fetch(0, "_smallint", v_bool);
-// 	res.fetch(0, "_smallint", v_int8);
-// 	res.fetch(0, "_smallint", v_int16);
-// 	res.fetch(0, "_smallint", v_int32);
-// 	res.fetch(0, "_smallint", v_int64);
-// 	res.fetch(0, "_smallint", v_uint8);
-// 	res.fetch(0, "_smallint", v_uint16);
-// 	res.fetch(0, "_smallint", v_uint32);
-// 	res.fetch(0, "_smallint", v_uint64);
-// 	res.fetch(0, "_smallint", v_stdtm);
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	pgc::Connection con;
-	con.open("dbname=test user=postgres password=postgres port=5433");
+	con.open("dbname=test user=postgres password=postgres port=5432");
 
 
 	std::string str;

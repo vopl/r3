@@ -5,6 +5,8 @@
 #include <pgtypes_numeric.h>
 #include <vector>
 #include <strstream>
+#include "julianUtils.h"
+#include "ntoa.hpp"
 
 namespace pgc
 {
@@ -25,237 +27,6 @@ namespace pgc
 		return v;
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	namespace impl
-	{
-		template <int maxDecs, typename integral>
-		char *_ntoa(integral num, char *res)
-		{
-			if(num)
-			{
-				bool negative = num<0;
-				int pos=maxDecs;
-
-				res[pos] = 0;
-
-				if(negative)
-				{
-					while(num)
-					{
-						res[--pos] = (char)('0' - (num % 10));
-						num /= 10;
-					}
-					res[--pos] = '-';
-				}
-				else
-				{
-					while(num)
-					{
-						res[--pos] = (char)('0' + (num % 10));
-						num /= 10;
-					}
-				}
-				if(pos)
-				{
-					memmove(res, res+pos, maxDecs-pos+1);
-				}
-				return res;
-			}
-			res[0] = '0';
-			res[1] = 0;
-			return res;
-		}
-		template <int maxDecs, typename integral>
-		char *_untoa(integral num, char *res)
-		{
-			if(num)
-			{
-				int pos=maxDecs;
-				res[pos] = 0;
-
-				while(num)
-				{
-					res[--pos] = (char)('0' + (num % 10));
-					num /= 10;
-				}
-				if(pos)
-				{
-					memmove(res, res+pos, maxDecs-pos+1);
-				}
-				return res;
-			}
-			res[0] = '0';
-			res[1] = 0;
-			return res;
-		}
-
-		inline
-			char *_ntoa(long long num, char *res)
-		{
-			return impl::_ntoa<24>(num, res);
-		}
-		inline
-			char *_ntoa(unsigned long long num, char *res)
-		{
-			return impl::_untoa<25>(num, res);
-		}
-		inline
-			char *_ntoa(long num, char *res)
-		{
-			return impl::_ntoa<12>(num, res);
-		}
-		inline
-			char *_ntoa(unsigned long num, char *res)
-		{
-			return impl::_untoa<13>(num, res);
-		}
-		inline
-			char *_ntoa(int num, char *res)
-		{
-			return impl::_ntoa<12>(num, res);
-		}
-		inline
-			char *_ntoa(unsigned int num, char *res)
-		{
-			return impl::_untoa<13>(num, res);
-		}
-		inline
-			char *_ntoa(short num, char *res)
-		{
-			return impl::_ntoa<6>(num, res);
-		}
-		inline
-			char *_ntoa(unsigned short num, char *res)
-		{
-			return impl::_untoa<7>(num, res);
-		}
-		inline
-			char *_ntoa(char num, char *res)
-		{
-			return impl::_ntoa<3>(num, res);
-		}
-		inline
-			char *_ntoa(unsigned char num, char *res)
-		{
-			return impl::_untoa<4>(num, res);
-		}
-
-	}
-
-
-
-
-	//////////////////////////////////////////////////////////////////////////
-#define TMODULO(t,q,u) \
-	do { \
-	(q) = (((t) < 0) ? ceil((t) / (u)): floor((t) / (u))); \
-	if ((q) != 0) (t) -= int((q) * (u) + 0.5); \
-	} while(0)
-
-	typedef double TTimestamp;
-	enum
-	{
-		SECS_PER_YEAR	= 36525 * 864,	/* avoid floating-point computation */
-		SECS_PER_DAY	= 86400,
-		SECS_PER_HOUR	= 3600,
-		SECS_PER_MINUTE = 60,
-		MINS_PER_HOUR	= 60,
-	};
-
-	int date2j(int y, int m, int d);
-	void j2date(int jd, int *year, int *month, int *day);
-
-	double time2j(const int hour, const int min, const int sec, const int fsec);
-	void j2time(double t, int *hour, int *min, int *sec, int *fsec);
-
-
-
-	//////////////////////////////////////////////////////////////////////////
-	inline int date2j(int y, int m, int d)
-	{
-		int			julian;
-		int			century;
-
-		if (m > 2)
-		{
-			m += 1;
-			y += 4800;
-		}
-		else
-		{
-			m += 13;
-			y += 4799;
-		}
-
-		century = y / 100;
-		julian = y * 365 - 32167;
-		julian += y / 4 - century + century / 4;
-		julian += 7834 * m / 256 + d;
-
-		return julian;
-	}
-
-
-	inline void j2date(int jd, int *year, int *month, int *day)
-	{
-		unsigned int julian;
-		unsigned int quad;
-		unsigned int extra;
-		int			y;
-
-		julian = jd;
-		julian += 32044;
-		quad = julian / 146097;
-		extra = (julian - quad * 146097) * 4 + 3;
-		julian += 60 + quad * 3 + extra / 146097;
-		quad = julian / 1461;
-		julian -= quad * 1461;
-		y = julian * 4 / 1461;
-		julian = ((y != 0) ? (julian + 305) % 365 : (julian + 306) % 366) + 123;
-		y += quad * 4;
-		*year = y - 4800;
-		quad = julian * 2141 / 65536;
-		*day = julian - 7834 * quad / 256;
-		*month = (quad + 10) % 12 + 1;
-
-		return;
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	inline double time2j(const int hour, const int min, const int sec, const int fsec)
-	{
-		double d=0;
-		int i = fsec;
-		while(i)
-		{
-			d += i%10;
-			d /= 10;
-			i /= 10;
-		}
-		return (((((double)hour * MINS_PER_HOUR) + min) * SECS_PER_MINUTE) + sec) + d;
-	}
-
-	inline void j2time(double t, int *hour, int *min, int *sec, int *fsec)
-	{
-		*hour = (int)(t / SECS_PER_HOUR);
-		t -= (*hour) * SECS_PER_HOUR;
-		*min = (int)(t / SECS_PER_MINUTE);
-		t -= (*min) * SECS_PER_MINUTE;
-		*sec = (int)(t);
-		t -= *sec;
-		*fsec = 0;
-		while(t)
-		{
-			*fsec *= 10;
-			t *= 10;
-			int d = (int)t;
-			*fsec += d;
-			t -= d;
-		}
-
-	}
-
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -266,19 +37,19 @@ namespace pgc
 		case 21://int2
 			{
 				boost::int16_t v = *(boost::int16_t *)valDb;
-				impl::_ntoa(revert(v), valCpp);
+				_ntoa(revert(v), valCpp);
 			}
 			break;
 		case 23://int4
 			{
 				boost::int32_t v = *(boost::int32_t *)valDb;
-				impl::_ntoa(revert(v), valCpp);
+				_ntoa(revert(v), valCpp);
 			}
 			break;
 		case 20://int8
 			{
 				boost::int64_t v = *(boost::int64_t *)valDb;
-				impl::_ntoa(revert(v), valCpp);
+				_ntoa(revert(v), valCpp);
 			}
 			break;
 		case 1700://numeric
@@ -354,7 +125,7 @@ namespace pgc
 		case 790://money
 			{
 				boost::uint64_t v = *(boost::uint64_t *)valDb;
-				impl::_ntoa(revert(v), valCpp);
+				_ntoa(revert(v), valCpp);
 			}
 			break;
 		case 1043://varchar
@@ -384,41 +155,152 @@ namespace pgc
 			}
 			break;
 		case 1114://timestamp
+		case 1184://timestamptz
 			{
+				boost::int64_t		date, time;
+				time = *(boost::int64_t *)valDb;
+				revert(time);
 
-				double v = *(double *)valDb;
-				revert(v);
+				TMODULO(time, date, USECS_PER_DAY);
 
-				double		date;
-				double		time;
-
-				time = v;
-				TMODULO(time, date, (double) SECS_PER_DAY);
-
-				if (time < 0)
+				if(time < 0)
 				{
-					time += SECS_PER_DAY;
+					time += USECS_PER_DAY;
 					date -= 1;
 				}
 
 				/* add offset to go from J2000 back to standard Julian date */
-				date += 2451545;
+				date += date2j(2000, 1, 1);
+
+				if(date < 0 || date > INT_MAX)
+				{
+					return false;
+				}
 
 				/* Julian day routine does not work for negative Julian days */
 				int year, month, day, hour, min, sec, fsec;
 				j2date((int) date, &year, &month, &day);
-				j2time(time, &hour, &min, &sec, &fsec);
+				dt2time(time, &hour, &min, &sec, &fsec);
 
-				int k=220;
+				sprintf(valCpp, "%04d-%02d-%02d %02d:%02d:%02d", 
+					year, month, day,
+					hour, min, sec);
+			}
+			break;
+		case 1186://interval
+			{
+				typedef struct Interval
+				{
+					boost::uint64_t time;
+					boost::uint32_t day;
+					boost::uint32_t month;
+				} Interval;
 
+				std::vector<unsigned char> buf(lenDb);
+				memcpy(&buf.front(), valDb, lenDb);
+				Interval &v = *(Interval *)&buf.front();
 
+				revert(v.time);
+				revert(v.day);
+				revert(v.month);
+
+				int hour, min, sec, fsec;
+				dt2time(v.time, &hour, &min, &sec, &fsec);
+
+				sprintf(valCpp, "%d month %d day %02d:%02d:%02d", 
+					v.month, v.day,
+					hour, min, sec);
+			}
+			break;
+		case 1082://date
+			{
+				boost::int32_t v = *(boost::int32_t *)valDb;
+				revert(v);
+
+				v += date2j(2000, 1, 1);
+
+				int year, month, day;
+				j2date(v, &year, &month, &day);
+
+				sprintf(valCpp, "%04d-%02d-%02d", 
+					year, month, day);
+
+			}
+			break;
+		case 1083://time
+		case 1266://timetz
+			{
+				boost::int64_t		time;
+				time = *(boost::int64_t *)valDb;
+				revert(time);
+
+				/* Julian day routine does not work for negative Julian days */
+				int hour, min, sec, fsec;
+				dt2time(time, &hour, &min, &sec, &fsec);
+
+				sprintf(valCpp, "%02d:%02d:%02d", 
+					hour, min, sec);
+			}
+			break;
+		case 16://bool
+			{
+				char v = *(char *)valDb;
+				if(v)
+				{
+					strcpy(valCpp, "true");
+				}
+				else
+				{
+					strcpy(valCpp, "false");
+				}
+			}
+			break;
+		case 1560://bit
+		case 1562://varbit
+			{
+				typedef struct VarBit
+				{
+					boost::uint32_t amount;
+					boost::int8_t bits[1];
+				} VarBit;
+
+				std::vector<unsigned char> buf(lenDb);
+				memcpy(&buf.front(), valDb, lenDb);
+				VarBit &v = *(VarBit *)&buf.front();
+
+				revert(v.amount);
+				for(size_t i(0); i<v.amount; i++)
+				{
+					if((v.bits[i/8] << i%8) & 0x80)
+					{
+						valCpp[i] = '1';
+					}
+					else
+					{
+						valCpp[i] = '0';
+					}
+				}
+				valCpp[v.amount] = 0;
+			}
+			break;
+
+		case 26://oid
+			{
+				boost::uint32_t v = *(boost::uint32_t *)valDb;
+				_ntoa(revert(v), valCpp);
 			}
 			break;
 
 
+
 		default:
-			assert(!"unsupported db type");
-			valCpp[0] = 0;
+			size_t lenCpp=0;
+			unsigned char *esc = PQescapeBytea((const unsigned char *)valDb, lenDb, &lenCpp);
+			memcpy(valCpp, esc, lenCpp);
+			valCpp[lenCpp] = 0;
+
+// 			assert(!"unsupported db type");
+// 			valCpp[0] = 0;
 			return false;
 
 		}
