@@ -44,5 +44,16 @@ namespace pgc
 		return _impl->rows();
 	}
 
+	bool Result::isNull(size_t rowIdx, size_t colIdx)
+	{
+		return _impl->isNull(rowIdx, colIdx);
+	}
+
+	bool Result::isNull(size_t rowIdx, const char *colName)
+	{
+		return _impl->isNull(rowIdx, colName);
+	}
+
+
 
 }

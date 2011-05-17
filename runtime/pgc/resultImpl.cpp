@@ -103,4 +103,33 @@ namespace pgc
 		return false;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool ResultImpl::isNull(size_t rowIdx, size_t colIdx)
+	{
+		if(!_pgres)
+		{
+			return true;
+		}
+
+		return PQgetisnull(_pgres, rowIdx, colIdx)?true:false;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	bool ResultImpl::isNull(size_t rowIdx, const char *colName)
+	{
+		if(_pgres)
+		{
+			int cn = PQfnumber(_pgres, colName);
+			if(0 > cn)
+			{
+				return false;
+			}
+
+			return isNull(rowIdx, (size_t)cn);
+		}
+
+		return true;
+	}
+
+
 }

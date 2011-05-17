@@ -118,7 +118,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
@@ -250,6 +250,10 @@
 			</File>
 			<File
 				RelativePath=".\exception.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fixEndian.hpp"
 				>
 			</File>
 			<File

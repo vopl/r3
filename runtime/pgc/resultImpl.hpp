@@ -23,6 +23,10 @@ namespace pgc
 		size_t rows();
 		bool fetch(size_t rowIdx, size_t colIdx, int typIdx, void *data);
 		bool fetch(size_t rowIdx, const char *colName, int typIdx, void *data);
+
+		bool isNull(size_t rowIdx, size_t colIdx);
+		bool isNull(size_t rowIdx, const char *colName);
+
 	};
 
 	typedef boost::shared_ptr<ResultImpl> ResultImplPtr;

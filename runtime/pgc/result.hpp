@@ -33,6 +33,9 @@ namespace pgc
 		size_t rows();
 		template <class T> Result &fetch(size_t rowIdx, size_t colIdx, T &v);
 		template <class T> Result &fetch(size_t rowIdx, const char *colName, T &v);
+
+		bool isNull(size_t rowIdx, size_t colIdx);
+		bool isNull(size_t rowIdx, const char *colName);
 	};
 
 	//////////////////////////////////////////////////////////////////////////
