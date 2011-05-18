@@ -626,6 +626,12 @@ namespace pgc
 		case CppDataType<boost::uint64_t>::cdt_index:
 			*(boost::uint64_t *)valCpp = utils::_atoul(valDb);
 			return true;
+		case CppDataType<std::vector<unsigned char> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				(*(std::vector<unsigned char> *)valCpp).assign((unsigned char *)valDb, (unsigned char*)valDb+lenDb);
+			}
+			return true;
 		}
 
 
@@ -756,7 +762,12 @@ namespace pgc
 				impl::bytea2Bitset(*(std::bitset<512>*)valCpp, lenDb*8, valDb);
 			}
 			return true;
-
+		case CppDataType<std::vector<unsigned char> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				(*(std::vector<unsigned char> *)valCpp).assign((unsigned char *)valDb, (unsigned char *)valDb+lenDb);
+			}
+			return true;
 		}
 
 
@@ -1437,6 +1448,20 @@ namespace pgc
 			{
 				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 				impl::bits2Bitset(*(std::bitset<512>*)valCpp, v.amount, v.bits);
+			}
+			return true;
+		case CppDataType<std::vector<unsigned char> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+
+				std::vector<unsigned char> &vec = (*(std::vector<unsigned char> *)valCpp);
+				vec.assign((unsigned char *)v.bits, (unsigned char *)v.bits + ((v.amount%8)?(v.amount/8+1):(v.amount/8)));
+
+				//reverse
+				for(size_t i(0); i<vec.size(); i++)
+				{
+					vec[i] = (unsigned char)(((vec[i] * 0x0802LU & 0x22110LU) | (vec[i] * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16);
+				}
 			}
 			return true;
 		}

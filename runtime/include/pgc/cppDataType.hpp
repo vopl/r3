@@ -134,7 +134,7 @@ namespace pgc
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<std::vector<char> >
+	template <> struct CppDataType<std::vector<unsigned char> >
 	{
 		enum {cdt_index = __LINE__};
 	};

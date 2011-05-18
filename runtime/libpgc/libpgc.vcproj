@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libpgc"
 	ProjectGUID="{55B09566-11AA-42DD-A2AA-A359E9E8098E}"
 	RootNamespace="libpgc"
@@ -169,12 +169,18 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="3"
+				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
 				AdditionalIncludeDirectories="../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
+				FloatingPointModel="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>

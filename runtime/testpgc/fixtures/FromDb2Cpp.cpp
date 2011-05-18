@@ -27,6 +27,7 @@ class FromDb2Cpp
 	CPPUNIT_TEST( _stdtm );
 
 	CPPUNIT_TEST( _stdbitset );
+	CPPUNIT_TEST( _stdvectorchar );
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -812,6 +813,94 @@ protected:
 		CPPUNIT_ASSERT( !SQL("1234::oid", val8) );
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void _stdvectorchar()
+	{
+		std::vector<unsigned char> val;
+
+#undef SQL
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+
+		CPPUNIT_ASSERT( !SQL("-123::int2") );
+		CPPUNIT_ASSERT( !SQL("0::int4") );
+		CPPUNIT_ASSERT( !SQL("1::int8") );
+		CPPUNIT_ASSERT( !SQL("-1234.321::numeric(10,5)") );
+		CPPUNIT_ASSERT( !SQL("-1234.123::float4") );
+		CPPUNIT_ASSERT( !SQL("-0::float8") );
+		CPPUNIT_ASSERT( !SQL("'1234'::money") );
+
+
+		val.resize(10);
+		CPPUNIT_ASSERT( SQL("''::varchar") );
+		CPPUNIT_ASSERT(val.size() == 0);
+
+		std::vector<unsigned char> expect;
+		CPPUNIT_ASSERT( SQL("'1234'::varchar") );
+
+		expect.resize(4);
+		expect[0] = '1';
+		expect[1] = '2';
+		expect[2] = '3';
+		expect[3] = '4';
+
+		CPPUNIT_ASSERT( SQL("'1234'::bytea") );
+		CPPUNIT_ASSERT(expect == val);
+
+		CPPUNIT_ASSERT( SQL("B'1001011'::varbit") );
+		expect.resize(1);
+		expect[0] = 0x69;
+		CPPUNIT_ASSERT(expect == val);
+
+
+		CPPUNIT_ASSERT( SQL("B'1001011011010110000'::varbit") );
+		expect.resize(3);
+		expect[0] = 0x69;
+		expect[1] = 0x6b;
+		expect[2] = 0x00;
+		CPPUNIT_ASSERT(expect == val);
+
+
+
+
+		CPPUNIT_ASSERT( !SQL("'2010-03-04 13:00:17'::timestamp") );
+		CPPUNIT_ASSERT( !SQL("'2010-03-04 13:00:17'::timestamp with time zone") );
+		CPPUNIT_ASSERT( !SQL("'4 months 5 days 18:07:56'::interval") );
+		CPPUNIT_ASSERT( !SQL("'2010-03-04'::date") );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time") );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time with time zone") );
+		CPPUNIT_ASSERT( !SQL("true") );
+		CPPUNIT_ASSERT( !SQL("false") );
+
+		CPPUNIT_ASSERT( !SQL("1234::oid") );
+	}
 
 
 
