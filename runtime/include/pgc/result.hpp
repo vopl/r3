@@ -23,8 +23,8 @@ namespace pgc
 		friend class Statement;
 		Result(ResultImplPtr impl);
 
-		bool fetchHelper(int rowIdx, int colIdx, int typIdx, void *data);
-		bool fetchHelper(int rowIdx, const char *colName, int typIdx, void *data);
+		bool fetchHelper(int rowIdx, int colIdx, int typCpp, void *valCpp);
+		bool fetchHelper(int rowIdx, const char *colName, int typCpp, void *valCpp);
 
 	public:
 		~Result();

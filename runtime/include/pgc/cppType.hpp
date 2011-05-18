@@ -15,21 +15,21 @@ namespace pgc
 		enum {cdt_index = __LINE__};
 	};
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<std::string >
+	template <> struct CppDataType<std::string>
 	{
 
 		enum {cdt_index = __LINE__};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<bool >
+	template <> struct CppDataType<bool>
 	{
 
 		enum {cdt_index = __LINE__};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<float >
+	template <> struct CppDataType<float>
 	{
 
 		enum {cdt_index = __LINE__};
@@ -37,69 +37,75 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<double >
+	template <> struct CppDataType<double>
 	{
 
 		enum {cdt_index = __LINE__};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::int8_t >
+	template <> struct CppDataType<boost::int8_t>
 	{
 
 		enum {cdt_index = __LINE__};
 	};
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::int16_t >
+	template <> struct CppDataType<boost::int16_t>
 	{
 
 		enum {cdt_index = __LINE__};
 	};
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::int32_t >
+	template <> struct CppDataType<boost::int32_t>
 	{
 
 		enum {cdt_index = __LINE__};
 	};
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::int64_t >
-	{
-
-		enum {cdt_index = __LINE__};
-	};
-
-	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::uint8_t >
-	{
-
-		enum {cdt_index = __LINE__};
-	};
-	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::uint16_t >
-	{
-
-		enum {cdt_index = __LINE__};
-	};
-	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::uint32_t >
-	{
-
-		enum {cdt_index = __LINE__};
-	};
-	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::uint64_t >
+	template <> struct CppDataType<boost::int64_t>
 	{
 
 		enum {cdt_index = __LINE__};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<std::tm >
+	template <> struct CppDataType<boost::uint8_t>
+	{
+
+		enum {cdt_index = __LINE__};
+	};
+	//////////////////////////////////////////////////////////////////////////
+	template <> struct CppDataType<boost::uint16_t>
+	{
+
+		enum {cdt_index = __LINE__};
+	};
+	//////////////////////////////////////////////////////////////////////////
+	template <> struct CppDataType<boost::uint32_t>
+	{
+
+		enum {cdt_index = __LINE__};
+	};
+	//////////////////////////////////////////////////////////////////////////
+	template <> struct CppDataType<boost::uint64_t>
 	{
 
 		enum {cdt_index = __LINE__};
 	};
 
+	//////////////////////////////////////////////////////////////////////////
+	template <> struct CppDataType<std::tm>
+	{
+
+		enum {cdt_index = __LINE__};
+	};
+
+	//bits - bitset
+	//binary - vector<char>
+	//blob
+	//boost date
+	//boost ptime
+	//boost time interval
 
 }
 

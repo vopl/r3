@@ -44,7 +44,7 @@ namespace pgc
 			else
 			{
 				//return ResultImplPtr(new ResultImpl(PQexec(_con->_pgcon, _sql.c_str())));
-				return ResultImplPtr(new ResultImpl(PQexecParams(_con->_pgcon, _sql.c_str(), 0, 0, 0, 0, 0, 1)));
+				return ResultImplPtr(new ResultImpl(_con, PQexecParams(_con->_pgcon, _sql.c_str(), 0, 0, 0, 0, 0, 1)));
 			}
 		}
 		else

@@ -27,8 +27,8 @@ namespace pgc
 		void close();
 		EConnectionStatus status();
 
-		Statement once();
-		Statement prep();
+		Statement once(const char *sql=NULL);
+		Statement prep(const char *sql=NULL);
 	};
 }
 #endif

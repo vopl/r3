@@ -95,7 +95,7 @@ protected:
 		//CPPUNIT_ASSERT_STR_EQUAL( pchar, "13:00:17");
 
 		CPPUNIT_ASSERT( SQL("true") );
-		CPPUNIT_ASSERT_STR_EQUAL( pchar, "true");
+		CPPUNIT_ASSERT_STR_EQUAL( pchar, "1");
 
 		CPPUNIT_ASSERT( SQL("B'101100111000'::bit(12)") );
 		CPPUNIT_ASSERT_STR_EQUAL( pchar, "101100111000");

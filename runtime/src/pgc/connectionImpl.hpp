@@ -17,6 +17,8 @@ namespace pgc
 		ConnectionImpl();
 		~ConnectionImpl();
 
+		PGconn *pgcon();
+
 		EConnectionStatus open(const char *conninfo);
 		void close();
 		EConnectionStatus status();

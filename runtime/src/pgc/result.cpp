@@ -9,14 +9,14 @@ namespace pgc
 	{
 	}
 
-	bool Result::fetchHelper(int rowIdx, int colIdx, int typIdx, void *data)
+	bool Result::fetchHelper(int rowIdx, int colIdx, int typCpp, void *valCpp)
 	{
-		return _impl->fetch(rowIdx, colIdx, typIdx, data);
+		return _impl->fetch(rowIdx, colIdx, typCpp, valCpp);
 	}
 	
-	bool Result::fetchHelper(int rowIdx, const char *colName, int typIdx, void *data)
+	bool Result::fetchHelper(int rowIdx, const char *colName, int typCpp, void *valCpp)
 	{
-		return _impl->fetch(rowIdx, colName, typIdx, data);
+		return _impl->fetch(rowIdx, colName, typCpp, valCpp);
 	}
 
 	Result::~Result()

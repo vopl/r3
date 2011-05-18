@@ -12,6 +12,11 @@ namespace pgc
 		close();
 	}
 
+	PGconn *ConnectionImpl::pgcon()
+	{
+		return _pgcon;
+	}
+
 	EConnectionStatus ConnectionImpl::open(const char *conninfo)
 	{
 		close();

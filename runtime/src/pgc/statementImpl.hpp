@@ -9,7 +9,7 @@ namespace pgc
 {
 	class ConnectionImpl;
 	typedef boost::shared_ptr<ConnectionImpl> ConnectionImplPtr;
-	typedef boost::weak_ptr<ConnectionImpl> ConnectionImplWtr;
+//	typedef boost::weak_ptr<ConnectionImpl> ConnectionImplWtr;
 
 	struct CppConstValue
 	{

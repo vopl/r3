@@ -26,12 +26,26 @@ namespace pgc
 		return _impl->status();
 	}
 
-	Statement Connection::once()
+	Statement Connection::once(const char *sql)
 	{
-		return Statement(_impl->once());
+		Statement s(_impl->once());
+
+		if(sql)
+		{
+			s.sql(sql);
+		}
+
+		return s;
 	}
-	Statement Connection::prep()
+	Statement Connection::prep(const char *sql)
 	{
-		return Statement(_impl->prep());
+		Statement s(_impl->prep());
+
+		if(sql)
+		{
+			s.sql(sql);
+		}
+
+		return s;
 	}
 }
