@@ -70,7 +70,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for int2");
+		//assert(!"unsupported cpp type for int2");
 		return false;
 	}
 
@@ -133,7 +133,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for int4");
+		//assert(!"unsupported cpp type for int4");
 		return false;
 	}
 
@@ -196,7 +196,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for int8");
+		//assert(!"unsupported cpp type for int8");
 		return false;
 	}
 
@@ -321,10 +321,16 @@ namespace pgc
 			*(bool *)valCpp = utils::_atoc(str)?true:false;
 			return true;
 		case CppDataType<float>::cdt_index:
-			sscanf(str, "%f", *(float *)valCpp);
+			if(1 != sscanf(str, "%f", (float *)valCpp))
+			{
+				*(float *)valCpp = 0;
+			}
 			return true;
 		case CppDataType<double>::cdt_index:
-			sscanf(str, "%lf", *(float *)valCpp);
+			if(1 != sscanf(str, "%lf", (double *)valCpp))
+			{
+				*(double *)valCpp = 0;
+			}
 			return true;
 		case CppDataType<boost::int8_t>::cdt_index:
 			*(boost::int8_t *)valCpp = utils::_atoc(str);
@@ -353,7 +359,7 @@ namespace pgc
 		}
 
 
-		assert(!"unsupported cpp type for numeric");
+		//assert(!"unsupported cpp type for numeric");
 		return false;
 	}
 
@@ -417,7 +423,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for float4");
+		//assert(!"unsupported cpp type for float4");
 		return false;
 	}
 
@@ -481,7 +487,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for float8");
+		//assert(!"unsupported cpp type for float8");
 		return false;
 	}
 
@@ -544,7 +550,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for money");
+		//assert(!"unsupported cpp type for money");
 		return false;
 	}
 
@@ -585,10 +591,16 @@ namespace pgc
 			*(bool *)valCpp = utils::_atoc(valDb)?true:false;
 			return true;
 		case CppDataType<float>::cdt_index:
-			sscanf(valDb, "%f", *(float *)valCpp);
+			if(1 != sscanf(valDb, "%f", (float *)valCpp))
+			{
+				*(float *)valCpp = 0;
+			}
 			return true;
 		case CppDataType<double>::cdt_index:
-			sscanf(valDb, "%lf", *(float *)valCpp);
+			if(1 != sscanf(valDb, "%lf", (double *)valCpp))
+			{
+				*(double *)valCpp = 0;
+			}
 			return true;
 		case CppDataType<boost::int8_t>::cdt_index:
 			*(boost::int8_t *)valCpp = utils::_atoc(valDb);
@@ -617,7 +629,7 @@ namespace pgc
 		}
 
 
-		assert(!"unsupported cpp type for varchar");
+		//assert(!"unsupported cpp type for varchar");
 		return false;
 	}
 
@@ -657,10 +669,16 @@ namespace pgc
 				strCpp.assign(valDb, valDb+lenDb);
 			}
 			return true;
+		case CppDataType<bool>::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				(*(bool*)valCpp) = lenDb?true:false;
+			}
+			return true;
 		}
 
 
-		assert(!"unsupported cpp type for bytea");
+		//assert(!"unsupported cpp type for bytea");
 		return false;
 	}
 
@@ -771,7 +789,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for timestamp");
+		//assert(!"unsupported cpp type for timestamp");
 		return false;
 	}
 
@@ -826,6 +844,9 @@ namespace pgc
 				*(std::string*)valCpp = buf;
 			}
 			return true;
+		case CppDataType<bool>::cdt_index:
+			*(bool *)valCpp = VAL?true:false;
+			return true;
 		case CppDataType<float>::cdt_index:
 			*(float *)valCpp = (float)VAL;
 			return true;
@@ -859,7 +880,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for interval");
+		//assert(!"unsupported cpp type for interval");
 		return false;
 	}
 
@@ -943,7 +964,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for date");
+		//assert(!"unsupported cpp type for date");
 		return false;
 	}
 
@@ -980,6 +1001,9 @@ namespace pgc
 					hour, min, sec);
 				*(std::string*)valCpp = buf;
 			}
+			return true;
+		case CppDataType<bool>::cdt_index:
+			*(bool *)valCpp = VAL?true:false;
 			return true;
 		case CppDataType<float>::cdt_index:
 			*(float *)valCpp = (float)VAL;
@@ -1025,7 +1049,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for time");
+		//assert(!"unsupported cpp type for time");
 		return false;
 	}
 
@@ -1088,7 +1112,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for bool");
+		//assert(!"unsupported cpp type for bool");
 		return false;
 	}
 
@@ -1225,7 +1249,7 @@ namespace pgc
 				}
 				else
 				{
-					*(bool *)valCpp = v.bits[0]?true:false;
+					*(bool *)valCpp = (v.bits[0] & 0x80)?true:false;
 					return true;
 				}
 			}
@@ -1262,7 +1286,7 @@ namespace pgc
 			return true;
 		}
 
-		assert(!"unsupported cpp type for varbit");
+		//assert(!"unsupported cpp type for varbit");
 		return false;
 	}
 
@@ -1325,7 +1349,7 @@ namespace pgc
 		}
 #undef VAL
 
-		assert(!"unsupported cpp type for oid");
+		//assert(!"unsupported cpp type for oid");
 		return false;
 	}
 
