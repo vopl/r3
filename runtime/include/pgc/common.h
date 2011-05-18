@@ -1,19 +1,19 @@
 #ifndef _PGC_COMMON_HPP_
 #define _PGC_COMMON_HPP_
 
-#include <boost/cstdint.hpp>
-#include <string>
 #include <exception>
+
+#include <string>
+#include <bitset>
+#include <vector>
+
 #include <boost/shared_ptr.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/date_time/gregorian_calendar.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace pgc
 {
 }
-
-#ifdef LIBPGC_EXPORTS
-#define LIBPGC_API __declspec(dllexport)
-#else
-#define LIBPGC_API __declspec(dllimport)
-#endif
 
 #endif

@@ -26,6 +26,8 @@ class FromDb2Cpp
 
 	CPPUNIT_TEST( _stdtm );
 
+	CPPUNIT_TEST( _stdbitset );
+
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -688,6 +690,146 @@ protected:
 	}
 
 
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void _stdbitset()
+	{
+		std::bitset<8> val8;
+		std::bitset<16> val16;
+		std::bitset<32> val32;
+		std::bitset<64> val64;
+		std::bitset<128> val128;
+		std::bitset<256> val256;
+		std::bitset<512> val512;
+
+#undef SQL
+#define SQL(x, v) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,v)
+
+		CPPUNIT_ASSERT( !SQL("-123::int2", val8) );
+		CPPUNIT_ASSERT( !SQL("0::int4", val8) );
+		CPPUNIT_ASSERT( !SQL("1::int8", val8) );
+		CPPUNIT_ASSERT( !SQL("-1234.321::numeric(10,5)", val8) );
+		CPPUNIT_ASSERT( !SQL("-1234.123::float4", val8) );
+		CPPUNIT_ASSERT( !SQL("-0::float8", val8) );
+		CPPUNIT_ASSERT( !SQL("'1234'::money", val8) );
+		CPPUNIT_ASSERT( !SQL("''::varchar", val8) );
+		CPPUNIT_ASSERT( !SQL("'1234'::char(10)", val8) );
+		CPPUNIT_ASSERT( !SQL("'1234'::text", val8) );
+
+
+
+
+
+
+		CPPUNIT_ASSERT( SQL("'1234'::bytea", val8) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<8>(std::string("00110001")), val8);
+
+		CPPUNIT_ASSERT( SQL("'1234'::bytea", val16) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<16>(std::string("0011001000110001")), val16);
+
+		CPPUNIT_ASSERT( SQL("'1234'::bytea", val32) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<32>(std::string("00110100001100110011001000110001")), val32);
+
+		val64.set(47);
+		CPPUNIT_ASSERT( SQL("'1234'::bytea", val64) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<64>(std::string("00110100001100110011001000110001")), val64);
+
+		val128.set(100);
+		CPPUNIT_ASSERT( SQL("'1234'::bytea", val128) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<128>(std::string("00110100001100110011001000110001")), val128);
+
+		val256.set(255);
+		CPPUNIT_ASSERT( SQL("'1234'::bytea", val256) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<256>(std::string("00110100001100110011001000110001")), val256);
+
+		val512.set(67);
+		val512.set(75);
+		val512.set(100);
+		val512.set(200);
+		val512.set(300);
+		val512.set(400);
+		val512.set(511);
+		CPPUNIT_ASSERT( SQL("'1234'::bytea", val512) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<512>(std::string("00110100001100110011001000110001")), val512);
+
+
+		CPPUNIT_ASSERT( SQL("'D234'::bytea", val8) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<8>(std::string("01000100")), val8);
+
+		CPPUNIT_ASSERT( SQL("'#'::bytea", val8) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<8>(std::string("00100011")), val8);
+
+
+
+
+
+
+
+
+		CPPUNIT_ASSERT( SQL("B'1000001100000011110011111111110000011100010011001111000100111111'::bit(64)", val8) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<8>(std::string("11000001")), val8);
+
+		CPPUNIT_ASSERT( SQL("B'000'::varbit", val8) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<8>(std::string("00000000")), val8);
+
+		CPPUNIT_ASSERT( SQL("B'001'::varbit", val8) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<8>(std::string("00000100")), val8);
+
+		CPPUNIT_ASSERT( SQL("B'10100'::varbit", val8) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<8>(std::string("00000101")), val8);
+
+		CPPUNIT_ASSERT( SQL("B''::varbit", val8) );
+		CPPUNIT_ASSERT_EQUAL(std::bitset<8>(std::string("00000000")), val8);
+
+
+
+
+
+
+
+		CPPUNIT_ASSERT( !SQL("'2010-03-04 13:00:17'::timestamp", val8) );
+		CPPUNIT_ASSERT( !SQL("'2010-03-04 13:00:17'::timestamp with time zone", val8) );
+		CPPUNIT_ASSERT( !SQL("'4 months 5 days 18:07:56'::interval", val8) );
+		CPPUNIT_ASSERT( !SQL("'2010-03-04'::date", val8) );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time", val8) );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time with time zone", val8) );
+		CPPUNIT_ASSERT( !SQL("true", val8) );
+		CPPUNIT_ASSERT( !SQL("false", val8) );
+
+		CPPUNIT_ASSERT( !SQL("1234::oid", val8) );
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 
 
 

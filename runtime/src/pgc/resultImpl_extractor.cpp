@@ -1,6 +1,6 @@
 #include "resultImpl.hpp"
 #include "connectionImpl.hpp"
-#include "pgc/cppType.hpp"
+#include "pgc/cppDataType.hpp"
 #include "utils/fixEndian.hpp"
 #include "utils/ntoa.hpp"
 #include "utils/aton.hpp"
@@ -633,6 +633,45 @@ namespace pgc
 		return false;
 	}
 
+	namespace impl
+	{
+		template <size_t N>
+		void bytea2Bitset(std::bitset<N> &bs, int bitsDb, const char *valDb)
+		{
+			if(bitsDb > (int)bs.size())
+			{
+				bitsDb = bs.size();
+			}
+
+			for(int i(0); i<bitsDb/8; i++)
+			{
+				bs.set(i*8+0, (valDb[i] & 0x01)?true:false);
+				bs.set(i*8+1, (valDb[i] & 0x02)?true:false);
+				bs.set(i*8+2, (valDb[i] & 0x04)?true:false);
+				bs.set(i*8+3, (valDb[i] & 0x08)?true:false);
+				bs.set(i*8+4, (valDb[i] & 0x10)?true:false);
+				bs.set(i*8+5, (valDb[i] & 0x20)?true:false);
+				bs.set(i*8+6, (valDb[i] & 0x40)?true:false);
+				bs.set(i*8+7, (valDb[i] & 0x80)?true:false);
+			}
+
+			if(bitsDb%8)
+			{
+				for(int i(0); i<bitsDb%8; i++)
+				{
+					bs.set(bitsDb/8*8+i, (valDb[bitsDb/8] & (0x01<<i))?true:false);
+				}
+
+				bitsDb = bitsDb/8*8 + 1;
+			}
+
+			for(size_t i(bitsDb); i<bs.size(); i++)
+			{
+				bs.reset(i);
+			}
+		}
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	bool ResultImpl::extractor_bytea		(int rowIdx, int colIdx, int typCpp, void *valCpp)
 	{
@@ -675,6 +714,49 @@ namespace pgc
 				(*(bool*)valCpp) = lenDb?true:false;
 			}
 			return true;
+		case CppDataType<std::bitset<8> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bytea2Bitset(*(std::bitset<8>*)valCpp, lenDb*8, valDb);
+			}
+			return true;
+		case CppDataType<std::bitset<16> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bytea2Bitset(*(std::bitset<16>*)valCpp, lenDb*8, valDb);
+			}
+			return true;
+		case CppDataType<std::bitset<32> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bytea2Bitset(*(std::bitset<32>*)valCpp, lenDb*8, valDb);
+			}
+			return true;
+		case CppDataType<std::bitset<64> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bytea2Bitset(*(std::bitset<64>*)valCpp, lenDb*8, valDb);
+			}
+			return true;
+		case CppDataType<std::bitset<128> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bytea2Bitset(*(std::bitset<128>*)valCpp, lenDb*8, valDb);
+			}
+			return true;
+		case CppDataType<std::bitset<256> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bytea2Bitset(*(std::bitset<256>*)valCpp, lenDb*8, valDb);
+			}
+			return true;
+		case CppDataType<std::bitset<512> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bytea2Bitset(*(std::bitset<512>*)valCpp, lenDb*8, valDb);
+			}
+			return true;
+
 		}
 
 
@@ -1119,7 +1201,7 @@ namespace pgc
 	namespace impl
 	{
 		template <class T>
-		void bits2POD(T &pod, boost::uint32_t amount, boost::int8_t *bits)
+		void bits2POD(T &pod, boost::uint32_t amount, boost::uint8_t *bits)
 		{
 			boost::uint32_t tail = 0;
 			if(sizeof(pod)*8 <= amount)
@@ -1177,6 +1259,37 @@ namespace pgc
 				buf[i] = (unsigned char)(((buf[i] * 0x0802LU & 0x22110LU) | (buf[i] * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16);
 			}
 		}
+
+		template <size_t N>
+		void bits2Bitset(std::bitset<N> &bs, int bitsDb, boost::uint8_t *valDb)
+		{
+			if(bitsDb > (int)bs.size())
+			{
+				bitsDb = bs.size();
+			}
+
+			for(int i(0); i<bitsDb/8; i++)
+			{
+				bs.set(i*8+0, (valDb[i] & 0x80)?true:false);
+				bs.set(i*8+1, (valDb[i] & 0x40)?true:false);
+				bs.set(i*8+2, (valDb[i] & 0x20)?true:false);
+				bs.set(i*8+3, (valDb[i] & 0x10)?true:false);
+				bs.set(i*8+4, (valDb[i] & 0x08)?true:false);
+				bs.set(i*8+5, (valDb[i] & 0x04)?true:false);
+				bs.set(i*8+6, (valDb[i] & 0x02)?true:false);
+				bs.set(i*8+7, (valDb[i] & 0x01)?true:false);
+			}
+
+			for(int i(0); i<bitsDb%8; i++)
+			{
+				bs.set(bitsDb/8*8+i, (valDb[bitsDb/8] & (0x80>>i))?true:false);
+			}
+
+			for(size_t i(bitsDb); i<bs.size(); i++)
+			{
+				bs.reset(i);
+			}
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1192,7 +1305,7 @@ namespace pgc
 		typedef struct VarBit
 		{
 			boost::uint32_t amount;
-			boost::int8_t bits[1];
+			boost::uint8_t bits[1];
 		} VarBit;
 
 		int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
@@ -1283,6 +1396,48 @@ namespace pgc
 			return true;
 		case CppDataType<boost::uint64_t>::cdt_index:
 			impl::bits2POD(*(boost::uint64_t *)valCpp, v.amount, v.bits);
+			return true;
+		case CppDataType<std::bitset<8> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bits2Bitset(*(std::bitset<8>*)valCpp, v.amount, v.bits);
+			}
+			return true;
+		case CppDataType<std::bitset<16> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bits2Bitset(*(std::bitset<16>*)valCpp, v.amount, v.bits);
+			}
+			return true;
+		case CppDataType<std::bitset<32> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bits2Bitset(*(std::bitset<32>*)valCpp, v.amount, v.bits);
+			}
+			return true;
+		case CppDataType<std::bitset<64> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bits2Bitset(*(std::bitset<64>*)valCpp, v.amount, v.bits);
+			}
+			return true;
+		case CppDataType<std::bitset<128> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bits2Bitset(*(std::bitset<128>*)valCpp, v.amount, v.bits);
+			}
+			return true;
+		case CppDataType<std::bitset<256> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bits2Bitset(*(std::bitset<256>*)valCpp, v.amount, v.bits);
+			}
+			return true;
+		case CppDataType<std::bitset<512> >::cdt_index:
+			{
+				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+				impl::bits2Bitset(*(std::bitset<512>*)valCpp, v.amount, v.bits);
+			}
 			return true;
 		}
 
