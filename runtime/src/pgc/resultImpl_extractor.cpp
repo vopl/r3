@@ -640,7 +640,7 @@ namespace pgc
 		{
 			if(bitsDb > (int)bs.size())
 			{
-				bitsDb = bs.size();
+				bitsDb = (int)bs.size();
 			}
 
 			for(int i(0); i<bitsDb/8; i++)
@@ -1265,7 +1265,7 @@ namespace pgc
 		{
 			if(bitsDb > (int)bs.size())
 			{
-				bitsDb = bs.size();
+				bitsDb = (int)bs.size();
 			}
 
 			for(int i(0); i<bitsDb/8; i++)
