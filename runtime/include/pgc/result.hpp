@@ -33,8 +33,8 @@ namespace pgc
 		Result &throwIfError();
 
 		int rows();
-		template <class T> Result &fetch(int rowIdx, int colIdx, T &v);
-		template <class T> Result &fetch(int rowIdx, const char *colName, T &v);
+		template <class T> bool fetch(int rowIdx, int colIdx, T &v);
+		template <class T> bool fetch(int rowIdx, const char *colName, T &v);
 
 		bool isNull(int rowIdx, int colIdx);
 		bool isNull(int rowIdx, const char *colName);
@@ -42,17 +42,15 @@ namespace pgc
 	typedef boost::shared_ptr<Result> ResultPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class T> Result &Result::fetch(int rowIdx, int colIdx, T &v)
+	template <class T> bool Result::fetch(int rowIdx, int colIdx, T &v)
 	{
-		fetchHelper(rowIdx, colIdx, CppDataType<T>::cdt_index, &v);
-		return *this;
+		return fetchHelper(rowIdx, colIdx, CppDataType<T>::cdt_index, &v);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class T> Result &Result::fetch(int rowIdx, const char *colName, T &v)
+	template <class T> bool Result::fetch(int rowIdx, const char *colName, T &v)
 	{
-		fetchHelper(rowIdx, colName, CppDataType<T>::cdt_index, &v);
-		return *this;
+		return fetchHelper(rowIdx, colName, CppDataType<T>::cdt_index, &v);
 	}
 
 }

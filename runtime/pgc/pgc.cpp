@@ -149,19 +149,19 @@ void selectTestTable(pgc::Connection con)
 	}
 
 
-	std::string		v_stdstring;
-	bool			v_bool;
-	boost::int8_t	v_int8;
-	boost::int16_t	v_int16;
-	boost::int32_t	v_int32;
-	boost::int64_t	v_int64;
-	boost::uint8_t	v_uint8;
-	boost::uint16_t	v_uint16;
-	boost::uint32_t	v_uint32;
-	boost::uint64_t	v_uint64;
-	float			v_real;
-	double			v_double;
-	std::tm			v_stdtm;
+// 	std::string		v_stdstring;
+// 	bool			v_bool;
+// 	boost::int8_t	v_int8;
+// 	boost::int16_t	v_int16;
+// 	boost::int32_t	v_int32;
+// 	boost::int64_t	v_int64;
+// 	boost::uint8_t	v_uint8;
+// 	boost::uint16_t	v_uint16;
+// 	boost::uint32_t	v_uint32;
+// 	boost::uint64_t	v_uint64;
+// 	float			v_real;
+// 	double			v_double;
+// 	std::tm			v_stdtm;
 
 }
 
@@ -171,7 +171,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 
 		pgc::Connection con;
-		pgc::EConnectionStatus s = con.open("dbname=test user=postgres password=postgres port=5433");
+		pgc::EConnectionStatus s = con.open("dbname=test user=postgres password=postgres port=5432");
 
 
 		std::string str;
