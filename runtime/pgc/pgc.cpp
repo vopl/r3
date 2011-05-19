@@ -153,16 +153,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		try
 		{
 
-			pgc::DateTimeDuration in = 
-			{
-				boost::gregorian::date_duration(45),
-				boost::posix_time::time_duration(25, 2, 56, 123),
-			};
+			std::bitset<256> in(std::string("111"));
 
 			std::string out;
 
 
-			pgc::Statement stmt = con.once("SELECT $1::interval::varchar");
+			pgc::Statement stmt = con.once("SELECT $1::varbit");
 
 			stmt.bind(in, 1);
 

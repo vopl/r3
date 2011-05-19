@@ -4,6 +4,7 @@
 #include "utils/fixEndian.hpp"
 #include "utils/ntoa.hpp"
 #include "utils/julian.h"
+#include <boost/static_assert.hpp>
 
 namespace pgc
 {
@@ -34,6 +35,28 @@ namespace pgc
 	void StatementImpl::sql(const char *csz)
 	{
 		_sql = csz;
+	}
+
+	namespace impl
+	{
+		template <size_t N>
+		void bitset2Bits(const std::bitset<N> &bs, boost::uint8_t *bits)
+		{
+			BOOST_STATIC_ASSERT(N%8 == 0);
+
+			for(int i(0); i<N/8; i++)
+			{
+				bits[i]=
+					(bs[i*8+0]?0x80:0) | 
+					(bs[i*8+1]?0x40:0) | 
+					(bs[i*8+2]?0x20:0) | 
+					(bs[i*8+3]?0x10:0) | 
+					(bs[i*8+4]?0x08:0) | 
+					(bs[i*8+5]?0x04:0) | 
+					(bs[i*8+6]?0x02:0) | 
+					(bs[i*8+7]?0x01:0);
+			}
+		}
 	}
 	void StatementImpl::bind(int typCpp, void const *valCpp, size_t idx)
 	{
@@ -275,6 +298,122 @@ namespace pgc
 				pgi.month = utils::fixEndian((boost::uint32_t)(dtd._dd.days() / utils::DAYS_PER_MONTH));
 				pgi.day = utils::fixEndian((boost::uint32_t)(dtd._dd.days() % utils::DAYS_PER_MONTH));
 				pgi.time = utils::fixEndian(dtd._td.total_microseconds());
+			}
+			break;
+
+		case CppDataType<std::bitset<8> >::cdt_index:
+			{
+				const std::bitset<8> &bs = *(const std::bitset<8> *)valCpp;
+
+				_bindTyp[idx] = 1562;//varbit
+				_bindVal[idx] = new char[sizeof(PG_VarBit)-1+1];
+				PG_VarBit &vb = *(PG_VarBit *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_VarBit)-1+1;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				vb.amount = utils::fixEndian((boost::uint32_t)8);
+				impl::bitset2Bits(bs, vb.bits);
+			}
+			break;
+		case CppDataType<std::bitset<16> >::cdt_index:
+			{
+				const std::bitset<16> &bs = *(const std::bitset<16> *)valCpp;
+
+				_bindTyp[idx] = 1562;//varbit
+				_bindVal[idx] = new char[sizeof(PG_VarBit)-1+2];
+				PG_VarBit &vb = *(PG_VarBit *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_VarBit)-1+2;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				vb.amount = utils::fixEndian((boost::uint32_t)16);
+				impl::bitset2Bits(bs, vb.bits);
+			}
+			break;
+		case CppDataType<std::bitset<32> >::cdt_index:
+			{
+				const std::bitset<32> &bs = *(const std::bitset<32> *)valCpp;
+
+				_bindTyp[idx] = 1562;//varbit
+				_bindVal[idx] = new char[sizeof(PG_VarBit)-1+4];
+				PG_VarBit &vb = *(PG_VarBit *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_VarBit)-1+4;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				vb.amount = utils::fixEndian((boost::uint32_t)32);
+				impl::bitset2Bits(bs, vb.bits);
+			}
+			break;
+		case CppDataType<std::bitset<64> >::cdt_index:
+			{
+				const std::bitset<64> &bs = *(const std::bitset<64> *)valCpp;
+
+				_bindTyp[idx] = 1562;//varbit
+				_bindVal[idx] = new char[sizeof(PG_VarBit)-1+8];
+				PG_VarBit &vb = *(PG_VarBit *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_VarBit)-1+8;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				vb.amount = utils::fixEndian((boost::uint32_t)64);
+				impl::bitset2Bits(bs, vb.bits);
+			}
+			break;
+		case CppDataType<std::bitset<128> >::cdt_index:
+			{
+				const std::bitset<128> &bs = *(const std::bitset<128> *)valCpp;
+
+				_bindTyp[idx] = 1562;//varbit
+				_bindVal[idx] = new char[sizeof(PG_VarBit)-1+16];
+				PG_VarBit &vb = *(PG_VarBit *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_VarBit)-1+16;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				vb.amount = utils::fixEndian((boost::uint32_t)128);
+				impl::bitset2Bits(bs, vb.bits);
+			}
+			break;
+		case CppDataType<std::bitset<256> >::cdt_index:
+			{
+				const std::bitset<256> &bs = *(const std::bitset<256> *)valCpp;
+
+				_bindTyp[idx] = 1562;//varbit
+				_bindVal[idx] = new char[sizeof(PG_VarBit)-1+32];
+				PG_VarBit &vb = *(PG_VarBit *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_VarBit)-1+32;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				vb.amount = utils::fixEndian((boost::uint32_t)256);
+				impl::bitset2Bits(bs, vb.bits);
+			}
+			break;
+		case CppDataType<std::bitset<512> >::cdt_index:
+			{
+				const std::bitset<512> &bs = *(const std::bitset<512> *)valCpp;
+
+				_bindTyp[idx] = 1562;//varbit
+				_bindVal[idx] = new char[sizeof(PG_VarBit)-1+64];
+				PG_VarBit &vb = *(PG_VarBit *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_VarBit)-1+64;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				vb.amount = utils::fixEndian((boost::uint32_t)512);
+				impl::bitset2Bits(bs, vb.bits);
+			}
+			break;
+		default:
+			{
+				assert(!"unknown type for bind");
+				_bindTyp[idx] = 0;
+				_bindVal[idx] = NULL;
+				_bindLen[idx] = 0;
+				_bindFmt[idx] = 0;
+				_bindOwn[idx] = false;
 			}
 			break;
 

@@ -3,6 +3,7 @@
 
 namespace pgc
 {
+#pragma pack (push, 1)
 	typedef struct PG_NumericData
 	{
 		short ndigits;
@@ -27,6 +28,7 @@ namespace pgc
 		boost::uint32_t amount;
 		boost::uint8_t bits[1];
 	} PG_VarBit;
+#pragma pack (pop)
 
 
 
