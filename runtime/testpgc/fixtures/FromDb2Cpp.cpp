@@ -103,21 +103,21 @@ protected:
 		CPPUNIT_ASSERT( SQL("'1234'::bytea") );
 		STR_EQUAL( "1234", val );
 
-		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17'::timestamp") );
-		STR_EQUAL( "2010-03-04 13:00:17", val );
+		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17.12'::timestamp") );
+		STR_EQUAL( "2010-03-04 13:00:17.12", val );
 
 		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17'::timestamp with time zone") );
 		//зависит от локальной зоны
 		//STR_EQUAL( "2010-03-04 13:00:17", val );
 
-		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56'::interval") );
-		STR_EQUAL( "4 month 5 day 18:07:56", val );
+		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56.0012'::interval") );
+		STR_EQUAL( "4 month 5 day 18:07:56.0012", val );
 
 		CPPUNIT_ASSERT( SQL("'2010-03-04'::date") );
 		STR_EQUAL( "2010-03-04", val );
 
-		CPPUNIT_ASSERT( SQL("'13:00:17'::time") );
-		STR_EQUAL( "13:00:17", val );
+		CPPUNIT_ASSERT( SQL("'13:00:17.1234'::time") );
+		STR_EQUAL( "13:00:17.1234", val );
 
 		CPPUNIT_ASSERT( SQL("'13:00:17'::time with time zone") );
 		//зависит от локальной зоны
@@ -186,21 +186,21 @@ protected:
 		CPPUNIT_ASSERT( SQL("'1234'::bytea") );
 		STR_EQUAL( "1234", val );
 
-		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17'::timestamp") );
-		STR_EQUAL( "2010-03-04 13:00:17", val );
+		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17.1234'::timestamp") );
+		STR_EQUAL( "2010-03-04 13:00:17.1234", val );
 
 		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17'::timestamp with time zone") );
 		//зависит от локальной зоны
 		//STR_EQUAL( "2010-03-04 13:00:17", val );
 
-		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56'::interval") );
-		STR_EQUAL( "4 month 5 day 18:07:56", val );
+		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56.4321'::interval") );
+		STR_EQUAL( "4 month 5 day 18:07:56.4321", val );
 
 		CPPUNIT_ASSERT( SQL("'2010-03-04'::date") );
 		STR_EQUAL( "2010-03-04", val );
 
-		CPPUNIT_ASSERT( SQL("'13:00:17'::time") );
-		STR_EQUAL( "13:00:17", val );
+		CPPUNIT_ASSERT( SQL("'13:00:17.0012'::time") );
+		STR_EQUAL( "13:00:17.0012", val );
 
 		CPPUNIT_ASSERT( SQL("'13:00:17'::time with time zone") );
 		//зависит от локальной зоны

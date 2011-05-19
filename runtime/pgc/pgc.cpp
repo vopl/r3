@@ -3,16 +3,6 @@
 
 #include "stdafx.h"
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
-#include <string>
-#include <iostream>
-
-#include "pgc/connection.hpp"
-#include "pgc/exception.hpp"
-#include <boost/cstdint.hpp>
 
 
 void createTestTable(pgc::Connection con)
@@ -151,7 +141,7 @@ void selectTestTable(pgc::Connection con)
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	{
 
 		pgc::Connection con;
@@ -162,27 +152,24 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		try
 		{
-			std::tm in = {};
-			std::tm out = {};
+
+			pgc::DateTimeDuration in = 
+			{
+				boost::gregorian::date_duration(45),
+				boost::posix_time::time_duration(25, 2, 56, 123),
+			};
+
+			std::string out;
 
 
-			in.tm_year = -110;
-			in.tm_mon = 1;
-			in.tm_mday = 6;
-
-			in.tm_hour = 1;
-			in.tm_min = 12;
-			in.tm_sec = 14;
-
-
-			pgc::Statement stmt = con.once("SELECT $1::timestamp");
+			pgc::Statement stmt = con.once("SELECT $1::interval::varchar");
 
 			stmt.bind(in, 1);
 
 			pgc::Result res = stmt.exec().throwIfError();
 			bool b = res.fetch(0,0,out);
 			if(!b)throw std::exception("fetch failed");
-			//std::cout<<out<<std::endl;
+			std::cout<<out<<std::endl;
 		}
 		catch (std::exception &e)
 		{
@@ -191,7 +178,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		con.close();
 	}
-	_CrtDumpMemoryLeaks();
+	//_CrtDumpMemoryLeaks();
 
 	return 0;
 }

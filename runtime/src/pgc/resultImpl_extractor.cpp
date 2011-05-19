@@ -1,6 +1,7 @@
 #include "resultImpl.hpp"
 #include "connectionImpl.hpp"
 #include "pgc/cppDataType.hpp"
+#include "pgDataType.h"
 #include "utils/fixEndian.hpp"
 #include "utils/ntoa.hpp"
 #include "utils/aton.hpp"
@@ -221,19 +222,10 @@ namespace pgc
 			если была заказана не строка то сконвертировать
 		*/
 
-		typedef struct NumericData
-		{
-			short ndigits;
-			short weight;
-			short sign;
-			short dscale;
-			short NumericDigits[1];
-		} NumericData;
-
 		int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 		std::vector<unsigned char> buf(lenDb);
 		memcpy(&buf.front(), valDb, lenDb);
-		NumericData &v = *(NumericData *)&buf.front();
+		PG_NumericData &v = *(PG_NumericData *)&buf.front();
 
 		v.ndigits = utils::fixEndian(v.ndigits);
 		v.weight = utils::fixEndian(v.weight);
@@ -814,9 +806,25 @@ namespace pgc
 						utils::j2date((int) date, &year, &month, &day);
 						utils::dt2time(time, &hour, &min, &sec, &fsec);
 
-						sprintf(*(char **)valCpp, "%04d-%02d-%02d %02d:%02d:%02d", 
-							year, month, day,
-							hour, min, sec);
+						if(fsec)
+						{
+							int digs = 6;
+							while(!(fsec%10))
+							{
+								digs--;
+								fsec /= 10;
+							}
+							sprintf(*(char **)valCpp, "%04d-%02d-%02d %02d:%02d:%02d.%0*d", 
+								year, month, day,
+								hour, min, sec,
+								digs, fsec);
+						}
+						else
+						{
+							sprintf(*(char **)valCpp, "%04d-%02d-%02d %02d:%02d:%02d", 
+								year, month, day,
+								hour, min, sec);
+						}
 					}
 					break;
 				case CppDataType<std::string>::cdt_index:
@@ -826,9 +834,25 @@ namespace pgc
 						utils::dt2time(time, &hour, &min, &sec, &fsec);
 
 						char buf[128];
-						sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d", 
-							year, month, day,
-							hour, min, sec);
+						if(fsec)
+						{
+							int digs = 6;
+							while(!(fsec%10))
+							{
+								digs--;
+								fsec /= 10;
+							}
+							sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d.%0*d", 
+								year, month, day,
+								hour, min, sec,
+								digs, fsec);
+						}
+						else
+						{
+							sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d", 
+								year, month, day,
+								hour, min, sec);
+						}
 						(*(std::string*)valCpp) = buf;
 					}
 					break;
@@ -968,16 +992,10 @@ namespace pgc
 			return false;
 		}
 
-		typedef struct Interval
-		{
-			boost::uint64_t time;
-			boost::uint32_t day;
-			boost::uint32_t month;
-		} Interval;
 
-		unsigned char buf[sizeof(Interval)];
-		memcpy(buf, valDb, sizeof(Interval));
-		Interval &v = *(Interval *)buf;
+		unsigned char buf[sizeof(PG_Interval)];
+		memcpy(buf, valDb, sizeof(PG_Interval));
+		PG_Interval &v = *(PG_Interval *)buf;
 
 		v.time = utils::fixEndian(v.time);
 		v.day = utils::fixEndian(v.day);
@@ -992,9 +1010,25 @@ namespace pgc
 				int hour, min, sec, fsec;
 				utils::dt2time(v.time, &hour, &min, &sec, &fsec);
 
-				sprintf(*(char **)valCpp, "%d month %d day %02d:%02d:%02d", 
-					v.month, v.day,
-					hour, min, sec);
+				if(fsec)
+				{
+					int digs = 6;
+					while(!(fsec%10))
+					{
+						digs--;
+						fsec /= 10;
+					}
+					sprintf(*(char **)valCpp, "%d month %d day %02d:%02d:%02d.%0*d", 
+						v.month, v.day,
+						hour, min, sec,
+						digs, fsec);
+				}
+				else
+				{
+					sprintf(*(char **)valCpp, "%d month %d day %02d:%02d:%02d", 
+						v.month, v.day,
+						hour, min, sec);
+				}
 			}
 			return true;
 		case CppDataType<std::string>::cdt_index:
@@ -1003,9 +1037,27 @@ namespace pgc
 				utils::dt2time(v.time, &hour, &min, &sec, &fsec);
 
 				char buf[128];
-				sprintf(buf, "%d month %d day %02d:%02d:%02d", 
-					v.month, v.day,
-					hour, min, sec);
+
+				if(fsec)
+				{
+					int digs = 6;
+					while(!(fsec%10))
+					{
+						digs--;
+						fsec /= 10;
+					}
+					sprintf(buf, "%d month %d day %02d:%02d:%02d.%0*d", 
+						v.month, v.day,
+						hour, min, sec,
+						digs, fsec);
+				}
+				else
+				{
+					sprintf(buf, "%d month %d day %02d:%02d:%02d", 
+						v.month, v.day,
+						hour, min, sec);
+				}
+
 				*(std::string*)valCpp = buf;
 			}
 			return true;
@@ -1202,8 +1254,23 @@ namespace pgc
 				int hour, min, sec, fsec;
 				utils::dt2time(VAL, &hour, &min, &sec, &fsec);
 
-				sprintf(*(char **)valCpp, "%02d:%02d:%02d", 
-					hour, min, sec);
+				if(fsec)
+				{
+					int digs = 6;
+					while(!(fsec%10))
+					{
+						digs--;
+						fsec /= 10;
+					}
+					sprintf(*(char **)valCpp, "%02d:%02d:%02d.%0*d", 
+						hour, min, sec,
+						digs, fsec);
+				}
+				else
+				{
+					sprintf(*(char **)valCpp, "%02d:%02d:%02d", 
+						hour, min, sec);
+				}
 			}
 			return true;
 		case CppDataType<std::string>::cdt_index:
@@ -1212,8 +1279,25 @@ namespace pgc
 				utils::dt2time(VAL, &hour, &min, &sec, &fsec);
 
 				char buf[128];
-				sprintf(buf, "%02d:%02d:%02d", 
-					hour, min, sec);
+
+				if(fsec)
+				{
+					int digs = 6;
+					while(!(fsec%10))
+					{
+						digs--;
+						fsec /= 10;
+					}
+					sprintf(buf, "%02d:%02d:%02d.%0*d", 
+						hour, min, sec,
+						digs, fsec);
+				}
+				else
+				{
+					sprintf(buf, "%02d:%02d:%02d", 
+						hour, min, sec);
+				}
+
 				*(std::string*)valCpp = buf;
 			}
 			return true;
@@ -1459,16 +1543,10 @@ namespace pgc
 			return false;
 		}
 
-		typedef struct VarBit
-		{
-			boost::uint32_t amount;
-			boost::uint8_t bits[1];
-		} VarBit;
-
 		int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 		std::vector<unsigned char> buf(lenDb);
 		memcpy(&buf.front(), valDb, lenDb);
-		VarBit &v = *(VarBit *)&buf.front();
+		PG_VarBit &v = *(PG_VarBit *)&buf.front();
 
 		v.amount = utils::fixEndian(v.amount);
 

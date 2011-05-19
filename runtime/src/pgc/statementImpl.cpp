@@ -1,5 +1,6 @@
 #include "statementImpl.hpp"
 #include "connectionImpl.hpp"
+#include "pgDataType.h"
 #include "utils/fixEndian.hpp"
 #include "utils/ntoa.hpp"
 #include "utils/julian.h"
@@ -191,6 +192,92 @@ namespace pgc
 
 			}
 			break;
+		case CppDataType<boost::gregorian::date>::cdt_index:
+			{
+				const boost::gregorian::date &bgd = *(const boost::gregorian::date *)valCpp;
+
+				boost::int32_t d = 
+					utils::date2j(bgd.year(), bgd.month(), bgd.day()) - utils::POSTGRES_EPOCH_JDATE;
+
+				_bindTyp[idx] = 1082;//date
+				_bindVal[idx] = new char[4];
+				*(boost::uint32_t *)_bindVal[idx] = utils::fixEndian(d);
+				_bindLen[idx] = 4;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+			}
+			break;
+		case CppDataType<boost::posix_time::ptime>::cdt_index:
+			{
+				const boost::posix_time::ptime &ptm = *(const boost::posix_time::ptime *)valCpp;
+
+				boost::gregorian::date bgd = ptm.date();
+				boost::posix_time::time_duration pt = ptm.time_of_day();
+
+				boost::int64_t ts = 
+					pt.total_microseconds() + 
+					(utils::date2j(bgd.year(), bgd.month(), bgd.day()) - utils::POSTGRES_EPOCH_JDATE) * utils::USECS_PER_DAY;
+
+				_bindTyp[idx] = 1114;//timestamp
+				_bindVal[idx] = new char[8];
+				*(boost::uint64_t *)_bindVal[idx] = utils::fixEndian(ts);
+				_bindLen[idx] = 8;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+			}
+			break;
+		case CppDataType<boost::gregorian::date_duration>::cdt_index:
+			{
+				const boost::gregorian::date_duration &bgdd = *(const boost::gregorian::date_duration *)valCpp;
+
+				_bindTyp[idx] = 1186;//interval
+				_bindVal[idx] = new char[sizeof(PG_Interval)];
+				PG_Interval &pgi = *(PG_Interval *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_Interval);
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				pgi.month = utils::fixEndian((boost::uint32_t)(bgdd.days() / utils::DAYS_PER_MONTH));
+				pgi.day = utils::fixEndian((boost::uint32_t)(bgdd.days() % utils::DAYS_PER_MONTH));
+				pgi.time = 0;
+			}
+			break;
+		case CppDataType<boost::posix_time::time_duration>::cdt_index:
+			{
+				const boost::posix_time::time_duration &bptd = *(const boost::posix_time::time_duration *)valCpp;
+
+				_bindTyp[idx] = 1186;//interval
+				_bindVal[idx] = new char[sizeof(PG_Interval)];
+				PG_Interval &pgi = *(PG_Interval *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_Interval);
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				pgi.month = 0;
+				pgi.day = 0;
+				pgi.time = utils::fixEndian(bptd.total_microseconds());
+			}
+			break;
+		case CppDataType<DateTimeDuration>::cdt_index:
+			{
+				const DateTimeDuration &dtd = *(const DateTimeDuration *)valCpp;
+
+
+				_bindTyp[idx] = 1186;//interval
+				_bindVal[idx] = new char[sizeof(PG_Interval)];
+				PG_Interval &pgi = *(PG_Interval *)_bindVal[idx];
+				_bindLen[idx] = sizeof(PG_Interval);
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
+				pgi.month = utils::fixEndian((boost::uint32_t)(dtd._dd.days() / utils::DAYS_PER_MONTH));
+				pgi.day = utils::fixEndian((boost::uint32_t)(dtd._dd.days() % utils::DAYS_PER_MONTH));
+				pgi.time = utils::fixEndian(dtd._td.total_microseconds());
+			}
+			break;
+
 		}
 	}
 

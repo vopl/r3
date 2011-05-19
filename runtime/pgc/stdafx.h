@@ -13,3 +13,13 @@
 
 
 // TODO: reference additional headers your program requires here
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#include <string>
+#include <iostream>
+
+#include "pgc/connection.hpp"
+#include "pgc/exception.hpp"
+#include <boost/cstdint.hpp>
