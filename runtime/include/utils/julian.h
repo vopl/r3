@@ -55,20 +55,24 @@ namespace utils
 		return;
 	}	/* j2date() */
 
-	static const boost::int32_t JULIAN_MINYEAR = (-4713);
-	static const boost::int32_t JULIAN_MINMONTH = (11);
-	static const boost::int32_t JULIAN_MINDAY = (24);
-	static const boost::int32_t JULIAN_MAXYEAR = (5874898);
+	static const boost::int32_t JULIAN_MINYEAR		= (-4713);
+	static const boost::int32_t JULIAN_MINMONTH		= (11);
+	static const boost::int32_t JULIAN_MINDAY		= (24);
+	static const boost::int32_t JULIAN_MAXYEAR		= (5874898);
 
-	static const boost::uint32_t DAYS_PER_MONTH =	30;
-	static const boost::uint32_t SECS_PER_YEAR	 =(36525 * 864);
+	static const boost::int32_t DAYS_PER_MONTH		= 30;
+	static const boost::int32_t SECS_PER_YEAR		= (36525 * 864);
+	static const boost::int32_t SECS_PER_DAY		= 86400;
+	static const boost::int32_t SECS_PER_HOUR		= 3600;
+	static const boost::int32_t SECS_PER_MINUTE		= 60;
+	static const boost::int32_t MINS_PER_HOUR		= 60;
 
-	static const boost::uint64_t USECS_PER_DAY	=86400000000LL;
-	static const boost::uint64_t USECS_PER_HOUR	=3600000000LL;
-	static const boost::uint64_t USECS_PER_MINUTE =60000000LL;
-	static const boost::uint64_t USECS_PER_SEC	=1000000LL;
+	static const boost::int64_t USECS_PER_DAY		= 86400000000LL;
+	static const boost::int64_t USECS_PER_HOUR		= 3600000000LL;
+	static const boost::int64_t USECS_PER_MINUTE	= 60000000LL;
+	static const boost::int64_t USECS_PER_SEC		= 1000000LL;
 
-	static const boost::int64_t POSTGRES_EPOCH_JDATE =2451545LL; /* == date2j(2000, 1, 1) */
+	static const boost::int64_t POSTGRES_EPOCH_JDATE	= 2451545LL; /* == date2j(2000, 1, 1) */
 
 
 	template<class Y, class M, class D>
@@ -78,7 +82,7 @@ namespace utils
 			((((y) > JULIAN_MINYEAR) 
 			|| (((y) == JULIAN_MINYEAR) && (((m) > JULIAN_MINMONTH) 
 			|| (((m) == JULIAN_MINMONTH) && ((d) >= JULIAN_MINDAY))))) 
-			&& ((y) < JULIAN_MAXYEAR))
+			&& ((y) < JULIAN_MAXYEAR));
 	}
 
 
@@ -94,7 +98,7 @@ namespace utils
 	}
 
 	boost::int64_t
-		time2t(const int hour, const int min, const int sec, const int fsec)
+		inline time2t(const int hour, const int min, const int sec, const int fsec)
 	{
 		return (((((hour * MINS_PER_HOUR) + min) * SECS_PER_MINUTE) + sec) * USECS_PER_SEC) + fsec;
 	}

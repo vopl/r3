@@ -162,17 +162,27 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		try
 		{
-			boost::uint64_t in = 220;
-			boost::int64_t out;
+			std::tm in = {};
+			std::tm out = {};
 
-			pgc::Statement stmt = con.once("SELECT $1::int8");
+
+			in.tm_year = -110;
+			in.tm_mon = 1;
+			in.tm_mday = 6;
+
+			in.tm_hour = 1;
+			in.tm_min = 12;
+			in.tm_sec = 14;
+
+
+			pgc::Statement stmt = con.once("SELECT $1::timestamp");
 
 			stmt.bind(in, 1);
 
 			pgc::Result res = stmt.exec().throwIfError();
 			bool b = res.fetch(0,0,out);
 			if(!b)throw std::exception("fetch failed");
-			std::cout<<out<<std::endl;
+			//std::cout<<out<<std::endl;
 		}
 		catch (std::exception &e)
 		{

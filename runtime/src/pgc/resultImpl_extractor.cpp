@@ -983,7 +983,7 @@ namespace pgc
 		v.day = utils::fixEndian(v.day);
 		v.month = utils::fixEndian(v.month);
 
-#define VAL (v.time + utils::USECS_PER_DAY*(v.day + v.month*utils::UDAYS_PER_MONTH))
+#define VAL (v.time + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH))
 
 		switch(typCpp)
 		{
@@ -1056,14 +1056,14 @@ namespace pgc
 		case CppDataType<boost::gregorian::date_duration>::cdt_index:
 			{
 				*(boost::gregorian::date_duration*)valCpp = 
-					boost::gregorian::date_duration(v.day + v.month*utils::UDAYS_PER_MONTH);
+					boost::gregorian::date_duration(v.day + v.month*utils::DAYS_PER_MONTH);
 			}
 			return true;
 		case CppDataType<DateTimeDuration>::cdt_index:
 			{
 				DateTimeDuration &dtd = *(DateTimeDuration *)valCpp;
 
-				dtd._dd = boost::gregorian::date_duration(v.day + v.month*utils::UDAYS_PER_MONTH);
+				dtd._dd = boost::gregorian::date_duration(v.day + v.month*utils::DAYS_PER_MONTH);
 
 				int hour, min, sec, fsec;
 				utils::dt2time(v.time, &hour, &min, &sec, &fsec);

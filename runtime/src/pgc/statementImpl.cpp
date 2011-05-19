@@ -2,6 +2,7 @@
 #include "connectionImpl.hpp"
 #include "utils/fixEndian.hpp"
 #include "utils/ntoa.hpp"
+#include "utils/julian.h"
 
 namespace pgc
 {
@@ -176,6 +177,18 @@ namespace pgc
 		case CppDataType<std::tm>::cdt_index:
 			{
 				const std::tm &stm = *(const std::tm *)valCpp;
+
+				boost::int64_t ts = 
+					utils::time2t(stm.tm_hour, stm.tm_min, stm.tm_sec, 0) + 
+					(utils::date2j(stm.tm_year+1900, stm.tm_mon+1, stm.tm_mday) - utils::POSTGRES_EPOCH_JDATE) * utils::USECS_PER_DAY;
+
+				_bindTyp[idx] = 1114;//timestamp
+				_bindVal[idx] = new char[8];
+				*(boost::uint64_t *)_bindVal[idx] = utils::fixEndian(ts);
+				_bindLen[idx] = 8;
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = true;
+
 			}
 			break;
 		}
