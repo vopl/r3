@@ -462,19 +462,22 @@ namespace pgc
 		else
 		{
 			//all
-			for(size_t i(0); i<_bindTyp.size(); i++)
+			if(!_bindTyp.empty())
 			{
-				if(_bindOwn[idx])
+				for(size_t i(0); i<_bindTyp.size(); i++)
 				{
-					delete [] _bindVal[idx];
+					if(_bindOwn[idx])
+					{
+						delete [] _bindVal[idx];
+					}
 				}
-			}
 
-			_bindTyp.clear();
-			_bindVal.clear();
-			_bindLen.clear();
-			_bindFmt.clear();
-			_bindOwn.clear();
+				_bindTyp.clear();
+				_bindVal.clear();
+				_bindLen.clear();
+				_bindFmt.clear();
+				_bindOwn.clear();
+			}
 		}
 	}
 

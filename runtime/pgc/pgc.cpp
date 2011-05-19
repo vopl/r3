@@ -164,12 +164,9 @@ int _tmain(int argc, _TCHAR* argv[])
 			char *out = bufOut;
 
 
-			pgc::Statement stmt = con.once("SELECT $1::bytea");
+			pgc::Result res = con.once("SELECT $1::bytea, $2::bytea").exec(in, in).throwIfError();
 
-			stmt.bind(in, 1);
-
-			pgc::Result res = stmt.exec().throwIfError();
-			bool b = res.fetch(0,0,out);
+			bool b = res.fetch(0,1,out);
 			if(!b)throw std::exception("fetch failed");
 			std::cout<<out<<std::endl;
 		}

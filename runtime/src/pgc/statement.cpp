@@ -3,9 +3,9 @@
 
 namespace pgc
 {
-	void Statement::bindHelper(int typIdx, void const *data, size_t idx)
+	void Statement::bindHelper(int typCpp, void const *valCpp, size_t idx)
 	{
-		_impl->bind(typIdx, data, idx);
+		_impl->bind(typCpp, valCpp, idx);
 	}
 
 	Statement::Statement(StatementImplPtr impl)
