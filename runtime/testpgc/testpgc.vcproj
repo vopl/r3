@@ -391,6 +391,10 @@
 			Name="fixtures"
 			>
 			<File
+				RelativePath=".\fixtures\FromCpp2Db.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\fixtures\FromDb2Cpp.cpp"
 				>
 			</File>

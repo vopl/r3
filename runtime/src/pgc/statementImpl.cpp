@@ -180,20 +180,20 @@ namespace pgc
 				boost::uint64_t &ui64 = *(boost::uint64_t *)valCpp;
 				if(ui64 & 0x8000000000000000ULL)
 				{
-					_bindTyp[idx] = 20;//int8
-					_bindVal[idx] = new char[8];
-					*(boost::uint64_t *)_bindVal[idx] = utils::fixEndian(*(boost::uint64_t *)valCpp);
-					_bindLen[idx] = 8;
-					_bindFmt[idx] = 1;
-					_bindOwn[idx] = true;
-				}
-				else
-				{
 					_bindTyp[idx] = 0;
 					_bindVal[idx] = new char[32];
 					utils::_ntoa(ui64, _bindVal[idx]);
 					_bindLen[idx] = 0;
 					_bindFmt[idx] = 0;
+					_bindOwn[idx] = true;
+				}
+				else
+				{
+					_bindTyp[idx] = 20;//int8
+					_bindVal[idx] = new char[8];
+					*(boost::uint64_t *)_bindVal[idx] = utils::fixEndian(*(boost::uint64_t *)valCpp);
+					_bindLen[idx] = 8;
+					_bindFmt[idx] = 1;
 					_bindOwn[idx] = true;
 				}
 			}
