@@ -9,23 +9,7 @@ namespace pgc
 {
 	class ConnectionImpl;
 	typedef boost::shared_ptr<ConnectionImpl> ConnectionImplPtr;
-//	typedef boost::weak_ptr<ConnectionImpl> ConnectionImplWtr;
 
-	struct CppConstValue
-	{
-		int _typIdx;
-		void const * _data;
-		CppConstValue()
-			: _typIdx(0)
-			, _data(0)
-		{
-		}
-		CppConstValue(int typIdx, void const *data)
-			: _typIdx(typIdx)
-			, _data(data)
-		{
-		}
-	};
 	//////////////////////////////////////////////////////////////////////////
 	class StatementImpl
 		: public boost::enable_shared_from_this<StatementImpl>
@@ -35,13 +19,21 @@ namespace pgc
 		bool _once;
 		std::string _sql;
 
-		std::deque<CppConstValue> _binds;
+		//std::deque<CppConstValue> _binds;
+		std::vector<Oid>	_bindTyp;
+		std::vector<char *>	_bindVal;
+		std::vector<int>	_bindLen;
+		std::vector<int>	_bindFmt;
+		std::vector<bool>	_bindOwn;
+
+		void ensureBindIndex(size_t idx);
 	public:
 		StatementImpl(ConnectionImplPtr con, bool once);
 		~StatementImpl();
 
 		void sql(const char *csz);
-		void bind(int typIdx, void const *data, size_t idx);
+		void bind(int typCpp, void const *valCpp, size_t idx);
+		void unbind(size_t idx);
 		ResultImplPtr exec();
 	};
 

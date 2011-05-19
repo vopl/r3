@@ -26,6 +26,7 @@ namespace pgc
 		Statement &sql(const char *csz);
 
 		template <class T> Statement &bind(T const &v, size_t idx=0);
+		Statement &unbind(size_t idx=0);
 
 		Result exec();
 	};

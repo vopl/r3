@@ -147,22 +147,6 @@ void selectTestTable(pgc::Connection con)
 		res.fetch(0, "_oid",			v); 
 		assert(!strcmp(v, "220"));
 	}
-
-
-// 	std::string		v_stdstring;
-// 	bool			v_bool;
-// 	boost::int8_t	v_int8;
-// 	boost::int16_t	v_int16;
-// 	boost::int32_t	v_int32;
-// 	boost::int64_t	v_int64;
-// 	boost::uint8_t	v_uint8;
-// 	boost::uint16_t	v_uint16;
-// 	boost::uint32_t	v_uint32;
-// 	boost::uint64_t	v_uint64;
-// 	float			v_real;
-// 	double			v_double;
-// 	std::tm			v_stdtm;
-
 }
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -178,33 +162,19 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		try
 		{
-			createTestTable(con);
-			for(size_t k(0); k<1000; k++)
-			{
-				selectTestTable(con);
-			}
+			boost::uint64_t in = 220;
+			boost::int64_t out;
 
-	// 		int i;
-	// 		con.once().sql("SELECT $1::varchar")
-	// 			.bind(i)
-	// 			.bind(220)
-	// 			.bind(std::string("sdfgsd"))
-	// 			.bind(str)
-	// 			.exec().fetch(str);
-	// 		;
+			pgc::Statement stmt = con.once("SELECT $1::int8");
 
-			pgc::Result res = con.once().sql("SELECT '$1'::varchar").exec().throwIfError();
+			stmt.bind(in, 1);
 
-			for(int row(0); row<res.rows(); row++)
-			{
-				char buf[4096];
-				char *tmp = buf;
-				res.fetch(row, 0, tmp);
-			}
-			
-			;
+			pgc::Result res = stmt.exec().throwIfError();
+			bool b = res.fetch(0,0,out);
+			if(!b)throw std::exception("fetch failed");
+			std::cout<<out<<std::endl;
 		}
-		catch (pgc::Exception &e)
+		catch (std::exception &e)
 		{
 			std::cout<<e.what()<<std::endl;
 		}

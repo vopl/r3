@@ -55,8 +55,13 @@ namespace utils
 		return;
 	}	/* j2date() */
 
-	static const boost::uint32_t UDAYS_PER_MONTH =	30;
-	static const boost::uint32_t USECS_PER_YEAR	 =(36525 * 864);
+	static const boost::int32_t JULIAN_MINYEAR = (-4713);
+	static const boost::int32_t JULIAN_MINMONTH = (11);
+	static const boost::int32_t JULIAN_MINDAY = (24);
+	static const boost::int32_t JULIAN_MAXYEAR = (5874898);
+
+	static const boost::uint32_t DAYS_PER_MONTH =	30;
+	static const boost::uint32_t SECS_PER_YEAR	 =(36525 * 864);
 
 	static const boost::uint64_t USECS_PER_DAY	=86400000000LL;
 	static const boost::uint64_t USECS_PER_HOUR	=3600000000LL;
@@ -64,6 +69,18 @@ namespace utils
 	static const boost::uint64_t USECS_PER_SEC	=1000000LL;
 
 	static const boost::int64_t POSTGRES_EPOCH_JDATE =2451545LL; /* == date2j(2000, 1, 1) */
+
+
+	template<class Y, class M, class D>
+	bool IS_VALID_JULIAN(const Y &y, const M &m, const D &d)
+	{
+		return 
+			((((y) > JULIAN_MINYEAR) 
+			|| (((y) == JULIAN_MINYEAR) && (((m) > JULIAN_MINMONTH) 
+			|| (((m) == JULIAN_MINMONTH) && ((d) >= JULIAN_MINDAY))))) 
+			&& ((y) < JULIAN_MAXYEAR))
+	}
+
 
 
 	template <class T1, class T2, class T3>
@@ -74,6 +91,12 @@ namespace utils
 			(q) = ((t) / (u));
 			if ((q) != 0) (t) -= ((q) * (u));
 		} while(0);
+	}
+
+	boost::int64_t
+		time2t(const int hour, const int min, const int sec, const int fsec)
+	{
+		return (((((hour * MINS_PER_HOUR) + min) * SECS_PER_MINUTE) + sec) * USECS_PER_SEC) + fsec;
 	}
 
 	void

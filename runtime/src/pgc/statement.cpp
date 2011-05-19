@@ -22,6 +22,11 @@ namespace pgc
 		_impl->sql(csz);
 		return *this;
 	}
+	Statement &Statement::unbind(size_t idx)
+	{
+		_impl->unbind(idx);
+		return *this;
+	}
 	Result Statement::exec()
 	{
 		return Result(_impl->exec());
