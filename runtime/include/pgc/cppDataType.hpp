@@ -140,19 +140,37 @@ namespace pgc
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::gregorian::date >
+	template <> struct CppDataType<boost::gregorian::date>
 	{
 		enum {cdt_index = __LINE__};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::posix_time::time_duration >
+	template <> struct CppDataType<boost::posix_time::ptime>
 	{
 		enum {cdt_index = __LINE__};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<boost::posix_time::ptime >
+	template <> struct CppDataType<boost::gregorian::date_duration>
+	{
+		enum {cdt_index = __LINE__};
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <> struct CppDataType<boost::posix_time::time_duration>
+	{
+		enum {cdt_index = __LINE__};
+	};
+
+	struct DateTimeDuration
+	{
+		boost::gregorian::date_duration		_dd;
+		boost::posix_time::time_duration	_td;
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <> struct CppDataType<DateTimeDuration>
 	{
 		enum {cdt_index = __LINE__};
 	};

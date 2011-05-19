@@ -879,6 +879,78 @@ namespace pgc
 		case CppDataType<boost::uint64_t>::cdt_index:
 			*(boost::uint64_t *)valCpp = VAL;
 			return true;
+		case CppDataType<boost::gregorian::date>::cdt_index:
+			{
+				boost::int64_t time, date;
+				time = VAL;
+				utils::TMODULO(time, date, utils::USECS_PER_DAY);
+
+				if(time < 0)
+				{
+					time += utils::USECS_PER_DAY;
+					date -= 1;
+				}
+
+				/* add offset to go from J2000 back to standard Julian date */
+				date += utils::POSTGRES_EPOCH_JDATE;
+
+				int year, month, day;
+				utils::j2date((int) date, &year, &month, &day);
+
+				*(boost::gregorian::date*)valCpp = boost::gregorian::date(year, month, day);
+			}
+			return true;
+		case CppDataType<boost::posix_time::time_duration>::cdt_index:
+			{
+				boost::int64_t time, date;
+				time = VAL;
+				utils::TMODULO(time, date, utils::USECS_PER_DAY);
+
+				if(time < 0)
+				{
+					time += utils::USECS_PER_DAY;
+					//date -= 1;
+				}
+
+				int hour, min, sec, fsec;
+				utils::dt2time(time, &hour, &min, &sec, &fsec);
+
+				boost::int64_t fsecl = (boost::int64_t)fsec * utils::USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
+
+				*(boost::posix_time::time_duration*)valCpp = 
+					boost::posix_time::time_duration(hour, min, sec, fsecl);
+			}
+			return true;
+		case CppDataType<boost::posix_time::ptime>::cdt_index:
+			{
+				boost::int64_t time, date;
+				time = VAL;
+				utils::TMODULO(time, date, utils::USECS_PER_DAY);
+
+				if(time < 0)
+				{
+					time += utils::USECS_PER_DAY;
+					date -= 1;
+				}
+
+				/* add offset to go from J2000 back to standard Julian date */
+				date += utils::POSTGRES_EPOCH_JDATE;
+
+				int year, month, day, hour, min, sec, fsec;
+				utils::j2date((int) date, &year, &month, &day);
+				utils::dt2time(time, &hour, &min, &sec, &fsec);
+
+				boost::int64_t fsecl = (boost::int64_t)fsec * utils::USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
+
+				*(boost::posix_time::ptime*)valCpp = 
+					boost::posix_time::ptime(
+						boost::gregorian::date(year, month, day),
+						boost::posix_time::time_duration(hour, min, sec, fsecl)
+					);
+
+				
+			}
+			return true;
 		}
 #undef VAL
 
@@ -970,6 +1042,36 @@ namespace pgc
 		case CppDataType<boost::uint64_t>::cdt_index:
 			*(boost::uint64_t *)valCpp = VAL;
 			return true;
+		case CppDataType<boost::posix_time::time_duration>::cdt_index:
+			{
+				int hour, min, sec, fsec;
+				utils::dt2time(v.time, &hour, &min, &sec, &fsec);
+
+				boost::int64_t fsecl = (boost::int64_t)fsec * utils::USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
+
+				*(boost::posix_time::time_duration*)valCpp = 
+					boost::posix_time::time_duration(hour, min, sec, fsecl);
+			}
+			return true;
+		case CppDataType<boost::gregorian::date_duration>::cdt_index:
+			{
+				*(boost::gregorian::date_duration*)valCpp = 
+					boost::gregorian::date_duration(v.day + v.month*utils::UDAYS_PER_MONTH);
+			}
+			return true;
+		case CppDataType<DateTimeDuration>::cdt_index:
+			{
+				DateTimeDuration &dtd = *(DateTimeDuration *)valCpp;
+
+				dtd._dd = boost::gregorian::date_duration(v.day + v.month*utils::UDAYS_PER_MONTH);
+
+				int hour, min, sec, fsec;
+				utils::dt2time(v.time, &hour, &min, &sec, &fsec);
+
+				boost::int64_t fsecl = (boost::int64_t)fsec * utils::USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
+				dtd._td = boost::posix_time::time_duration(hour, min, sec, fsecl);
+			}
+			return true;
 		}
 #undef VAL
 
@@ -1051,6 +1153,26 @@ namespace pgc
 				stm.tm_year -= 1900;
 				stm.tm_mon -= 1;
 				stm.tm_isdst = -1;
+			}
+			return true;
+		case CppDataType<boost::gregorian::date>::cdt_index:
+			{
+				int year, month, day;
+				utils::j2date(VAL, &year, &month, &day);
+
+				*(boost::gregorian::date*)valCpp = boost::gregorian::date(year, month, day);
+			}
+			return true;
+		case CppDataType<boost::posix_time::ptime>::cdt_index:
+			{
+				int year, month, day;
+				utils::j2date(VAL, &year, &month, &day);
+
+				*(boost::posix_time::ptime*)valCpp = 
+					boost::posix_time::ptime(
+						boost::gregorian::date(year, month, day));
+
+
 			}
 			return true;
 
@@ -1137,6 +1259,30 @@ namespace pgc
 				utils::dt2time(VAL, &stm.tm_hour, &stm.tm_min, &stm.tm_sec, &fsec);
 
 				stm.tm_isdst = -1;
+			}
+			return true;
+		case CppDataType<boost::posix_time::time_duration>::cdt_index:
+			{
+				int hour, min, sec, fsec;
+				utils::dt2time(VAL, &hour, &min, &sec, &fsec);
+
+				boost::int64_t fsecl = (boost::int64_t)fsec * utils::USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
+
+				*(boost::posix_time::time_duration*)valCpp = 
+					boost::posix_time::time_duration(hour, min, sec, fsecl);
+			}
+			return true;
+		case CppDataType<DateTimeDuration>::cdt_index:
+			{
+				int hour, min, sec, fsec;
+				utils::dt2time(VAL, &hour, &min, &sec, &fsec);
+
+				boost::int64_t fsecl = (boost::int64_t)fsec * utils::USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
+
+				DateTimeDuration &dtd = *(DateTimeDuration*)valCpp;
+				dtd._td = 
+					boost::posix_time::time_duration(hour, min, sec, fsecl);
+				dtd._dd = boost::gregorian::date_duration();
 			}
 			return true;
 		}

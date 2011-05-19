@@ -9,6 +9,7 @@ class FromDb2Cpp
 {
 	CPPUNIT_TEST_SUITE( FromDb2Cpp );
 	CPPUNIT_TEST( connected );
+
 	CPPUNIT_TEST( _pchar );
 	CPPUNIT_TEST( _stdstring );
 	CPPUNIT_TEST( _bool );
@@ -28,6 +29,12 @@ class FromDb2Cpp
 
 	CPPUNIT_TEST( _stdbitset );
 	CPPUNIT_TEST( _stdvectorchar );
+
+	CPPUNIT_TEST( _boost_date_time_date );
+	CPPUNIT_TEST( _boost_date_time_ptime );
+	CPPUNIT_TEST( _boost_date_time_datedur );
+	CPPUNIT_TEST( _boost_date_time_timedur );
+	CPPUNIT_TEST( _boost_date_time_datetimedur );
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -912,6 +919,392 @@ protected:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void _boost_date_time_date()
+	{
+		boost::gregorian::date val;
+
+#undef SQL
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+
+		CPPUNIT_ASSERT( !SQL("-123::int2") );
+		CPPUNIT_ASSERT( !SQL("0::int4") );
+		CPPUNIT_ASSERT( !SQL("1::int8") );
+		CPPUNIT_ASSERT( !SQL("-1234.321::numeric(10,5)") );
+		CPPUNIT_ASSERT( !SQL("-1234.123::float4") );
+		CPPUNIT_ASSERT( !SQL("-0::float8") );
+		CPPUNIT_ASSERT( !SQL("'1234'::money") );
+		CPPUNIT_ASSERT( !SQL("''::varchar") );
+		CPPUNIT_ASSERT( !SQL("'1234'::bytea") );
+		CPPUNIT_ASSERT( !SQL("B'1001011'::varbit") );
+
+
+
+
+		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17'::timestamp") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)2010, (unsigned short)val.year());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)3, (unsigned short)val.month());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)4, (unsigned short)val.day());
+
+		CPPUNIT_ASSERT( SQL("'2011-04-05 13:00:17'::timestamp with time zone") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)2011, (unsigned short)val.year());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)4, (unsigned short)val.month());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)5, (unsigned short)val.day());
+
+		CPPUNIT_ASSERT( SQL("'2012-05-06'::date") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)2012, (unsigned short)val.year());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)5, (unsigned short)val.month());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)6, (unsigned short)val.day());
+
+
+
+
+		CPPUNIT_ASSERT( !SQL("'4 months 5 days 18:07:56'::interval") );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time") );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time with time zone") );
+		CPPUNIT_ASSERT( !SQL("true") );
+		CPPUNIT_ASSERT( !SQL("false") );
+		CPPUNIT_ASSERT( !SQL("1234::oid") );
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void _boost_date_time_ptime()
+	{
+		boost::posix_time::ptime val;
+
+#undef SQL
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+
+		CPPUNIT_ASSERT( !SQL("-123::int2") );
+		CPPUNIT_ASSERT( !SQL("0::int4") );
+		CPPUNIT_ASSERT( !SQL("1::int8") );
+		CPPUNIT_ASSERT( !SQL("-1234.321::numeric(10,5)") );
+		CPPUNIT_ASSERT( !SQL("-1234.123::float4") );
+		CPPUNIT_ASSERT( !SQL("-0::float8") );
+		CPPUNIT_ASSERT( !SQL("'1234'::money") );
+		CPPUNIT_ASSERT( !SQL("''::varchar") );
+		CPPUNIT_ASSERT( !SQL("'1234'::bytea") );
+		CPPUNIT_ASSERT( !SQL("B'1001011'::varbit") );
+
+
+
+
+		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17.27452'::timestamp") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)2010, (unsigned short)val.date().year());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)3, (unsigned short)val.date().month());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)4, (unsigned short)val.date().day());
+
+		CPPUNIT_ASSERT_EQUAL((unsigned short)13, (unsigned short)val.time_of_day().hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)0, (unsigned short)val.time_of_day().minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)17, (unsigned short)val.time_of_day().seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)274520, val.time_of_day().fractional_seconds());
+
+		CPPUNIT_ASSERT( SQL("'2012-05-05 13:00:17.99'::timestamp with time zone") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)2012, (unsigned short)val.date().year());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)5, (unsigned short)val.date().month());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)5, (unsigned short)val.date().day());
+// 		CPPUNIT_ASSERT_EQUAL((unsigned short)13, (unsigned short)val.time_of_day().hours());
+// 		CPPUNIT_ASSERT_EQUAL((unsigned short)0, (unsigned short)val.time_of_day().minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)17, (unsigned short)val.time_of_day().seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)990000, val.time_of_day().fractional_seconds());
+
+
+		CPPUNIT_ASSERT( SQL("'2012-05-06'::date") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)2012, (unsigned short)val.date().year());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)5, (unsigned short)val.date().month());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)6, (unsigned short)val.date().day());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)0, (unsigned short)val.time_of_day().hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)0, (unsigned short)val.time_of_day().minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)0, (unsigned short)val.time_of_day().seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)0, val.time_of_day().fractional_seconds());
+
+
+
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time") );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time with time zone") );
+
+		CPPUNIT_ASSERT( !SQL("'4 months 5 days 18:07:56'::interval") );
+		CPPUNIT_ASSERT( !SQL("true") );
+		CPPUNIT_ASSERT( !SQL("false") );
+		CPPUNIT_ASSERT( !SQL("1234::oid") );
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void _boost_date_time_datedur()
+	{
+		boost::gregorian::date_duration val;
+
+#undef SQL
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+
+		CPPUNIT_ASSERT( !SQL("-123::int2") );
+		CPPUNIT_ASSERT( !SQL("0::int4") );
+		CPPUNIT_ASSERT( !SQL("1::int8") );
+		CPPUNIT_ASSERT( !SQL("-1234.321::numeric(10,5)") );
+		CPPUNIT_ASSERT( !SQL("-1234.123::float4") );
+		CPPUNIT_ASSERT( !SQL("-0::float8") );
+		CPPUNIT_ASSERT( !SQL("'1234'::money") );
+		CPPUNIT_ASSERT( !SQL("''::varchar") );
+		CPPUNIT_ASSERT( !SQL("'1234'::bytea") );
+		CPPUNIT_ASSERT( !SQL("B'1001011'::varbit") );
+
+
+
+
+		CPPUNIT_ASSERT( !SQL("'2010-03-04 13:00:17.27452'::timestamp") );
+		CPPUNIT_ASSERT( !SQL("'2012-05-05 13:00:17.99'::timestamp with time zone") );
+		CPPUNIT_ASSERT( !SQL("'2012-05-06'::date") );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time") );
+		CPPUNIT_ASSERT( !SQL("'13:00:17'::time with time zone") );
+
+		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56'::interval") );
+		CPPUNIT_ASSERT_EQUAL((long)4*30 + 5, val.days());
+
+		CPPUNIT_ASSERT( SQL("'18:07:56'::interval") );
+		CPPUNIT_ASSERT_EQUAL((long)0, val.days());
+
+
+		CPPUNIT_ASSERT( !SQL("true") );
+		CPPUNIT_ASSERT( !SQL("false") );
+		CPPUNIT_ASSERT( !SQL("1234::oid") );
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void _boost_date_time_timedur()
+	{
+		boost::posix_time::time_duration val;
+
+#undef SQL
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+
+		CPPUNIT_ASSERT( !SQL("-123::int2") );
+		CPPUNIT_ASSERT( !SQL("0::int4") );
+		CPPUNIT_ASSERT( !SQL("1::int8") );
+		CPPUNIT_ASSERT( !SQL("-1234.321::numeric(10,5)") );
+		CPPUNIT_ASSERT( !SQL("-1234.123::float4") );
+		CPPUNIT_ASSERT( !SQL("-0::float8") );
+		CPPUNIT_ASSERT( !SQL("'1234'::money") );
+		CPPUNIT_ASSERT( !SQL("''::varchar") );
+		CPPUNIT_ASSERT( !SQL("'1234'::bytea") );
+		CPPUNIT_ASSERT( !SQL("B'1001011'::varbit") );
+
+
+
+
+		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17.27452'::timestamp") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)13, (unsigned short)val.hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)0, (unsigned short)val.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)17, (unsigned short)val.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)274520, val.fractional_seconds());
+
+		CPPUNIT_ASSERT( SQL("'2012-05-05 13:00:17.99'::timestamp with time zone") );
+// 		CPPUNIT_ASSERT_EQUAL((unsigned short)13, (unsigned short)val.hours());
+// 		CPPUNIT_ASSERT_EQUAL((unsigned short)0, (unsigned short)val.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)17, (unsigned short)val.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)990000, val.fractional_seconds());
+
+		CPPUNIT_ASSERT( !SQL("'2012-05-06'::date") );
+		
+		CPPUNIT_ASSERT( SQL("'14:01:18'::time") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)14, (unsigned short)val.hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)1, (unsigned short)val.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)18, (unsigned short)val.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)0, val.fractional_seconds());
+
+		CPPUNIT_ASSERT( SQL("'14:01:18.67'::time with time zone") );
+// 		CPPUNIT_ASSERT_EQUAL((unsigned short)14, (unsigned short)val.hours());
+// 		CPPUNIT_ASSERT_EQUAL((unsigned short)1, (unsigned short)val.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)18, (unsigned short)val.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)670000, val.fractional_seconds());
+
+		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56'::interval") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)18, (unsigned short)val.hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)7, (unsigned short)val.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)56, (unsigned short)val.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)0, val.fractional_seconds());
+
+		CPPUNIT_ASSERT( SQL("'19:08:59.22'::interval") );
+		CPPUNIT_ASSERT_EQUAL((unsigned short)19, (unsigned short)val.hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)8, (unsigned short)val.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)59, (unsigned short)val.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)220000, val.fractional_seconds());
+
+
+		CPPUNIT_ASSERT( !SQL("true") );
+		CPPUNIT_ASSERT( !SQL("false") );
+		CPPUNIT_ASSERT( !SQL("1234::oid") );
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void _boost_date_time_datetimedur()
+	{
+		pgc::DateTimeDuration val;
+
+#undef SQL
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+
+		CPPUNIT_ASSERT( !SQL("-123::int2") );
+		CPPUNIT_ASSERT( !SQL("0::int4") );
+		CPPUNIT_ASSERT( !SQL("1::int8") );
+		CPPUNIT_ASSERT( !SQL("-1234.321::numeric(10,5)") );
+		CPPUNIT_ASSERT( !SQL("-1234.123::float4") );
+		CPPUNIT_ASSERT( !SQL("-0::float8") );
+		CPPUNIT_ASSERT( !SQL("'1234'::money") );
+		CPPUNIT_ASSERT( !SQL("''::varchar") );
+		CPPUNIT_ASSERT( !SQL("'1234'::bytea") );
+		CPPUNIT_ASSERT( !SQL("B'1001011'::varbit") );
+
+
+
+
+		CPPUNIT_ASSERT( !SQL("'2010-03-04 13:00:17.27452'::timestamp") );
+		CPPUNIT_ASSERT( !SQL("'2012-05-05 13:00:17.99'::timestamp with time zone") );
+		CPPUNIT_ASSERT( !SQL("'2012-05-06'::date") );
+
+		CPPUNIT_ASSERT( SQL("'14:01:18'::time") );
+		CPPUNIT_ASSERT_EQUAL((long)0, val._dd.days());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)14, (unsigned short)val._td.hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)1, (unsigned short)val._td.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)18, (unsigned short)val._td.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)0, val._td.fractional_seconds());
+
+		CPPUNIT_ASSERT( SQL("'14:01:18.67'::time with time zone") );
+		CPPUNIT_ASSERT_EQUAL((long)0, val._dd.days());
+// 		CPPUNIT_ASSERT_EQUAL((unsigned short)14, (unsigned short)val._td.hours());
+// 		CPPUNIT_ASSERT_EQUAL((unsigned short)1, (unsigned short)val._td.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)18, (unsigned short)val._td.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)670000, val._td.fractional_seconds());
+
+		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56'::interval") );
+		CPPUNIT_ASSERT_EQUAL((long)4*30+5, val._dd.days());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)18, (unsigned short)val._td.hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)7, (unsigned short)val._td.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)56, (unsigned short)val._td.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)0, val._td.fractional_seconds());
+
+		CPPUNIT_ASSERT( SQL("'19:08:59.22'::interval") );
+		CPPUNIT_ASSERT_EQUAL((long)0, val._dd.days());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)19, (unsigned short)val._td.hours());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)8, (unsigned short)val._td.minutes());
+		CPPUNIT_ASSERT_EQUAL((unsigned short)59, (unsigned short)val._td.seconds());
+		CPPUNIT_ASSERT_EQUAL((boost::int64_t)220000, val._td.fractional_seconds());
+
+
+		CPPUNIT_ASSERT( !SQL("true") );
+		CPPUNIT_ASSERT( !SQL("false") );
+		CPPUNIT_ASSERT( !SQL("1234::oid") );
+	}
 
 
 
