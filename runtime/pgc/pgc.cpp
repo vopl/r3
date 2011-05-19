@@ -153,12 +153,18 @@ int _tmain(int argc, _TCHAR* argv[])
 		try
 		{
 
-			std::bitset<256> in(std::string("111"));
+			std::vector<unsigned char> in;
+			in.resize(4);
+			in[0] = '\0';
+			in[1] = '1';
+			in[2] = '2';
+			in[3] = '3';
 
-			std::string out;
+			char bufOut[4096];
+			char *out = bufOut;
 
 
-			pgc::Statement stmt = con.once("SELECT $1::varbit");
+			pgc::Statement stmt = con.once("SELECT $1::bytea");
 
 			stmt.bind(in, 1);
 

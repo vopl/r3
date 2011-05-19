@@ -406,6 +406,16 @@ namespace pgc
 				impl::bitset2Bits(bs, vb.bits);
 			}
 			break;
+		case CppDataType<std::vector<unsigned char> >::cdt_index:
+			{
+				std::vector<unsigned char> &vec = *(std::vector<unsigned char> *)valCpp;
+				_bindTyp[idx] = 17;//bytea
+				_bindVal[idx] = (char *)&vec[0];
+				_bindLen[idx] = vec.size();
+				_bindFmt[idx] = 1;
+				_bindOwn[idx] = false;
+			}
+			break;
 		default:
 			{
 				assert(!"unknown type for bind");
