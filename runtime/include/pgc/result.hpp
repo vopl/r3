@@ -30,6 +30,8 @@ namespace pgc
 		~Result();
 
 		EExecStatus status();
+		const char *errorMsg();
+		const char *errorCode();
 		Result &throwIfError();
 
 		int rows();

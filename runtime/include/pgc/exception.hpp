@@ -2,6 +2,7 @@
 #define _PGC_EXCEPTION_HPP_
 
 #include "pgc/common.h"
+#include "pgc/result.hpp"
 
 namespace pgc
 {
@@ -12,8 +13,16 @@ namespace pgc
 	class Exception
 		: public std::exception
 	{
+		ResultImplPtr _res;
 	public:
 		Exception(ResultImplPtr res);
+		Exception(const Exception &from);
+		virtual const char *what() const;
+
+		EExecStatus status();
+		const char *errorMsg();
+		const char *errorCode();
+
 	};
 }
 #endif

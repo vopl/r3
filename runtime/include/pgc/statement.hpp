@@ -19,7 +19,6 @@ namespace pgc
 		Statement(StatementImplPtr impl);
 
 		void bindHelper(int typCpp, void const *valCpp, size_t idx);
-		void execHelper(int typCpp1, void const *valCpp1);
 
 	public:
 		~Statement();
@@ -35,7 +34,7 @@ namespace pgc
 		Result exec(T1 const &b1)
 		{
 			unbind();
-			bind(b1);
+			bind(b1,1);
 			return exec();
 		}
 
@@ -43,8 +42,8 @@ namespace pgc
 		Result exec(T1 const &b1, T2 const &b2)
 		{
 			unbind();
-			bind(b2);
-			bind(b1);
+			bind(b2, 2);
+			bind(b1, 1);
 			return exec();
 		}
 
@@ -52,9 +51,9 @@ namespace pgc
 		Result exec(T1 const &b1, T2 const &b2, T3 const &b3)
 		{
 			unbind();
-			bind(b3);
-			bind(b2);
-			bind(b1);
+			bind(b3,3);
+			bind(b2,2);
+			bind(b1,1);
 			return exec();
 		}
 
@@ -62,9 +61,10 @@ namespace pgc
 		Result exec(T1 const &b1, T2 const &b2, T3 const &b3, T4 const &b4)
 		{
 			unbind();
-			bind(b3);
-			bind(b2);
-			bind(b1);
+			bind(b4,4);
+			bind(b3,3);
+			bind(b2,2);
+			bind(b1,1);
 			return exec();
 		}
 

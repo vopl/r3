@@ -1,4 +1,6 @@
 #include "connectionImpl.hpp"
+#include "statementImpl.hpp"
+#include "statementPrepImpl.hpp"
 
 namespace pgc
 {
@@ -26,9 +28,35 @@ namespace pgc
 		{
 			return ecs_null;
 		}
+		PQsetClientEncoding(_pgcon, "UTF-8");
 
-		return status();
+		EConnectionStatus s = status();
+
+		if(ecs_ok == s)
+		{
+			PQsetClientEncoding(_pgcon, "UTF-8");
+		}
+
+		return s;
 	}
+
+	EConnectionStatus ConnectionImpl::reset()
+	{
+		if(_pgcon)
+		{
+			PQreset(_pgcon);
+		}
+
+		EConnectionStatus s = status();
+
+		if(ecs_ok == s)
+		{
+			PQsetClientEncoding(_pgcon, "UTF-8");
+		}
+
+		return s;
+	}
+
 	void ConnectionImpl::close()
 	{
 		if(_pgcon)
@@ -48,10 +76,10 @@ namespace pgc
 
 	StatementImplPtr ConnectionImpl::once()
 	{
-		return StatementImplPtr(new StatementImpl(shared_from_this(), true));
+		return StatementImplPtr(new StatementImpl(shared_from_this()));
 	}
 	StatementImplPtr ConnectionImpl::prep()
 	{
-		return StatementImplPtr(new StatementImpl(shared_from_this(), false));
+		return StatementImplPtr(new StatementPrepImpl(shared_from_this()));
 	}
 }

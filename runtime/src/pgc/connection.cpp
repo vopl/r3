@@ -17,6 +17,10 @@ namespace pgc
 	{
 		return _impl->open(conninfo);
 	}
+	EConnectionStatus Connection::reset()
+	{
+		return _impl->reset();
+	}
 	void Connection::close()
 	{
 		return _impl->close();

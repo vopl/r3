@@ -24,6 +24,7 @@ namespace pgc
 		~Connection();
 
 		EConnectionStatus open(const char *conninfo);
+		EConnectionStatus reset();
 		void close();
 		EConnectionStatus status();
 

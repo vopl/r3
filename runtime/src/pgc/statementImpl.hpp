@@ -14,9 +14,9 @@ namespace pgc
 	class StatementImpl
 		: public boost::enable_shared_from_this<StatementImpl>
 	{
+	protected:
 		ConnectionImplPtr _con;
 
-		bool _once;
 		std::string _sql;
 
 		//std::deque<CppConstValue> _binds;
@@ -25,16 +25,24 @@ namespace pgc
 		std::vector<int>	_bindLen;
 		std::vector<int>	_bindFmt;
 		std::vector<bool>	_bindOwn;
-
-		void ensureBindIndex(size_t idx);
 	public:
-		StatementImpl(ConnectionImplPtr con, bool once);
+		StatementImpl(ConnectionImplPtr con);
 		~StatementImpl();
 
 		void sql(const char *csz);
-		void bind(int typCpp, void const *valCpp, size_t idx);
-		void unbind(size_t idx);
-		ResultImplPtr exec();
+		virtual void bind(int typCpp, void const *valCpp, size_t idx);
+		virtual void unbind(size_t idx);
+		virtual ResultImplPtr exec();
+
+	protected:
+		bool bindFiller(
+			int typCpp, void const *valCpp, 
+			Oid	&_bindTyp,
+			char *&_bindVal,
+			int &_bindLen,
+			int &_bindFmt,
+			bool &_bindOwn);
+
 	};
 
 	typedef boost::shared_ptr<StatementImpl> StatementImplPtr;

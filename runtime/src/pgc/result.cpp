@@ -28,6 +28,15 @@ namespace pgc
 	{
 		return _impl->status();
 	}
+	const char *Result::errorMsg()
+	{
+		return _impl->errorMsg();
+	}
+	const char *Result::errorCode()
+	{
+		return _impl->errorCode();
+	}
+
 
 	Result &Result::throwIfError()
 	{

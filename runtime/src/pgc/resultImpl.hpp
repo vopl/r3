@@ -54,6 +54,7 @@ namespace pgc
 
 		EExecStatus status();
 		const char *errorMsg();
+		const char *errorCode();
 
 		size_t cmdRows();
 

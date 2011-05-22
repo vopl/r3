@@ -1,9 +1,8 @@
 #ifndef _PGC_CONNECTIONIMPL_HPP_
 #define _PGC_CONNECTIONIMPL_HPP_
 
-#include "statementImpl.hpp"
 #include "pgc/connection.hpp"
-
+#include <boost/enable_shared_from_this.hpp>
 #include <libpq-fe.h>
 
 namespace pgc
@@ -20,6 +19,7 @@ namespace pgc
 		PGconn *pgcon();
 
 		EConnectionStatus open(const char *conninfo);
+		EConnectionStatus reset();
 		void close();
 		EConnectionStatus status();
 

@@ -164,11 +164,33 @@ int _tmain(int argc, _TCHAR* argv[])
 			char *out = bufOut;
 
 
-			pgc::Result res = con.once("SELECT $1::bytea, $2::bytea").exec(in, in).throwIfError();
+			pgc::Statement stmt = con.prep("SELECT $1::bytea, $2::bytea").bind(in,1).bind(in,2);
 
+			pgc::Result res = stmt.exec(in, in).throwIfError();
 			bool b = res.fetch(0,1,out);
 			if(!b)throw std::exception("fetch failed");
 			std::cout<<out<<std::endl;
+
+			con.reset();
+			res = stmt.exec(in, in).throwIfError();
+			b = res.fetch(0,1,out);
+			if(!b)throw std::exception("fetch failed");
+			std::cout<<out<<std::endl;
+
+			res = stmt.exec(in, in).throwIfError();
+			b = res.fetch(0,1,out);
+			if(!b)throw std::exception("fetch failed");
+			std::cout<<out<<std::endl;
+
+			res = stmt.exec(in, in).throwIfError();
+			b = res.fetch(0,1,out);
+			if(!b)throw std::exception("fetch failed");
+			std::cout<<out<<std::endl;
+
+		}
+		catch (pgc::Exception &e)
+		{
+			std::cout<<e.what()<<", "<<e.errorMsg()<<", "<<e.errorCode()<<", "<<e.status()<<std::endl;
 		}
 		catch (std::exception &e)
 		{

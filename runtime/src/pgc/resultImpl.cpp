@@ -127,6 +127,16 @@ namespace pgc
 		return "null result";
 	}
 
+	const char *ResultImpl::errorCode()
+	{
+		if(_pgres)
+		{
+			return PQresultErrorField(_pgres, PG_DIAG_SQLSTATE);
+		}
+		return "null";
+	}
+
+
 
 	size_t ResultImpl::cmdRows()
 	{
