@@ -175,7 +175,12 @@ namespace pgc
 		enum {cdt_index = __LINE__};
 	};
 
-	//blob
+	//////////////////////////////////////////////////////////////////////////
+	class Blob;
+	template <> struct CppDataType<Blob>
+	{
+		enum {cdt_index = __LINE__};
+	};
 }
 
 #endif

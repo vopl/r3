@@ -22,4 +22,5 @@
 
 #include "pgc/connection.hpp"
 #include "pgc/exception.hpp"
+#include "pgc/blob.hpp"
 #include <boost/cstdint.hpp>

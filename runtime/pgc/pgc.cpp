@@ -75,6 +75,23 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		try
 		{
+			{
+				con.once("BEGIN").exec();
+				pgc::Blob bl(con);
+				bl.import("c:/temp/httrack.exe");
+				pgc::Blob bl2;
+
+				pgc::Result res = con.prep("SELECT $1::oid").exec(bl);
+
+				res.fetch(0,0,bl2);
+				bl2.export_("c:/temp/httrack.exe.2");
+
+
+
+				con.once("COMMIT").exec();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
 
 			std::vector<unsigned char> in;
 			in.resize(4);

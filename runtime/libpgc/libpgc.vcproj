@@ -288,6 +288,10 @@
 				Name="pgc"
 				>
 				<File
+					RelativePath="..\include\pgc\blob.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\pgc\common.h"
 					>
 				</File>
@@ -339,6 +343,18 @@
 			<Filter
 				Name="pgc"
 				>
+				<File
+					RelativePath="..\src\pgc\blob.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgc\blobImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgc\blobImpl.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\src\pgc\connection.cpp"
 					>

@@ -5,6 +5,8 @@
 #include "utils/ntoa.hpp"
 #include "utils/julian.h"
 #include <boost/static_assert.hpp>
+#include "pgc/blob.hpp"
+#include "blobImpl.hpp"
 
 namespace pgc
 {
@@ -543,6 +545,18 @@ namespace pgc
 				bindOwn = false;
 			}
 			break;
+		case CppDataType<Blob>::cdt_index:
+			{
+				Blob &b = *(Blob *)valCpp;
+				bindTyp = 26;//oid
+				bindVal = new char[4];
+				*(Oid *)bindVal = utils::fixEndian(b._impl->oid());
+				bindLen = 4;
+				bindFmt = 1;
+				bindOwn = true;
+			}
+			break;
+
 		default:
 			{
 				return false;

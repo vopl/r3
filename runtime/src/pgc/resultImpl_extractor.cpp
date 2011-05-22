@@ -7,6 +7,9 @@
 #include "utils/aton.hpp"
 #include "utils/julian.h"
 
+#include "pgc/blob.hpp"
+#include "blobImpl.hpp"
+
 #include <boost/static_assert.hpp>
 
 
@@ -1749,6 +1752,14 @@ namespace pgc
 			return true;
 		case CppDataType<boost::uint64_t>::cdt_index:
 			*(boost::uint64_t *)valCpp = VAL;
+			return true;
+
+		case CppDataType<Blob>::cdt_index:
+			{
+				Blob &bl = *(Blob *)valCpp;
+				bl._impl->oid(VAL);
+				bl._impl->con(_con);
+			}
 			return true;
 		}
 #undef VAL
