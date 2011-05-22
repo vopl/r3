@@ -19,7 +19,7 @@ namespace pgc
 		PGconn *pgcon();
 
 		EConnectionStatus open(const char *conninfo);
-		EConnectionStatus reset();
+		EConnectionStatus ping(bool forceReset);
 		void close();
 		EConnectionStatus status();
 

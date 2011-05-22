@@ -171,7 +171,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			if(!b)throw std::exception("fetch failed");
 			std::cout<<out<<std::endl;
 
-			con.reset();
+			con.ping();
 			res = stmt.exec(in, in).throwIfError();
 			b = res.fetch(0,1,out);
 			if(!b)throw std::exception("fetch failed");

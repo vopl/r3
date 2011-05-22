@@ -40,21 +40,26 @@ namespace pgc
 		return s;
 	}
 
-	EConnectionStatus ConnectionImpl::reset()
+	EConnectionStatus ConnectionImpl::ping(bool forceReset)
 	{
 		if(_pgcon)
 		{
-			PQreset(_pgcon);
+			if(ecs_ok != status() && forceReset)
+			{
+				PQreset(_pgcon);
+			}
+
+			EConnectionStatus s = status();
+
+			if(ecs_ok == s)
+			{
+				PQsetClientEncoding(_pgcon, "UTF-8");
+			}
+			return s;
 		}
 
-		EConnectionStatus s = status();
 
-		if(ecs_ok == s)
-		{
-			PQsetClientEncoding(_pgcon, "UTF-8");
-		}
-
-		return s;
+		return status();
 	}
 
 	void ConnectionImpl::close()

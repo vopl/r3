@@ -17,9 +17,9 @@ namespace pgc
 	{
 		return _impl->open(conninfo);
 	}
-	EConnectionStatus Connection::reset()
+	EConnectionStatus Connection::ping(bool forceReset)
 	{
-		return _impl->reset();
+		return _impl->ping(forceReset);
 	}
 	void Connection::close()
 	{
