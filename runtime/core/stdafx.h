@@ -14,4 +14,9 @@
 
 // TODO: reference additional headers your program requires here
 #include <string>
-#include "soci-pch.h"
+#include <iostream>
+#include <deque>
+
+#include <boost/date_time/gregorian_calendar.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/cstdint.hpp>

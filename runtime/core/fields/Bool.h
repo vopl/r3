@@ -4,40 +4,40 @@
 #include "./Field.h"
 
 
-namespace r3
+namespace r3{ namespace fields
 {
 	//*******************************************************************
 	//   C  L  A  S  S   Bool
 	//*******************************************************************
-	template <bool allowNull = true>
+
 	class Bool
-		: public Simple<allowNull>
+		: public Simple
 	{
 		bool _value;
 
 	public:
 		Bool()
-			: Simple<allowNull>()
+			: Simple()
 			, _value(false)
 		{
 		}
 
 		Bool(const Bool &from)
-			: Simple<allowNull>(from)
+			: Simple(from)
 			, _value(from._value)
 		{
 		}
 
 		Bool(bool from)
-			: Simple<allowNull>()
+			: Simple()
 			, _value(from)
 		{
-			isNull(false);
+			fvs(fvs_set);
 		}
 
 		Bool &operator=(const Bool &from)
 		{
-			this->Simple<allowNull>::operator=(from);
+			this->Simple::operator=(from);
 			_value = from._value;
 			return *this;
 		}
@@ -45,7 +45,7 @@ namespace r3
 		Bool &operator=(bool from)
 		{
 			_value = from;
-			isNull(false);
+			fvs(fvs_set);
 			return *this;
 		}
 
@@ -61,7 +61,7 @@ namespace r3
 
 
 	}; // class
-}  // namespace
+}}  // namespace
 
 
 #endif

@@ -3,19 +3,21 @@
 
 #include "./Field.h"
 
-
-namespace r3
+namespace r3{ namespace fields
 {
 	//*******************************************************************
 	//   C  L  A  S  S   Int64
 	//*******************************************************************
-	template <bool allowNull = true>
+
 	class Int64
-		: public Int<allowNull>
+		: public Int
 	{
+		boost::int64_t _value;
 	public:
+		const boost::int64_t &value() const;
+		boost::int64_t &value();
 	}; // class
-}  // namespace
+}}  // namespace
 
 
 #endif

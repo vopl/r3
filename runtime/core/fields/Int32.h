@@ -4,18 +4,18 @@
 #include "./Field.h"
 
 
-namespace r3
+namespace r3{ namespace fields
 {
 	//*******************************************************************
 	//   C  L  A  S  S   Int32
 	//*******************************************************************
-	template <bool allowNull = true>
+
 	class Int32
-		: public Int<allowNull>
+		: public Int
 	{
 	public:
 	}; // class
-}  // namespace
+}}  // namespace
 
 
 #endif

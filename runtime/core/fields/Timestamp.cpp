@@ -2,7 +2,7 @@
 #include "./Field.h"
 
 
-namespace r3
+namespace r3{ namespace fields
 {
 
-}
+}}

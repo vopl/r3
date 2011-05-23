@@ -4,35 +4,34 @@
 #include "./Field.h"
 
 
-namespace r3
+namespace r3{ namespace fields
 {
 	//*******************************************************************
 	//   C  L  A  S  S   Simple
 	//*******************************************************************
-	template <bool allowNull = true>
 	class Simple
-		: public Field<allowNull>
+		: public Field
 	{
 	public:
 		Simple()
-			: Field<allowNull>()
+			: Field()
 		{
 		}
 		
 		Simple(const Simple &from)
-			: Field<allowNull>(from)
+			: Field(from)
 		{
 		}
 
 
 		Simple &operator=(const Simple &from)
 		{
-			this->Field<allowNull>::operator=(from);
+			this->Field::operator=(from);
 			return *this;
 		}
 
 	}; // class
-}  // namespace
+}}  // namespace
 
 
 #endif

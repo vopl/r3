@@ -21,6 +21,7 @@ namespace pgc
 		void bindHelper(int typCpp, void const *valCpp, size_t idx);
 
 	public:
+		Statement();
 		~Statement();
 
 		Statement &sql(const char *csz);

@@ -19,6 +19,11 @@ namespace pgc
 		return _impl->fetch(rowIdx, colName, typCpp, valCpp);
 	}
 
+	Result::Result()
+	{
+
+	}
+
 	Result::~Result()
 	{
 		_impl.reset();

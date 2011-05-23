@@ -4,18 +4,18 @@
 #include "./Field.h"
 
 
-namespace r3
+namespace r3{ namespace fields
 {
 	//*******************************************************************
 	//   C  L  A  S  S   DateTimeValue
 	//*******************************************************************
-	template <bool allowNull = true>
+
 	class DateTimeValue
-		: public DateTime<allowNull>
+		: public DateTime
 	{
 	public:
 	}; // class
-}  // namespace
+}}  // namespace
 
 
 #endif

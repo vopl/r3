@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "core\core.vcproj", "{A52B51E4-E717-4F19-BD43-4BE941420B08}"
+	ProjectSection(ProjectDependencies) = postProject
+		{55B09566-11AA-42DD-A2AA-A359E9E8098E} = {55B09566-11AA-42DD-A2AA-A359E9E8098E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pgc", "pgc\pgc.vcproj", "{3F4A5835-832F-4058-9EAF-3CAB5702EC98}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -24,6 +27,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Debug|Win32.Build.0 = Debug|Win32
 		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Debug|x64.ActiveCfg = Debug|x64
 		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Release|Win32.ActiveCfg = Release|Win32
 		{A52B51E4-E717-4F19-BD43-4BE941420B08}.Release|x64.ActiveCfg = Release|x64

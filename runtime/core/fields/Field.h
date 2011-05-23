@@ -4,52 +4,56 @@
 #include "./Field.h"
 
 
-namespace r3
+namespace r3{ namespace fields
 {
+	enum EFieldValueState
+	{
+		fvs_null,
+		fvs_notset,
+		fvs_set,
+	};
+
 	#pragma pack(push, 1)
 	//*******************************************************************
 	//   C  L  A  S  S   Field
 	//*******************************************************************
-	template <bool allowNull = true>
 	class Field
 	{
-		bool _isNull;
-	public:
+	private:
+		EFieldValueState _fvs;
+
+	protected:
 		Field()
-			: _isNull(true)
+			: _fvs(fvs_notset)
 		{
 		}
 
 		Field(const Field &from)
-			: _isNull(from._isNull)
+			: _fvs(from._fvs)
 		{
 		}
 
 
 		Field &operator=(const Field &from)
 		{
-			_isNull = from._isNull;
+			_fvs = from._fvs;
 			return *this;
 		}
 
-		bool isNull() const
+	public:
+		EFieldValueState fvs() const
 		{
-			return _isNull;
+			return _fvs;
 		}
 
-		bool isNull(bool b)
+		EFieldValueState fvs(EFieldValueState fvs)
 		{
-			bool prev = _isNull;
-			_isNull = b;
+			EFieldValueState prev = _fvs;
+			_fvs = fvs;
 			return prev;
 		}
-
-		bool isValid() const
-		{
-			return allowNull?true:!_isNull;
-		}
 	}; // class
-}  // namespace
+}}  // namespace
 
 
 //////////////////////////////////////////////////////////////////////////

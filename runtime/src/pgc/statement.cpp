@@ -12,6 +12,9 @@ namespace pgc
 		: _impl(impl)
 	{
 	}
+	Statement::Statement()
+	{
+	}
 	Statement::~Statement()
 	{
 		_impl.reset();

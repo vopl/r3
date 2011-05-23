@@ -27,6 +27,7 @@ namespace pgc
 		bool fetchHelper(int rowIdx, const char *colName, int typCpp, void *valCpp);
 
 	public:
+		Result();
 		~Result();
 
 		EExecStatus status();

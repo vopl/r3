@@ -4,47 +4,47 @@
 #include "./Field.h"
 
 
-namespace r3
+namespace r3{ namespace fields
 {
 	//*******************************************************************
 	//   C  L  A  S  S   String
 	//*******************************************************************
-	template <bool allowNull = true>
+
 	class String
-		: public Simple<allowNull>
+		: public Simple
 	{
 		std::string _value;
 
 	public:
 		String()
-			: Simple<allowNull>()
+			: Simple()
 			, _value()
 		{
 		}
 
 		String(const String &from)
-			: Simple<allowNull>(from)
+			: Simple(from)
 			, _value(from._value)
 		{
 		}
 
 		String(const std::string &from)
-			: Simple<allowNull>()
+			: Simple()
 			, _value(from)
 		{
-			isNull(false);
+			fvs(fvs_set);
 		}
 
 		String(const char *from)
-			: Simple<allowNull>()
+			: Simple()
 			, _value(from?from:"")
 		{
-			isNull(from?false:true);
+			fvs(from?fvs_set:fvs_null);
 		}
 
 		String &operator=(const String &from)
 		{
-			this->Simple<allowNull>::operator=(from);
+			this->Simple::operator=(from);
 			_value = from._value;
 			return *this;
 		}
@@ -52,13 +52,13 @@ namespace r3
 		String &operator=(const std::string &from)
 		{
 			_value = from;
-			isNull(false);
+			fvs(fvs_set);
 			return *this;
 		}
 		String &operator=(const char *from)
 		{
 			_value = from?from:"";
-			isNull(from?false:true);
+			fvs(from?fvs_set:fvs_null);
 			return *this;
 		}
 
@@ -68,11 +68,11 @@ namespace r3
 		}
 		operator const char *()
 		{
-			return isNull()?NULL:_value.c_str();
+			return fvs_set == fvs()?NULL:_value.c_str();
 		}
 
 	}; // class
-}  // namespace
+}}  // namespace
 
 
 #endif

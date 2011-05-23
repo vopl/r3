@@ -2,13 +2,11 @@
 //
 
 #include "stdafx.h"
-#include <iostream>
 #include "fields/Field.h"
-
-#include "soci.h"
-#include "../backends/postgresql/soci-postgresql.h"
+#include "pgc/connection.hpp"
 
 /*
+	создавалка схемы
 	репликатор
 	гуй
 */
@@ -80,39 +78,82 @@
 // 	Node getNode(const char *nid);
 // };
 
-int _tmain(int argc, _TCHAR* argv[])
+struct MyTuple
 {
-	soci::session sql(soci::postgresql, "dbname=test user=postgres password=postgres");
+	boost::int64_t			id;
+	r3::fields::Date		birth;
+	//r3::fields::Enum<Sex>	sex;
+	r3::fields::Int64		year;
 
-	SOCI_VECTOR_TYPE<std::string> str(220);
-	const int in=0;
-	//sql<<"SELECT txt FROM myt WHERE id>:one", soci::into(str), soci::use(in, "one");
+};
 
+//////////////////////////////////////////////////////////////////////////
+class MyCategory1
+{
+	typedef MyTuple Tuple;
+	typedef boost::shared_ptr<Tuple> TuplePtr;
 
-	soci::statement st = (sql.prepare<<"SELECT 'asdf'::varchar", soci::into(str));
-	st.execute(true);
+	typedef std::deque<TuplePtr> TATuples;
 
-	sql.close();
+	pgc::Connection _con;
+	pgc::Statement _selectById;
+	pgc::Statement _insert;
+	pgc::Statement _update;
+	pgc::Statement _lastid;
 
-	/*
-	connection con("dbname=test user=postgres password=postgres");
-
-	con.once<<"SELECT txt FROM myt WHERE id>$1" & use(in);
-	stmt s = con.prep;
-
-	s.sql("SELECT txt FROM myt WHERE id>$1");
-	s.bind(str);
-	s.exec();
-
-	while(s.hasRow())
+public:
+	MyCategory1(pgc::Connection con, const char *schema=NULL)
+		: _con(con)
 	{
-		s.fetch(str);
-		//use str
+		_selectById = _con.prep("SELECT id,birth,year FROM tratata WHERE id=$1");
+		_insert = _con.prep("INSERT INTO tratata (birth,year) VALUES ($1,$2)");
+		_update = _con.prep("UPDATE INTO tratata SET birth=$2,year=$3 WHERE id=$1");
+		_lastid = _con.prep("SELECT lastval('tratata_id_seq'::regclass)");
 	}
 
-	*/
+	TuplePtr recSelect(boost::int64_t id)
+	{
+		pgc::Result res = _selectById.exec(id);
+		if(!res.rows())
+		{
+			return TuplePtr();
+		}
+
+		TuplePtr tupl(new Tuple);
+
+		res.fetch(0, 0, tupl->id);
+		res.fetch(0, 1, tupl->birth.value());
+		res.fetch(0, 2, tupl->year.value());
+		return tupl;
+	}
+	void recSave(TuplePtr r)
+	{
+		pgc::Result res;
+		if(r->id)
+		{
+			res = _update.exec(r->id, r->birth.value(), r->year.value());
+		}
+		else
+		{
+			res = _insert.exec(r->birth.value(), r->year.value());
+			_lastid.exec().fetch(0,0,r->id);
+		}
+	}
+	void recDrop(TuplePtr r)
+	{
+		//аналогично
+	}
 
 
+	//TATuples recSelect1(param1, param2);
+
+};
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+	std::cout<<sizeof(r3::fields::Date)<<std::endl;
+	std::cout<<sizeof(r3::fields::Int64)<<std::endl;
 
 	return 0;
 }
