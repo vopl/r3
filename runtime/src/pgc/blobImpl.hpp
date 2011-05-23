@@ -27,10 +27,10 @@ namespace pgc
 		bool unlink();
 		bool close();
 
-		bool read(char *buf, size_t len);
-		bool write(const char *buf, size_t len);
+		int read(char *buf, size_t len);
+		int write(const char *buf, size_t len);
 
-		bool seek(int offset, EBlobSeekMethod whence);
+		int seek(int offset, EBlobSeekMethod whence);
 		int tell();
 		bool truncate(size_t len);
 

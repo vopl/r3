@@ -44,6 +44,7 @@ namespace pgc
 		{
 			if(!_con) return false;
 			lo_close(_con->pgcon(), _fd);
+			_fd = -1;
 		}
 		return true;
 	}
@@ -70,36 +71,36 @@ namespace pgc
 			return true;
 		}
 
-		return false;
+		return true;
 	}
 
-	bool BlobImpl::read(char *buf, size_t len)
+	int BlobImpl::read(char *buf, size_t len)
+	{
+		if(!ensureOpen())
+		{
+			return -1;
+		}
+
+		return lo_read(_con->pgcon(), _fd, buf, len);
+	}
+	int BlobImpl::write(const char *buf, size_t len)
+	{
+		if(!ensureOpen())
+		{
+			return -1;
+		}
+
+		return lo_write(_con->pgcon(), _fd, buf, len);
+	}
+
+	int BlobImpl::seek(int offset, EBlobSeekMethod whence)
 	{
 		if(!ensureOpen())
 		{
 			return false;
 		}
 
-		return 0 >= lo_read(_con->pgcon(), _fd, buf, len);
-	}
-	bool BlobImpl::write(const char *buf, size_t len)
-	{
-		if(!ensureOpen())
-		{
-			return false;
-		}
-
-		return 0 >= lo_write(_con->pgcon(), _fd, buf, len);
-	}
-
-	bool BlobImpl::seek(int offset, EBlobSeekMethod whence)
-	{
-		if(!ensureOpen())
-		{
-			return false;
-		}
-
-		return 0 >= lo_lseek(_con->pgcon(), _fd, offset, whence);
+		return lo_lseek(_con->pgcon(), _fd, offset, whence);
 	}
 	int BlobImpl::tell()
 	{

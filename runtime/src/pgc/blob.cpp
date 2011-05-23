@@ -21,6 +21,11 @@ namespace pgc
 	}
 
 
+	void Blob::con(Connection con)
+	{
+		return _impl->con(con._impl);
+	}
+
 
 	bool Blob::unlink()
 	{
@@ -31,16 +36,16 @@ namespace pgc
 		return _impl->close();
 	}
 
-	bool Blob::read(char *buf, size_t len)
+	int Blob::read(char *buf, size_t len)
 	{
 		return _impl->read(buf, len);
 	}
-	bool Blob::write(const char *buf, size_t len)
+	int Blob::write(const char *buf, size_t len)
 	{
 		return _impl->write(buf, len);
 	}
 
-	bool Blob::seek(int offset, EBlobSeekMethod whence)
+	int Blob::seek(int offset, EBlobSeekMethod whence)
 	{
 		return _impl->seek(offset, whence);
 	}
