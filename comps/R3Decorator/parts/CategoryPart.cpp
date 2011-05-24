@@ -5,6 +5,8 @@
 #include "Resource.h"
 #include "DecoratorCusts.h"
 
+#include <algorithm>
+
 namespace Decor {
 
 CategoryPart::CategoryPart(DecoratorSDK::PartBase* pPart, CComPtr<IMgaCommonDecoratorEvents> eventSink):
@@ -315,10 +317,35 @@ void CategoryPart::AddAttributes(CComPtr<IMgaFCO> mgaFco, ECategoryAttributeKind
 	long count;
 	COMTHROW(childs->get_Count(&count));
 
+	//отсортировать
+	std::vector<CComPtr<IMgaObject> > schilds(count);
 	for(long i(0); i<count; i++)
 	{
 		CComPtr<IMgaObject> child;
-		COMTHROW(childs->get_Item(i+1, &child));
+		COMTHROW(childs->get_Item(i+1, &schilds[i]));
+	}
+
+	struct SAttrSortPred{bool operator()(const CComPtr<IMgaObject> &a, const CComPtr<IMgaObject> &b)
+	{
+		CComPtr<IMgaFCO> af;
+		af = (a);
+		CComPtr<IMgaFCO> bf;
+		bf = (b);
+		CComBSTR ap, bp;
+		af->get_RegistryValue(CComBSTR("PartRegs/AspectCategory/Position"), &ap);
+		bf->get_RegistryValue(CComBSTR("PartRegs/AspectCategory/Position"), &bp);
+
+		unsigned t,ay=0,by=0;
+		sscanf_s(CString(ap), "%u,%u", &t, &ay);
+		sscanf_s(CString(bp), "%u,%u", &t, &by);
+
+		return ay<by;
+	}};
+	std::sort(schilds.begin(), schilds.end(), SAttrSortPred());
+
+	for(size_t i(0); i<schilds.size(); i++)
+	{
+		CComPtr<IMgaObject> child = schilds[i];
 
 		CComPtr<IMgaFCO> fco;
 		COMTHROW(child.QueryInterface(&fco));
