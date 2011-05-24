@@ -18,7 +18,7 @@ class Category_Owner
 : public CategoryBase<Category_Owner>
 {
 
-protected:
+public:
 typedef bmpl::vector<
 > TVBases;
 

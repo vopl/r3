@@ -21,7 +21,11 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/cstdint.hpp>
 
+#include <boost/type_traits.hpp>
+
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/for_each.hpp>
+#include <boost/mpl/transform.hpp>
 namespace bmpl = boost::mpl;
 
 #include <boost/enable_shared_from_this.hpp>

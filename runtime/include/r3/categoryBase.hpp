@@ -7,7 +7,15 @@ namespace r3
 	class CategoryBase
 	{
 	public:
+		void init(...);
 
+		void dbCreateTable();
+		void dbCreateFields();
+		void dbCreateIndices();
+		void dbCreateForeignFields();
+		void dbCreateCrosses();
+		void dbCreateForeignConstraints();
+		void dbCreateViews();
 	};
 }
 

@@ -12,7 +12,7 @@ class Category_Right
 : public CategoryBase<Category_Right>
 {
 
-protected:
+public:
 typedef bmpl::vector<
 > TVBases;
 

@@ -9,19 +9,19 @@ class Schema_common;
 typedef boost::shared_ptr<Schema_common> Schema_common_ptr;
 
 //bases
-class Category_Owner;
-typedef boost::shared_ptr<Category_Owner> Category_Owner_ptr;
 class Category_HasRights;
 typedef boost::shared_ptr<Category_HasRights> Category_HasRights_ptr;
+class Category_Owner;
+typedef boost::shared_ptr<Category_Owner> Category_Owner_ptr;
 
 class Category_User
 : public CategoryBase<Category_User>
 {
 
-protected:
+public:
 typedef bmpl::vector<
-	  Category_Owner
-	, Category_HasRights
+	  Category_HasRights
+	, Category_Owner
 > TVBases;
 
 typedef bmpl::vector<

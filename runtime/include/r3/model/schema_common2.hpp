@@ -11,14 +11,19 @@ class Schema_common2
 : public SchemaBase<Schema_common2>
 {
 
-protected:
+public:
 typedef bmpl::vector<
 	  Category_Category2
 > TVCategoryTypes;
 
+Category_Category2_ptr category_Category2;
+
 public:
 Schema_common2(const char *id);
 ~Schema_common2();
+
+template <class C> boost::shared_ptr<C> getCategory(){return boost::shared_ptr<C>();}
+template <> Category_Category2_ptr	getCategory<Category_Category2>(){return category_Category2;}
 
 Category_Category2_ptr	getCategory_Category2();
 

@@ -99,7 +99,7 @@ namespace workers
 		hpp<<"{"<<endl;
 		hpp<<endl;
 
-		hpp<<"protected:"<<endl;
+		hpp<<"public:"<<endl;
 
 		//вектор типов категорий
 		hpp<<"typedef bmpl::vector<";
@@ -119,6 +119,13 @@ namespace workers
 		hpp<<endl<<"> TVCategoryTypes;"<<endl;
 		hpp<<endl;
 
+		//указатели на экземпляры категорий
+		BOOST_FOREACH(const Category &cat, cats)
+		{
+			hpp<<"Category_"<<cat->getName()<<"_ptr category_"<<cat->getName()<<";"<<endl;
+		}
+		hpp<<endl;
+
 		hpp<<"public:"<<endl;
 
 		//конструктор
@@ -126,6 +133,18 @@ namespace workers
 
 		//деструктор
 		hpp<<"~Schema_"<<name<<"();"<<endl;
+		hpp<<endl;
+
+		//шаблон для доступа к экземпляру по типу
+		hpp<<"template <class C> boost::shared_ptr<C> getCategory(){return boost::shared_ptr<C>();}"<<endl;
+		BOOST_FOREACH(const Category &cat, cats)
+		{
+			hpp<<"template <> Category_"<<cat->getName()<<"_ptr\t"<<"getCategory<Category_"<<cat->getName()<<">()";
+			hpp<<"{";
+			hpp<<"return category_"<<cat->getName()<<";";
+			hpp<<"}";
+			hpp<<endl;
+		}
 		hpp<<endl;
 
 		//геттеры для категорий
@@ -266,7 +285,7 @@ namespace workers
 		hpp<<"{"<<endl;
 		hpp<<endl;
 
-		hpp<<"protected:"<<endl;
+		hpp<<"public:"<<endl;
 
 		//вектор базовых
 		hpp<<"typedef bmpl::vector<";

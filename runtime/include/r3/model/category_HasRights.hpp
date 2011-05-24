@@ -22,7 +22,7 @@ class Category_HasRights
 : public CategoryBase<Category_HasRights>
 {
 
-protected:
+public:
 typedef bmpl::vector<
 	  Category_Category1
 > TVBases;

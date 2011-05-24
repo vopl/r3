@@ -159,7 +159,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	pgc::Connection con;
 	con.open("dbname=test user=postgres password=postgres port=5432");
-	s->attach(con);
+	s->dbCon(con);
+	s->dbCreate();
 	return 0;
 }
 
