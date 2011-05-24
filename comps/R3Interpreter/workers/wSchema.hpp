@@ -20,8 +20,13 @@ namespace workers
 		void operator()(const std::set<FCO> &roots);
 
 	private:
-		void processSchema(std::string name, std::set<Category> cats);
+		void processSchema(const std::string &name, const std::set<Category> &cats);
+		void processSchema_hpp(const std::string &name, const std::set<Category> &cats);
+		void processSchema_cpp(const std::string &name, const std::set<Category> &cats);
+		
 		void processCategory(Category cat);
+		void processCategory_hpp(Category cat);
+		void processCategory_cpp(Category cat);
 	};
 }
 #endif
