@@ -39,3 +39,21 @@ std::set<R3Meta_BON::IndexOnCategoryField> R3Meta_BON::FieldImpl::getOutIndexOnC
 }
 
 
+//********************************************************************************
+// 
+//********************************************************************************
+bool R3Meta_BON::FieldImpl::isAllowNull() 
+{
+	return FCOImpl::getAttribute("AllowNull")->getBooleanValue();
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
+void R3Meta_BON::FieldImpl::setAllowNull( bool val)
+{
+	FCOImpl::getAttribute("AllowNull")->setBooleanValue( val);
+}
+
+

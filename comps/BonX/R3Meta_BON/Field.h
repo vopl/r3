@@ -13,13 +13,15 @@ class FieldImpl :
 	  public CategoryMemberImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 
 	//
 	// connectionEnd getters
 	virtual std::multiset<R3Meta_BON::Index>          getIndexOnCategoryFieldDsts();
 	virtual std::set<R3Meta_BON::IndexOnCategoryField> getOutIndexOnCategoryFieldLinks();
+	//
+	// attribute getters and setters
+	virtual bool        isAllowNull() ;
+	virtual void        setAllowNull( bool val);
 
 	///BUP
 	// add your own members here

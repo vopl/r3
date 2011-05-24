@@ -14,10 +14,14 @@ class CategoryReferenceImpl :
 	, public CategoryOrReferenceImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 	virtual void        accept( BON::Visitor *pVisitor);
 
+	//
+	// connectionEnd getters
+	virtual std::multiset<R3Meta_BON::Channel>        getCategoryInputSrcs();
+	virtual std::multiset<R3Meta_BON::Channel>        getCategoryOutputDsts();
+	virtual std::set<R3Meta_BON::CategoryInput>       getInCategoryInputLinks();
+	virtual std::set<R3Meta_BON::CategoryOutput>      getOutCategoryOutputLinks();
 	//
 	// ref getters
 	virtual R3Meta_BON::Category            getCategory();

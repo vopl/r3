@@ -14,8 +14,6 @@ class Real64Impl :
 	, public RealImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 	virtual void        accept( BON::Visitor *pVisitor);
 
 

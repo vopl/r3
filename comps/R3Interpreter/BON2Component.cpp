@@ -25,6 +25,8 @@
 
 #include "R3MetaBonX.h"
 
+#include "workers/wSchema.hpp"
+
 namespace BON
 {
 
@@ -97,6 +99,20 @@ void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>
 	// ======================
 	// TODO: Insert application specific code here
 	std::set<FCO> roots = project->getRootFolder()->getRootFCOs();
+
+	workers::WSchema schema;
+
+	std::set<FCO>::iterator iter=roots.begin();
+	std::set<FCO>::iterator end=roots.end();
+	for(; iter!=end; iter++)
+	{
+		R3Meta_BON::Schema s(*iter);
+		if(s)
+		{
+			schema(s);
+		}
+	}
+
 
 // 	R3Meta_BON::R3MetaVisitor *visitor = new R3Meta_BON::R3MetaVisitor;
 // 	std::set<FCO>::iterator iter=roots.begin();

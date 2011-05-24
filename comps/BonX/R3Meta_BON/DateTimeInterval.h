@@ -14,8 +14,6 @@ class DateTimeIntervalImpl :
 	, public DateTimeImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 	virtual void        accept( BON::Visitor *pVisitor);
 
 

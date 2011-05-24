@@ -5,10 +5,10 @@
 //********************************************************************************
 // 
 //********************************************************************************
-void R3Meta_BON::ScantyValueImpl::accept( BON::Visitor *pVisitor)
+void R3Meta_BON::CategoryOutputImpl::accept( BON::Visitor *pVisitor)
 {
-	// visit the Atom
-	pVisitor->visitAtom( BON::Atom( this));
+	// visit the Connection
+	pVisitor->visitConnection( BON::Connection( this));
 
 }
 
@@ -16,54 +16,66 @@ void R3Meta_BON::ScantyValueImpl::accept( BON::Visitor *pVisitor)
 //********************************************************************************
 // 
 //********************************************************************************
-std::string R3Meta_BON::ScantyValueImpl::getLongDescription() 
+std::string R3Meta_BON::CategoryOutputImpl::getNodeManager() 
 {
-	return FCOImpl::getAttribute("LongDescription")->getStringValue();
+	return FCOImpl::getAttribute("NodeManager")->getStringValue();
 }
 
 
 //********************************************************************************
 // 
 //********************************************************************************
-long R3Meta_BON::ScantyValueImpl::getScantyValueKey() 
+std::string R3Meta_BON::CategoryOutputImpl::getValueAdapter() 
 {
-	return FCOImpl::getAttribute("ScantyValueKey")->getIntegerValue();
+	return FCOImpl::getAttribute("ValueAdapter")->getStringValue();
 }
 
 
 //********************************************************************************
 // 
 //********************************************************************************
-std::string R3Meta_BON::ScantyValueImpl::getShortDescription() 
+void R3Meta_BON::CategoryOutputImpl::setNodeManager( const std::string& val)
 {
-	return FCOImpl::getAttribute("ShortDescription")->getStringValue();
+	FCOImpl::getAttribute("NodeManager")->setStringValue( val);
 }
 
 
 //********************************************************************************
 // 
 //********************************************************************************
-void R3Meta_BON::ScantyValueImpl::setLongDescription( const std::string& val)
+void R3Meta_BON::CategoryOutputImpl::setValueAdapter( const std::string& val)
 {
-	FCOImpl::getAttribute("LongDescription")->setStringValue( val);
+	FCOImpl::getAttribute("ValueAdapter")->setStringValue( val);
 }
 
 
 //********************************************************************************
-// 
+// getDst() return value is a ConnectionEnd casted to R3Meta_BON::Channel
 //********************************************************************************
-void R3Meta_BON::ScantyValueImpl::setScantyValueKey( const long val)
+R3Meta_BON::Channel R3Meta_BON::CategoryOutputImpl::getDst()
 {
-	FCOImpl::getAttribute("ScantyValueKey")->setIntegerValue( val);
+	BON::ConnectionEnd ce = ConnectionImpl::getDst();
+	R3Meta_BON::Channel sp( ce);
+	if ( sp)
+		return sp;
+
+	R3Meta_BON::Channel empty;
+	return empty;
 }
 
 
 //********************************************************************************
-// 
+// getSrc() return value is a ConnectionEnd casted to R3Meta_BON::CategoryReference
 //********************************************************************************
-void R3Meta_BON::ScantyValueImpl::setShortDescription( const std::string& val)
+R3Meta_BON::CategoryReference R3Meta_BON::CategoryOutputImpl::getSrc()
 {
-	FCOImpl::getAttribute("ShortDescription")->setStringValue( val);
+	BON::ConnectionEnd ce = ConnectionImpl::getSrc();
+	R3Meta_BON::CategoryReference sp( ce);
+	if ( sp)
+		return sp;
+
+	R3Meta_BON::CategoryReference empty;
+	return empty;
 }
 
 

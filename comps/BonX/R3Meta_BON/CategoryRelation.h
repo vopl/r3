@@ -13,8 +13,6 @@ class CategoryRelationImpl :
 	  virtual public BON::ConnectionImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 	virtual void        accept( BON::Visitor *pVisitor);
 	typedef enum
 	{
@@ -31,8 +29,12 @@ public:
 	// attribute getters and setters
 	virtual R3Meta_BON::CategoryRelationImpl::Multiplier1_Type getMultiplier1();
 	virtual R3Meta_BON::CategoryRelationImpl::Multiplier2_Type getMultiplier2();
+	virtual std::string getName1() ;
+	virtual std::string getName2() ;
 	virtual void        setMultiplier1( CategoryRelationImpl::Multiplier1_Type val);
 	virtual void        setMultiplier2( CategoryRelationImpl::Multiplier2_Type val);
+	virtual void        setName1( const std::string& val);
+	virtual void        setName2( const std::string& val);
 	//
 	// connectionEnd getters
 	virtual R3Meta_BON::CategoryOrReference getDst();

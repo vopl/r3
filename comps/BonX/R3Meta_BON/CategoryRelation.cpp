@@ -42,6 +42,24 @@ R3Meta_BON::CategoryRelationImpl::Multiplier2_Type R3Meta_BON::CategoryRelationI
 //********************************************************************************
 // 
 //********************************************************************************
+std::string R3Meta_BON::CategoryRelationImpl::getName1() 
+{
+	return FCOImpl::getAttribute("Name1")->getStringValue();
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
+std::string R3Meta_BON::CategoryRelationImpl::getName2() 
+{
+	return FCOImpl::getAttribute("Name2")->getStringValue();
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
 void R3Meta_BON::CategoryRelationImpl::setMultiplier1( CategoryRelationImpl::Multiplier1_Type val)
 {
 	std::string str_val = "";
@@ -66,6 +84,24 @@ void R3Meta_BON::CategoryRelationImpl::setMultiplier2( CategoryRelationImpl::Mul
 	else throw("None of the possible items");
 
 	FCOImpl::getAttribute("Multiplier2")->setStringValue( str_val);
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
+void R3Meta_BON::CategoryRelationImpl::setName1( const std::string& val)
+{
+	FCOImpl::getAttribute("Name1")->setStringValue( val);
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
+void R3Meta_BON::CategoryRelationImpl::setName2( const std::string& val)
+{
+	FCOImpl::getAttribute("Name2")->setStringValue( val);
 }
 
 

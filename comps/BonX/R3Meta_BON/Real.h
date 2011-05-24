@@ -13,8 +13,6 @@ class RealImpl :
 	  public SimpleImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 
 
 	///BUP

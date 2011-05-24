@@ -13,8 +13,6 @@ class DateTimeValueImpl :
 	  public DateTimeImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 
 
 	///BUP

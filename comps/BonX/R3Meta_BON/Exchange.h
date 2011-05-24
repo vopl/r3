@@ -1,5 +1,5 @@
-#ifndef R3META_BONSCHEMA_H
-#define R3META_BONSCHEMA_H
+#ifndef R3META_BONEXCHANGE_H
+#define R3META_BONEXCHANGE_H
 
 #include "R3MetaBonX.h"
 
@@ -7,9 +7,9 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   SchemaImpl
+//   C  L  A  S  S   ExchangeImpl
 //*******************************************************************
-class SchemaImpl :
+class ExchangeImpl :
 	  virtual public BON::ModelImpl
 {
 public:
@@ -17,11 +17,10 @@ public:
 
 	//
 	// kind and role getters
-	virtual std::set<R3Meta_BON::Category>  getCategory();
-	virtual std::set<R3Meta_BON::CategoryInheritance> getCategoryInheritance();
-	virtual std::set<R3Meta_BON::CategoryOrReference> getCategoryOrReference();
+	virtual std::set<R3Meta_BON::CategoryInput>       getCategoryInput();
+	virtual std::set<R3Meta_BON::CategoryOutput>      getCategoryOutput();
 	virtual std::set<R3Meta_BON::CategoryReference>   getCategoryReference();
-	virtual std::set<R3Meta_BON::CategoryRelation>    getCategoryRelation();
+	virtual std::set<R3Meta_BON::Channel>   getChannel();
 
 	///BUP
 	// add your own members here

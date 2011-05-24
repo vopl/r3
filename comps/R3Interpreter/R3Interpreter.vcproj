@@ -425,6 +425,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\BonX\R3Meta_BON\CategoryInput.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\CategoryInput.h"
+					>
+				</File>
+				<File
 					RelativePath="..\BonX\R3Meta_BON\CategoryMember.cpp"
 					>
 				</File>
@@ -438,6 +446,14 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\CategoryOrReference.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\CategoryOutput.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\CategoryOutput.h"
 					>
 				</File>
 				<File
@@ -457,11 +473,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Char.cpp"
+					RelativePath="..\BonX\R3Meta_BON\Channel.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Char.h"
+					RelativePath="..\BonX\R3Meta_BON\Channel.h"
 					>
 				</File>
 				<File
@@ -502,6 +518,14 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\Enum.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Exchange.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Exchange.h"
 					>
 				</File>
 				<File
@@ -689,6 +713,18 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="workers"
+			>
+			<File
+				RelativePath=".\workers\wSchema.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\workers\wSchema.hpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

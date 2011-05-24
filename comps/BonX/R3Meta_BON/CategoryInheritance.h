@@ -13,8 +13,6 @@ class CategoryInheritanceImpl :
 	  virtual public BON::ConnectionImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 	virtual void        accept( BON::Visitor *pVisitor);
 
 	//

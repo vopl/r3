@@ -14,16 +14,17 @@ class CategoryImpl :
 	, public CategoryOrReferenceImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 	virtual void        accept( BON::Visitor *pVisitor);
 
+	//
+	// attribute getters and setters
+	virtual bool        isAbstract() ;
+	virtual void        setAbstract( bool val);
 	//
 	// kind and role getters
 	virtual std::set<R3Meta_BON::Audio>     getAudio();
 	virtual std::set<R3Meta_BON::Bool>      getBool();
 	virtual std::set<R3Meta_BON::CategoryMember>      getCategoryMember();
-	virtual std::set<R3Meta_BON::Char>      getChar();
 	virtual std::set<R3Meta_BON::Date>      getDate();
 	virtual std::set<R3Meta_BON::DateTimeInterval>    getDateTimeInterval();
 	virtual std::set<R3Meta_BON::Enum>      getEnum();

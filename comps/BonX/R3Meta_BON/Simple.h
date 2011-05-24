@@ -13,8 +13,6 @@ class SimpleImpl :
 	  public FieldImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 
 
 	///BUP

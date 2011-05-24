@@ -13,15 +13,15 @@ class ScantyValueImpl :
 	  virtual public BON::AtomImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 	virtual void        accept( BON::Visitor *pVisitor);
 
 	//
 	// attribute getters and setters
 	virtual std::string getLongDescription() ;
+	virtual long        getScantyValueKey() ;
 	virtual std::string getShortDescription() ;
 	virtual void        setLongDescription( const std::string& val);
+	virtual void        setScantyValueKey( const long val);
 	virtual void        setShortDescription( const std::string& val);
 
 	///BUP

@@ -13,8 +13,6 @@ class CategoryOrReferenceImpl :
 	  virtual public BON::FCOImpl
 {
 public:
-	virtual void        initialize() { };
-	virtual void        finalize() { };
 
 	//
 	// connectionEnd getters
