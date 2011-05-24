@@ -101,17 +101,7 @@ void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>
 	std::set<FCO> roots = project->getRootFolder()->getRootFCOs();
 
 	workers::WSchema schema;
-
-	std::set<FCO>::iterator iter=roots.begin();
-	std::set<FCO>::iterator end=roots.end();
-	for(; iter!=end; iter++)
-	{
-		R3Meta_BON::Schema s(*iter);
-		if(s)
-		{
-			schema(s);
-		}
-	}
+	schema(roots);
 
 
 // 	R3Meta_BON::R3MetaVisitor *visitor = new R3Meta_BON::R3MetaVisitor;

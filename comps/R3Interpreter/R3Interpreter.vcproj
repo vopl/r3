@@ -409,6 +409,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\BonX\R3Meta_BON\Categories.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Categories.h"
+					>
+				</File>
+				<File
 					RelativePath="..\BonX\R3Meta_BON\Category.cpp"
 					>
 				</File>
@@ -654,14 +662,6 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\ScantyValue.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Schema.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Schema.h"
 					>
 				</File>
 				<File

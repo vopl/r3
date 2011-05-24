@@ -16,6 +16,15 @@ void R3Meta_BON::CategoryImpl::accept( BON::Visitor *pVisitor)
 //********************************************************************************
 // 
 //********************************************************************************
+std::string R3Meta_BON::CategoryImpl::getSchema() 
+{
+	return FCOImpl::getAttribute("Schema")->getStringValue();
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
 bool R3Meta_BON::CategoryImpl::isAbstract() 
 {
 	return FCOImpl::getAttribute("Abstract")->getBooleanValue();
@@ -28,6 +37,15 @@ bool R3Meta_BON::CategoryImpl::isAbstract()
 void R3Meta_BON::CategoryImpl::setAbstract( bool val)
 {
 	FCOImpl::getAttribute("Abstract")->setBooleanValue( val);
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
+void R3Meta_BON::CategoryImpl::setSchema( const std::string& val)
+{
+	FCOImpl::getAttribute("Schema")->setStringValue( val);
 }
 
 

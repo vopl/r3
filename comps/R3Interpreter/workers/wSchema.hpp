@@ -17,7 +17,11 @@ namespace workers
 		WSchema();
 		~WSchema();
 
-		void operator()(const Schema &s);
+		void operator()(const std::set<FCO> &roots);
+
+	private:
+		void processSchema(std::string name, std::set<Category> cats);
+		void processCategory(Category cat);
 	};
 }
 #endif

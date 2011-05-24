@@ -33,4 +33,7 @@ extern CComModule _Module;
 
 #include "R3MetaBonX.h"
 
+#include <boost/foreach.hpp>
+#include <cassert>
+
 #endif // !defined(AFX_STDAFX_H__C4EFDDFC_C095_4509_B571_632F0986D162__INCLUDED)
