@@ -99,11 +99,11 @@ namespace workers
 		hpp<<"protected:"<<endl;
 
 		//вектор типов категорий
-		hpp<<"typedef bmpl::vector<"<<endl;
+		hpp<<"typedef bmpl::vector<";
 		bool first = true;
 		BOOST_FOREACH(const Category &cat, cats)
 		{
-			hpp<<"\t";
+			hpp<<endl<<"\t";
 			if(!first)
 				hpp<<", ";
 			else
@@ -111,7 +111,7 @@ namespace workers
 				hpp<<"  ";
 				first = false;
 			}
-			hpp<<"Category_"<<cat->getName()<<endl;
+			hpp<<"Category_"<<cat->getName();
 		}
 		hpp<<endl<<"> TVCategoryTypes;"<<endl;
 		hpp<<endl;
@@ -233,6 +233,30 @@ namespace workers
 
 		hpp<<endl;
 
+		//предварительные объявления базовых и производных
+		if(bases.size())
+		{
+			hpp<<"//bases"<<endl;
+			BOOST_FOREACH(Category cat, bases)
+			{
+				hpp<<"class Category_"<<cat->getName()<<";"<<endl;
+				hpp<<"typedef boost::shared_ptr<Category_"<<cat->getName()<<"> Category_"<<cat->getName()<<"_ptr;"<<endl;
+			}
+			hpp<<endl;
+		}
+
+		if(deriveds.size())
+		{
+			hpp<<"//deriveds"<<endl;
+			BOOST_FOREACH(Category cat, deriveds)
+			{
+				hpp<<"class Category_"<<cat->getName()<<";"<<endl;
+				hpp<<"typedef boost::shared_ptr<Category_"<<cat->getName()<<"> Category_"<<cat->getName()<<"_ptr;"<<endl;
+			}
+			hpp<<endl;
+		}
+
+
 		//класс
 		hpp<<"class Category_"<<name<<endl;
 		hpp<<": public CategoryBase<Category_"<<name<<">"<<endl;
@@ -242,11 +266,11 @@ namespace workers
 		hpp<<"protected:"<<endl;
 
 		//вектор базовых
-		hpp<<"typedef bmpl::vector<"<<endl;
+		hpp<<"typedef bmpl::vector<";
 		bool first = true;
 		BOOST_FOREACH(const Category &cat, bases)
 		{
-			hpp<<"\t";
+			hpp<<endl<<"\t";
 			if(!first)
 				hpp<<", ";
 			else
@@ -254,17 +278,17 @@ namespace workers
 				hpp<<"  ";
 				first = false;
 			}
-			hpp<<"Category_"<<cat->getName()<<endl;
+			hpp<<"Category_"<<cat->getName();
 		}
 		hpp<<endl<<"> TVBases;"<<endl;
 		hpp<<endl;
 
 		//вектор производных
-		hpp<<"typedef bmpl::vector<"<<endl;
+		hpp<<"typedef bmpl::vector<";
 		first = true;
 		BOOST_FOREACH(const Category &cat, deriveds)
 		{
-			hpp<<"\t";
+			hpp<<endl<<"\t";
 			if(!first)
 				hpp<<", ";
 			else
@@ -272,7 +296,7 @@ namespace workers
 				hpp<<"  ";
 				first = false;
 			}
-			hpp<<"Category_"<<cat->getName()<<endl;
+			hpp<<"Category_"<<cat->getName();
 		}
 		hpp<<endl<<"> TVDeriveds;"<<endl;
 		hpp<<endl;
