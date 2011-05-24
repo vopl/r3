@@ -21,6 +21,9 @@ namespace workers
 	void WSchema::operator()(const std::set<FCO> &roots)
 	{
 		_mkdir("R3_interpret");
+		_mkdir("R3_interpret/include");
+		_mkdir("R3_interpret/include/r3");
+		_mkdir("R3_interpret/include/r3/model");
 
 		//собрать все категории и распредилить по схемам
 		std::map<std::string, std::set<Category> > schema2cats;
@@ -71,13 +74,13 @@ namespace workers
 	//////////////////////////////////////////////////////////////////////////
 	void WSchema::processSchema_hpp(const std::string &name, const std::set<Category> &cats)
 	{
-		out::File hpp("R3_interpret/schema_"+name+".hpp");
+		out::File hpp("R3_interpret/include/r3/model/schema_"+name+".hpp");
 
-		hpp<<"#ifndef _R3_SCHEMA_"<<name<<"_HPP_"<<endl;
-		hpp<<"#define _R3_SCHEMA_"<<name<<"_HPP_"<<endl;
+		hpp<<"#ifndef _R3_MODEL_SCHEMA_"<<name<<"_HPP_"<<endl;
+		hpp<<"#define _R3_MODEL_SCHEMA_"<<name<<"_HPP_"<<endl;
 		hpp<<endl;
 
-		hpp<<"#include \"schemaBase.hpp\""<<endl;
+		hpp<<"#include \"r3/schemaBase.hpp\""<<endl;
 		hpp<<endl;
 
 		//include для категорий
@@ -87,7 +90,7 @@ namespace workers
 		}
 		hpp<<endl;
 
-		hpp<<"namespace r3"<<endl<<"{"<<endl;
+		hpp<<"namespace r3 { namespace model "<<endl<<"{"<<endl;
 
 
 		//класс
@@ -139,7 +142,7 @@ namespace workers
 		hpp<<"typedef boost::shared_ptr<Schema_"<<name<<"> Schema_"<<name<<"_ptr;"<<endl;
 
 		//конец пространства имен
-		hpp<<"}"<<endl;
+		hpp<<"}}"<<endl;
 
 		hpp<<endl;
 
@@ -215,17 +218,17 @@ namespace workers
 
 
 
-		out::File hpp("R3_interpret/category_"+name+".hpp");
+		out::File hpp("R3_interpret/include/r3/model/category_"+name+".hpp");
 
-		hpp<<"#ifndef _R3_CATEGORY_"<<name<<"_HPP_"<<endl;
-		hpp<<"#define _R3_CATEGORY_"<<name<<"_HPP_"<<endl;
+		hpp<<"#ifndef _R3_MODEL_CATEGORY_"<<name<<"_HPP_"<<endl;
+		hpp<<"#define _R3_MODEL_CATEGORY_"<<name<<"_HPP_"<<endl;
 		hpp<<endl;
 
-		hpp<<"#include \"categoryBase.hpp\""<<endl;
+		hpp<<"#include \"r3/categoryBase.hpp\""<<endl;
 		hpp<<endl;
 
 
-		hpp<<"namespace r3"<<endl<<"{"<<endl;
+		hpp<<"namespace r3 { namespace model "<<endl<<"{"<<endl;
 
 		//предварительное объявление схемы
 		hpp<<"class Schema_"<<cat->getSchema()<<";"<<endl;
@@ -329,7 +332,7 @@ namespace workers
 		hpp<<"typedef boost::shared_ptr<Category_"<<name<<"> Category_"<<name<<"_ptr;"<<endl;
 
 		//конец пространства имен
-		hpp<<"}"<<endl;
+		hpp<<"}}"<<endl;
 
 		hpp<<endl;
 

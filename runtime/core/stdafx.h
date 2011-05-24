@@ -20,3 +20,8 @@
 #include <boost/date_time/gregorian_calendar.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/cstdint.hpp>
+
+#include <boost/mpl/vector.hpp>
+namespace bmpl = boost::mpl;
+
+#include <boost/enable_shared_from_this.hpp>
