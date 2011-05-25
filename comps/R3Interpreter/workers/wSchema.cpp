@@ -3,6 +3,7 @@
 #include <Console.h>
 #include <direct.h>
 #include "out/file.hpp"
+#include "out/styler.hpp"
 
 namespace workers
 {
@@ -190,6 +191,8 @@ namespace workers
 
 
 		hpp<<"#endif"<<endl;
+		hpp.close();
+		out::styler_cpp(hpp.pathName());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -395,6 +398,9 @@ namespace workers
 
 
 		hpp<<"#endif"<<endl;
+
+		hpp.close();
+		out::styler_cpp(hpp.pathName());
 	}
 	
 	//////////////////////////////////////////////////////////////////////////

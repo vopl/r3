@@ -71,6 +71,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="../debug/AStyleLibd.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="Component.def"
 				GenerateDebugInformation="true"
@@ -133,7 +134,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories=".;$(GME_ROOT)/SDK/BON/Common"
+				AdditionalIncludeDirectories=".;$(GME_ROOT)/SDK/BON/Common;../BonX"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;_USRDLL;BUILDER_OBJECT_NETWORK_V2"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -155,6 +156,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="../release/AStyleLib.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="Component.def"
 				GenerateDebugInformation="true"
@@ -731,6 +733,14 @@
 			>
 			<File
 				RelativePath=".\out\file.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\out\styler.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\out\styler.hpp"
 				>
 			</File>
 		</Filter>
