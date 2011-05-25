@@ -30,12 +30,26 @@ typedef bmpl::vector<
 
 public:
 typedef Schema_common Schema;
+typedef boost::shared_ptr<Schema_common> Schema_ptr;
+typedef boost::weak_ptr<Schema_common> Schema_wtr;
+Schema *_schema;
 
 public:
-Category_Owner();
-~Category_Owner();
+Category_Owner(Schema *s)
+: CategoryBase<Category_Owner>("Owner")
+, _schema(s)
+{
+}
 
-Schema_common_ptr getSchema();
+~Category_Owner()
+{
+}
+
+Schema *schema()
+{
+return _schema;
+}
+
 };
 typedef boost::shared_ptr<Category_Owner> Category_Owner_ptr;
 }}

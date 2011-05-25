@@ -52,4 +52,20 @@ namespace pgc
 
 		return s;
 	}
+
+	Statement Connection::once(const std::string &sql)
+	{
+		Statement s(_impl->once());
+		s.sql(sql.c_str());
+
+		return s;
+	}
+	Statement Connection::prep(const std::string &sql)
+	{
+		Statement s(_impl->prep());
+		s.sql(sql.c_str());
+
+		return s;
+	}
+
 }

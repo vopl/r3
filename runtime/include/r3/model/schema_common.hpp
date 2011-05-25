@@ -13,10 +13,11 @@
 
 namespace r3 { namespace model 
 {
+class Schema_common;
+typedef boost::shared_ptr<Schema_common> Schema_common_ptr;
 class Schema_common
 : public SchemaBase<Schema_common>
 {
-	typedef int KKK;
 
 public:
 typedef bmpl::vector<
@@ -29,37 +30,53 @@ typedef bmpl::vector<
 	, Category_Department
 > TVCategoryTypes;
 
-Category_Category1_ptr category_Category1;
-Category_HasRights_ptr category_HasRights;
-Category_Owner_ptr category_Owner;
-Category_User_ptr category_User;
-Category_Right_ptr category_Right;
-Category_Role_ptr category_Role;
-Category_Department_ptr category_Department;
+Category_Category1_ptr _category_Category1;
+Category_HasRights_ptr _category_HasRights;
+Category_Owner_ptr _category_Owner;
+Category_User_ptr _category_User;
+Category_Right_ptr _category_Right;
+Category_Role_ptr _category_Role;
+Category_Department_ptr _category_Department;
 
 public:
-Schema_common(const char *id);
-~Schema_common();
+Schema_common(const char *id)
+: SchemaBase<Schema_common>(id, "common")
+{
+init();
+}
+~Schema_common()
+{}
+
+template <class Oper> void enumCategories(Oper o)
+{
+Schema_common *s = (Schema_common*)this;
+o(s, _category_Category1);
+o(s, _category_HasRights);
+o(s, _category_Owner);
+o(s, _category_User);
+o(s, _category_Right);
+o(s, _category_Role);
+o(s, _category_Department);
+}
 
 template <class C> boost::shared_ptr<C> getCategory(){return boost::shared_ptr<C>();}
-template <> Category_Category1_ptr	getCategory<Category_Category1>(){return category_Category1;}
-template <> Category_HasRights_ptr	getCategory<Category_HasRights>(){return category_HasRights;}
-template <> Category_Owner_ptr	getCategory<Category_Owner>(){return category_Owner;}
-template <> Category_User_ptr	getCategory<Category_User>(){return category_User;}
-template <> Category_Right_ptr	getCategory<Category_Right>(){return category_Right;}
-template <> Category_Role_ptr	getCategory<Category_Role>(){return category_Role;}
-template <> Category_Department_ptr	getCategory<Category_Department>(){return category_Department;}
+template <> Category_Category1_ptr	getCategory<Category_Category1>(){return _category_Category1;}
+template <> Category_HasRights_ptr	getCategory<Category_HasRights>(){return _category_HasRights;}
+template <> Category_Owner_ptr	getCategory<Category_Owner>(){return _category_Owner;}
+template <> Category_User_ptr	getCategory<Category_User>(){return _category_User;}
+template <> Category_Right_ptr	getCategory<Category_Right>(){return _category_Right;}
+template <> Category_Role_ptr	getCategory<Category_Role>(){return _category_Role;}
+template <> Category_Department_ptr	getCategory<Category_Department>(){return _category_Department;}
 
-Category_Category1_ptr	getCategory_Category1();
-Category_HasRights_ptr	getCategory_HasRights();
-Category_Owner_ptr	getCategory_Owner();
-Category_User_ptr	getCategory_User();
-Category_Right_ptr	getCategory_Right();
-Category_Role_ptr	getCategory_Role();
-Category_Department_ptr	getCategory_Department();
+Category_Category1_ptr	getCategory_Category1(){return _category_Category1;}
+Category_HasRights_ptr	getCategory_HasRights(){return _category_HasRights;}
+Category_Owner_ptr	getCategory_Owner(){return _category_Owner;}
+Category_User_ptr	getCategory_User(){return _category_User;}
+Category_Right_ptr	getCategory_Right(){return _category_Right;}
+Category_Role_ptr	getCategory_Role(){return _category_Role;}
+Category_Department_ptr	getCategory_Department(){return _category_Department;}
 
 };
-typedef boost::shared_ptr<Schema_common> Schema_common_ptr;
 }}
 
 #endif

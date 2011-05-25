@@ -20,10 +20,10 @@ namespace workers
 
 	void WSchema::operator()(const std::set<FCO> &roots)
 	{
-		_mkdir("R3_interpret");
-		_mkdir("R3_interpret/include");
-		_mkdir("R3_interpret/include/r3");
-		_mkdir("R3_interpret/include/r3/model");
+		_mkdir("runtime");
+		_mkdir("runtime/include");
+		_mkdir("runtime/include/r3");
+		_mkdir("runtime/include/r3/model");
 
 		//собрать все категории и распредилить по схемам
 		std::map<std::string, std::set<Category> > schema2cats;
@@ -74,7 +74,7 @@ namespace workers
 	//////////////////////////////////////////////////////////////////////////
 	void WSchema::processSchema_hpp(const std::string &name, const std::set<Category> &cats)
 	{
-		out::File hpp("R3_interpret/include/r3/model/schema_"+name+".hpp");
+		out::File hpp("runtime/include/r3/model/schema_"+name+".hpp");
 
 		hpp<<"#ifndef _R3_MODEL_SCHEMA_"<<name<<"_HPP_"<<endl;
 		hpp<<"#define _R3_MODEL_SCHEMA_"<<name<<"_HPP_"<<endl;
@@ -91,6 +91,10 @@ namespace workers
 		hpp<<endl;
 
 		hpp<<"namespace r3 { namespace model "<<endl<<"{"<<endl;
+
+		//указатель
+		hpp<<"class Schema_"<<name<<";"<<endl;
+		hpp<<"typedef boost::shared_ptr<Schema_"<<name<<"> Schema_"<<name<<"_ptr;"<<endl;
 
 
 		//класс
@@ -122,18 +126,36 @@ namespace workers
 		//указатели на экземпл€ры категорий
 		BOOST_FOREACH(const Category &cat, cats)
 		{
-			hpp<<"Category_"<<cat->getName()<<"_ptr category_"<<cat->getName()<<";"<<endl;
+			hpp<<"Category_"<<cat->getName()<<"_ptr _category_"<<cat->getName()<<";"<<endl;
 		}
 		hpp<<endl;
 
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<"Schema_"<<name<<"(const char *id);"<<endl;
+		hpp<<"Schema_"<<name<<"(const char *id)"<<endl;
+		hpp<<": SchemaBase<Schema_"<<name<<">(id, \""<<name<<"\")"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"init();"<<endl;
+		hpp<<"}"<<endl;
 
 		//деструктор
-		hpp<<"~Schema_"<<name<<"();"<<endl;
+		hpp<<"~Schema_"<<name<<"()"<<endl;
+		hpp<<"{}"<<endl;
 		hpp<<endl;
+
+		//перечисление типизированных экземпл€ров категорий
+		hpp<<"template <class Oper> void enumCategories(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"Schema_"<<name<<" *s = (Schema_"<<name<<"*)this;"<<endl;
+		BOOST_FOREACH(const Category &cat, cats)
+		{
+			hpp<<"o(s, _category_"<<cat->getName()<<");";
+			hpp<<endl;
+		}
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
 
 		//шаблон дл€ доступа к экземпл€ру по типу
 		hpp<<"template <class C> boost::shared_ptr<C> getCategory(){return boost::shared_ptr<C>();}"<<endl;
@@ -141,7 +163,7 @@ namespace workers
 		{
 			hpp<<"template <> Category_"<<cat->getName()<<"_ptr\t"<<"getCategory<Category_"<<cat->getName()<<">()";
 			hpp<<"{";
-			hpp<<"return category_"<<cat->getName()<<";";
+			hpp<<"return _category_"<<cat->getName()<<";";
 			hpp<<"}";
 			hpp<<endl;
 		}
@@ -150,15 +172,16 @@ namespace workers
 		//геттеры дл€ категорий
 		BOOST_FOREACH(const Category &cat, cats)
 		{
-			hpp<<"Category_"<<cat->getName()<<"_ptr\t"<<"getCategory_"<<cat->getName()<<"();"<<endl;
+			hpp<<"Category_"<<cat->getName()<<"_ptr\t"<<"getCategory_"<<cat->getName()<<"()";
+			hpp<<"{";
+			hpp<<"return _category_"<<cat->getName()<<";";
+			hpp<<"}";
+			hpp<<endl;
 		}
 		hpp<<endl;
 
 		hpp<<"};"<<endl;
 		//конец класса
-
-		//указатель
-		hpp<<"typedef boost::shared_ptr<Schema_"<<name<<"> Schema_"<<name<<"_ptr;"<<endl;
 
 		//конец пространства имен
 		hpp<<"}}"<<endl;
@@ -237,7 +260,7 @@ namespace workers
 
 
 
-		out::File hpp("R3_interpret/include/r3/model/category_"+name+".hpp");
+		out::File hpp("runtime/include/r3/model/category_"+name+".hpp");
 
 		hpp<<"#ifndef _R3_MODEL_CATEGORY_"<<name<<"_HPP_"<<endl;
 		hpp<<"#define _R3_MODEL_CATEGORY_"<<name<<"_HPP_"<<endl;
@@ -329,19 +352,34 @@ namespace workers
 		hpp<<"public:"<<endl;
 		//тип схемы
 		hpp<<"typedef Schema_"<<cat->getSchema()<<" Schema;"<<endl;
+		hpp<<"typedef boost::shared_ptr<Schema_"<<cat->getSchema()<<"> Schema_ptr;"<<endl;
+		hpp<<"typedef boost::weak_ptr<Schema_"<<cat->getSchema()<<"> Schema_wtr;"<<endl;
+
+		hpp<<"Schema *_schema;"<<endl;
 		hpp<<endl;
 
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<"Category_"<<name<<"();"<<endl;
+		hpp<<"Category_"<<name<<"(Schema *s)"<<endl;
+		hpp<<": CategoryBase<Category_"<<name<<">(\""<<name<<"\")"<<endl;
+		hpp<<", _schema(s)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
 
 		//деструктор
-		hpp<<"~Category_"<<name<<"();"<<endl;
+		hpp<<"~Category_"<<name<<"()"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"}"<<endl;
 		hpp<<endl;
 
 		//геттер дл€ схемы
-		hpp<<"Schema_"<<cat->getSchema()<<"_ptr getSchema();"<<endl;
+		hpp<<"Schema *schema()"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return _schema;"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
 
 
 		hpp<<"};"<<endl;

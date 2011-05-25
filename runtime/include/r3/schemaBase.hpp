@@ -14,9 +14,20 @@ namespace r3
 
 		pgc::Connection _con;
 		std::string _id;
+		std::string _name;
+
+	protected:
+		void init();
 	public:
-		SchemaBase(const char *id);
+		SchemaBase(const char *id, const char *name);
 		~SchemaBase();
+
+		pgc::Connection con();
+
+		const std::string &id();
+		const std::string &name();
+
+		std::string db_name();
 
 		void dbCon(pgc::Connection con);
 		void dbCreate();
@@ -27,101 +38,68 @@ namespace r3
 	namespace impl
 	{
 		///////////////////////////
-		template <class S, class Tag> struct dbCreate_Operator;
-
-		///////////////////////////
-		typedef struct {} tag_Init;
-		template <class S> struct dbCreate_Operator<S, tag_Init>
+		struct enumOper_init
 		{
-			S *_schema;
-			dbCreate_Operator(S *schema) : _schema(schema){}
-			template <typename Category> void operator()(Category *stub)
+			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				_schema->getCategory<Category>()->init(_schema);
+				c.reset(new typename CategoryPtr::element_type(s));
 			}
 		};
 
 		///////////////////////////
-		typedef struct {} tag_CreateTable;
-		template <class S> struct dbCreate_Operator<S, tag_CreateTable>
+		struct enumOper_createTable
 		{
-			S *_schema;
-			dbCreate_Operator(S *schema) : _schema(schema){}
-			template <typename Category> void operator()(Category *stub)
+			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				_schema->getCategory<Category>()->dbCreateTable();
+				c->dbCreateTable();
 			}
 		};
-
 		///////////////////////////
-		typedef struct {} tag_CreateFields;
-		template <class S> struct dbCreate_Operator<S, tag_CreateFields>
+		struct enumOper_createFields
 		{
-			S *_schema;
-			dbCreate_Operator(S *schema) : _schema(schema){}
-			template <typename Category> void operator()(Category *stub)
+			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				_schema->getCategory<Category>()->dbCreateFields();
+				c->dbCreateFields();
 			}
 		};
-
 		///////////////////////////
-		typedef struct {} tag_CreateIndices;
-		template <class S> struct dbCreate_Operator<S, tag_CreateIndices>
+		struct enumOper_createIndices
 		{
-			S *_schema;
-			dbCreate_Operator(S *schema) : _schema(schema){}
-			template <typename Category> void operator()(Category *stub)
+			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				_schema->getCategory<Category>()->dbCreateIndices();
+				c->dbCreateIndices();
 			}
 		};
-
 		///////////////////////////
-		typedef struct {} tag_CreateForeignFields;
-		template <class S> struct dbCreate_Operator<S, tag_CreateForeignFields>
+		struct enumOper_createForeignFields
 		{
-			S *_schema;
-			dbCreate_Operator(S *schema) : _schema(schema){}
-			template <typename Category> void operator()(Category *stub)
+			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				_schema->getCategory<Category>()->dbCreateForeignFields();
+				c->dbCreateForeignFields();
 			}
 		};
-
 		///////////////////////////
-		typedef struct {} tag_CreateCrosses;
-		template <class S> struct dbCreate_Operator<S, tag_CreateCrosses>
+		struct enumOper_createCrosses
 		{
-			S *_schema;
-			dbCreate_Operator(S *schema) : _schema(schema){}
-			template <typename Category> void operator()(Category *stub)
+			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				_schema->getCategory<Category>()->dbCreateCrosses();
+				c->dbCreateCrosses();
 			}
 		};
-
 		///////////////////////////
-		typedef struct {} tag_CreateForeignConstraints;
-		template <class S> struct dbCreate_Operator<S, tag_CreateForeignConstraints>
+		struct enumOper_createForeignConstraints
 		{
-			S *_schema;
-			dbCreate_Operator(S *schema) : _schema(schema){}
-			template <typename Category> void operator()(Category *stub)
+			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				_schema->getCategory<Category>()->dbCreateForeignConstraints();
+				c->dbCreateForeignConstraints();
 			}
 		};
-
 		///////////////////////////
-		typedef struct {} tag_CreateViews;
-		template <class S> struct dbCreate_Operator<S, tag_CreateViews>
+		struct enumOper_createViews
 		{
-			S *_schema;
-			dbCreate_Operator(S *schema) : _schema(schema){}
-			template <typename Category> void operator()(Category *stub)
+			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				_schema->getCategory<Category>()->dbCreateViews();
+				c->dbCreateViews();
 			}
 		};
 
@@ -129,10 +107,19 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S>
-	SchemaBase<S>::SchemaBase(const char *id)
-		: _id(id)
+	void SchemaBase<S>::init()
 	{
+		S* s = (S*)this;
+		s->enumCategories(impl::enumOper_init());
+	}
 
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S>
+	SchemaBase<S>::SchemaBase(const char *id, const char *name)
+		: _id(id)
+		, _name(name)
+	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -144,17 +131,38 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S>
+	pgc::Connection SchemaBase<S>::con()
+	{
+		return _con;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S>
+	const std::string &SchemaBase<S>::id()
+	{
+		return _id;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S>
+	const std::string &SchemaBase<S>::name()
+	{
+		return _name;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S>
+	std::string SchemaBase<S>::db_name()
+	{
+		return "\""+_id+"_"+_name+"\"";
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S>
 	void SchemaBase<S>::dbCon(pgc::Connection con)
 	{
 		_con = con;
-
-		typedef typename bmpl::transform
-			<
-				typename Schema::TVCategoryTypes,
-				boost::add_pointer<bmpl::_1>
-			>::type CategoryPointerTypes;
-
-		bmpl::for_each<CategoryPointerTypes>(impl::dbCreate_Operator<S, impl::tag_Init>((S*)this));
 	}
 
 
@@ -162,39 +170,37 @@ namespace r3
 	template <class S>
 	void SchemaBase<S>::dbCreate()
 	{
-		typedef typename bmpl::transform
-			<
-				typename Schema::TVCategoryTypes,
-				boost::add_pointer<bmpl::_1>
-			>::type CategoryPointerTypes;
+		S* s = (S*)this;
+
+		_con.once("CREATE SCHEMA "+db_name()).exec().throwIfError();
 
 		//таблицы, поля первичных ключей
-		bmpl::for_each<CategoryPointerTypes>(impl::dbCreate_Operator<S, impl::tag_CreateTable>((S*)this));
+		s->enumCategories(impl::enumOper_createTable());
 
 		//поля данных
-		bmpl::for_each<CategoryPointerTypes>(impl::dbCreate_Operator<S, impl::tag_CreateFields>((S*)this));
+		s->enumCategories(impl::enumOper_createFields());
 
 		//индексы
-		bmpl::for_each<CategoryPointerTypes>(impl::dbCreate_Operator<S, impl::tag_CreateIndices>((S*)this));
+		s->enumCategories(impl::enumOper_createIndices());
 
 		//поля вторичных ключей
-		bmpl::for_each<CategoryPointerTypes>(impl::dbCreate_Operator<S, impl::tag_CreateForeignFields>((S*)this));
+		s->enumCategories(impl::enumOper_createForeignFields());
 
 		//таблицы кроссов
-		bmpl::for_each<CategoryPointerTypes>(impl::dbCreate_Operator<S, impl::tag_CreateCrosses>((S*)this));
+		s->enumCategories(impl::enumOper_createCrosses());
 
 		//ограничения по связям
-		bmpl::for_each<CategoryPointerTypes>(impl::dbCreate_Operator<S, impl::tag_CreateForeignConstraints>((S*)this));
+		s->enumCategories(impl::enumOper_createForeignConstraints());
 
 		//виды
-		bmpl::for_each<CategoryPointerTypes>(impl::dbCreate_Operator<S, impl::tag_CreateViews>((S*)this));
+		s->enumCategories(impl::enumOper_createViews());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S>
 	void SchemaBase<S>::dbDrop()
 	{
-		_con.once("DROP SCHEMA $1").exec("r3_"+_id).throwIfError();
+		_con.once("DROP SCHEMA "+db_name()).exec().throwIfError();
 	}
 
 }

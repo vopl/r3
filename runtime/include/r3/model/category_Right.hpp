@@ -22,12 +22,26 @@ typedef bmpl::vector<
 
 public:
 typedef Schema_common Schema;
+typedef boost::shared_ptr<Schema_common> Schema_ptr;
+typedef boost::weak_ptr<Schema_common> Schema_wtr;
+Schema *_schema;
 
 public:
-Category_Right();
-~Category_Right();
+Category_Right(Schema *s)
+: CategoryBase<Category_Right>("Right")
+, _schema(s)
+{
+}
 
-Schema_common_ptr getSchema();
+~Category_Right()
+{
+}
+
+Schema *schema()
+{
+return _schema;
+}
+
 };
 typedef boost::shared_ptr<Category_Right> Category_Right_ptr;
 }}

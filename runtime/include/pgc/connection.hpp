@@ -31,6 +31,9 @@ namespace pgc
 
 		Statement once(const char *sql=NULL);
 		Statement prep(const char *sql=NULL);
+		Statement once(const std::string &sql);
+		Statement prep(const std::string &sql);
+
 	};
 }
 #endif

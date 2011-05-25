@@ -159,8 +159,25 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	pgc::Connection con;
 	con.open("dbname=test user=postgres password=postgres port=5432");
+
 	s->dbCon(con);
-	s->dbCreate();
+	try
+	{
+		s->dbDrop();
+	}
+	catch(std::exception &e)
+	{
+		std::cout<<e.what()<<std::endl;
+	}
+
+	try
+	{
+		s->dbCreate();
+	}
+	catch(std::exception &e)
+	{
+		std::cout<<e.what()<<std::endl;
+	}
 	return 0;
 }
 
