@@ -1,6 +1,8 @@
 #ifndef _R3_CATEGORYBASE_HPP_
 #define _R3_CATEGORYBASE_HPP_
 
+#include "r3/fields/Field.h"
+
 namespace r3
 {
 	template <class C>
@@ -88,14 +90,41 @@ namespace r3
 		}
 	}
 	
+	namespace impl
+	{
+		struct enumOper_createField
+		{
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, r3::fields::String *stub, const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN "+fname+" VARCHAR").exec().throwIfError();
+			}
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, r3::fields::Enum *stub, const char *fname)
+			{
+				assert(!"тип енума?");
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN "+fname+" INT4").exec().throwIfError();
+			}
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, r3::fields::Bool *stub, const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN "+fname+" BOOL").exec().throwIfError();
+			}
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, void *stub, const char *fname)
+			{
+				assert(!"добить поля");
+			}
+		};
+	}
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateFields()
 	{
-		//перечислить все базовые и себя, собрать все поля
-
-		//добавить собранные поля
-		assert(0);
+		if(!C::isAbstract)
+		{
+			//перечислить все базовые и себя, собрать все поля и добавить их к таблице
+			((C*)this)->enumFieldsFromBasesAndSelf(impl::enumOper_createField());
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////////

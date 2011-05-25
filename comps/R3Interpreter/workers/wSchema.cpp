@@ -314,7 +314,30 @@ namespace workers
 		hpp<<endl;
 
 
-		//вектор полей
+		//поля свои и все от базовых
+		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		std::set<Category> basesAndSelf(bases);
+		basesAndSelf.insert(cat);
+		BOOST_FOREACH(Category cat, basesAndSelf)
+		{
+			hpp<<"//"<<cat->getName()<<endl;
+
+			std::set<BON::FCO> fields = cat->getChildFCOs();
+
+			BOOST_FOREACH(Field fld, fields)
+			{
+				if(!fld) continue;
+
+				hpp
+					<<"o(this, _schema->getCategory<"<<cat->getName()<<">().get(), (r3::fields::"<<fld->getObjectMeta().name()<<"*)NULL, "
+					<<"\""<<fld->getName()<<"\""
+					<<");"
+					<<endl;
+			}
+		}
+		hpp<<"}"<<endl;
+
 		hpp<<endl;
 
 		hpp<<"public:"<<endl;
@@ -323,6 +346,7 @@ namespace workers
 		hpp<<"typedef boost::shared_ptr<"<<cat->getSchema()<<"> Schema_ptr;"<<endl;
 		hpp<<"typedef boost::weak_ptr<"<<cat->getSchema()<<"> Schema_wtr;"<<endl;
 
+		hpp<<"protected:"<<endl;
 		hpp<<"Schema *_schema;"<<endl;
 		hpp<<endl;
 

@@ -20,11 +20,16 @@ namespace r3
 			
 			public:
 				static const bool isAbstract = false;
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
+				{
+					//Category2
+				}
 				
 			public:
 				typedef common2 Schema;
 				typedef boost::shared_ptr<common2> Schema_ptr;
 				typedef boost::weak_ptr<common2> Schema_wtr;
+			protected:
 				Schema *_schema;
 				
 			public:

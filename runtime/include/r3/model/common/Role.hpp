@@ -24,11 +24,19 @@ namespace r3
 			
 			public:
 				static const bool isAbstract = false;
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
+				{
+					//HasRights
+					o(this, _schema->getCategory<HasRights>().get(), (r3::fields::Bool *)NULL, "attrInHasRights");
+					//Role
+					o(this, _schema->getCategory<Role>().get(), (r3::fields::String *)NULL, "name");
+				}
 				
 			public:
 				typedef common Schema;
 				typedef boost::shared_ptr<common> Schema_ptr;
 				typedef boost::weak_ptr<common> Schema_wtr;
+			protected:
 				Schema *_schema;
 				
 			public:
