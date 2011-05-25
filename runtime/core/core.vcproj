@@ -513,45 +513,53 @@
 					Name="model"
 					>
 					<File
-						RelativePath="..\include\r3\model\category_Category1.hpp"
+						RelativePath="..\include\r3\model\common.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\model\category_Category2.hpp"
+						RelativePath="..\include\r3\model\common2.hpp"
 						>
 					</File>
-					<File
-						RelativePath="..\include\r3\model\category_Department.hpp"
+					<Filter
+						Name="common"
 						>
-					</File>
-					<File
-						RelativePath="..\include\r3\model\category_HasRights.hpp"
+						<File
+							RelativePath="..\include\r3\model\common\Category1.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\include\r3\model\common\Department.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\include\r3\model\common\HasRights.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\include\r3\model\common\Owner.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\include\r3\model\common\Right.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\include\r3\model\common\Role.hpp"
+							>
+						</File>
+						<File
+							RelativePath="..\include\r3\model\common\User.hpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="common2"
 						>
-					</File>
-					<File
-						RelativePath="..\include\r3\model\category_Owner.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\include\r3\model\category_Right.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\include\r3\model\category_Role.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\include\r3\model\category_User.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\include\r3\model\schema_common.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\include\r3\model\schema_common2.hpp"
-						>
-					</File>
+						<File
+							RelativePath="..\include\r3\model\common2\Category2.hpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 		</Filter>

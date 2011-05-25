@@ -200,7 +200,7 @@ namespace r3
 	template <class S>
 	void SchemaBase<S>::dbDrop()
 	{
-		_con.once("DROP SCHEMA "+db_name()).exec().throwIfError();
+		_con.once("DROP SCHEMA "+db_name()+" CASCADE").exec().throwIfError();
 	}
 
 }

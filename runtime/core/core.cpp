@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "r3/model/schema_common.hpp"
+#include "r3/model/common.hpp"
 #include "pgc/connection.hpp"
 
 /*
@@ -155,7 +155,7 @@ int _tmain(int argc, _TCHAR* argv[])
 // 	std::cout<<sizeof(r3::fields::Date)<<std::endl;
 // 	std::cout<<sizeof(r3::fields::Int64)<<std::endl;
 
-	r3::model::Schema_common_ptr s(new r3::model::Schema_common("myId"));
+	r3::model::common_ptr s(new r3::model::common("myId"));
 
 	pgc::Connection con;
 	con.open("dbname=test user=postgres password=postgres port=5432");
