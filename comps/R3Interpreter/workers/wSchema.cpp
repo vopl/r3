@@ -310,41 +310,9 @@ namespace workers
 
 		hpp<<"public:"<<endl;
 
-		//вектор базовых
-		hpp<<"typedef bmpl::vector<";
-		bool first = true;
-		BOOST_FOREACH(const Category &cat, bases)
-		{
-			hpp<<endl<<"\t";
-			if(!first)
-				hpp<<", ";
-			else
-			{
-				hpp<<"  ";
-				first = false;
-			}
-			hpp<<""<<cat->getName();
-		}
-		hpp<<endl<<"> TVBases;"<<endl;
+		hpp<<"static const bool isAbstract = "<<(cat->isAbstract()?"true":"false")<<";";
 		hpp<<endl;
 
-		//вектор производных
-		hpp<<"typedef bmpl::vector<";
-		first = true;
-		BOOST_FOREACH(const Category &cat, deriveds)
-		{
-			hpp<<endl<<"\t";
-			if(!first)
-				hpp<<", ";
-			else
-			{
-				hpp<<"  ";
-				first = false;
-			}
-			hpp<<""<<cat->getName();
-		}
-		hpp<<endl<<"> TVDeriveds;"<<endl;
-		hpp<<endl;
 
 		//вектор полей
 		hpp<<endl;

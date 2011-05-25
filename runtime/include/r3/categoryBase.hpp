@@ -81,14 +81,20 @@ namespace r3
 	template <class C>
 	void CategoryBase<C>::dbCreateTable()
 	{
-		pgc::Connection con = category()->schema()->con();
-		con.once("CREATE TABLE "+db_sname()+"(id int8 PRIMARY KEY)").exec().throwIfError();
+		if(!C::isAbstract)
+		{
+			pgc::Connection con = category()->schema()->con();
+			con.once("CREATE TABLE "+db_sname()+"(id int8 PRIMARY KEY)").exec().throwIfError();
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateFields()
 	{
+		//перечислить все базовые и себя, собрать все поля
+
+		//добавить собранные поля
 		assert(0);
 	}
 	

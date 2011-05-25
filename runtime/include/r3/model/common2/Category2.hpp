@@ -19,12 +19,7 @@ namespace r3
 			{
 			
 			public:
-				typedef bmpl::vector <
-				> TVBases;
-				
-				typedef bmpl::vector <
-				> TVDeriveds;
-				
+				static const bool isAbstract = false;
 				
 			public:
 				typedef common2 Schema;

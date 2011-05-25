@@ -15,24 +15,17 @@ namespace r3
 		{
 		
 			//deriveds
-			class User;
-			typedef boost::shared_ptr<User> User_ptr;
 			class Department;
 			typedef boost::shared_ptr<Department> Department_ptr;
+			class User;
+			typedef boost::shared_ptr<User> User_ptr;
 			
 			class Owner
 				: public CategoryBase<Owner>
 			{
 			
 			public:
-				typedef bmpl::vector <
-				> TVBases;
-				
-				typedef bmpl::vector <
-				User
-				, Department
-				> TVDeriveds;
-				
+				static const bool isAbstract = true;
 				
 			public:
 				typedef common Schema;
