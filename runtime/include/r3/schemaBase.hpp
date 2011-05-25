@@ -154,7 +154,7 @@ namespace r3
 	template <class S>
 	std::string SchemaBase<S>::db_name()
 	{
-		return "\""+_id+"_"+_name+"\"";
+		return "\""+_name+"_"+_id+"\"";
 	}
 
 
