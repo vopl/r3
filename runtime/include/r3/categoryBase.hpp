@@ -13,6 +13,14 @@ namespace r3
 		Category *category();
 
 		std::string _name;
+
+	public:
+		enum EIndexMethod
+		{
+			im_tree,
+			im_hash,
+		};
+
 	public:
 		CategoryBase(const char *name);
 		~CategoryBase();
@@ -95,8 +103,6 @@ namespace r3
 	{
 		struct enumOper_createField
 		{
-
-
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
 				Category *c, 
@@ -337,6 +343,165 @@ namespace r3
 				throw std::exception("неизвестный тип поля при добавлении колонки в таблицу");
 			}
 		};
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		//////////////////////////////////////////////////////////////////////////
+		struct enumOper_createIndex
+		{
+
+			template <typename Category, typename CategoryBaseOrSelf>
+			std::string sql1(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				const char *idxName,
+				typename Category::EIndexMethod idxMethod)
+			{
+				std::string res = "CREATE INDEX \"_idx_";
+				res += c->name();
+				res += "_";
+				res += idxName;
+				res += "\" ON ";
+				res += c->db_sname();
+				res += " USING ";
+
+				switch(idxMethod)
+				{
+				case Category::im_tree:
+					res += "btree";
+					break;
+				case Category::im_hash:
+					res += "hash";
+					break;
+				default:
+					assert(!"unknown index method");
+					res += "btree";
+					break;
+				}
+
+				return res;
+			}
+
+			template <typename F>
+			std::string sql2(F *stub, const char *fname)
+			{
+				std::string res = "\"_";
+				res += fname;
+				res += "_\"";
+				return res;
+			}
+
+			template <>
+			std::string sql2(r3::fields::Audio *stub, const char *fname)
+			{
+				std::string res = "\"_";
+				res += fname;
+				res += "_name\"";
+				return res;
+			}
+			template <>
+			std::string sql2(r3::fields::Image *stub, const char *fname)
+			{
+				std::string res = "\"_";
+				res += fname;
+				res += "_name\"";
+				return res;
+			}
+			template <>
+			std::string sql2(r3::fields::Video *stub, const char *fname)
+			{
+				std::string res = "\"_";
+				res += fname;
+				res += "_name\"";
+				return res;
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename F0, typename F1, typename F2, typename F3> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				const char *idxName,
+				typename Category::EIndexMethod idxMethod,
+				F0 *stub0, 
+				const char *fname0,
+				F1 *stub1, 
+				const char *fname1,
+				F2 *stub2, 
+				const char *fname2,
+				F3 *stub3, 
+				const char *fname3)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once(
+					sql1(c,bos, idxName, idxMethod)+" ("+
+					sql2(stub0, fname0)+", "+
+					sql2(stub1, fname1)+", "+
+					sql2(stub2, fname2)+", "+
+					sql2(stub3, fname3)+")").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename F0, typename F1, typename F2> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				const char *idxName,
+				typename Category::EIndexMethod idxMethod,
+				F0 *stub0, 
+				const char *fname0,
+				F1 *stub1, 
+				const char *fname1,
+				F2 *stub2, 
+				const char *fname2)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once(
+					sql1(c,bos, idxName, idxMethod)+" ("+
+					sql2(stub0, fname0)+", "+
+					sql2(stub1, fname1)+", "+
+					sql2(stub2, fname2)+")").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename F0, typename F1> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				const char *idxName,
+				typename Category::EIndexMethod idxMethod,
+				F0 *stub0, 
+				const char *fname0,
+				F1 *stub1, 
+				const char *fname1)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once(
+					sql1(c,bos, idxName, idxMethod)+" ("+
+					sql2(stub0, fname0)+", "+
+					sql2(stub1, fname1)+")").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename F0> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				const char *idxName,
+				typename Category::EIndexMethod idxMethod,
+				F0 *stub0, 
+				const char *fname0)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once(
+					sql1(c,bos, idxName, idxMethod)+" ("+
+					sql2(stub0, fname0)+")").exec().throwIfError();
+			}
+		};
 	}
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
@@ -353,7 +518,11 @@ namespace r3
 	template <class C>
 	void CategoryBase<C>::dbCreateIndices()
 	{
-		//assert(0);
+		if(!C::isAbstract)
+		{
+			//перечислить все базовые и себя, собрать все поля и добавить их к таблице
+			((C*)this)->enumIndicesFromBasesAndSelf(impl::enumOper_createIndex());
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////////

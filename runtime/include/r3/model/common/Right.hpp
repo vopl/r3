@@ -31,8 +31,14 @@ namespace r3
 				{
 					//Right
 					Right *c_Right = _schema->getCategory<Right>().get();
-					o(this, c_Right, (r3::fields::Enum<r3::model::s_common::Right::Domainvalue>*)NULL, "value");
+					o(this, c_Right, (r3::fields::Enum<Right::Domainvalue>*)NULL, "value");
 					o(this, c_Right, (r3::fields::String *)NULL, "name");
+				}
+				
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
+				{
+					//Right
+					Right *c_Right = _schema->getCategory<Right>().get();
 				}
 				
 			public:

@@ -33,6 +33,14 @@ namespace r3
 					o(this, c_Department, (r3::fields::String *)NULL, "name");
 				}
 				
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
+				{
+					//Owner
+					Owner *c_Owner = _schema->getCategory<Owner>().get();
+					//Department
+					Department *c_Department = _schema->getCategory<Department>().get();
+				}
+				
 			public:
 				typedef common Schema;
 				typedef boost::shared_ptr<common> Schema_ptr;

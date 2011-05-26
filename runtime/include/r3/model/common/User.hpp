@@ -38,6 +38,16 @@ namespace r3
 					o(this, c_User, (r3::fields::String *)NULL, "login");
 				}
 				
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
+				{
+					//HasRights
+					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
+					//Owner
+					Owner *c_Owner = _schema->getCategory<Owner>().get();
+					//User
+					User *c_User = _schema->getCategory<User>().get();
+				}
+				
 			public:
 				typedef common Schema;
 				typedef boost::shared_ptr<common> Schema_ptr;

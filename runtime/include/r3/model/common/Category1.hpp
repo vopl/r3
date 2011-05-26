@@ -31,6 +31,12 @@ namespace r3
 					Category1 *c_Category1 = _schema->getCategory<Category1>().get();
 				}
 				
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
+				{
+					//Category1
+					Category1 *c_Category1 = _schema->getCategory<Category1>().get();
+				}
+				
 			public:
 				typedef common Schema;
 				typedef boost::shared_ptr<common> Schema_ptr;

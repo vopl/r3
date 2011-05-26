@@ -15,10 +15,10 @@ namespace r3
 		{
 		
 			//deriveds
-			class User;
-			typedef boost::shared_ptr<User> User_ptr;
 			class Department;
 			typedef boost::shared_ptr<Department> Department_ptr;
+			class User;
+			typedef boost::shared_ptr<User> User_ptr;
 			
 			class Owner
 				: public CategoryBase<Owner>
@@ -28,6 +28,12 @@ namespace r3
 				static const bool isAbstract = true;
 				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
+				{
+					//Owner
+					Owner *c_Owner = _schema->getCategory<Owner>().get();
+				}
+				
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Owner
 					Owner *c_Owner = _schema->getCategory<Owner>().get();

@@ -251,6 +251,8 @@ namespace workers
 				deriveds.insert(scat);
 			}
 		}
+		std::set<Category> basesAndSelf(bases);
+		basesAndSelf.insert(cat);
 
 
 		out::File hpp("runtime/include/r3/model/"+cat->getSchema()+"/"+name+".hpp");
@@ -339,8 +341,6 @@ namespace workers
 		//поля свои и все от базовых
 		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)"<<endl;
 		hpp<<"{"<<endl;
-		std::set<Category> basesAndSelf(bases);
-		basesAndSelf.insert(cat);
 		BOOST_FOREACH(Category cat, basesAndSelf)
 		{
 			hpp<<"//"<<cat->getName()<<endl;
@@ -360,7 +360,7 @@ namespace workers
 				if(Scanty(fld))
 				{
 					Category pcat = fld->getParentModel();
-					hpp<<"<r3::model::s_"<<pcat->getSchema()<<"::"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+					hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
 				}
 					
 				hpp
@@ -371,8 +371,63 @@ namespace workers
 			}
 		}
 		hpp<<"}"<<endl;
-
 		hpp<<endl;
+
+
+
+		//индексы свои и все от базовых
+		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		BOOST_FOREACH(Category cat, basesAndSelf)
+		{
+			hpp<<"//"<<cat->getName()<<endl;
+
+			std::set<BON::FCO> fields = cat->getChildFCOs();
+
+			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
+
+			BOOST_FOREACH(Index ind, fields)
+			{
+				if(!ind) continue;
+
+				if(ind->getInIndexOnCategoryFieldLinks().empty()) continue;
+
+				hpp<<"o(this, c_"<<cat->getName()<<", ";
+				hpp<<"\""<<ind->getName()<<"\", ";
+
+				switch(ind->getIndexType())
+				{
+				case IndexImpl::tree_IndexType_Type:
+					hpp<<"im_tree";
+					break;
+				case IndexImpl::hash_IndexType_Type:
+					hpp<<"im_hash";
+					break;
+				default:
+					hpp<<"im_tree";
+					assert(!"unknown index method!");
+				}
+
+
+				BOOST_FOREACH(IndexOnCategoryField link, ind->getInIndexOnCategoryFieldLinks())
+				{
+					Field fld = link->getSrc();
+					hpp<<", (r3::fields::"<<fld->getObjectMeta().name();
+					if(Scanty(fld))
+					{
+						Category pcat = fld->getParentModel();
+						hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+					}
+					hpp<<"*)NULL, ";
+					hpp<<"\""<<fld->getName()<<"\"";
+				}
+
+				hpp<<");"<<endl;
+			}
+		}
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
 
 		hpp<<"public:"<<endl;
 		//тип схемы
