@@ -15,10 +15,10 @@ namespace r3
 		{
 		
 			//deriveds
-			class Department;
-			typedef boost::shared_ptr<Department> Department_ptr;
 			class User;
 			typedef boost::shared_ptr<User> User_ptr;
+			class Department;
+			typedef boost::shared_ptr<Department> Department_ptr;
 			
 			class Owner
 				: public CategoryBase<Owner>

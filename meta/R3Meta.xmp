@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{7528F5D9-4560-4780-BEB1-006C2351998A}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{8732FD79-7436-49F7-83CE-A275B46EABB3}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -56,11 +56,63 @@
 		</attrdef>
 		<atom name = "Audio" metaref = "1331"  attributes = "AllowNull FileStoreKind">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
 		<atom name = "Bool" metaref = "1332"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
@@ -70,6 +122,32 @@
 		</atom>
 		<atom name = "Date" metaref = "1333"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -81,6 +159,32 @@
 		</atom>
 		<atom name = "DateTimeInterval" metaref = "1334"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -88,14 +192,96 @@
 		</atom>
 		<atom name = "Image" metaref = "1335"  attributes = "AllowNull FileStoreKind">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
 		<atom name = "Index" metaref = "1336"  attributes = "IndexType">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="FieldsInIndexLimit" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self.connectedFCOs(IndexOnCategoryField)->size<=4]]>
+				<dispname>Index can`t contain more then 4 fields</dispname>
+			</constraint>
+			<constraint name="UniqueIndexNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Index|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Index names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueIndexNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Index|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Index names in same and base categories must be unique</dispname>
+			</constraint>
 		</atom>
 		<atom name = "Int16" metaref = "1337"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -103,6 +289,32 @@
 		</atom>
 		<atom name = "Int32" metaref = "1338"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -110,6 +322,32 @@
 		</atom>
 		<atom name = "Int64" metaref = "1339"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -117,6 +355,32 @@
 		</atom>
 		<atom name = "Int8" metaref = "1340"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -124,11 +388,63 @@
 		</atom>
 		<atom name = "Money" metaref = "1341"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
 		<atom name = "Real32" metaref = "1342"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -136,6 +452,32 @@
 		</atom>
 		<atom name = "Real64" metaref = "1343"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -147,11 +489,63 @@
 		</atom>
 		<atom name = "String" metaref = "1345"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
 		<atom name = "Time" metaref = "1346"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -163,6 +557,32 @@
 		</atom>
 		<atom name = "Timestamp" metaref = "1347"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -174,6 +594,32 @@
 		</atom>
 		<atom name = "Video" metaref = "1348"  attributes = "AllowNull FileStoreKind">
 				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
@@ -301,9 +747,19 @@
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<constraint name="UniqueCategoryNames" eventmask = "0x101" depth = "any" priority = "2">
+			<constraint name="UniqueCategoryNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[project.rootFolder()
-.models(Categories)->size() == 2]]>
+.models(Categories)
+->forAll(
+  cs:Categories|
+    cs.parts(Category)
+    ->forAll(
+      c:Category|
+        c=self ||
+        c.Schema<>self.Schema ||
+        c.name<>self.name
+    )
+)]]>
 				<dispname>Category names in same schema must be unique</dispname>
 			</constraint>
 			<role name = "Audio" metaref = "1364" kind = "Audio"></role>
@@ -354,6 +810,32 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 			<role name = "ScantyValue" metaref = "1405" kind = "ScantyValue"></role>
 			<aspect name = "AspectScanty" metaref = "1168" attributes = "AllowNull" >
 				<part metaref = "1406" role = "ScantyValue" primary = "yes" linked = "no"></part>
@@ -378,6 +860,32 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
 			<role name = "ScantyValue" metaref = "1410" kind = "ScantyValue"></role>
 			<aspect name = "AspectScanty" metaref = "1176" attributes = "AllowNull" >
 				<part metaref = "1411" role = "ScantyValue" primary = "yes" linked = "no"></part>

@@ -224,33 +224,10 @@ namespace workers
 		//перечень базовых и производных
 		std::set<Category> bases;
 		std::set<Category> deriveds;
-		BOOST_FOREACH(CategoryOrReference cor, cors)
-		{
-			BOOST_FOREACH(CategoryOrReference bas, cor->getCategoryInheritanceDsts())
-			{
-				Category scat(bas);
-				CategoryReference sref(bas);
-				if(sref)
-				{
-					scat = sref->getCategory();
-				}
 
-				bases.insert(scat);
-			}
+		collectInheriance(bases, cat, true, true);
+		collectInheriance(deriveds, cat, false, true);
 
-
-			BOOST_FOREACH(CategoryOrReference der, cor->getCategoryInheritanceSrcs())
-			{
-				Category scat(der);
-				CategoryReference sref(der);
-				if(sref)
-				{
-					scat = sref->getCategory();
-				}
-
-				deriveds.insert(scat);
-			}
-		}
 		std::set<Category> basesAndSelf(bases);
 		basesAndSelf.insert(cat);
 
@@ -487,5 +464,53 @@ namespace workers
 
 	}
 
+
+	//////////////////////////////////////////////////////////////////////////
+	void WSchema::collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive)
+	{
+		if(res.end() != res.find(cat))
+		{
+			assert(!"recursive inheritance");
+			return;
+		}
+
+		std::set<CategoryOrReference> cors;
+		BOOST_FOREACH(Reference ref, cat->getReferredBy())
+		{
+			cors.insert(ref);
+		}
+		cors.insert(cat);
+
+
+		BOOST_FOREACH(CategoryOrReference cor, cors)
+		{
+			std::multiset<CategoryOrReference> targets;
+			if(bases)
+			{
+				targets = cor->getCategoryInheritanceDsts();
+			}
+			else
+			{
+				targets = cor->getCategoryInheritanceSrcs();
+			}
+
+			BOOST_FOREACH(CategoryOrReference bas, targets)
+			{
+				Category scat(bas);
+				CategoryReference sref(bas);
+				if(sref)
+				{
+					scat = sref->getCategory();
+				}
+
+				if(recursive)
+				{
+					collectInheriance(res, scat, bases, recursive);
+				}
+
+				res.insert(scat);
+			}
+		}
+	}
 
 }

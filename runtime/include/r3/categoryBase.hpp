@@ -520,7 +520,7 @@ namespace r3
 	{
 		if(!C::isAbstract)
 		{
-			//перечислить все базовые и себя, собрать все поля и добавить их к таблице
+			//перечислить все базовые и себя, собрать все индексы и добавить их к таблице
 			((C*)this)->enumIndicesFromBasesAndSelf(impl::enumOper_createIndex());
 		}
 	}
@@ -529,7 +529,11 @@ namespace r3
 	template <class C>
 	void CategoryBase<C>::dbCreateForeignFields()
 	{
-		//assert(0);
+		if(!C::isAbstract)
+		{
+			//перечислить все базовые и себя, собрать все индексы и добавить их к таблице
+			//((C*)this)->enumRelationsFromBasesAndSelf(impl::enumOper_createForeignField());
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////////

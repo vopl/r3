@@ -4,6 +4,7 @@
 #include "r3/categoryBase.hpp"
 
 //bases
+#include "r3/model/common/Category1.hpp"
 #include "r3/model/common/HasRights.hpp"
 
 namespace r3
@@ -26,9 +27,10 @@ namespace r3
 				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
+					//Category1
+					Category1 *c_Category1 = _schema->getCategory<Category1>().get();
 					//HasRights
 					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-					o(this, c_HasRights, (r3::fields::Bool *)NULL, "attrInHasRights");
 					//Role
 					Role *c_Role = _schema->getCategory<Role>().get();
 					o(this, c_Role, (r3::fields::String *)NULL, "name");
@@ -36,6 +38,8 @@ namespace r3
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
+					//Category1
+					Category1 *c_Category1 = _schema->getCategory<Category1>().get();
 					//HasRights
 					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
 					//Role

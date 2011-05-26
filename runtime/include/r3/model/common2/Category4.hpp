@@ -1,9 +1,10 @@
-#ifndef _r3_model_common2_Category3_hpp_
-#define _r3_model_common2_Category3_hpp_
+#ifndef _r3_model_common2_Category4_hpp_
+#define _r3_model_common2_Category4_hpp_
 
 #include "r3/categoryBase.hpp"
 
 //bases
+#include "r3/model/common2/Category3.hpp"
 #include "r3/model/common2/Category2.hpp"
 
 namespace r3
@@ -17,12 +18,8 @@ namespace r3
 		namespace s_common2
 		{
 		
-			//deriveds
-			class Category4;
-			typedef boost::shared_ptr<Category4> Category4_ptr;
-			
-			class Category3
-				: public CategoryBase<Category3>
+			class Category4
+				: public CategoryBase<Category4>
 			{
 			
 			public:
@@ -30,6 +27,8 @@ namespace r3
 				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
+					//Category4
+					Category4 *c_Category4 = _schema->getCategory<Category4>().get();
 					//Category3
 					Category3 *c_Category3 = _schema->getCategory<Category3>().get();
 					//Category2
@@ -56,6 +55,8 @@ namespace r3
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
+					//Category4
+					Category4 *c_Category4 = _schema->getCategory<Category4>().get();
 					//Category3
 					Category3 *c_Category3 = _schema->getCategory<Category3>().get();
 					//Category2
@@ -70,13 +71,13 @@ namespace r3
 				Schema *_schema;
 				
 			public:
-				Category3(Schema *s)
-					: CategoryBase<Category3>("Category3")
+				Category4(Schema *s)
+					: CategoryBase<Category4>("Category4")
 					, _schema(s)
 				{
 				}
 				
-				~Category3()
+				~Category4()
 				{
 				}
 				
@@ -86,7 +87,7 @@ namespace r3
 				}
 				
 			};
-			typedef boost::shared_ptr<Category3> Category3_ptr;
+			typedef boost::shared_ptr<Category4> Category4_ptr;
 		}
 	}
 }
