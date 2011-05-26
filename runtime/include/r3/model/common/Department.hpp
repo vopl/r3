@@ -3,6 +3,9 @@
 
 #include "r3/categoryBase.hpp"
 
+//bases
+#include "r3/model/common/Owner.hpp"
+
 namespace r3
 {
 	namespace model
@@ -14,21 +17,20 @@ namespace r3
 		namespace s_common
 		{
 		
-			//bases
-			class Owner;
-			typedef boost::shared_ptr<Owner> Owner_ptr;
-			
 			class Department
 				: public CategoryBase<Department>
 			{
 			
 			public:
 				static const bool isAbstract = false;
+				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
-					//Department
-					o(this, _schema->getCategory<Department>().get(), (r3::fields::String *)NULL, "name");
 					//Owner
+					Owner *c_Owner = _schema->getCategory<Owner>().get();
+					//Department
+					Department *c_Department = _schema->getCategory<Department>().get();
+					o(this, c_Department, (r3::fields::String *)NULL, "name");
 				}
 				
 			public:

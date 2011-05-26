@@ -262,6 +262,18 @@ namespace workers
 		hpp<<"#include \"r3/categoryBase.hpp\""<<endl;
 		hpp<<endl;
 
+		//инклюды для базовых
+		if(bases.size())
+		{
+			hpp<<"//bases"<<endl;
+			BOOST_FOREACH(Category bcat, bases)
+			{
+				assert(bcat->getSchema() == cat->getSchema());
+				hpp<<"#include \"r3/model/"<<bcat->getSchema()<<"/"<<bcat->getName()<<".hpp\""<<endl;
+			}
+			hpp<<endl;
+		}
+
 
 		hpp<<"namespace r3"<<endl
 			<<"{"<<endl
@@ -278,25 +290,15 @@ namespace workers
 			<<"{"<<endl;
 		hpp<<endl;
 
-		//предварительные объявления базовых и производных
-		if(bases.size())
-		{
-			hpp<<"//bases"<<endl;
-			BOOST_FOREACH(Category cat, bases)
-			{
-				hpp<<"class "<<cat->getName()<<";"<<endl;
-				hpp<<"typedef boost::shared_ptr<"<<cat->getName()<<"> "<<cat->getName()<<"_ptr;"<<endl;
-			}
-			hpp<<endl;
-		}
-
+		//предварительные объявления производных
 		if(deriveds.size())
 		{
 			hpp<<"//deriveds"<<endl;
-			BOOST_FOREACH(Category cat, deriveds)
+			BOOST_FOREACH(Category dcat, deriveds)
 			{
-				hpp<<"class "<<cat->getName()<<";"<<endl;
-				hpp<<"typedef boost::shared_ptr<"<<cat->getName()<<"> "<<cat->getName()<<"_ptr;"<<endl;
+				assert(dcat->getSchema() == cat->getSchema());
+				hpp<<"class "<<dcat->getName()<<";"<<endl;
+				hpp<<"typedef boost::shared_ptr<"<<dcat->getName()<<"> "<<dcat->getName()<<"_ptr;"<<endl;
 			}
 			hpp<<endl;
 		}
@@ -310,9 +312,29 @@ namespace workers
 
 		hpp<<"public:"<<endl;
 
-		hpp<<"static const bool isAbstract = "<<(cat->isAbstract()?"true":"false")<<";";
+		hpp<<"static const bool isAbstract = "<<(cat->isAbstract()?"true":"false")<<";"<<endl;
 		hpp<<endl;
 
+		//домены
+		std::set<FCO> enums = cat->getChildFCOsAs("Enum");
+		std::set<FCO> sets = cat->getChildFCOsAs("Set");
+		std::set<FCO> scanties(enums);
+		scanties.insert(sets.begin(), sets.end());
+		BOOST_FOREACH(Scanty s, scanties)
+		{
+			assert(s);
+
+			hpp<<"struct Domain"<<s->getName()<<endl;
+			hpp<<"{"<<endl;
+
+			std::set<FCO> vals = s->getChildFCOsAs("ScantyValue");
+			hpp<<"static const size_t amount = "<<vals.size()<<";"<<endl;
+
+			hpp<<"static const char *values[amount];"<<endl;
+
+			hpp<<"};"<<endl;
+			hpp<<endl;
+		}
 
 		//поля свои и все от базовых
 		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)"<<endl;
@@ -325,12 +347,24 @@ namespace workers
 
 			std::set<BON::FCO> fields = cat->getChildFCOs();
 
+			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
+
 			BOOST_FOREACH(Field fld, fields)
 			{
 				if(!fld) continue;
 
 				hpp
-					<<"o(this, _schema->getCategory<"<<cat->getName()<<">().get(), (r3::fields::"<<fld->getObjectMeta().name()<<"*)NULL, "
+					<<"o(this, c_"<<cat->getName()<<", "
+					<<"(r3::fields::"<<fld->getObjectMeta().name();
+					
+				if(Scanty(fld))
+				{
+					Category pcat = fld->getParentModel();
+					hpp<<"<r3::model::s_"<<pcat->getSchema()<<"::"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+				}
+					
+				hpp
+					<<"*)NULL, "
 					<<"\""<<fld->getName()<<"\""
 					<<");"
 					<<endl;

@@ -3,6 +3,10 @@
 
 #include "r3/categoryBase.hpp"
 
+//bases
+#include "r3/model/common/HasRights.hpp"
+#include "r3/model/common/Owner.hpp"
+
 namespace r3
 {
 	namespace model
@@ -14,26 +18,24 @@ namespace r3
 		namespace s_common
 		{
 		
-			//bases
-			class Owner;
-			typedef boost::shared_ptr<Owner> Owner_ptr;
-			class HasRights;
-			typedef boost::shared_ptr<HasRights> HasRights_ptr;
-			
 			class User
 				: public CategoryBase<User>
 			{
 			
 			public:
 				static const bool isAbstract = false;
+				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
-					//Owner
 					//HasRights
-					o(this, _schema->getCategory<HasRights>().get(), (r3::fields::Bool *)NULL, "attrInHasRights");
+					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
+					o(this, c_HasRights, (r3::fields::Bool *)NULL, "attrInHasRights");
+					//Owner
+					Owner *c_Owner = _schema->getCategory<Owner>().get();
 					//User
-					o(this, _schema->getCategory<User>().get(), (r3::fields::String *)NULL, "login");
-					o(this, _schema->getCategory<User>().get(), (r3::fields::String *)NULL, "password");
+					User *c_User = _schema->getCategory<User>().get();
+					o(this, c_User, (r3::fields::String *)NULL, "password");
+					o(this, c_User, (r3::fields::String *)NULL, "login");
 				}
 				
 			public:

@@ -10,10 +10,12 @@ namespace r3{ namespace fields
 	//   C  L  A  S  S   Scanty
 	//*******************************************************************
 
+	template <class Domain>
 	class Scanty
 		: public Field
 	{
 	public:
+		static const size_t amount=Domain::amount;
 	}; // class
 }}  // namespace
 

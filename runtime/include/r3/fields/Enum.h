@@ -10,8 +10,9 @@ namespace r3{ namespace fields
 	//   C  L  A  S  S   Enum
 	//*******************************************************************
 
+	template <class Domain>
 	class Enum
-		: public Scanty
+		: public Scanty<Domain>
 	{
 	public:
 	}; // class

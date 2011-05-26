@@ -2,6 +2,7 @@
 #define _R3_CATEGORYBASE_HPP_
 
 #include "r3/fields/Field.h"
+#include "utils/ntoa.hpp"
 
 namespace r3
 {
@@ -94,25 +95,246 @@ namespace r3
 	{
 		struct enumOper_createField
 		{
-			template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, r3::fields::String *stub, const char *fname)
+
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Audio *stub, 
+				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
-				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN "+fname+" VARCHAR").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_name\" VARCHAR").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_ext\" VARCHAR").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_size\" INT4").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_blob\" OID").exec().throwIfError();
 			}
-			template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, r3::fields::Enum *stub, const char *fname)
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Bool *stub, 
+				const char *fname)
 			{
-				assert(!"тип енума?");
 				pgc::Connection con = c->schema()->con();
-				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN "+fname+" INT4").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" BOOL").exec().throwIfError();
 			}
-			template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, r3::fields::Bool *stub, const char *fname)
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Date *stub, 
+				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
-				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN "+fname+" BOOL").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" DATE").exec().throwIfError();
 			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::DateTimeInterval *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INTERVAL").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename Domain> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Enum<Domain> *stub, 
+				const char *fname)
+			{
+				static const size_t amount = r3::fields::Enum<Domain>::amount;
+				
+				pgc::Connection con = c->schema()->con();
+
+				if(amount <= std::numeric_limits<boost::int16_t>::max())
+				{
+					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT2").exec().throwIfError();
+				}
+				else if(amount <= std::numeric_limits<boost::int32_t>::max())
+				{
+					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT4").exec().throwIfError();
+				}
+				else if(amount <= std::numeric_limits<boost::int64_t>::max())
+				{
+					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT8").exec().throwIfError();
+				}
+				else
+				{
+					throw("enum domain too long");
+				}
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Image *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_name\" VARCHAR").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_ext\" VARCHAR").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_size\" INT4").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_blob\" OID").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_width\" INT4").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_height\" INT4").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Int16 *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT2").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Int32 *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT4").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Int64 *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT8").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Int8 *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT2").exec().throwIfError();
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Money *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" MONEY").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Real32 *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" FLOAT4").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Real64 *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" FLOAT8").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename Domain> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Set<Domain> *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+
+				static const size_t amount = r3::fields::Set<Domain>::amount;
+				char buf[64];
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" BIT("+utils::_ntoa(amount, buf)+")").exec().throwIfError();
+			}
+			
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::String *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" VARCHAR").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Time *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" TIME WITHOUT TIME ZONE").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Timestamp *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" TIMESTAMP WITHOUT TIME ZONE").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf> void operator()(
+				Category *c, 
+				CategoryBaseOrSelf *bos, 
+				r3::fields::Video *stub, 
+				const char *fname)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_name\" VARCHAR").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_ext\" VARCHAR").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_size\" INT4").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_blob\" OID").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_width\" INT4").exec().throwIfError();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_height\" INT4").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, void *stub, const char *fname)
 			{
-				assert(!"добить поля");
+				//assert(!"добить поля");
+				throw std::exception("неизвестный тип поля при добавлении колонки в таблицу");
 			}
 		};
 	}
@@ -131,35 +353,35 @@ namespace r3
 	template <class C>
 	void CategoryBase<C>::dbCreateIndices()
 	{
-		assert(0);
+		//assert(0);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateForeignFields()
 	{
-		assert(0);
+		//assert(0);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateCrosses()
 	{
-		assert(0);
+		//assert(0);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateForeignConstraints()
 	{
-		assert(0);
+		//assert(0);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateViews()
 	{
-		assert(0);
+		//assert(0);
 	}
 
 }

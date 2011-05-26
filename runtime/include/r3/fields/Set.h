@@ -10,8 +10,9 @@ namespace r3{ namespace fields
 	//   C  L  A  S  S   Set
 	//*******************************************************************
 
+	template <class Domain>
 	class Set
-		: public Scanty
+		: public Scanty<Domain>
 	{
 	public:
 	}; // class

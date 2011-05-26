@@ -1,7 +1,10 @@
-#ifndef _r3_model_common2_Category2_hpp_
-#define _r3_model_common2_Category2_hpp_
+#ifndef _r3_model_common2_Category3_hpp_
+#define _r3_model_common2_Category3_hpp_
 
 #include "r3/categoryBase.hpp"
+
+//bases
+#include "r3/model/common2/Category2.hpp"
 
 namespace r3
 {
@@ -14,31 +17,17 @@ namespace r3
 		namespace s_common2
 		{
 		
-			//deriveds
-			class Category3;
-			typedef boost::shared_ptr<Category3> Category3_ptr;
-			
-			class Category2
-				: public CategoryBase<Category2>
+			class Category3
+				: public CategoryBase<Category3>
 			{
 			
 			public:
 				static const bool isAbstract = false;
 				
-				struct DomainEnum
-				{
-					static const size_t amount = 2;
-					static const char *values[amount];
-				};
-				
-				struct DomainSet
-				{
-					static const size_t amount = 4;
-					static const char *values[amount];
-				};
-				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
+					//Category3
+					Category3 *c_Category3 = _schema->getCategory<Category3>().get();
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
 					o(this, c_Category2, (r3::fields::Audio *)NULL, "Audio");
@@ -68,13 +57,13 @@ namespace r3
 				Schema *_schema;
 				
 			public:
-				Category2(Schema *s)
-					: CategoryBase<Category2>("Category2")
+				Category3(Schema *s)
+					: CategoryBase<Category3>("Category3")
 					, _schema(s)
 				{
 				}
 				
-				~Category2()
+				~Category3()
 				{
 				}
 				
@@ -84,7 +73,7 @@ namespace r3
 				}
 				
 			};
-			typedef boost::shared_ptr<Category2> Category2_ptr;
+			typedef boost::shared_ptr<Category3> Category3_ptr;
 		}
 	}
 }

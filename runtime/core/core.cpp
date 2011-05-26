@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "r3/model/common.hpp"
+#include "r3/model/common2.hpp"
 #include "pgc/connection.hpp"
 
 /*
@@ -155,7 +156,7 @@ int _tmain(int argc, _TCHAR* argv[])
 // 	std::cout<<sizeof(r3::fields::Date)<<std::endl;
 // 	std::cout<<sizeof(r3::fields::Int64)<<std::endl;
 
-	r3::model::common_ptr s(new r3::model::common("myId"));
+	r3::model::common2_ptr s(new r3::model::common2("myId"));
 
 	pgc::Connection con;
 	con.open("dbname=test user=postgres password=postgres port=5432");

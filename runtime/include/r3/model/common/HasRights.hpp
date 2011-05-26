@@ -3,6 +3,9 @@
 
 #include "r3/categoryBase.hpp"
 
+//bases
+#include "r3/model/common/Category1.hpp"
+
 namespace r3
 {
 	namespace model
@@ -14,10 +17,6 @@ namespace r3
 		namespace s_common
 		{
 		
-			//bases
-			class Category1;
-			typedef boost::shared_ptr<Category1> Category1_ptr;
-			
 			//deriveds
 			class Role;
 			typedef boost::shared_ptr<Role> Role_ptr;
@@ -30,11 +29,14 @@ namespace r3
 			
 			public:
 				static const bool isAbstract = true;
+				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Category1
+					Category1 *c_Category1 = _schema->getCategory<Category1>().get();
 					//HasRights
-					o(this, _schema->getCategory<HasRights>().get(), (r3::fields::Bool *)NULL, "attrInHasRights");
+					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
+					o(this, c_HasRights, (r3::fields::Bool *)NULL, "attrInHasRights");
 				}
 				
 			public:

@@ -559,6 +559,10 @@
 							RelativePath="..\include\r3\model\common2\Category2.hpp"
 							>
 						</File>
+						<File
+							RelativePath="..\include\r3\model\common2\Category3.hpp"
+							>
+						</File>
 					</Filter>
 				</Filter>
 			</Filter>

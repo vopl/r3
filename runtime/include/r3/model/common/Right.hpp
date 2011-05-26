@@ -20,11 +20,19 @@ namespace r3
 			
 			public:
 				static const bool isAbstract = false;
+				
+				struct Domainvalue
+				{
+					static const size_t amount = 3;
+					static const char *values[amount];
+				};
+				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Right
-					o(this, _schema->getCategory<Right>().get(), (r3::fields::String *)NULL, "name");
-					o(this, _schema->getCategory<Right>().get(), (r3::fields::Enum *)NULL, "value");
+					Right *c_Right = _schema->getCategory<Right>().get();
+					o(this, c_Right, (r3::fields::Enum<r3::model::s_common::Right::Domainvalue>*)NULL, "value");
+					o(this, c_Right, (r3::fields::String *)NULL, "name");
 				}
 				
 			public:

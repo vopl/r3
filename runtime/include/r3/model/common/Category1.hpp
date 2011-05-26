@@ -24,9 +24,11 @@ namespace r3
 			
 			public:
 				static const bool isAbstract = false;
+				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Category1
+					Category1 *c_Category1 = _schema->getCategory<Category1>().get();
 				}
 				
 			public:
