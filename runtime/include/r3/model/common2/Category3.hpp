@@ -31,17 +31,11 @@ namespace r3
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Category3
-					Category3 *c_Category3 = _schema->getCategory<Category3>().get();
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
-					o(this, c_Category2, (r3::fields::Audio *)NULL, "Audio");
 					o(this, c_Category2, (r3::fields::Bool *)NULL, "Bool");
 					o(this, c_Category2, (r3::fields::Date *)NULL, "Date");
-					o(this, c_Category2, (r3::fields::DateTimeInterval *)NULL, "DateTimeInterval");
-					o(this, c_Category2, (r3::fields::Enum<Category2::DomainEnum>*)NULL, "Enum");
-					o(this, c_Category2, (r3::fields::Image *)NULL, "Image");
-					o(this, c_Category2, (r3::fields::Int16 *)NULL, "Int16");
-					o(this, c_Category2, (r3::fields::Int32 *)NULL, "Int32");
+					o(this, c_Category2, (r3::fields::Audio *)NULL, "Audio");
 					o(this, c_Category2, (r3::fields::Int64 *)NULL, "Int64");
 					o(this, c_Category2, (r3::fields::Int8 *)NULL, "Int8");
 					o(this, c_Category2, (r3::fields::Money *)NULL, "Money");
@@ -51,13 +45,31 @@ namespace r3
 					o(this, c_Category2, (r3::fields::Time *)NULL, "Time");
 					o(this, c_Category2, (r3::fields::Timestamp *)NULL, "Timestamp");
 					o(this, c_Category2, (r3::fields::Video *)NULL, "Video");
+					o(this, c_Category2, (r3::fields::DateTimeInterval *)NULL, "DateTimeInterval");
+					o(this, c_Category2, (r3::fields::Enum<Category2::DomainEnum>*)NULL, "Enum");
+					o(this, c_Category2, (r3::fields::Image *)NULL, "Image");
+					o(this, c_Category2, (r3::fields::Int16 *)NULL, "Int16");
+					o(this, c_Category2, (r3::fields::Int32 *)NULL, "Int32");
 					o(this, c_Category2, (r3::fields::Set<Category2::DomainSet>*)NULL, "Set");
+				}
+				
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
+				{
+					//Category3
+					Category3 *c_Category3 = _schema->getCategory<Category3>().get();
+					o(this, c_Category3, rm_n,	"unnamed1_2",	rm_one,	"unnamed2_2",	rs_src);
+					o(this, c_Category3, rm_n,	"unnamed1_3",	rm_n,	"unnamed2_3",	rs_src);
+					o(this, c_Category3, rm_one,	"unnamed1_1",	rm_one,	"unnamed2_1",	rs_src);
+					//Category2
+					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
+					o(this, c_Category2, rm_one,	"unnamed2_2",	rm_n,	"unnamed1_2",	rs_dst);
+					o(this, c_Category2, rm_n,	"unnamed2_3",	rm_n,	"unnamed1_3",	rs_dst);
+					o(this, c_Category2, rm_one,	"unnamed2_1",	rm_one,	"unnamed1_1",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Category3
-					Category3 *c_Category3 = _schema->getCategory<Category3>().get();
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
 				}

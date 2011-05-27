@@ -29,6 +29,7 @@ namespace workers
 		void processCategory_cpp(Category cat);
 
 		void collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive);
+		void collectRelations(std::set<CategoryRelation> &res, Category cat, bool bases, bool recursive);
 	};
 }
 #endif

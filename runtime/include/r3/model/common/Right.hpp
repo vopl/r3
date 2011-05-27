@@ -35,10 +35,16 @@ namespace r3
 					o(this, c_Right, (r3::fields::String *)NULL, "name");
 				}
 				
-				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Right
 					Right *c_Right = _schema->getCategory<Right>().get();
+					o(this, c_Right, rm_n,	"rights",	rm_n,	"owners",	rs_src);
+				}
+				
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
+				{
+					//Right
 				}
 				
 			public:

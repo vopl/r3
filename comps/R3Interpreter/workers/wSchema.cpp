@@ -322,7 +322,10 @@ namespace workers
 		{
 			hpp<<"//"<<cat->getName()<<endl;
 
-			std::set<BON::FCO> fields = cat->getChildFCOs();
+			
+			std::set<BON::FCO> fcos = cat->getChildFCOs();
+			std::set<Field> fields(fcos.begin(), fcos.end());
+			if(fields.empty()) continue;
 
 			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
 
@@ -352,6 +355,94 @@ namespace workers
 
 
 
+
+
+
+
+
+
+
+
+		//связи свои и все от базовых
+		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		BOOST_FOREACH(Category cat, basesAndSelf)
+		{
+			hpp<<"//"<<cat->getName()<<endl;
+
+			//std::set<BON::FCO> fields = cat->getChildFCOs();
+			std::set<CategoryRelation> rels;
+			collectRelations(rels, cat, true, true);
+
+			if(rels.empty()) continue;
+
+			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
+
+			BOOST_FOREACH(CategoryRelation rel, rels)
+			{
+				assert(rel);
+
+				Category src = rel->getSrc();
+				if(!src) src = CategoryReference(rel->getSrc())->getCategory();
+
+				Category dst = rel->getDst();
+				if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
+
+				hpp<<"o(this, c_"<<cat->getName()<<", ";
+
+				if(src == cat)
+				{
+					switch(rel->getMultiplier1())
+					{
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"rm_one,\t"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"rm_n,\t"; break;
+					default:assert(0); hpp<<"rm_one, ";break;
+					}
+					hpp<<"\""<<rel->getName1()<<"\",\t";
+
+					switch(rel->getMultiplier2())
+					{
+					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"rm_one,\t"; break;
+					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"rm_n,\t"; break;
+					default:assert(0); hpp<<"rm_one, ";break;
+					}
+					hpp<<"\""<<rel->getName2()<<"\",\t";
+
+					hpp<<"rs_src";
+				}
+				else
+				{
+					switch(rel->getMultiplier2())
+					{
+					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"rm_one,\t"; break;
+					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"rm_n,\t"; break;
+					default:assert(0); hpp<<"rm_one, ";break;
+					}
+					hpp<<"\""<<rel->getName2()<<"\",\t";
+
+					switch(rel->getMultiplier1())
+					{
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"rm_one,\t"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type: hpp<<"rm_n,\t"; break;
+					default:assert(0); hpp<<"rm_one, ";break;
+					}
+					hpp<<"\""<<rel->getName1()<<"\",\t";
+
+					hpp<<"rs_dst";
+				}
+
+				hpp<<");"<<endl;
+			}
+		}
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+
+
+
+
+
+
 		//индексы свои и все от базовых
 		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)"<<endl;
 		hpp<<"{"<<endl;
@@ -359,13 +450,14 @@ namespace workers
 		{
 			hpp<<"//"<<cat->getName()<<endl;
 
-			std::set<BON::FCO> fields = cat->getChildFCOs();
+			std::set<Index> indices = cat->getIndex();
+			if(indices.empty()) continue;
 
 			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
 
-			BOOST_FOREACH(Index ind, fields)
+			BOOST_FOREACH(Index ind, indices)
 			{
-				if(!ind) continue;
+				assert(ind);
 
 				if(ind->getInIndexOnCategoryFieldLinks().empty()) continue;
 
@@ -510,6 +602,24 @@ namespace workers
 
 				res.insert(scat);
 			}
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WSchema::collectRelations(std::set<CategoryRelation> &res, Category cat, bool bases, bool recursive)
+	{
+		std::set<CategoryOrReference> cors;
+		BOOST_FOREACH(Reference ref, cat->getReferredBy())
+		{
+			cors.insert(ref);
+		}
+		cors.insert(cat);
+
+		BOOST_FOREACH(CategoryOrReference cor, cors)
+		{
+			std::set<CategoryRelation> rels = cor->getCategoryRelationLinks();
+
+			res.insert(rels.begin(), rels.end());
 		}
 	}
 

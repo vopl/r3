@@ -22,6 +22,17 @@ namespace r3
 			im_hash,
 		};
 
+		enum ERelationSide
+		{
+			rs_src,
+			rs_dst,
+		};
+		enum ERelationMultiplier
+		{
+			rm_one,
+			rm_n,
+		};
+
 	public:
 		CategoryBase(const char *name);
 		~CategoryBase();

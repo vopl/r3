@@ -5,9 +5,8 @@
 
 namespace r3 {namespace relations{
 
-	template <ERelationSide side>
 	class Relation_one2n
-		: public Relation<side>
+		: public Relation
 	{
 	public:
 	};

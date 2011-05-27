@@ -4,13 +4,6 @@
 
 namespace r3 {namespace relations{
 
-	enum ERelationSide
-	{
-		rs_first,
-		rs_second,
-	};
-
-	template <ERelationSide side>
 	class Relation
 	{
 	public:

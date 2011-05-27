@@ -30,13 +30,18 @@ namespace r3
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Owner
+				}
+				
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
+				{
+					//Owner
 					Owner *c_Owner = _schema->getCategory<Owner>().get();
+					o(this, c_Owner, rm_n,	"childs",	rm_one,	"parent",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Owner
-					Owner *c_Owner = _schema->getCategory<Owner>().get();
 				}
 				
 			public:

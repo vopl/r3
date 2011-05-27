@@ -33,17 +33,21 @@ namespace r3
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Category1
-					Category1 *c_Category1 = _schema->getCategory<Category1>().get();
+					//HasRights
+				}
+				
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
+				{
+					//Category1
 					//HasRights
 					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
+					o(this, c_HasRights, rm_n,	"owners",	rm_n,	"rights",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Category1
-					Category1 *c_Category1 = _schema->getCategory<Category1>().get();
 					//HasRights
-					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
 				}
 				
 			public:
