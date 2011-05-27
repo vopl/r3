@@ -2,6 +2,7 @@
 #define _R3_CATEGORYBASE_HPP_
 
 #include "r3/fields/field.h"
+#include "r3/relations/relation.hpp"
 #include "utils/ntoa.hpp"
 
 namespace r3

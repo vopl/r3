@@ -573,7 +573,15 @@
 					Name="relations"
 					>
 					<File
+						RelativePath="..\include\r3\relations\relation.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\include\r3\relations\relation_n2n.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\r3\relations\relation_n2one.hpp"
 						>
 					</File>
 					<File
