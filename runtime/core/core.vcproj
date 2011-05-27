@@ -405,107 +405,107 @@
 					Name="fields"
 					>
 					<File
-						RelativePath="..\include\r3\fields\Audio.h"
+						RelativePath="..\include\r3\fields\audio.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Bool.h"
+						RelativePath="..\include\r3\fields\bool.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Date.h"
+						RelativePath="..\include\r3\fields\date.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\DateTime.h"
+						RelativePath="..\include\r3\fields\dateTime.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\DateTimeInterval.h"
+						RelativePath="..\include\r3\fields\dateTimeInterval.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\DateTimeValue.h"
+						RelativePath="..\include\r3\fields\dateTimeValue.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Enum.h"
+						RelativePath="..\include\r3\fields\enum.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Field.h"
+						RelativePath="..\include\r3\fields\field.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\File.h"
+						RelativePath="..\include\r3\fields\file.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Image.h"
+						RelativePath="..\include\r3\fields\image.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Int.h"
+						RelativePath="..\include\r3\fields\int.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Int16.h"
+						RelativePath="..\include\r3\fields\int16.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Int32.h"
+						RelativePath="..\include\r3\fields\int32.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Int64.h"
+						RelativePath="..\include\r3\fields\int64.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Int8.h"
+						RelativePath="..\include\r3\fields\int8.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Money.h"
+						RelativePath="..\include\r3\fields\money.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Real.h"
+						RelativePath="..\include\r3\fields\real.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Real32.h"
+						RelativePath="..\include\r3\fields\real32.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Real64.h"
+						RelativePath="..\include\r3\fields\real64.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Scanty.h"
+						RelativePath="..\include\r3\fields\scanty.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Set.h"
+						RelativePath="..\include\r3\fields\set.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Simple.h"
+						RelativePath="..\include\r3\fields\simple.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\String.h"
+						RelativePath="..\include\r3\fields\string.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Time.h"
+						RelativePath="..\include\r3\fields\time.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Timestamp.h"
+						RelativePath="..\include\r3\fields\timestamp.h"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\fields\Video.h"
+						RelativePath="..\include\r3\fields\video.h"
 						>
 					</File>
 				</Filter>
@@ -581,107 +581,107 @@
 					Name="fields"
 					>
 					<File
-						RelativePath="..\src\r3\fields\Audio.cpp"
+						RelativePath="..\src\r3\fields\audio.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Bool.cpp"
+						RelativePath="..\src\r3\fields\bool.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Date.cpp"
+						RelativePath="..\src\r3\fields\date.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\DateTime.cpp"
+						RelativePath="..\src\r3\fields\dateTime.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\DateTimeInterval.cpp"
+						RelativePath="..\src\r3\fields\dateTimeInterval.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\DateTimeValue.cpp"
+						RelativePath="..\src\r3\fields\dateTimeValue.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Enum.cpp"
+						RelativePath="..\src\r3\fields\enum.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Field.cpp"
+						RelativePath="..\src\r3\fields\field.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\File.cpp"
+						RelativePath="..\src\r3\fields\file.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Image.cpp"
+						RelativePath="..\src\r3\fields\image.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Int.cpp"
+						RelativePath="..\src\r3\fields\int.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Int16.cpp"
+						RelativePath="..\src\r3\fields\int16.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Int32.cpp"
+						RelativePath="..\src\r3\fields\int32.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Int64.cpp"
+						RelativePath="..\src\r3\fields\int64.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Int8.cpp"
+						RelativePath="..\src\r3\fields\int8.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Money.cpp"
+						RelativePath="..\src\r3\fields\money.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Real.cpp"
+						RelativePath="..\src\r3\fields\real.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Real32.cpp"
+						RelativePath="..\src\r3\fields\real32.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Real64.cpp"
+						RelativePath="..\src\r3\fields\real64.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Scanty.cpp"
+						RelativePath="..\src\r3\fields\scanty.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Set.cpp"
+						RelativePath="..\src\r3\fields\set.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Simple.cpp"
+						RelativePath="..\src\r3\fields\simple.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\String.cpp"
+						RelativePath="..\src\r3\fields\string.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Time.cpp"
+						RelativePath="..\src\r3\fields\time.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Timestamp.cpp"
+						RelativePath="..\src\r3\fields\timestamp.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\r3\fields\Video.cpp"
+						RelativePath="..\src\r3\fields\video.cpp"
 						>
 					</File>
 				</Filter>
