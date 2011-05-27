@@ -1,5 +1,5 @@
-#ifndef _R3_FIELD_MONEY_H
-#define _R3_FIELD_MONEY_H
+#ifndef _R3_FIELDS_MONEY_H
+#define _R3_FIELDS_MONEY_H
 
 #include "r3/fields/field.h"
 

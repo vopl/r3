@@ -569,6 +569,22 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="relations"
+					>
+					<File
+						RelativePath="..\include\r3\relations\relation_n2n.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\r3\relations\relation_one2n.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\r3\relations\relation_ont2one.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

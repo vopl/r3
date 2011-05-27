@@ -1,5 +1,5 @@
-#ifndef _R3_FIELD_INT64_H
-#define _R3_FIELD_INT64_H
+#ifndef _R3_FIELDS_INT64_H
+#define _R3_FIELDS_INT64_H
 
 #include "r3/fields/field.h"
 

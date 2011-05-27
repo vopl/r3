@@ -1,5 +1,5 @@
-#ifndef _R3_FIELD_ENUM_H
-#define _R3_FIELD_ENUM_H
+#ifndef _R3_FIELDS_ENUM_H
+#define _R3_FIELDS_ENUM_H
 
 #include "r3/fields/field.h"
 

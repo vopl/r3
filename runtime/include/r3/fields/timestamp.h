@@ -1,5 +1,5 @@
-#ifndef _R3_FIELD_TIMESTAMP_H
-#define _R3_FIELD_TIMESTAMP_H
+#ifndef _R3_FIELDS_TIMESTAMP_H
+#define _R3_FIELDS_TIMESTAMP_H
 
 #include "r3/fields/field.h"
 

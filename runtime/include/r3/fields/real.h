@@ -1,5 +1,5 @@
-#ifndef _R3_FIELD_REAL_H
-#define _R3_FIELD_REAL_H
+#ifndef _R3_FIELDS_REAL_H
+#define _R3_FIELDS_REAL_H
 
 #include "r3/fields/field.h"
 

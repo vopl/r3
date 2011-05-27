@@ -1,5 +1,5 @@
-#ifndef _R3_FIELD_FIELD_H
-#define _R3_FIELD_FIELD_H
+#ifndef _R3_FIELDS_FIELD_H
+#define _R3_FIELDS_FIELD_H
 
 
 namespace r3{ namespace fields
