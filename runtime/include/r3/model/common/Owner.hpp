@@ -36,7 +36,7 @@ namespace r3
 				{
 					//Owner
 					Owner *c_Owner = _schema->getCategory<Owner>().get();
-					o(this, c_Owner, rm_n,	"childs",	rm_one,	"parent",	rs_dst);
+					o(this, c_Owner, (r3::relations::Relation2n *)NULL,	"childs",	(r3::relations::Relation2one *)NULL,	"parent",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)

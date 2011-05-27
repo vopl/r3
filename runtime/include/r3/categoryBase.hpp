@@ -27,11 +27,6 @@ namespace r3
 			rs_src,
 			rs_dst,
 		};
-		enum ERelationMultiplier
-		{
-			rm_one,
-			rm_n,
-		};
 
 	public:
 		CategoryBase(const char *name);

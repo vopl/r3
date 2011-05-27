@@ -577,19 +577,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\relations\relation_n2n.hpp"
+						RelativePath="..\include\r3\relations\relation2n.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\include\r3\relations\relation_n2one.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\include\r3\relations\relation_one2n.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\include\r3\relations\relation_ont2one.hpp"
+						RelativePath="..\include\r3\relations\relation2one.hpp"
 						>
 					</File>
 				</Filter>

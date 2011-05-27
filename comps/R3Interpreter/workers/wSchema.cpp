@@ -394,17 +394,17 @@ namespace workers
 				{
 					switch(rel->getMultiplier1())
 					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"rm_one,\t"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"rm_n,\t"; break;
-					default:assert(0); hpp<<"rm_one, ";break;
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n*)NULL,\t"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one*)NULL,\t";break;
 					}
 					hpp<<"\""<<rel->getName1()<<"\",\t";
 
 					switch(rel->getMultiplier2())
 					{
-					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"rm_one,\t"; break;
-					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"rm_n,\t"; break;
-					default:assert(0); hpp<<"rm_one, ";break;
+					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
+					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n*)NULL,\t"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one*)NULL,\t";break;
 					}
 					hpp<<"\""<<rel->getName2()<<"\",\t";
 
@@ -414,17 +414,17 @@ namespace workers
 				{
 					switch(rel->getMultiplier2())
 					{
-					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"rm_one,\t"; break;
-					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"rm_n,\t"; break;
-					default:assert(0); hpp<<"rm_one, ";break;
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n*)NULL,\t"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one*)NULL,\t";break;
 					}
 					hpp<<"\""<<rel->getName2()<<"\",\t";
 
 					switch(rel->getMultiplier1())
 					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"rm_one,\t"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type: hpp<<"rm_n,\t"; break;
-					default:assert(0); hpp<<"rm_one, ";break;
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n*)NULL,\t"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one*)NULL,\t";break;
 					}
 					hpp<<"\""<<rel->getName1()<<"\",\t";
 

@@ -10,9 +10,7 @@ namespace r3 {namespace relations{
 	};
 }}
 
-#include "r3/relations/relation_n2n.hpp"
-#include "r3/relations/relation_one2n.hpp"
-#include "r3/relations/relation_n2one.hpp"
-#include "r3/relations/relation_one2one.hpp"
+#include "r3/relations/relation2n.hpp"
+#include "r3/relations/relation2one.hpp"
 
 #endif
