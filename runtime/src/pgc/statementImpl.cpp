@@ -33,16 +33,16 @@ namespace pgc
 		{
 			BOOST_STATIC_ASSERT(N%8 == 0);
 
-			for(int i(0); i<N/8; i++)
+			for(size_t i(0); i<N/8; i++)
 			{
 				bits[i]=
-					(bs[i*8+0]?0x80:0) | 
-					(bs[i*8+1]?0x40:0) | 
-					(bs[i*8+2]?0x20:0) | 
-					(bs[i*8+3]?0x10:0) | 
-					(bs[i*8+4]?0x08:0) | 
-					(bs[i*8+5]?0x04:0) | 
-					(bs[i*8+6]?0x02:0) | 
+					(bs[i*8+0]?0x80:0) |
+					(bs[i*8+1]?0x40:0) |
+					(bs[i*8+2]?0x20:0) |
+					(bs[i*8+3]?0x10:0) |
+					(bs[i*8+4]?0x08:0) |
+					(bs[i*8+5]?0x04:0) |
+					(bs[i*8+6]?0x02:0) |
 					(bs[i*8+7]?0x01:0);
 			}
 		}
@@ -86,7 +86,7 @@ namespace pgc
 		bool bindOwn;
 
 		bool bf = bindFiller(
-			typCpp, valCpp, 
+			typCpp, valCpp,
 			bindTyp,
 			bindVal,
 			bindLen,
@@ -160,13 +160,13 @@ namespace pgc
 		if(_bindTyp.empty())
 		{
 			res.reset(new ResultImpl(_con, PQexecParams(
-				_con->_pgcon, 
-				_sql.c_str(), 
-				0, 
-				0, 
-				0, 
-				0, 
-				0, 
+				_con->_pgcon,
+				_sql.c_str(),
+				0,
+				0,
+				0,
+				0,
+				0,
 				1)));
 		}
 		else
@@ -179,13 +179,13 @@ namespace pgc
 				_bindTyp.size() == _bindOwn.size());
 
 			res.reset(new ResultImpl(_con, PQexecParams(
-				_con->_pgcon, 
-				_sql.c_str(), 
-				_bindTyp.size(), 
-				&_bindTyp[0], 
-				&_bindVal[0], 
-				&_bindLen[0], 
-				&_bindFmt[0], 
+				_con->_pgcon,
+				_sql.c_str(),
+				_bindTyp.size(),
+				&_bindTyp[0],
+				&_bindVal[0],
+				&_bindLen[0],
+				&_bindFmt[0],
 				1)));
 		}
 
@@ -201,7 +201,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	bool StatementImpl::bindFiller(
-		int typCpp, void const *valCpp, 
+		int typCpp, void const *valCpp,
 		Oid	&bindTyp,
 		char *&bindVal,
 		int &bindLen,
@@ -331,8 +331,8 @@ namespace pgc
 			{
 				const std::tm &stm = *(const std::tm *)valCpp;
 
-				boost::int64_t ts = 
-					utils::time2t(stm.tm_hour, stm.tm_min, stm.tm_sec, 0) + 
+				boost::int64_t ts =
+					utils::time2t(stm.tm_hour, stm.tm_min, stm.tm_sec, 0) +
 					(utils::date2j(stm.tm_year+1900, stm.tm_mon+1, stm.tm_mday) - utils::POSTGRES_EPOCH_JDATE) * utils::USECS_PER_DAY;
 
 				bindTyp = 1114;//timestamp
@@ -348,7 +348,7 @@ namespace pgc
 			{
 				const boost::gregorian::date &bgd = *(const boost::gregorian::date *)valCpp;
 
-				boost::int32_t d = 
+				boost::int32_t d =
 					utils::date2j(bgd.year(), bgd.month(), bgd.day()) - utils::POSTGRES_EPOCH_JDATE;
 
 				bindTyp = 1082;//date
@@ -367,8 +367,8 @@ namespace pgc
 				boost::gregorian::date bgd = ptm.date();
 				boost::posix_time::time_duration pt = ptm.time_of_day();
 
-				boost::int64_t ts = 
-					pt.total_microseconds() + 
+				boost::int64_t ts =
+					pt.total_microseconds() +
 					(utils::date2j(bgd.year(), bgd.month(), bgd.day()) - utils::POSTGRES_EPOCH_JDATE) * utils::USECS_PER_DAY;
 
 				bindTyp = 1114;//timestamp

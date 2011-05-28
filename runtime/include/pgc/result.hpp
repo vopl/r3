@@ -2,6 +2,7 @@
 #define _PGC_RESULT_HPP_
 
 #include "pgc/common.h"
+#include "pgc/cppDataType.hpp"
 
 namespace pgc
 {

@@ -2,6 +2,7 @@
 #include "connectionImpl.hpp"
 #include "pgDataType.h"
 #include "pgc/exception.hpp"
+#include <cstring>
 
 namespace pgc
 {
@@ -26,7 +27,7 @@ namespace pgc
 			idx--;
 			if(idx >= _bindTyp.size())
 			{
-				throw std::exception("bind index out of range");
+				throw std::range_error("bind index out of range");
 				return;
 			}
 
@@ -36,7 +37,7 @@ namespace pgc
 				_bindVal[idx] = NULL;
 				_bindOwn[idx] = false;
 			}
-			
+
 			Oid	bindTyp = InvalidOid;
 			char *bindVal = NULL;
 			int bindLen = 0;
@@ -44,7 +45,7 @@ namespace pgc
 			bool bindOwn = 0;
 
 			bool bf = bindFiller(
-				typCpp, valCpp, 
+				typCpp, valCpp,
 				bindTyp,
 				bindVal,
 				bindLen,
@@ -55,7 +56,7 @@ namespace pgc
 			{
 				if(bindTyp != _bindTyp[idx])
 				{
-					throw std::exception("bind type is differ");
+					throw std::invalid_argument("bind type is differ");
 					return;
 				}
 
@@ -67,7 +68,7 @@ namespace pgc
 			return;
 		}
 
-		throw std::exception("unable bind to compiled statement");
+		//throw std::exception("unable bind to compiled statement");
 	}
 
 	void StatementPrepImpl::unbind(size_t idx)
@@ -131,23 +132,23 @@ namespace pgc
 		if(_bindTyp.size())
 		{
 			res.reset(new ResultImpl(_con, PQexecPrepared(
-				_con->pgcon(), 
-				_id.c_str(), 
-				_bindVal.size(), 
-				&_bindVal[0], 
-				&_bindLen[0], 
-				&_bindFmt[0], 
+				_con->pgcon(),
+				_id.c_str(),
+				_bindVal.size(),
+				&_bindVal[0],
+				&_bindLen[0],
+				&_bindFmt[0],
 				1)));
 		}
 		else
 		{
 			res.reset(new ResultImpl(_con, PQexecPrepared(
-				_con->pgcon(), 
-				_id.c_str(), 
-				0, 
-				NULL, 
-				NULL, 
-				NULL, 
+				_con->pgcon(),
+				_id.c_str(),
+				0,
+				NULL,
+				NULL,
+				NULL,
 				1)));
 		}
 
@@ -231,7 +232,7 @@ namespace pgc
 		_id = id;
 		return ResultImplPtr();
 	}
-	
+
 	void StatementPrepImpl::unprepare()
 	{
 		if(!_id.empty())

@@ -17,7 +17,7 @@ namespace pgc
 	public:
 		Exception(ResultImplPtr res);
 		Exception(const Exception &from);
-		virtual const char *what() const;
+		virtual const char *what() const throw ();
 
 		EExecStatus status();
 		const char *errorMsg();

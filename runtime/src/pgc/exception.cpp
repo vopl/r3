@@ -16,7 +16,7 @@ namespace pgc
 
 	}
 
-	const char *Exception::what() const
+	const char *Exception::what() const throw ()
 	{
 		return _res->errorMsg();
 	}

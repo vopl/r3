@@ -1,6 +1,8 @@
 #ifndef _UTILS_NTOA_HPP_
 #define _UTILS_NTOA_HPP_
 
+#include <cstring>
+
 //////////////////////////////////////////////////////////////////////////
 namespace utils
 {
