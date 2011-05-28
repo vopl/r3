@@ -31,8 +31,8 @@ namespace r3
 				{
 					//Right
 					Right *c_Right = _schema->getCategory<Right>().get();
-					o(this, c_Right, (r3::fields::Enum<Right::Domainvalue>*)NULL, "value");
 					o(this, c_Right, (r3::fields::String *)NULL, "name");
+					o(this, c_Right, (r3::fields::Enum<Right::Domainvalue>*)NULL, "value");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)

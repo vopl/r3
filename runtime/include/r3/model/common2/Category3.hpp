@@ -26,8 +26,12 @@ namespace r3
 				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
+					//Category3
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
+					o(this, c_Category2, (r3::fields::Audio *)NULL, "Audio");
+					o(this, c_Category2, (r3::fields::Bool *)NULL, "Bool");
+					o(this, c_Category2, (r3::fields::Date *)NULL, "Date");
 					o(this, c_Category2, (r3::fields::DateTimeInterval *)NULL, "DateTimeInterval");
 					o(this, c_Category2, (r3::fields::Image *)NULL, "Image");
 					o(this, c_Category2, (r3::fields::Int16 *)NULL, "Int16");
@@ -43,25 +47,21 @@ namespace r3
 					o(this, c_Category2, (r3::fields::Video *)NULL, "Video");
 					o(this, c_Category2, (r3::fields::Enum<Category2::DomainEnum>*)NULL, "Enum");
 					o(this, c_Category2, (r3::fields::Set<Category2::DomainSet>*)NULL, "Set");
-					o(this, c_Category2, (r3::fields::Bool *)NULL, "Bool");
-					o(this, c_Category2, (r3::fields::Audio *)NULL, "Audio");
-					o(this, c_Category2, (r3::fields::Date *)NULL, "Date");
-					//Category3
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
-					//Category2
 					//Category3
 					Category3 *c_Category3 = _schema->getCategory<Category3>().get();
-					o(this, c_Category3, _schema->getCategory<Category4>().get(), (r3::relations::Relation2n *)NULL,	"unnamed2",	(r3::relations::Relation2n *)NULL,	"unnamed1",	rs_dst);
+					o(this, c_Category3, _schema->getCategory<Category4>().get(), (r3::relations::Relation2n *)NULL,	"unnamed2",	(r3::relations::Relation2one *)NULL,	"unnamed1",	rs_dst);
+					//Category2
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
+					//Category3
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
-					//Category3
 				}
 				
 			public:

@@ -527,7 +527,7 @@ namespace r3
 				if(Category::rs_src == ers && !Category::isAbstract)
 				{
 					pgc::Connection con = c->schema()->con();
-					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_ref_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
+					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_rel_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
 				}
 				//
 			}
@@ -540,8 +540,11 @@ namespace r3
 				r3::relations::Relation2n *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
-				//pgc::Connection con = c->schema()->con();
-				//ничего
+				if(!Category::isAbstract)
+				{
+					pgc::Connection con = c->schema()->con();
+					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_rel_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
+				}
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -552,11 +555,6 @@ namespace r3
 				r3::relations::Relation2one *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
-				if(!Category::isAbstract)
-				{
-					pgc::Connection con = c->schema()->con();
-					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_ref_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
-				}
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -581,11 +579,11 @@ namespace r3
 				{
 					pgc::Connection con = c->schema()->con();
 
-					std::string tableName = "\""+c->schema()->name()+"_"+c->schema()->id()+"\".\"_refcross_"+c->name()+"_"+nameOwn+"_"+ca->name()+"_"+nameAlien+"_\"";
+					std::string tableName = "\""+c->schema()->name()+"_"+c->schema()->id()+"\".\"_refcross_"+nameOwn+"_"+ca->name()+"_"+nameAlien+"_"+c->name()+"_\"";
 					con.once(
 						"CREATE TABLE "+tableName+"("+
-						"\"_"+c->name()+"_"+nameOwn+"_id_\" INT8,"
-						"\"_"+ca->name()+"_"+nameAlien+"_id_\" INT8"
+						"\"_rel_"+nameOwn+"_"+ca->name()+"_id_\" INT8,"
+						"\"_rel_"+nameAlien+"_"+c->name()+"_id_\" INT8"
 						")").exec().throwIfError();
 				}
 			}

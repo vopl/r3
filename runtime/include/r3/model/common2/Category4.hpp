@@ -31,7 +31,7 @@ namespace r3
 				{
 					//Category4
 					Category4 *c_Category4 = _schema->getCategory<Category4>().get();
-					o(this, c_Category4, _schema->getCategory<Category3>().get(), (r3::relations::Relation2n *)NULL,	"unnamed1",	(r3::relations::Relation2n *)NULL,	"unnamed2",	rs_src);
+					o(this, c_Category4, _schema->getCategory<Category3>().get(), (r3::relations::Relation2one *)NULL,	"unnamed1",	(r3::relations::Relation2n *)NULL,	"unnamed2",	rs_src);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)

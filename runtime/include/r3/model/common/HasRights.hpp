@@ -18,10 +18,10 @@ namespace r3
 		{
 		
 			//deriveds
-			class User;
-			typedef boost::shared_ptr<User> User_ptr;
 			class Role;
 			typedef boost::shared_ptr<Role> Role_ptr;
+			class User;
+			typedef boost::shared_ptr<User> User_ptr;
 			
 			class HasRights
 				: public CategoryBase<HasRights>

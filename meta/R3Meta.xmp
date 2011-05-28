@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{7658DC5F-4B94-4300-BD75-0B1066C4AB4B}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{918D95D5-C358-4449-80E1-F53D22D25BF2}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -673,8 +673,8 @@
 		</connection>
 		<connection name = "CategoryRelation" metaref = "1350" attributes = "Name1 Multiplier1 Name2 Multiplier2" >
 				<regnode name = "color" value ="0x007700"></regnode>
-				<regnode name = "dstStyle" value ="butt"></regnode>
-				<regnode name = "srcStyle" value ="butt"></regnode>
+				<regnode name = "dstStyle" value ="empty diamond"></regnode>
+				<regnode name = "srcStyle" value ="empty diamond"></regnode>
 				<regnode name = "lineType" value ="solid"></regnode>
 				<regnode name= "srcLabel1" value="%Multiplier1%"/>
 				<regnode name= "srcLabel2" value="%Name1%"/>
