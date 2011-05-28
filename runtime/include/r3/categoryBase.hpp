@@ -40,9 +40,7 @@ namespace r3
 		void dbCreateTable();
 		void dbCreateFields();
 		void dbCreateIndices();
-		void dbCreateForeignFields();
-		void dbCreateCrosses();
-		void dbCreateForeignConstraints();
+		void dbCreateRelations();
 		void dbCreateViews();
 	};
 
@@ -510,6 +508,77 @@ namespace r3
 			}
 		};
 	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	namespace impl
+	{
+
+		struct enumOper_createRelation
+		{
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
+			void operator()(
+				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
+				r3::relations::Relation2one *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2one *stubAlien, const char *nameAlien,
+				typename Category::ERelationSide ers)
+			{
+				if(Category::rs_src == ers)
+				{
+					pgc::Connection con = c->schema()->con();
+					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_ref_"+nameOwn+"_\" INT8").exec().throwIfError();
+				}
+				//
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
+			void operator()(
+				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
+				r3::relations::Relation2one *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2n *stubAlien, const char *nameAlien,
+				typename Category::ERelationSide ers)
+			{
+				//pgc::Connection con = c->schema()->con();
+				//ничего
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
+			void operator()(
+				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
+				r3::relations::Relation2n *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2one *stubAlien, const char *nameAlien,
+				typename Category::ERelationSide ers)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_ref_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
+			void operator()(
+				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
+				r3::relations::Relation2n *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2n *stubAlien, const char *nameAlien,
+				typename Category::ERelationSide ers)
+			{
+				if(Category::rs_src == ers)
+				{
+					pgc::Connection con = c->schema()->con();
+
+					std::string tableName = "\""+c->schema()->name()+"_"+c->schema()->id()+"\".\"_refcross_"+c->name()+"_"+nameOwn+"_"+ca->name()+"_"+nameAlien+"_\"";
+					con.once(
+						"CREATE TABLE "+tableName+"("+
+						"\"_"+c->name()+"_"+nameOwn+"_id_\" INT4,"
+						"\"_"+ca->name()+"_"+nameAlien+"_id_\" INT4"
+						")").exec().throwIfError();
+				}
+			}
+		};
+
+	};
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateFields()
@@ -534,27 +603,9 @@ namespace r3
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
-	void CategoryBase<C>::dbCreateForeignFields()
+	void CategoryBase<C>::dbCreateRelations()
 	{
-		if(!C::isAbstract)
-		{
-			//перечислить все базовые и себя, собрать все индексы и добавить их к таблице
-			//((C*)this)->enumRelationsFromBasesAndSelf(impl::enumOper_createForeignField());
-		}
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	void CategoryBase<C>::dbCreateCrosses()
-	{
-		//assert(0);
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	void CategoryBase<C>::dbCreateForeignConstraints()
-	{
-		//assert(0);
+		((C*)this)->enumRelationsFromBasesAndSelf(impl::enumOper_createRelation());
 	}
 	
 	//////////////////////////////////////////////////////////////////////////

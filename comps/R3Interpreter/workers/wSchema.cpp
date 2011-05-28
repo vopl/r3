@@ -392,6 +392,8 @@ namespace workers
 
 				if(src == cat)
 				{
+					hpp<<"_schema->getCategory<"<<dst->getName()<<">().get(), ";
+
 					switch(rel->getMultiplier1())
 					{
 					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
@@ -412,6 +414,7 @@ namespace workers
 				}
 				else
 				{
+					hpp<<"_schema->getCategory<"<<src->getName()<<">().get(), ";
 					switch(rel->getMultiplier2())
 					{
 					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;

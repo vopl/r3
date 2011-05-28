@@ -67,9 +67,9 @@ namespace r3
 				{
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
-					o(this, c_Category2, (r3::relations::Relation2one *)NULL,	"unnamed2_2",	(r3::relations::Relation2n *)NULL,	"unnamed1_2",	rs_dst);
-					o(this, c_Category2, (r3::relations::Relation2n *)NULL,	"unnamed2_3",	(r3::relations::Relation2n *)NULL,	"unnamed1_3",	rs_dst);
-					o(this, c_Category2, (r3::relations::Relation2one *)NULL,	"unnamed2_1",	(r3::relations::Relation2one *)NULL,	"unnamed1_1",	rs_dst);
+					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2one *)NULL,	"unnamed2_2",	(r3::relations::Relation2n *)NULL,	"unnamed1_2",	rs_dst);
+					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2n *)NULL,	"unnamed2_3",	(r3::relations::Relation2n *)NULL,	"unnamed1_3",	rs_dst);
+					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2one *)NULL,	"unnamed2_1",	(r3::relations::Relation2one *)NULL,	"unnamed1_1",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)

@@ -39,10 +39,10 @@ namespace r3
 					//Category1
 					//HasRights
 					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-					o(this, c_HasRights, (r3::relations::Relation2n *)NULL,	"owners",	(r3::relations::Relation2n *)NULL,	"rights",	rs_dst);
+					o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n *)NULL,	"owners",	(r3::relations::Relation2n *)NULL,	"rights",	rs_dst);
 					//Role
 					Role *c_Role = _schema->getCategory<Role>().get();
-					o(this, c_Role, (r3::relations::Relation2n *)NULL,	"roles",	(r3::relations::Relation2n *)NULL,	"users",	rs_src);
+					o(this, c_Role, _schema->getCategory<User>().get(), (r3::relations::Relation2n *)NULL,	"roles",	(r3::relations::Relation2n *)NULL,	"users",	rs_src);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)

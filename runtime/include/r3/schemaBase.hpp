@@ -71,27 +71,11 @@ namespace r3
 			}
 		};
 		///////////////////////////
-		struct enumOper_createForeignFields
+		struct enumOper_createRelations
 		{
 			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				c->dbCreateForeignFields();
-			}
-		};
-		///////////////////////////
-		struct enumOper_createCrosses
-		{
-			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
-			{
-				c->dbCreateCrosses();
-			}
-		};
-		///////////////////////////
-		struct enumOper_createForeignConstraints
-		{
-			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
-			{
-				c->dbCreateForeignConstraints();
+				c->dbCreateRelations();
 			}
 		};
 		///////////////////////////
@@ -184,13 +168,7 @@ namespace r3
 		s->enumCategories(impl::enumOper_createIndices());
 
 		//поля вторичных ключей
-		s->enumCategories(impl::enumOper_createForeignFields());
-
-		//таблицы кроссов
-		s->enumCategories(impl::enumOper_createCrosses());
-
-		//ограничения по связям
-		s->enumCategories(impl::enumOper_createForeignConstraints());
+		s->enumCategories(impl::enumOper_createRelations());
 
 		//виды
 		s->enumCategories(impl::enumOper_createViews());

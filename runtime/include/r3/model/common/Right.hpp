@@ -39,7 +39,7 @@ namespace r3
 				{
 					//Right
 					Right *c_Right = _schema->getCategory<Right>().get();
-					o(this, c_Right, (r3::relations::Relation2n *)NULL,	"rights",	(r3::relations::Relation2n *)NULL,	"owners",	rs_src);
+					o(this, c_Right, _schema->getCategory<HasRights>().get(), (r3::relations::Relation2n *)NULL,	"rights",	(r3::relations::Relation2n *)NULL,	"owners",	rs_src);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
