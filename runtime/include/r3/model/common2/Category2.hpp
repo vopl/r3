@@ -15,8 +15,6 @@ namespace r3
 		{
 		
 			//deriveds
-			class Category4;
-			typedef boost::shared_ptr<Category4> Category4_ptr;
 			class Category3;
 			typedef boost::shared_ptr<Category3> Category3_ptr;
 			
@@ -43,11 +41,7 @@ namespace r3
 				{
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
-					o(this, c_Category2, (r3::fields::Audio *)NULL, "Audio");
-					o(this, c_Category2, (r3::fields::Bool *)NULL, "Bool");
-					o(this, c_Category2, (r3::fields::Date *)NULL, "Date");
 					o(this, c_Category2, (r3::fields::DateTimeInterval *)NULL, "DateTimeInterval");
-					o(this, c_Category2, (r3::fields::Enum<Category2::DomainEnum>*)NULL, "Enum");
 					o(this, c_Category2, (r3::fields::Image *)NULL, "Image");
 					o(this, c_Category2, (r3::fields::Int16 *)NULL, "Int16");
 					o(this, c_Category2, (r3::fields::Int32 *)NULL, "Int32");
@@ -60,16 +54,16 @@ namespace r3
 					o(this, c_Category2, (r3::fields::Time *)NULL, "Time");
 					o(this, c_Category2, (r3::fields::Timestamp *)NULL, "Timestamp");
 					o(this, c_Category2, (r3::fields::Video *)NULL, "Video");
+					o(this, c_Category2, (r3::fields::Enum<Category2::DomainEnum>*)NULL, "Enum");
 					o(this, c_Category2, (r3::fields::Set<Category2::DomainSet>*)NULL, "Set");
+					o(this, c_Category2, (r3::fields::Bool *)NULL, "Bool");
+					o(this, c_Category2, (r3::fields::Audio *)NULL, "Audio");
+					o(this, c_Category2, (r3::fields::Date *)NULL, "Date");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Category2
-					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
-					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2one *)NULL,	"unnamed2_2",	(r3::relations::Relation2n *)NULL,	"unnamed1_2",	rs_dst);
-					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2n *)NULL,	"unnamed2_3",	(r3::relations::Relation2n *)NULL,	"unnamed1_3",	rs_dst);
-					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2one *)NULL,	"unnamed2_1",	(r3::relations::Relation2one *)NULL,	"unnamed1_1",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)

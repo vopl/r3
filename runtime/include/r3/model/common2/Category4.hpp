@@ -3,10 +3,6 @@
 
 #include "r3/categoryBase.hpp"
 
-//bases
-#include "r3/model/common2/Category3.hpp"
-#include "r3/model/common2/Category2.hpp"
-
 namespace r3
 {
 	namespace model
@@ -29,51 +25,19 @@ namespace r3
 				{
 					//Category4
 					Category4 *c_Category4 = _schema->getCategory<Category4>().get();
-					//Category3
-					//Category2
-					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
-					o(this, c_Category2, (r3::fields::Audio *)NULL, "Audio");
-					o(this, c_Category2, (r3::fields::Bool *)NULL, "Bool");
-					o(this, c_Category2, (r3::fields::Date *)NULL, "Date");
-					o(this, c_Category2, (r3::fields::DateTimeInterval *)NULL, "DateTimeInterval");
-					o(this, c_Category2, (r3::fields::Enum<Category2::DomainEnum>*)NULL, "Enum");
-					o(this, c_Category2, (r3::fields::Image *)NULL, "Image");
-					o(this, c_Category2, (r3::fields::Int16 *)NULL, "Int16");
-					o(this, c_Category2, (r3::fields::Int32 *)NULL, "Int32");
-					o(this, c_Category2, (r3::fields::Int64 *)NULL, "Int64");
-					o(this, c_Category2, (r3::fields::Int8 *)NULL, "Int8");
-					o(this, c_Category2, (r3::fields::Money *)NULL, "Money");
-					o(this, c_Category2, (r3::fields::Real32 *)NULL, "Real32");
-					o(this, c_Category2, (r3::fields::Real64 *)NULL, "Real64");
-					o(this, c_Category2, (r3::fields::String *)NULL, "String");
-					o(this, c_Category2, (r3::fields::Time *)NULL, "Time");
-					o(this, c_Category2, (r3::fields::Timestamp *)NULL, "Timestamp");
-					o(this, c_Category2, (r3::fields::Video *)NULL, "Video");
-					o(this, c_Category2, (r3::fields::Set<Category2::DomainSet>*)NULL, "Set");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Category4
-					//Category3
-					Category3 *c_Category3 = _schema->getCategory<Category3>().get();
-					o(this, c_Category3, _schema->getCategory<Category2>().get(), (r3::relations::Relation2n *)NULL,	"unnamed1_2",	(r3::relations::Relation2one *)NULL,	"unnamed2_2",	rs_src);
-					o(this, c_Category3, _schema->getCategory<Category2>().get(), (r3::relations::Relation2n *)NULL,	"unnamed1_3",	(r3::relations::Relation2n *)NULL,	"unnamed2_3",	rs_src);
-					o(this, c_Category3, _schema->getCategory<Category2>().get(), (r3::relations::Relation2one *)NULL,	"unnamed1_1",	(r3::relations::Relation2one *)NULL,	"unnamed2_1",	rs_src);
-					//Category2
-					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
-					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2one *)NULL,	"unnamed2_2",	(r3::relations::Relation2n *)NULL,	"unnamed1_2",	rs_dst);
-					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2n *)NULL,	"unnamed2_3",	(r3::relations::Relation2n *)NULL,	"unnamed1_3",	rs_dst);
-					o(this, c_Category2, _schema->getCategory<Category3>().get(), (r3::relations::Relation2one *)NULL,	"unnamed2_1",	(r3::relations::Relation2one *)NULL,	"unnamed1_1",	rs_dst);
+					Category4 *c_Category4 = _schema->getCategory<Category4>().get();
+					o(this, c_Category4, _schema->getCategory<Category3>().get(), (r3::relations::Relation2n *)NULL,	"unnamed1",	(r3::relations::Relation2n *)NULL,	"unnamed2",	rs_src);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Category4
 					Category4 *c_Category4 = _schema->getCategory<Category4>().get();
-					//Category3
-					//Category2
-					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
 				}
 				
 			public:

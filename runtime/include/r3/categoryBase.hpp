@@ -524,10 +524,10 @@ namespace r3
 				r3::relations::Relation2one *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
-				if(Category::rs_src == ers)
+				if(Category::rs_src == ers && !Category::isAbstract)
 				{
 					pgc::Connection con = c->schema()->con();
-					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_ref_"+nameOwn+"_\" INT8").exec().throwIfError();
+					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_ref_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
 				}
 				//
 			}
@@ -552,14 +552,27 @@ namespace r3
 				r3::relations::Relation2one *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
-				pgc::Connection con = c->schema()->con();
-				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_ref_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
+				if(!Category::isAbstract)
+				{
+					pgc::Connection con = c->schema()->con();
+					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_ref_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
+				}
 			}
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
 			void operator()(
 				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
+				r3::relations::Relation2n *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2n *stubAlien, const char *nameAlien,
+				typename Category::ERelationSide ers)
+			{
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <typename Category, typename CategoryAlien>
+			void operator()(
+				Category *c, Category *bos, CategoryAlien *ca,
 				r3::relations::Relation2n *stubOwn,	const char *nameOwn,
 				r3::relations::Relation2n *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
@@ -571,8 +584,8 @@ namespace r3
 					std::string tableName = "\""+c->schema()->name()+"_"+c->schema()->id()+"\".\"_refcross_"+c->name()+"_"+nameOwn+"_"+ca->name()+"_"+nameAlien+"_\"";
 					con.once(
 						"CREATE TABLE "+tableName+"("+
-						"\"_"+c->name()+"_"+nameOwn+"_id_\" INT4,"
-						"\"_"+ca->name()+"_"+nameAlien+"_id_\" INT4"
+						"\"_"+c->name()+"_"+nameOwn+"_id_\" INT8,"
+						"\"_"+ca->name()+"_"+nameAlien+"_id_\" INT8"
 						")").exec().throwIfError();
 				}
 			}

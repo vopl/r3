@@ -7,9 +7,9 @@
 #include "r3/model/common/Owner.hpp"
 #include "r3/model/common/HasRights.hpp"
 #include "r3/model/common/User.hpp"
-#include "r3/model/common/Department.hpp"
 #include "r3/model/common/Right.hpp"
 #include "r3/model/common/Role.hpp"
+#include "r3/model/common/Department.hpp"
 
 namespace r3
 {
@@ -27,9 +27,9 @@ namespace r3
 			s_common::Owner_ptr	_Owner;
 			s_common::HasRights_ptr	_HasRights;
 			s_common::User_ptr	_User;
-			s_common::Department_ptr	_Department;
 			s_common::Right_ptr	_Right;
 			s_common::Role_ptr	_Role;
+			s_common::Department_ptr	_Department;
 			
 		public:
 			common(const char *id)
@@ -47,9 +47,9 @@ namespace r3
 				o(s, _Owner);
 				o(s, _HasRights);
 				o(s, _User);
-				o(s, _Department);
 				o(s, _Right);
 				o(s, _Role);
+				o(s, _Department);
 			}
 			
 			template <class C> boost::shared_ptr<C> getCategory()
@@ -77,11 +77,6 @@ namespace r3
 				return _User;
 			}
 			
-			template <> s_common::Department_ptr	getCategory<s_common::Department>()
-			{
-				return _Department;
-			}
-			
 			template <> s_common::Right_ptr	getCategory<s_common::Right>()
 			{
 				return _Right;
@@ -90,6 +85,11 @@ namespace r3
 			template <> s_common::Role_ptr	getCategory<s_common::Role>()
 			{
 				return _Role;
+			}
+			
+			template <> s_common::Department_ptr	getCategory<s_common::Department>()
+			{
+				return _Department;
 			}
 			
 			
@@ -113,11 +113,6 @@ namespace r3
 				return _User;
 			}
 			
-			s_common::Department_ptr	getDepartment()
-			{
-				return _Department;
-			}
-			
 			s_common::Right_ptr	getRight()
 			{
 				return _Right;
@@ -126,6 +121,11 @@ namespace r3
 			s_common::Role_ptr	getRole()
 			{
 				return _Role;
+			}
+			
+			s_common::Department_ptr	getDepartment()
+			{
+				return _Department;
 			}
 			
 			
