@@ -156,6 +156,8 @@ namespace pgc
 
 	ResultImplPtr StatementImpl::exec()
 	{
+		_con->doLogExec(_sql);
+
 		ResultImplPtr res;
 		if(_bindTyp.empty())
 		{
@@ -188,6 +190,7 @@ namespace pgc
 				&_bindFmt[0],
 				1)));
 		}
+		_con->doLogError(_sql, res);
 
 		//почистить бинды
 		unbind(0);

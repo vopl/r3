@@ -14,6 +14,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	m.startInThread("dbname=test user=postgres password=postgres port=5432");
 
+	m.con().log(std::cout, pgc::lf_all);
+
 	r3::model::common2_ptr c2 = m.getcommon2("myId");
 
 	try

@@ -1,13 +1,15 @@
 #include "connectionImpl.hpp"
 #include "statementImpl.hpp"
 #include "statementPrepImpl.hpp"
+#include <iostream>
 
 namespace pgc
 {
 	ConnectionImpl::ConnectionImpl()
 		: _pgcon(NULL)
+		, _log(NULL)
+		, _logFlags(lf_notice)
 	{
-
 	}
 	ConnectionImpl::~ConnectionImpl()
 	{
@@ -19,6 +21,13 @@ namespace pgc
 		return _pgcon;
 	}
 
+	void ConnectionImpl::log(std::ostream &out, int flags)
+	{
+		_log = &out;
+		_logFlags = flags;
+		updateLog();
+	}
+
 	EConnectionStatus ConnectionImpl::open(const char *conninfo)
 	{
 		close();
@@ -28,7 +37,7 @@ namespace pgc
 		{
 			return ecs_null;
 		}
-		PQsetClientEncoding(_pgcon, "UTF-8");
+		updateLog();
 
 		EConnectionStatus s = status();
 
@@ -87,4 +96,56 @@ namespace pgc
 	{
 		return StatementImplPtr(new StatementPrepImpl(shared_from_this()));
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::doLogExec(const std::string &stmt)
+	{
+		if(_log && _logFlags&lf_exec)
+		{
+			(*_log)<<stmt<<std::endl;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::doLogError(const std::string &stmt, ResultImplPtr &res)
+	{
+		if(res->status() == ees_error)
+		{
+
+			if(_log)
+			{
+				if(!(lf_exec & _logFlags))
+				{
+					(*_log)<<stmt<<std::endl;
+				}
+				(*_log)<<res->errorMsg()<<std::endl;
+			}
+			else
+			{
+				std::cerr<<res->errorMsg()<<std::endl;
+			}
+		}
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::noticeReceiver(void *arg, const PGresult *res)
+	{
+		ConnectionImpl *self = (ConnectionImpl *)arg;
+
+		if(self->_log && self->_logFlags&lf_notice)
+		{
+			(*self->_log)<<PQresultErrorMessage(res);
+			self->_log->flush();
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::updateLog()
+	{
+		PQsetNoticeReceiver(_pgcon, noticeReceiver, this);
+	}
+
+
+
 }

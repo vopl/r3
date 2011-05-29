@@ -119,12 +119,15 @@ namespace pgc
 	}
 	ResultImplPtr StatementPrepImpl::exec()
 	{
+		_con->doLogExec(_sql);
+
 		ResultImplPtr res;
 		if(_id.empty())
 		{
 			res = prepare();
 			if(res)
 			{
+				_con->doLogError(_sql, res);
 				return res;
 			}
 		}
@@ -160,6 +163,7 @@ namespace pgc
 				return exec();
 			}
 		}
+		_con->doLogError(_sql, res);
 		unbind(0);
 		return res;
 	}

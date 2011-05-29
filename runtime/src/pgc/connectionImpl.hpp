@@ -12,12 +12,17 @@ namespace pgc
 	{
 		PGconn *	_pgcon;
 		friend class StatementImpl;
+
+		std::ostream *_log;
+		int _logFlags;
+
 	public:
 		ConnectionImpl();
 		~ConnectionImpl();
 
 		PGconn *pgcon();
 
+		void log(std::ostream &out, int flags);
 		EConnectionStatus open(const char *conninfo);
 		EConnectionStatus ping(bool forceReset);
 		void close();
@@ -25,6 +30,12 @@ namespace pgc
 
 		StatementImplPtr once();
 		StatementImplPtr prep();
+
+		void doLogExec(const std::string &stmt);
+		void doLogError(const std::string &stmt, ResultImplPtr &res);
+	private:
+		static void noticeReceiver(void *arg, const PGresult *res);
+		void updateLog();
 	};
 
 	typedef boost::shared_ptr<ConnectionImpl> ConnectionImplPtr;

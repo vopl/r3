@@ -13,6 +13,11 @@ namespace pgc
 		_impl.reset();
 	}
 
+	void Connection::log(std::ostream &out, int flags)
+	{
+		_impl->log(out, flags);
+	}
+
 	EConnectionStatus Connection::open(const char *conninfo)
 	{
 		return _impl->open(conninfo);

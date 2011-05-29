@@ -2,7 +2,7 @@
 #define _PGC_CONNECTION_HPP_
 
 #include "pgc/statement.hpp"
-
+#include <ostream>
 namespace pgc
 {
 	class ConnectionImpl;
@@ -14,6 +14,16 @@ namespace pgc
 		ecs_lost,
 	};
 
+	enum ELogFlags
+	{
+		lf_none		= 0x00,
+
+		lf_notice	= 0x01,
+		lf_exec		= 0x02,
+
+		lf_all		= 0x03,
+	};
+
 	//////////////////////////////////////////////////////////////////////////
 	class Connection
 	{
@@ -23,6 +33,8 @@ namespace pgc
 	public:
 		Connection();
 		~Connection();
+
+		void log(std::ostream &out, int flags = lf_notice);
 
 		EConnectionStatus open(const char *conninfo);
 		EConnectionStatus ping(bool forceReset = false);
