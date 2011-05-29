@@ -4,6 +4,7 @@
 #include "pgc/connection.hpp"
 
 #include <boost/thread/tss.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace r3
 {
@@ -12,6 +13,8 @@ namespace r3
 	class ModelBase
 	{
 		boost::thread_specific_ptr<pgc::Connection> _tcon;
+		boost::mutex _mtx;
+
 	public:
 		ModelBase();
 		~ModelBase();
@@ -25,6 +28,8 @@ namespace r3
 		template <class SP>
 		SP getSchemaImpl(std::map<std::string, SP> &m, const char *id)
 		{
+			boost::mutex::scoped_lock sl(_mtx);
+
 			SP &p = m[id];
 			if(!p)
 			{
