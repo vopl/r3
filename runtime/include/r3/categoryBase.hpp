@@ -41,7 +41,7 @@ namespace r3
 		void dbCreateFields();
 		void dbCreateIndices();
 		void dbCreateRelations();
-		void dbCreateViews();
+		void dbCreateInheritance();
 	};
 
 
@@ -97,11 +97,8 @@ namespace r3
 	template <class C>
 	void CategoryBase<C>::dbCreateTable()
 	{
-		if(!C::isAbstract)
-		{
-			pgc::Connection con = category()->schema()->con();
-			con.once("CREATE TABLE "+db_sname()+"(id int8 PRIMARY KEY)").exec().throwIfError();
-		}
+		pgc::Connection con = category()->schema()->con();
+		con.once("CREATE TABLE "+db_sname()+"(id int8 PRIMARY KEY)").exec().throwIfError();
 	}
 
 	namespace impl
@@ -522,7 +519,7 @@ namespace r3
 				r3::relations::Relation2one *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
-				if(Category::rs_src == ers && !Category::isAbstract)
+				if(Category::rs_src == ers)
 				{
 					pgc::Connection con = c->schema()->con();
 					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_rel_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
@@ -538,11 +535,8 @@ namespace r3
 				r3::relations::Relation2n *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
-				if(!Category::isAbstract)
-				{
-					pgc::Connection con = c->schema()->con();
-					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_rel_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
-				}
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_rel_"+nameOwn+"_"+ca->name()+"_id_\" INT8").exec().throwIfError();
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -586,28 +580,38 @@ namespace r3
 				}
 			}
 		};
-
 	};
+
+
+	namespace impl
+	{
+
+		struct enumOper_createInheritance
+		{
+			template <typename Category, typename CategoryBase>
+			void operator()(Category *c, CategoryBase *bc)
+			{
+				pgc::Connection con = c->schema()->con();
+				con.once("ALTER TABLE "+c->db_sname()+" INHERIT "+bc->db_sname()).exec().throwIfError();
+			}
+
+		};
+
+	}
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateFields()
 	{
-		if(!C::isAbstract)
-		{
-			//перечислить все базовые и себя, собрать все поля и добавить их к таблице
-			((C*)this)->enumFieldsFromBasesAndSelf(impl::enumOper_createField());
-		}
+		//перечислить все базовые и себя, собрать все поля и добавить их к таблице
+		((C*)this)->enumFieldsFromBasesAndSelf(impl::enumOper_createField());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateIndices()
 	{
-		if(!C::isAbstract)
-		{
-			//перечислить все базовые и себя, собрать все индексы и добавить их к таблице
-			((C*)this)->enumIndicesFromBasesAndSelf(impl::enumOper_createIndex());
-		}
+		//перечислить все базовые и себя, собрать все индексы и добавить их к таблице
+		((C*)this)->enumIndicesFromBasesAndSelf(impl::enumOper_createIndex());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -619,9 +623,9 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
-	void CategoryBase<C>::dbCreateViews()
+	void CategoryBase<C>::dbCreateInheritance()
 	{
-		//assert(0);
+		((C*)this)->enumBasesFirst(impl::enumOper_createInheritance());
 	}
 
 }

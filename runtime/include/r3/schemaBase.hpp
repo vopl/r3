@@ -79,11 +79,11 @@ namespace r3
 			}
 		};
 		///////////////////////////
-		struct enumOper_createViews
+		struct enumOper_createInheritances
 		{
 			template <typename Schema, typename CategoryPtr> void operator()(Schema *s, CategoryPtr &c)
 			{
-				c->dbCreateViews();
+				c->dbCreateInheritance();
 			}
 		};
 
@@ -170,8 +170,8 @@ namespace r3
 		//поля вторичных ключей
 		s->enumCategories(impl::enumOper_createRelations());
 
-		//виды
-		s->enumCategories(impl::enumOper_createViews());
+		//наследование таблиц
+		s->enumCategories(impl::enumOper_createInheritances());
 	}
 
 	//////////////////////////////////////////////////////////////////////////

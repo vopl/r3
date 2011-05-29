@@ -39,6 +39,8 @@ namespace r3
 				{
 					//Category1
 					//HasRights
+					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
+					o(this, c_HasRights, (r3::fields::Bool *)NULL, "attrInHasRights");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)

@@ -17,13 +17,15 @@ namespace r3
 			//deriveds
 			class Category3;
 			typedef boost::shared_ptr<Category3> Category3_ptr;
+			class Category4;
+			typedef boost::shared_ptr<Category4> Category4_ptr;
 			
 			class Category2
 				: public CategoryBase<Category2>
 			{
 			
 			public:
-				static const bool isAbstract = true;
+				static const bool isAbstract = false;
 				
 				struct DomainEnum
 				{
@@ -33,7 +35,7 @@ namespace r3
 				
 				struct DomainSet
 				{
-					static const size_t amount = 3;
+					static const size_t amount = 4;
 					static const char *values[amount];
 				};
 				
@@ -53,7 +55,6 @@ namespace r3
 					o(this, c_Category2, (r3::fields::Image *)NULL, "Image");
 					o(this, c_Category2, (r3::fields::Int16 *)NULL, "Int16");
 					o(this, c_Category2, (r3::fields::Int32 *)NULL, "Int32");
-					o(this, c_Category2, (r3::fields::Int64 *)NULL, "Int64");
 					o(this, c_Category2, (r3::fields::Int8 *)NULL, "Int8");
 					o(this, c_Category2, (r3::fields::Money *)NULL, "Money");
 					o(this, c_Category2, (r3::fields::Real32 *)NULL, "Real32");
@@ -68,12 +69,17 @@ namespace r3
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Category2
+					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
+					o(this, c_Category2, _schema->getCategory<Category4>().get(), (r3::relations::Relation2n *)NULL,	"unnamed2",	(r3::relations::Relation2n *)NULL,	"unnamed1",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
+					o(this, c_Category2, "Index", im_tree, (r3::fields::DateTimeInterval *)NULL, "DateTimeInterval", (r3::fields::Audio *)NULL, "Audio");
+					o(this, c_Category2, "Index1", im_tree, (r3::fields::Int16 *)NULL, "Int16", (r3::fields::Money *)NULL, "Money", (r3::fields::Int8 *)NULL, "Int8", (r3::fields::Int32 *)NULL, "Int32");
+					o(this, c_Category2, "Index2", im_tree, (r3::fields::Real32 *)NULL, "Real32", (r3::fields::String *)NULL, "String", (r3::fields::Set<Category2::DomainSet>*)NULL, "Set", (r3::fields::Real64 *)NULL, "Real64");
 				}
 				
 			public:
