@@ -73,6 +73,9 @@ namespace workers
 		hpp<<"#define _r3_model_hpp_"<<endl;
 		hpp<<endl;
 
+		hpp<<"#include \"r3/modelBase.hpp\""<<endl;
+		hpp<<endl;
+
 		BOOST_FOREACH(std::string schemaName, schemas)
 		{
 			hpp<<"#include \"r3/model/"<<schemaName<<".hpp\""<<endl;
@@ -82,8 +85,34 @@ namespace workers
 		hpp<<"namespace r3"<<endl<<"{"<<endl;
 
 		hpp<<"class Model"<<endl;
+		hpp<<": public ModelBase"<<endl;
 		hpp<<"{"<<endl;
+
+
+		//тип карты id->schema ptr
+		BOOST_FOREACH(std::string schemaName, schemas)
+		{
+			hpp<<"typedef std::map<std::string, r3::model::"<<schemaName<<"_ptr> TM"<<schemaName<<";"<<endl;
+			hpp<<"TM"<<schemaName<<" _"<<schemaName<<";"<<endl;
+		}
+		hpp<<endl;
+
+
 		hpp<<"public:"<<endl;
+
+
+		//геттеры для схем
+		BOOST_FOREACH(std::string schemaName, schemas)
+		{
+			hpp<<"r3::model::"<<schemaName<<"_ptr get"<<schemaName<<"(const char *id)"<<endl;
+			hpp<<"{"<<endl;
+			hpp<<"return getSchemaImpl(_"<<schemaName<<", id);"<<endl;
+			hpp<<"}"<<endl;
+		}
+		hpp<<endl;
+
+
+
 		hpp<<"};"<<endl;
 		hpp<<endl;
 
@@ -116,7 +145,7 @@ namespace workers
 		//DDL для БД
 		//cpp файлы схемы
 
-		BOOST_FOREACH(const Category &cat, cats)
+		BOOST_FOREACH(const Category &cat, orderByName(cats))
 		{
 			assert(name == cat->getSchema());
 			processCategory(cat);
@@ -136,7 +165,11 @@ namespace workers
 		hpp<<"#include \"r3/schemaBase.hpp\""<<endl;
 		hpp<<endl;
 
-		hpp<<"namespace r3"<<endl<<"{"<<endl<<"namespace model"<<endl<<"{"<<endl;
+		hpp<<"namespace r3"<<endl<<"{"<<endl;
+
+		hpp<<"class Model;"<<endl;
+		
+		hpp<<"namespace model"<<endl<<"{"<<endl;
 
 		hpp<<"namespace s_"<<name<<endl<<"{"<<endl;
 
@@ -175,8 +208,8 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<""<<name<<"(const char *id)"<<endl;
-		hpp<<": SchemaBase<"<<name<<">(id, \""<<name<<"\")"<<endl;
+		hpp<<""<<name<<"(Model *model, const char *id)"<<endl;
+		hpp<<": SchemaBase<"<<name<<">(model, id, \""<<name<<"\")"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<"init();"<<endl;
 		hpp<<"}"<<endl;
@@ -560,10 +593,14 @@ namespace workers
 					assert(!"unknown index method!");
 				}
 
-
-				BOOST_FOREACH(IndexOnCategoryField link, orderByName(ind->getInIndexOnCategoryFieldLinks()))
+				std::set<Field> targetFields;
+				BOOST_FOREACH(IndexOnCategoryField link, ind->getInIndexOnCategoryFieldLinks())
 				{
-					Field fld = link->getSrc();
+					targetFields.insert(link->getSrc());
+				}
+
+				BOOST_FOREACH(Field fld, orderByName(targetFields))
+				{
 					hpp<<", (r3::fields::"<<fld->getObjectMeta().name();
 					if(Scanty(fld))
 					{

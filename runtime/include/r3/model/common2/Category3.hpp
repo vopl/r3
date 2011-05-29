@@ -72,7 +72,7 @@ namespace r3
 					//Category2
 					Category2 *c_Category2 = _schema->getCategory<Category2>().get();
 					o(this, c_Category2, "Index", im_tree, (r3::fields::DateTimeInterval *)NULL, "DateTimeInterval", (r3::fields::Audio *)NULL, "Audio");
-					o(this, c_Category2, "Index1", im_tree, (r3::fields::Int16 *)NULL, "Int16", (r3::fields::Int32 *)NULL, "Int32", (r3::fields::Int8 *)NULL, "Int8", (r3::fields::Money *)NULL, "Money");
+					o(this, c_Category2, "Index1", im_tree, (r3::fields::Int32 *)NULL, "Int32", (r3::fields::Money *)NULL, "Money", (r3::fields::Int8 *)NULL, "Int8", (r3::fields::Int16 *)NULL, "Int16");
 					o(this, c_Category2, "Index2", im_tree, (r3::fields::String *)NULL, "String", (r3::fields::Set<Category2::DomainSet>*)NULL, "Set", (r3::fields::Real64 *)NULL, "Real64", (r3::fields::Real32 *)NULL, "Real32");
 					//Category3
 				}

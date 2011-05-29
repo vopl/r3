@@ -402,6 +402,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\r3\modelBase.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\r3\schemaBase.hpp"
 					>
 				</File>
@@ -537,6 +541,10 @@
 			<Filter
 				Name="r3"
 				>
+				<File
+					RelativePath="..\src\r3\modelBase.cpp"
+					>
+				</File>
 				<Filter
 					Name="fields"
 					>

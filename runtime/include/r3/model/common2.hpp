@@ -7,6 +7,7 @@
 
 namespace r3
 {
+	class Model;
 	namespace model
 	{
 		namespace s_common2
@@ -35,8 +36,8 @@ namespace r3
 			s_common2::Category2_ptr	_Category2;
 			
 		public:
-			common2(const char *id)
-				: SchemaBase<common2>(id, "common2")
+			common2(Model *model, const char *id)
+				: SchemaBase<common2>(model, id, "common2")
 			{
 				init();
 			}

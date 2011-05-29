@@ -6,20 +6,23 @@
 namespace r3
 {
 	//////////////////////////////////////////////////////////////////////////
+	class Model;
+
+	//////////////////////////////////////////////////////////////////////////
 	template <class S>
 	class SchemaBase
 		: public boost::enable_shared_from_this<S>
 	{
 		typedef S Schema;
 
-		pgc::Connection _con;
+		Model *_model;
 		std::string _id;
 		std::string _name;
 
 	protected:
 		void init();
 	public:
-		SchemaBase(const char *id, const char *name);
+		SchemaBase(Model *model, const char *id, const char *name);
 		~SchemaBase();
 
 		pgc::Connection con();
@@ -29,7 +32,6 @@ namespace r3
 
 		std::string db_name();
 
-		void dbCon(pgc::Connection con);
 		void dbCreate();
 		void dbDrop();
 	};
@@ -100,8 +102,9 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S>
-	SchemaBase<S>::SchemaBase(const char *id, const char *name)
-		: _id(id)
+	SchemaBase<S>::SchemaBase(Model *model, const char *id, const char *name)
+		: _model(model)
+		, _id(id)
 		, _name(name)
 	{
 	}
@@ -117,7 +120,7 @@ namespace r3
 	template <class S>
 	pgc::Connection SchemaBase<S>::con()
 	{
-		return _con;
+		return _model->con();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -144,19 +147,11 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S>
-	void SchemaBase<S>::dbCon(pgc::Connection con)
-	{
-		_con = con;
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class S>
 	void SchemaBase<S>::dbCreate()
 	{
 		S* s = (S*)this;
 
-		_con.once("CREATE SCHEMA "+db_name()).exec().throwIfError();
+		con().once("CREATE SCHEMA "+db_name()).exec().throwIfError();
 
 		//таблицы, поля первичных ключей
 		s->enumCategories(impl::enumOper_createTable());
@@ -178,7 +173,7 @@ namespace r3
 	template <class S>
 	void SchemaBase<S>::dbDrop()
 	{
-		_con.once("DROP SCHEMA "+db_name()+" CASCADE").exec().throwIfError();
+		con().once("DROP SCHEMA "+db_name()+" CASCADE").exec().throwIfError();
 	}
 
 }
