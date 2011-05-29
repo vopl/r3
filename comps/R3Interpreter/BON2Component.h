@@ -25,6 +25,7 @@
 #include "BON.h"
 #include "BONImpl.h"
 #include <ComponentConfig.h>
+#include <boost/filesystem.hpp>
 
 namespace BON
 {
@@ -67,6 +68,10 @@ class Component
 		void globalEventPerformed( globalevent_enum event );
 		void objectEventPerformed( Object& object, unsigned long event, VARIANT v );
 	#endif
+
+	private:
+		bool browseGenDir(Project& project, boost::filesystem::path &genDir);
+
 };
 
 }; // namespace BON

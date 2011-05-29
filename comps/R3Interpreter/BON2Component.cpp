@@ -27,7 +27,6 @@
 
 #include "workers/wSchema.hpp"
 
-#include <boost/filesystem.hpp>
 
 namespace BON
 {
@@ -91,108 +90,15 @@ void Component::invoke( Project& project, const std::set<FCO>& setModels, long l
 // This is the main component method for Interpereters and Plugins.
 // May also be used in case of invokeable Add-Ons
 
-int CALLBACK BrowseCallbackProc( HWND hWnd, UINT uMsg, LPARAM lParam,
-								LPARAM lpData )
-{
-	TCHAR szPath[_MAX_PATH];
-	switch (uMsg) {
-	case BFFM_INITIALIZED:
-		if (lpData)
-			SendMessage(hWnd,BFFM_SETSELECTION,TRUE,lpData);
-		break;
-	case BFFM_SELCHANGED:
-		SHGetPathFromIDList(LPITEMIDLIST(lParam),szPath);
-		SendMessage(hWnd, BFFM_SETSTATUSTEXT, NULL, LPARAM(szPath));
-		break;
-	}
-	return 0;
-}
 
 void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>& setSelectedFCOs, long lParam )
 {
-	//взять путь из реестра модели, отложить его от пути к модели
-	//прогнать через диалог выбора пути
-	//преобразовать обратно в относительный от пути к модели и запомнить в реестре
-	boost::filesystem::path projectDir = project->getProjectPath();
-	projectDir = projectDir.parent_path();
-	Folder rootFolder = project->getRootFolder();
-	boost::filesystem::path genRelDir = rootFolder->getRegistry()->getValueByPath("/R3/GeneratePath");
+
 	boost::filesystem::path genDir;
-	
-	if(genRelDir.has_root_directory() && genRelDir.has_root_path())
+	if(!browseGenDir(project, genDir))
 	{
-		genDir = genRelDir;
-	}
-	else
-	{
-		genDir = projectDir / genRelDir;
-	}
-	genDir.normalize();
-
-	TCHAR brPath[MAX_PATH*10];
-	strcpy(brPath, genDir.native_directory_string().c_str());
-
-	BROWSEINFO bi = {};
-	bi.lpszTitle = "select generation target directory";
-	bi.pszDisplayName = brPath;
-	bi.ulFlags = 
-		BIF_RETURNONLYFSDIRS|
-		BIF_USENEWUI|
-		BIF_STATUSTEXT|
-		0;                       // Flags that control the return stuff
-	bi.lpfn = BrowseCallbackProc;
-	bi.lParam = (LPARAM)brPath;
-	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
-
-	if(pidl)
-	{
-		if(SHGetPathFromIDList(pidl, brPath))
-		{
-			genDir = brPath;
-		}
-
-		// free memory used
-		IMalloc * imalloc = 0;
-		if ( SUCCEEDED( SHGetMalloc ( &imalloc )) )
-		{
-			imalloc->Free ( pidl );
-			imalloc->Release ( );
-		}
-	}
-	else
-	{
-		//отмена
 		return;
 	}
-
-	boost::filesystem::path genRelDir2;
-	if(genDir.root_name() == projectDir.root_name())
-	{
-		boost::filesystem::path::iterator gIter = genDir.begin();
-		boost::filesystem::path::iterator gEnd = genDir.end();
-		boost::filesystem::path::iterator pIter = projectDir.begin();
-		boost::filesystem::path::iterator pEnd = projectDir.end();
-		for(; gIter!=gEnd && pIter!=pEnd && *gIter==*pIter; gIter++, pIter++);
-
-		for(; pIter!=pEnd; pIter++)
-		{
-			genRelDir2 /= "..";
-		}
-		for(; gIter!=gEnd; gIter++)
-		{
-			genRelDir2 /= *gIter;
-		}
-	}
-	else
-	{
-		genRelDir2 = genDir;
-	}
-
-	if(genRelDir2 != genRelDir)
-	{
-		rootFolder->getRegistry()->setValueByPath("/R3/GeneratePath", genRelDir2.native_directory_string());
-	}
-
 
 	//////////////////////////////////////////////////////////////////////////
 #ifdef GME_ADDON
@@ -205,7 +111,7 @@ void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>
 
 	// ======================
 	// TODO: Insert application specific code here
-	std::set<FCO> roots = rootFolder->getRootFCOs();
+	std::set<FCO> roots = project->getRootFolder()->getRootFCOs();
 
 	workers::WSchema schema(genDir);
 	schema(roots);
@@ -261,6 +167,113 @@ void Component::objectEventPerformed( Object& object, unsigned long event, VARIA
 }
 
 #endif // GME_ADDON
+
+
+//////////////////////////////////////////////////////////////////////////
+int CALLBACK BrowseCallbackProc( HWND hWnd, UINT uMsg, LPARAM lParam,
+								LPARAM lpData )
+{
+	TCHAR szPath[_MAX_PATH];
+	switch (uMsg) {
+	case BFFM_INITIALIZED:
+		if (lpData)
+			SendMessage(hWnd,BFFM_SETSELECTION,TRUE,lpData);
+		break;
+	case BFFM_SELCHANGED:
+		SHGetPathFromIDList(LPITEMIDLIST(lParam),szPath);
+		SendMessage(hWnd, BFFM_SETSTATUSTEXT, NULL, LPARAM(szPath));
+		break;
+	}
+	return 0;
+}
+
+bool Component::browseGenDir(Project& project, boost::filesystem::path &genDir)
+{
+	//взять путь из реестра модели, отложить его от пути к модели
+	//прогнать через диалог выбора пути
+	//преобразовать обратно в относительный от пути к модели и запомнить в реестре
+	boost::filesystem::path projectDir = project->getProjectPath();
+	projectDir = projectDir.parent_path();
+	Folder rootFolder = project->getRootFolder();
+	boost::filesystem::path genRelDir = rootFolder->getRegistry()->getValueByPath("/R3/GeneratePath");
+
+	if(genRelDir.has_root_directory() && genRelDir.has_root_path())
+	{
+		genDir = genRelDir;
+	}
+	else
+	{
+		genDir = projectDir / genRelDir;
+	}
+	genDir.normalize();
+
+	TCHAR brPath[MAX_PATH*10];
+	strcpy(brPath, genDir.native_directory_string().c_str());
+
+	BROWSEINFO bi = {};
+	bi.lpszTitle = "select generation target directory";
+	bi.pszDisplayName = brPath;
+	bi.ulFlags = 
+		BIF_RETURNONLYFSDIRS|
+		BIF_USENEWUI|
+		BIF_STATUSTEXT|
+		0;                       // Flags that control the return stuff
+	bi.lpfn = BrowseCallbackProc;
+	bi.lParam = (LPARAM)brPath;
+	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
+
+	if(pidl)
+	{
+		if(SHGetPathFromIDList(pidl, brPath))
+		{
+			genDir = brPath;
+		}
+
+		// free memory used
+		IMalloc * imalloc = 0;
+		if ( SUCCEEDED( SHGetMalloc ( &imalloc )) )
+		{
+			imalloc->Free ( pidl );
+			imalloc->Release ( );
+		}
+	}
+	else
+	{
+		//отмена
+		return false;
+	}
+
+	boost::filesystem::path genRelDir2;
+	if(genDir.root_name() == projectDir.root_name())
+	{
+		boost::filesystem::path::iterator gIter = genDir.begin();
+		boost::filesystem::path::iterator gEnd = genDir.end();
+		boost::filesystem::path::iterator pIter = projectDir.begin();
+		boost::filesystem::path::iterator pEnd = projectDir.end();
+		for(; gIter!=gEnd && pIter!=pEnd && *gIter==*pIter; gIter++, pIter++);
+
+		for(; pIter!=pEnd; pIter++)
+		{
+			genRelDir2 /= "..";
+		}
+		for(; gIter!=gEnd; gIter++)
+		{
+			genRelDir2 /= *gIter;
+		}
+	}
+	else
+	{
+		genRelDir2 = genDir;
+	}
+
+	if(genRelDir2 != genRelDir)
+	{
+		rootFolder->getRegistry()->setValueByPath("/R3/GeneratePath", genRelDir2.native_directory_string());
+	}
+
+	return true;
+}
+
 
 }; // namespace BON
 
