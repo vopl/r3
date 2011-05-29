@@ -260,7 +260,7 @@ namespace workers
 		if(basesFirst.size())
 		{
 			hpp<<"//bases"<<endl;
-			BOOST_FOREACH(Category bcat, basesFirst)
+			BOOST_FOREACH(Category bcat, orderByName(basesFirst))
 			{
 				assert(bcat->getSchema() == cat->getSchema());
 				hpp<<"#include \"r3/model/"<<bcat->getSchema()<<"/"<<bcat->getName()<<".hpp\""<<endl;
@@ -288,7 +288,7 @@ namespace workers
 		if(deriveds.size())
 		{
 			hpp<<"//deriveds"<<endl;
-			BOOST_FOREACH(Category dcat, deriveds)
+			BOOST_FOREACH(Category dcat, orderByName(deriveds))
 			{
 				assert(dcat->getSchema() == cat->getSchema());
 				hpp<<"class "<<dcat->getName()<<";"<<endl;
@@ -314,7 +314,7 @@ namespace workers
 		std::set<FCO> sets = cat->getChildFCOsAs("Set");
 		std::set<FCO> scanties(enums);
 		scanties.insert(sets.begin(), sets.end());
-		BOOST_FOREACH(Scanty s, scanties)
+		BOOST_FOREACH(Scanty s, orderByName(scanties))
 		{
 			assert(s);
 
@@ -333,7 +333,7 @@ namespace workers
 		//перечисление базовых
 		hpp<<"template <class Oper> void enumBasesFirst(Oper o)"<<endl;
 		hpp<<"{"<<endl;
-		BOOST_FOREACH(Category bcat, basesFirst)
+		BOOST_FOREACH(Category bcat, orderByName(basesFirst))
 		{
 			assert(bcat->getSchema() == cat->getSchema());
 			hpp<<"o(this, schema()->getCategory<"<<bcat->getName()<<">().get());"<<endl;
@@ -345,7 +345,7 @@ namespace workers
 		//поля свои и все от базовых
 		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)"<<endl;
 		hpp<<"{"<<endl;
-		BOOST_FOREACH(Category cat, basesAndSelf)
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
 			hpp<<"//"<<cat->getName()<<endl;
 
@@ -356,7 +356,7 @@ namespace workers
 
 			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
 
-			BOOST_FOREACH(Field fld, fields)
+			BOOST_FOREACH(Field fld, orderByName(fields))
 			{
 				if(!fld) continue;
 
@@ -393,7 +393,7 @@ namespace workers
 		//связи свои и все от базовых
 		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)"<<endl;
 		hpp<<"{"<<endl;
-		BOOST_FOREACH(Category cat, basesAndSelf)
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
 			hpp<<"//"<<cat->getName()<<endl;
 
@@ -405,7 +405,7 @@ namespace workers
 
 			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
 
-			BOOST_FOREACH(CategoryRelation rel, rels)
+			BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
 			{
 				assert(rel);
 
@@ -476,7 +476,7 @@ namespace workers
 		//индексы свои и все от базовых
 		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)"<<endl;
 		hpp<<"{"<<endl;
-		BOOST_FOREACH(Category cat, basesAndSelf)
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
 			hpp<<"//"<<cat->getName()<<endl;
 
@@ -485,7 +485,7 @@ namespace workers
 
 			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
 
-			BOOST_FOREACH(Index ind, indices)
+			BOOST_FOREACH(Index ind, orderByName(indices))
 			{
 				assert(ind);
 
@@ -508,7 +508,7 @@ namespace workers
 				}
 
 
-				BOOST_FOREACH(IndexOnCategoryField link, ind->getInIndexOnCategoryFieldLinks())
+				BOOST_FOREACH(IndexOnCategoryField link, orderByName(ind->getInIndexOnCategoryFieldLinks()))
 				{
 					Field fld = link->getSrc();
 					hpp<<", (r3::fields::"<<fld->getObjectMeta().name();

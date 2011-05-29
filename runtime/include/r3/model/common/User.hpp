@@ -4,8 +4,8 @@
 #include "r3/categoryBase.hpp"
 
 //bases
-#include "r3/model/common/Owner.hpp"
 #include "r3/model/common/HasRights.hpp"
+#include "r3/model/common/Owner.hpp"
 
 namespace r3
 {
@@ -27,15 +27,15 @@ namespace r3
 				
 				template <class Oper> void enumBasesFirst(Oper o)
 				{
-					o(this, schema()->getCategory<Owner>().get());
 					o(this, schema()->getCategory<HasRights>().get());
+					o(this, schema()->getCategory<Owner>().get());
 				}
 				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Category1
-					//Owner
 					//HasRights
+					//Owner
 					//User
 					User *c_User = _schema->getCategory<User>().get();
 					o(this, c_User, (r3::fields::String *)NULL, "login");
@@ -45,12 +45,12 @@ namespace r3
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Category1
-					//Owner
-					Owner *c_Owner = _schema->getCategory<Owner>().get();
-					o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n *)NULL,	"childs",	(r3::relations::Relation2one *)NULL,	"parent",	rs_dst);
 					//HasRights
 					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
 					o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n *)NULL,	"owners",	(r3::relations::Relation2n *)NULL,	"rights",	rs_dst);
+					//Owner
+					Owner *c_Owner = _schema->getCategory<Owner>().get();
+					o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n *)NULL,	"childs",	(r3::relations::Relation2one *)NULL,	"parent",	rs_dst);
 					//User
 					User *c_User = _schema->getCategory<User>().get();
 					o(this, c_User, _schema->getCategory<Role>().get(), (r3::relations::Relation2n *)NULL,	"users",	(r3::relations::Relation2n *)NULL,	"roles",	rs_dst);
@@ -59,8 +59,8 @@ namespace r3
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Category1
-					//Owner
 					//HasRights
+					//Owner
 					//User
 				}
 				
