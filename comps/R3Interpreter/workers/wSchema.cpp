@@ -84,20 +84,25 @@ namespace workers
 		hpp<<"#include \"r3/schemaBase.hpp\""<<endl;
 		hpp<<endl;
 
-		//include дл€ категорий
-		BOOST_FOREACH(const Category &cat, cats)
-		{
-			hpp<<"#include \"r3/model/"<<name<<"/"<<cat->getName()<<".hpp\""<<endl;
-		}
-		hpp<<endl;
-
 		hpp<<"namespace r3"<<endl<<"{"<<endl<<"namespace model"<<endl<<"{"<<endl;
 
-		hpp<<"namespace s_"<<name<<"{}"<<endl;
+		hpp<<"namespace s_"<<name<<endl<<"{"<<endl;
+
+		//предварительные объ€влени€ типов категорий
+		BOOST_FOREACH(const Category &cat, cats)
+		{
+			hpp<<"class "<<cat->getName()<<";"<<endl;
+			hpp<<"typedef boost::shared_ptr<"<<cat->getName()<<"> "<<cat->getName()<<"_ptr;"<<endl;
+			hpp<<endl;
+		}
+
+		hpp<<"}"<<endl;
+		hpp<<endl;
 
 		//указатель
 		hpp<<"class "<<name<<";"<<endl;
 		hpp<<"typedef boost::shared_ptr<"<<name<<"> "<<name<<"_ptr;"<<endl;
+		hpp<<endl;
 
 
 		//класс
@@ -143,20 +148,10 @@ namespace workers
 
 
 		//шаблон дл€ доступа к экземпл€ру по типу
-		hpp<<"template <class C> boost::shared_ptr<C> getCategory()"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"return boost::shared_ptr<C>();"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		BOOST_FOREACH(const Category &cat, cats)
-		{
-			hpp<<"template <> s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<"getCategory<s_"<<name<<"::"<<cat->getName()<<">()"<<endl;
-			hpp<<"{"<<endl;
-			hpp<<"return _"<<cat->getName()<<";";
-			hpp<<"}"<<endl;
-			hpp<<endl;
-		}
+		hpp<<"template <class C> boost::shared_ptr<C> getCategory();"<<endl;
+// 		hpp<<"{"<<endl;
+// 		hpp<<"return boost::shared_ptr<C>();"<<endl;
+// 		hpp<<"}"<<endl;
 		hpp<<endl;
 
 		//геттеры дл€ категорий
@@ -173,10 +168,28 @@ namespace workers
 		hpp<<"};"<<endl;
 		//конец класса
 
+		BOOST_FOREACH(const Category &cat, cats)
+		{
+			hpp<<"template <> s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<name<<"::getCategory<s_"<<name<<"::"<<cat->getName()<<">()"<<endl;
+			hpp<<"{"<<endl;
+			hpp<<"return _"<<cat->getName()<<";";
+			hpp<<"}"<<endl;
+			hpp<<endl;
+		}
+		hpp<<endl;
+
+
 		//конец пространства имен
 		hpp<<"}"<<endl<<"}"<<endl;
-
 		hpp<<endl;
+
+		//include дл€ категорий
+		BOOST_FOREACH(const Category &cat, cats)
+		{
+			hpp<<"#include \"r3/model/"<<name<<"/"<<cat->getName()<<".hpp\""<<endl;
+		}
+		hpp<<endl;
+
 
 
 		hpp<<"#endif"<<endl;

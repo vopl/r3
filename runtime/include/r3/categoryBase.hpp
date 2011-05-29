@@ -85,7 +85,7 @@ namespace r3
 	{
 		return "\""+_name+"\"";
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	std::string CategoryBase<C>::db_sname()
@@ -103,16 +103,16 @@ namespace r3
 			con.once("CREATE TABLE "+db_sname()+"(id int8 PRIMARY KEY)").exec().throwIfError();
 		}
 	}
-	
+
 	namespace impl
 	{
 		struct enumOper_createField
 		{
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Audio *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Audio *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -124,9 +124,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Bool *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Bool *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -135,9 +135,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Date *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Date *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -146,9 +146,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::DateTimeInterval *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::DateTimeInterval *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -157,24 +157,24 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf, typename Domain> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Enum<Domain> *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Enum<Domain> *stub,
 				const char *fname)
 			{
 				static const size_t amount = r3::fields::Enum<Domain>::amount;
-				
+
 				pgc::Connection con = c->schema()->con();
 
-				if(amount <= std::numeric_limits<boost::int16_t>::max())
+				if(amount <= (size_t)std::numeric_limits<boost::int16_t>::max())
 				{
 					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT2").exec().throwIfError();
 				}
-				else if(amount <= std::numeric_limits<boost::int32_t>::max())
+				else if(amount <= (size_t)std::numeric_limits<boost::int32_t>::max())
 				{
 					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT4").exec().throwIfError();
 				}
-				else if(amount <= std::numeric_limits<boost::int64_t>::max())
+				else if(amount <= (size_t)std::numeric_limits<boost::int64_t>::max())
 				{
 					con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" INT8").exec().throwIfError();
 				}
@@ -186,9 +186,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Image *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Image *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -202,9 +202,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Int16 *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Int16 *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -213,9 +213,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Int32 *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Int32 *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -224,9 +224,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Int64 *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Int64 *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -235,9 +235,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Int8 *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Int8 *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -247,9 +247,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Money *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Money *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -258,9 +258,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Real32 *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Real32 *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -269,9 +269,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Real64 *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Real64 *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -280,9 +280,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf, typename Domain> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Set<Domain> *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Set<Domain> *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -291,12 +291,12 @@ namespace r3
 				char buf[64];
 				con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" BIT("+utils::_ntoa(amount, buf)+")").exec().throwIfError();
 			}
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::String *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::String *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -305,9 +305,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Time *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Time *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -316,9 +316,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Timestamp *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Timestamp *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -327,9 +327,9 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
-				r3::fields::Video *stub, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
+				r3::fields::Video *stub,
 				const char *fname)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -349,23 +349,23 @@ namespace r3
 			}
 		};
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
+
+
 		//////////////////////////////////////////////////////////////////////////
 		struct enumOper_createIndex
 		{
 
 			template <typename Category, typename CategoryBaseOrSelf>
 			std::string sql1(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
 				const char *idxName,
 				typename Category::EIndexMethod idxMethod)
 			{
@@ -394,8 +394,7 @@ namespace r3
 				return res;
 			}
 
-			template <typename F>
-			std::string sql2(F *stub, const char *fname)
+			std::string sql2(void *stub, const char *fname)
 			{
 				std::string res = "\"_";
 				res += fname;
@@ -403,7 +402,6 @@ namespace r3
 				return res;
 			}
 
-			template <>
 			std::string sql2(r3::fields::Audio *stub, const char *fname)
 			{
 				std::string res = "\"_";
@@ -411,7 +409,7 @@ namespace r3
 				res += "_name\"";
 				return res;
 			}
-			template <>
+
 			std::string sql2(r3::fields::Image *stub, const char *fname)
 			{
 				std::string res = "\"_";
@@ -419,7 +417,7 @@ namespace r3
 				res += "_name\"";
 				return res;
 			}
-			template <>
+
 			std::string sql2(r3::fields::Video *stub, const char *fname)
 			{
 				std::string res = "\"_";
@@ -431,17 +429,17 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf, typename F0, typename F1, typename F2, typename F3> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
 				const char *idxName,
 				typename Category::EIndexMethod idxMethod,
-				F0 *stub0, 
+				F0 *stub0,
 				const char *fname0,
-				F1 *stub1, 
+				F1 *stub1,
 				const char *fname1,
-				F2 *stub2, 
+				F2 *stub2,
 				const char *fname2,
-				F3 *stub3, 
+				F3 *stub3,
 				const char *fname3)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -455,15 +453,15 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf, typename F0, typename F1, typename F2> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
 				const char *idxName,
 				typename Category::EIndexMethod idxMethod,
-				F0 *stub0, 
+				F0 *stub0,
 				const char *fname0,
-				F1 *stub1, 
+				F1 *stub1,
 				const char *fname1,
-				F2 *stub2, 
+				F2 *stub2,
 				const char *fname2)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -476,13 +474,13 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf, typename F0, typename F1> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
 				const char *idxName,
 				typename Category::EIndexMethod idxMethod,
-				F0 *stub0, 
+				F0 *stub0,
 				const char *fname0,
-				F1 *stub1, 
+				F1 *stub1,
 				const char *fname1)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -494,11 +492,11 @@ namespace r3
 
 			//////////////////////////////////////////////////////////////////////////
 			template <typename Category, typename CategoryBaseOrSelf, typename F0> void operator()(
-				Category *c, 
-				CategoryBaseOrSelf *bos, 
+				Category *c,
+				CategoryBaseOrSelf *bos,
 				const char *idxName,
 				typename Category::EIndexMethod idxMethod,
-				F0 *stub0, 
+				F0 *stub0,
 				const char *fname0)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -600,7 +598,7 @@ namespace r3
 			((C*)this)->enumFieldsFromBasesAndSelf(impl::enumOper_createField());
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateIndices()
@@ -611,14 +609,14 @@ namespace r3
 			((C*)this)->enumIndicesFromBasesAndSelf(impl::enumOper_createIndex());
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateRelations()
 	{
 		((C*)this)->enumRelationsFromBasesAndSelf(impl::enumOper_createRelation());
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	void CategoryBase<C>::dbCreateViews()

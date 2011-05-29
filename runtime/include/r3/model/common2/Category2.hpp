@@ -25,15 +25,15 @@ namespace r3
 			public:
 				static const bool isAbstract = true;
 				
-				struct DomainEnum
-				{
-					static const size_t amount = 2;
-					static const char *values[amount];
-				};
-				
 				struct DomainSet
 				{
 					static const size_t amount = 3;
+					static const char *values[amount];
+				};
+				
+				struct DomainEnum
+				{
+					static const size_t amount = 2;
 					static const char *values[amount];
 				};
 				
@@ -45,9 +45,6 @@ namespace r3
 					o(this, c_Category2, (r3::fields::Bool *)NULL, "Bool");
 					o(this, c_Category2, (r3::fields::Date *)NULL, "Date");
 					o(this, c_Category2, (r3::fields::DateTimeInterval *)NULL, "DateTimeInterval");
-					o(this, c_Category2, (r3::fields::Image *)NULL, "Image");
-					o(this, c_Category2, (r3::fields::Int16 *)NULL, "Int16");
-					o(this, c_Category2, (r3::fields::Int32 *)NULL, "Int32");
 					o(this, c_Category2, (r3::fields::Int64 *)NULL, "Int64");
 					o(this, c_Category2, (r3::fields::Int8 *)NULL, "Int8");
 					o(this, c_Category2, (r3::fields::Money *)NULL, "Money");
@@ -57,8 +54,11 @@ namespace r3
 					o(this, c_Category2, (r3::fields::Time *)NULL, "Time");
 					o(this, c_Category2, (r3::fields::Timestamp *)NULL, "Timestamp");
 					o(this, c_Category2, (r3::fields::Video *)NULL, "Video");
-					o(this, c_Category2, (r3::fields::Enum<Category2::DomainEnum>*)NULL, "Enum");
 					o(this, c_Category2, (r3::fields::Set<Category2::DomainSet>*)NULL, "Set");
+					o(this, c_Category2, (r3::fields::Enum<Category2::DomainEnum>*)NULL, "Enum");
+					o(this, c_Category2, (r3::fields::Image *)NULL, "Image");
+					o(this, c_Category2, (r3::fields::Int16 *)NULL, "Int16");
+					o(this, c_Category2, (r3::fields::Int32 *)NULL, "Int32");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
