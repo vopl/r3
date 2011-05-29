@@ -26,6 +26,7 @@ namespace pgc
 
 		Statement &sql(const char *csz);
 
+		Statement &bind(const char *v, size_t idx=0);
 		template <class T> Statement &bind(T const &v, size_t idx=0);
 		Statement &unbind(size_t idx=0);
 
@@ -72,11 +73,19 @@ namespace pgc
 	};
 
 	//////////////////////////////////////////////////////////////////////////
+	inline Statement &Statement::bind(const char *v, size_t idx)
+	{
+		bindHelper(CppDataType<char *>::cdt_index, &v, idx);
+		return *this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T const &v, size_t idx)
 	{
 		bindHelper(CppDataType<T>::cdt_index, &v, idx);
 		return *this;
 	}
+	
 
 }
 #endif

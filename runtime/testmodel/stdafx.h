@@ -7,15 +7,18 @@
 
 #include "targetver.h"
 
-#include <stdio.h>
-#include <tchar.h>
-
+#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+// Windows Header Files:
+#include <windows.h>
+#ifdef max
+#	undef max
+#	undef min
+#endif
 
 
 // TODO: reference additional headers your program requires here
-#include <string>
-#include <iostream>
-#include <deque>
+#include <cppunit/plugin/TestPlugIn.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 #include <boost/date_time/gregorian_calendar.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>

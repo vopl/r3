@@ -41,10 +41,10 @@ namespace r3
 				{
 					//Service
 					Service *c_Service = _schema->getCategory<Service>().get();
-					o(this, c_Service, _schema->getCategory<Client>().get(), (r3::relations::Relation2one *)NULL,	"client",	(r3::relations::Relation2n *)NULL,	"services",	rs_src);
-					o(this, c_Service, _schema->getCategory<People>().get(), (r3::relations::Relation2n *)NULL,	"observers",	(r3::relations::Relation2n *)NULL,	"observableServices",	rs_src);
 					o(this, c_Service, _schema->getCategory<Stock>().get(), (r3::relations::Relation2n *)NULL,	"stocks",	(r3::relations::Relation2n *)NULL,	"services",	rs_src);
 					o(this, c_Service, _schema->getCategory<Employee>().get(), (r3::relations::Relation2one *)NULL,	"worker",	(r3::relations::Relation2n *)NULL,	"services",	rs_src);
+					o(this, c_Service, _schema->getCategory<Client>().get(), (r3::relations::Relation2one *)NULL,	"client",	(r3::relations::Relation2n *)NULL,	"services",	rs_src);
+					o(this, c_Service, _schema->getCategory<People>().get(), (r3::relations::Relation2n *)NULL,	"observers",	(r3::relations::Relation2n *)NULL,	"observableServices",	rs_src);
 					o(this, c_Service, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2n *)NULL,	"parts",	(r3::relations::Relation2one *)NULL,	"service",	rs_src);
 				}
 				
