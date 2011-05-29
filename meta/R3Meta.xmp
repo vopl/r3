@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{AA9F0F91-4C00-4670-B763-888F1EE1F064}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{C46373A6-6077-4A7F-B3F7-C027ACB0BCC3}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -11,10 +11,6 @@
 		<attrdef name="Abstract" metaref = "1318" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="AllowNull" metaref = "1319" valuetype = "boolean" defvalue = "true">
-		</attrdef>
-		<attrdef name="FileStoreKind" metaref = "1320" valuetype = "enum" defvalue = "blob">
-			<enumitem dispname = "bytea" value = "bytea"></enumitem>
-			<enumitem dispname = "blob" value = "blob"></enumitem>
 		</attrdef>
 		<attrdef name="IndexType" metaref = "1321" valuetype = "enum" defvalue = "tree">
 			<enumitem dispname = "tree" value = "tree"></enumitem>
@@ -54,7 +50,7 @@
 		</attrdef>
 		<attrdef name="ValueAdapter" metaref = "1308" valuetype = "string" defvalue = "unchanged">
 		</attrdef>
-		<atom name = "Audio" metaref = "1331"  attributes = "AllowNull FileStoreKind">
+		<atom name = "Audio" metaref = "1331"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -190,7 +186,37 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
-		<atom name = "Image" metaref = "1335"  attributes = "AllowNull FileStoreKind">
+		<atom name = "File" metaref = "1412"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Image" metaref = "1335"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -592,7 +618,7 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
-		<atom name = "Video" metaref = "1348"  attributes = "AllowNull FileStoreKind">
+		<atom name = "Video" metaref = "1348"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -703,6 +729,7 @@
 					<pointeritem desc = "Date"></pointeritem>
 					<pointeritem desc = "DateTimeInterval"></pointeritem>
 					<pointeritem desc = "Enum"></pointeritem>
+					<pointeritem desc = "File"></pointeritem>
 					<pointeritem desc = "Image"></pointeritem>
 					<pointeritem desc = "Int16"></pointeritem>
 					<pointeritem desc = "Int32"></pointeritem>
@@ -767,6 +794,7 @@
 			<role name = "Date" metaref = "1366" kind = "Date"></role>
 			<role name = "DateTimeInterval" metaref = "1367" kind = "DateTimeInterval"></role>
 			<role name = "Enum" metaref = "1368" kind = "Enum"></role>
+			<role name = "File" metaref = "1413" kind = "File"></role>
 			<role name = "Image" metaref = "1369" kind = "Image"></role>
 			<role name = "Index" metaref = "1370" kind = "Index"></role>
 			<role name = "IndexOnCategoryField" metaref = "1371" kind = "IndexOnCategoryField"></role>
@@ -788,6 +816,7 @@
 				<part metaref = "1386" role = "Date" primary = "yes" linked = "no"></part>
 				<part metaref = "1387" role = "DateTimeInterval" primary = "yes" linked = "no"></part>
 				<part metaref = "1388" role = "Enum" primary = "yes" linked = "no"></part>
+				<part metaref = "1414" role = "File" primary = "yes" linked = "no"></part>
 				<part metaref = "1389" role = "Image" primary = "yes" linked = "no"></part>
 				<part metaref = "1390" role = "Index" primary = "yes" linked = "no"></part>
 				<part metaref = "1391" role = "IndexOnCategoryField" primary = "yes" linked = "no"></part>
