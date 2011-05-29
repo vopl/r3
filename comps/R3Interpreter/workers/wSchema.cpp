@@ -10,7 +10,8 @@ namespace workers
 	using namespace GMEConsole;
 	using namespace std;
 
-	WSchema::WSchema()
+	WSchema::WSchema(const boost::filesystem::path &path)
+		: _path(path)
 	{
 
 	}
@@ -21,10 +22,8 @@ namespace workers
 
 	void WSchema::operator()(const std::set<FCO> &roots)
 	{
-		_mkdir("runtime");
-		_mkdir("runtime/include");
-		_mkdir("runtime/include/r3");
-		_mkdir("runtime/include/r3/model");
+		boost::filesystem::create_directories(_path/"include/r3/model");
+		boost::filesystem::create_directories(_path/"src/r3/model");
 
 		//собрать все категории и распредилить по схемам
 		std::map<std::string, std::set<Category> > schema2cats;
@@ -75,7 +74,7 @@ namespace workers
 	//////////////////////////////////////////////////////////////////////////
 	void WSchema::processSchema_hpp(const std::string &name, const std::set<Category> &cats)
 	{
-		out::File hpp("runtime/include/r3/model/"+name+".hpp");
+		out::File hpp(_path / "include/r3/model" / (name+".hpp"));
 
 		hpp<<"#ifndef _r3_model_"<<name<<"_hpp_"<<endl;
 		hpp<<"#define _r3_model_"<<name<<"_hpp_"<<endl;
@@ -220,7 +219,7 @@ namespace workers
 	//////////////////////////////////////////////////////////////////////////
 	void WSchema::processCategory_hpp(Category cat)
 	{
-		_mkdir(("runtime/include/r3/model/"+cat->getSchema()).c_str());
+		boost::filesystem::create_directories(_path/"include/r3/model"/cat->getSchema());
 
 		std::string name = cat->getName();
 
@@ -247,7 +246,7 @@ namespace workers
 		basesAndSelf.insert(cat);
 
 
-		out::File hpp("runtime/include/r3/model/"+cat->getSchema()+"/"+name+".hpp");
+		out::File hpp(_path / "include/r3/model" / cat->getSchema() / (name+".hpp"));
 
 		hpp<<"#ifndef _r3_model_"<<cat->getSchema()<<"_"<<name<<"_hpp_"<<endl;
 		hpp<<"#define _r3_model_"<<cat->getSchema()<<"_"<<name<<"_hpp_"<<endl;
@@ -592,7 +591,8 @@ namespace workers
 	{
 		if(res.end() != res.find(cat))
 		{
-			assert(!"recursive inheritance");
+			//две базы могут быть и не только по рекурсии
+			//assert(!"recursive inheritance");
 			return;
 		}
 

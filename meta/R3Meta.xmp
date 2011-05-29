@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{0DD7E364-FE59-43DD-9AC7-E4F663772047}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{AA9F0F91-4C00-4670-B763-888F1EE1F064}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -48,7 +48,7 @@
 		<attrdef name="ScantyValueKey" metaref = "1328" valuetype = "integer" defvalue = "1">
 			<dispname>Key</dispname>
 		</attrdef>
-		<attrdef name="Schema" metaref = "1329" valuetype = "string" defvalue = "common">
+		<attrdef name="Schema" metaref = "1329" valuetype = "string" defvalue = "Undefined">
 		</attrdef>
 		<attrdef name="ShortDescription" metaref = "1330" valuetype = "string" defvalue = "">
 		</attrdef>

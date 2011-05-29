@@ -6,6 +6,7 @@
 #include <ComponentConfig.h>
 #include "R3MetaBonX.h"
 #include <algorithm>
+#include <boost/filesystem.hpp>
 
 namespace workers
 {
@@ -14,8 +15,9 @@ namespace workers
 
 	class WSchema
 	{
+		const boost::filesystem::path _path;
 	public:
-		WSchema();
+		WSchema(const boost::filesystem::path &path);
 		~WSchema();
 
 		void operator()(const std::set<FCO> &roots);

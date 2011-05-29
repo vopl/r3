@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <boost/filesystem.hpp>
 
 namespace out
 {
@@ -20,6 +21,11 @@ namespace out
 		File(const std::string &pathName)
 			: std::ofstream(pathName.c_str())
 			, _pathName(pathName)
+		{
+		}
+		File(const boost::filesystem::path &pathName)
+			: std::ofstream(pathName.string().c_str())
+			, _pathName(pathName.string())
 		{
 		}
 		~File()
