@@ -112,6 +112,11 @@ void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>
 	// ======================
 	// TODO: Insert application specific code here
 	std::set<FCO> roots = project->getRootFolder()->getRootFCOs();
+	BOOST_FOREACH(Folder f, project->getLibraries())
+	{
+		std::set<FCO> lroots = f->getRootFCOs();
+		roots.insert(lroots.begin(), lroots.end());
+	}
 
 	workers::WSchema schema(genDir);
 	schema(roots);

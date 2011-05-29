@@ -14,9 +14,9 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	m.startInThread("dbname=test user=postgres password=postgres port=5432");
 
-	m.con().log(std::cout, pgc::lf_all);
+	m.con().log(std::cout, pgc::lf_exec);
 
-	r3::model::common2_ptr c2 = m.getcommon2("myId");
+	r3::model::Test_ptr c2 = m.getTest("myId");
 
 	try
 	{
@@ -27,12 +27,16 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::cout<<e.what()<<std::endl;
 	}
 
+
+	m.con().once("BEGIN").exec();
 	try
 	{
 		c2->dbCreate();
+		m.con().once("COMMIT").exec();
 	}
 	catch(std::exception &e)
 	{
+		m.con().once("ROLLBACK").exec();
 		std::cout<<e.what()<<std::endl;
 	}
 
