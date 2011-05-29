@@ -98,7 +98,7 @@ namespace r3
 	void CategoryBase<C>::dbCreateTable()
 	{
 		pgc::Connection con = category()->schema()->con();
-		con.once("CREATE TABLE "+db_sname()+"(id int8 PRIMARY KEY)").exec().throwIfError();
+		con.once("CREATE TABLE "+db_sname()+"(id INT8 PRIMARY KEY DEFAULT nextval('"+category()->schema()->db_name()+".\"idGen\"'::regclass))").exec().throwIfError();
 	}
 
 	namespace impl

@@ -152,6 +152,7 @@ namespace r3
 		S* s = (S*)this;
 
 		con().once("CREATE SCHEMA "+db_name()).exec().throwIfError();
+		con().once("CREATE SEQUENCE "+db_name()+".\"idGen\"").exec().throwIfError();
 
 		//таблицы, поля первичных ключей
 		s->enumCategories(impl::enumOper_createTable());
