@@ -27,6 +27,10 @@ namespace r3
 					static const char *values[amount];
 				};
 				
+				template <class Oper> void enumBasesFirst(Oper o)
+				{
+				}
+				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Right

@@ -4,7 +4,6 @@
 #include "r3/categoryBase.hpp"
 
 //bases
-#include "r3/model/common/Category1.hpp"
 #include "r3/model/common/HasRights.hpp"
 
 namespace r3
@@ -24,6 +23,11 @@ namespace r3
 			
 			public:
 				static const bool isAbstract = false;
+				
+				template <class Oper> void enumBasesFirst(Oper o)
+				{
+					o(this, schema()->getCategory<HasRights>().get());
+				}
 				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{

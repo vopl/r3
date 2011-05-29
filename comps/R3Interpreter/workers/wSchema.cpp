@@ -235,9 +235,11 @@ namespace workers
 
 
 		//перечень базовых и производных
+		std::set<Category> basesFirst;
 		std::set<Category> bases;
 		std::set<Category> deriveds;
 
+		collectInheriance(basesFirst, cat, true, false);
 		collectInheriance(bases, cat, true, true);
 		collectInheriance(deriveds, cat, false, true);
 
@@ -255,10 +257,10 @@ namespace workers
 		hpp<<endl;
 
 		//инклюды для базовых
-		if(bases.size())
+		if(basesFirst.size())
 		{
 			hpp<<"//bases"<<endl;
-			BOOST_FOREACH(Category bcat, bases)
+			BOOST_FOREACH(Category bcat, basesFirst)
 			{
 				assert(bcat->getSchema() == cat->getSchema());
 				hpp<<"#include \"r3/model/"<<bcat->getSchema()<<"/"<<bcat->getName()<<".hpp\""<<endl;
@@ -327,6 +329,18 @@ namespace workers
 			hpp<<"};"<<endl;
 			hpp<<endl;
 		}
+
+		//перечисление базовых
+		hpp<<"template <class Oper> void enumBasesFirst(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		BOOST_FOREACH(Category bcat, basesFirst)
+		{
+			assert(bcat->getSchema() == cat->getSchema());
+			hpp<<"o(this, schema()->getCategory<"<<bcat->getName()<<">().get());"<<endl;
+		}
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
 
 		//поля свои и все от базовых
 		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)"<<endl;

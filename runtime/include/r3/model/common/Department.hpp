@@ -24,6 +24,11 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
+				template <class Oper> void enumBasesFirst(Oper o)
+				{
+					o(this, schema()->getCategory<Owner>().get());
+				}
+				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Owner

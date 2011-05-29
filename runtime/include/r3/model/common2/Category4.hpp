@@ -21,6 +21,10 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
+				template <class Oper> void enumBasesFirst(Oper o)
+				{
+				}
+				
 				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
 				{
 					//Category4
