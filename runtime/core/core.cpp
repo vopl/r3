@@ -28,10 +28,50 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 	m.con().once("BEGIN").exec();
 	try
 	{
 		c2->dbCreate();
+		m.con().once("COMMIT").exec();
+	}
+	catch(std::exception &e)
+	{
+		m.con().once("ROLLBACK").exec();
+		std::cout<<e.what()<<std::endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	m.con().once("BEGIN").exec();
+	try
+	{
+		r3::model::Test_ptr test = m.getTest("myId");
+
+		r3::model::s_Test::Computer_ptr ccomp = test->getComputer();
+
+// 		r3::model::s_Test::Computer::Tuple comp;
+// 
+// 		comp.Mobile = true;
+// 		ccomp->ins(comp);
+// 
+// 		comp.Cost = 340;
+// 		ccomp->upd(comp);
+// 
+// 		r3::model::s_Test::Computer::Tuple_ptr pcomp;
+// 		pcomp = ccomp->sel(comp.id);
+
+		r3::model::s_Test::Stock_ptr cstock = test->getStock();
+// 		r3::model::s_Test::Stock::Tuple_ptr pstock = cstock->set(comp.id);
+// 		pcomp->upg(pstock);
+// 
+// 		test->del(pcomp->id);
+
 		m.con().once("COMMIT").exec();
 	}
 	catch(std::exception &e)
