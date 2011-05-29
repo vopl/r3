@@ -27,6 +27,7 @@ namespace workers
 
 		//собрать все категории и распредилить по схемам
 		std::map<std::string, std::set<Category> > schema2cats;
+		std::set<std::string> schemas;
 
 		BOOST_FOREACH(const FCO &fco, roots)
 		{
@@ -36,14 +37,18 @@ namespace workers
 				BOOST_FOREACH(const Category &cat, categories->getCategory())
 				{
 					schema2cats[cat->getSchema()].insert(cat);
+					schemas.insert(cat->getSchema());
 				}
 				BOOST_FOREACH(const CategoryReference &catref, categories->getCategoryReference())
 				{
 					const Category &cat = catref->getCategory();
 					schema2cats[cat->getSchema()].insert(cat);
+					schemas.insert(cat->getSchema());
 				}
 			}
 		}
+
+		processModel(schemas);
 
 		typedef std::pair<std::string, std::set<Category> > TP;
 		BOOST_FOREACH(const TP &p, schema2cats)
@@ -51,6 +56,52 @@ namespace workers
 			processSchema(p.first, p.second);
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WSchema::processModel(const std::set<std::string> &schemas)
+	{
+		processModel_hpp(schemas);
+		processModel_cpp(schemas);
+	}
+
+	void WSchema::processModel_hpp(const std::set<std::string> &schemas)
+	{
+		out::File hpp(_path / "include/r3/model.hpp");
+
+		hpp<<"#ifndef _r3_model_hpp_"<<endl;
+		hpp<<"#define _r3_model_hpp_"<<endl;
+		hpp<<endl;
+
+		BOOST_FOREACH(std::string schemaName, schemas)
+		{
+			hpp<<"#include \"r3/model/"<<schemaName<<".hpp\""<<endl;
+		}
+		hpp<<endl;
+
+		hpp<<"namespace r3"<<endl<<"{"<<endl;
+
+		hpp<<"class Model"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"public:"<<endl;
+		hpp<<"};"<<endl;
+		hpp<<endl;
+
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+
+		hpp<<"#endif"<<endl;
+		hpp<<endl;
+		hpp.close();
+		out::styler_cpp(hpp.pathName());
+
+	}
+
+	void WSchema::processModel_cpp(const std::set<std::string> &schemas)
+	{
+
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void WSchema::processSchema(const std::string &name, const std::set<Category> &cats)

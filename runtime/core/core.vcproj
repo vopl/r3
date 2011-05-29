@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="core"
 	ProjectGUID="{A52B51E4-E717-4F19-BD43-4BE941420B08}"
 	RootNamespace="core"
@@ -398,6 +398,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\r3\model.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\r3\schemaBase.hpp"
 					>
 				</File>
@@ -508,66 +512,6 @@
 						RelativePath="..\include\r3\fields\video.h"
 						>
 					</File>
-				</Filter>
-				<Filter
-					Name="model"
-					>
-					<File
-						RelativePath="..\include\r3\model\common.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\include\r3\model\common2.hpp"
-						>
-					</File>
-					<Filter
-						Name="common"
-						>
-						<File
-							RelativePath="..\include\r3\model\common\Category1.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\include\r3\model\common\Department.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\include\r3\model\common\HasRights.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\include\r3\model\common\Owner.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\include\r3\model\common\Right.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\include\r3\model\common\Role.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\include\r3\model\common\User.hpp"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="common2"
-						>
-						<File
-							RelativePath="..\include\r3\model\common2\Category2.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\include\r3\model\common2\Category3.hpp"
-							>
-						</File>
-						<File
-							RelativePath="..\include\r3\model\common2\Category4.hpp"
-							>
-						</File>
-					</Filter>
 				</Filter>
 				<Filter
 					Name="relations"

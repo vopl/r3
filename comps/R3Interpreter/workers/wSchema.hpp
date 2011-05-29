@@ -23,6 +23,10 @@ namespace workers
 		void operator()(const std::set<FCO> &roots);
 
 	private:
+		void processModel(const std::set<std::string> &schemas);
+		void processModel_hpp(const std::set<std::string> &schemas);
+		void processModel_cpp(const std::set<std::string> &schemas);
+
 		void processSchema(const std::string &name, const std::set<Category> &cats);
 		void processSchema_hpp(const std::string &name, const std::set<Category> &cats);
 		void processSchema_cpp(const std::string &name, const std::set<Category> &cats);

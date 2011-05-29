@@ -2,8 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "r3/model/common.hpp"
-#include "r3/model/common2.hpp"
+#include "r3/model.hpp"
 #include "pgc/connection.hpp"
 
 /*
