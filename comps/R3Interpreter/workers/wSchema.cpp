@@ -67,6 +67,7 @@ namespace workers
 	void WSchema::processModel_hpp(const std::set<std::string> &schemas)
 	{
 		out::File hpp(_path / "include/r3/model.hpp");
+		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
 
 		hpp<<"#ifndef _r3_model_hpp_"<<endl;
 		hpp<<"#define _r3_model_hpp_"<<endl;
@@ -126,6 +127,7 @@ namespace workers
 	void WSchema::processSchema_hpp(const std::string &name, const std::set<Category> &cats)
 	{
 		out::File hpp(_path / "include/r3/model" / (name+".hpp"));
+		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
 
 		hpp<<"#ifndef _r3_model_"<<name<<"_hpp_"<<endl;
 		hpp<<"#define _r3_model_"<<name<<"_hpp_"<<endl;
@@ -298,6 +300,7 @@ namespace workers
 
 
 		out::File hpp(_path / "include/r3/model" / cat->getSchema() / (name+".hpp"));
+		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
 
 		hpp<<"#ifndef _r3_model_"<<cat->getSchema()<<"_"<<name<<"_hpp_"<<endl;
 		hpp<<"#define _r3_model_"<<cat->getSchema()<<"_"<<name<<"_hpp_"<<endl;

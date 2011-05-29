@@ -1,3 +1,5 @@
+// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!
+
 #ifndef _r3_model_common2_Category2_hpp_
 #define _r3_model_common2_Category2_hpp_
 
