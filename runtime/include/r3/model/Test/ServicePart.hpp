@@ -23,34 +23,8 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
-				template <class Oper> void enumBasesFirst(Oper o)
-				{
-				}
-				
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
-				{
-					//ServicePart
-					ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-					o(this, c_ServicePart, (r3::fields::String *)NULL, "comment");
-					o(this, c_ServicePart, (r3::fields::Money *)NULL, "cost");
-					o(this, c_ServicePart, (r3::fields::DateTimeInterval *)NULL, "duration");
-					o(this, c_ServicePart, (r3::fields::Date *)NULL, "start");
-					o(this, c_ServicePart, (r3::fields::Date *)NULL, "stop");
-				}
-				
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
-				{
-					//ServicePart
-					ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-					o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n<Document>*)NULL,	"documents",	(r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	rs_src);
-					o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one<Service>*)NULL,	"service",	(r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	rs_dst);
-				}
-				
-				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
-				{
-					//ServicePart
-				}
-				
+			public:
+			
 			public:
 				struct Tuple
 						: public CategoryBase<ServicePart>::Tuple
@@ -60,36 +34,74 @@ namespace r3
 					r3::fields::DateTimeInterval duration;
 					r3::fields::Date start;
 					r3::fields::Date stop;
-					r3::relations::Relation2n<Document> documents;
 					r3::relations::Relation2one<Service> service;
+					r3::relations::Relation2n<Document> documents;
 				};
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
-				typedef Test Schema;
-				typedef boost::shared_ptr<Test> Schema_ptr;
-				typedef boost::weak_ptr<Test> Schema_wtr;
-			protected:
-				Schema *_schema;
+				template <class Oper> void enumBasesFirst(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				ServicePart(Schema *s)
-					: CategoryBase<ServicePart>("ServicePart")
-					, _schema(s)
-				{
-				}
+				ServicePart(Test *s);
+				~ServicePart();
+				Test *schema();
 				
-				~ServicePart()
-				{
-				}
-				
-				Schema *schema()
-				{
-					return _schema;
-				}
+			protected:
+				Test *_schema;
 				
 			};
 			typedef boost::shared_ptr<ServicePart> ServicePart_ptr;
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			template <class Oper> void ServicePart::enumBasesFirst(Oper o)
+			{
+			}
+			
+			template <class Oper> void ServicePart::enumFieldsFromBasesAndSelf(Oper o)
+			{
+				//ServicePart
+				ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
+				o(this, c_ServicePart, (r3::fields::String *)NULL, "comment");
+				o(this, c_ServicePart, (r3::fields::Money *)NULL, "cost");
+				o(this, c_ServicePart, (r3::fields::DateTimeInterval *)NULL, "duration");
+				o(this, c_ServicePart, (r3::fields::Date *)NULL, "start");
+				o(this, c_ServicePart, (r3::fields::Date *)NULL, "stop");
+			}
+			
+			template <class Oper> void ServicePart::enumRelationsFromBasesAndSelf(Oper o)
+			{
+				//ServicePart
+				ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
+				o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one<Service>*)NULL,	"service",	(r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	rs_dst);
+				o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n<Document>*)NULL,	"documents",	(r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	rs_src);
+			}
+			
+			template <class Oper> void ServicePart::enumIndicesFromBasesAndSelf(Oper o)
+			{
+				//ServicePart
+			}
+			
+			inline ServicePart::ServicePart(Test *s)
+				: CategoryBase<ServicePart>("ServicePart")
+				, _schema(s)
+			{
+			}
+			
+			inline ServicePart::~ServicePart()
+			{
+			}
+			
+			inline Test *ServicePart::schema()
+			{
+				return _schema;
+			}
+			
 		}
 	}
 }

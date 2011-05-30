@@ -414,10 +414,11 @@ namespace workers
 		hpp<<endl;
 
 		hpp<<"public:"<<endl;
-
 		hpp<<"static const bool isAbstract = "<<(cat->isAbstract()?"true":"false")<<";"<<endl;
 		hpp<<endl;
 
+
+		hpp<<"public:"<<endl;
 		//домены
 		std::set<FCO> enums = cat->getChildFCOsAs("Enum");
 		std::set<FCO> sets = cat->getChildFCOsAs("Set");
@@ -439,211 +440,7 @@ namespace workers
 			hpp<<endl;
 		}
 
-
-
-		//перечисление базовых
-		hpp<<"template <class Oper> void enumBasesFirst(Oper o)"<<endl;
-		hpp<<"{"<<endl;
-		BOOST_FOREACH(Category bcat, orderByName(basesFirst))
-		{
-			assert(bcat->getSchema() == cat->getSchema());
-			hpp<<"o(this, schema()->getCategory<"<<bcat->getName()<<">().get());"<<endl;
-		}
-		hpp<<"}"<<endl;
 		hpp<<endl;
-
-
-		//поля свои и все от базовых
-		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)"<<endl;
-		hpp<<"{"<<endl;
-		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
-		{
-			hpp<<"//"<<cat->getName()<<endl;
-
-			
-			std::set<BON::FCO> fcos = cat->getChildFCOs();
-			std::set<Field> fields(fcos.begin(), fcos.end());
-			if(fields.empty()) continue;
-
-			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
-
-			BOOST_FOREACH(Field fld, orderByName(fields))
-			{
-				if(!fld) continue;
-
-				hpp
-					<<"o(this, c_"<<cat->getName()<<", "
-					<<"(r3::fields::"<<fld->getObjectMeta().name();
-					
-				if(Scanty(fld))
-				{
-					Category pcat = fld->getParentModel();
-					hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
-				}
-					
-				hpp
-					<<"*)NULL, "
-					<<"\""<<fld->getName()<<"\""
-					<<");"
-					<<endl;
-			}
-		}
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-
-
-
-
-
-
-
-
-
-
-		//связи свои и все от базовых
-		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)"<<endl;
-		hpp<<"{"<<endl;
-		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
-		{
-			hpp<<"//"<<cat->getName()<<endl;
-
-			//std::set<BON::FCO> fields = cat->getChildFCOs();
-			std::set<CategoryRelation> rels;
-			collectRelations(rels, cat, true, true);
-
-			if(rels.empty()) continue;
-
-			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
-
-			BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
-			{
-				assert(rel);
-
-				Category src = rel->getSrc();
-				if(!src) src = CategoryReference(rel->getSrc())->getCategory();
-
-				Category dst = rel->getDst();
-				if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
-
-				hpp<<"o(this, c_"<<cat->getName()<<", ";
-
-				if(src == cat)
-				{
-					hpp<<"_schema->getCategory<"<<dst->getName()<<">().get(), ";
-
-					switch(rel->getMultiplier1())
-					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
-					}
-					hpp<<"<"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
-
-					switch(rel->getMultiplier2())
-					{
-					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
-					}
-					hpp<<"<"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
-
-					hpp<<"rs_src";
-				}
-				else
-				{
-					hpp<<"_schema->getCategory<"<<src->getName()<<">().get(), ";
-					switch(rel->getMultiplier2())
-					{
-					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
-					}
-					hpp<<"<"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
-
-					switch(rel->getMultiplier1())
-					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
-					}
-					hpp<<"<"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
-
-					hpp<<"rs_dst";
-				}
-
-				hpp<<");"<<endl;
-			}
-		}
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-
-
-
-
-
-
-		//индексы свои и все от базовых
-		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)"<<endl;
-		hpp<<"{"<<endl;
-		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
-		{
-			hpp<<"//"<<cat->getName()<<endl;
-
-			std::set<Index> indices = cat->getIndex();
-			if(indices.empty()) continue;
-
-			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
-
-			BOOST_FOREACH(Index ind, orderByName(indices))
-			{
-				assert(ind);
-
-				if(ind->getInIndexOnCategoryFieldLinks().empty()) continue;
-
-				hpp<<"o(this, c_"<<cat->getName()<<", ";
-				hpp<<"\""<<ind->getName()<<"\", ";
-
-				switch(ind->getIndexType())
-				{
-				case IndexImpl::tree_IndexType_Type:
-					hpp<<"im_tree";
-					break;
-				case IndexImpl::hash_IndexType_Type:
-					hpp<<"im_hash";
-					break;
-				default:
-					hpp<<"im_tree";
-					assert(!"unknown index method!");
-				}
-
-				std::set<Field> targetFields;
-				BOOST_FOREACH(IndexOnCategoryField link, ind->getInIndexOnCategoryFieldLinks())
-				{
-					targetFields.insert(link->getSrc());
-				}
-
-				BOOST_FOREACH(Field fld, orderByName(targetFields))
-				{
-					hpp<<", (r3::fields::"<<fld->getObjectMeta().name();
-					if(Scanty(fld))
-					{
-						Category pcat = fld->getParentModel();
-						hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
-					}
-					hpp<<"*)NULL, ";
-					hpp<<"\""<<fld->getName()<<"\"";
-				}
-
-				hpp<<");"<<endl;
-			}
-		}
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-
-
 
 
 
@@ -737,19 +534,253 @@ namespace workers
 
 
 		hpp<<"public:"<<endl;
-		//тип схемы
-		hpp<<"typedef "<<cat->getSchema()<<" Schema;"<<endl;
-		hpp<<"typedef boost::shared_ptr<"<<cat->getSchema()<<"> Schema_ptr;"<<endl;
-		hpp<<"typedef boost::weak_ptr<"<<cat->getSchema()<<"> Schema_wtr;"<<endl;
+		//перечисление базовых
+		hpp<<"template <class Oper> void enumBasesFirst(Oper o);"<<endl;
 
-		hpp<<"protected:"<<endl;
-		hpp<<"Schema *_schema;"<<endl;
+		//поля свои и все от базовых
+		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);"<<endl;
+
+		//связи свои и все от базовых
+		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);"<<endl;
+
+		//индексы свои и все от базовых
+		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);"<<endl;
 		hpp<<endl;
+
 
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<""<<name<<"(Schema *s)"<<endl;
+		hpp<<""<<name<<"("<<cat->getSchema()<<" *s);"<<endl;
+
+		//деструктор
+		hpp<<"~"<<name<<"();"<<endl;
+
+		//геттер для схемы
+		hpp<<""<<cat->getSchema()<<" *schema();"<<endl;
+		hpp<<endl;
+
+		hpp<<"protected:"<<endl;
+		hpp<<""<<cat->getSchema()<<" *_schema;"<<endl;
+		hpp<<endl;
+
+		hpp<<"};"<<endl;
+		//конец класса
+
+		//указатель
+		hpp<<"typedef boost::shared_ptr<"<<name<<"> "<<name<<"_ptr;"<<endl;
+
+
+		hpp<<endl;
+		hpp<<endl;
+
+		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
+		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
+
+		//перечисление базовых
+		hpp<<"template <class Oper> void "<<name<<"::enumBasesFirst(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		BOOST_FOREACH(Category bcat, orderByName(basesFirst))
+		{
+			assert(bcat->getSchema() == cat->getSchema());
+			hpp<<"o(this, schema()->getCategory<"<<bcat->getName()<<">().get());"<<endl;
+		}
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+
+		//поля свои и все от базовых
+		hpp<<"template <class Oper> void "<<name<<"::enumFieldsFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
+		{
+			hpp<<"//"<<cat->getName()<<endl;
+
+
+			std::set<BON::FCO> fcos = cat->getChildFCOs();
+			std::set<Field> fields(fcos.begin(), fcos.end());
+			if(fields.empty()) continue;
+
+			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
+
+			BOOST_FOREACH(Field fld, orderByName(fields))
+			{
+				if(!fld) continue;
+
+				hpp
+					<<"o(this, c_"<<cat->getName()<<", "
+					<<"(r3::fields::"<<fld->getObjectMeta().name();
+
+				if(Scanty(fld))
+				{
+					Category pcat = fld->getParentModel();
+					hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+				}
+
+				hpp
+					<<"*)NULL, "
+					<<"\""<<fld->getName()<<"\""
+					<<");"
+					<<endl;
+			}
+		}
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+
+
+
+
+
+
+
+
+
+
+		//связи свои и все от базовых
+		hpp<<"template <class Oper> void "<<name<<"::enumRelationsFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
+		{
+			hpp<<"//"<<cat->getName()<<endl;
+
+			//std::set<BON::FCO> fields = cat->getChildFCOs();
+			std::set<CategoryRelation> rels;
+			collectRelations(rels, cat, true, true);
+
+			if(rels.empty()) continue;
+
+			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
+
+			BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
+			{
+				assert(rel);
+
+				Category src = rel->getSrc();
+				if(!src) src = CategoryReference(rel->getSrc())->getCategory();
+
+				Category dst = rel->getDst();
+				if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
+
+				hpp<<"o(this, c_"<<cat->getName()<<", ";
+
+				if(src == cat)
+				{
+					hpp<<"_schema->getCategory<"<<dst->getName()<<">().get(), ";
+
+					switch(rel->getMultiplier1())
+					{
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
+					}
+					hpp<<"<"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
+
+					switch(rel->getMultiplier2())
+					{
+					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
+					}
+					hpp<<"<"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
+
+					hpp<<"rs_src";
+				}
+				else
+				{
+					hpp<<"_schema->getCategory<"<<src->getName()<<">().get(), ";
+					switch(rel->getMultiplier2())
+					{
+					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
+					}
+					hpp<<"<"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
+
+					switch(rel->getMultiplier1())
+					{
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
+					}
+					hpp<<"<"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
+
+					hpp<<"rs_dst";
+				}
+
+				hpp<<");"<<endl;
+			}
+		}
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+
+
+
+
+
+
+		//индексы свои и все от базовых
+		hpp<<"template <class Oper> void "<<name<<"::enumIndicesFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"{"<<endl;
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
+		{
+			hpp<<"//"<<cat->getName()<<endl;
+
+			std::set<Index> indices = cat->getIndex();
+			if(indices.empty()) continue;
+
+			hpp<<cat->getName()<<"* c_"<<cat->getName()<<" = _schema->getCategory<"<<cat->getName()<<">().get();"<<endl;
+
+			BOOST_FOREACH(Index ind, orderByName(indices))
+			{
+				assert(ind);
+
+				if(ind->getInIndexOnCategoryFieldLinks().empty()) continue;
+
+				hpp<<"o(this, c_"<<cat->getName()<<", ";
+				hpp<<"\""<<ind->getName()<<"\", ";
+
+				switch(ind->getIndexType())
+				{
+				case IndexImpl::tree_IndexType_Type:
+					hpp<<"im_tree";
+					break;
+				case IndexImpl::hash_IndexType_Type:
+					hpp<<"im_hash";
+					break;
+				default:
+					hpp<<"im_tree";
+					assert(!"unknown index method!");
+				}
+
+				std::set<Field> targetFields;
+				BOOST_FOREACH(IndexOnCategoryField link, ind->getInIndexOnCategoryFieldLinks())
+				{
+					targetFields.insert(link->getSrc());
+				}
+
+				BOOST_FOREACH(Field fld, orderByName(targetFields))
+				{
+					hpp<<", (r3::fields::"<<fld->getObjectMeta().name();
+					if(Scanty(fld))
+					{
+						Category pcat = fld->getParentModel();
+						hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+					}
+					hpp<<"*)NULL, ";
+					hpp<<"\""<<fld->getName()<<"\"";
+				}
+
+				hpp<<");"<<endl;
+			}
+		}
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+
+		//конструктор
+		hpp<<"inline "<<name<<"::"<<name<<"("<<cat->getSchema()<<" *s)"<<endl;
 		hpp<<": CategoryBase<"<<name<<">(\""<<name<<"\")"<<endl;
 		hpp<<", _schema(s)"<<endl;
 		hpp<<"{"<<endl;
@@ -757,24 +788,18 @@ namespace workers
 		hpp<<endl;
 
 		//деструктор
-		hpp<<"~"<<name<<"()"<<endl;
+		hpp<<"inline "<<name<<"::"<<"~"<<name<<"()"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
 		//геттер для схемы
-		hpp<<"Schema *schema()"<<endl;
+		hpp<<"inline "<<cat->getSchema()<<" *"<<name<<"::schema()"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<"return _schema;"<<endl;
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
-
-		hpp<<"};"<<endl;
-		//конец класса
-
-		//указатель
-		hpp<<"typedef boost::shared_ptr<"<<name<<"> "<<name<<"_ptr;"<<endl;
 
 		//конец пространства имен
 		hpp<<"}"<<endl<<"}"<<endl<<"}"<<endl;

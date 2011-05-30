@@ -26,35 +26,8 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
-				template <class Oper> void enumBasesFirst(Oper o)
-				{
-					o(this, schema()->getCategory<Owner>().get());
-				}
-				
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
-				{
-					//Department
-					Department *c_Department = _schema->getCategory<Department>().get();
-					o(this, c_Department, (r3::fields::String *)NULL, "name");
-					//Owner
-				}
-				
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
-				{
-					//Department
-					Department *c_Department = _schema->getCategory<Department>().get();
-					o(this, c_Department, _schema->getCategory<Owner>().get(), (r3::relations::Relation2one<Owner>*)NULL,	"parent",	(r3::relations::Relation2n<Department>*)NULL,	"childs",	rs_src);
-					//Owner
-					Owner *c_Owner = _schema->getCategory<Owner>().get();
-					o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)NULL,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
-				}
-				
-				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
-				{
-					//Department
-					//Owner
-				}
-				
+			public:
+			
 			public:
 				struct Tuple
 						: public Owner::Tuple
@@ -65,30 +38,69 @@ namespace r3
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
-				typedef V1 Schema;
-				typedef boost::shared_ptr<V1> Schema_ptr;
-				typedef boost::weak_ptr<V1> Schema_wtr;
-			protected:
-				Schema *_schema;
+				template <class Oper> void enumBasesFirst(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				Department(Schema *s)
-					: CategoryBase<Department>("Department")
-					, _schema(s)
-				{
-				}
+				Department(V1 *s);
+				~Department();
+				V1 *schema();
 				
-				~Department()
-				{
-				}
-				
-				Schema *schema()
-				{
-					return _schema;
-				}
+			protected:
+				V1 *_schema;
 				
 			};
 			typedef boost::shared_ptr<Department> Department_ptr;
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			template <class Oper> void Department::enumBasesFirst(Oper o)
+			{
+				o(this, schema()->getCategory<Owner>().get());
+			}
+			
+			template <class Oper> void Department::enumFieldsFromBasesAndSelf(Oper o)
+			{
+				//Department
+				Department *c_Department = _schema->getCategory<Department>().get();
+				o(this, c_Department, (r3::fields::String *)NULL, "name");
+				//Owner
+			}
+			
+			template <class Oper> void Department::enumRelationsFromBasesAndSelf(Oper o)
+			{
+				//Department
+				Department *c_Department = _schema->getCategory<Department>().get();
+				o(this, c_Department, _schema->getCategory<Owner>().get(), (r3::relations::Relation2one<Owner>*)NULL,	"parent",	(r3::relations::Relation2n<Department>*)NULL,	"childs",	rs_src);
+				//Owner
+				Owner *c_Owner = _schema->getCategory<Owner>().get();
+				o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)NULL,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
+			}
+			
+			template <class Oper> void Department::enumIndicesFromBasesAndSelf(Oper o)
+			{
+				//Department
+				//Owner
+			}
+			
+			inline Department::Department(V1 *s)
+				: CategoryBase<Department>("Department")
+				, _schema(s)
+			{
+			}
+			
+			inline Department::~Department()
+			{
+			}
+			
+			inline V1 *Department::schema()
+			{
+				return _schema;
+			}
+			
 		}
 	}
 }

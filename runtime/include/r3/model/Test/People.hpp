@@ -23,39 +23,13 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
+			public:
 				struct Domainsex
 				{
 					static const size_t amount = 0;
 					static const char *values[amount];
 				};
 				
-				template <class Oper> void enumBasesFirst(Oper o)
-				{
-				}
-				
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
-				{
-					//People
-					People *c_People = _schema->getCategory<People>().get();
-					o(this, c_People, (r3::fields::Date *)NULL, "birth");
-					o(this, c_People, (r3::fields::String *)NULL, "middlename");
-					o(this, c_People, (r3::fields::String *)NULL, "name");
-					o(this, c_People, (r3::fields::Image *)NULL, "photo");
-					o(this, c_People, (r3::fields::Enum<People::Domainsex>*)NULL, "sex");
-					o(this, c_People, (r3::fields::String *)NULL, "surname");
-				}
-				
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
-				{
-					//People
-					People *c_People = _schema->getCategory<People>().get();
-					o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
-				}
-				
-				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
-				{
-					//People
-				}
 				
 			public:
 				struct Tuple
@@ -72,30 +46,68 @@ namespace r3
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
-				typedef Test Schema;
-				typedef boost::shared_ptr<Test> Schema_ptr;
-				typedef boost::weak_ptr<Test> Schema_wtr;
-			protected:
-				Schema *_schema;
+				template <class Oper> void enumBasesFirst(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				People(Schema *s)
-					: CategoryBase<People>("People")
-					, _schema(s)
-				{
-				}
+				People(Test *s);
+				~People();
+				Test *schema();
 				
-				~People()
-				{
-				}
-				
-				Schema *schema()
-				{
-					return _schema;
-				}
+			protected:
+				Test *_schema;
 				
 			};
 			typedef boost::shared_ptr<People> People_ptr;
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			template <class Oper> void People::enumBasesFirst(Oper o)
+			{
+			}
+			
+			template <class Oper> void People::enumFieldsFromBasesAndSelf(Oper o)
+			{
+				//People
+				People *c_People = _schema->getCategory<People>().get();
+				o(this, c_People, (r3::fields::Date *)NULL, "birth");
+				o(this, c_People, (r3::fields::String *)NULL, "middlename");
+				o(this, c_People, (r3::fields::String *)NULL, "name");
+				o(this, c_People, (r3::fields::Image *)NULL, "photo");
+				o(this, c_People, (r3::fields::Enum<People::Domainsex>*)NULL, "sex");
+				o(this, c_People, (r3::fields::String *)NULL, "surname");
+			}
+			
+			template <class Oper> void People::enumRelationsFromBasesAndSelf(Oper o)
+			{
+				//People
+				People *c_People = _schema->getCategory<People>().get();
+				o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
+			}
+			
+			template <class Oper> void People::enumIndicesFromBasesAndSelf(Oper o)
+			{
+				//People
+			}
+			
+			inline People::People(Test *s)
+				: CategoryBase<People>("People")
+				, _schema(s)
+			{
+			}
+			
+			inline People::~People()
+			{
+			}
+			
+			inline Test *People::schema()
+			{
+				return _schema;
+			}
+			
 		}
 	}
 }

@@ -23,27 +23,8 @@ namespace r3
 			public:
 				static const bool isAbstract = true;
 				
-				template <class Oper> void enumBasesFirst(Oper o)
-				{
-				}
-				
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
-				{
-					//Owner
-				}
-				
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
-				{
-					//Owner
-					Owner *c_Owner = _schema->getCategory<Owner>().get();
-					o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)NULL,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
-				}
-				
-				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
-				{
-					//Owner
-				}
-				
+			public:
+			
 			public:
 				struct Tuple
 						: public CategoryBase<Owner>::Tuple
@@ -53,30 +34,61 @@ namespace r3
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
-				typedef V1 Schema;
-				typedef boost::shared_ptr<V1> Schema_ptr;
-				typedef boost::weak_ptr<V1> Schema_wtr;
-			protected:
-				Schema *_schema;
+				template <class Oper> void enumBasesFirst(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				Owner(Schema *s)
-					: CategoryBase<Owner>("Owner")
-					, _schema(s)
-				{
-				}
+				Owner(V1 *s);
+				~Owner();
+				V1 *schema();
 				
-				~Owner()
-				{
-				}
-				
-				Schema *schema()
-				{
-					return _schema;
-				}
+			protected:
+				V1 *_schema;
 				
 			};
 			typedef boost::shared_ptr<Owner> Owner_ptr;
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			template <class Oper> void Owner::enumBasesFirst(Oper o)
+			{
+			}
+			
+			template <class Oper> void Owner::enumFieldsFromBasesAndSelf(Oper o)
+			{
+				//Owner
+			}
+			
+			template <class Oper> void Owner::enumRelationsFromBasesAndSelf(Oper o)
+			{
+				//Owner
+				Owner *c_Owner = _schema->getCategory<Owner>().get();
+				o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)NULL,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
+			}
+			
+			template <class Oper> void Owner::enumIndicesFromBasesAndSelf(Oper o)
+			{
+				//Owner
+			}
+			
+			inline Owner::Owner(V1 *s)
+				: CategoryBase<Owner>("Owner")
+				, _schema(s)
+			{
+			}
+			
+			inline Owner::~Owner()
+			{
+			}
+			
+			inline V1 *Owner::schema()
+			{
+				return _schema;
+			}
+			
 		}
 	}
 }

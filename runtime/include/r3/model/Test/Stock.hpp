@@ -23,37 +23,13 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
+			public:
 				struct DomainsecurityStatus
 				{
 					static const size_t amount = 3;
 					static const char *values[amount];
 				};
 				
-				template <class Oper> void enumBasesFirst(Oper o)
-				{
-				}
-				
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
-				{
-					//Stock
-					Stock *c_Stock = _schema->getCategory<Stock>().get();
-					o(this, c_Stock, (r3::fields::Money *)NULL, "cost");
-					o(this, c_Stock, (r3::fields::Date *)NULL, "incomingDate");
-					o(this, c_Stock, (r3::fields::String *)NULL, "inventoryNumber");
-					o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)NULL, "securityStatus");
-				}
-				
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
-				{
-					//Stock
-					Stock *c_Stock = _schema->getCategory<Stock>().get();
-					o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"services",	(r3::relations::Relation2n<Stock>*)NULL,	"stocks",	rs_dst);
-				}
-				
-				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
-				{
-					//Stock
-				}
 				
 			public:
 				struct Tuple
@@ -68,30 +44,66 @@ namespace r3
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
-				typedef Test Schema;
-				typedef boost::shared_ptr<Test> Schema_ptr;
-				typedef boost::weak_ptr<Test> Schema_wtr;
-			protected:
-				Schema *_schema;
+				template <class Oper> void enumBasesFirst(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				Stock(Schema *s)
-					: CategoryBase<Stock>("Stock")
-					, _schema(s)
-				{
-				}
+				Stock(Test *s);
+				~Stock();
+				Test *schema();
 				
-				~Stock()
-				{
-				}
-				
-				Schema *schema()
-				{
-					return _schema;
-				}
+			protected:
+				Test *_schema;
 				
 			};
 			typedef boost::shared_ptr<Stock> Stock_ptr;
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			template <class Oper> void Stock::enumBasesFirst(Oper o)
+			{
+			}
+			
+			template <class Oper> void Stock::enumFieldsFromBasesAndSelf(Oper o)
+			{
+				//Stock
+				Stock *c_Stock = _schema->getCategory<Stock>().get();
+				o(this, c_Stock, (r3::fields::Money *)NULL, "cost");
+				o(this, c_Stock, (r3::fields::Date *)NULL, "incomingDate");
+				o(this, c_Stock, (r3::fields::String *)NULL, "inventoryNumber");
+				o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)NULL, "securityStatus");
+			}
+			
+			template <class Oper> void Stock::enumRelationsFromBasesAndSelf(Oper o)
+			{
+				//Stock
+				Stock *c_Stock = _schema->getCategory<Stock>().get();
+				o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"services",	(r3::relations::Relation2n<Stock>*)NULL,	"stocks",	rs_dst);
+			}
+			
+			template <class Oper> void Stock::enumIndicesFromBasesAndSelf(Oper o)
+			{
+				//Stock
+			}
+			
+			inline Stock::Stock(Test *s)
+				: CategoryBase<Stock>("Stock")
+				, _schema(s)
+			{
+			}
+			
+			inline Stock::~Stock()
+			{
+			}
+			
+			inline Test *Stock::schema()
+			{
+				return _schema;
+			}
+			
 		}
 	}
 }

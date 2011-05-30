@@ -26,37 +26,8 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
-				template <class Oper> void enumBasesFirst(Oper o)
-				{
-					o(this, schema()->getCategory<Document>().get());
-				}
-				
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
-				{
-					//Document
-					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, (r3::fields::Date *)NULL, "creation");
-					o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
-					//Letter
-					Letter *c_Letter = _schema->getCategory<Letter>().get();
-					o(this, c_Letter, (r3::fields::String *)NULL, "comment");
-					o(this, c_Letter, (r3::fields::String *)NULL, "content");
-				}
-				
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
-				{
-					//Document
-					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
-					//Letter
-				}
-				
-				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
-				{
-					//Document
-					//Letter
-				}
-				
+			public:
+			
 			public:
 				struct Tuple
 						: public Document::Tuple
@@ -67,30 +38,71 @@ namespace r3
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
-				typedef Test Schema;
-				typedef boost::shared_ptr<Test> Schema_ptr;
-				typedef boost::weak_ptr<Test> Schema_wtr;
-			protected:
-				Schema *_schema;
+				template <class Oper> void enumBasesFirst(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				Letter(Schema *s)
-					: CategoryBase<Letter>("Letter")
-					, _schema(s)
-				{
-				}
+				Letter(Test *s);
+				~Letter();
+				Test *schema();
 				
-				~Letter()
-				{
-				}
-				
-				Schema *schema()
-				{
-					return _schema;
-				}
+			protected:
+				Test *_schema;
 				
 			};
 			typedef boost::shared_ptr<Letter> Letter_ptr;
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			template <class Oper> void Letter::enumBasesFirst(Oper o)
+			{
+				o(this, schema()->getCategory<Document>().get());
+			}
+			
+			template <class Oper> void Letter::enumFieldsFromBasesAndSelf(Oper o)
+			{
+				//Document
+				Document *c_Document = _schema->getCategory<Document>().get();
+				o(this, c_Document, (r3::fields::Date *)NULL, "creation");
+				o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
+				//Letter
+				Letter *c_Letter = _schema->getCategory<Letter>().get();
+				o(this, c_Letter, (r3::fields::String *)NULL, "comment");
+				o(this, c_Letter, (r3::fields::String *)NULL, "content");
+			}
+			
+			template <class Oper> void Letter::enumRelationsFromBasesAndSelf(Oper o)
+			{
+				//Document
+				Document *c_Document = _schema->getCategory<Document>().get();
+				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
+				//Letter
+			}
+			
+			template <class Oper> void Letter::enumIndicesFromBasesAndSelf(Oper o)
+			{
+				//Document
+				//Letter
+			}
+			
+			inline Letter::Letter(Test *s)
+				: CategoryBase<Letter>("Letter")
+				, _schema(s)
+			{
+			}
+			
+			inline Letter::~Letter()
+			{
+			}
+			
+			inline Test *Letter::schema()
+			{
+				return _schema;
+			}
+			
 		}
 	}
 }

@@ -23,29 +23,8 @@ namespace r3
 			public:
 				static const bool isAbstract = true;
 				
-				template <class Oper> void enumBasesFirst(Oper o)
-				{
-				}
-				
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o)
-				{
-					//HasRights
-					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-					o(this, c_HasRights, (r3::fields::Bool *)NULL, "attrInHasRights");
-				}
-				
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
-				{
-					//HasRights
-					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-					o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)NULL,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
-				}
-				
-				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
-				{
-					//HasRights
-				}
-				
+			public:
+			
 			public:
 				struct Tuple
 						: public CategoryBase<HasRights>::Tuple
@@ -56,30 +35,63 @@ namespace r3
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
-				typedef V1 Schema;
-				typedef boost::shared_ptr<V1> Schema_ptr;
-				typedef boost::weak_ptr<V1> Schema_wtr;
-			protected:
-				Schema *_schema;
+				template <class Oper> void enumBasesFirst(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				HasRights(Schema *s)
-					: CategoryBase<HasRights>("HasRights")
-					, _schema(s)
-				{
-				}
+				HasRights(V1 *s);
+				~HasRights();
+				V1 *schema();
 				
-				~HasRights()
-				{
-				}
-				
-				Schema *schema()
-				{
-					return _schema;
-				}
+			protected:
+				V1 *_schema;
 				
 			};
 			typedef boost::shared_ptr<HasRights> HasRights_ptr;
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			template <class Oper> void HasRights::enumBasesFirst(Oper o)
+			{
+			}
+			
+			template <class Oper> void HasRights::enumFieldsFromBasesAndSelf(Oper o)
+			{
+				//HasRights
+				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
+				o(this, c_HasRights, (r3::fields::Bool *)NULL, "attrInHasRights");
+			}
+			
+			template <class Oper> void HasRights::enumRelationsFromBasesAndSelf(Oper o)
+			{
+				//HasRights
+				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
+				o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)NULL,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
+			}
+			
+			template <class Oper> void HasRights::enumIndicesFromBasesAndSelf(Oper o)
+			{
+				//HasRights
+			}
+			
+			inline HasRights::HasRights(V1 *s)
+				: CategoryBase<HasRights>("HasRights")
+				, _schema(s)
+			{
+			}
+			
+			inline HasRights::~HasRights()
+			{
+			}
+			
+			inline V1 *HasRights::schema()
+			{
+				return _schema;
+			}
+			
 		}
 	}
 }
