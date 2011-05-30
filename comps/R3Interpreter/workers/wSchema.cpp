@@ -208,19 +208,51 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<""<<name<<"(Model *model, const char *id)"<<endl;
+		hpp<<""<<name<<"(Model *model, const char *id);"<<endl;
+		//деструктор
+		hpp<<"~"<<name<<"();"<<endl;
+		hpp<<endl;
+
+		//перечисление типизированных экземпляров категорий
+		hpp<<"template <class Oper> void enumCategories(Oper o);"<<endl;
+
+
+		//шаблон для доступа к экземпляру по типу
+		hpp<<"template <class C> boost::shared_ptr<C> getCategory();"<<endl;
+		hpp<<endl;
+
+		//геттеры для категорий
+		BOOST_FOREACH(Category cat, orderByName(cats))
+		{
+			hpp<<"s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<"get"<<cat->getName()<<"();"<<endl;
+		}
+		hpp<<endl;
+
+		hpp<<"};"<<endl;
+		//конец класса
+
+
+		hpp<<endl;
+		hpp<<endl;
+		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
+		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
+		
+
+		//конструктор
+		hpp<<"inline "<<name<<"::"<<name<<"(Model *model, const char *id)"<<endl;
 		hpp<<": SchemaBase<"<<name<<">(model, id, \""<<name<<"\")"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<"init();"<<endl;
 		hpp<<"}"<<endl;
 
 		//деструктор
-		hpp<<"~"<<name<<"()"<<endl;
-		hpp<<"{}"<<endl;
+		hpp<<"inline "<<name<<"::~"<<name<<"()"<<endl;
+		hpp<<"{"<<endl<<"}"<<endl;
 		hpp<<endl;
 
+
 		//перечисление типизированных экземпляров категорий
-		hpp<<"template <class Oper> void enumCategories(Oper o)"<<endl;
+		hpp<<"template <class Oper> void "<<name<<"::enumCategories(Oper o)"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<""<<name<<" *s = ("<<name<<"*)this;"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(cats))
@@ -232,27 +264,7 @@ namespace workers
 		hpp<<endl;
 
 
-		//шаблон для доступа к экземпляру по типу
-		hpp<<"template <class C> boost::shared_ptr<C> getCategory();"<<endl;
-// 		hpp<<"{"<<endl;
-// 		hpp<<"return boost::shared_ptr<C>();"<<endl;
-// 		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		//геттеры для категорий
-		BOOST_FOREACH(Category cat, orderByName(cats))
-		{
-			hpp<<"s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<"get"<<cat->getName()<<"()"<<endl;
-			hpp<<"{"<<endl;
-			hpp<<"return _"<<cat->getName()<<";";
-			hpp<<"}"<<endl;
-			hpp<<endl;
-		}
-		hpp<<endl;
-
-		hpp<<"};"<<endl;
-		//конец класса
-
+		//шаблонный геттер для категорий
 		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"template <> s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<name<<"::getCategory<s_"<<name<<"::"<<cat->getName()<<">()"<<endl;
@@ -263,6 +275,17 @@ namespace workers
 		}
 		hpp<<endl;
 
+
+		//именованные геттеры для категорий
+		BOOST_FOREACH(Category cat, orderByName(cats))
+		{
+			hpp<<"s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<name<<"::"<<"get"<<cat->getName()<<"()"<<endl;
+			hpp<<"{"<<endl;
+			hpp<<"return _"<<cat->getName()<<";";
+			hpp<<"}"<<endl;
+			hpp<<endl;
+		}
+		hpp<<endl;
 
 		//конец пространства имен
 		hpp<<"}"<<endl<<"}"<<endl;

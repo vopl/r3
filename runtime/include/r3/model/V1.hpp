@@ -48,59 +48,44 @@ namespace r3
 			s_V1::User_ptr	_User;
 			
 		public:
-			V1(Model *model, const char *id)
-				: SchemaBase<V1>(model, id, "V1")
-			{
-				init();
-			}
-			~V1()
-			{}
+			V1(Model *model, const char *id);
+			~V1();
 			
-			template <class Oper> void enumCategories(Oper o)
-			{
-				V1 *s = (V1 *)this;
-				o(s, _Department);
-				o(s, _HasRights);
-				o(s, _Owner);
-				o(s, _Right);
-				o(s, _Role);
-				o(s, _User);
-			}
-			
+			template <class Oper> void enumCategories(Oper o);
 			template <class C> boost::shared_ptr<C> getCategory();
 			
-			s_V1::Department_ptr	getDepartment()
-			{
-				return _Department;
-			}
-			
-			s_V1::HasRights_ptr	getHasRights()
-			{
-				return _HasRights;
-			}
-			
-			s_V1::Owner_ptr	getOwner()
-			{
-				return _Owner;
-			}
-			
-			s_V1::Right_ptr	getRight()
-			{
-				return _Right;
-			}
-			
-			s_V1::Role_ptr	getRole()
-			{
-				return _Role;
-			}
-			
-			s_V1::User_ptr	getUser()
-			{
-				return _User;
-			}
-			
+			s_V1::Department_ptr	getDepartment();
+			s_V1::HasRights_ptr	getHasRights();
+			s_V1::Owner_ptr	getOwner();
+			s_V1::Right_ptr	getRight();
+			s_V1::Role_ptr	getRole();
+			s_V1::User_ptr	getUser();
 			
 		};
+		
+		
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		inline V1::V1(Model *model, const char *id)
+			: SchemaBase<V1>(model, id, "V1")
+		{
+			init();
+		}
+		inline V1::~V1()
+		{
+		}
+		
+		template <class Oper> void V1::enumCategories(Oper o)
+		{
+			V1 *s = (V1 *)this;
+			o(s, _Department);
+			o(s, _HasRights);
+			o(s, _Owner);
+			o(s, _Right);
+			o(s, _Role);
+			o(s, _User);
+		}
+		
 		template <> s_V1::Department_ptr	V1::getCategory<s_V1::Department>()
 		{
 			return _Department;
@@ -127,6 +112,37 @@ namespace r3
 		}
 		
 		template <> s_V1::User_ptr	V1::getCategory<s_V1::User>()
+		{
+			return _User;
+		}
+		
+		
+		s_V1::Department_ptr	V1::getDepartment()
+		{
+			return _Department;
+		}
+		
+		s_V1::HasRights_ptr	V1::getHasRights()
+		{
+			return _HasRights;
+		}
+		
+		s_V1::Owner_ptr	V1::getOwner()
+		{
+			return _Owner;
+		}
+		
+		s_V1::Right_ptr	V1::getRight()
+		{
+			return _Right;
+		}
+		
+		s_V1::Role_ptr	V1::getRole()
+		{
+			return _Role;
+		}
+		
+		s_V1::User_ptr	V1::getUser()
 		{
 			return _User;
 		}

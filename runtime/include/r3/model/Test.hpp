@@ -88,119 +88,64 @@ namespace r3
 			s_Test::WebSite_ptr	_WebSite;
 			
 		public:
-			Test(Model *model, const char *id)
-				: SchemaBase<Test>(model, id, "Test")
-			{
-				init();
-			}
-			~Test()
-			{}
+			Test(Model *model, const char *id);
+			~Test();
 			
-			template <class Oper> void enumCategories(Oper o)
-			{
-				Test *s = (Test *)this;
-				o(s, _Client);
-				o(s, _Computer);
-				o(s, _Contract);
-				o(s, _ContractComplex);
-				o(s, _ContractSimple);
-				o(s, _Document);
-				o(s, _Employee);
-				o(s, _Furniture);
-				o(s, _Letter);
-				o(s, _Mockup);
-				o(s, _People);
-				o(s, _Program);
-				o(s, _Service);
-				o(s, _ServicePart);
-				o(s, _Stock);
-				o(s, _WebSite);
-			}
-			
+			template <class Oper> void enumCategories(Oper o);
 			template <class C> boost::shared_ptr<C> getCategory();
 			
-			s_Test::Client_ptr	getClient()
-			{
-				return _Client;
-			}
-			
-			s_Test::Computer_ptr	getComputer()
-			{
-				return _Computer;
-			}
-			
-			s_Test::Contract_ptr	getContract()
-			{
-				return _Contract;
-			}
-			
-			s_Test::ContractComplex_ptr	getContractComplex()
-			{
-				return _ContractComplex;
-			}
-			
-			s_Test::ContractSimple_ptr	getContractSimple()
-			{
-				return _ContractSimple;
-			}
-			
-			s_Test::Document_ptr	getDocument()
-			{
-				return _Document;
-			}
-			
-			s_Test::Employee_ptr	getEmployee()
-			{
-				return _Employee;
-			}
-			
-			s_Test::Furniture_ptr	getFurniture()
-			{
-				return _Furniture;
-			}
-			
-			s_Test::Letter_ptr	getLetter()
-			{
-				return _Letter;
-			}
-			
-			s_Test::Mockup_ptr	getMockup()
-			{
-				return _Mockup;
-			}
-			
-			s_Test::People_ptr	getPeople()
-			{
-				return _People;
-			}
-			
-			s_Test::Program_ptr	getProgram()
-			{
-				return _Program;
-			}
-			
-			s_Test::Service_ptr	getService()
-			{
-				return _Service;
-			}
-			
-			s_Test::ServicePart_ptr	getServicePart()
-			{
-				return _ServicePart;
-			}
-			
-			s_Test::Stock_ptr	getStock()
-			{
-				return _Stock;
-			}
-			
-			s_Test::WebSite_ptr	getWebSite()
-			{
-				return _WebSite;
-			}
-			
+			s_Test::Client_ptr	getClient();
+			s_Test::Computer_ptr	getComputer();
+			s_Test::Contract_ptr	getContract();
+			s_Test::ContractComplex_ptr	getContractComplex();
+			s_Test::ContractSimple_ptr	getContractSimple();
+			s_Test::Document_ptr	getDocument();
+			s_Test::Employee_ptr	getEmployee();
+			s_Test::Furniture_ptr	getFurniture();
+			s_Test::Letter_ptr	getLetter();
+			s_Test::Mockup_ptr	getMockup();
+			s_Test::People_ptr	getPeople();
+			s_Test::Program_ptr	getProgram();
+			s_Test::Service_ptr	getService();
+			s_Test::ServicePart_ptr	getServicePart();
+			s_Test::Stock_ptr	getStock();
+			s_Test::WebSite_ptr	getWebSite();
 			
 		};
+		
+		
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		inline Test::Test(Model *model, const char *id)
+			: SchemaBase<Test>(model, id, "Test")
+		{
+			init();
+		}
+		inline Test::~Test()
+		{
+		}
+		
+		template <class Oper> void Test::enumCategories(Oper o)
+		{
+			Test *s = (Test *)this;
+			o(s, _Client);
+			o(s, _Computer);
+			o(s, _Contract);
+			o(s, _ContractComplex);
+			o(s, _ContractSimple);
+			o(s, _Document);
+			o(s, _Employee);
+			o(s, _Furniture);
+			o(s, _Letter);
+			o(s, _Mockup);
+			o(s, _People);
+			o(s, _Program);
+			o(s, _Service);
+			o(s, _ServicePart);
+			o(s, _Stock);
+			o(s, _WebSite);
+		}
+		
 		template <> s_Test::Client_ptr	Test::getCategory<s_Test::Client>()
 		{
 			return _Client;
@@ -277,6 +222,87 @@ namespace r3
 		}
 		
 		template <> s_Test::WebSite_ptr	Test::getCategory<s_Test::WebSite>()
+		{
+			return _WebSite;
+		}
+		
+		
+		s_Test::Client_ptr	Test::getClient()
+		{
+			return _Client;
+		}
+		
+		s_Test::Computer_ptr	Test::getComputer()
+		{
+			return _Computer;
+		}
+		
+		s_Test::Contract_ptr	Test::getContract()
+		{
+			return _Contract;
+		}
+		
+		s_Test::ContractComplex_ptr	Test::getContractComplex()
+		{
+			return _ContractComplex;
+		}
+		
+		s_Test::ContractSimple_ptr	Test::getContractSimple()
+		{
+			return _ContractSimple;
+		}
+		
+		s_Test::Document_ptr	Test::getDocument()
+		{
+			return _Document;
+		}
+		
+		s_Test::Employee_ptr	Test::getEmployee()
+		{
+			return _Employee;
+		}
+		
+		s_Test::Furniture_ptr	Test::getFurniture()
+		{
+			return _Furniture;
+		}
+		
+		s_Test::Letter_ptr	Test::getLetter()
+		{
+			return _Letter;
+		}
+		
+		s_Test::Mockup_ptr	Test::getMockup()
+		{
+			return _Mockup;
+		}
+		
+		s_Test::People_ptr	Test::getPeople()
+		{
+			return _People;
+		}
+		
+		s_Test::Program_ptr	Test::getProgram()
+		{
+			return _Program;
+		}
+		
+		s_Test::Service_ptr	Test::getService()
+		{
+			return _Service;
+		}
+		
+		s_Test::ServicePart_ptr	Test::getServicePart()
+		{
+			return _ServicePart;
+		}
+		
+		s_Test::Stock_ptr	Test::getStock()
+		{
+			return _Stock;
+		}
+		
+		s_Test::WebSite_ptr	Test::getWebSite()
 		{
 			return _WebSite;
 		}
