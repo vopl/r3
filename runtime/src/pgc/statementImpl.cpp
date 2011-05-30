@@ -21,9 +21,14 @@ namespace pgc
 		_con.reset();
 	}
 
-	void StatementImpl::sql(const char *csz)
+	void StatementImpl::sql(const char *sql)
 	{
-		_sql = csz;
+		_sql = sql;
+	}
+
+	void StatementImpl::sql(const std::string &sql)
+	{
+		_sql = sql;
 	}
 
 	namespace impl

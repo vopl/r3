@@ -61,7 +61,7 @@ namespace pgc
 	Statement Connection::once(const std::string &sql)
 	{
 		Statement s(_impl->once());
-		s.sql(sql.c_str());
+		s.sql(sql);
 
 		return s;
 	}

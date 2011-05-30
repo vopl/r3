@@ -20,9 +20,14 @@ namespace pgc
 		_impl.reset();
 	}
 
-	Statement &Statement::sql(const char *csz)
+	Statement &Statement::sql(const char *sql)
 	{
-		_impl->sql(csz);
+		_impl->sql(sql);
+		return *this;
+	}
+	Statement &Statement::sql(const std::string &sql)
+	{
+		_impl->sql(sql);
 		return *this;
 	}
 	Statement &Statement::unbind(size_t idx)
