@@ -56,7 +56,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		r3::model::s_Test::Computer_ptr ccomp = test->getComputer();
 
  		r3::model::s_Test::Computer::Tuple comp;
- 
+
+		//ccomp->
 		comp.mobile = true;
 // 		ccomp->ins(comp);
 // 

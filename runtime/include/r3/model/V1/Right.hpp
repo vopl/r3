@@ -48,9 +48,12 @@ namespace r3
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				Right(V1 *s);
 				~Right();
 				V1 *schema();
+				
+			protected:
+				template <class S> friend class SchemaBase;
+				Right(V1 *s);
 				
 			protected:
 				V1 *_schema;

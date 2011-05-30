@@ -52,9 +52,12 @@ namespace r3
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				Employee(Test *s);
 				~Employee();
 				Test *schema();
+				
+			protected:
+				template <class S> friend class SchemaBase;
+				Employee(Test *s);
 				
 			protected:
 				Test *_schema;

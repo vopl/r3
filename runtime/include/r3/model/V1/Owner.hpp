@@ -40,9 +40,12 @@ namespace r3
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				Owner(V1 *s);
 				~Owner();
 				V1 *schema();
+				
+			protected:
+				template <class S> friend class SchemaBase;
+				Owner(V1 *s);
 				
 			protected:
 				V1 *_schema;

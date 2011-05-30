@@ -550,15 +550,19 @@ namespace workers
 
 		hpp<<"public:"<<endl;
 
-		//конструктор
-		hpp<<""<<name<<"("<<cat->getSchema()<<" *s);"<<endl;
-
 		//деструктор
 		hpp<<"~"<<name<<"();"<<endl;
 
 		//геттер для схемы
 		hpp<<""<<cat->getSchema()<<" *schema();"<<endl;
 		hpp<<endl;
+
+		hpp<<"protected:"<<endl;
+		//конструктор
+		hpp<<"template <class S> friend class SchemaBase;"<<endl;
+		hpp<<""<<name<<"("<<cat->getSchema()<<" *s);"<<endl;
+		hpp<<endl;
+
 
 		hpp<<"protected:"<<endl;
 		hpp<<""<<cat->getSchema()<<" *_schema;"<<endl;

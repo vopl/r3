@@ -45,9 +45,12 @@ namespace r3
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
-				WebSite(Test *s);
 				~WebSite();
 				Test *schema();
+				
+			protected:
+				template <class S> friend class SchemaBase;
+				WebSite(Test *s);
 				
 			protected:
 				Test *_schema;
