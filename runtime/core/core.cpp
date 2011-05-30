@@ -57,9 +57,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
  		r3::model::s_Test::Computer::Tuple comp;
 
-		//ccomp->
 		comp.mobile = true;
-// 		ccomp->ins(comp);
+ 		ccomp->ins(comp);
 // 
 // 		comp.cost = 340;
 // 		ccomp->upd(comp);

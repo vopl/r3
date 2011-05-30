@@ -557,6 +557,24 @@ namespace workers
 		hpp<<""<<cat->getSchema()<<" *schema();"<<endl;
 		hpp<<endl;
 
+		//ins
+		hpp<<"void ins(Tuple &tup);"<<endl;
+		hpp<<"void ins(Tuple_ptr tup);"<<endl;
+		hpp<<endl;
+		//upd
+		hpp<<"void upd(Tuple &tup);"<<endl;
+		hpp<<"void upd(Tuple_ptr tup);"<<endl;
+		hpp<<endl;
+		//del
+		hpp<<"void del(const boost::int64_t &id);"<<endl;
+		hpp<<"void del(Tuple &tup);"<<endl;
+		hpp<<"void del(Tuple_ptr tup);"<<endl;
+		hpp<<endl;
+		//sel
+		hpp<<"Tuple_ptr sel(const boost::int64_t &id);"<<endl;
+		hpp<<"Tuple_ptr sel(Tuple_ptr tup);"<<endl;
+		hpp<<endl;
+
 		hpp<<"protected:"<<endl;
 		//конструктор
 		hpp<<"template <class S> friend class SchemaBase;"<<endl;

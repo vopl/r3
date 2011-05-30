@@ -44,6 +44,19 @@ namespace r3
 				~HasRights();
 				V1 *schema();
 				
+				void ins(Tuple &tup);
+				void ins(Tuple_ptr tup);
+				
+				void upd(Tuple &tup);
+				void upd(Tuple_ptr tup);
+				
+				void del(const boost::int64_t &id);
+				void del(Tuple &tup);
+				void del(Tuple_ptr tup);
+				
+				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(Tuple_ptr tup);
+				
 			protected:
 				template <class S> friend class SchemaBase;
 				HasRights(V1 *s);
