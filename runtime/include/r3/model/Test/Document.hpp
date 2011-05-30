@@ -30,6 +30,7 @@ namespace r3
 						: public CategoryBase<Document>::Tuple
 				{
 					r3::fields::Date creation;
+					r3::fields::File file;
 					r3::fields::Timestamp lastModified;
 					r3::relations::Relation2one<ServicePart> servicePart;
 				};
@@ -80,6 +81,7 @@ namespace r3
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
 				o(this, c_Document, (r3::fields::Date *)NULL, "creation");
+				o(this, c_Document, (r3::fields::File *)NULL, "file");
 				o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
 			}
 			

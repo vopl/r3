@@ -30,6 +30,7 @@ public:
 	virtual std::set<R3Meta_BON::Date>      getDate();
 	virtual std::set<R3Meta_BON::DateTimeInterval>    getDateTimeInterval();
 	virtual std::set<R3Meta_BON::Enum>      getEnum();
+	virtual std::set<R3Meta_BON::File>      getFile();
 	virtual std::set<R3Meta_BON::Image>     getImage();
 	virtual std::set<R3Meta_BON::Index>     getIndex();
 	virtual std::set<R3Meta_BON::IndexOnCategoryField> getIndexOnCategoryField();

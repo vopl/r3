@@ -85,6 +85,7 @@ namespace r3
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
 				o(this, c_Document, (r3::fields::Date *)NULL, "creation");
+				o(this, c_Document, (r3::fields::File *)NULL, "file");
 				o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
 				//Mockup
 				Mockup *c_Mockup = _schema->getCategory<Mockup>().get();

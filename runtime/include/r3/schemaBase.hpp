@@ -27,6 +27,9 @@ namespace r3
 		void dbCreate();
 		void dbDrop();
 
+	public:
+
+
 	private:
 		struct enumOper_init;
 		struct enumOper_createTable;

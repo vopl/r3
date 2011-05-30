@@ -10,19 +10,12 @@ namespace R3Meta_BON
 //   C  L  A  S  S   FileImpl
 //*******************************************************************
 class FileImpl :
-	  public FieldImpl
+	  virtual public BON::AtomImpl
+	, public FieldImpl
 {
 public:
-	typedef enum
-	{
-		bytea_FileStoreKind_Type,
-		blob_FileStoreKind_Type
-	} FileStoreKind_Type;
+	virtual void        accept( BON::Visitor *pVisitor);
 
-	//
-	// attribute getters and setters
-	virtual R3Meta_BON::FileImpl::FileStoreKind_Type  getFileStoreKind();
-	virtual void        setFileStoreKind( FileImpl::FileStoreKind_Type val);
 
 	///BUP
 	// add your own members here

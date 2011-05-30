@@ -368,6 +368,20 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::File *stub,
+			const char *fname)
+		{
+			pgc::Connection con = c->schema()->con();
+			con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_name\" VARCHAR").exec().throwIfError();
+			con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_ext\" VARCHAR").exec().throwIfError();
+			con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_size\" INT4").exec().throwIfError();
+			con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_blob\" OID").exec().throwIfError();
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		template <typename Category, typename CategoryBaseOrSelf> void operator()(Category *c, CategoryBaseOrSelf *bos, void *stub, const char *fname)
 		{
 			//assert(!"добить поля");

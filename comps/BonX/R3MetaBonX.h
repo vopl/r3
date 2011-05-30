@@ -14,19 +14,19 @@ namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( CategoryMember, Field
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, CategoryMember, IndexImpl, Index ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Connection, CategoryMember, IndexOnCategoryFieldImpl, IndexOnCategoryField ); }
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION2( BON::Model, Field, ScantyImpl, Scanty ); }
-namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( Field, FileImpl, File ); }
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( Field, SimpleImpl, Simple ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, Field, FileImpl, File ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( Scanty, EnumImpl, Enum ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( Scanty, SetImpl, Set ); }
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( Simple, DateTimeImpl, DateTime ); }
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( Simple, IntImpl, Int ); }
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( Simple, RealImpl, Real ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, File, AudioImpl, Audio ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( File, AudioImpl, Audio ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, Simple, BoolImpl, Bool ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, File, ImageImpl, Image ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( File, ImageImpl, Image ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, Simple, MoneyImpl, Money ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, Simple, StringImpl, String ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, File, VideoImpl, Video ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( File, VideoImpl, Video ); }
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( DateTime, DateTimeValueImpl, DateTimeValue ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, DateTime, DateTimeIntervalImpl, DateTimeInterval ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, Int, Int16Impl, Int16 ); }
@@ -56,8 +56,8 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryRelat
 #include "R3Meta_BON/Index.h"
 #include "R3Meta_BON/IndexOnCategoryField.h"
 #include "R3Meta_BON/Scanty.h"
-#include "R3Meta_BON/File.h"
 #include "R3Meta_BON/Simple.h"
+#include "R3Meta_BON/File.h"
 #include "R3Meta_BON/Enum.h"
 #include "R3Meta_BON/Set.h"
 #include "R3Meta_BON/DateTime.h"

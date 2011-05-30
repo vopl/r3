@@ -10,8 +10,7 @@ namespace R3Meta_BON
 //   C  L  A  S  S   AudioImpl
 //*******************************************************************
 class AudioImpl :
-	  virtual public BON::AtomImpl
-	, public FileImpl
+	  public FileImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);
