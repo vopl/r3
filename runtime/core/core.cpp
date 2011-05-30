@@ -16,6 +16,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	m.con().log(std::cout, pgc::lf_exec);
 
+	m.stm<int>("sdf").sql("SELECT 1").exec();
+	m.stm("sdf").sql("SELECT 1").exec();
 
 	r3::model::Test_ptr c2 = m.getTest("myId");
 

@@ -65,9 +65,12 @@ namespace r3
 		void stopInThread();
 		
 		pgc::Connection con();
-		template <class tag> pgc::Statement stm(const std::string &key);
+		template <class tag>
+		pgc::Statement stm(const std::string &key);
+		pgc::Statement stm(const std::string &key);
 
 	private:
+		struct StmSecretType;
 
 		
 	protected:
@@ -137,6 +140,12 @@ namespace r3
 		size_t idx = StmStorage<tag>::_index;
 		assert(_stmStorages.size() && _stmStorages.size() > idx);
 		return _stmStorages[idx]->call(key);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	inline pgc::Statement ModelBase::stm(const std::string &key)
+	{
+		return stm<ModelBase::StmSecretType>(key);
 	}
 
 }
