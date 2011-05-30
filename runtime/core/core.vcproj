@@ -449,6 +449,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\include\r3\fields\id.h"
+						>
+					</File>
+					<File
 						RelativePath="..\include\r3\fields\image.h"
 						>
 					</File>
@@ -582,6 +586,10 @@
 					</File>
 					<File
 						RelativePath="..\src\r3\fields\file.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\id.cpp"
 						>
 					</File>
 					<File

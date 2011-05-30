@@ -55,7 +55,6 @@ namespace r3{ namespace fields
 
 
 //////////////////////////////////////////////////////////////////////////
-
 #include "./file.h"
 #include "./audio.h"
 #include "./image.h"
@@ -86,6 +85,8 @@ namespace r3{ namespace fields
 #include "./time.h"
 #include "./timestamp.h"
 #include "./dateTimeInterval.h"
+
+#include "./id.h"
 
 #pragma pack(pop)
 

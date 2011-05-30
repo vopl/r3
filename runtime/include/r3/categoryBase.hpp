@@ -13,7 +13,7 @@ namespace r3
 	public:
 		struct Tuple
 		{
-			boost::int64_t id;
+			fields::Id id;
 
 			Tuple();
 			~Tuple();
@@ -80,7 +80,7 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>
 	CategoryBase<C>::Tuple::Tuple()
-		: id(0)
+		: id()
 	{
 	}
 
