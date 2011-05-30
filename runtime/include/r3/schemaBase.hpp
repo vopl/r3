@@ -19,6 +19,9 @@ namespace r3
 
 		pgc::Connection con();
 
+		template <class tag>
+		pgc::Statement stm(const std::string &key);
+
 		const std::string &id();
 		const std::string &name();
 		std::string db_name();
@@ -134,6 +137,14 @@ namespace r3
 	pgc::Connection SchemaBase<S>::con()
 	{
 		return _model->con();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S>
+	template <class tag>
+	pgc::Statement SchemaBase<S>::stm(const std::string &key)
+	{
+		return _model->stm<std::pair<S, tag> >(key);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

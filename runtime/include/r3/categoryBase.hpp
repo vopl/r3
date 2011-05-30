@@ -34,6 +34,12 @@ namespace r3
 
 
 	public:
+
+		pgc::Connection con();
+
+		template <class tag>
+		pgc::Statement stm(const std::string &key);
+
 		C *category();
 		const std::string &name();
 		std::string db_name();
@@ -69,6 +75,20 @@ namespace r3
 
 
 
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	pgc::Connection CategoryBase<C>::con()
+	{
+		return category()->schema()->con();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	template <class tag>
+	pgc::Statement CategoryBase<C>::stm(const std::string &key)
+	{
+		return category()->schema()->stm<std::pair<C, tag> >(key);
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class C>

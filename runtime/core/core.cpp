@@ -16,10 +16,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	m.con().log(std::cout, pgc::lf_exec);
 
-	pgc::Statement stm = m.stm<int>("sgdf");
-	stm.sql("SELECT 1").exec();
 
 	r3::model::Test_ptr c2 = m.getTest("myId");
+
+	c2->stm<int>("sdf").sql("SELECT 1").exec();
 
 	try
 	{
@@ -57,6 +57,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		r3::model::Test_ptr test = m.getTest("myId");
 
 		r3::model::s_Test::Computer_ptr ccomp = test->getComputer();
+
+		ccomp->stm<int>("sdf").sql("SELECT 1").exec();
 
  		r3::model::s_Test::Computer::Tuple comp;
 
