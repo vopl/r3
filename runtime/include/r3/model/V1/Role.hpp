@@ -45,10 +45,10 @@ namespace r3
 				{
 					//HasRights
 					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-					o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n *)NULL,	"owners",	(r3::relations::Relation2n *)NULL,	"rights",	rs_dst);
+					o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)NULL,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
 					//Role
 					Role *c_Role = _schema->getCategory<Role>().get();
-					o(this, c_Role, _schema->getCategory<User>().get(), (r3::relations::Relation2n *)NULL,	"roles",	(r3::relations::Relation2n *)NULL,	"users",	rs_src);
+					o(this, c_Role, _schema->getCategory<User>().get(), (r3::relations::Relation2n<User>*)NULL,	"roles",	(r3::relations::Relation2n<Role>*)NULL,	"users",	rs_src);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
@@ -56,6 +56,15 @@ namespace r3
 					//HasRights
 					//Role
 				}
+				
+			public:
+				struct Tuple
+						: public HasRights::Tuple
+				{
+					r3::fields::String name;
+					r3::relations::Relation2n<User> roles;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef V1 Schema;

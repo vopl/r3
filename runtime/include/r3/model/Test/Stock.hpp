@@ -16,12 +16,6 @@ namespace r3
 		namespace s_Test
 		{
 		
-			//deriveds
-			class Computer;
-			typedef boost::shared_ptr<Computer> Computer_ptr;
-			class Furniture;
-			typedef boost::shared_ptr<Furniture> Furniture_ptr;
-			
 			class Stock
 				: public CategoryBase<Stock>
 			{
@@ -29,7 +23,7 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
-				struct DomainSecurityStatus
+				struct DomainsecurityStatus
 				{
 					static const size_t amount = 3;
 					static const char *values[amount];
@@ -43,23 +37,35 @@ namespace r3
 				{
 					//Stock
 					Stock *c_Stock = _schema->getCategory<Stock>().get();
-					o(this, c_Stock, (r3::fields::Money *)NULL, "Cost");
-					o(this, c_Stock, (r3::fields::Date *)NULL, "IncomingDate");
-					o(this, c_Stock, (r3::fields::String *)NULL, "InventoryNumber");
-					o(this, c_Stock, (r3::fields::Enum<Stock::DomainSecurityStatus>*)NULL, "SecurityStatus");
+					o(this, c_Stock, (r3::fields::Money *)NULL, "cost");
+					o(this, c_Stock, (r3::fields::Date *)NULL, "incomingDate");
+					o(this, c_Stock, (r3::fields::String *)NULL, "inventoryNumber");
+					o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)NULL, "securityStatus");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Stock
 					Stock *c_Stock = _schema->getCategory<Stock>().get();
-					o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n *)NULL,	"services",	(r3::relations::Relation2n *)NULL,	"stocks",	rs_dst);
+					o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"services",	(r3::relations::Relation2n<Stock>*)NULL,	"stocks",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Stock
 				}
+				
+			public:
+				struct Tuple
+						: public CategoryBase<Stock>::Tuple
+				{
+					r3::fields::Money cost;
+					r3::fields::Date incomingDate;
+					r3::fields::String inventoryNumber;
+					r3::fields::Enum<Stock::DomainsecurityStatus> securityStatus;
+					r3::relations::Relation2n<Service> services;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

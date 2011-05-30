@@ -35,19 +35,19 @@ namespace r3
 				{
 					//Document
 					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, (r3::fields::Date *)NULL, "Creation");
-					o(this, c_Document, (r3::fields::Timestamp *)NULL, "LastModified");
+					o(this, c_Document, (r3::fields::Date *)NULL, "creation");
+					o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
 					//Letter
 					Letter *c_Letter = _schema->getCategory<Letter>().get();
-					o(this, c_Letter, (r3::fields::String *)NULL, "Comment");
-					o(this, c_Letter, (r3::fields::String *)NULL, "Content");
+					o(this, c_Letter, (r3::fields::String *)NULL, "comment");
+					o(this, c_Letter, (r3::fields::String *)NULL, "content");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Document
 					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one *)NULL,	"servicePart",	(r3::relations::Relation2n *)NULL,	"documents",	rs_dst);
+					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
 					//Letter
 				}
 				
@@ -56,6 +56,15 @@ namespace r3
 					//Document
 					//Letter
 				}
+				
+			public:
+				struct Tuple
+						: public Document::Tuple
+				{
+					r3::fields::String comment;
+					r3::fields::String content;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

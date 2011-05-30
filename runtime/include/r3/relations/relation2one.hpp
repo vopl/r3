@@ -5,6 +5,7 @@
 
 namespace r3 {namespace relations{
 
+	template <class C>
 	class Relation2one
 		: public Relation
 	{

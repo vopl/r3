@@ -35,26 +35,26 @@ namespace r3
 				{
 					//ServicePart
 					ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-					o(this, c_ServicePart, (r3::fields::String *)NULL, "Comment");
-					o(this, c_ServicePart, (r3::fields::Money *)NULL, "Cost");
-					o(this, c_ServicePart, (r3::fields::DateTimeInterval *)NULL, "Duration");
-					o(this, c_ServicePart, (r3::fields::Date *)NULL, "Start");
-					o(this, c_ServicePart, (r3::fields::Date *)NULL, "Stop");
+					o(this, c_ServicePart, (r3::fields::String *)NULL, "comment");
+					o(this, c_ServicePart, (r3::fields::Money *)NULL, "cost");
+					o(this, c_ServicePart, (r3::fields::DateTimeInterval *)NULL, "duration");
+					o(this, c_ServicePart, (r3::fields::Date *)NULL, "start");
+					o(this, c_ServicePart, (r3::fields::Date *)NULL, "stop");
 					//WebSite
 					WebSite *c_WebSite = _schema->getCategory<WebSite>().get();
-					o(this, c_WebSite, (r3::fields::String *)NULL, "Host");
-					o(this, c_WebSite, (r3::fields::String *)NULL, "Url");
+					o(this, c_WebSite, (r3::fields::String *)NULL, "host");
+					o(this, c_WebSite, (r3::fields::String *)NULL, "url");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//ServicePart
 					ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-					o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n *)NULL,	"documents",	(r3::relations::Relation2one *)NULL,	"servicePart",	rs_src);
-					o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one *)NULL,	"service",	(r3::relations::Relation2n *)NULL,	"parts",	rs_dst);
+					o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n<Document>*)NULL,	"documents",	(r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	rs_src);
+					o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one<Service>*)NULL,	"service",	(r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	rs_dst);
 					//WebSite
 					WebSite *c_WebSite = _schema->getCategory<WebSite>().get();
-					o(this, c_WebSite, _schema->getCategory<Mockup>().get(), (r3::relations::Relation2n *)NULL,	"mockups",	(r3::relations::Relation2one *)NULL,	"webSite",	rs_dst);
+					o(this, c_WebSite, _schema->getCategory<Mockup>().get(), (r3::relations::Relation2n<Mockup>*)NULL,	"mockups",	(r3::relations::Relation2one<WebSite>*)NULL,	"webSite",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
@@ -62,6 +62,16 @@ namespace r3
 					//ServicePart
 					//WebSite
 				}
+				
+			public:
+				struct Tuple
+						: public ServicePart::Tuple
+				{
+					r3::fields::String host;
+					r3::fields::String url;
+					r3::relations::Relation2n<Mockup> mockups;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

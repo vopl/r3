@@ -36,22 +36,22 @@ namespace r3
 					//Client
 					//People
 					People *c_People = _schema->getCategory<People>().get();
-					o(this, c_People, (r3::fields::Date *)NULL, "Birth");
-					o(this, c_People, (r3::fields::String *)NULL, "Middlename");
-					o(this, c_People, (r3::fields::String *)NULL, "Name");
-					o(this, c_People, (r3::fields::Image *)NULL, "Photo");
-					o(this, c_People, (r3::fields::Enum<People::DomainSex>*)NULL, "Sex");
-					o(this, c_People, (r3::fields::String *)NULL, "Surname");
+					o(this, c_People, (r3::fields::Date *)NULL, "birth");
+					o(this, c_People, (r3::fields::String *)NULL, "middlename");
+					o(this, c_People, (r3::fields::String *)NULL, "name");
+					o(this, c_People, (r3::fields::Image *)NULL, "photo");
+					o(this, c_People, (r3::fields::Enum<People::Domainsex>*)NULL, "sex");
+					o(this, c_People, (r3::fields::String *)NULL, "surname");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Client
 					Client *c_Client = _schema->getCategory<Client>().get();
-					o(this, c_Client, _schema->getCategory<Service>().get(), (r3::relations::Relation2n *)NULL,	"services",	(r3::relations::Relation2one *)NULL,	"client",	rs_dst);
+					o(this, c_Client, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"services",	(r3::relations::Relation2one<Client>*)NULL,	"client",	rs_dst);
 					//People
 					People *c_People = _schema->getCategory<People>().get();
-					o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n *)NULL,	"observableServices",	(r3::relations::Relation2n *)NULL,	"observers",	rs_dst);
+					o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
@@ -59,6 +59,14 @@ namespace r3
 					//Client
 					//People
 				}
+				
+			public:
+				struct Tuple
+						: public People::Tuple
+				{
+					r3::relations::Relation2n<Service> services;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

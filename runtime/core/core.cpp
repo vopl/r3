@@ -55,19 +55,20 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		r3::model::s_Test::Computer_ptr ccomp = test->getComputer();
 
-// 		r3::model::s_Test::Computer::Tuple comp;
-// 
-// 		comp.Mobile = true;
+ 		r3::model::s_Test::Computer::Tuple comp;
+ 
+		comp.mobile = true;
 // 		ccomp->ins(comp);
 // 
-// 		comp.Cost = 340;
+// 		comp.cost = 340;
 // 		ccomp->upd(comp);
 // 
-// 		r3::model::s_Test::Computer::Tuple_ptr pcomp;
+		r3::model::s_Test::Computer::Tuple_ptr pcomp;
 // 		pcomp = ccomp->sel(comp.id);
 
 		r3::model::s_Test::Stock_ptr cstock = test->getStock();
-// 		r3::model::s_Test::Stock::Tuple_ptr pstock = cstock->set(comp.id);
+		r3::model::s_Test::Stock::Tuple_ptr pstock;
+// 		pstock = cstock->sel(comp.id);
 // 		pcomp->upg(pstock);
 // 
 // 		test->del(pcomp->id);

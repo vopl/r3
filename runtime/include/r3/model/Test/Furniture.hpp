@@ -26,7 +26,7 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
-				struct DomainConstraints
+				struct Domainconstraints
 				{
 					static const size_t amount = 4;
 					static const char *values[amount];
@@ -41,17 +41,17 @@ namespace r3
 				{
 					//Furniture
 					Furniture *c_Furniture = _schema->getCategory<Furniture>().get();
-					o(this, c_Furniture, (r3::fields::Set<Furniture::DomainConstraints>*)NULL, "Constraints");
-					o(this, c_Furniture, (r3::fields::Int16 *)NULL, "Depth");
-					o(this, c_Furniture, (r3::fields::Int16 *)NULL, "Height");
-					o(this, c_Furniture, (r3::fields::Real32 *)NULL, "Weight");
-					o(this, c_Furniture, (r3::fields::Int16 *)NULL, "Width");
+					o(this, c_Furniture, (r3::fields::Set<Furniture::Domainconstraints>*)NULL, "constraints");
+					o(this, c_Furniture, (r3::fields::Int16 *)NULL, "depth");
+					o(this, c_Furniture, (r3::fields::Int16 *)NULL, "height");
+					o(this, c_Furniture, (r3::fields::Real32 *)NULL, "weight");
+					o(this, c_Furniture, (r3::fields::Int16 *)NULL, "width");
 					//Stock
 					Stock *c_Stock = _schema->getCategory<Stock>().get();
-					o(this, c_Stock, (r3::fields::Money *)NULL, "Cost");
-					o(this, c_Stock, (r3::fields::Date *)NULL, "IncomingDate");
-					o(this, c_Stock, (r3::fields::String *)NULL, "InventoryNumber");
-					o(this, c_Stock, (r3::fields::Enum<Stock::DomainSecurityStatus>*)NULL, "SecurityStatus");
+					o(this, c_Stock, (r3::fields::Money *)NULL, "cost");
+					o(this, c_Stock, (r3::fields::Date *)NULL, "incomingDate");
+					o(this, c_Stock, (r3::fields::String *)NULL, "inventoryNumber");
+					o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)NULL, "securityStatus");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
@@ -59,7 +59,7 @@ namespace r3
 					//Furniture
 					//Stock
 					Stock *c_Stock = _schema->getCategory<Stock>().get();
-					o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n *)NULL,	"services",	(r3::relations::Relation2n *)NULL,	"stocks",	rs_dst);
+					o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"services",	(r3::relations::Relation2n<Stock>*)NULL,	"stocks",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
@@ -67,6 +67,18 @@ namespace r3
 					//Furniture
 					//Stock
 				}
+				
+			public:
+				struct Tuple
+						: public Stock::Tuple
+				{
+					r3::fields::Set<Furniture::Domainconstraints> constraints;
+					r3::fields::Int16 depth;
+					r3::fields::Int16 height;
+					r3::fields::Real32 weight;
+					r3::fields::Int16 width;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

@@ -29,6 +29,16 @@ namespace r3
 		};
 
 	public:
+		struct Tuple
+		{
+			boost::int64_t id;
+
+			Tuple();
+			~Tuple();
+		};
+
+
+	public:
 		CategoryBase(const char *name);
 		~CategoryBase();
 
@@ -58,6 +68,19 @@ namespace r3
 	typename CategoryBase<C>::Category *CategoryBase<C>::category()
 	{
 		return (Category*)this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	CategoryBase<C>::Tuple::Tuple()
+		: id(0)
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	CategoryBase<C>::Tuple::~Tuple()
+	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -515,8 +538,8 @@ namespace r3
 			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
 			void operator()(
 				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
-				r3::relations::Relation2one *stubOwn,	const char *nameOwn,
-				r3::relations::Relation2one *stubAlien, const char *nameAlien,
+				r3::relations::Relation2one<CategoryAlien> *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2one<CategoryBaseOrSelf> *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
 				if(Category::rs_src == ers)
@@ -531,8 +554,8 @@ namespace r3
 			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
 			void operator()(
 				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
-				r3::relations::Relation2one *stubOwn,	const char *nameOwn,
-				r3::relations::Relation2n *stubAlien, const char *nameAlien,
+				r3::relations::Relation2one<CategoryAlien> *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2n<CategoryBaseOrSelf> *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
 				pgc::Connection con = c->schema()->con();
@@ -543,8 +566,8 @@ namespace r3
 			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
 			void operator()(
 				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
-				r3::relations::Relation2n *stubOwn,	const char *nameOwn,
-				r3::relations::Relation2one *stubAlien, const char *nameAlien,
+				r3::relations::Relation2n<CategoryAlien> *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2one<CategoryBaseOrSelf> *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
 			}
@@ -553,8 +576,8 @@ namespace r3
 			template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
 			void operator()(
 				Category *c, CategoryBaseOrSelf *bos, CategoryAlien *ca,
-				r3::relations::Relation2n *stubOwn,	const char *nameOwn,
-				r3::relations::Relation2n *stubAlien, const char *nameAlien,
+				r3::relations::Relation2n<CategoryAlien> *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2n<CategoryBaseOrSelf> *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
 			}
@@ -563,8 +586,8 @@ namespace r3
 			template <typename Category, typename CategoryAlien>
 			void operator()(
 				Category *c, Category *bos, CategoryAlien *ca,
-				r3::relations::Relation2n *stubOwn,	const char *nameOwn,
-				r3::relations::Relation2n *stubAlien, const char *nameAlien,
+				r3::relations::Relation2n<CategoryAlien> *stubOwn,	const char *nameOwn,
+				r3::relations::Relation2n<Category> *stubAlien, const char *nameAlien,
 				typename Category::ERelationSide ers)
 			{
 				if(Category::rs_src == ers)

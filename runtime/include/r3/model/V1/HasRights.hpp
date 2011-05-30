@@ -16,12 +16,6 @@ namespace r3
 		namespace s_V1
 		{
 		
-			//deriveds
-			class Role;
-			typedef boost::shared_ptr<Role> Role_ptr;
-			class User;
-			typedef boost::shared_ptr<User> User_ptr;
-			
 			class HasRights
 				: public CategoryBase<HasRights>
 			{
@@ -44,13 +38,22 @@ namespace r3
 				{
 					//HasRights
 					HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-					o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n *)NULL,	"owners",	(r3::relations::Relation2n *)NULL,	"rights",	rs_dst);
+					o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)NULL,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//HasRights
 				}
+				
+			public:
+				struct Tuple
+						: public CategoryBase<HasRights>::Tuple
+				{
+					r3::fields::Bool attrInHasRights;
+					r3::relations::Relation2n<Right> owners;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef V1 Schema;

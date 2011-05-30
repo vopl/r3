@@ -35,17 +35,17 @@ namespace r3
 				{
 					//Contract
 					Contract *c_Contract = _schema->getCategory<Contract>().get();
-					o(this, c_Contract, (r3::fields::Int32 *)NULL, "Param1");
-					o(this, c_Contract, (r3::fields::Int64 *)NULL, "Param2");
-					o(this, c_Contract, (r3::fields::Int8 *)NULL, "Param3");
-					o(this, c_Contract, (r3::fields::Real64 *)NULL, "Param4");
+					o(this, c_Contract, (r3::fields::Int32 *)NULL, "param1");
+					o(this, c_Contract, (r3::fields::Int64 *)NULL, "param2");
+					o(this, c_Contract, (r3::fields::Int8 *)NULL, "param3");
+					o(this, c_Contract, (r3::fields::Real64 *)NULL, "param4");
 					//ContractSimple
 					ContractSimple *c_ContractSimple = _schema->getCategory<ContractSimple>().get();
-					o(this, c_ContractSimple, (r3::fields::Date *)NULL, "Expiration");
+					o(this, c_ContractSimple, (r3::fields::Date *)NULL, "expiration");
 					//Document
 					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, (r3::fields::Date *)NULL, "Creation");
-					o(this, c_Document, (r3::fields::Timestamp *)NULL, "LastModified");
+					o(this, c_Document, (r3::fields::Date *)NULL, "creation");
+					o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
@@ -54,7 +54,7 @@ namespace r3
 					//ContractSimple
 					//Document
 					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one *)NULL,	"servicePart",	(r3::relations::Relation2n *)NULL,	"documents",	rs_dst);
+					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
@@ -63,6 +63,14 @@ namespace r3
 					//ContractSimple
 					//Document
 				}
+				
+			public:
+				struct Tuple
+						: public Contract::Tuple
+				{
+					r3::fields::Date expiration;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

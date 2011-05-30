@@ -26,7 +26,7 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
-				struct DomainDepartment
+				struct Domaindepartment
 				{
 					static const size_t amount = 2;
 					static const char *values[amount];
@@ -41,27 +41,27 @@ namespace r3
 				{
 					//Employee
 					Employee *c_Employee = _schema->getCategory<Employee>().get();
-					o(this, c_Employee, (r3::fields::Enum<Employee::DomainDepartment>*)NULL, "Department");
-					o(this, c_Employee, (r3::fields::Money *)NULL, "RateNight");
-					o(this, c_Employee, (r3::fields::Money *)NULL, "RateNormal");
+					o(this, c_Employee, (r3::fields::Enum<Employee::Domaindepartment>*)NULL, "department");
+					o(this, c_Employee, (r3::fields::Money *)NULL, "rateNight");
+					o(this, c_Employee, (r3::fields::Money *)NULL, "rateNormal");
 					//People
 					People *c_People = _schema->getCategory<People>().get();
-					o(this, c_People, (r3::fields::Date *)NULL, "Birth");
-					o(this, c_People, (r3::fields::String *)NULL, "Middlename");
-					o(this, c_People, (r3::fields::String *)NULL, "Name");
-					o(this, c_People, (r3::fields::Image *)NULL, "Photo");
-					o(this, c_People, (r3::fields::Enum<People::DomainSex>*)NULL, "Sex");
-					o(this, c_People, (r3::fields::String *)NULL, "Surname");
+					o(this, c_People, (r3::fields::Date *)NULL, "birth");
+					o(this, c_People, (r3::fields::String *)NULL, "middlename");
+					o(this, c_People, (r3::fields::String *)NULL, "name");
+					o(this, c_People, (r3::fields::Image *)NULL, "photo");
+					o(this, c_People, (r3::fields::Enum<People::Domainsex>*)NULL, "sex");
+					o(this, c_People, (r3::fields::String *)NULL, "surname");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Employee
 					Employee *c_Employee = _schema->getCategory<Employee>().get();
-					o(this, c_Employee, _schema->getCategory<Service>().get(), (r3::relations::Relation2n *)NULL,	"services",	(r3::relations::Relation2one *)NULL,	"worker",	rs_dst);
+					o(this, c_Employee, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"services",	(r3::relations::Relation2one<Employee>*)NULL,	"worker",	rs_dst);
 					//People
 					People *c_People = _schema->getCategory<People>().get();
-					o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n *)NULL,	"observableServices",	(r3::relations::Relation2n *)NULL,	"observers",	rs_dst);
+					o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
@@ -69,6 +69,17 @@ namespace r3
 					//Employee
 					//People
 				}
+				
+			public:
+				struct Tuple
+						: public People::Tuple
+				{
+					r3::fields::Enum<Employee::Domaindepartment> department;
+					r3::fields::Money rateNight;
+					r3::fields::Money rateNormal;
+					r3::relations::Relation2n<Service> services;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

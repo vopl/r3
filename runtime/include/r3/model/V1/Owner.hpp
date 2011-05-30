@@ -16,12 +16,6 @@ namespace r3
 		namespace s_V1
 		{
 		
-			//deriveds
-			class Department;
-			typedef boost::shared_ptr<Department> Department_ptr;
-			class User;
-			typedef boost::shared_ptr<User> User_ptr;
-			
 			class Owner
 				: public CategoryBase<Owner>
 			{
@@ -42,13 +36,21 @@ namespace r3
 				{
 					//Owner
 					Owner *c_Owner = _schema->getCategory<Owner>().get();
-					o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n *)NULL,	"childs",	(r3::relations::Relation2one *)NULL,	"parent",	rs_dst);
+					o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)NULL,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Owner
 				}
+				
+			public:
+				struct Tuple
+						: public CategoryBase<Owner>::Tuple
+				{
+					r3::relations::Relation2n<Department> childs;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef V1 Schema;

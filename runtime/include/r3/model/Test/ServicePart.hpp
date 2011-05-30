@@ -16,12 +16,6 @@ namespace r3
 		namespace s_Test
 		{
 		
-			//deriveds
-			class Program;
-			typedef boost::shared_ptr<Program> Program_ptr;
-			class WebSite;
-			typedef boost::shared_ptr<WebSite> WebSite_ptr;
-			
 			class ServicePart
 				: public CategoryBase<ServicePart>
 			{
@@ -37,25 +31,39 @@ namespace r3
 				{
 					//ServicePart
 					ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-					o(this, c_ServicePart, (r3::fields::String *)NULL, "Comment");
-					o(this, c_ServicePart, (r3::fields::Money *)NULL, "Cost");
-					o(this, c_ServicePart, (r3::fields::DateTimeInterval *)NULL, "Duration");
-					o(this, c_ServicePart, (r3::fields::Date *)NULL, "Start");
-					o(this, c_ServicePart, (r3::fields::Date *)NULL, "Stop");
+					o(this, c_ServicePart, (r3::fields::String *)NULL, "comment");
+					o(this, c_ServicePart, (r3::fields::Money *)NULL, "cost");
+					o(this, c_ServicePart, (r3::fields::DateTimeInterval *)NULL, "duration");
+					o(this, c_ServicePart, (r3::fields::Date *)NULL, "start");
+					o(this, c_ServicePart, (r3::fields::Date *)NULL, "stop");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//ServicePart
 					ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-					o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n *)NULL,	"documents",	(r3::relations::Relation2one *)NULL,	"servicePart",	rs_src);
-					o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one *)NULL,	"service",	(r3::relations::Relation2n *)NULL,	"parts",	rs_dst);
+					o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n<Document>*)NULL,	"documents",	(r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	rs_src);
+					o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one<Service>*)NULL,	"service",	(r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//ServicePart
 				}
+				
+			public:
+				struct Tuple
+						: public CategoryBase<ServicePart>::Tuple
+				{
+					r3::fields::String comment;
+					r3::fields::Money cost;
+					r3::fields::DateTimeInterval duration;
+					r3::fields::Date start;
+					r3::fields::Date stop;
+					r3::relations::Relation2n<Document> documents;
+					r3::relations::Relation2one<Service> service;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

@@ -35,23 +35,23 @@ namespace r3
 				{
 					//Document
 					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, (r3::fields::Date *)NULL, "Creation");
-					o(this, c_Document, (r3::fields::Timestamp *)NULL, "LastModified");
+					o(this, c_Document, (r3::fields::Date *)NULL, "creation");
+					o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
 					//Mockup
 					Mockup *c_Mockup = _schema->getCategory<Mockup>().get();
-					o(this, c_Mockup, (r3::fields::Audio *)NULL, "Audio");
-					o(this, c_Mockup, (r3::fields::Image *)NULL, "Image");
-					o(this, c_Mockup, (r3::fields::Video *)NULL, "Video");
+					o(this, c_Mockup, (r3::fields::Audio *)NULL, "audio");
+					o(this, c_Mockup, (r3::fields::Image *)NULL, "image");
+					o(this, c_Mockup, (r3::fields::Video *)NULL, "video");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Document
 					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one *)NULL,	"servicePart",	(r3::relations::Relation2n *)NULL,	"documents",	rs_dst);
+					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
 					//Mockup
 					Mockup *c_Mockup = _schema->getCategory<Mockup>().get();
-					o(this, c_Mockup, _schema->getCategory<WebSite>().get(), (r3::relations::Relation2one *)NULL,	"webSite",	(r3::relations::Relation2n *)NULL,	"mockups",	rs_src);
+					o(this, c_Mockup, _schema->getCategory<WebSite>().get(), (r3::relations::Relation2one<WebSite>*)NULL,	"webSite",	(r3::relations::Relation2n<Mockup>*)NULL,	"mockups",	rs_src);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
@@ -59,6 +59,17 @@ namespace r3
 					//Document
 					//Mockup
 				}
+				
+			public:
+				struct Tuple
+						: public Document::Tuple
+				{
+					r3::fields::Audio audio;
+					r3::fields::Image image;
+					r3::fields::Video video;
+					r3::relations::Relation2one<WebSite> webSite;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

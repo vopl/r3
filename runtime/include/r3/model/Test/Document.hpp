@@ -16,18 +16,6 @@ namespace r3
 		namespace s_Test
 		{
 		
-			//deriveds
-			class Contract;
-			typedef boost::shared_ptr<Contract> Contract_ptr;
-			class ContractComplex;
-			typedef boost::shared_ptr<ContractComplex> ContractComplex_ptr;
-			class ContractSimple;
-			typedef boost::shared_ptr<ContractSimple> ContractSimple_ptr;
-			class Letter;
-			typedef boost::shared_ptr<Letter> Letter_ptr;
-			class Mockup;
-			typedef boost::shared_ptr<Mockup> Mockup_ptr;
-			
 			class Document
 				: public CategoryBase<Document>
 			{
@@ -43,21 +31,31 @@ namespace r3
 				{
 					//Document
 					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, (r3::fields::Date *)NULL, "Creation");
-					o(this, c_Document, (r3::fields::Timestamp *)NULL, "LastModified");
+					o(this, c_Document, (r3::fields::Date *)NULL, "creation");
+					o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//Document
 					Document *c_Document = _schema->getCategory<Document>().get();
-					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one *)NULL,	"servicePart",	(r3::relations::Relation2n *)NULL,	"documents",	rs_dst);
+					o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//Document
 				}
+				
+			public:
+				struct Tuple
+						: public CategoryBase<Document>::Tuple
+				{
+					r3::fields::Date creation;
+					r3::fields::Timestamp lastModified;
+					r3::relations::Relation2one<ServicePart> servicePart;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

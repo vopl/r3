@@ -16,12 +16,6 @@ namespace r3
 		namespace s_Test
 		{
 		
-			//deriveds
-			class Client;
-			typedef boost::shared_ptr<Client> Client_ptr;
-			class Employee;
-			typedef boost::shared_ptr<Employee> Employee_ptr;
-			
 			class People
 				: public CategoryBase<People>
 			{
@@ -29,7 +23,7 @@ namespace r3
 			public:
 				static const bool isAbstract = false;
 				
-				struct DomainSex
+				struct Domainsex
 				{
 					static const size_t amount = 0;
 					static const char *values[amount];
@@ -43,25 +37,39 @@ namespace r3
 				{
 					//People
 					People *c_People = _schema->getCategory<People>().get();
-					o(this, c_People, (r3::fields::Date *)NULL, "Birth");
-					o(this, c_People, (r3::fields::String *)NULL, "Middlename");
-					o(this, c_People, (r3::fields::String *)NULL, "Name");
-					o(this, c_People, (r3::fields::Image *)NULL, "Photo");
-					o(this, c_People, (r3::fields::Enum<People::DomainSex>*)NULL, "Sex");
-					o(this, c_People, (r3::fields::String *)NULL, "Surname");
+					o(this, c_People, (r3::fields::Date *)NULL, "birth");
+					o(this, c_People, (r3::fields::String *)NULL, "middlename");
+					o(this, c_People, (r3::fields::String *)NULL, "name");
+					o(this, c_People, (r3::fields::Image *)NULL, "photo");
+					o(this, c_People, (r3::fields::Enum<People::Domainsex>*)NULL, "sex");
+					o(this, c_People, (r3::fields::String *)NULL, "surname");
 				}
 				
 				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o)
 				{
 					//People
 					People *c_People = _schema->getCategory<People>().get();
-					o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n *)NULL,	"observableServices",	(r3::relations::Relation2n *)NULL,	"observers",	rs_dst);
+					o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
 				}
 				
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o)
 				{
 					//People
 				}
+				
+			public:
+				struct Tuple
+						: public CategoryBase<People>::Tuple
+				{
+					r3::fields::Date birth;
+					r3::fields::String middlename;
+					r3::fields::String name;
+					r3::fields::Image photo;
+					r3::fields::Enum<People::Domainsex> sex;
+					r3::fields::String surname;
+					r3::relations::Relation2n<Service> observableServices;
+				};
+				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
 			public:
 				typedef Test Schema;

@@ -174,7 +174,7 @@ namespace workers
 		hpp<<"namespace s_"<<name<<endl<<"{"<<endl;
 
 		//предварительные объ€влени€ типов категорий
-		BOOST_FOREACH(const Category &cat, cats)
+		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"class "<<cat->getName()<<";"<<endl;
 			hpp<<"typedef boost::shared_ptr<"<<cat->getName()<<"> "<<cat->getName()<<"_ptr;"<<endl;
@@ -199,7 +199,7 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//указатели на экземпл€ры категорий
-		BOOST_FOREACH(const Category &cat, cats)
+		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"s_"<<name<<"::"<<cat->getName()<<"_ptr\t_"<<cat->getName()<<";"<<endl;
 		}
@@ -223,7 +223,7 @@ namespace workers
 		hpp<<"template <class Oper> void enumCategories(Oper o)"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<""<<name<<" *s = ("<<name<<"*)this;"<<endl;
-		BOOST_FOREACH(const Category &cat, cats)
+		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"o(s, _"<<cat->getName()<<");";
 			hpp<<endl;
@@ -240,7 +240,7 @@ namespace workers
 		hpp<<endl;
 
 		//геттеры дл€ категорий
-		BOOST_FOREACH(const Category &cat, cats)
+		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<"get"<<cat->getName()<<"()"<<endl;
 			hpp<<"{"<<endl;
@@ -253,7 +253,7 @@ namespace workers
 		hpp<<"};"<<endl;
 		//конец класса
 
-		BOOST_FOREACH(const Category &cat, cats)
+		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"template <> s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<name<<"::getCategory<s_"<<name<<"::"<<cat->getName()<<">()"<<endl;
 			hpp<<"{"<<endl;
@@ -269,7 +269,7 @@ namespace workers
 		hpp<<endl;
 
 		//include дл€ категорий
-		BOOST_FOREACH(const Category &cat, cats)
+		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"#include \"r3/model/"<<name<<"/"<<cat->getName()<<".hpp\""<<endl;
 		}
@@ -370,18 +370,18 @@ namespace workers
 			<<"{"<<endl;
 		hpp<<endl;
 
-		//предварительные объ€влени€ производных
-		if(deriveds.size())
-		{
-			hpp<<"//deriveds"<<endl;
-			BOOST_FOREACH(Category dcat, orderByName(deriveds))
-			{
-				assert(dcat->getSchema() == cat->getSchema());
-				hpp<<"class "<<dcat->getName()<<";"<<endl;
-				hpp<<"typedef boost::shared_ptr<"<<dcat->getName()<<"> "<<dcat->getName()<<"_ptr;"<<endl;
-			}
-			hpp<<endl;
-		}
+// 		//предварительные объ€влени€ производных
+// 		if(deriveds.size())
+// 		{
+// 			hpp<<"//deriveds"<<endl;
+// 			BOOST_FOREACH(Category dcat, orderByName(deriveds))
+// 			{
+// 				assert(dcat->getSchema() == cat->getSchema());
+// 				hpp<<"class "<<dcat->getName()<<";"<<endl;
+// 				hpp<<"typedef boost::shared_ptr<"<<dcat->getName()<<"> "<<dcat->getName()<<"_ptr;"<<endl;
+// 			}
+// 			hpp<<endl;
+// 		}
 
 
 		//класс
@@ -415,6 +415,8 @@ namespace workers
 			hpp<<"};"<<endl;
 			hpp<<endl;
 		}
+
+
 
 		//перечисление базовых
 		hpp<<"template <class Oper> void enumBasesFirst(Oper o)"<<endl;
@@ -509,19 +511,19 @@ namespace workers
 
 					switch(rel->getMultiplier1())
 					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n*)NULL,\t"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one*)NULL,\t";break;
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"\""<<rel->getName1()<<"\",\t";
+					hpp<<"<"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
 
 					switch(rel->getMultiplier2())
 					{
-					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
-					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n*)NULL,\t"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one*)NULL,\t";break;
+					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"\""<<rel->getName2()<<"\",\t";
+					hpp<<"<"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
 
 					hpp<<"rs_src";
 				}
@@ -530,19 +532,19 @@ namespace workers
 					hpp<<"_schema->getCategory<"<<src->getName()<<">().get(), ";
 					switch(rel->getMultiplier2())
 					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n*)NULL,\t"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one*)NULL,\t";break;
+					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"\""<<rel->getName2()<<"\",\t";
+					hpp<<"<"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
 
 					switch(rel->getMultiplier1())
 					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one*)NULL,\t"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n*)NULL,\t"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one*)NULL,\t";break;
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"\""<<rel->getName1()<<"\",\t";
+					hpp<<"<"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
 
 					hpp<<"rs_dst";
 				}
@@ -616,6 +618,99 @@ namespace workers
 		}
 		hpp<<"}"<<endl;
 		hpp<<endl;
+
+
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		//тупла
+		hpp<<"public:"<<endl;
+		hpp<<"struct Tuple"<<endl;
+		if(!basesFirst.empty())
+		{
+			bool first = true;
+			BOOST_FOREACH(Category bcat, basesFirst)
+			{
+				if(first)
+				{
+					first = false;
+					hpp<<": ";
+				}
+				else
+				{
+					hpp<<", ";
+				}
+				hpp<<"public "<<bcat->getName()<<"::Tuple"<<endl;
+			}
+		}
+		else
+		{
+			hpp<<": public CategoryBase<"<<cat->getName()<<">::Tuple"<<endl;
+		}
+
+
+		hpp<<"{"<<endl;
+
+		//пол€
+		std::set<BON::FCO> fields = cat->getChildFCOs();
+		BOOST_FOREACH(Field fld, orderByName(fields))
+		{
+			if(!fld) continue;
+
+			hpp
+				<<"r3::fields::"<<fld->getObjectMeta().name();
+
+			if(Scanty(fld))
+			{
+				Category pcat = fld->getParentModel();
+				hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+			}
+
+			hpp
+				<<" "<<fld->getName()<<";"
+				<<endl;
+		}
+
+		//св€зи
+		std::set<CategoryRelation> rels;
+		collectRelations(rels, cat, true, true);
+		BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
+		{
+			assert(rel);
+
+			Category src = rel->getSrc();
+			if(!src) src = CategoryReference(rel->getSrc())->getCategory();
+
+			Category dst = rel->getDst();
+			if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
+
+			if(src == cat)
+			{
+				switch(rel->getMultiplier1())
+				{
+				case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
+				case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
+				default:assert(0); hpp<<"r3::relations::Relation2one";break;
+				}
+				hpp<<"<"<<dst->getName()<<"> "<<rel->getName1()<<";"<<endl;
+			}
+			else
+			{
+				switch(rel->getMultiplier2())
+				{
+				case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
+				case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
+				default:assert(0); hpp<<"r3::relations::Relation2one";break;
+				}
+				hpp<<"<"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;
+			}
+		}
+		hpp<<"};"<<endl;
+		hpp<<"typedef boost::shared_ptr<Tuple> Tuple_ptr;"<<endl;
+		hpp<<endl;
+
 
 
 		hpp<<"public:"<<endl;
