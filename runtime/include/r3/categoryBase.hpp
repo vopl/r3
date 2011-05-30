@@ -39,6 +39,7 @@ namespace r3
 
 		template <class tag>
 		pgc::Statement stm(const std::string &key);
+		pgc::Statement stm(const std::string &key);
 
 		C *category();
 		const std::string &name();
@@ -88,6 +89,13 @@ namespace r3
 	pgc::Statement CategoryBase<C>::stm(const std::string &key)
 	{
 		return category()->schema()->stm<std::pair<C, tag> >(key);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	pgc::Statement CategoryBase<C>::stm(const std::string &key)
+	{
+		return category()->schema()->stm<C>(key);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

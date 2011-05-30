@@ -21,6 +21,7 @@ namespace r3
 
 		template <class tag>
 		pgc::Statement stm(const std::string &key);
+		pgc::Statement stm(const std::string &key);
 
 		const std::string &id();
 		const std::string &name();
@@ -145,6 +146,13 @@ namespace r3
 	pgc::Statement SchemaBase<S>::stm(const std::string &key)
 	{
 		return _model->stm<std::pair<S, tag> >(key);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S>
+	pgc::Statement SchemaBase<S>::stm(const std::string &key)
+	{
+		return _model->stm<S>(key);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
