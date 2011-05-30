@@ -30,6 +30,12 @@ namespace pgc
 		_impl->sql(sql);
 		return *this;
 	}
+
+	bool Statement::empty() const
+	{
+		return _impl->empty();
+	}
+
 	Statement &Statement::unbind(size_t idx)
 	{
 		_impl->unbind(idx);

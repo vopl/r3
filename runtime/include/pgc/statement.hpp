@@ -27,6 +27,8 @@ namespace pgc
 		Statement &sql(const char *csz);
 		Statement &sql(const std::string &sql);
 
+		bool empty() const;
+
 		Statement &bind(const char *v, size_t idx=0);
 		template <class T> Statement &bind(T const &v, size_t idx=0);
 		Statement &unbind(size_t idx=0);

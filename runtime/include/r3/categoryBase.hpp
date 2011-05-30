@@ -77,6 +77,17 @@ namespace r3
 		void dbCreateInheritance();
 
 	private:
+		template <class Cat>	std::string tupleInsKey(typename Cat::Tuple &tup);
+		template <class Cat>	std::string tupleInsSql(typename Cat::Tuple &tup);
+		template <class Cat>	std::string tupleInsBind(typename Cat::Tuple &tup, pgc::Statement &stm);
+
+		template <class Cat>	std::string tupleUpdKey(typename Cat::Tuple &tup);
+		template <class Cat>	std::string tupleUpdSql(typename Cat::Tuple &tup);
+		template <class Cat>	std::string tupleUpdBind(typename Cat::Tuple &tup, pgc::Statement &stm);
+
+		template <class Cat>	std::string tupleSelSql(typename Cat::Tuple &tup);
+
+	private:
 		std::string _name;
 	};
 
@@ -710,7 +721,13 @@ namespace r3
 	template <class Cat>
 	void CategoryBase<C>::ins(Cat *cat, typename Cat::Tuple &tup)
 	{
-		assert(0);
+		pgc::Statement stm_ = stm(tupleInsKey<Cat>(tup));
+		if(stm_.empty())
+		{
+			stm_.sql(tupleInsSql<Cat>(tup));
+		}
+		tupleInsBind<Cat>(tup, stm_);
+		stm_.exec().throwIfError();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -718,7 +735,13 @@ namespace r3
 	template <class Cat>
 	void CategoryBase<C>::upd(Cat *cat, typename Cat::Tuple &tup)
 	{
-		assert(0);
+		pgc::Statement stm_ = stm(tupleUpdKey<Cat>(tup));
+		if(stm_.empty())
+		{
+			stm_.sql(tupleUpdSql<Cat>(tup));
+		}
+		tupleUpdBind<Cat>(tup, stm_);
+		stm_.exec().throwIfError();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -726,7 +749,13 @@ namespace r3
 	template <class Cat>
 	void CategoryBase<C>::del(Cat *cat, const fields::Id &id)
 	{
-		assert(0);
+		pgc::Statement stm_ = stm("del_id");
+		if(stm_.empty())
+		{
+			stm_.sql("DELETE FROM "+cat->db_sname()+" WHERE id=$1::INT8");
+		}
+		stm_.bind(id.value());
+		stm_.exec().throwIfError();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -734,7 +763,8 @@ namespace r3
 	template <class Cat>
 	void CategoryBase<C>::del(Cat *cat, typename Cat::Tuple &tup)
 	{
-		assert(0);
+		del(cat, tup.id);
+		tup.id.value() = 0;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -742,7 +772,9 @@ namespace r3
 	template <class Cat>
 	typename Cat::Tuple_ptr CategoryBase<C>::sel(Cat *cat, const fields::Id &id)
 	{
-		assert(0);
+		typename Cat::Tuple_ptr tup(new typename Cat::Tuple);
+		tup->id = id;
+		return sel(cat, tup);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -750,7 +782,13 @@ namespace r3
 	template <class Cat>
 	typename Cat::Tuple_ptr CategoryBase<C>::sel(Cat *cat, typename Cat::Tuple_ptr tup)
 	{
-		assert(0);
+		pgc::Statement stm_ = stm("sel_id");
+		if(stm_.empty())
+		{
+			stm_.sql(tupleSelSql<Cat>(*tup));
+		}
+		stm_.bind(tup->id.value());
+		stm_.exec().throwIfError();
 	}
 
 }

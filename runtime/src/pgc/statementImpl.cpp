@@ -31,6 +31,11 @@ namespace pgc
 		_sql = sql;
 	}
 
+	bool StatementImpl::empty() const
+	{
+		return _sql.empty();
+	}
+
 	namespace impl
 	{
 		template <size_t N>
