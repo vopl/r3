@@ -38,8 +38,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -52,11 +52,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -76,20 +76,20 @@ namespace r3
 			{
 			}
 			
-			template <class Oper> void Document::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void Document::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, (r3::fields::Date *)NULL, "creation");
-				o(this, c_Document, (r3::fields::File *)NULL, "file");
-				o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
+				o(this, c_Document, (r3::fields::Date *)&tup.creation, "creation");
+				o(this, c_Document, (r3::fields::File *)&tup.file, "file");
+				o(this, c_Document, (r3::fields::Timestamp *)&tup.lastModified, "lastModified");
 			}
 			
-			template <class Oper> void Document::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void Document::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
+				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)&tup.servicePart,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
 			}
 			
 			template <class Oper> void Document::enumIndicesFromBasesAndSelf(Oper o)
@@ -110,6 +110,51 @@ namespace r3
 			inline Test *Document::schema()
 			{
 				return _schema;
+			}
+			
+			inline void Document::ins(Document::Tuple &tup)
+			{
+				return CategoryBase<Document>::ins(this, tup);
+			}
+			
+			inline void Document::ins(Document::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void Document::upd(Document::Tuple &tup)
+			{
+				return CategoryBase<Document>::upd(this, tup);
+			}
+			
+			inline void Document::upd(Document::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void Document::del(const fields::Id &id)
+			{
+				return CategoryBase<Document>::del(this, id);
+			}
+			
+			inline void Document::del(Document::Tuple &tup)
+			{
+				return CategoryBase<Document>::del(this, tup);
+			}
+			
+			inline void Document::del(Document::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline Document::Tuple_ptr  Document::sel(const fields::Id &id)
+			{
+				return CategoryBase<Document>::sel(this, id);
+			}
+			
+			inline Document::Tuple_ptr Document::sel(Document::Tuple_ptr tup)
+			{
+				return CategoryBase<Document>::sel(this, tup);
 			}
 			
 		}

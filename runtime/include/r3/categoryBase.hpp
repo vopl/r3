@@ -50,6 +50,18 @@ namespace r3
 		CategoryBase(const char *name);
 		~CategoryBase();
 
+	protected:
+		template <class Cat>		void ins(Cat *cat, typename Cat::Tuple &tup);
+		
+		template <class Cat>		void upd(Cat *cat, typename Cat::Tuple &tup);
+
+		template <class Cat>		void del(Cat *cat, const fields::Id &id);
+		template <class Cat>		void del(Cat *cat, typename Cat::Tuple &tup);
+
+		template <class Cat>		typename Cat::Tuple_ptr sel(Cat *cat, const fields::Id &id);
+		template <class Cat>		typename Cat::Tuple_ptr sel(Cat *cat, typename Cat::Tuple_ptr tup);
+
+
 	private:
 		struct enumOper_createField;
 		struct enumOper_createIndex;
@@ -666,7 +678,8 @@ namespace r3
 	void CategoryBase<C>::dbCreateFields()
 	{
 		//перечислить все базовые и себя, собрать все поля и добавить их к таблице
-		((C*)this)->enumFieldsFromBasesAndSelf(enumOper_createField());
+		C::Tuple tup;
+		((C*)this)->enumFieldsFromBasesAndSelf(enumOper_createField(), tup);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -681,7 +694,8 @@ namespace r3
 	template <class C>
 	void CategoryBase<C>::dbCreateRelations()
 	{
-		((C*)this)->enumRelationsFromBasesAndSelf(enumOper_createRelation());
+		C::Tuple tup;
+		((C*)this)->enumRelationsFromBasesAndSelf(enumOper_createRelation(), tup);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -689,6 +703,54 @@ namespace r3
 	void CategoryBase<C>::dbCreateInheritance()
 	{
 		((C*)this)->enumBasesFirst(enumOper_createInheritance());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	template <class Cat>
+	void CategoryBase<C>::ins(Cat *cat, typename Cat::Tuple &tup)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	template <class Cat>
+	void CategoryBase<C>::upd(Cat *cat, typename Cat::Tuple &tup)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	template <class Cat>
+	void CategoryBase<C>::del(Cat *cat, const fields::Id &id)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	template <class Cat>
+	void CategoryBase<C>::del(Cat *cat, typename Cat::Tuple &tup)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	template <class Cat>
+	typename Cat::Tuple_ptr CategoryBase<C>::sel(Cat *cat, const fields::Id &id)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class C>
+	template <class Cat>
+	typename Cat::Tuple_ptr CategoryBase<C>::sel(Cat *cat, typename Cat::Tuple_ptr tup)
+	{
+		assert(0);
 	}
 
 }

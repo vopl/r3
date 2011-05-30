@@ -39,8 +39,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -53,11 +53,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -78,24 +78,24 @@ namespace r3
 				o(this, schema()->getCategory<Document>().get());
 			}
 			
-			template <class Oper> void Letter::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void Letter::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, (r3::fields::Date *)NULL, "creation");
-				o(this, c_Document, (r3::fields::File *)NULL, "file");
-				o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
+				o(this, c_Document, (r3::fields::Date *)&tup.creation, "creation");
+				o(this, c_Document, (r3::fields::File *)&tup.file, "file");
+				o(this, c_Document, (r3::fields::Timestamp *)&tup.lastModified, "lastModified");
 				//Letter
 				Letter *c_Letter = _schema->getCategory<Letter>().get();
-				o(this, c_Letter, (r3::fields::String *)NULL, "comment");
-				o(this, c_Letter, (r3::fields::String *)NULL, "content");
+				o(this, c_Letter, (r3::fields::String *)&tup.comment, "comment");
+				o(this, c_Letter, (r3::fields::String *)&tup.content, "content");
 			}
 			
-			template <class Oper> void Letter::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void Letter::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
+				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)&tup.servicePart,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
 				//Letter
 			}
 			
@@ -118,6 +118,51 @@ namespace r3
 			inline Test *Letter::schema()
 			{
 				return _schema;
+			}
+			
+			inline void Letter::ins(Letter::Tuple &tup)
+			{
+				return CategoryBase<Letter>::ins(this, tup);
+			}
+			
+			inline void Letter::ins(Letter::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void Letter::upd(Letter::Tuple &tup)
+			{
+				return CategoryBase<Letter>::upd(this, tup);
+			}
+			
+			inline void Letter::upd(Letter::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void Letter::del(const fields::Id &id)
+			{
+				return CategoryBase<Letter>::del(this, id);
+			}
+			
+			inline void Letter::del(Letter::Tuple &tup)
+			{
+				return CategoryBase<Letter>::del(this, tup);
+			}
+			
+			inline void Letter::del(Letter::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline Letter::Tuple_ptr  Letter::sel(const fields::Id &id)
+			{
+				return CategoryBase<Letter>::sel(this, id);
+			}
+			
+			inline Letter::Tuple_ptr Letter::sel(Letter::Tuple_ptr tup)
+			{
+				return CategoryBase<Letter>::sel(this, tup);
 			}
 			
 		}

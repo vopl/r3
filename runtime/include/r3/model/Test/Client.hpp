@@ -38,8 +38,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -52,11 +52,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -77,27 +77,27 @@ namespace r3
 				o(this, schema()->getCategory<People>().get());
 			}
 			
-			template <class Oper> void Client::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void Client::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Client
 				//People
 				People *c_People = _schema->getCategory<People>().get();
-				o(this, c_People, (r3::fields::Date *)NULL, "birth");
-				o(this, c_People, (r3::fields::String *)NULL, "middlename");
-				o(this, c_People, (r3::fields::String *)NULL, "name");
-				o(this, c_People, (r3::fields::Image *)NULL, "photo");
-				o(this, c_People, (r3::fields::Enum<People::Domainsex>*)NULL, "sex");
-				o(this, c_People, (r3::fields::String *)NULL, "surname");
+				o(this, c_People, (r3::fields::Date *)&tup.birth, "birth");
+				o(this, c_People, (r3::fields::String *)&tup.middlename, "middlename");
+				o(this, c_People, (r3::fields::String *)&tup.name, "name");
+				o(this, c_People, (r3::fields::Image *)&tup.photo, "photo");
+				o(this, c_People, (r3::fields::Enum<People::Domainsex>*)&tup.sex, "sex");
+				o(this, c_People, (r3::fields::String *)&tup.surname, "surname");
 			}
 			
-			template <class Oper> void Client::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void Client::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Client
 				Client *c_Client = _schema->getCategory<Client>().get();
-				o(this, c_Client, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"services",	(r3::relations::Relation2one<Client>*)NULL,	"client",	rs_dst);
+				o(this, c_Client, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)&tup.services,	"services",	(r3::relations::Relation2one<Client>*)NULL,	"client",	rs_dst);
 				//People
 				People *c_People = _schema->getCategory<People>().get();
-				o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
+				o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)&tup.observableServices,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
 			}
 			
 			template <class Oper> void Client::enumIndicesFromBasesAndSelf(Oper o)
@@ -119,6 +119,51 @@ namespace r3
 			inline Test *Client::schema()
 			{
 				return _schema;
+			}
+			
+			inline void Client::ins(Client::Tuple &tup)
+			{
+				return CategoryBase<Client>::ins(this, tup);
+			}
+			
+			inline void Client::ins(Client::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void Client::upd(Client::Tuple &tup)
+			{
+				return CategoryBase<Client>::upd(this, tup);
+			}
+			
+			inline void Client::upd(Client::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void Client::del(const fields::Id &id)
+			{
+				return CategoryBase<Client>::del(this, id);
+			}
+			
+			inline void Client::del(Client::Tuple &tup)
+			{
+				return CategoryBase<Client>::del(this, tup);
+			}
+			
+			inline void Client::del(Client::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline Client::Tuple_ptr  Client::sel(const fields::Id &id)
+			{
+				return CategoryBase<Client>::sel(this, id);
+			}
+			
+			inline Client::Tuple_ptr Client::sel(Client::Tuple_ptr tup)
+			{
+				return CategoryBase<Client>::sel(this, tup);
 			}
 			
 		}

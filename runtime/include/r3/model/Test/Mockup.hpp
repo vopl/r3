@@ -41,8 +41,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -55,11 +55,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -80,28 +80,28 @@ namespace r3
 				o(this, schema()->getCategory<Document>().get());
 			}
 			
-			template <class Oper> void Mockup::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void Mockup::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, (r3::fields::Date *)NULL, "creation");
-				o(this, c_Document, (r3::fields::File *)NULL, "file");
-				o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
+				o(this, c_Document, (r3::fields::Date *)&tup.creation, "creation");
+				o(this, c_Document, (r3::fields::File *)&tup.file, "file");
+				o(this, c_Document, (r3::fields::Timestamp *)&tup.lastModified, "lastModified");
 				//Mockup
 				Mockup *c_Mockup = _schema->getCategory<Mockup>().get();
-				o(this, c_Mockup, (r3::fields::Audio *)NULL, "audio");
-				o(this, c_Mockup, (r3::fields::Image *)NULL, "image");
-				o(this, c_Mockup, (r3::fields::Video *)NULL, "video");
+				o(this, c_Mockup, (r3::fields::Audio *)&tup.audio, "audio");
+				o(this, c_Mockup, (r3::fields::Image *)&tup.image, "image");
+				o(this, c_Mockup, (r3::fields::Video *)&tup.video, "video");
 			}
 			
-			template <class Oper> void Mockup::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void Mockup::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
+				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)&tup.servicePart,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
 				//Mockup
 				Mockup *c_Mockup = _schema->getCategory<Mockup>().get();
-				o(this, c_Mockup, _schema->getCategory<WebSite>().get(), (r3::relations::Relation2one<WebSite>*)NULL,	"webSite",	(r3::relations::Relation2n<Mockup>*)NULL,	"mockups",	rs_src);
+				o(this, c_Mockup, _schema->getCategory<WebSite>().get(), (r3::relations::Relation2one<WebSite>*)&tup.webSite,	"webSite",	(r3::relations::Relation2n<Mockup>*)NULL,	"mockups",	rs_src);
 			}
 			
 			template <class Oper> void Mockup::enumIndicesFromBasesAndSelf(Oper o)
@@ -123,6 +123,51 @@ namespace r3
 			inline Test *Mockup::schema()
 			{
 				return _schema;
+			}
+			
+			inline void Mockup::ins(Mockup::Tuple &tup)
+			{
+				return CategoryBase<Mockup>::ins(this, tup);
+			}
+			
+			inline void Mockup::ins(Mockup::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void Mockup::upd(Mockup::Tuple &tup)
+			{
+				return CategoryBase<Mockup>::upd(this, tup);
+			}
+			
+			inline void Mockup::upd(Mockup::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void Mockup::del(const fields::Id &id)
+			{
+				return CategoryBase<Mockup>::del(this, id);
+			}
+			
+			inline void Mockup::del(Mockup::Tuple &tup)
+			{
+				return CategoryBase<Mockup>::del(this, tup);
+			}
+			
+			inline void Mockup::del(Mockup::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline Mockup::Tuple_ptr  Mockup::sel(const fields::Id &id)
+			{
+				return CategoryBase<Mockup>::sel(this, id);
+			}
+			
+			inline Mockup::Tuple_ptr Mockup::sel(Mockup::Tuple_ptr tup)
+			{
+				return CategoryBase<Mockup>::sel(this, tup);
 			}
 			
 		}

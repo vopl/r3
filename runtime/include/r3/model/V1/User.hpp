@@ -42,8 +42,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -56,11 +56,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -82,29 +82,29 @@ namespace r3
 				o(this, schema()->getCategory<Owner>().get());
 			}
 			
-			template <class Oper> void User::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void User::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//HasRights
 				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-				o(this, c_HasRights, (r3::fields::Bool *)NULL, "attrInHasRights");
+				o(this, c_HasRights, (r3::fields::Bool *)&tup.attrInHasRights, "attrInHasRights");
 				//Owner
 				//User
 				User *c_User = _schema->getCategory<User>().get();
-				o(this, c_User, (r3::fields::String *)NULL, "login");
-				o(this, c_User, (r3::fields::String *)NULL, "password");
+				o(this, c_User, (r3::fields::String *)&tup.login, "login");
+				o(this, c_User, (r3::fields::String *)&tup.password, "password");
 			}
 			
-			template <class Oper> void User::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void User::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//HasRights
 				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-				o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)NULL,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
+				o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)&tup.owners,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
 				//Owner
 				Owner *c_Owner = _schema->getCategory<Owner>().get();
-				o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)NULL,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
+				o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)&tup.childs,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
 				//User
 				User *c_User = _schema->getCategory<User>().get();
-				o(this, c_User, _schema->getCategory<Role>().get(), (r3::relations::Relation2n<Role>*)NULL,	"users",	(r3::relations::Relation2n<User>*)NULL,	"roles",	rs_dst);
+				o(this, c_User, _schema->getCategory<Role>().get(), (r3::relations::Relation2n<Role>*)&tup.users,	"users",	(r3::relations::Relation2n<User>*)NULL,	"roles",	rs_dst);
 			}
 			
 			template <class Oper> void User::enumIndicesFromBasesAndSelf(Oper o)
@@ -127,6 +127,51 @@ namespace r3
 			inline V1 *User::schema()
 			{
 				return _schema;
+			}
+			
+			inline void User::ins(User::Tuple &tup)
+			{
+				return CategoryBase<User>::ins(this, tup);
+			}
+			
+			inline void User::ins(User::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void User::upd(User::Tuple &tup)
+			{
+				return CategoryBase<User>::upd(this, tup);
+			}
+			
+			inline void User::upd(User::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void User::del(const fields::Id &id)
+			{
+				return CategoryBase<User>::del(this, id);
+			}
+			
+			inline void User::del(User::Tuple &tup)
+			{
+				return CategoryBase<User>::del(this, tup);
+			}
+			
+			inline void User::del(User::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline User::Tuple_ptr  User::sel(const fields::Id &id)
+			{
+				return CategoryBase<User>::sel(this, id);
+			}
+			
+			inline User::Tuple_ptr User::sel(User::Tuple_ptr tup)
+			{
+				return CategoryBase<User>::sel(this, tup);
 			}
 			
 		}

@@ -41,8 +41,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -55,11 +55,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -80,28 +80,28 @@ namespace r3
 				o(this, schema()->getCategory<Stock>().get());
 			}
 			
-			template <class Oper> void Computer::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void Computer::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Computer
 				Computer *c_Computer = _schema->getCategory<Computer>().get();
-				o(this, c_Computer, (r3::fields::DateTimeInterval *)NULL, "equipmentInterval");
-				o(this, c_Computer, (r3::fields::Timestamp *)NULL, "equipmentStamp");
-				o(this, c_Computer, (r3::fields::Bool *)NULL, "mobile");
-				o(this, c_Computer, (r3::fields::String *)NULL, "model");
+				o(this, c_Computer, (r3::fields::DateTimeInterval *)&tup.equipmentInterval, "equipmentInterval");
+				o(this, c_Computer, (r3::fields::Timestamp *)&tup.equipmentStamp, "equipmentStamp");
+				o(this, c_Computer, (r3::fields::Bool *)&tup.mobile, "mobile");
+				o(this, c_Computer, (r3::fields::String *)&tup.model, "model");
 				//Stock
 				Stock *c_Stock = _schema->getCategory<Stock>().get();
-				o(this, c_Stock, (r3::fields::Money *)NULL, "cost");
-				o(this, c_Stock, (r3::fields::Date *)NULL, "incomingDate");
-				o(this, c_Stock, (r3::fields::String *)NULL, "inventoryNumber");
-				o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)NULL, "securityStatus");
+				o(this, c_Stock, (r3::fields::Money *)&tup.cost, "cost");
+				o(this, c_Stock, (r3::fields::Date *)&tup.incomingDate, "incomingDate");
+				o(this, c_Stock, (r3::fields::String *)&tup.inventoryNumber, "inventoryNumber");
+				o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)&tup.securityStatus, "securityStatus");
 			}
 			
-			template <class Oper> void Computer::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void Computer::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Computer
 				//Stock
 				Stock *c_Stock = _schema->getCategory<Stock>().get();
-				o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"services",	(r3::relations::Relation2n<Stock>*)NULL,	"stocks",	rs_dst);
+				o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)&tup.services,	"services",	(r3::relations::Relation2n<Stock>*)NULL,	"stocks",	rs_dst);
 			}
 			
 			template <class Oper> void Computer::enumIndicesFromBasesAndSelf(Oper o)
@@ -123,6 +123,51 @@ namespace r3
 			inline Test *Computer::schema()
 			{
 				return _schema;
+			}
+			
+			inline void Computer::ins(Computer::Tuple &tup)
+			{
+				return CategoryBase<Computer>::ins(this, tup);
+			}
+			
+			inline void Computer::ins(Computer::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void Computer::upd(Computer::Tuple &tup)
+			{
+				return CategoryBase<Computer>::upd(this, tup);
+			}
+			
+			inline void Computer::upd(Computer::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void Computer::del(const fields::Id &id)
+			{
+				return CategoryBase<Computer>::del(this, id);
+			}
+			
+			inline void Computer::del(Computer::Tuple &tup)
+			{
+				return CategoryBase<Computer>::del(this, tup);
+			}
+			
+			inline void Computer::del(Computer::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline Computer::Tuple_ptr  Computer::sel(const fields::Id &id)
+			{
+				return CategoryBase<Computer>::sel(this, id);
+			}
+			
+			inline Computer::Tuple_ptr Computer::sel(Computer::Tuple_ptr tup)
+			{
+				return CategoryBase<Computer>::sel(this, tup);
 			}
 			
 		}

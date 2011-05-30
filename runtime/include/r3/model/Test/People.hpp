@@ -47,8 +47,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -61,11 +61,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -85,23 +85,23 @@ namespace r3
 			{
 			}
 			
-			template <class Oper> void People::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void People::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//People
 				People *c_People = _schema->getCategory<People>().get();
-				o(this, c_People, (r3::fields::Date *)NULL, "birth");
-				o(this, c_People, (r3::fields::String *)NULL, "middlename");
-				o(this, c_People, (r3::fields::String *)NULL, "name");
-				o(this, c_People, (r3::fields::Image *)NULL, "photo");
-				o(this, c_People, (r3::fields::Enum<People::Domainsex>*)NULL, "sex");
-				o(this, c_People, (r3::fields::String *)NULL, "surname");
+				o(this, c_People, (r3::fields::Date *)&tup.birth, "birth");
+				o(this, c_People, (r3::fields::String *)&tup.middlename, "middlename");
+				o(this, c_People, (r3::fields::String *)&tup.name, "name");
+				o(this, c_People, (r3::fields::Image *)&tup.photo, "photo");
+				o(this, c_People, (r3::fields::Enum<People::Domainsex>*)&tup.sex, "sex");
+				o(this, c_People, (r3::fields::String *)&tup.surname, "surname");
 			}
 			
-			template <class Oper> void People::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void People::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//People
 				People *c_People = _schema->getCategory<People>().get();
-				o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)NULL,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
+				o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)&tup.observableServices,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
 			}
 			
 			template <class Oper> void People::enumIndicesFromBasesAndSelf(Oper o)
@@ -122,6 +122,51 @@ namespace r3
 			inline Test *People::schema()
 			{
 				return _schema;
+			}
+			
+			inline void People::ins(People::Tuple &tup)
+			{
+				return CategoryBase<People>::ins(this, tup);
+			}
+			
+			inline void People::ins(People::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void People::upd(People::Tuple &tup)
+			{
+				return CategoryBase<People>::upd(this, tup);
+			}
+			
+			inline void People::upd(People::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void People::del(const fields::Id &id)
+			{
+				return CategoryBase<People>::del(this, id);
+			}
+			
+			inline void People::del(People::Tuple &tup)
+			{
+				return CategoryBase<People>::del(this, tup);
+			}
+			
+			inline void People::del(People::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline People::Tuple_ptr  People::sel(const fields::Id &id)
+			{
+				return CategoryBase<People>::sel(this, id);
+			}
+			
+			inline People::Tuple_ptr People::sel(People::Tuple_ptr tup)
+			{
+				return CategoryBase<People>::sel(this, tup);
 			}
 			
 		}

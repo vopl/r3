@@ -538,10 +538,10 @@ namespace workers
 		hpp<<"template <class Oper> void enumBasesFirst(Oper o);"<<endl;
 
 		//поля свои и все от базовых
-		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);"<<endl;
+		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);"<<endl;
 
 		//связи свои и все от базовых
-		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);"<<endl;
+		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);"<<endl;
 
 		//индексы свои и все от базовых
 		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);"<<endl;
@@ -566,12 +566,12 @@ namespace workers
 		hpp<<"void upd(Tuple_ptr tup);"<<endl;
 		hpp<<endl;
 		//del
-		hpp<<"void del(const boost::int64_t &id);"<<endl;
+		hpp<<"void del(const fields::Id &id);"<<endl;
 		hpp<<"void del(Tuple &tup);"<<endl;
 		hpp<<"void del(Tuple_ptr tup);"<<endl;
 		hpp<<endl;
 		//sel
-		hpp<<"Tuple_ptr sel(const boost::int64_t &id);"<<endl;
+		hpp<<"Tuple_ptr sel(const fields::Id &id);"<<endl;
 		hpp<<"Tuple_ptr sel(Tuple_ptr tup);"<<endl;
 		hpp<<endl;
 
@@ -612,7 +612,7 @@ namespace workers
 
 
 		//поля свои и все от базовых
-		hpp<<"template <class Oper> void "<<name<<"::enumFieldsFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"template <class Oper> void "<<name<<"::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)"<<endl;
 		hpp<<"{"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
@@ -640,7 +640,7 @@ namespace workers
 				}
 
 				hpp
-					<<"*)NULL, "
+					<<"*)&tup."<<fld->getName()<<", "
 					<<"\""<<fld->getName()<<"\""
 					<<");"
 					<<endl;
@@ -660,7 +660,7 @@ namespace workers
 
 
 		//связи свои и все от базовых
-		hpp<<"template <class Oper> void "<<name<<"::enumRelationsFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"template <class Oper> void "<<name<<"::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)"<<endl;
 		hpp<<"{"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
@@ -696,7 +696,7 @@ namespace workers
 					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"<"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
+					hpp<<"<"<<dst->getName()<<">*)&tup."<<rel->getName1()<<",\t\""<<rel->getName1()<<"\",\t";
 
 					switch(rel->getMultiplier2())
 					{
@@ -717,7 +717,7 @@ namespace workers
 					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"<"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
+					hpp<<"<"<<src->getName()<<">*)&tup."<<rel->getName2()<<",\t\""<<rel->getName2()<<"\",\t";
 
 					switch(rel->getMultiplier1())
 					{
@@ -822,6 +822,64 @@ namespace workers
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
+
+		//ins
+		hpp<<"inline void "<<name<<"::ins("<<name<<"::Tuple &tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return CategoryBase<"<<name<<">::ins(this, tup);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		hpp<<"inline void "<<name<<"::ins("<<name<<"::Tuple_ptr tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return ins(*tup);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		//upd
+		hpp<<"inline void "<<name<<"::upd("<<name<<"::Tuple &tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return CategoryBase<"<<name<<">::upd(this, tup);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		hpp<<"inline void "<<name<<"::upd("<<name<<"::Tuple_ptr tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return upd(*tup);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		//del
+		hpp<<"inline void "<<name<<"::del(const fields::Id &id)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return CategoryBase<"<<name<<">::del(this, id);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		hpp<<"inline void "<<name<<"::del("<<name<<"::Tuple &tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return CategoryBase<"<<name<<">::del(this, tup);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		hpp<<"inline void "<<name<<"::del("<<name<<"::Tuple_ptr tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return del(*tup);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		//sel
+		hpp<<"inline "<<name<<"::Tuple_ptr  "<<name<<"::sel(const fields::Id &id)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return CategoryBase<"<<name<<">::sel(this, id);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		hpp<<"inline "<<name<<"::Tuple_ptr "<<name<<"::sel("<<name<<"::Tuple_ptr tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"return CategoryBase<"<<name<<">::sel(this, tup);"<<endl;
+		hpp<<"}"<<endl;
+		hpp<<endl;
 
 		//конец пространства имен
 		hpp<<"}"<<endl<<"}"<<endl<<"}"<<endl;

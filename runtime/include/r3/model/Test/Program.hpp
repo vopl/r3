@@ -39,8 +39,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -53,11 +53,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -78,28 +78,28 @@ namespace r3
 				o(this, schema()->getCategory<ServicePart>().get());
 			}
 			
-			template <class Oper> void Program::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void Program::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Program
 				Program *c_Program = _schema->getCategory<Program>().get();
-				o(this, c_Program, (r3::fields::String *)NULL, "language");
-				o(this, c_Program, (r3::fields::String *)NULL, "repository");
+				o(this, c_Program, (r3::fields::String *)&tup.language, "language");
+				o(this, c_Program, (r3::fields::String *)&tup.repository, "repository");
 				//ServicePart
 				ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-				o(this, c_ServicePart, (r3::fields::String *)NULL, "comment");
-				o(this, c_ServicePart, (r3::fields::Money *)NULL, "cost");
-				o(this, c_ServicePart, (r3::fields::DateTimeInterval *)NULL, "duration");
-				o(this, c_ServicePart, (r3::fields::Date *)NULL, "start");
-				o(this, c_ServicePart, (r3::fields::Date *)NULL, "stop");
+				o(this, c_ServicePart, (r3::fields::String *)&tup.comment, "comment");
+				o(this, c_ServicePart, (r3::fields::Money *)&tup.cost, "cost");
+				o(this, c_ServicePart, (r3::fields::DateTimeInterval *)&tup.duration, "duration");
+				o(this, c_ServicePart, (r3::fields::Date *)&tup.start, "start");
+				o(this, c_ServicePart, (r3::fields::Date *)&tup.stop, "stop");
 			}
 			
-			template <class Oper> void Program::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void Program::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Program
 				//ServicePart
 				ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-				o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n<Document>*)NULL,	"documents",	(r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	rs_src);
-				o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one<Service>*)NULL,	"service",	(r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	rs_dst);
+				o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n<Document>*)&tup.documents,	"documents",	(r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	rs_src);
+				o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one<Service>*)&tup.service,	"service",	(r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	rs_dst);
 			}
 			
 			template <class Oper> void Program::enumIndicesFromBasesAndSelf(Oper o)
@@ -121,6 +121,51 @@ namespace r3
 			inline Test *Program::schema()
 			{
 				return _schema;
+			}
+			
+			inline void Program::ins(Program::Tuple &tup)
+			{
+				return CategoryBase<Program>::ins(this, tup);
+			}
+			
+			inline void Program::ins(Program::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void Program::upd(Program::Tuple &tup)
+			{
+				return CategoryBase<Program>::upd(this, tup);
+			}
+			
+			inline void Program::upd(Program::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void Program::del(const fields::Id &id)
+			{
+				return CategoryBase<Program>::del(this, id);
+			}
+			
+			inline void Program::del(Program::Tuple &tup)
+			{
+				return CategoryBase<Program>::del(this, tup);
+			}
+			
+			inline void Program::del(Program::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline Program::Tuple_ptr  Program::sel(const fields::Id &id)
+			{
+				return CategoryBase<Program>::sel(this, id);
+			}
+			
+			inline Program::Tuple_ptr Program::sel(Program::Tuple_ptr tup)
+			{
+				return CategoryBase<Program>::sel(this, tup);
 			}
 			
 		}

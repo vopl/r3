@@ -43,8 +43,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -57,11 +57,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -81,25 +81,25 @@ namespace r3
 			{
 			}
 			
-			template <class Oper> void Service::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void Service::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Service
 				Service *c_Service = _schema->getCategory<Service>().get();
-				o(this, c_Service, (r3::fields::Bool *)NULL, "archive");
-				o(this, c_Service, (r3::fields::String *)NULL, "comment");
-				o(this, c_Service, (r3::fields::Date *)NULL, "created");
-				o(this, c_Service, (r3::fields::String *)NULL, "description");
+				o(this, c_Service, (r3::fields::Bool *)&tup.archive, "archive");
+				o(this, c_Service, (r3::fields::String *)&tup.comment, "comment");
+				o(this, c_Service, (r3::fields::Date *)&tup.created, "created");
+				o(this, c_Service, (r3::fields::String *)&tup.description, "description");
 			}
 			
-			template <class Oper> void Service::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void Service::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Service
 				Service *c_Service = _schema->getCategory<Service>().get();
-				o(this, c_Service, _schema->getCategory<Client>().get(), (r3::relations::Relation2one<Client>*)NULL,	"client",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
-				o(this, c_Service, _schema->getCategory<People>().get(), (r3::relations::Relation2n<People>*)NULL,	"observers",	(r3::relations::Relation2n<Service>*)NULL,	"observableServices",	rs_src);
-				o(this, c_Service, _schema->getCategory<Stock>().get(), (r3::relations::Relation2n<Stock>*)NULL,	"stocks",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
-				o(this, c_Service, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	(r3::relations::Relation2one<Service>*)NULL,	"service",	rs_src);
-				o(this, c_Service, _schema->getCategory<Employee>().get(), (r3::relations::Relation2one<Employee>*)NULL,	"worker",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
+				o(this, c_Service, _schema->getCategory<Client>().get(), (r3::relations::Relation2one<Client>*)&tup.client,	"client",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
+				o(this, c_Service, _schema->getCategory<People>().get(), (r3::relations::Relation2n<People>*)&tup.observers,	"observers",	(r3::relations::Relation2n<Service>*)NULL,	"observableServices",	rs_src);
+				o(this, c_Service, _schema->getCategory<Stock>().get(), (r3::relations::Relation2n<Stock>*)&tup.stocks,	"stocks",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
+				o(this, c_Service, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2n<ServicePart>*)&tup.parts,	"parts",	(r3::relations::Relation2one<Service>*)NULL,	"service",	rs_src);
+				o(this, c_Service, _schema->getCategory<Employee>().get(), (r3::relations::Relation2one<Employee>*)&tup.worker,	"worker",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
 			}
 			
 			template <class Oper> void Service::enumIndicesFromBasesAndSelf(Oper o)
@@ -120,6 +120,51 @@ namespace r3
 			inline Test *Service::schema()
 			{
 				return _schema;
+			}
+			
+			inline void Service::ins(Service::Tuple &tup)
+			{
+				return CategoryBase<Service>::ins(this, tup);
+			}
+			
+			inline void Service::ins(Service::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void Service::upd(Service::Tuple &tup)
+			{
+				return CategoryBase<Service>::upd(this, tup);
+			}
+			
+			inline void Service::upd(Service::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void Service::del(const fields::Id &id)
+			{
+				return CategoryBase<Service>::del(this, id);
+			}
+			
+			inline void Service::del(Service::Tuple &tup)
+			{
+				return CategoryBase<Service>::del(this, tup);
+			}
+			
+			inline void Service::del(Service::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline Service::Tuple_ptr  Service::sel(const fields::Id &id)
+			{
+				return CategoryBase<Service>::sel(this, id);
+			}
+			
+			inline Service::Tuple_ptr Service::sel(Service::Tuple_ptr tup)
+			{
+				return CategoryBase<Service>::sel(this, tup);
 			}
 			
 		}

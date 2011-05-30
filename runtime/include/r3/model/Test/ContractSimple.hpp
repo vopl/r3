@@ -38,8 +38,8 @@ namespace r3
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
-				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o);
-				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o);
+				template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);
+				template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);
 				template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);
 				
 			public:
@@ -52,11 +52,11 @@ namespace r3
 				void upd(Tuple &tup);
 				void upd(Tuple_ptr tup);
 				
-				void del(const boost::int64_t &id);
+				void del(const fields::Id &id);
 				void del(Tuple &tup);
 				void del(Tuple_ptr tup);
 				
-				Tuple_ptr sel(const boost::int64_t &id);
+				Tuple_ptr sel(const fields::Id &id);
 				Tuple_ptr sel(Tuple_ptr tup);
 				
 			protected:
@@ -77,31 +77,31 @@ namespace r3
 				o(this, schema()->getCategory<Contract>().get());
 			}
 			
-			template <class Oper> void ContractSimple::enumFieldsFromBasesAndSelf(Oper o)
+			template <class Oper> void ContractSimple::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Contract
 				Contract *c_Contract = _schema->getCategory<Contract>().get();
-				o(this, c_Contract, (r3::fields::Int32 *)NULL, "param1");
-				o(this, c_Contract, (r3::fields::Int64 *)NULL, "param2");
-				o(this, c_Contract, (r3::fields::Int8 *)NULL, "param3");
-				o(this, c_Contract, (r3::fields::Real64 *)NULL, "param4");
+				o(this, c_Contract, (r3::fields::Int32 *)&tup.param1, "param1");
+				o(this, c_Contract, (r3::fields::Int64 *)&tup.param2, "param2");
+				o(this, c_Contract, (r3::fields::Int8 *)&tup.param3, "param3");
+				o(this, c_Contract, (r3::fields::Real64 *)&tup.param4, "param4");
 				//ContractSimple
 				ContractSimple *c_ContractSimple = _schema->getCategory<ContractSimple>().get();
-				o(this, c_ContractSimple, (r3::fields::Date *)NULL, "expiration");
+				o(this, c_ContractSimple, (r3::fields::Date *)&tup.expiration, "expiration");
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, (r3::fields::Date *)NULL, "creation");
-				o(this, c_Document, (r3::fields::File *)NULL, "file");
-				o(this, c_Document, (r3::fields::Timestamp *)NULL, "lastModified");
+				o(this, c_Document, (r3::fields::Date *)&tup.creation, "creation");
+				o(this, c_Document, (r3::fields::File *)&tup.file, "file");
+				o(this, c_Document, (r3::fields::Timestamp *)&tup.lastModified, "lastModified");
 			}
 			
-			template <class Oper> void ContractSimple::enumRelationsFromBasesAndSelf(Oper o)
+			template <class Oper> void ContractSimple::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
 			{
 				//Contract
 				//ContractSimple
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
+				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)&tup.servicePart,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
 			}
 			
 			template <class Oper> void ContractSimple::enumIndicesFromBasesAndSelf(Oper o)
@@ -124,6 +124,51 @@ namespace r3
 			inline Test *ContractSimple::schema()
 			{
 				return _schema;
+			}
+			
+			inline void ContractSimple::ins(ContractSimple::Tuple &tup)
+			{
+				return CategoryBase<ContractSimple>::ins(this, tup);
+			}
+			
+			inline void ContractSimple::ins(ContractSimple::Tuple_ptr tup)
+			{
+				return ins(*tup);
+			}
+			
+			inline void ContractSimple::upd(ContractSimple::Tuple &tup)
+			{
+				return CategoryBase<ContractSimple>::upd(this, tup);
+			}
+			
+			inline void ContractSimple::upd(ContractSimple::Tuple_ptr tup)
+			{
+				return upd(*tup);
+			}
+			
+			inline void ContractSimple::del(const fields::Id &id)
+			{
+				return CategoryBase<ContractSimple>::del(this, id);
+			}
+			
+			inline void ContractSimple::del(ContractSimple::Tuple &tup)
+			{
+				return CategoryBase<ContractSimple>::del(this, tup);
+			}
+			
+			inline void ContractSimple::del(ContractSimple::Tuple_ptr tup)
+			{
+				return del(*tup);
+			}
+			
+			inline ContractSimple::Tuple_ptr  ContractSimple::sel(const fields::Id &id)
+			{
+				return CategoryBase<ContractSimple>::sel(this, id);
+			}
+			
+			inline ContractSimple::Tuple_ptr ContractSimple::sel(ContractSimple::Tuple_ptr tup)
+			{
+				return CategoryBase<ContractSimple>::sel(this, tup);
 			}
 			
 		}
