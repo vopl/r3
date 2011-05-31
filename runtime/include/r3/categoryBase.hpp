@@ -745,12 +745,13 @@ namespace r3
 	{
 		pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
 
-// 		if(stm_.empty()) {
-// 			stm_.sql(tupleUpdSql(tup));
-// 		}
-// 
-// 		tupleUpdBind(tup, stm_);
-// 		stm_.exec().throwIfError();
+		if(stm_.empty())
+		{
+			stm_.sql(tupleUpdSql(tup));
+		}
+
+		tupleUpdBind(tup, stm_);
+		stm_.exec().throwIfError();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -940,6 +941,106 @@ namespace r3
 	void CategoryBase<S,C,T>::tupleInsBind(T &tup, pgc::Statement &stm)
 	{
 		enumOper_tupleInsBind oper(stm);
+		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
+	}
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_tupleUpdSql
+	{
+		std::string fields;
+		size_t idx;
+
+		enumOper_tupleUpdSql()
+			: idx(0)
+		{
+		}
+
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::Field *fld,
+			const char *fname)
+		{
+			assert(idx < T::_fieldsAmount);
+
+			if(fld->fvs() != fields::fvs_notset)
+			{
+				if(idx)
+				{
+					fields += ",";
+				}
+
+				idx++;
+				fields += "\"_";
+				fields += fname;
+				fields += "_\"=$";
+
+				char buf[32];
+				fields += utils::_ntoa(idx+1, buf);
+			}
+		}
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	std::string CategoryBase<S,C,T>::tupleUpdSql(T &tup)
+	{
+		enumOper_tupleUpdSql oper;
+		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
+
+		return "UPDATE "+((C*)this)->db_sname()+" SET "+oper.fields+" WHERE id=$1";
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_tupleUpdBind
+	{
+		pgc::Statement &stm;
+		size_t idx;
+
+		enumOper_tupleUpdBind(pgc::Statement &stm)
+			: idx(0)
+			, stm(stm)
+		{
+		}
+
+		template <typename F> void bind(F *fld)
+		{
+			stm.bind(fld->value(), idx+1);
+		}
+
+		template <typename Category, typename CategoryBaseOrSelf, typename F> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			F *fld,
+			const char *fname)
+		{
+			assert(idx < T::_fieldsAmount);
+
+			if(fld->fvs() != fields::fvs_notset)
+			{
+				idx++;
+				bind(fld);
+			}
+		}
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S,C,T>::tupleUpdBind(T &tup, pgc::Statement &stm)
+	{
+		enumOper_tupleUpdBind oper(stm);
+		stm.bind(tup.id.value(), 1);
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 	}
 

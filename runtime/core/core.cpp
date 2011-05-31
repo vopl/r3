@@ -81,6 +81,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		comp.model = "mmodel3!!";
 		ccomp->ins(comp);
 
+		comp.id.value() = 3;
+		comp.model = "mmodel3!!___";
+		ccomp->upd(comp);
+
 // 		comp.cost = 340;
 // 		ccomp->upd(comp);
 // 

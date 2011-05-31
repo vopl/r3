@@ -14,8 +14,10 @@ namespace r3{ namespace fields
 	{
 		boost::int64_t _value;
 	public:
-		const boost::int64_t &value() const;
-		boost::int64_t &value();
+		boost::int64_t &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 
