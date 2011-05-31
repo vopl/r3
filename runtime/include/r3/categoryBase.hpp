@@ -93,6 +93,9 @@ namespace r3
 		struct enumOper_tupleUpdBind;
 		void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 
+		struct enumOper_tupleSelFetch;
+		void tupleSelFetch(Tuple &tup, pgc::Result &res, size_t row);
+
 
 	private:
 		std::string _name;
@@ -786,7 +789,42 @@ namespace r3
 		tup.id.value() = 0;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S, C, T>::del(Tuple_ptr tup)
+	{
+		del(tup->id);
+		tup->id.value() = 0;
+	}
 
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	typename CategoryBase<S, C, T>::Tuple_ptr CategoryBase<S, C, T>::sel(const fields::Id &id)
+	{
+		Tuple_ptr res(new Tuple);
+		res->id = id;
+		return sel(res);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	typename CategoryBase<S, C, T>::Tuple_ptr CategoryBase<S, C, T>::sel(Tuple_ptr tup)
+	{
+		pgc::Statement stm_ = stm("sel_id");
+
+		if(stm_.empty())
+		{
+			stm_.sql(tupleSelSql(*tup));
+		}
+
+		stm_.bind(tup->id.value());
+		pgc::Result res = stm_.exec().throwIfError();
+
+		tupleSelFetch(*tup, res, 0);
+		return tup;
+	}
 
 
 
@@ -1045,6 +1083,98 @@ namespace r3
 	{
 		enumOper_tupleUpdBind oper(stm);
 		stm.bind(tup.id.value(), 1);
+		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_tupleSelSql
+	{
+		std::string fields;
+		size_t idx;
+
+		enumOper_tupleSelSql()
+			: idx(0)
+		{
+		}
+
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::Field *fld,
+			const char *fname)
+		{
+			assert(idx < T::_fieldsAmount);
+
+			if(idx)
+			{
+				fields += ",";
+			}
+
+			idx++;
+			fields += "\"_";
+			fields += fname;
+			fields += "_\"";
+		}
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	std::string CategoryBase<S,C,T>::tupleSelSql(Tuple &tup)
+	{
+		enumOper_tupleSelSql oper;
+		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
+
+		return "SELECT id,"+oper.fields+" FROM "+((C*)this)->db_sname()+" WHERE id=$1";
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_tupleSelFetch
+	{
+		pgc::Result &res;
+		size_t row;
+		size_t idx;
+		enumOper_tupleSelFetch(pgc::Result &res, size_t row)
+			: res(res)
+			, row(row)
+			, idx(0)
+		{
+		}
+
+		template <typename F> void fetch(F *fld)
+		{
+			idx++;
+			if(res.isNull(row, idx))
+			{
+				fld->fvs(fields::fvs_null);
+			}
+			else
+			{
+				fld->fvs(fields::fvs_set);
+				res.fetch(row, idx, fld->value());
+			}
+		}
+
+		template <typename Category, typename CategoryBaseOrSelf, typename F> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			F *fld,
+			const char *fname)
+		{
+			fetch(fld);
+		}
+
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S,C,T>::tupleSelFetch(Tuple &tup, pgc::Result &res, size_t row)
+	{
+		enumOper_tupleSelFetch oper(res, row);
+		res.fetch(row, 0, tup.id.value());
+		tup.id.fvs(fields::fvs_set);
+
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 	}
 

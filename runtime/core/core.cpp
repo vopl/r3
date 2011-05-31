@@ -83,20 +83,20 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		comp.model = "mmodel3!!___";
 		ccomp->upd(comp);
-		ccomp->del(comp);
+//		ccomp->del(comp);
 
 // 		comp.cost = 340;
 // 		ccomp->upd(comp);
 // 
 		r3::model::s_Test::Computer::Tuple_ptr pcomp;
-// 		pcomp = ccomp->sel(comp.id);
+ 		pcomp = ccomp->sel(comp.id);
 
 		r3::model::s_Test::Stock_ptr cstock = test->getStock();
 		r3::model::s_Test::Stock::Tuple_ptr pstock;
-// 		pstock = cstock->sel(comp.id);
-// 		pcomp->upg(pstock);
-// 
-// 		test->del(pcomp->id);
+ 		pstock = cstock->sel(comp.id);
+ 		//pcomp->upg(pstock);
+ 
+ 		cstock->del(pstock);
 
 		m.con().once("COMMIT").exec();
 	}
