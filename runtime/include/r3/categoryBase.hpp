@@ -767,12 +767,13 @@ namespace r3
 	{
 		pgc::Statement stm_ = stm("del_id");
 
-// 		if(stm_.empty()) {
-// 			stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
-// 		}
-// 
-// 		stm_.bind(id.value());
-// 		stm_.exec().throwIfError();
+		if(stm_.empty())
+		{
+			stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1");
+		}
+
+		stm_.bind(id.value());
+		stm_.exec().throwIfError();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

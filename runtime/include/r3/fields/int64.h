@@ -18,6 +18,10 @@ namespace r3{ namespace fields
 		{
 			return _value;
 		}
+		const boost::int64_t &value() const 
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 
