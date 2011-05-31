@@ -24,7 +24,12 @@ namespace r3
 		};
 
 	public:
+		typedef S Schema;
+		typedef C Category;
+		typedef T Tuple;
+		typedef boost::shared_ptr<T> Tuple_ptr;
 
+	public:
 		pgc::Connection con();
 
 		template <class tag>
@@ -35,6 +40,21 @@ namespace r3
 		const std::string &name();
 		std::string db_name();
 		std::string db_sname();
+
+	public:
+		void ins(Tuple &tup);
+		void ins(Tuple_ptr tup);
+
+		void upd(Tuple &tup);
+		void upd(Tuple_ptr tup);
+
+		void del(const fields::Id &id);
+		void del(Tuple &tup);
+		void del(Tuple_ptr tup);
+
+		Tuple_ptr sel(const fields::Id &id);
+		Tuple_ptr sel(Tuple_ptr tup);
+
 
 	protected:
 		CategoryBase(const char *name);
@@ -53,6 +73,16 @@ namespace r3
 		void dbCreateIndices();
 		void dbCreateRelations();
 		void dbCreateInheritance();
+
+	private:
+		struct enumOper_tupleFillKey;
+		std::string tupleFillKey(Tuple &tup);
+		std::string tupleInsSql(Tuple &tup);
+		std::string tupleUpdSql(Tuple &tup);
+		std::string tupleSelSql(Tuple &tup);
+		void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+		void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
+
 
 	private:
 		std::string _name;
@@ -669,6 +699,146 @@ namespace r3
 	{
 		((C*)this)->enumBasesFirst(enumOper_createInheritance());
 	}
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S, C, T>::ins(Tuple &tup)
+	{
+		pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+
+// 		if(stm_.empty())
+// 		{
+// 			stm_.sql(tupleInsSql(tup));
+// 		}
+// 
+// 		tupleInsBind(tup, stm_);
+// 		stm_.exec().throwIfError();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S, C, T>::ins(Tuple_ptr tup)
+	{
+		return ins(*tup);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S, C, T>::upd(Tuple &tup)
+	{
+		pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+
+// 		if(stm_.empty()) {
+// 			stm_.sql(tupleUpdSql(tup));
+// 		}
+// 
+// 		tupleUpdBind(tup, stm_);
+// 		stm_.exec().throwIfError();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S, C, T>::upd(Tuple_ptr tup)
+	{
+		return upd(*tup);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S, C, T>::del(const fields::Id &id)
+	{
+		pgc::Statement stm_ = stm("del_id");
+
+// 		if(stm_.empty()) {
+// 			stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+// 		}
+// 
+// 		stm_.bind(id.value());
+// 		stm_.exec().throwIfError();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	void CategoryBase<S, C, T>::del(Tuple &tup)
+	{
+		del(tup.id);
+		tup.id.value() = 0;
+	}
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_tupleFillKey
+	{
+		static const size_t _bufSize = T::_fieldsAmount/8 + (T::_fieldsAmount % 8 ? 1 : 0);
+		unsigned char _buf[_bufSize];
+		size_t idx;
+
+		enumOper_tupleFillKey()
+			: idx(0)
+		{
+			memset(_buf, 0, _bufSize);
+		}
+
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::Field *fld,
+			const char *fname)
+		{
+			assert(idx < T::_fieldsAmount);
+			if(fld->fvs() != fields::fvs_notset)
+			{
+				_buf[idx/8] |= 1 << (idx%8);
+			}
+			idx++;
+		}
+
+		unsigned char toHex(unsigned char c)
+		{
+			if(c >= 10) 
+				return c-10+'a';
+			return c + '0';
+		}
+
+		std::string mkRes()
+		{
+			assert(idx == T::_fieldsAmount);
+
+			std::string res;
+			res.resize(_bufSize*2);
+			for(size_t i(0); i<_bufSize; i++)
+			{
+				res[i*2+0] = toHex(_buf[i]/16);
+				res[i*2+1] = toHex(_buf[i]%16);
+			}
+
+			return res;
+		}
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S, class C, class T>
+	std::string CategoryBase<S,C,T>::tupleFillKey(T &tup)
+	{
+		enumOper_tupleFillKey oper;
+		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
+
+		return oper.mkRes();
+	}
+
 }
 
 #endif

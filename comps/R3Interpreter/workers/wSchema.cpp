@@ -408,7 +408,7 @@ namespace workers
 
 
 		//////////////////////////////////////////////////////////////////////////
-		hpp<<"namespace tuple"<<endl;
+		hpp<<"namespace tuples"<<endl;
 		hpp<<"{"<<endl;
 
 		//домены
@@ -438,6 +438,8 @@ namespace workers
 		hpp<<": public TupleBase<"<<name<<">"<<endl;
 		hpp<<"{"<<endl;
 
+		size_t fieldsAmount = 0;
+		size_t relationsAmount = 0;
 		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
 			hpp<<"// "<<cat->getName()<<endl;
@@ -460,6 +462,7 @@ namespace workers
 				hpp
 					<<" "<<fld->getName()<<";"
 					<<endl;
+				fieldsAmount++;
 			}
 
 			//связи
@@ -495,8 +498,13 @@ namespace workers
 					}
 					hpp<<"<"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;
 				}
+				relationsAmount++;
 			}
 		}
+		hpp<<endl;
+		hpp<<"static const size_t _fieldsAmount = "<<fieldsAmount<<";"<<endl;
+		hpp<<"static const size_t _relationsAmount = "<<relationsAmount<<";"<<endl;
+		hpp<<endl;
 		hpp<<"};"<<endl;
 		hpp<<"typedef boost::shared_ptr<"<<name<<"> "<<name<<"_ptr;"<<endl;
 		hpp<<endl;
@@ -507,7 +515,7 @@ namespace workers
 
 		//класс
 		hpp<<"class "<<name<<endl;
-		hpp<<": public CategoryBase<"<<cat->getSchema()<<", "<<name<<", tuple::"<<name<<">"<<endl;
+		hpp<<": public CategoryBase<"<<cat->getSchema()<<", "<<name<<", tuples::"<<name<<">"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<endl;
 
@@ -515,8 +523,8 @@ namespace workers
 		hpp<<"static const bool isAbstract = "<<(cat->isAbstract()?"true":"false")<<";"<<endl;
 		hpp<<endl;
 
-		hpp<<"typedef tuple::"<<name<<" Tuple;"<<endl;
-		hpp<<"typedef tuple::"<<name<<"_ptr Tuple_ptr;"<<endl;
+		hpp<<"typedef tuples::"<<name<<" Tuple;"<<endl;
+		hpp<<"typedef tuples::"<<name<<"_ptr Tuple_ptr;"<<endl;
 		hpp<<endl;
 
 		hpp<<"typedef "<<cat->getSchema()<<" Schema;"<<endl;
@@ -531,13 +539,13 @@ namespace workers
 		hpp<<"template <class Oper> void enumBasesFirst(Oper o);"<<endl;
 
 		//поля свои и все от базовых
-		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper o, Tuple &tup);"<<endl;
+		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper &o, Tuple &tup);"<<endl;
 
 		//связи свои и все от базовых
-		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper o, Tuple &tup);"<<endl;
+		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup);"<<endl;
 
 		//индексы свои и все от базовых
-		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper o);"<<endl;
+		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper &o);"<<endl;
 		hpp<<endl;
 
 
@@ -548,24 +556,6 @@ namespace workers
 
 		//геттер для схемы
 		hpp<<""<<cat->getSchema()<<" *schema();"<<endl;
-		hpp<<endl;
-
-		//ins
-		hpp<<"void ins(Tuple &tup);"<<endl;
-		hpp<<"void ins(Tuple_ptr tup);"<<endl;
-		hpp<<endl;
-		//upd
-		hpp<<"void upd(Tuple &tup);"<<endl;
-		hpp<<"void upd(Tuple_ptr tup);"<<endl;
-		hpp<<endl;
-		//del
-		hpp<<"void del(const fields::Id &id);"<<endl;
-		hpp<<"void del(Tuple &tup);"<<endl;
-		hpp<<"void del(Tuple_ptr tup);"<<endl;
-		hpp<<endl;
-		//sel
-		hpp<<"Tuple_ptr sel(const fields::Id &id);"<<endl;
-		hpp<<"Tuple_ptr sel(Tuple_ptr tup);"<<endl;
 		hpp<<endl;
 
 		hpp<<"protected:"<<endl;
@@ -579,14 +569,6 @@ namespace workers
 		hpp<<""<<cat->getSchema()<<" *_schema;"<<endl;
 		hpp<<endl;
 
-		hpp<<"protected:"<<endl;
-		hpp<<"std::string tupleFillKey(Tuple &tup);"<<endl;
-		hpp<<"std::string tupleInsSql(Tuple &tup);"<<endl;
-		hpp<<"std::string tupleUpdSql(Tuple &tup);"<<endl;
-		hpp<<"std::string tupleSelSql(Tuple &tup);"<<endl;
-		hpp<<"void tupleInsBind(Tuple &tup, pgc::Statement &stm);"<<endl;
-		hpp<<"void tupleUpdBind(Tuple &tup, pgc::Statement &stm);"<<endl;
-		hpp<<endl;
 
 		hpp<<"};"<<endl;
 		//конец класса
@@ -614,7 +596,7 @@ namespace workers
 
 
 		//поля свои и все от базовых
-		hpp<<"template <class Oper> void "<<name<<"::enumFieldsFromBasesAndSelf(Oper o, Tuple &tup)"<<endl;
+		hpp<<"template <class Oper> void "<<name<<"::enumFieldsFromBasesAndSelf(Oper &o, Tuple &tup)"<<endl;
 		hpp<<"{"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
@@ -638,7 +620,7 @@ namespace workers
 				if(Scanty(fld))
 				{
 					Category pcat = fld->getParentModel();
-					hpp<<"<"<<"tuple::Domain"<<pcat->getName()<<fld->getName()<<">";
+					hpp<<"<"<<"tuples::Domain"<<pcat->getName()<<fld->getName()<<">";
 				}
 
 				hpp
@@ -662,7 +644,7 @@ namespace workers
 
 
 		//связи свои и все от базовых
-		hpp<<"template <class Oper> void "<<name<<"::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)"<<endl;
+		hpp<<"template <class Oper> void "<<name<<"::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)"<<endl;
 		hpp<<"{"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
@@ -745,7 +727,7 @@ namespace workers
 
 
 		//индексы свои и все от базовых
-		hpp<<"template <class Oper> void "<<name<<"::enumIndicesFromBasesAndSelf(Oper o)"<<endl;
+		hpp<<"template <class Oper> void "<<name<<"::enumIndicesFromBasesAndSelf(Oper &o)"<<endl;
 		hpp<<"{"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
@@ -790,7 +772,7 @@ namespace workers
 					if(Scanty(fld))
 					{
 						Category pcat = fld->getParentModel();
-						hpp<<"<"<<"tuple::Domain"<<pcat->getName()<<fld->getName()<<">";
+						hpp<<"<"<<"tuples::Domain"<<pcat->getName()<<fld->getName()<<">";
 					}
 					hpp<<"*)NULL, ";
 					hpp<<"\""<<fld->getName()<<"\"";
@@ -805,7 +787,7 @@ namespace workers
 
 		//конструктор
 		hpp<<"inline "<<name<<"::"<<name<<"("<<cat->getSchema()<<" *s)"<<endl;
-		hpp<<": CategoryBase<"<<cat->getSchema()<<", "<<name<<", tuple::"<<name<<">(\""<<name<<"\")"<<endl;
+		hpp<<": CategoryBase<"<<cat->getSchema()<<", "<<name<<", tuples::"<<name<<">(\""<<name<<"\")"<<endl;
 		hpp<<", _schema(s)"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<"}"<<endl;
@@ -824,159 +806,6 @@ namespace workers
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
-
-		//ins
-		hpp<<"inline void "<<name<<"::ins("<<name<<"::Tuple &tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"pgc::Statement stm_ = stm(tupleFillKey(tup)+\"_ins_tuple\");"<<endl;
-		hpp<<"if(stm_.empty())stm_.sql(tupleInsSql(tup));"<<endl;
-		hpp<<"tupleInsBind(tup, stm_);"<<endl;
-		hpp<<"stm_.exec().throwIfError();"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		hpp<<"inline void "<<name<<"::ins("<<name<<"::Tuple_ptr tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"return ins(*tup);"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		//upd
-		hpp<<"inline void "<<name<<"::upd("<<name<<"::Tuple &tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"pgc::Statement stm_ = stm(tupleFillKey(tup)+\"_upd_tuple\");"<<endl;
-		hpp<<"if(stm_.empty())stm_.sql(tupleUpdSql(tup));"<<endl;
-		hpp<<"tupleUpdBind(tup, stm_);"<<endl;
-		hpp<<"stm_.exec().throwIfError();"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		hpp<<"inline void "<<name<<"::upd("<<name<<"::Tuple_ptr tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"return upd(*tup);"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		//del
-		hpp<<"inline void "<<name<<"::del(const fields::Id &id)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"pgc::Statement stm_ = stm(\"del_id\");"<<endl;
-		hpp<<"if(stm_.empty()) stm_.sql(\"DELETE FROM \"+db_sname()+\" WHERE id=$1::INT8\");"<<endl;
-		hpp<<"stm_.bind(id.value());"<<endl;
-		hpp<<"stm_.exec().throwIfError();"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		hpp<<"inline void "<<name<<"::del("<<name<<"::Tuple &tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"del(tup.id);"<<endl;
-		hpp<<"tup.id.value() = 0;"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		hpp<<"inline void "<<name<<"::del("<<name<<"::Tuple_ptr tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"return del(*tup);"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		//sel
-		hpp<<"inline "<<name<<"::Tuple_ptr  "<<name<<"::sel(const fields::Id &id)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"Tuple_ptr tup(new Tuple);"<<endl;
-		hpp<<"tup->id = id;"<<endl;
-		hpp<<"return sel(tup);"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-		hpp<<"inline "<<name<<"::Tuple_ptr "<<name<<"::sel("<<name<<"::Tuple_ptr tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"pgc::Statement stm_ = stm(\"sel_id\");"<<endl;
-		hpp<<"if(stm_.empty()) stm_.sql(tupleSelSql(*tup));"<<endl;
-		hpp<<"stm_.bind(tup->id.value());"<<endl;
-		hpp<<"stm_.exec().throwIfError();"<<endl;
-		hpp<<"}"<<endl;
-		hpp<<endl;
-
-
-
-
-
-
-		//tupleFillKey
-		hpp<<"inline std::string  "<<name<<"::tupleFillKey(Tuple &tup)"<<endl;
-		hpp<<"{"<<endl;
-
-		std::vector<Field> fields = collectFields(cat);
-		hpp<<"std::string res("<<fields.size()<<", '0');"<<endl;
-		for(size_t i(0); i<fields.size(); i++)
-		{
-			hpp<<"if(tup."<<fields[i]->getName()<<".fvs() != fields::fvs_notset) res["<<i<<"] = '1';"<<endl;
-		}
-
-		hpp<<"return res;"<<endl;
-		hpp<<"}"<<endl;
-
-		//tupleInsSql
-		hpp<<"inline std::string  "<<name<<"::tupleInsSql(Tuple &tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"std::string res;"<<endl;
-		hpp<<"std::string vals;"<<endl;
-		hpp<<"size_t idx(0);"<<endl;
-		hpp<<"char buf[32];"<<endl;
-		for(size_t i(0); i<fields.size(); i++)
-		{
-			hpp<<"if(tup."<<fields[i]->getName()<<".fvs() != fields::fvs_notset)"<<endl;
-			hpp<<"{"<<endl;
-			hpp<<"if(idx)"<<endl;
-			hpp<<"{"<<endl;
-			hpp<<"res += \",\";"<<endl;
-			hpp<<"vals += \",\";"<<endl;
-			hpp<<"}"<<endl;
-			hpp<<"res += \"\\\"_"+fields[i]->getName()+"_\\\"\";"<<endl;
-			hpp<<"vals += \"$\";"<<endl;
-			hpp<<"vals += utils::_ntoa(idx+1,buf);"<<endl;
-			hpp<<"idx++;";
-			hpp<<"}"<<endl;
-		}
-		hpp<<"res = \"INSERT INTO \"+db_sname()+\"(\"+res;"<<endl;
-		hpp<<"res += \") VALUES (\"+vals+\")\";"<<endl;
-		hpp<<"return res;"<<endl;
-		hpp<<"}"<<endl;
-
-		//tupleUpdSql
-		hpp<<"inline std::string  "<<name<<"::tupleUpdSql(Tuple &tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"assert(0);"<<endl;
-		hpp<<"return \"\";"<<endl;
-		hpp<<"}"<<endl;
-
-		//tupleSelSql
-		hpp<<"inline std::string  "<<name<<"::tupleSelSql(Tuple &tup)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"assert(0);"<<endl;
-		hpp<<"return \"\";"<<endl;
-		hpp<<"}"<<endl;
-
-		//tupleInsBind
-		hpp<<"inline void  "<<name<<"::tupleInsBind(Tuple &tup, pgc::Statement &stm)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"size_t idx(0);"<<endl;
-		for(size_t i(0); i<fields.size(); i++)
-		{
-			hpp<<"if(tup."<<fields[i]->getName()<<".fvs() != fields::fvs_notset)"<<endl;
-			hpp<<"{"<<endl;
-			hpp<<"stm.bind(tup."<<fields[i]->getName()<<".value(), idx+1);"<<endl;
-			hpp<<"idx++;";
-			hpp<<"}"<<endl;
-		}
-		hpp<<"}"<<endl;
-
-		//tupleUpdBind
-		hpp<<"inline void  "<<name<<"::tupleUpdBind(Tuple &tup, pgc::Statement &stm)"<<endl;
-		hpp<<"{"<<endl;
-		hpp<<"assert(0);"<<endl;
-		hpp<<"}"<<endl;
 
 
 

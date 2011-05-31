@@ -542,6 +542,30 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\include\utils\aton.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\utils\base64.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\utils\fixEndian.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\utils\julian.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\utils\ntoa.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -665,6 +689,14 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\src\utils\base64.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<File

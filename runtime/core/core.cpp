@@ -24,14 +24,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	c2->stm<int>("sdf").sql("SELECT 1").exec();
 	c2->stm("sdf").sql("SELECT 1").exec();
 
-	try
-	{
-		c2->dbDrop();
-	}
-	catch(std::exception &e)
-	{
-		std::cout<<e.what()<<std::endl;
-	}
+// 	try
+// 	{
+// 		c2->dbDrop();
+// 	}
+// 	catch(std::exception &e)
+// 	{
+// 		std::cout<<e.what()<<std::endl;
+// 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	m.con().once("BEGIN").exec();
 	try
 	{
-		c2->dbCreate();
+
+		int cnt;
+		m.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec("Test_myId").throwIfError().fetch(0,0,cnt);
+
+		if(!cnt)
+		{
+			c2->dbCreate();
+		}
 		m.con().once("COMMIT").exec();
 	}
 	catch(std::exception &e)
