@@ -721,6 +721,8 @@ namespace r3
 	template <class S, class C, class T>
 	void CategoryBase<S, C, T>::ins(Tuple &tup)
 	{
+		tup.id = ((C*)this)->schema()->idGen();
+
 		pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
 
 		if(stm_.empty())
@@ -887,7 +889,7 @@ namespace r3
 
 				char buf[32];
 				values += "$";
-				values += utils::_ntoa(idx, buf);
+				values += utils::_ntoa(idx+1, buf);
 			}
 		}
 	};
@@ -899,7 +901,7 @@ namespace r3
 		enumOper_tupleInsSql oper;
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 
-		return "INSERT INTO "+((C*)this)->db_sname()+" ("+oper.fields+") VALUES ("+oper.values+")";
+		return "INSERT INTO "+((C*)this)->db_sname()+" (id,"+oper.fields+") VALUES ($1,"+oper.values+")";
 	}
 
 
@@ -918,7 +920,7 @@ namespace r3
 
 		template <typename F> void bind(F *fld)
 		{
-			stm.bind(fld->value(), idx);
+			stm.bind(fld->value(), idx+1);
 		}
 
 		template <typename Category, typename CategoryBaseOrSelf, typename F> void operator()(
@@ -941,6 +943,7 @@ namespace r3
 	template <class S, class C, class T>
 	void CategoryBase<S,C,T>::tupleInsBind(T &tup, pgc::Statement &stm)
 	{
+		stm.bind(tup.id.value(), 1);
 		enumOper_tupleInsBind oper(stm);
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 	}

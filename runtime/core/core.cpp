@@ -81,7 +81,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		comp.model = "mmodel3!!";
 		ccomp->ins(comp);
 
-		comp.id.value() = 4;
 		comp.model = "mmodel3!!___";
 		ccomp->upd(comp);
 		ccomp->del(comp);

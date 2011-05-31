@@ -2,6 +2,7 @@
 #define _R3_SCHEMABASE_HPP_
 
 #include "pgc/connection.hpp"
+#include "r3/fields/field.h"
 
 namespace r3
 {
@@ -30,6 +31,8 @@ namespace r3
 	public:
 		void dbCreate();
 		void dbDrop();
+
+		fields::Id idGen();
 
 	public:
 
@@ -208,6 +211,28 @@ namespace r3
 	{
 		con().once("DROP SCHEMA "+db_name()+" CASCADE").exec().throwIfError();
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	namespace {
+		struct SchemaBaseSecretType;
+	}
+	template <class S>
+	fields::Id SchemaBase<S>::idGen()
+	{
+		pgc::Statement stm_ = stm<SchemaBaseSecretType>("idGen");
+		if(stm_.empty())
+		{
+			stm_.sql("SELECT nextval('"+db_name()+".\"idGen\"'::regclass)");
+		}
+
+		fields::Id res;
+		res.fvs(fields::fvs_set);
+		stm_.exec().throwIfError().fetch(0,0,res.value());
+
+		return res;
+
+	}
+
 
 }
 #endif
