@@ -15,6 +15,11 @@ namespace r3{ namespace fields
 	{
 		boost::int8_t _value;
 	public:
+		Int8()
+			: _value(0)
+		{
+
+		}
 		boost::int8_t &value()
 		{
 			return _value;

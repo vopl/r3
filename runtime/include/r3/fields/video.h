@@ -16,6 +16,12 @@ namespace r3{ namespace fields
 		boost::int32_t _width;
 		boost::int32_t _height;
 	public:
+		Video()
+			: _width(0)
+			, _height(0)
+		{
+
+		}
 		boost::int32_t &width();
 		boost::int32_t &height();
 

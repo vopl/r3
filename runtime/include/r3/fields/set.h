@@ -14,9 +14,14 @@ namespace r3{ namespace fields
 	class Set
 		: public Scanty<Domain>
 	{
-		boost::int32_t _value;
 	public:
-		boost::int32_t &value()
+		typedef std::bitset<bits4SetAmount> TSet;
+
+	private:
+		TSet _value;
+
+	public:
+		TSet &value()
 		{
 			return _value;
 		}

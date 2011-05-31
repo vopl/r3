@@ -39,7 +39,7 @@ namespace r3
 			: public SchemaBase<V1>
 		{
 		
-		public:
+		private:
 			s_V1::Department_ptr	_Department;
 			s_V1::HasRights_ptr	_HasRights;
 			s_V1::Owner_ptr	_Owner;

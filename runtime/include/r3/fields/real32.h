@@ -15,6 +15,11 @@ namespace r3{ namespace fields
 	{
 		float _value;
 	public:
+		Real32()
+			: _value(0)
+		{
+
+		}
 		float &value()
 		{
 			return _value;

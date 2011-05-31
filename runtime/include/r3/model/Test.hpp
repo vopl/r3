@@ -69,7 +69,7 @@ namespace r3
 			: public SchemaBase<Test>
 		{
 		
-		public:
+		private:
 			s_Test::Client_ptr	_Client;
 			s_Test::Computer_ptr	_Computer;
 			s_Test::Contract_ptr	_Contract;

@@ -14,6 +14,12 @@ namespace r3{ namespace fields
 	{
 		boost::int64_t _value;
 	public:
+		Int64()
+			: _value(0)
+		{
+
+		}
+
 		boost::int64_t &value()
 		{
 			return _value;

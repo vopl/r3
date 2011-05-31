@@ -196,7 +196,7 @@ namespace workers
 		hpp<<"{"<<endl;
 		hpp<<endl;
 
-		hpp<<"public:"<<endl;
+		hpp<<"private:"<<endl;
 
 		//указатели на экземпляры категорий
 		BOOST_FOREACH(Category cat, orderByName(cats))

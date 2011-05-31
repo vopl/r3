@@ -14,11 +14,16 @@ namespace r3{ namespace fields
 	class Enum
 		: public Scanty<Domain>
 	{
-		boost::uint32_t _oid;
+		Integral _value;
 	public:
-		boost::uint32_t &value()
+		Enum()
+			: _value()
 		{
-			return _oid;
+
+		}
+		Integral &value()
+		{
+			return _value;
 		}
 	}; // class
 }}  // namespace

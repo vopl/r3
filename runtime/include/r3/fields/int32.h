@@ -15,6 +15,11 @@ namespace r3{ namespace fields
 	{
 		boost::int32_t _value;
 	public:
+		Int32()
+			: _value(0)
+		{
+
+		}
 		boost::int32_t &value()
 		{
 			return _value;

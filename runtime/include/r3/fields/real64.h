@@ -15,6 +15,11 @@ namespace r3{ namespace fields
 	{
 		double _value;
 	public:
+		Real64()
+			: _value(0)
+		{
+
+		}
 		double &value()
 		{
 			return _value;

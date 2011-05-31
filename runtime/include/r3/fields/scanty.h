@@ -15,7 +15,54 @@ namespace r3{ namespace fields
 		: public Field
 	{
 	public:
-		static const size_t amount=Domain::amount;
+		static const size_t amount = Domain::amount;
+
+		static const size_t bits4SetAmount = 
+			amount<=8?8:
+			amount<=16?16:
+			amount<=32?32:
+			amount<=64?64:
+			amount<=128?128:
+			amount<=256?256:512;
+
+		static const size_t bits4EnumAmount = 
+			amount<=(1ULL<<8)?8:
+			amount<=(1ULL<<16)?16:
+			amount<=(1ULL<<32)?32:64;
+
+		template <size_t bits>
+		struct IntegralHelper
+		{
+			typedef void Integral;
+		};
+
+		template <>
+		struct IntegralHelper<8>
+		{
+			typedef boost::int8_t type;
+		};
+
+		template <>
+		struct IntegralHelper<16>
+		{
+			typedef boost::int16_t type;
+		};
+
+		template <>
+		struct IntegralHelper<32>
+		{
+			typedef boost::int32_t type;
+		};
+
+		template <>
+		struct IntegralHelper<64>
+		{
+			typedef boost::int64_t type;
+		};
+
+		typedef typename IntegralHelper<bits4EnumAmount>::type Integral;
+
+	public:
 	}; // class
 }}  // namespace
 

@@ -3,6 +3,8 @@
 #include <string>
 #include "r3/model.hpp"
 
+using namespace r3::model::s_Test;
+
 
 class Crud
 	: public CPPUNIT_NS::TestFixture
@@ -10,21 +12,26 @@ class Crud
 	CPPUNIT_TEST_SUITE( Crud );
 	CPPUNIT_TEST( connected );
 
-	CPPUNIT_TEST( _createDropSchema );
+	CPPUNIT_TEST( _ins );
 
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
 	r3::Model _mod;
 
+	r3::model::Test_ptr _t;
+
+
 public:
 	void setUp()
 	{
 		_mod.startInThread("dbname=test user=postgres password=postgres port=5432");
+		_t = _mod.getTest("crudTester");
 	}
 
 	void tearDown()
 	{
+		_t.reset();
 		_mod.stopInThread();
 	}
 
@@ -43,30 +50,83 @@ protected:
 
 
 
-
-
-
-
-
-
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	void _createDropSchema()
+	void checkSchema()
 	{
-		int cnt;
+		size_t cnt(0);
 		CPPUNIT_ASSERT_NO_THROW(
-			_mod.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec("Test_myId").throwIfError().fetch(0,0,cnt)
-		);
-		if(cnt)
-		{
-			CPPUNIT_ASSERT_NO_THROW(
-				_mod.con().once("DROP SCHEMA \"Test_myId\" CASCADE").exec().throwIfError()
+			_mod.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec("Test_crudTester").throwIfError().fetch(0,0,cnt)
 			);
+		if(!cnt)
+		{
+			CPPUNIT_ASSERT_NO_THROW(_t->dbCreate());
 		}
-		CPPUNIT_ASSERT_NO_THROW(_mod.getTest("myId")->dbCreate());
-		CPPUNIT_ASSERT_NO_THROW(_mod.getTest("myId")->dbDrop());
+	}
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void _ins()
+	{
+		checkSchema();
+
+		CPPUNIT_ASSERT_NO_THROW(_t->getPeople()->ins(People::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getClient()->ins(Client::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getEmployee()->ins(Employee::Tuple()));
+
+		CPPUNIT_ASSERT_NO_THROW(_t->getStock()->ins(Stock::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getFurniture()->ins(Furniture::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getComputer()->ins(Computer::Tuple()));
+
+		CPPUNIT_ASSERT_NO_THROW(_t->getServicePart()->ins(ServicePart::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getWebSite()->ins(WebSite::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getProgram()->ins(Program::Tuple()));
+
+
+		CPPUNIT_ASSERT_NO_THROW(_t->getDocument()->ins(Document::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getLetter()->ins(Letter::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getContract()->ins(Contract::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getContractComplex()->ins(ContractComplex::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getContractSimple()->ins(ContractSimple::Tuple()));
+		CPPUNIT_ASSERT_NO_THROW(_t->getMockup()->ins(Mockup::Tuple()));
+
+
+
+
+
+		CPPUNIT_ASSERT_NO_THROW(_t->getPeople()->ins(People::Tuple_ptr(new People::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getClient()->ins(Client::Tuple_ptr(new Client::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getEmployee()->ins(Employee::Tuple_ptr(new Employee::Tuple)));
+
+		CPPUNIT_ASSERT_NO_THROW(_t->getStock()->ins(Stock::Tuple_ptr(new Stock::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getFurniture()->ins(Furniture::Tuple_ptr(new Furniture::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getComputer()->ins(Computer::Tuple_ptr(new Computer::Tuple)));
+
+		CPPUNIT_ASSERT_NO_THROW(_t->getServicePart()->ins(ServicePart::Tuple_ptr(new ServicePart::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getWebSite()->ins(WebSite::Tuple_ptr(new WebSite::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getProgram()->ins(Program::Tuple_ptr(new Program::Tuple)));
+
+
+		CPPUNIT_ASSERT_NO_THROW(_t->getDocument()->ins(Document::Tuple_ptr(new Document::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getLetter()->ins(Letter::Tuple_ptr(new Letter::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getContract()->ins(Contract::Tuple_ptr(new Contract::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getContractComplex()->ins(ContractComplex::Tuple_ptr(new ContractComplex::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getContractSimple()->ins(ContractSimple::Tuple_ptr(new ContractSimple::Tuple)));
+		CPPUNIT_ASSERT_NO_THROW(_t->getMockup()->ins(Mockup::Tuple_ptr(new Mockup::Tuple)));
+
+
+		People::Tuple people;
+		CPPUNIT_ASSERT_NO_THROW(_t->getPeople()->ins(people));
+
+		CPPUNIT_ASSERT(people.id.fvs() == r3::fields::fvs_set);
+		CPPUNIT_ASSERT(people.id.value() != 0);
+
+		int k=220;
 	}
 
 

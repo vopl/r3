@@ -935,6 +935,10 @@ namespace r3
 		enumOper_tupleInsSql oper;
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 
+		if(oper.fields.empty())
+		{
+			return "INSERT INTO "+((C*)this)->db_sname()+" (id) VALUES ($1)";
+		}
 		return "INSERT INTO "+((C*)this)->db_sname()+" (id,"+oper.fields+") VALUES ($1,"+oper.values+")";
 	}
 
@@ -954,7 +958,46 @@ namespace r3
 
 		template <typename F> void bind(F *fld)
 		{
+			idx++;
 			stm.bind(fld->value(), idx+1);
+		}
+
+		void bind(r3::fields::File *fld)
+		{
+			idx++;
+			stm.bind(fld->name(), idx+1);
+
+			idx++;
+			stm.bind(fld->ext(), idx+2);
+
+			idx++;
+			stm.bind(fld->blob(), idx+3);
+		}
+		void bind(r3::fields::Audio *fld)
+		{
+			bind((r3::fields::File *)fld);
+		}
+
+		void bind(r3::fields::Image *fld)
+		{
+			bind((r3::fields::File *)fld);
+
+			idx++;
+			stm.bind(fld->width(), idx+1);
+
+			idx++;
+			stm.bind(fld->height(), idx+2);
+		}
+
+		void bind(r3::fields::Video *fld)
+		{
+			bind((r3::fields::File *)fld);
+
+			idx++;
+			stm.bind(fld->width(), idx+1);
+
+			idx++;
+			stm.bind(fld->height(), idx+2);
 		}
 
 		template <typename Category, typename CategoryBaseOrSelf, typename F> void operator()(
@@ -963,11 +1006,8 @@ namespace r3
 			F *fld,
 			const char *fname)
 		{
-			assert(idx < T::_fieldsAmount);
-
 			if(fld->fvs() != fields::fvs_notset)
 			{
-				idx++;
 				bind(fld);
 			}
 		}
