@@ -16,18 +16,10 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Service
-				: public CategoryBase<Service>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<Service>::Tuple
+				struct Service
+						: public TupleBase<Service>
 				{
 					// Service
 					r3::fields::Bool archive;
@@ -37,10 +29,24 @@ namespace r3
 					r3::relations::Relation2one<Client> client;
 					r3::relations::Relation2n<People> observers;
 					r3::relations::Relation2n<Stock> stocks;
-					r3::relations::Relation2one<Employee> worker;
 					r3::relations::Relation2n<ServicePart> parts;
+					r3::relations::Relation2one<Employee> worker;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Service> Service_ptr;
+				
+			}
+			
+			class Service
+				: public CategoryBase<Test, Service, tuple::Service>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Service Tuple;
+				typedef tuple::Service_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -107,8 +113,8 @@ namespace r3
 				o(this, c_Service, _schema->getCategory<Client>().get(), (r3::relations::Relation2one<Client>*)&tup.client,	"client",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
 				o(this, c_Service, _schema->getCategory<People>().get(), (r3::relations::Relation2n<People>*)&tup.observers,	"observers",	(r3::relations::Relation2n<Service>*)NULL,	"observableServices",	rs_src);
 				o(this, c_Service, _schema->getCategory<Stock>().get(), (r3::relations::Relation2n<Stock>*)&tup.stocks,	"stocks",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
-				o(this, c_Service, _schema->getCategory<Employee>().get(), (r3::relations::Relation2one<Employee>*)&tup.worker,	"worker",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
 				o(this, c_Service, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2n<ServicePart>*)&tup.parts,	"parts",	(r3::relations::Relation2one<Service>*)NULL,	"service",	rs_src);
+				o(this, c_Service, _schema->getCategory<Employee>().get(), (r3::relations::Relation2one<Employee>*)&tup.worker,	"worker",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
 			}
 			
 			template <class Oper> void Service::enumIndicesFromBasesAndSelf(Oper o)
@@ -117,7 +123,7 @@ namespace r3
 			}
 			
 			inline Service::Service(Test *s)
-				: CategoryBase<Service>("Service")
+				: CategoryBase<Test, Service, tuple::Service>("Service")
 				, _schema(s)
 			{
 			}

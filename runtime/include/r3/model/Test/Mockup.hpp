@@ -19,18 +19,10 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Mockup
-				: public CategoryBase<Mockup>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<Mockup>::Tuple
+				struct Mockup
+						: public TupleBase<Mockup>
 				{
 					// Document
 					r3::fields::Date creation;
@@ -43,7 +35,21 @@ namespace r3
 					r3::fields::Video video;
 					r3::relations::Relation2one<WebSite> webSite;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Mockup> Mockup_ptr;
+				
+			}
+			
+			class Mockup
+				: public CategoryBase<Test, Mockup, tuple::Mockup>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Mockup Tuple;
+				typedef tuple::Mockup_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -125,7 +131,7 @@ namespace r3
 			}
 			
 			inline Mockup::Mockup(Test *s)
-				: CategoryBase<Mockup>("Mockup")
+				: CategoryBase<Test, Mockup, tuple::Mockup>("Mockup")
 				, _schema(s)
 			{
 			}

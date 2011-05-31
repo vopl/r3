@@ -16,35 +16,41 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class People
-				: public CategoryBase<People>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-				struct Domainsex
+				struct DomainPeoplesex
 				{
 					static const size_t amount = 0;
 					static const char *values[amount];
 				};
 				
-				
-			public:
-				struct Tuple
-						: public CategoryBase<People>::Tuple
+				struct People
+						: public TupleBase<People>
 				{
 					// People
 					r3::fields::Date birth;
 					r3::fields::String middlename;
 					r3::fields::String name;
 					r3::fields::Image photo;
-					r3::fields::Enum<People::Domainsex> sex;
+					r3::fields::Enum<DomainPeoplesex> sex;
 					r3::fields::String surname;
 					r3::relations::Relation2n<Service> observableServices;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<People> People_ptr;
+				
+			}
+			
+			class People
+				: public CategoryBase<Test, People, tuple::People>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::People Tuple;
+				typedef tuple::People_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -102,7 +108,7 @@ namespace r3
 				o(this, c_People, (r3::fields::String *)&tup.middlename, "middlename");
 				o(this, c_People, (r3::fields::String *)&tup.name, "name");
 				o(this, c_People, (r3::fields::Image *)&tup.photo, "photo");
-				o(this, c_People, (r3::fields::Enum<People::Domainsex>*)&tup.sex, "sex");
+				o(this, c_People, (r3::fields::Enum<tuple::DomainPeoplesex>*)&tup.sex, "sex");
 				o(this, c_People, (r3::fields::String *)&tup.surname, "surname");
 			}
 			
@@ -119,7 +125,7 @@ namespace r3
 			}
 			
 			inline People::People(Test *s)
-				: CategoryBase<People>("People")
+				: CategoryBase<Test, People, tuple::People>("People")
 				, _schema(s)
 			{
 			}

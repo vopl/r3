@@ -1,24 +1,15 @@
 #ifndef _R3_CATEGORYBASE_HPP_
 #define _R3_CATEGORYBASE_HPP_
 
-#include "r3/fields/field.h"
+#include "r3/tupleBase.hpp"
 #include "r3/relations/relation.hpp"
 #include "utils/ntoa.hpp"
 
 namespace r3
 {
-	template <class C>
+	template <class S, class C, class T>
 	class CategoryBase
 	{
-	public:
-		struct Tuple
-		{
-			fields::Id id;
-
-			Tuple();
-			~Tuple();
-		};
-
 	public:
 		enum EIndexMethod
 		{
@@ -31,7 +22,6 @@ namespace r3
 			rs_src,
 			rs_dst,
 		};
-
 
 	public:
 
@@ -77,90 +67,77 @@ namespace r3
 
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	pgc::Connection CategoryBase<C>::con()
+	template <class S, class C, class T>
+	pgc::Connection CategoryBase<S,C,T>::con()
 	{
 		return category()->schema()->con();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
+	template <class S, class C, class T>
 	template <class tag>
-	pgc::Statement CategoryBase<C>::stm(const std::string &key)
+	pgc::Statement CategoryBase<S,C,T>::stm(const std::string &key)
 	{
 		return category()->schema()->stm<std::pair<C, tag> >(key);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	pgc::Statement CategoryBase<C>::stm(const std::string &key)
+	template <class S, class C, class T>
+	pgc::Statement CategoryBase<S,C,T>::stm(const std::string &key)
 	{
 		return category()->schema()->stm<C>(key);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	typename C *CategoryBase<C>::category()
+	template <class S, class C, class T>
+	typename C *CategoryBase<S,C,T>::category()
 	{
 		return (C*)this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	CategoryBase<C>::Tuple::Tuple()
-		: id()
-	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	CategoryBase<C>::Tuple::~Tuple()
-	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	CategoryBase<C>::CategoryBase(const char *name)
+	template <class S, class C, class T>
+	CategoryBase<S,C,T>::CategoryBase(const char *name)
 		: _name(name)
 	{
 	}
 
-	template <class C>
-	CategoryBase<C>::~CategoryBase()
+	template <class S, class C, class T>
+	CategoryBase<S,C,T>::~CategoryBase()
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	const std::string &CategoryBase<C>::name()
+	template <class S, class C, class T>
+	const std::string &CategoryBase<S,C,T>::name()
 	{
 		return _name;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	std::string CategoryBase<C>::db_name()
+	template <class S, class C, class T>
+	std::string CategoryBase<S,C,T>::db_name()
 	{
 		return "\""+_name+"\"";
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	std::string CategoryBase<C>::db_sname()
+	template <class S, class C, class T>
+	std::string CategoryBase<S,C,T>::db_sname()
 	{
 		return category()->schema()->db_name()+"."+db_name();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	void CategoryBase<C>::dbCreateTable()
+	template <class S, class C, class T>
+	void CategoryBase<S,C,T>::dbCreateTable()
 	{
 		pgc::Connection con = category()->schema()->con();
 		con.once("CREATE TABLE "+db_sname()+"(id INT8 PRIMARY KEY DEFAULT nextval('"+category()->schema()->db_name()+".\"idGen\"'::regclass))").exec().throwIfError();
 	}
 
-	template <class C>
-	struct CategoryBase<C>::enumOper_createField
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_createField
 	{
 		//////////////////////////////////////////////////////////////////////////
 		template <typename Category, typename CategoryBaseOrSelf> void operator()(
@@ -427,8 +404,8 @@ namespace r3
 
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	struct CategoryBase<C>::enumOper_createIndex
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_createIndex
 	{
 
 		template <typename Category, typename CategoryBaseOrSelf>
@@ -575,8 +552,8 @@ namespace r3
 		}
 	};
 
-	template <class C>
-	struct CategoryBase<C>::enumOper_createRelation
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_createRelation
 	{
 		//////////////////////////////////////////////////////////////////////////
 		template <typename Category, typename CategoryBaseOrSelf, typename CategoryAlien>
@@ -649,8 +626,8 @@ namespace r3
 	};
 
 
-	template <class C>
-	struct CategoryBase<C>::enumOper_createInheritance
+	template <class S, class C, class T>
+	struct CategoryBase<S,C,T>::enumOper_createInheritance
 	{
 		template <typename Category, typename CategoryBase>
 		void operator()(Category *c, CategoryBase *bc)
@@ -662,8 +639,8 @@ namespace r3
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	void CategoryBase<C>::dbCreateFields()
+	template <class S, class C, class T>
+	void CategoryBase<S,C,T>::dbCreateFields()
 	{
 		//перечислить все базовые и себя, собрать все поля и добавить их к таблице
 		C::Tuple tup;
@@ -671,24 +648,24 @@ namespace r3
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	void CategoryBase<C>::dbCreateIndices()
+	template <class S, class C, class T>
+	void CategoryBase<S,C,T>::dbCreateIndices()
 	{
 		//перечислить все базовые и себя, собрать все индексы и добавить их к таблице
 		((C*)this)->enumIndicesFromBasesAndSelf(enumOper_createIndex());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	void CategoryBase<C>::dbCreateRelations()
+	template <class S, class C, class T>
+	void CategoryBase<S,C,T>::dbCreateRelations()
 	{
 		C::Tuple tup;
 		((C*)this)->enumRelationsFromBasesAndSelf(enumOper_createRelation(), tup);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	void CategoryBase<C>::dbCreateInheritance()
+	template <class S, class C, class T>
+	void CategoryBase<S,C,T>::dbCreateInheritance()
 	{
 		((C*)this)->enumBasesFirst(enumOper_createInheritance());
 	}

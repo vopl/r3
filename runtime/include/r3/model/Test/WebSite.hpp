@@ -19,18 +19,10 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class WebSite
-				: public CategoryBase<WebSite>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<WebSite>::Tuple
+				struct WebSite
+						: public TupleBase<WebSite>
 				{
 					// ServicePart
 					r3::fields::String comment;
@@ -45,7 +37,21 @@ namespace r3
 					r3::fields::String url;
 					r3::relations::Relation2n<Mockup> mockups;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<WebSite> WebSite_ptr;
+				
+			}
+			
+			class WebSite
+				: public CategoryBase<Test, WebSite, tuple::WebSite>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::WebSite Tuple;
+				typedef tuple::WebSite_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -129,7 +135,7 @@ namespace r3
 			}
 			
 			inline WebSite::WebSite(Test *s)
-				: CategoryBase<WebSite>("WebSite")
+				: CategoryBase<Test, WebSite, tuple::WebSite>("WebSite")
 				, _schema(s)
 			{
 			}

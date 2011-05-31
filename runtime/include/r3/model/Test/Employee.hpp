@@ -19,27 +19,19 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Employee
-				: public CategoryBase<Employee>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-				struct Domaindepartment
+				struct DomainEmployeedepartment
 				{
 					static const size_t amount = 2;
 					static const char *values[amount];
 				};
 				
-				
-			public:
-				struct Tuple
-						: public CategoryBase<Employee>::Tuple
+				struct Employee
+						: public TupleBase<Employee>
 				{
 					// Employee
-					r3::fields::Enum<Employee::Domaindepartment> department;
+					r3::fields::Enum<DomainEmployeedepartment> department;
 					r3::fields::Money rateNight;
 					r3::fields::Money rateNormal;
 					r3::relations::Relation2n<Service> services;
@@ -48,11 +40,25 @@ namespace r3
 					r3::fields::String middlename;
 					r3::fields::String name;
 					r3::fields::Image photo;
-					r3::fields::Enum<People::Domainsex> sex;
+					r3::fields::Enum<DomainPeoplesex> sex;
 					r3::fields::String surname;
 					r3::relations::Relation2n<Service> observableServices;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Employee> Employee_ptr;
+				
+			}
+			
+			class Employee
+				: public CategoryBase<Test, Employee, tuple::Employee>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Employee Tuple;
+				typedef tuple::Employee_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -107,7 +113,7 @@ namespace r3
 			{
 				//Employee
 				Employee *c_Employee = _schema->getCategory<Employee>().get();
-				o(this, c_Employee, (r3::fields::Enum<Employee::Domaindepartment>*)&tup.department, "department");
+				o(this, c_Employee, (r3::fields::Enum<tuple::DomainEmployeedepartment>*)&tup.department, "department");
 				o(this, c_Employee, (r3::fields::Money *)&tup.rateNight, "rateNight");
 				o(this, c_Employee, (r3::fields::Money *)&tup.rateNormal, "rateNormal");
 				//People
@@ -116,7 +122,7 @@ namespace r3
 				o(this, c_People, (r3::fields::String *)&tup.middlename, "middlename");
 				o(this, c_People, (r3::fields::String *)&tup.name, "name");
 				o(this, c_People, (r3::fields::Image *)&tup.photo, "photo");
-				o(this, c_People, (r3::fields::Enum<People::Domainsex>*)&tup.sex, "sex");
+				o(this, c_People, (r3::fields::Enum<tuple::DomainPeoplesex>*)&tup.sex, "sex");
 				o(this, c_People, (r3::fields::String *)&tup.surname, "surname");
 			}
 			
@@ -137,7 +143,7 @@ namespace r3
 			}
 			
 			inline Employee::Employee(Test *s)
-				: CategoryBase<Employee>("Employee")
+				: CategoryBase<Test, Employee, tuple::Employee>("Employee")
 				, _schema(s)
 			{
 			}

@@ -19,18 +19,10 @@ namespace r3
 		namespace s_V1
 		{
 		
-			class Department
-				: public CategoryBase<Department>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<Department>::Tuple
+				struct Department
+						: public TupleBase<Department>
 				{
 					// Department
 					r3::fields::String name;
@@ -38,7 +30,21 @@ namespace r3
 					// Owner
 					r3::relations::Relation2n<Department> childs;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Department> Department_ptr;
+				
+			}
+			
+			class Department
+				: public CategoryBase<V1, Department, tuple::Department>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Department Tuple;
+				typedef tuple::Department_ptr Tuple_ptr;
+				
+				typedef V1 Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -114,7 +120,7 @@ namespace r3
 			}
 			
 			inline Department::Department(V1 *s)
-				: CategoryBase<Department>("Department")
+				: CategoryBase<V1, Department, tuple::Department>("Department")
 				, _schema(s)
 			{
 			}

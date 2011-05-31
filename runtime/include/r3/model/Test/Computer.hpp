@@ -19,18 +19,10 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Computer
-				: public CategoryBase<Computer>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<Computer>::Tuple
+				struct Computer
+						: public TupleBase<Computer>
 				{
 					// Computer
 					r3::fields::DateTimeInterval equipmentInterval;
@@ -41,10 +33,24 @@ namespace r3
 					r3::fields::Money cost;
 					r3::fields::Date incomingDate;
 					r3::fields::String inventoryNumber;
-					r3::fields::Enum<Stock::DomainsecurityStatus> securityStatus;
+					r3::fields::Enum<DomainStocksecurityStatus> securityStatus;
 					r3::relations::Relation2n<Service> services;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Computer> Computer_ptr;
+				
+			}
+			
+			class Computer
+				: public CategoryBase<Test, Computer, tuple::Computer>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Computer Tuple;
+				typedef tuple::Computer_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -108,7 +114,7 @@ namespace r3
 				o(this, c_Stock, (r3::fields::Money *)&tup.cost, "cost");
 				o(this, c_Stock, (r3::fields::Date *)&tup.incomingDate, "incomingDate");
 				o(this, c_Stock, (r3::fields::String *)&tup.inventoryNumber, "inventoryNumber");
-				o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)&tup.securityStatus, "securityStatus");
+				o(this, c_Stock, (r3::fields::Enum<tuple::DomainStocksecurityStatus>*)&tup.securityStatus, "securityStatus");
 			}
 			
 			template <class Oper> void Computer::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
@@ -126,7 +132,7 @@ namespace r3
 			}
 			
 			inline Computer::Computer(Test *s)
-				: CategoryBase<Computer>("Computer")
+				: CategoryBase<Test, Computer, tuple::Computer>("Computer")
 				, _schema(s)
 			{
 			}

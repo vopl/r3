@@ -407,18 +407,10 @@ namespace workers
 // 		}
 
 
-		//класс
-		hpp<<"class "<<name<<endl;
-		hpp<<": public CategoryBase<"<<name<<">"<<endl;
+		//////////////////////////////////////////////////////////////////////////
+		hpp<<"namespace tuple"<<endl;
 		hpp<<"{"<<endl;
-		hpp<<endl;
 
-		hpp<<"public:"<<endl;
-		hpp<<"static const bool isAbstract = "<<(cat->isAbstract()?"true":"false")<<";"<<endl;
-		hpp<<endl;
-
-
-		hpp<<"public:"<<endl;
 		//домены
 		std::set<FCO> enums = cat->getChildFCOsAs("Enum");
 		std::set<FCO> sets = cat->getChildFCOsAs("Set");
@@ -428,7 +420,7 @@ namespace workers
 		{
 			assert(s);
 
-			hpp<<"struct Domain"<<s->getName()<<endl;
+			hpp<<"struct Domain"<<name<<s->getName()<<endl;
 			hpp<<"{"<<endl;
 
 			std::set<FCO> vals = s->getChildFCOsAs("ScantyValue");
@@ -440,15 +432,10 @@ namespace workers
 			hpp<<endl;
 		}
 
-		hpp<<endl;
 
-
-
-		//////////////////////////////////////////////////////////////////////////
 		//тупла
-		hpp<<"public:"<<endl;
-		hpp<<"struct Tuple"<<endl;
-		hpp<<": public CategoryBase<"<<cat->getName()<<">::Tuple"<<endl;
+		hpp<<"struct "<<name<<endl;
+		hpp<<": public TupleBase<"<<name<<">"<<endl;
 		hpp<<"{"<<endl;
 
 		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
@@ -467,7 +454,7 @@ namespace workers
 				if(Scanty(fld))
 				{
 					Category pcat = fld->getParentModel();
-					hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+					hpp<<"<"<<"Domain"<<pcat->getName()<<fld->getName()<<">";
 				}
 
 				hpp
@@ -511,8 +498,31 @@ namespace workers
 			}
 		}
 		hpp<<"};"<<endl;
-		hpp<<"typedef boost::shared_ptr<Tuple> Tuple_ptr;"<<endl;
+		hpp<<"typedef boost::shared_ptr<"<<name<<"> "<<name<<"_ptr;"<<endl;
 		hpp<<endl;
+
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+
+		//класс
+		hpp<<"class "<<name<<endl;
+		hpp<<": public CategoryBase<"<<cat->getSchema()<<", "<<name<<", tuple::"<<name<<">"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<endl;
+
+		hpp<<"public:"<<endl;
+		hpp<<"static const bool isAbstract = "<<(cat->isAbstract()?"true":"false")<<";"<<endl;
+		hpp<<endl;
+
+		hpp<<"typedef tuple::"<<name<<" Tuple;"<<endl;
+		hpp<<"typedef tuple::"<<name<<"_ptr Tuple_ptr;"<<endl;
+		hpp<<endl;
+
+		hpp<<"typedef "<<cat->getSchema()<<" Schema;"<<endl;
+		hpp<<endl;
+
+
 
 
 
@@ -628,7 +638,7 @@ namespace workers
 				if(Scanty(fld))
 				{
 					Category pcat = fld->getParentModel();
-					hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+					hpp<<"<"<<"tuple::Domain"<<pcat->getName()<<fld->getName()<<">";
 				}
 
 				hpp
@@ -780,7 +790,7 @@ namespace workers
 					if(Scanty(fld))
 					{
 						Category pcat = fld->getParentModel();
-						hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+						hpp<<"<"<<"tuple::Domain"<<pcat->getName()<<fld->getName()<<">";
 					}
 					hpp<<"*)NULL, ";
 					hpp<<"\""<<fld->getName()<<"\"";
@@ -795,7 +805,7 @@ namespace workers
 
 		//конструктор
 		hpp<<"inline "<<name<<"::"<<name<<"("<<cat->getSchema()<<" *s)"<<endl;
-		hpp<<": CategoryBase<"<<name<<">(\""<<name<<"\")"<<endl;
+		hpp<<": CategoryBase<"<<cat->getSchema()<<", "<<name<<", tuple::"<<name<<">(\""<<name<<"\")"<<endl;
 		hpp<<", _schema(s)"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<"}"<<endl;

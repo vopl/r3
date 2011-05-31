@@ -20,18 +20,10 @@ namespace r3
 		namespace s_V1
 		{
 		
-			class User
-				: public CategoryBase<User>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<User>::Tuple
+				struct User
+						: public TupleBase<User>
 				{
 					// HasRights
 					r3::fields::Bool attrInHasRights;
@@ -43,7 +35,21 @@ namespace r3
 					r3::fields::String password;
 					r3::relations::Relation2n<Role> users;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<User> User_ptr;
+				
+			}
+			
+			class User
+				: public CategoryBase<V1, User, tuple::User>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::User Tuple;
+				typedef tuple::User_ptr Tuple_ptr;
+				
+				typedef V1 Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -128,7 +134,7 @@ namespace r3
 			}
 			
 			inline User::User(V1 *s)
-				: CategoryBase<User>("User")
+				: CategoryBase<V1, User, tuple::User>("User")
 				, _schema(s)
 			{
 			}

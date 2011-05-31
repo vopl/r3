@@ -16,24 +16,30 @@ namespace r3
 		namespace s_V1
 		{
 		
-			class HasRights
-				: public CategoryBase<HasRights>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = true;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<HasRights>::Tuple
+				struct HasRights
+						: public TupleBase<HasRights>
 				{
 					// HasRights
 					r3::fields::Bool attrInHasRights;
 					r3::relations::Relation2n<Right> owners;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<HasRights> HasRights_ptr;
+				
+			}
+			
+			class HasRights
+				: public CategoryBase<V1, HasRights, tuple::HasRights>
+			{
+			
+			public:
+				static const bool isAbstract = true;
+				
+				typedef tuple::HasRights Tuple;
+				typedef tuple::HasRights_ptr Tuple_ptr;
+				
+				typedef V1 Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -103,7 +109,7 @@ namespace r3
 			}
 			
 			inline HasRights::HasRights(V1 *s)
-				: CategoryBase<HasRights>("HasRights")
+				: CategoryBase<V1, HasRights, tuple::HasRights>("HasRights")
 				, _schema(s)
 			{
 			}

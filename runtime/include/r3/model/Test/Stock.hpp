@@ -16,33 +16,39 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Stock
-				: public CategoryBase<Stock>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-				struct DomainsecurityStatus
+				struct DomainStocksecurityStatus
 				{
 					static const size_t amount = 3;
 					static const char *values[amount];
 				};
 				
-				
-			public:
-				struct Tuple
-						: public CategoryBase<Stock>::Tuple
+				struct Stock
+						: public TupleBase<Stock>
 				{
 					// Stock
 					r3::fields::Money cost;
 					r3::fields::Date incomingDate;
 					r3::fields::String inventoryNumber;
-					r3::fields::Enum<Stock::DomainsecurityStatus> securityStatus;
+					r3::fields::Enum<DomainStocksecurityStatus> securityStatus;
 					r3::relations::Relation2n<Service> services;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Stock> Stock_ptr;
+				
+			}
+			
+			class Stock
+				: public CategoryBase<Test, Stock, tuple::Stock>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Stock Tuple;
+				typedef tuple::Stock_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -99,7 +105,7 @@ namespace r3
 				o(this, c_Stock, (r3::fields::Money *)&tup.cost, "cost");
 				o(this, c_Stock, (r3::fields::Date *)&tup.incomingDate, "incomingDate");
 				o(this, c_Stock, (r3::fields::String *)&tup.inventoryNumber, "inventoryNumber");
-				o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)&tup.securityStatus, "securityStatus");
+				o(this, c_Stock, (r3::fields::Enum<tuple::DomainStocksecurityStatus>*)&tup.securityStatus, "securityStatus");
 			}
 			
 			template <class Oper> void Stock::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
@@ -115,7 +121,7 @@ namespace r3
 			}
 			
 			inline Stock::Stock(Test *s)
-				: CategoryBase<Stock>("Stock")
+				: CategoryBase<Test, Stock, tuple::Stock>("Stock")
 				, _schema(s)
 			{
 			}

@@ -19,18 +19,10 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class ContractSimple
-				: public CategoryBase<ContractSimple>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<ContractSimple>::Tuple
+				struct ContractSimple
+						: public TupleBase<ContractSimple>
 				{
 					// Contract
 					r3::fields::Int32 param1;
@@ -45,7 +37,21 @@ namespace r3
 					r3::fields::Timestamp lastModified;
 					r3::relations::Relation2one<ServicePart> servicePart;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<ContractSimple> ContractSimple_ptr;
+				
+			}
+			
+			class ContractSimple
+				: public CategoryBase<Test, ContractSimple, tuple::ContractSimple>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::ContractSimple Tuple;
+				typedef tuple::ContractSimple_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -131,7 +137,7 @@ namespace r3
 			}
 			
 			inline ContractSimple::ContractSimple(Test *s)
-				: CategoryBase<ContractSimple>("ContractSimple")
+				: CategoryBase<Test, ContractSimple, tuple::ContractSimple>("ContractSimple")
 				, _schema(s)
 			{
 			}

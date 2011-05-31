@@ -19,18 +19,10 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Letter
-				: public CategoryBase<Letter>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<Letter>::Tuple
+				struct Letter
+						: public TupleBase<Letter>
 				{
 					// Document
 					r3::fields::Date creation;
@@ -41,7 +33,21 @@ namespace r3
 					r3::fields::String comment;
 					r3::fields::String content;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Letter> Letter_ptr;
+				
+			}
+			
+			class Letter
+				: public CategoryBase<Test, Letter, tuple::Letter>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Letter Tuple;
+				typedef tuple::Letter_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -120,7 +126,7 @@ namespace r3
 			}
 			
 			inline Letter::Letter(Test *s)
-				: CategoryBase<Letter>("Letter")
+				: CategoryBase<Test, Letter, tuple::Letter>("Letter")
 				, _schema(s)
 			{
 			}

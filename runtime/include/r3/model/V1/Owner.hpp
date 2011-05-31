@@ -16,23 +16,29 @@ namespace r3
 		namespace s_V1
 		{
 		
+			namespace tuple
+			{
+				struct Owner
+						: public TupleBase<Owner>
+				{
+					// Owner
+					r3::relations::Relation2n<Department> childs;
+				};
+				typedef boost::shared_ptr<Owner> Owner_ptr;
+				
+			}
+			
 			class Owner
-				: public CategoryBase<Owner>
+				: public CategoryBase<V1, Owner, tuple::Owner>
 			{
 			
 			public:
 				static const bool isAbstract = true;
 				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<Owner>::Tuple
-				{
-					// Owner
-					r3::relations::Relation2n<Department> childs;
-				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef tuple::Owner Tuple;
+				typedef tuple::Owner_ptr Tuple_ptr;
+				
+				typedef V1 Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -100,7 +106,7 @@ namespace r3
 			}
 			
 			inline Owner::Owner(V1 *s)
-				: CategoryBase<Owner>("Owner")
+				: CategoryBase<V1, Owner, tuple::Owner>("Owner")
 				, _schema(s)
 			{
 			}

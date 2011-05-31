@@ -16,31 +16,37 @@ namespace r3
 		namespace s_V1
 		{
 		
-			class Right
-				: public CategoryBase<Right>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-				struct Domainvalue
+				struct DomainRightvalue
 				{
 					static const size_t amount = 3;
 					static const char *values[amount];
 				};
 				
-				
-			public:
-				struct Tuple
-						: public CategoryBase<Right>::Tuple
+				struct Right
+						: public TupleBase<Right>
 				{
 					// Right
 					r3::fields::String name;
-					r3::fields::Enum<Right::Domainvalue> value;
+					r3::fields::Enum<DomainRightvalue> value;
 					r3::relations::Relation2n<HasRights> rights;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Right> Right_ptr;
+				
+			}
+			
+			class Right
+				: public CategoryBase<V1, Right, tuple::Right>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Right Tuple;
+				typedef tuple::Right_ptr Tuple_ptr;
+				
+				typedef V1 Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -95,7 +101,7 @@ namespace r3
 				//Right
 				Right *c_Right = _schema->getCategory<Right>().get();
 				o(this, c_Right, (r3::fields::String *)&tup.name, "name");
-				o(this, c_Right, (r3::fields::Enum<Right::Domainvalue>*)&tup.value, "value");
+				o(this, c_Right, (r3::fields::Enum<tuple::DomainRightvalue>*)&tup.value, "value");
 			}
 			
 			template <class Oper> void Right::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
@@ -111,7 +117,7 @@ namespace r3
 			}
 			
 			inline Right::Right(V1 *s)
-				: CategoryBase<Right>("Right")
+				: CategoryBase<V1, Right, tuple::Right>("Right")
 				, _schema(s)
 			{
 			}

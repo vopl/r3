@@ -16,18 +16,10 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Document
-				: public CategoryBase<Document>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<Document>::Tuple
+				struct Document
+						: public TupleBase<Document>
 				{
 					// Document
 					r3::fields::Date creation;
@@ -35,7 +27,21 @@ namespace r3
 					r3::fields::Timestamp lastModified;
 					r3::relations::Relation2one<ServicePart> servicePart;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Document> Document_ptr;
+				
+			}
+			
+			class Document
+				: public CategoryBase<Test, Document, tuple::Document>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Document Tuple;
+				typedef tuple::Document_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -107,7 +113,7 @@ namespace r3
 			}
 			
 			inline Document::Document(Test *s)
-				: CategoryBase<Document>("Document")
+				: CategoryBase<Test, Document, tuple::Document>("Document")
 				, _schema(s)
 			{
 			}

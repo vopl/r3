@@ -19,18 +19,10 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Program
-				: public CategoryBase<Program>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-			
-			public:
-				struct Tuple
-						: public CategoryBase<Program>::Tuple
+				struct Program
+						: public TupleBase<Program>
 				{
 					// Program
 					r3::fields::String language;
@@ -44,7 +36,21 @@ namespace r3
 					r3::relations::Relation2n<Document> documents;
 					r3::relations::Relation2one<Service> service;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Program> Program_ptr;
+				
+			}
+			
+			class Program
+				: public CategoryBase<Test, Program, tuple::Program>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Program Tuple;
+				typedef tuple::Program_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -126,7 +132,7 @@ namespace r3
 			}
 			
 			inline Program::Program(Test *s)
-				: CategoryBase<Program>("Program")
+				: CategoryBase<Test, Program, tuple::Program>("Program")
 				, _schema(s)
 			{
 			}

@@ -19,27 +19,19 @@ namespace r3
 		namespace s_Test
 		{
 		
-			class Furniture
-				: public CategoryBase<Furniture>
+			namespace tuple
 			{
-			
-			public:
-				static const bool isAbstract = false;
-				
-			public:
-				struct Domainconstraints
+				struct DomainFurnitureconstraints
 				{
 					static const size_t amount = 4;
 					static const char *values[amount];
 				};
 				
-				
-			public:
-				struct Tuple
-						: public CategoryBase<Furniture>::Tuple
+				struct Furniture
+						: public TupleBase<Furniture>
 				{
 					// Furniture
-					r3::fields::Set<Furniture::Domainconstraints> constraints;
+					r3::fields::Set<DomainFurnitureconstraints> constraints;
 					r3::fields::Int16 depth;
 					r3::fields::Int16 height;
 					r3::fields::Real32 weight;
@@ -48,10 +40,24 @@ namespace r3
 					r3::fields::Money cost;
 					r3::fields::Date incomingDate;
 					r3::fields::String inventoryNumber;
-					r3::fields::Enum<Stock::DomainsecurityStatus> securityStatus;
+					r3::fields::Enum<DomainStocksecurityStatus> securityStatus;
 					r3::relations::Relation2n<Service> services;
 				};
-				typedef boost::shared_ptr<Tuple> Tuple_ptr;
+				typedef boost::shared_ptr<Furniture> Furniture_ptr;
+				
+			}
+			
+			class Furniture
+				: public CategoryBase<Test, Furniture, tuple::Furniture>
+			{
+			
+			public:
+				static const bool isAbstract = false;
+				
+				typedef tuple::Furniture Tuple;
+				typedef tuple::Furniture_ptr Tuple_ptr;
+				
+				typedef Test Schema;
 				
 			public:
 				template <class Oper> void enumBasesFirst(Oper o);
@@ -106,7 +112,7 @@ namespace r3
 			{
 				//Furniture
 				Furniture *c_Furniture = _schema->getCategory<Furniture>().get();
-				o(this, c_Furniture, (r3::fields::Set<Furniture::Domainconstraints>*)&tup.constraints, "constraints");
+				o(this, c_Furniture, (r3::fields::Set<tuple::DomainFurnitureconstraints>*)&tup.constraints, "constraints");
 				o(this, c_Furniture, (r3::fields::Int16 *)&tup.depth, "depth");
 				o(this, c_Furniture, (r3::fields::Int16 *)&tup.height, "height");
 				o(this, c_Furniture, (r3::fields::Real32 *)&tup.weight, "weight");
@@ -116,7 +122,7 @@ namespace r3
 				o(this, c_Stock, (r3::fields::Money *)&tup.cost, "cost");
 				o(this, c_Stock, (r3::fields::Date *)&tup.incomingDate, "incomingDate");
 				o(this, c_Stock, (r3::fields::String *)&tup.inventoryNumber, "inventoryNumber");
-				o(this, c_Stock, (r3::fields::Enum<Stock::DomainsecurityStatus>*)&tup.securityStatus, "securityStatus");
+				o(this, c_Stock, (r3::fields::Enum<tuple::DomainStocksecurityStatus>*)&tup.securityStatus, "securityStatus");
 			}
 			
 			template <class Oper> void Furniture::enumRelationsFromBasesAndSelf(Oper o, Tuple &tup)
@@ -134,7 +140,7 @@ namespace r3
 			}
 			
 			inline Furniture::Furniture(Test *s)
-				: CategoryBase<Furniture>("Furniture")
+				: CategoryBase<Test, Furniture, tuple::Furniture>("Furniture")
 				, _schema(s)
 			{
 			}
