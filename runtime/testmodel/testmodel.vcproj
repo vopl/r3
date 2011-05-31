@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="testmodel"
 	ProjectGUID="{9CF40CAA-2AB9-43F5-9FB1-8DB41F57BC26}"
 	RootNamespace="testmodel"
@@ -46,7 +46,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -177,6 +177,14 @@
 			<File
 				RelativePath=".\stdafx.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\testmodel.cpp"
@@ -208,6 +216,10 @@
 			>
 			<File
 				RelativePath=".\fixtures\createSchema.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fixtures\crud.cpp"
 				>
 			</File>
 		</Filter>

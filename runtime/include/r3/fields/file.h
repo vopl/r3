@@ -3,6 +3,7 @@
 
 #include "r3/fields/field.h"
 
+#include "pgc/blob.hpp"
 
 namespace r3{ namespace fields
 {
@@ -12,12 +13,21 @@ namespace r3{ namespace fields
 	class File
 		: public Field
 	{
-		boost::uint32_t _value;
+		std::string		_name;
+		std::string		_ext;
+		pgc::Blob		_blob;
+
 	public:
-		boost::uint32_t &value()
-		{
-			return _value;
-		}
+		std::string &name();
+		std::string &ext();
+		pgc::Blob &blob();
+
+		File &operator=(const std::string &from);
+		File &operator=(const pgc::Blob &from);
+
+		operator std::string();
+		operator pgc::Blob();
+
 	}; // class
 }}  // namespace
 

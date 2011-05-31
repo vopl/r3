@@ -14,6 +14,9 @@ namespace r3{ namespace fields
 		: public File
 	{
 	public:
+		Audio &operator=(const std::string &from);
+		Audio &operator=(const pgc::Blob &from);
+
 	}; // class
 }}  // namespace
 

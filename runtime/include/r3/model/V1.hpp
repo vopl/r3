@@ -86,63 +86,63 @@ namespace r3
 			o(s, _User);
 		}
 		
-		template <> s_V1::Department_ptr	V1::getCategory<s_V1::Department>()
+		template <> inline s_V1::Department_ptr	V1::getCategory<s_V1::Department>()
 		{
 			return _Department;
 		}
 		
-		template <> s_V1::HasRights_ptr	V1::getCategory<s_V1::HasRights>()
+		template <> inline s_V1::HasRights_ptr	V1::getCategory<s_V1::HasRights>()
 		{
 			return _HasRights;
 		}
 		
-		template <> s_V1::Owner_ptr	V1::getCategory<s_V1::Owner>()
+		template <> inline s_V1::Owner_ptr	V1::getCategory<s_V1::Owner>()
 		{
 			return _Owner;
 		}
 		
-		template <> s_V1::Right_ptr	V1::getCategory<s_V1::Right>()
+		template <> inline s_V1::Right_ptr	V1::getCategory<s_V1::Right>()
 		{
 			return _Right;
 		}
 		
-		template <> s_V1::Role_ptr	V1::getCategory<s_V1::Role>()
+		template <> inline s_V1::Role_ptr	V1::getCategory<s_V1::Role>()
 		{
 			return _Role;
 		}
 		
-		template <> s_V1::User_ptr	V1::getCategory<s_V1::User>()
+		template <> inline s_V1::User_ptr	V1::getCategory<s_V1::User>()
 		{
 			return _User;
 		}
 		
 		
-		s_V1::Department_ptr	V1::getDepartment()
+		inline s_V1::Department_ptr	V1::getDepartment()
 		{
 			return _Department;
 		}
 		
-		s_V1::HasRights_ptr	V1::getHasRights()
+		inline s_V1::HasRights_ptr	V1::getHasRights()
 		{
 			return _HasRights;
 		}
 		
-		s_V1::Owner_ptr	V1::getOwner()
+		inline s_V1::Owner_ptr	V1::getOwner()
 		{
 			return _Owner;
 		}
 		
-		s_V1::Right_ptr	V1::getRight()
+		inline s_V1::Right_ptr	V1::getRight()
 		{
 			return _Right;
 		}
 		
-		s_V1::Role_ptr	V1::getRole()
+		inline s_V1::Role_ptr	V1::getRole()
 		{
 			return _Role;
 		}
 		
-		s_V1::User_ptr	V1::getUser()
+		inline s_V1::User_ptr	V1::getUser()
 		{
 			return _User;
 		}

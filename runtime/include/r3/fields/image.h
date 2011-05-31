@@ -13,12 +13,11 @@ namespace r3{ namespace fields
 	class Image
 		: public File
 	{
-		boost::uint32_t _oid;
+		boost::int32_t _width;
+		boost::int32_t _height;
 	public:
-		boost::uint32_t &value()
-		{
-			return _oid;
-		}
+		boost::int32_t &width();
+		boost::int32_t &height();
 
 	}; // class
 }}  // namespace

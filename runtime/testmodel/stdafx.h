@@ -25,3 +25,5 @@
 #include <boost/cstdint.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
+
+#include "r3/model.hpp"

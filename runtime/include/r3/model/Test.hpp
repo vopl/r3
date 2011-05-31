@@ -146,163 +146,163 @@ namespace r3
 			o(s, _WebSite);
 		}
 		
-		template <> s_Test::Client_ptr	Test::getCategory<s_Test::Client>()
+		template <> inline s_Test::Client_ptr	Test::getCategory<s_Test::Client>()
 		{
 			return _Client;
 		}
 		
-		template <> s_Test::Computer_ptr	Test::getCategory<s_Test::Computer>()
+		template <> inline s_Test::Computer_ptr	Test::getCategory<s_Test::Computer>()
 		{
 			return _Computer;
 		}
 		
-		template <> s_Test::Contract_ptr	Test::getCategory<s_Test::Contract>()
+		template <> inline s_Test::Contract_ptr	Test::getCategory<s_Test::Contract>()
 		{
 			return _Contract;
 		}
 		
-		template <> s_Test::ContractComplex_ptr	Test::getCategory<s_Test::ContractComplex>()
+		template <> inline s_Test::ContractComplex_ptr	Test::getCategory<s_Test::ContractComplex>()
 		{
 			return _ContractComplex;
 		}
 		
-		template <> s_Test::ContractSimple_ptr	Test::getCategory<s_Test::ContractSimple>()
+		template <> inline s_Test::ContractSimple_ptr	Test::getCategory<s_Test::ContractSimple>()
 		{
 			return _ContractSimple;
 		}
 		
-		template <> s_Test::Document_ptr	Test::getCategory<s_Test::Document>()
+		template <> inline s_Test::Document_ptr	Test::getCategory<s_Test::Document>()
 		{
 			return _Document;
 		}
 		
-		template <> s_Test::Employee_ptr	Test::getCategory<s_Test::Employee>()
+		template <> inline s_Test::Employee_ptr	Test::getCategory<s_Test::Employee>()
 		{
 			return _Employee;
 		}
 		
-		template <> s_Test::Furniture_ptr	Test::getCategory<s_Test::Furniture>()
+		template <> inline s_Test::Furniture_ptr	Test::getCategory<s_Test::Furniture>()
 		{
 			return _Furniture;
 		}
 		
-		template <> s_Test::Letter_ptr	Test::getCategory<s_Test::Letter>()
+		template <> inline s_Test::Letter_ptr	Test::getCategory<s_Test::Letter>()
 		{
 			return _Letter;
 		}
 		
-		template <> s_Test::Mockup_ptr	Test::getCategory<s_Test::Mockup>()
+		template <> inline s_Test::Mockup_ptr	Test::getCategory<s_Test::Mockup>()
 		{
 			return _Mockup;
 		}
 		
-		template <> s_Test::People_ptr	Test::getCategory<s_Test::People>()
+		template <> inline s_Test::People_ptr	Test::getCategory<s_Test::People>()
 		{
 			return _People;
 		}
 		
-		template <> s_Test::Program_ptr	Test::getCategory<s_Test::Program>()
+		template <> inline s_Test::Program_ptr	Test::getCategory<s_Test::Program>()
 		{
 			return _Program;
 		}
 		
-		template <> s_Test::Service_ptr	Test::getCategory<s_Test::Service>()
+		template <> inline s_Test::Service_ptr	Test::getCategory<s_Test::Service>()
 		{
 			return _Service;
 		}
 		
-		template <> s_Test::ServicePart_ptr	Test::getCategory<s_Test::ServicePart>()
+		template <> inline s_Test::ServicePart_ptr	Test::getCategory<s_Test::ServicePart>()
 		{
 			return _ServicePart;
 		}
 		
-		template <> s_Test::Stock_ptr	Test::getCategory<s_Test::Stock>()
+		template <> inline s_Test::Stock_ptr	Test::getCategory<s_Test::Stock>()
 		{
 			return _Stock;
 		}
 		
-		template <> s_Test::WebSite_ptr	Test::getCategory<s_Test::WebSite>()
+		template <> inline s_Test::WebSite_ptr	Test::getCategory<s_Test::WebSite>()
 		{
 			return _WebSite;
 		}
 		
 		
-		s_Test::Client_ptr	Test::getClient()
+		inline s_Test::Client_ptr	Test::getClient()
 		{
 			return _Client;
 		}
 		
-		s_Test::Computer_ptr	Test::getComputer()
+		inline s_Test::Computer_ptr	Test::getComputer()
 		{
 			return _Computer;
 		}
 		
-		s_Test::Contract_ptr	Test::getContract()
+		inline s_Test::Contract_ptr	Test::getContract()
 		{
 			return _Contract;
 		}
 		
-		s_Test::ContractComplex_ptr	Test::getContractComplex()
+		inline s_Test::ContractComplex_ptr	Test::getContractComplex()
 		{
 			return _ContractComplex;
 		}
 		
-		s_Test::ContractSimple_ptr	Test::getContractSimple()
+		inline s_Test::ContractSimple_ptr	Test::getContractSimple()
 		{
 			return _ContractSimple;
 		}
 		
-		s_Test::Document_ptr	Test::getDocument()
+		inline s_Test::Document_ptr	Test::getDocument()
 		{
 			return _Document;
 		}
 		
-		s_Test::Employee_ptr	Test::getEmployee()
+		inline s_Test::Employee_ptr	Test::getEmployee()
 		{
 			return _Employee;
 		}
 		
-		s_Test::Furniture_ptr	Test::getFurniture()
+		inline s_Test::Furniture_ptr	Test::getFurniture()
 		{
 			return _Furniture;
 		}
 		
-		s_Test::Letter_ptr	Test::getLetter()
+		inline s_Test::Letter_ptr	Test::getLetter()
 		{
 			return _Letter;
 		}
 		
-		s_Test::Mockup_ptr	Test::getMockup()
+		inline s_Test::Mockup_ptr	Test::getMockup()
 		{
 			return _Mockup;
 		}
 		
-		s_Test::People_ptr	Test::getPeople()
+		inline s_Test::People_ptr	Test::getPeople()
 		{
 			return _People;
 		}
 		
-		s_Test::Program_ptr	Test::getProgram()
+		inline s_Test::Program_ptr	Test::getProgram()
 		{
 			return _Program;
 		}
 		
-		s_Test::Service_ptr	Test::getService()
+		inline s_Test::Service_ptr	Test::getService()
 		{
 			return _Service;
 		}
 		
-		s_Test::ServicePart_ptr	Test::getServicePart()
+		inline s_Test::ServicePart_ptr	Test::getServicePart()
 		{
 			return _ServicePart;
 		}
 		
-		s_Test::Stock_ptr	Test::getStock()
+		inline s_Test::Stock_ptr	Test::getStock()
 		{
 			return _Stock;
 		}
 		
-		s_Test::WebSite_ptr	Test::getWebSite()
+		inline s_Test::WebSite_ptr	Test::getWebSite()
 		{
 			return _WebSite;
 		}

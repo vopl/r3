@@ -13,7 +13,12 @@ namespace r3{ namespace fields
 	class Video
 		: public File
 	{
+		boost::int32_t _width;
+		boost::int32_t _height;
 	public:
+		boost::int32_t &width();
+		boost::int32_t &height();
+
 	}; // class
 }}  // namespace
 

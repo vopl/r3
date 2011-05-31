@@ -267,7 +267,7 @@ namespace workers
 		//шаблонный геттер для категорий
 		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
-			hpp<<"template <> s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<name<<"::getCategory<s_"<<name<<"::"<<cat->getName()<<">()"<<endl;
+			hpp<<"template <> inline s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<name<<"::getCategory<s_"<<name<<"::"<<cat->getName()<<">()"<<endl;
 			hpp<<"{"<<endl;
 			hpp<<"return _"<<cat->getName()<<";";
 			hpp<<"}"<<endl;
@@ -279,7 +279,7 @@ namespace workers
 		//именованные геттеры для категорий
 		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
-			hpp<<"s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<name<<"::"<<"get"<<cat->getName()<<"()"<<endl;
+			hpp<<"inline s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<name<<"::"<<"get"<<cat->getName()<<"()"<<endl;
 			hpp<<"{"<<endl;
 			hpp<<"return _"<<cat->getName()<<";";
 			hpp<<"}"<<endl;
