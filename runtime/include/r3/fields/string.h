@@ -42,6 +42,11 @@ namespace r3{ namespace fields
 			fvs(from?fvs_set:fvs_null);
 		}
 
+		std::string &value()
+		{
+			return _value;
+		}
+
 		String &operator=(const String &from)
 		{
 			this->Simple::operator=(from);

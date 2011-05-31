@@ -30,10 +30,19 @@ namespace r3
 			
 			public:
 				struct Tuple
-						: public ServicePart::Tuple
+						: public CategoryBase<Program>::Tuple
 				{
+					// Program
 					r3::fields::String language;
 					r3::fields::String repository;
+					// ServicePart
+					r3::fields::String comment;
+					r3::fields::Money cost;
+					r3::fields::DateTimeInterval duration;
+					r3::fields::Date start;
+					r3::fields::Date stop;
+					r3::relations::Relation2n<Document> documents;
+					r3::relations::Relation2one<Service> service;
 				};
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
@@ -66,6 +75,14 @@ namespace r3
 				
 			protected:
 				Test *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<Program> Program_ptr;
@@ -125,7 +142,14 @@ namespace r3
 			
 			inline void Program::ins(Program::Tuple &tup)
 			{
-				return CategoryBase<Program>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Program::ins(Program::Tuple_ptr tup)
@@ -135,7 +159,14 @@ namespace r3
 			
 			inline void Program::upd(Program::Tuple &tup)
 			{
-				return CategoryBase<Program>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Program::upd(Program::Tuple_ptr tup)
@@ -145,12 +176,20 @@ namespace r3
 			
 			inline void Program::del(const fields::Id &id)
 			{
-				return CategoryBase<Program>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Program::del(Program::Tuple &tup)
 			{
-				return CategoryBase<Program>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void Program::del(Program::Tuple_ptr tup)
@@ -160,14 +199,226 @@ namespace r3
 			
 			inline Program::Tuple_ptr  Program::sel(const fields::Id &id)
 			{
-				return CategoryBase<Program>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline Program::Tuple_ptr Program::sel(Program::Tuple_ptr tup)
 			{
-				return CategoryBase<Program>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  Program::tupleFillKey(Tuple &tup)
+			{
+				std::string res(7, '0');
+				
+				if(tup.comment.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.duration.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.language.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				if(tup.repository.fvs() != fields::fvs_notset) {
+					res[4] = '1';
+				}
+				
+				if(tup.start.fvs() != fields::fvs_notset) {
+					res[5] = '1';
+				}
+				
+				if(tup.stop.fvs() != fields::fvs_notset) {
+					res[6] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  Program::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.comment.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_comment_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_cost_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.duration.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_duration_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.language.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_language_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.repository.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_repository_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.start.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_start_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.stop.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_stop_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  Program::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  Program::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  Program::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.comment.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.comment.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.cost.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.duration.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.duration.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.language.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.language.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.repository.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.repository.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.start.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.start.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.stop.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.stop.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  Program::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

@@ -13,7 +13,12 @@ namespace r3{ namespace fields
 	class Real32
 		: public Real
 	{
+		float _value;
 	public:
+		float &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 

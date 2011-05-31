@@ -13,7 +13,12 @@ namespace r3{ namespace fields
 	class Timestamp
 		: public DateTimeValue
 	{
+		boost::posix_time::ptime _value;
 	public:
+		boost::posix_time::ptime &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 

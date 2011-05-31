@@ -35,6 +35,7 @@ namespace r3
 				struct Tuple
 						: public CategoryBase<People>::Tuple
 				{
+					// People
 					r3::fields::Date birth;
 					r3::fields::String middlename;
 					r3::fields::String name;
@@ -74,6 +75,14 @@ namespace r3
 				
 			protected:
 				Test *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<People> People_ptr;
@@ -126,7 +135,14 @@ namespace r3
 			
 			inline void People::ins(People::Tuple &tup)
 			{
-				return CategoryBase<People>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void People::ins(People::Tuple_ptr tup)
@@ -136,7 +152,14 @@ namespace r3
 			
 			inline void People::upd(People::Tuple &tup)
 			{
-				return CategoryBase<People>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void People::upd(People::Tuple_ptr tup)
@@ -146,12 +169,20 @@ namespace r3
 			
 			inline void People::del(const fields::Id &id)
 			{
-				return CategoryBase<People>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void People::del(People::Tuple &tup)
 			{
-				return CategoryBase<People>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void People::del(People::Tuple_ptr tup)
@@ -161,14 +192,202 @@ namespace r3
 			
 			inline People::Tuple_ptr  People::sel(const fields::Id &id)
 			{
-				return CategoryBase<People>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline People::Tuple_ptr People::sel(People::Tuple_ptr tup)
 			{
-				return CategoryBase<People>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  People::tupleFillKey(Tuple &tup)
+			{
+				std::string res(6, '0');
+				
+				if(tup.birth.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.middlename.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.name.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.photo.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				if(tup.sex.fvs() != fields::fvs_notset) {
+					res[4] = '1';
+				}
+				
+				if(tup.surname.fvs() != fields::fvs_notset) {
+					res[5] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  People::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.birth.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_birth_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.middlename.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_middlename_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.name.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_name_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.photo.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_photo_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.sex.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_sex_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.surname.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_surname_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  People::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  People::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  People::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.birth.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.birth.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.middlename.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.middlename.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.name.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.name.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.photo.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.photo.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.sex.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.sex.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.surname.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.surname.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  People::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

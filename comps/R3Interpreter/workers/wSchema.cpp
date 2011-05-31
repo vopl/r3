@@ -448,83 +448,66 @@ namespace workers
 		//тупла
 		hpp<<"public:"<<endl;
 		hpp<<"struct Tuple"<<endl;
-		if(!basesFirst.empty())
+		hpp<<": public CategoryBase<"<<cat->getName()<<">::Tuple"<<endl;
+		hpp<<"{"<<endl;
+
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
-			bool first = true;
-			BOOST_FOREACH(Category bcat, basesFirst)
+			hpp<<"// "<<cat->getName()<<endl;
+
+			//поля
+			std::set<BON::FCO> fields = cat->getChildFCOs();
+			BOOST_FOREACH(Field fld, orderByName(fields))
 			{
-				if(first)
+				if(!fld) continue;
+
+				hpp
+					<<"r3::fields::"<<fld->getObjectMeta().name();
+
+				if(Scanty(fld))
 				{
-					first = false;
-					hpp<<": ";
+					Category pcat = fld->getParentModel();
+					hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
+				}
+
+				hpp
+					<<" "<<fld->getName()<<";"
+					<<endl;
+			}
+
+			//связи
+			std::set<CategoryRelation> rels;
+			collectRelations(rels, cat, true, true);
+			BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
+			{
+				assert(rel);
+
+				Category src = rel->getSrc();
+				if(!src) src = CategoryReference(rel->getSrc())->getCategory();
+
+				Category dst = rel->getDst();
+				if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
+
+				if(src == cat)
+				{
+					switch(rel->getMultiplier1())
+					{
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"r3::relations::Relation2one";break;
+					}
+					hpp<<"<"<<dst->getName()<<"> "<<rel->getName1()<<";"<<endl;
 				}
 				else
 				{
-					hpp<<", ";
+					switch(rel->getMultiplier2())
+					{
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"r3::relations::Relation2one";break;
+					}
+					hpp<<"<"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;
 				}
-				hpp<<"public "<<bcat->getName()<<"::Tuple"<<endl;
-			}
-		}
-		else
-		{
-			hpp<<": public CategoryBase<"<<cat->getName()<<">::Tuple"<<endl;
-		}
-
-
-		hpp<<"{"<<endl;
-
-		//поля
-		std::set<BON::FCO> fields = cat->getChildFCOs();
-		BOOST_FOREACH(Field fld, orderByName(fields))
-		{
-			if(!fld) continue;
-
-			hpp
-				<<"r3::fields::"<<fld->getObjectMeta().name();
-
-			if(Scanty(fld))
-			{
-				Category pcat = fld->getParentModel();
-				hpp<<"<"<<pcat->getName()<<"::Domain"<<fld->getName()<<">";
-			}
-
-			hpp
-				<<" "<<fld->getName()<<";"
-				<<endl;
-		}
-
-		//связи
-		std::set<CategoryRelation> rels;
-		collectRelations(rels, cat, true, true);
-		BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
-		{
-			assert(rel);
-
-			Category src = rel->getSrc();
-			if(!src) src = CategoryReference(rel->getSrc())->getCategory();
-
-			Category dst = rel->getDst();
-			if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
-
-			if(src == cat)
-			{
-				switch(rel->getMultiplier1())
-				{
-				case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
-				case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
-				default:assert(0); hpp<<"r3::relations::Relation2one";break;
-				}
-				hpp<<"<"<<dst->getName()<<"> "<<rel->getName1()<<";"<<endl;
-			}
-			else
-			{
-				switch(rel->getMultiplier2())
-				{
-				case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
-				case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
-				default:assert(0); hpp<<"r3::relations::Relation2one";break;
-				}
-				hpp<<"<"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;
 			}
 		}
 		hpp<<"};"<<endl;
@@ -584,6 +567,15 @@ namespace workers
 
 		hpp<<"protected:"<<endl;
 		hpp<<""<<cat->getSchema()<<" *_schema;"<<endl;
+		hpp<<endl;
+
+		hpp<<"protected:"<<endl;
+		hpp<<"std::string tupleFillKey(Tuple &tup);"<<endl;
+		hpp<<"std::string tupleInsSql(Tuple &tup);"<<endl;
+		hpp<<"std::string tupleUpdSql(Tuple &tup);"<<endl;
+		hpp<<"std::string tupleSelSql(Tuple &tup);"<<endl;
+		hpp<<"void tupleInsBind(Tuple &tup, pgc::Statement &stm);"<<endl;
+		hpp<<"void tupleUpdBind(Tuple &tup, pgc::Statement &stm);"<<endl;
 		hpp<<endl;
 
 		hpp<<"};"<<endl;
@@ -826,7 +818,10 @@ namespace workers
 		//ins
 		hpp<<"inline void "<<name<<"::ins("<<name<<"::Tuple &tup)"<<endl;
 		hpp<<"{"<<endl;
-		hpp<<"return CategoryBase<"<<name<<">::ins(this, tup);"<<endl;
+		hpp<<"pgc::Statement stm_ = stm(tupleFillKey(tup)+\"_ins_tuple\");"<<endl;
+		hpp<<"if(stm_.empty())stm_.sql(tupleInsSql(tup));"<<endl;
+		hpp<<"tupleInsBind(tup, stm_);"<<endl;
+		hpp<<"stm_.exec().throwIfError();"<<endl;
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
@@ -839,7 +834,10 @@ namespace workers
 		//upd
 		hpp<<"inline void "<<name<<"::upd("<<name<<"::Tuple &tup)"<<endl;
 		hpp<<"{"<<endl;
-		hpp<<"return CategoryBase<"<<name<<">::upd(this, tup);"<<endl;
+		hpp<<"pgc::Statement stm_ = stm(tupleFillKey(tup)+\"_upd_tuple\");"<<endl;
+		hpp<<"if(stm_.empty())stm_.sql(tupleUpdSql(tup));"<<endl;
+		hpp<<"tupleUpdBind(tup, stm_);"<<endl;
+		hpp<<"stm_.exec().throwIfError();"<<endl;
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
@@ -852,13 +850,17 @@ namespace workers
 		//del
 		hpp<<"inline void "<<name<<"::del(const fields::Id &id)"<<endl;
 		hpp<<"{"<<endl;
-		hpp<<"return CategoryBase<"<<name<<">::del(this, id);"<<endl;
+		hpp<<"pgc::Statement stm_ = stm(\"del_id\");"<<endl;
+		hpp<<"if(stm_.empty()) stm_.sql(\"DELETE FROM \"+db_sname()+\" WHERE id=$1::INT8\");"<<endl;
+		hpp<<"stm_.bind(id.value());"<<endl;
+		hpp<<"stm_.exec().throwIfError();"<<endl;
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
 		hpp<<"inline void "<<name<<"::del("<<name<<"::Tuple &tup)"<<endl;
 		hpp<<"{"<<endl;
-		hpp<<"return CategoryBase<"<<name<<">::del(this, tup);"<<endl;
+		hpp<<"del(tup.id);"<<endl;
+		hpp<<"tup.id.value() = 0;"<<endl;
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
@@ -871,15 +873,102 @@ namespace workers
 		//sel
 		hpp<<"inline "<<name<<"::Tuple_ptr  "<<name<<"::sel(const fields::Id &id)"<<endl;
 		hpp<<"{"<<endl;
-		hpp<<"return CategoryBase<"<<name<<">::sel(this, id);"<<endl;
+		hpp<<"Tuple_ptr tup(new Tuple);"<<endl;
+		hpp<<"tup->id = id;"<<endl;
+		hpp<<"return sel(tup);"<<endl;
 		hpp<<"}"<<endl;
 		hpp<<endl;
 
 		hpp<<"inline "<<name<<"::Tuple_ptr "<<name<<"::sel("<<name<<"::Tuple_ptr tup)"<<endl;
 		hpp<<"{"<<endl;
-		hpp<<"return CategoryBase<"<<name<<">::sel(this, tup);"<<endl;
+		hpp<<"pgc::Statement stm_ = stm(\"sel_id\");"<<endl;
+		hpp<<"if(stm_.empty()) stm_.sql(tupleSelSql(*tup));"<<endl;
+		hpp<<"stm_.bind(tup->id.value());"<<endl;
+		hpp<<"stm_.exec().throwIfError();"<<endl;
 		hpp<<"}"<<endl;
 		hpp<<endl;
+
+
+
+
+
+
+		//tupleFillKey
+		hpp<<"inline std::string  "<<name<<"::tupleFillKey(Tuple &tup)"<<endl;
+		hpp<<"{"<<endl;
+
+		std::vector<Field> fields = collectFields(cat);
+		hpp<<"std::string res("<<fields.size()<<", '0');"<<endl;
+		for(size_t i(0); i<fields.size(); i++)
+		{
+			hpp<<"if(tup."<<fields[i]->getName()<<".fvs() != fields::fvs_notset) res["<<i<<"] = '1';"<<endl;
+		}
+
+		hpp<<"return res;"<<endl;
+		hpp<<"}"<<endl;
+
+		//tupleInsSql
+		hpp<<"inline std::string  "<<name<<"::tupleInsSql(Tuple &tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"std::string res;"<<endl;
+		hpp<<"std::string vals;"<<endl;
+		hpp<<"size_t idx(0);"<<endl;
+		hpp<<"char buf[32];"<<endl;
+		for(size_t i(0); i<fields.size(); i++)
+		{
+			hpp<<"if(tup."<<fields[i]->getName()<<".fvs() != fields::fvs_notset)"<<endl;
+			hpp<<"{"<<endl;
+			hpp<<"if(idx)"<<endl;
+			hpp<<"{"<<endl;
+			hpp<<"res += \",\";"<<endl;
+			hpp<<"vals += \",\";"<<endl;
+			hpp<<"}"<<endl;
+			hpp<<"res += \"\\\"_"+fields[i]->getName()+"_\\\"\";"<<endl;
+			hpp<<"vals += \"$\";"<<endl;
+			hpp<<"vals += utils::_ntoa(idx+1,buf);"<<endl;
+			hpp<<"idx++;";
+			hpp<<"}"<<endl;
+		}
+		hpp<<"res = \"INSERT INTO \"+db_sname()+\"(\"+res;"<<endl;
+		hpp<<"res += \") VALUES (\"+vals+\")\";"<<endl;
+		hpp<<"return res;"<<endl;
+		hpp<<"}"<<endl;
+
+		//tupleUpdSql
+		hpp<<"inline std::string  "<<name<<"::tupleUpdSql(Tuple &tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"assert(0);"<<endl;
+		hpp<<"return \"\";"<<endl;
+		hpp<<"}"<<endl;
+
+		//tupleSelSql
+		hpp<<"inline std::string  "<<name<<"::tupleSelSql(Tuple &tup)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"assert(0);"<<endl;
+		hpp<<"return \"\";"<<endl;
+		hpp<<"}"<<endl;
+
+		//tupleInsBind
+		hpp<<"inline void  "<<name<<"::tupleInsBind(Tuple &tup, pgc::Statement &stm)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"size_t idx(0);"<<endl;
+		for(size_t i(0); i<fields.size(); i++)
+		{
+			hpp<<"if(tup."<<fields[i]->getName()<<".fvs() != fields::fvs_notset)"<<endl;
+			hpp<<"{"<<endl;
+			hpp<<"stm.bind(tup."<<fields[i]->getName()<<".value(), idx+1);"<<endl;
+			hpp<<"idx++;";
+			hpp<<"}"<<endl;
+		}
+		hpp<<"}"<<endl;
+
+		//tupleUpdBind
+		hpp<<"inline void  "<<name<<"::tupleUpdBind(Tuple &tup, pgc::Statement &stm)"<<endl;
+		hpp<<"{"<<endl;
+		hpp<<"assert(0);"<<endl;
+		hpp<<"}"<<endl;
+
+
 
 		//конец пространства имен
 		hpp<<"}"<<endl<<"}"<<endl<<"}"<<endl;
@@ -965,6 +1054,27 @@ namespace workers
 
 			res.insert(rels.begin(), rels.end());
 		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::vector<Field> WSchema::collectFields(Category cat)
+	{
+		std::set<Category> basesAndSelf;
+		collectInheriance(basesAndSelf, cat, true, true);
+		basesAndSelf.insert(cat);
+
+		std::set<Field> fields;
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
+		{
+			std::set<BON::FCO> fcos = cat->getChildFCOs();
+			BOOST_FOREACH(Field fld, orderByName(fcos))
+			{
+				if(!fld) continue;
+				fields.insert(fld);
+			}
+		}
+
+		return orderByName(fields);
 	}
 
 }

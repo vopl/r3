@@ -36,12 +36,21 @@ namespace r3
 				
 			public:
 				struct Tuple
-						: public People::Tuple
+						: public CategoryBase<Employee>::Tuple
 				{
+					// Employee
 					r3::fields::Enum<Employee::Domaindepartment> department;
 					r3::fields::Money rateNight;
 					r3::fields::Money rateNormal;
 					r3::relations::Relation2n<Service> services;
+					// People
+					r3::fields::Date birth;
+					r3::fields::String middlename;
+					r3::fields::String name;
+					r3::fields::Image photo;
+					r3::fields::Enum<People::Domainsex> sex;
+					r3::fields::String surname;
+					r3::relations::Relation2n<Service> observableServices;
 				};
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
@@ -74,6 +83,14 @@ namespace r3
 				
 			protected:
 				Test *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<Employee> Employee_ptr;
@@ -136,7 +153,14 @@ namespace r3
 			
 			inline void Employee::ins(Employee::Tuple &tup)
 			{
-				return CategoryBase<Employee>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Employee::ins(Employee::Tuple_ptr tup)
@@ -146,7 +170,14 @@ namespace r3
 			
 			inline void Employee::upd(Employee::Tuple &tup)
 			{
-				return CategoryBase<Employee>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Employee::upd(Employee::Tuple_ptr tup)
@@ -156,12 +187,20 @@ namespace r3
 			
 			inline void Employee::del(const fields::Id &id)
 			{
-				return CategoryBase<Employee>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Employee::del(Employee::Tuple &tup)
 			{
-				return CategoryBase<Employee>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void Employee::del(Employee::Tuple_ptr tup)
@@ -171,14 +210,274 @@ namespace r3
 			
 			inline Employee::Tuple_ptr  Employee::sel(const fields::Id &id)
 			{
-				return CategoryBase<Employee>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline Employee::Tuple_ptr Employee::sel(Employee::Tuple_ptr tup)
 			{
-				return CategoryBase<Employee>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  Employee::tupleFillKey(Tuple &tup)
+			{
+				std::string res(9, '0');
+				
+				if(tup.birth.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.department.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.middlename.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.name.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				if(tup.photo.fvs() != fields::fvs_notset) {
+					res[4] = '1';
+				}
+				
+				if(tup.rateNight.fvs() != fields::fvs_notset) {
+					res[5] = '1';
+				}
+				
+				if(tup.rateNormal.fvs() != fields::fvs_notset) {
+					res[6] = '1';
+				}
+				
+				if(tup.sex.fvs() != fields::fvs_notset) {
+					res[7] = '1';
+				}
+				
+				if(tup.surname.fvs() != fields::fvs_notset) {
+					res[8] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  Employee::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.birth.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_birth_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.department.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_department_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.middlename.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_middlename_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.name.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_name_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.photo.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_photo_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.rateNight.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_rateNight_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.rateNormal.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_rateNormal_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.sex.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_sex_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.surname.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_surname_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  Employee::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  Employee::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  Employee::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.birth.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.birth.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.department.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.department.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.middlename.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.middlename.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.name.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.name.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.photo.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.photo.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.rateNight.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.rateNight.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.rateNormal.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.rateNormal.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.sex.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.sex.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.surname.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.surname.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  Employee::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

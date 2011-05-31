@@ -35,6 +35,11 @@ namespace r3{ namespace fields
 			fvs(fvs_set);
 		}
 
+		bool &value()
+		{
+			return _value;
+		}
+
 		Bool &operator=(const Bool &from)
 		{
 			this->Simple::operator=(from);

@@ -36,13 +36,20 @@ namespace r3
 				
 			public:
 				struct Tuple
-						: public Stock::Tuple
+						: public CategoryBase<Furniture>::Tuple
 				{
+					// Furniture
 					r3::fields::Set<Furniture::Domainconstraints> constraints;
 					r3::fields::Int16 depth;
 					r3::fields::Int16 height;
 					r3::fields::Real32 weight;
 					r3::fields::Int16 width;
+					// Stock
+					r3::fields::Money cost;
+					r3::fields::Date incomingDate;
+					r3::fields::String inventoryNumber;
+					r3::fields::Enum<Stock::DomainsecurityStatus> securityStatus;
+					r3::relations::Relation2n<Service> services;
 				};
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
@@ -75,6 +82,14 @@ namespace r3
 				
 			protected:
 				Test *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<Furniture> Furniture_ptr;
@@ -135,7 +150,14 @@ namespace r3
 			
 			inline void Furniture::ins(Furniture::Tuple &tup)
 			{
-				return CategoryBase<Furniture>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Furniture::ins(Furniture::Tuple_ptr tup)
@@ -145,7 +167,14 @@ namespace r3
 			
 			inline void Furniture::upd(Furniture::Tuple &tup)
 			{
-				return CategoryBase<Furniture>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Furniture::upd(Furniture::Tuple_ptr tup)
@@ -155,12 +184,20 @@ namespace r3
 			
 			inline void Furniture::del(const fields::Id &id)
 			{
-				return CategoryBase<Furniture>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Furniture::del(Furniture::Tuple &tup)
 			{
-				return CategoryBase<Furniture>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void Furniture::del(Furniture::Tuple_ptr tup)
@@ -170,14 +207,274 @@ namespace r3
 			
 			inline Furniture::Tuple_ptr  Furniture::sel(const fields::Id &id)
 			{
-				return CategoryBase<Furniture>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline Furniture::Tuple_ptr Furniture::sel(Furniture::Tuple_ptr tup)
 			{
-				return CategoryBase<Furniture>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  Furniture::tupleFillKey(Tuple &tup)
+			{
+				std::string res(9, '0');
+				
+				if(tup.constraints.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.depth.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.height.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				if(tup.incomingDate.fvs() != fields::fvs_notset) {
+					res[4] = '1';
+				}
+				
+				if(tup.inventoryNumber.fvs() != fields::fvs_notset) {
+					res[5] = '1';
+				}
+				
+				if(tup.securityStatus.fvs() != fields::fvs_notset) {
+					res[6] = '1';
+				}
+				
+				if(tup.weight.fvs() != fields::fvs_notset) {
+					res[7] = '1';
+				}
+				
+				if(tup.width.fvs() != fields::fvs_notset) {
+					res[8] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  Furniture::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.constraints.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_constraints_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_cost_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.depth.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_depth_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.height.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_height_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.incomingDate.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_incomingDate_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.inventoryNumber.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_inventoryNumber_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.securityStatus.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_securityStatus_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.weight.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_weight_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.width.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_width_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  Furniture::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  Furniture::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  Furniture::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.constraints.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.constraints.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.cost.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.depth.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.depth.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.height.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.height.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.incomingDate.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.incomingDate.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.inventoryNumber.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.inventoryNumber.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.securityStatus.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.securityStatus.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.weight.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.weight.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.width.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.width.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  Furniture::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

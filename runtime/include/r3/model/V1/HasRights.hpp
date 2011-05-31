@@ -29,6 +29,7 @@ namespace r3
 				struct Tuple
 						: public CategoryBase<HasRights>::Tuple
 				{
+					// HasRights
 					r3::fields::Bool attrInHasRights;
 					r3::relations::Relation2n<Right> owners;
 				};
@@ -63,6 +64,14 @@ namespace r3
 				
 			protected:
 				V1 *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<HasRights> HasRights_ptr;
@@ -110,7 +119,14 @@ namespace r3
 			
 			inline void HasRights::ins(HasRights::Tuple &tup)
 			{
-				return CategoryBase<HasRights>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void HasRights::ins(HasRights::Tuple_ptr tup)
@@ -120,7 +136,14 @@ namespace r3
 			
 			inline void HasRights::upd(HasRights::Tuple &tup)
 			{
-				return CategoryBase<HasRights>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void HasRights::upd(HasRights::Tuple_ptr tup)
@@ -130,12 +153,20 @@ namespace r3
 			
 			inline void HasRights::del(const fields::Id &id)
 			{
-				return CategoryBase<HasRights>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void HasRights::del(HasRights::Tuple &tup)
 			{
-				return CategoryBase<HasRights>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void HasRights::del(HasRights::Tuple_ptr tup)
@@ -145,14 +176,82 @@ namespace r3
 			
 			inline HasRights::Tuple_ptr  HasRights::sel(const fields::Id &id)
 			{
-				return CategoryBase<HasRights>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline HasRights::Tuple_ptr HasRights::sel(HasRights::Tuple_ptr tup)
 			{
-				return CategoryBase<HasRights>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  HasRights::tupleFillKey(Tuple &tup)
+			{
+				std::string res(1, '0');
+				
+				if(tup.attrInHasRights.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  HasRights::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.attrInHasRights.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_attrInHasRights_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  HasRights::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  HasRights::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  HasRights::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.attrInHasRights.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.attrInHasRights.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  HasRights::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

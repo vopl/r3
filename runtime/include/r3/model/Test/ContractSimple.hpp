@@ -30,9 +30,20 @@ namespace r3
 			
 			public:
 				struct Tuple
-						: public Contract::Tuple
+						: public CategoryBase<ContractSimple>::Tuple
 				{
+					// Contract
+					r3::fields::Int32 param1;
+					r3::fields::Int64 param2;
+					r3::fields::Int8 param3;
+					r3::fields::Real64 param4;
+					// ContractSimple
 					r3::fields::Date expiration;
+					// Document
+					r3::fields::Date creation;
+					r3::fields::File file;
+					r3::fields::Timestamp lastModified;
+					r3::relations::Relation2one<ServicePart> servicePart;
 				};
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
@@ -65,6 +76,14 @@ namespace r3
 				
 			protected:
 				Test *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<ContractSimple> ContractSimple_ptr;
@@ -128,7 +147,14 @@ namespace r3
 			
 			inline void ContractSimple::ins(ContractSimple::Tuple &tup)
 			{
-				return CategoryBase<ContractSimple>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void ContractSimple::ins(ContractSimple::Tuple_ptr tup)
@@ -138,7 +164,14 @@ namespace r3
 			
 			inline void ContractSimple::upd(ContractSimple::Tuple &tup)
 			{
-				return CategoryBase<ContractSimple>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void ContractSimple::upd(ContractSimple::Tuple_ptr tup)
@@ -148,12 +181,20 @@ namespace r3
 			
 			inline void ContractSimple::del(const fields::Id &id)
 			{
-				return CategoryBase<ContractSimple>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void ContractSimple::del(ContractSimple::Tuple &tup)
 			{
-				return CategoryBase<ContractSimple>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void ContractSimple::del(ContractSimple::Tuple_ptr tup)
@@ -163,14 +204,250 @@ namespace r3
 			
 			inline ContractSimple::Tuple_ptr  ContractSimple::sel(const fields::Id &id)
 			{
-				return CategoryBase<ContractSimple>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline ContractSimple::Tuple_ptr ContractSimple::sel(ContractSimple::Tuple_ptr tup)
 			{
-				return CategoryBase<ContractSimple>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  ContractSimple::tupleFillKey(Tuple &tup)
+			{
+				std::string res(8, '0');
+				
+				if(tup.creation.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.expiration.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				if(tup.param1.fvs() != fields::fvs_notset) {
+					res[4] = '1';
+				}
+				
+				if(tup.param2.fvs() != fields::fvs_notset) {
+					res[5] = '1';
+				}
+				
+				if(tup.param3.fvs() != fields::fvs_notset) {
+					res[6] = '1';
+				}
+				
+				if(tup.param4.fvs() != fields::fvs_notset) {
+					res[7] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  ContractSimple::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.creation.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_creation_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.expiration.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_expiration_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_file_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_lastModified_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.param1.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_param1_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.param2.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_param2_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.param3.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_param3_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.param4.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_param4_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  ContractSimple::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  ContractSimple::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  ContractSimple::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.creation.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.creation.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.expiration.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.expiration.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.file.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.lastModified.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.param1.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.param1.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.param2.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.param2.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.param3.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.param3.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.param4.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.param4.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  ContractSimple::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

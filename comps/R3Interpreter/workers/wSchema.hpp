@@ -37,6 +37,7 @@ namespace workers
 
 		void collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive);
 		void collectRelations(std::set<CategoryRelation> &res, Category cat, bool bases, bool recursive);
+		std::vector<Field> collectFields(Category cat);
 
 
 		//////////////////////////////////////////////////////////////////////////

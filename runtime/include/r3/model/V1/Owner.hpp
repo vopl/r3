@@ -29,6 +29,7 @@ namespace r3
 				struct Tuple
 						: public CategoryBase<Owner>::Tuple
 				{
+					// Owner
 					r3::relations::Relation2n<Department> childs;
 				};
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
@@ -62,6 +63,14 @@ namespace r3
 				
 			protected:
 				V1 *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<Owner> Owner_ptr;
@@ -107,7 +116,14 @@ namespace r3
 			
 			inline void Owner::ins(Owner::Tuple &tup)
 			{
-				return CategoryBase<Owner>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Owner::ins(Owner::Tuple_ptr tup)
@@ -117,7 +133,14 @@ namespace r3
 			
 			inline void Owner::upd(Owner::Tuple &tup)
 			{
-				return CategoryBase<Owner>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Owner::upd(Owner::Tuple_ptr tup)
@@ -127,12 +150,20 @@ namespace r3
 			
 			inline void Owner::del(const fields::Id &id)
 			{
-				return CategoryBase<Owner>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Owner::del(Owner::Tuple &tup)
 			{
-				return CategoryBase<Owner>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void Owner::del(Owner::Tuple_ptr tup)
@@ -142,14 +173,56 @@ namespace r3
 			
 			inline Owner::Tuple_ptr  Owner::sel(const fields::Id &id)
 			{
-				return CategoryBase<Owner>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline Owner::Tuple_ptr Owner::sel(Owner::Tuple_ptr tup)
 			{
-				return CategoryBase<Owner>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  Owner::tupleFillKey(Tuple &tup)
+			{
+				std::string res(0, '0');
+				return res;
+			}
+			inline std::string  Owner::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  Owner::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  Owner::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  Owner::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+			}
+			inline void  Owner::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

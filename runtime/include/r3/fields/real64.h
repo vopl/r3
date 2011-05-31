@@ -13,7 +13,12 @@ namespace r3{ namespace fields
 	class Real64
 		: public Real
 	{
+		double _value;
 	public:
+		double &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 

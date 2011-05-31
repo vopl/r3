@@ -14,7 +14,12 @@ namespace r3{ namespace fields
 	class Enum
 		: public Scanty<Domain>
 	{
+		boost::uint32_t _oid;
 	public:
+		boost::uint32_t &value()
+		{
+			return _oid;
+		}
 	}; // class
 }}  // namespace
 

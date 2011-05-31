@@ -2,7 +2,7 @@
 #define _R3_FIELDS_DATETIMEINTERVAL_H
 
 #include "r3/fields/field.h"
-
+#include "pgc/cppDataType.hpp"
 
 namespace r3{ namespace fields
 {
@@ -13,7 +13,12 @@ namespace r3{ namespace fields
 	class DateTimeInterval
 		: public DateTime
 	{
+		pgc::DateTimeDuration _value;
 	public:
+		pgc::DateTimeDuration &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 

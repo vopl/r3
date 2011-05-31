@@ -30,8 +30,17 @@ namespace r3
 			
 			public:
 				struct Tuple
-						: public ServicePart::Tuple
+						: public CategoryBase<WebSite>::Tuple
 				{
+					// ServicePart
+					r3::fields::String comment;
+					r3::fields::Money cost;
+					r3::fields::DateTimeInterval duration;
+					r3::fields::Date start;
+					r3::fields::Date stop;
+					r3::relations::Relation2n<Document> documents;
+					r3::relations::Relation2one<Service> service;
+					// WebSite
 					r3::fields::String host;
 					r3::fields::String url;
 					r3::relations::Relation2n<Mockup> mockups;
@@ -67,6 +76,14 @@ namespace r3
 				
 			protected:
 				Test *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<WebSite> WebSite_ptr;
@@ -128,7 +145,14 @@ namespace r3
 			
 			inline void WebSite::ins(WebSite::Tuple &tup)
 			{
-				return CategoryBase<WebSite>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void WebSite::ins(WebSite::Tuple_ptr tup)
@@ -138,7 +162,14 @@ namespace r3
 			
 			inline void WebSite::upd(WebSite::Tuple &tup)
 			{
-				return CategoryBase<WebSite>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void WebSite::upd(WebSite::Tuple_ptr tup)
@@ -148,12 +179,20 @@ namespace r3
 			
 			inline void WebSite::del(const fields::Id &id)
 			{
-				return CategoryBase<WebSite>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void WebSite::del(WebSite::Tuple &tup)
 			{
-				return CategoryBase<WebSite>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void WebSite::del(WebSite::Tuple_ptr tup)
@@ -163,14 +202,226 @@ namespace r3
 			
 			inline WebSite::Tuple_ptr  WebSite::sel(const fields::Id &id)
 			{
-				return CategoryBase<WebSite>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline WebSite::Tuple_ptr WebSite::sel(WebSite::Tuple_ptr tup)
 			{
-				return CategoryBase<WebSite>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  WebSite::tupleFillKey(Tuple &tup)
+			{
+				std::string res(7, '0');
+				
+				if(tup.comment.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.duration.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.host.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				if(tup.start.fvs() != fields::fvs_notset) {
+					res[4] = '1';
+				}
+				
+				if(tup.stop.fvs() != fields::fvs_notset) {
+					res[5] = '1';
+				}
+				
+				if(tup.url.fvs() != fields::fvs_notset) {
+					res[6] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  WebSite::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.comment.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_comment_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_cost_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.duration.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_duration_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.host.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_host_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.start.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_start_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.stop.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_stop_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.url.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_url_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  WebSite::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  WebSite::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  WebSite::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.comment.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.comment.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.cost.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.cost.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.duration.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.duration.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.host.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.host.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.start.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.start.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.stop.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.stop.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.url.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.url.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  WebSite::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

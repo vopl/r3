@@ -12,7 +12,12 @@ namespace r3{ namespace fields
 	class File
 		: public Field
 	{
+		boost::uint32_t _value;
 	public:
+		boost::uint32_t &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 

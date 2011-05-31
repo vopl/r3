@@ -14,7 +14,12 @@ namespace r3{ namespace fields
 	class Set
 		: public Scanty<Domain>
 	{
+		boost::int32_t _value;
 	public:
+		boost::int32_t &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 

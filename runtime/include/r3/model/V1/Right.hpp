@@ -35,6 +35,7 @@ namespace r3
 				struct Tuple
 						: public CategoryBase<Right>::Tuple
 				{
+					// Right
 					r3::fields::String name;
 					r3::fields::Enum<Right::Domainvalue> value;
 					r3::relations::Relation2n<HasRights> rights;
@@ -70,6 +71,14 @@ namespace r3
 				
 			protected:
 				V1 *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<Right> Right_ptr;
@@ -118,7 +127,14 @@ namespace r3
 			
 			inline void Right::ins(Right::Tuple &tup)
 			{
-				return CategoryBase<Right>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Right::ins(Right::Tuple_ptr tup)
@@ -128,7 +144,14 @@ namespace r3
 			
 			inline void Right::upd(Right::Tuple &tup)
 			{
-				return CategoryBase<Right>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Right::upd(Right::Tuple_ptr tup)
@@ -138,12 +161,20 @@ namespace r3
 			
 			inline void Right::del(const fields::Id &id)
 			{
-				return CategoryBase<Right>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Right::del(Right::Tuple &tup)
 			{
-				return CategoryBase<Right>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void Right::del(Right::Tuple_ptr tup)
@@ -153,14 +184,106 @@ namespace r3
 			
 			inline Right::Tuple_ptr  Right::sel(const fields::Id &id)
 			{
-				return CategoryBase<Right>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline Right::Tuple_ptr Right::sel(Right::Tuple_ptr tup)
 			{
-				return CategoryBase<Right>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  Right::tupleFillKey(Tuple &tup)
+			{
+				std::string res(2, '0');
+				
+				if(tup.name.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.value.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  Right::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.name.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_name_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.value.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_value_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  Right::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  Right::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  Right::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.name.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.name.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.value.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.value.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  Right::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

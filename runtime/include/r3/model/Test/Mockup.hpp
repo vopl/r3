@@ -30,8 +30,14 @@ namespace r3
 			
 			public:
 				struct Tuple
-						: public Document::Tuple
+						: public CategoryBase<Mockup>::Tuple
 				{
+					// Document
+					r3::fields::Date creation;
+					r3::fields::File file;
+					r3::fields::Timestamp lastModified;
+					r3::relations::Relation2one<ServicePart> servicePart;
+					// Mockup
 					r3::fields::Audio audio;
 					r3::fields::Image image;
 					r3::fields::Video video;
@@ -68,6 +74,14 @@ namespace r3
 				
 			protected:
 				Test *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<Mockup> Mockup_ptr;
@@ -127,7 +141,14 @@ namespace r3
 			
 			inline void Mockup::ins(Mockup::Tuple &tup)
 			{
-				return CategoryBase<Mockup>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Mockup::ins(Mockup::Tuple_ptr tup)
@@ -137,7 +158,14 @@ namespace r3
 			
 			inline void Mockup::upd(Mockup::Tuple &tup)
 			{
-				return CategoryBase<Mockup>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Mockup::upd(Mockup::Tuple_ptr tup)
@@ -147,12 +175,20 @@ namespace r3
 			
 			inline void Mockup::del(const fields::Id &id)
 			{
-				return CategoryBase<Mockup>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Mockup::del(Mockup::Tuple &tup)
 			{
-				return CategoryBase<Mockup>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void Mockup::del(Mockup::Tuple_ptr tup)
@@ -162,14 +198,202 @@ namespace r3
 			
 			inline Mockup::Tuple_ptr  Mockup::sel(const fields::Id &id)
 			{
-				return CategoryBase<Mockup>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline Mockup::Tuple_ptr Mockup::sel(Mockup::Tuple_ptr tup)
 			{
-				return CategoryBase<Mockup>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  Mockup::tupleFillKey(Tuple &tup)
+			{
+				std::string res(6, '0');
+				
+				if(tup.audio.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.creation.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.image.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset) {
+					res[4] = '1';
+				}
+				
+				if(tup.video.fvs() != fields::fvs_notset) {
+					res[5] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  Mockup::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.audio.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_audio_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.creation.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_creation_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_file_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.image.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_image_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_lastModified_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.video.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_video_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  Mockup::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  Mockup::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  Mockup::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.audio.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.audio.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.creation.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.creation.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.file.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.image.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.image.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.lastModified.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.video.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.video.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  Mockup::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

@@ -13,7 +13,12 @@ namespace r3{ namespace fields
 	class Money
 		: public Simple
 	{
+		boost::uint64_t _value;
 	public:
+		boost::uint64_t &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 

@@ -13,7 +13,12 @@ namespace r3{ namespace fields
 	class Int8
 		: public Int
 	{
+		boost::int8_t _value;
 	public:
+		boost::int8_t &value()
+		{
+			return _value;
+		}
 	}; // class
 }}  // namespace
 

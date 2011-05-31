@@ -30,8 +30,14 @@ namespace r3
 			
 			public:
 				struct Tuple
-						: public Document::Tuple
+						: public CategoryBase<Letter>::Tuple
 				{
+					// Document
+					r3::fields::Date creation;
+					r3::fields::File file;
+					r3::fields::Timestamp lastModified;
+					r3::relations::Relation2one<ServicePart> servicePart;
+					// Letter
 					r3::fields::String comment;
 					r3::fields::String content;
 				};
@@ -66,6 +72,14 @@ namespace r3
 				
 			protected:
 				Test *_schema;
+				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 				
 			};
 			typedef boost::shared_ptr<Letter> Letter_ptr;
@@ -122,7 +136,14 @@ namespace r3
 			
 			inline void Letter::ins(Letter::Tuple &tup)
 			{
-				return CategoryBase<Letter>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Letter::ins(Letter::Tuple_ptr tup)
@@ -132,7 +153,14 @@ namespace r3
 			
 			inline void Letter::upd(Letter::Tuple &tup)
 			{
-				return CategoryBase<Letter>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Letter::upd(Letter::Tuple_ptr tup)
@@ -142,12 +170,20 @@ namespace r3
 			
 			inline void Letter::del(const fields::Id &id)
 			{
-				return CategoryBase<Letter>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Letter::del(Letter::Tuple &tup)
 			{
-				return CategoryBase<Letter>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void Letter::del(Letter::Tuple_ptr tup)
@@ -157,14 +193,178 @@ namespace r3
 			
 			inline Letter::Tuple_ptr  Letter::sel(const fields::Id &id)
 			{
-				return CategoryBase<Letter>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline Letter::Tuple_ptr Letter::sel(Letter::Tuple_ptr tup)
 			{
-				return CategoryBase<Letter>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  Letter::tupleFillKey(Tuple &tup)
+			{
+				std::string res(5, '0');
+				
+				if(tup.comment.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.content.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.creation.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset) {
+					res[4] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  Letter::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.comment.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_comment_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.content.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_content_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.creation.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_creation_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_file_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_lastModified_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  Letter::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  Letter::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  Letter::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.comment.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.comment.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.content.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.content.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.creation.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.creation.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.file.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.file.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.lastModified.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.lastModified.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  Letter::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

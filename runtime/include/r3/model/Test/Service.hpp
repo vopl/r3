@@ -29,6 +29,7 @@ namespace r3
 				struct Tuple
 						: public CategoryBase<Service>::Tuple
 				{
+					// Service
 					r3::fields::Bool archive;
 					r3::fields::String comment;
 					r3::fields::Date created;
@@ -36,8 +37,8 @@ namespace r3
 					r3::relations::Relation2one<Client> client;
 					r3::relations::Relation2n<People> observers;
 					r3::relations::Relation2n<Stock> stocks;
-					r3::relations::Relation2n<ServicePart> parts;
 					r3::relations::Relation2one<Employee> worker;
+					r3::relations::Relation2n<ServicePart> parts;
 				};
 				typedef boost::shared_ptr<Tuple> Tuple_ptr;
 				
@@ -71,6 +72,14 @@ namespace r3
 			protected:
 				Test *_schema;
 				
+			protected:
+				std::string tupleFillKey(Tuple &tup);
+				std::string tupleInsSql(Tuple &tup);
+				std::string tupleUpdSql(Tuple &tup);
+				std::string tupleSelSql(Tuple &tup);
+				void tupleInsBind(Tuple &tup, pgc::Statement &stm);
+				void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
+				
 			};
 			typedef boost::shared_ptr<Service> Service_ptr;
 			
@@ -98,8 +107,8 @@ namespace r3
 				o(this, c_Service, _schema->getCategory<Client>().get(), (r3::relations::Relation2one<Client>*)&tup.client,	"client",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
 				o(this, c_Service, _schema->getCategory<People>().get(), (r3::relations::Relation2n<People>*)&tup.observers,	"observers",	(r3::relations::Relation2n<Service>*)NULL,	"observableServices",	rs_src);
 				o(this, c_Service, _schema->getCategory<Stock>().get(), (r3::relations::Relation2n<Stock>*)&tup.stocks,	"stocks",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
-				o(this, c_Service, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2n<ServicePart>*)&tup.parts,	"parts",	(r3::relations::Relation2one<Service>*)NULL,	"service",	rs_src);
 				o(this, c_Service, _schema->getCategory<Employee>().get(), (r3::relations::Relation2one<Employee>*)&tup.worker,	"worker",	(r3::relations::Relation2n<Service>*)NULL,	"services",	rs_src);
+				o(this, c_Service, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2n<ServicePart>*)&tup.parts,	"parts",	(r3::relations::Relation2one<Service>*)NULL,	"service",	rs_src);
 			}
 			
 			template <class Oper> void Service::enumIndicesFromBasesAndSelf(Oper o)
@@ -124,7 +133,14 @@ namespace r3
 			
 			inline void Service::ins(Service::Tuple &tup)
 			{
-				return CategoryBase<Service>::ins(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_ins_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleInsSql(tup));
+				}
+				
+				tupleInsBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Service::ins(Service::Tuple_ptr tup)
@@ -134,7 +150,14 @@ namespace r3
 			
 			inline void Service::upd(Service::Tuple &tup)
 			{
-				return CategoryBase<Service>::upd(this, tup);
+				pgc::Statement stm_ = stm(tupleFillKey(tup) + "_upd_tuple");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleUpdSql(tup));
+				}
+				
+				tupleUpdBind(tup, stm_);
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Service::upd(Service::Tuple_ptr tup)
@@ -144,12 +167,20 @@ namespace r3
 			
 			inline void Service::del(const fields::Id &id)
 			{
-				return CategoryBase<Service>::del(this, id);
+				pgc::Statement stm_ = stm("del_id");
+				
+				if(stm_.empty()) {
+					stm_.sql("DELETE FROM " + db_sname() + " WHERE id=$1::INT8");
+				}
+				
+				stm_.bind(id.value());
+				stm_.exec().throwIfError();
 			}
 			
 			inline void Service::del(Service::Tuple &tup)
 			{
-				return CategoryBase<Service>::del(this, tup);
+				del(tup.id);
+				tup.id.value() = 0;
 			}
 			
 			inline void Service::del(Service::Tuple_ptr tup)
@@ -159,14 +190,154 @@ namespace r3
 			
 			inline Service::Tuple_ptr  Service::sel(const fields::Id &id)
 			{
-				return CategoryBase<Service>::sel(this, id);
+				Tuple_ptr tup(new Tuple);
+				tup->id = id;
+				return sel(tup);
 			}
 			
 			inline Service::Tuple_ptr Service::sel(Service::Tuple_ptr tup)
 			{
-				return CategoryBase<Service>::sel(this, tup);
+				pgc::Statement stm_ = stm("sel_id");
+				
+				if(stm_.empty()) {
+					stm_.sql(tupleSelSql(*tup));
+				}
+				
+				stm_.bind(tup->id.value());
+				stm_.exec().throwIfError();
 			}
 			
+			inline std::string  Service::tupleFillKey(Tuple &tup)
+			{
+				std::string res(4, '0');
+				
+				if(tup.archive.fvs() != fields::fvs_notset) {
+					res[0] = '1';
+				}
+				
+				if(tup.comment.fvs() != fields::fvs_notset) {
+					res[1] = '1';
+				}
+				
+				if(tup.created.fvs() != fields::fvs_notset) {
+					res[2] = '1';
+				}
+				
+				if(tup.description.fvs() != fields::fvs_notset) {
+					res[3] = '1';
+				}
+				
+				return res;
+			}
+			inline std::string  Service::tupleInsSql(Tuple &tup)
+			{
+				std::string res;
+				std::string vals;
+				size_t idx(0);
+				char buf[32];
+				
+				if(tup.archive.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_archive_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.comment.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_comment_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.created.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_created_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				if(tup.description.fvs() != fields::fvs_notset)
+				{
+					if(idx)
+					{
+						res += ",";
+						vals += ",";
+					}
+					
+					res += "\"_description_\"";
+					vals += "$";
+					vals += utils::_ntoa(idx + 1, buf);
+					idx++;
+				}
+				
+				res = "INSERT INTO " + db_sname() + "(" + res;
+				res += ") VALUES (" + vals + ")";
+				return res;
+			}
+			inline std::string  Service::tupleUpdSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline std::string  Service::tupleSelSql(Tuple &tup)
+			{
+				assert(0);
+				return "";
+			}
+			inline void  Service::tupleInsBind(Tuple &tup, pgc::Statement &stm)
+			{
+				size_t idx(0);
+				
+				if(tup.archive.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.archive.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.comment.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.comment.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.created.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.created.value(), idx + 1);
+					idx++;
+				}
+				
+				if(tup.description.fvs() != fields::fvs_notset)
+				{
+					stm.bind(tup.description.value(), idx + 1);
+					idx++;
+				}
+			}
+			inline void  Service::tupleUpdBind(Tuple &tup, pgc::Statement &stm)
+			{
+				assert(0);
+			}
 		}
 	}
 }

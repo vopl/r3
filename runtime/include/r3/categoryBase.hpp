@@ -50,18 +50,6 @@ namespace r3
 		CategoryBase(const char *name);
 		~CategoryBase();
 
-	protected:
-		template <class Cat>		void ins(Cat *cat, typename Cat::Tuple &tup);
-		
-		template <class Cat>		void upd(Cat *cat, typename Cat::Tuple &tup);
-
-		template <class Cat>		void del(Cat *cat, const fields::Id &id);
-		template <class Cat>		void del(Cat *cat, typename Cat::Tuple &tup);
-
-		template <class Cat>		typename Cat::Tuple_ptr sel(Cat *cat, const fields::Id &id);
-		template <class Cat>		typename Cat::Tuple_ptr sel(Cat *cat, typename Cat::Tuple_ptr tup);
-
-
 	private:
 		struct enumOper_createField;
 		struct enumOper_createIndex;
@@ -75,17 +63,6 @@ namespace r3
 		void dbCreateIndices();
 		void dbCreateRelations();
 		void dbCreateInheritance();
-
-	private:
-		template <class Cat>	std::string tupleInsKey(typename Cat::Tuple &tup);
-		template <class Cat>	std::string tupleInsSql(typename Cat::Tuple &tup);
-		template <class Cat>	std::string tupleInsBind(typename Cat::Tuple &tup, pgc::Statement &stm);
-
-		template <class Cat>	std::string tupleUpdKey(typename Cat::Tuple &tup);
-		template <class Cat>	std::string tupleUpdSql(typename Cat::Tuple &tup);
-		template <class Cat>	std::string tupleUpdBind(typename Cat::Tuple &tup, pgc::Statement &stm);
-
-		template <class Cat>	std::string tupleSelSql(typename Cat::Tuple &tup);
 
 	private:
 		std::string _name;
@@ -715,82 +692,6 @@ namespace r3
 	{
 		((C*)this)->enumBasesFirst(enumOper_createInheritance());
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	template <class Cat>
-	void CategoryBase<C>::ins(Cat *cat, typename Cat::Tuple &tup)
-	{
-		pgc::Statement stm_ = stm(tupleInsKey<Cat>(tup));
-		if(stm_.empty())
-		{
-			stm_.sql(tupleInsSql<Cat>(tup));
-		}
-		tupleInsBind<Cat>(tup, stm_);
-		stm_.exec().throwIfError();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	template <class Cat>
-	void CategoryBase<C>::upd(Cat *cat, typename Cat::Tuple &tup)
-	{
-		pgc::Statement stm_ = stm(tupleUpdKey<Cat>(tup));
-		if(stm_.empty())
-		{
-			stm_.sql(tupleUpdSql<Cat>(tup));
-		}
-		tupleUpdBind<Cat>(tup, stm_);
-		stm_.exec().throwIfError();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	template <class Cat>
-	void CategoryBase<C>::del(Cat *cat, const fields::Id &id)
-	{
-		pgc::Statement stm_ = stm("del_id");
-		if(stm_.empty())
-		{
-			stm_.sql("DELETE FROM "+cat->db_sname()+" WHERE id=$1::INT8");
-		}
-		stm_.bind(id.value());
-		stm_.exec().throwIfError();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	template <class Cat>
-	void CategoryBase<C>::del(Cat *cat, typename Cat::Tuple &tup)
-	{
-		del(cat, tup.id);
-		tup.id.value() = 0;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	template <class Cat>
-	typename Cat::Tuple_ptr CategoryBase<C>::sel(Cat *cat, const fields::Id &id)
-	{
-		typename Cat::Tuple_ptr tup(new typename Cat::Tuple);
-		tup->id = id;
-		return sel(cat, tup);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class C>
-	template <class Cat>
-	typename Cat::Tuple_ptr CategoryBase<C>::sel(Cat *cat, typename Cat::Tuple_ptr tup)
-	{
-		pgc::Statement stm_ = stm("sel_id");
-		if(stm_.empty())
-		{
-			stm_.sql(tupleSelSql<Cat>(*tup));
-		}
-		stm_.bind(tup->id.value());
-		stm_.exec().throwIfError();
-	}
-
 }
 
 #endif

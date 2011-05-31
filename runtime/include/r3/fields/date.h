@@ -14,8 +14,10 @@ namespace r3{ namespace fields
 	{
 		boost::gregorian::date _value;
 	public:
-		const boost::gregorian::date &value() const;
-		boost::gregorian::date &value();
+		boost::gregorian::date &value()
+		{
+			return _value;
+		}
 
 	}; // class
 }}  // namespace
