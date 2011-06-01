@@ -44,7 +44,7 @@ namespace pgc
 					break;
 				case 790://money
 					_extractors[colIdx]._meth = &ResultImpl::extractor_money;
-					_extractors[colIdx]._favorCppType = CppDataType<boost::int64_t>::cdt_index;
+					_extractors[colIdx]._favorCppType = CppDataType<Money>::cdt_index;
 					break;
 				case 1043://varchar
 				case 1042://bpchar

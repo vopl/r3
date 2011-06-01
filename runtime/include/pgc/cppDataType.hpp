@@ -181,6 +181,16 @@ namespace pgc
 	{
 		enum {cdt_index = __LINE__};
 	};
+
+	//////////////////////////////////////////////////////////////////////////
+	struct Money
+	{
+		boost::int64_t _value;
+	};
+	template <> struct CppDataType<Money>
+	{
+		enum {cdt_index = __LINE__};
+	};
 }
 
 #endif

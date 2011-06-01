@@ -13,11 +13,16 @@ namespace r3{ namespace fields
 	class Money
 		: public Simple
 	{
-		boost::uint64_t _value;
+		pgc::Money _value;
 	public:
-		boost::uint64_t &value()
+		pgc::Money &value()
 		{
 			return _value;
+		}
+
+		Money &operator=(const boost::uint64_t &val)
+		{
+			_value._value = val;
 		}
 	}; // class
 }}  // namespace

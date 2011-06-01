@@ -496,7 +496,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (utils::fixEndian(*(boost::uint64_t *)valDb))
+#define VAL (utils::fixEndian(*(boost::int64_t *)valDb))
 
 		switch(typCpp)
 		{
@@ -541,6 +541,9 @@ namespace pgc
 			return true;
 		case CppDataType<boost::uint64_t>::cdt_index:
 			*(boost::uint64_t *)valCpp = (boost::uint64_t)VAL;
+			return true;
+		case CppDataType<Money>::cdt_index:
+			((Money *)valCpp)->_value = VAL;
 			return true;
 		}
 #undef VAL

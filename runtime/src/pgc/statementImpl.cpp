@@ -570,6 +570,17 @@ namespace pgc
 			}
 			break;
 
+		case CppDataType<Money>::cdt_index:
+			{
+				boost::int64_t &i64 = ((Money *)valCpp)->_value;
+				bindTyp = 790;//money
+				bindVal = new char[8];
+				*(boost::uint64_t *)bindVal = utils::fixEndian(i64);
+				bindLen = 8;
+				bindFmt = 1;
+				bindOwn = true;
+			}
+			break;
 		default:
 			{
 				return false;

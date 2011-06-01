@@ -900,30 +900,88 @@ namespace r3
 		{
 		}
 
+		void pushOne(const char *fname, const char *suffix = NULL)
+		{
+			if(idx)
+			{
+				fields += ",";
+				values += ",";
+			}
+
+			idx++;
+
+			fields += "\"_";
+			fields += fname;
+			fields += "_";
+			if(suffix)
+			{
+				fields += suffix;
+			}
+			fields += "\"";
+
+			char buf[32];
+			values += "$";
+			values += utils::_ntoa(idx+1, buf);
+		}
+
+		//file
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::File *fld,
+			const char *fname)
+		{
+			if(fld->fvs() != fields::fvs_notset)
+			{
+				pushOne(fname, "name");
+				pushOne(fname, "ext");
+				pushOne(fname, "blob");
+			}
+		}
+
+		//image
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::Image *fld,
+			const char *fname)
+		{
+			if(fld->fvs() != fields::fvs_notset)
+			{
+				pushOne(fname, "name");
+				pushOne(fname, "ext");
+				pushOne(fname, "blob");
+				pushOne(fname, "width");
+				pushOne(fname, "height");
+			}
+		}
+
+		//video
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::Video *fld,
+			const char *fname)
+		{
+			if(fld->fvs() != fields::fvs_notset)
+			{
+				pushOne(fname, "name");
+				pushOne(fname, "ext");
+				pushOne(fname, "blob");
+				pushOne(fname, "width");
+				pushOne(fname, "height");
+			}
+		}
+
 		template <typename Category, typename CategoryBaseOrSelf> void operator()(
 			Category *c,
 			CategoryBaseOrSelf *bos,
 			r3::fields::Field *fld,
 			const char *fname)
 		{
-			assert(idx < T::_fieldsAmount);
-
 			if(fld->fvs() != fields::fvs_notset)
 			{
-				if(idx)
-				{
-					fields += ",";
-					values += ",";
-				}
-
-				idx++;
-				fields += "\"_";
-				fields += fname;
-				fields += "_\"";
-
-				char buf[32];
-				values += "$";
-				values += utils::_ntoa(idx+1, buf);
+				pushOne(fname);
 			}
 		}
 	};
@@ -968,10 +1026,10 @@ namespace r3
 			stm.bind(fld->name(), idx+1);
 
 			idx++;
-			stm.bind(fld->ext(), idx+2);
+			stm.bind(fld->ext(), idx+1);
 
 			idx++;
-			stm.bind(fld->blob(), idx+3);
+			stm.bind(fld->blob(), idx+1);
 		}
 		void bind(r3::fields::Audio *fld)
 		{
@@ -986,7 +1044,7 @@ namespace r3
 			stm.bind(fld->width(), idx+1);
 
 			idx++;
-			stm.bind(fld->height(), idx+2);
+			stm.bind(fld->height(), idx+1);
 		}
 
 		void bind(r3::fields::Video *fld)
@@ -997,7 +1055,7 @@ namespace r3
 			stm.bind(fld->width(), idx+1);
 
 			idx++;
-			stm.bind(fld->height(), idx+2);
+			stm.bind(fld->height(), idx+1);
 		}
 
 		template <typename Category, typename CategoryBaseOrSelf, typename F> void operator()(
