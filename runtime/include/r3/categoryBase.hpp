@@ -78,19 +78,15 @@ namespace r3
 		struct enumOper_tupleFillKey;
 		std::string tupleFillKey(Tuple &tup);
 
-		struct enumOper_tupleInsSql;
+		template <bool isIns> struct enumOper_tupleInsUpdSql;
 		std::string tupleInsSql(Tuple &tup);
-
-		struct enumOper_tupleUpdSql;
 		std::string tupleUpdSql(Tuple &tup);
 
 		struct enumOper_tupleSelSql;
 		std::string tupleSelSql(Tuple &tup);
 
-		struct enumOper_tupleInsBind;
+		struct enumOper_tupleInsUpdBind;
 		void tupleInsBind(Tuple &tup, pgc::Statement &stm);
-
-		struct enumOper_tupleUpdBind;
 		void tupleUpdBind(Tuple &tup, pgc::Statement &stm);
 
 		struct enumOper_tupleSelFetch;
@@ -815,9 +811,13 @@ namespace r3
 			stm_.sql(tupleSelSql(*tup));
 		}
 
-		stm_.bind(tup->id.value());
+		stm_.bind(tup->id.value(), 1);
 		pgc::Result res = stm_.exec().throwIfError();
 
+		if(!res.rows())
+		{
+			return Tuple_ptr();
+		}
 		tupleSelFetch(*tup, res, 0);
 		return tup;
 	}
@@ -889,13 +889,14 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S, class C, class T>
-	struct CategoryBase<S,C,T>::enumOper_tupleInsSql
+	template <bool isIns>
+	struct CategoryBase<S,C,T>::enumOper_tupleInsUpdSql
 	{
 		std::string fields;
 		std::string values;
 		size_t idx;
 
-		enumOper_tupleInsSql()
+		enumOper_tupleInsUpdSql()
 			: idx(0)
 		{
 		}
@@ -920,8 +921,16 @@ namespace r3
 			fields += "\"";
 
 			char buf[32];
-			values += "$";
-			values += utils::_ntoa(idx+1, buf);
+			if(isIns)
+			{
+				values += "$";
+				values += utils::_ntoa(idx+1, buf);
+			}
+			else
+			{
+				fields += "=$";
+				fields += utils::_ntoa(idx+1, buf);
+			}
 		}
 
 		//file
@@ -990,7 +999,7 @@ namespace r3
 	template <class S, class C, class T>
 	std::string CategoryBase<S,C,T>::tupleInsSql(T &tup)
 	{
-		enumOper_tupleInsSql oper;
+		enumOper_tupleInsUpdSql<true> oper;
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 
 		if(oper.fields.empty())
@@ -1003,12 +1012,12 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S, class C, class T>
-	struct CategoryBase<S,C,T>::enumOper_tupleInsBind
+	struct CategoryBase<S,C,T>::enumOper_tupleInsUpdBind
 	{
 		pgc::Statement &stm;
 		size_t idx;
 
-		enumOper_tupleInsBind(pgc::Statement &stm)
+		enumOper_tupleInsUpdBind(pgc::Statement &stm)
 			: idx(0)
 			, stm(stm)
 		{
@@ -1085,7 +1094,7 @@ namespace r3
 	void CategoryBase<S,C,T>::tupleInsBind(T &tup, pgc::Statement &stm)
 	{
 		stm.bind(tup.id.value(), 1);
-		enumOper_tupleInsBind oper(stm);
+		enumOper_tupleInsUpdBind oper(stm);
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 	}
 
@@ -1097,94 +1106,28 @@ namespace r3
 
 
 
-	//////////////////////////////////////////////////////////////////////////
-	template <class S, class C, class T>
-	struct CategoryBase<S,C,T>::enumOper_tupleUpdSql
-	{
-		std::string fields;
-		size_t idx;
-
-		enumOper_tupleUpdSql()
-			: idx(0)
-		{
-		}
-
-		template <typename Category, typename CategoryBaseOrSelf> void operator()(
-			Category *c,
-			CategoryBaseOrSelf *bos,
-			r3::fields::Field *fld,
-			const char *fname)
-		{
-			assert(idx < T::_fieldsAmount);
-
-			if(fld->fvs() != fields::fvs_notset)
-			{
-				if(idx)
-				{
-					fields += ",";
-				}
-
-				idx++;
-				fields += "\"_";
-				fields += fname;
-				fields += "_\"=$";
-
-				char buf[32];
-				fields += utils::_ntoa(idx+1, buf);
-			}
-		}
-	};
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S, class C, class T>
 	std::string CategoryBase<S,C,T>::tupleUpdSql(T &tup)
 	{
-		enumOper_tupleUpdSql oper;
+		enumOper_tupleInsUpdSql<false> oper;
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 
+		if(oper.fields.empty())
+		{
+			return "UPDATE "+((C*)this)->db_sname()+" SET id=id WHERE id=$1";
+		}
 		return "UPDATE "+((C*)this)->db_sname()+" SET "+oper.fields+" WHERE id=$1";
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S, class C, class T>
-	struct CategoryBase<S,C,T>::enumOper_tupleUpdBind
-	{
-		pgc::Statement &stm;
-		size_t idx;
-
-		enumOper_tupleUpdBind(pgc::Statement &stm)
-			: idx(0)
-			, stm(stm)
-		{
-		}
-
-		template <typename F> void bind(F *fld)
-		{
-			stm.bind(fld->value(), idx+1);
-		}
-
-		template <typename Category, typename CategoryBaseOrSelf, typename F> void operator()(
-			Category *c,
-			CategoryBaseOrSelf *bos,
-			F *fld,
-			const char *fname)
-		{
-			assert(idx < T::_fieldsAmount);
-
-			if(fld->fvs() != fields::fvs_notset)
-			{
-				idx++;
-				bind(fld);
-			}
-		}
-	};
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class S, class C, class T>
 	void CategoryBase<S,C,T>::tupleUpdBind(T &tup, pgc::Statement &stm)
 	{
-		enumOper_tupleUpdBind oper(stm);
+		//enumOper_tupleUpdBind oper(stm);
+		enumOper_tupleInsUpdBind oper(stm);
 		stm.bind(tup.id.value(), 1);
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 	}

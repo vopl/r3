@@ -25,7 +25,11 @@ namespace r3{ namespace fields
 		Integral &value();
 		const Integral &value() const;
 
+		Enum &operator=(r3::fields::EFieldValueState fvs);
 		Enum &operator=(const Integral &from);
+
+		bool operator==(r3::fields::EFieldValueState fvs);
+		bool operator==(const Integral &with);
 	}; // class
 
 
@@ -68,6 +72,35 @@ namespace r3{ namespace fields
 
 		return *this;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Domain>
+	Enum<Domain> &Enum<Domain>::operator=(r3::fields::EFieldValueState fvs)
+	{
+		Field::operator =(fvs);
+		return *this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Domain>
+	bool Enum<Domain>::operator==(r3::fields::EFieldValueState fvs)
+	{
+		return Field::operator ==(fvs);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Domain>
+	bool Enum<Domain>::operator==(const Integral &with)
+	{
+		if(fvs() != fvs_set)
+		{
+			return false;
+		}
+
+		return _value == with;
+	}
+
+
 
 }}  // namespace
 

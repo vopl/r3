@@ -12,7 +12,8 @@ class Crud
 	CPPUNIT_TEST_SUITE( Crud );
 	CPPUNIT_TEST( connected );
 
-	CPPUNIT_TEST( _ins );
+//	CPPUNIT_TEST( _ins );
+	CPPUNIT_TEST( _stock );
 
 	CPPUNIT_TEST_SUITE_END();
 
@@ -175,7 +176,85 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
+	void _stock()
+	{
+		checkSchema();
+		CPPUNIT_ASSERT_NO_THROW(_mod.con().once("BEGIN").exec().throwIfError());
 
+		Stock_ptr cat = _t->getStock();
+		Stock::Tuple tup;
+		Stock::Tuple_ptr ptup;
+
+		CPPUNIT_ASSERT_NO_THROW(cat->ins(tup));
+		CPPUNIT_ASSERT(tup.id.fvs()==r3::fields::fvs_set);
+		CPPUNIT_ASSERT(tup.id.value());
+
+		ptup = cat->sel(tup.id);
+
+		CPPUNIT_ASSERT(ptup->id == tup.id);
+		CPPUNIT_ASSERT(ptup->cost.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->incomingDate.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->inventoryNumber.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->securityStatus.fvs()==r3::fields::fvs_null);
+
+		///////////////////////////////////////////////
+		cat->upd(ptup);
+		ptup = cat->sel(ptup);
+		CPPUNIT_ASSERT(ptup->cost.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->incomingDate.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->inventoryNumber.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->securityStatus.fvs()==r3::fields::fvs_null);
+
+		///////////////////////////////////////////////
+		ptup->cost = 200;
+		ptup->incomingDate = r3::fields::fvs_notset;
+		ptup->inventoryNumber = r3::fields::fvs_notset;
+		ptup->securityStatus = r3::fields::fvs_notset;
+		cat->upd(ptup);
+		ptup = cat->sel(ptup);
+		CPPUNIT_ASSERT(ptup->cost == 200);
+		CPPUNIT_ASSERT(ptup->incomingDate.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->inventoryNumber.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->securityStatus.fvs()==r3::fields::fvs_null);
+
+		///////////////////////////////////////////////
+		ptup->incomingDate = boost::gregorian::date(2011, 6, 2);
+		ptup->inventoryNumber = r3::fields::fvs_notset;
+		ptup->securityStatus = r3::fields::fvs_notset;
+		cat->upd(ptup);
+		ptup = cat->sel(ptup);
+		CPPUNIT_ASSERT(ptup->cost == 200);
+		CPPUNIT_ASSERT(ptup->incomingDate == boost::gregorian::date(2011, 6, 2));
+		CPPUNIT_ASSERT(ptup->inventoryNumber.fvs()==r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->securityStatus.fvs()==r3::fields::fvs_null);
+
+		///////////////////////////////////////////////
+		ptup->inventoryNumber = "asdfgh";
+		ptup->securityStatus = r3::fields::fvs_notset;
+		cat->upd(ptup);
+		ptup = cat->sel(ptup);
+		CPPUNIT_ASSERT(ptup->cost == 200);
+		CPPUNIT_ASSERT(ptup->incomingDate == boost::gregorian::date(2011, 6, 2));
+		CPPUNIT_ASSERT(ptup->inventoryNumber == "asdfgh");
+		CPPUNIT_ASSERT(ptup->securityStatus.fvs()==r3::fields::fvs_null);
+
+		///////////////////////////////////////////////
+		ptup->securityStatus = 2;
+		cat->upd(ptup);
+		ptup = cat->sel(ptup);
+		CPPUNIT_ASSERT(ptup->cost == 200);
+		CPPUNIT_ASSERT(ptup->incomingDate == boost::gregorian::date(2011, 6, 2));
+		CPPUNIT_ASSERT(ptup->inventoryNumber == "asdfgh");
+		CPPUNIT_ASSERT(ptup->securityStatus == 2);
+
+
+		/////////////////////////////////////////////////
+		cat->del(ptup->id);
+		ptup = cat->sel(ptup);
+		CPPUNIT_ASSERT(!ptup);
+
+		CPPUNIT_ASSERT_NO_THROW(_mod.con().once("ROLLBACK").exec().throwIfError());
+	}
 
 
 };

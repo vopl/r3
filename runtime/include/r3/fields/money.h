@@ -24,10 +24,16 @@ namespace r3{ namespace fields
 		pgc::Money &value();
 		const pgc::Money &value() const;
 
+		Money &operator=(r3::fields::EFieldValueState fvs);
 		Money &operator=(const boost::int32_t &from);
 		Money &operator=(const boost::int64_t &from);
 		Money &operator=(float from);
 		Money &operator=(double from);
+
+		bool operator==(r3::fields::EFieldValueState fvs);
+		bool operator==(const Money &with);
+		bool operator==(const boost::int32_t &with);
+		bool operator==(const boost::int64_t &with);
 	}; // class
 }}  // namespace
 

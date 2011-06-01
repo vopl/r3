@@ -32,6 +32,13 @@ namespace r3{ namespace fields
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	Money &Money::operator=(r3::fields::EFieldValueState fvs)
+	{
+		Field::operator =(fvs);
+		return *this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	Money &Money::operator=(const boost::int64_t &from)
 	{
 		fvs(fvs_set);
@@ -61,6 +68,43 @@ namespace r3{ namespace fields
 		fvs(fvs_set);
 		_value._value = (boost::int64_t)((0.005 + from)*100);
 		return *this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Money::operator==(r3::fields::EFieldValueState fvs)
+	{
+		return Field::operator==(fvs);
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Money::operator==(const Money &with)
+	{
+		if(!Simple::operator ==(with))
+		{
+			return false;
+		}
+		return _value._value == with._value._value;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Money::operator==(const boost::int32_t &with)
+	{
+		if(fvs() != fvs_set)
+		{
+			return false;
+		}
+		return _value._value == with;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Money::operator==(const boost::int64_t &with)
+	{
+		if(fvs() != fvs_set)
+		{
+			return false;
+		}
+		return _value._value == with;
 	}
 
 }}

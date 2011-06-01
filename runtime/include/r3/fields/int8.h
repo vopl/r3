@@ -11,22 +11,9 @@ namespace r3{ namespace fields
 	//*******************************************************************
 
 	class Int8
-		: public Int
+		: public Int<boost::uint8_t>
 	{
 	public:
-		typedef boost::int8_t TValue;
-	private:
-		boost::int8_t _value;
-	public:
-		Int8()
-			: _value(0)
-		{
-
-		}
-		boost::int8_t &value()
-		{
-			return _value;
-		}
 	}; // class
 }}  // namespace
 

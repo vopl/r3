@@ -24,6 +24,10 @@ namespace pgc
 		}
 		else
 		{
+			if(!idx)
+			{
+				idx = _bindTyp.size();
+			}
 			idx--;
 			if(idx >= _bindTyp.size())
 			{

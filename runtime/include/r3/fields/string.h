@@ -79,6 +79,29 @@ namespace r3{ namespace fields
 			return fvs_set == fvs()?NULL:_value.c_str();
 		}
 
+		String &operator=(EFieldValueState from)
+		{
+			Field::operator =(from);
+			return *this;
+		}
+
+		bool operator==(const char *with)
+		{
+			if(fvs()!=fvs_set)
+			{
+				return false;
+			}
+			return _value == with;
+		}
+		bool operator==(const std::string &with)
+		{
+			if(fvs()!=fvs_set)
+			{
+				return false;
+			}
+			return _value == with;
+		}
+
 	}; // class
 }}  // namespace
 

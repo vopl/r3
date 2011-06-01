@@ -11,22 +11,9 @@ namespace r3{ namespace fields
 	//*******************************************************************
 
 	class Int16
-		: public Int
+		: public Int<boost::uint16_t>
 	{
 	public:
-		typedef boost::int16_t TValue;
-	private:
-		boost::int16_t _value;
-	public:
-		Int16()
-			: _value(0)
-		{
-
-		}
-		boost::int16_t &value()
-		{
-			return _value;
-		}
 	}; // class
 }}  // namespace
 

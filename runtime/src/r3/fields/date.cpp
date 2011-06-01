@@ -34,10 +34,26 @@ namespace r3{ namespace fields
 		return *this;
 	}
 
+	bool Date::operator==(const boost::gregorian::date &with) const
+	{
+		if(fvs() != fvs_set)
+		{
+			return false;
+		}
+
+		return _value == with;
+	}
+
 	Date::operator boost::gregorian::date ()const
 	{
 		return _value;
 	}
 
+
+	Date &Date::operator=(EFieldValueState from)
+	{
+		Field::operator =(from);
+		return *this;
+	}
 
 }}

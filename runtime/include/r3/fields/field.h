@@ -21,35 +21,18 @@ namespace r3{ namespace fields
 		EFieldValueState _fvs;
 
 	protected:
-		Field()
-			: _fvs(fvs_notset)
-		{
-		}
-
-		Field(const Field &from)
-			: _fvs(from._fvs)
-		{
-		}
-
-
-		Field &operator=(const Field &from)
-		{
-			_fvs = from._fvs;
-			return *this;
-		}
+		Field();
+		Field(const Field &from);
+		Field (EFieldValueState from);
+		Field &operator=(const Field &from);
+		bool operator==(const Field &with) const;
 
 	public:
-		EFieldValueState fvs() const
-		{
-			return _fvs;
-		}
+		Field &operator=(EFieldValueState from);
+		bool operator==(const EFieldValueState with) const;
 
-		EFieldValueState fvs(EFieldValueState fvs)
-		{
-			EFieldValueState prev = _fvs;
-			_fvs = fvs;
-			return prev;
-		}
+		EFieldValueState fvs() const;
+		EFieldValueState fvs(EFieldValueState fvs);
 	}; // class
 }}  // namespace
 

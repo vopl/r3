@@ -24,8 +24,10 @@ namespace r3{ namespace fields
 		const boost::gregorian::date &value() const;
 
 		Date &operator=(const boost::gregorian::date &from);
-
+		bool operator==(const boost::gregorian::date &with) const;
 		operator boost::gregorian::date ()const;
+
+		Date &operator=(EFieldValueState from);
 
 	}; // class
 }}  // namespace
