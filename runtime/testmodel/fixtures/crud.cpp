@@ -168,7 +168,6 @@ protected:
 			_mod.con().once("COMMIT").exec().throwIfError();
 
 		}
-		int k=220;
 	}
 
 
