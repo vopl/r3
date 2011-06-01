@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Int32
 		: public Int
 	{
+	public:
+		typedef boost::int32_t TValue;
+	private:
 		boost::int32_t _value;
 	public:
 		Int32()

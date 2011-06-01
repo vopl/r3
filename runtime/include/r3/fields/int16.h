@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Int16
 		: public Int
 	{
+	public:
+		typedef boost::int16_t TValue;
+	private:
 		boost::int16_t _value;
 	public:
 		Int16()

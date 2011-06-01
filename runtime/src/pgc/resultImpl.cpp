@@ -1,5 +1,6 @@
 #include "resultImpl.hpp"
 #include "pgc/cppDataType.hpp"
+#include "connectionImpl.hpp"
 
 namespace pgc
 {

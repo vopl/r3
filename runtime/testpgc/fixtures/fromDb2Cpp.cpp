@@ -10,7 +10,6 @@ class FromDb2Cpp
 	CPPUNIT_TEST_SUITE( FromDb2Cpp );
 	CPPUNIT_TEST( connected );
 
-	CPPUNIT_TEST( _pchar );
 	CPPUNIT_TEST( _stdstring );
 	CPPUNIT_TEST( _bool );
 	CPPUNIT_TEST( _float );
@@ -58,84 +57,6 @@ protected:
 		CPPUNIT_ASSERT( pgc::ecs_ok == _con.status());
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	void _pchar()
-	{
-		char buf[4096];
-		char *val = buf;
-
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
-#define STR_EQUAL(x,y) CPPUNIT_ASSERT_EQUAL( std::string(x), std::string(y) );
-
-		CPPUNIT_ASSERT( SQL("-1234::int2") );
-		STR_EQUAL( "-1234", val);
-
-		CPPUNIT_ASSERT( SQL("-1234::int4") );
-		STR_EQUAL( "-1234", val);
-
-		CPPUNIT_ASSERT( SQL("-1234::int8") );
-		STR_EQUAL( "-1234", val);
-
-		CPPUNIT_ASSERT( SQL("-1234.1234::numeric(10,5)") );
-		STR_EQUAL( "-1234.1234", val);
-
-		CPPUNIT_ASSERT( SQL("-1234.1234::float4") );
-		CPPUNIT_ASSERT_DOUBLES_EQUAL( -1234.1234, atof(val), 1e-3);
-
-		CPPUNIT_ASSERT( SQL("-1234.1234::float8") );
-		CPPUNIT_ASSERT_DOUBLES_EQUAL( -1234.1234, atof(val), 1e-3);
-
-		CPPUNIT_ASSERT( SQL("'1234'::money") );
-		STR_EQUAL( "123400", val );
-
-		CPPUNIT_ASSERT( SQL("'1234'::varchar") );
-		STR_EQUAL( "1234", val );
-
-		CPPUNIT_ASSERT( SQL("'1234'::char(10)") );
-		STR_EQUAL( "1234      ", val );
-
-		CPPUNIT_ASSERT( SQL("'1234'::text") );
-		STR_EQUAL( "1234", val );
-
-		CPPUNIT_ASSERT( SQL("'1234'::bytea") );
-		STR_EQUAL( "1234", val );
-
-		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17.12'::timestamp") );
-		STR_EQUAL( "2010-03-04 13:00:17.12", val );
-
-		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17'::timestamp with time zone") );
-		//зависит от локальной зоны
-		//STR_EQUAL( "2010-03-04 13:00:17", val );
-
-		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56.0012'::interval") );
-		STR_EQUAL( "4 month 5 day 18:07:56.0012", val );
-
-		CPPUNIT_ASSERT( SQL("'2010-03-04'::date") );
-		STR_EQUAL( "2010-03-04", val );
-
-		CPPUNIT_ASSERT( SQL("'13:00:17.1234'::time") );
-		STR_EQUAL( "13:00:17.1234", val );
-
-		CPPUNIT_ASSERT( SQL("'13:00:17'::time with time zone") );
-		//зависит от локальной зоны
-		//STR_EQUAL( "13:00:17", val );
-
-		CPPUNIT_ASSERT( SQL("true") );
-		STR_EQUAL( "1", val );
-
-		CPPUNIT_ASSERT( SQL("B'101100111000'::bit(12)") );
-		STR_EQUAL( "101100111000", val );
-
-		CPPUNIT_ASSERT( SQL("B'101100111000'::varbit") );
-		STR_EQUAL( "101100111000", val );
-
-		CPPUNIT_ASSERT( SQL("1234::oid") );
-		STR_EQUAL( "1234", val );
-#undef STR_EQUAL
-	}
 
 
 
@@ -390,7 +311,7 @@ protected:
 		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17'::timestamp with time zone") );
 
 		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56'::interval") );
-		CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0865276e+013f, val, 1e+10 );
+		CPPUNIT_ASSERT_DOUBLES_EQUAL( 10865276, val, 1 );
 
 		CPPUNIT_ASSERT( SQL("'2010-03-04'::date") );
 		CPPUNIT_ASSERT_DOUBLES_EQUAL( 2455260.0, val, 1e-0 );
@@ -478,7 +399,7 @@ protected:
 		CPPUNIT_ASSERT( SQL("'2010-03-04 13:00:17'::timestamp with time zone") );
 
 		CPPUNIT_ASSERT( SQL("'4 months 5 days 18:07:56'::interval") );
-		CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0865276e+013, val, 1e+10 );
+		CPPUNIT_ASSERT_DOUBLES_EQUAL( 10865276, val, 1 );
 
 		CPPUNIT_ASSERT( SQL("'2010-03-04'::date") );
 		CPPUNIT_ASSERT_DOUBLES_EQUAL( 2455260.0, val, 1e-0 );

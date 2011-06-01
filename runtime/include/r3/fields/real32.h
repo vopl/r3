@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Real32
 		: public Real
 	{
+	public:
+		typedef float TValue;
+	private:
 		float _value;
 	public:
 		Real32()

@@ -57,7 +57,7 @@ protected:
 	{
 		int cnt;
 		CPPUNIT_ASSERT_NO_THROW(
-			_mod.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec("Test_myId").throwIfError().fetch(0,0,cnt)
+			_mod.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(std::string("Test_myId")).throwIfError().fetch(0,0,cnt)
 		);
 		if(cnt)
 		{

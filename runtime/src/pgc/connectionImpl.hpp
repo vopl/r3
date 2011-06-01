@@ -13,6 +13,8 @@ namespace pgc
 		PGconn *	_pgcon;
 		friend class StatementImpl;
 
+		bool _integerDatetimes;
+
 		std::ostream *_log;
 		int _logFlags;
 
@@ -21,6 +23,7 @@ namespace pgc
 		~ConnectionImpl();
 
 		PGconn *pgcon();
+		bool integerDatetimes();
 
 		void log(std::ostream &out, int flags);
 		EConnectionStatus open(const char *conninfo);

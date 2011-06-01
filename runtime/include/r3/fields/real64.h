@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Real64
 		: public Real
 	{
+	public:
+		typedef double TValue;
+	private:
 		double _value;
 	public:
 		Real64()

@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class String
 		: public Simple
 	{
+	public:
+		typedef std::string TValue;
+	private:
 		std::string _value;
 
 	public:

@@ -9,6 +9,7 @@ namespace pgc
 		: _pgcon(NULL)
 		, _log(NULL)
 		, _logFlags(lf_notice)
+		, _integerDatetimes(false)
 	{
 	}
 	ConnectionImpl::~ConnectionImpl()
@@ -19,6 +20,11 @@ namespace pgc
 	PGconn *ConnectionImpl::pgcon()
 	{
 		return _pgcon;
+	}
+
+	bool ConnectionImpl::integerDatetimes()
+	{
+		return _integerDatetimes;
 	}
 
 	void ConnectionImpl::log(std::ostream &out, int flags)
@@ -44,6 +50,22 @@ namespace pgc
 		if(ecs_ok == s)
 		{
 			PQsetClientEncoding(_pgcon, "UTF-8");
+
+			const char *csz = PQparameterStatus(_pgcon, "integer_datetimes");
+
+			if(!strcmp("on", csz))
+			{
+				_integerDatetimes = true;
+			}
+			else if(!strcmp("off", csz))
+			{
+				_integerDatetimes = false;
+			}
+			else
+			{
+				assert(0);
+				_integerDatetimes = false;
+			}
 		}
 
 		return s;

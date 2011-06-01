@@ -55,7 +55,7 @@ protected:
 	{
 		size_t cnt(0);
 		CPPUNIT_ASSERT_NO_THROW(
-			_mod.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec("Test_crudTester").throwIfError().fetch(0,0,cnt)
+			_mod.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(std::string("Test_crudTester")).throwIfError().fetch(0,0,cnt)
 			);
 		if(!cnt)
 		{
@@ -132,16 +132,17 @@ protected:
 
 		////////////////////////////////////////////////////////
 		{
+			_mod.con().once("BEGIN").exec().throwIfError();
 			Employee::Tuple t;
 			t.birth = boost::gregorian::date(2011, 1, 12);
 			t.department = 1;
 			t.middlename = "mname";
 			t.name = "name";
-
 			t.photo.fvs(r3::fields::fvs_set);
 			t.photo.name() = "pname";
 			t.photo.ext() = "jpg";
-			//t.photo.blob().write("asdfg", 5);
+			t.photo.blob().con(_mod.con());
+			t.photo.blob().write("asdfg", 5);
 			t.photo.width() = 220;
 			t.photo.height() = 380;
 			t.rateNight = 10012;
@@ -152,6 +153,19 @@ protected:
 			Employee::Tuple t2(t);
 
 			_t->getEmployee()->ins(t2);
+
+			t.birth.fvs(r3::fields::fvs_null);
+			t.department.fvs(r3::fields::fvs_null);
+			t.middlename.fvs(r3::fields::fvs_null);
+			t.name.fvs(r3::fields::fvs_null);
+			t.photo.fvs(r3::fields::fvs_null);
+			t.rateNight.fvs(r3::fields::fvs_null);
+			t.rateNormal.fvs(r3::fields::fvs_null);
+			t.sex.fvs(r3::fields::fvs_null);
+			t.surname.fvs(r3::fields::fvs_null);
+			_t->getEmployee()->ins(t);
+
+			_mod.con().once("COMMIT").exec().throwIfError();
 
 		}
 		int k=220;

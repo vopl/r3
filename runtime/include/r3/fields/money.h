@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Money
 		: public Simple
 	{
+	public:
+		typedef pgc::Money TValue;
+	private:
 		pgc::Money _value;
 	public:
 		Money();

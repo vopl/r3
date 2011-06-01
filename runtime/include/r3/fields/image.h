@@ -13,6 +13,11 @@ namespace r3{ namespace fields
 	class Image
 		: public File
 	{
+	public:
+		typedef boost::int32_t TWidth;
+		typedef boost::int32_t THeight;
+	private:
+
 		boost::int32_t _width;
 		boost::int32_t _height;
 	public:

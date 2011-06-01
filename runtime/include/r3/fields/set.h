@@ -17,6 +17,9 @@ namespace r3{ namespace fields
 	public:
 		typedef std::bitset<bits4SetAmount> TSet;
 
+	public:
+		typedef TSet TValue;
+	private:
 	private:
 		TSet _value;
 

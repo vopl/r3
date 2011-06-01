@@ -12,6 +12,9 @@ namespace r3{ namespace fields
 	class Int64
 		: public Int
 	{
+	public:
+		typedef boost::int64_t TValue;
+	private:
 		boost::int64_t _value;
 	public:
 		Int64()

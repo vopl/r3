@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class DateTimeInterval
 		: public DateTime
 	{
+	public:
+		typedef pgc::DateTimeDuration TValue;
+	private:
 		pgc::DateTimeDuration _value;
 	public:
 		pgc::DateTimeDuration &value()

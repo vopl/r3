@@ -100,8 +100,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			in[2] = '2';
 			in[3] = '3';
 
-			char bufOut[4096];
-			char *out = bufOut;
+			std::string out;
 
 
 			pgc::Statement stmt = con.prep("SELECT $1::bytea, $2::bytea").bind(in,1).bind(in,2);

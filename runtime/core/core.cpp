@@ -43,7 +43,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 
 		int cnt;
-		m.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec("Test_myId").throwIfError().fetch(0,0,cnt);
+		m.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(std::string("Test_myId")).throwIfError().fetch(0,0,cnt);
 
 		if(!cnt)
 		{

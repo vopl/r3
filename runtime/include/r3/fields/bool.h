@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Bool
 		: public Simple
 	{
+	public:
+		typedef bool TValue;
+	private:
 		bool _value;
 
 	public:

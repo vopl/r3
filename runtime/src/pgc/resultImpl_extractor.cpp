@@ -29,9 +29,9 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			utils::_ntoa(VAL, *(char **)valCpp);
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			utils::_ntoa(VAL, *(char **)valCpp);
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				char buf[32];
@@ -92,9 +92,9 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			utils::_ntoa(VAL, *(char **)valCpp);
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			utils::_ntoa(VAL, *(char **)valCpp);
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				char buf[32];
@@ -155,9 +155,9 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			utils::_ntoa(VAL, *(char **)valCpp);
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			utils::_ntoa(VAL, *(char **)valCpp);
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				char buf[32];
@@ -241,9 +241,9 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			str = *(char **)valCpp;
-			break;
+// 		case CppDataType<char *>::cdt_index:
+// 			str = *(char **)valCpp;
+// 			break;
 		case CppDataType<std::string>::cdt_index:
 			{
 				std::string &cppStr = *(std::string*)valCpp;
@@ -303,9 +303,9 @@ namespace pgc
 		//////////////////////////////////////////////////////////////////////////
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			//уже все готово
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			//уже все готово
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				std::string &strCpp = *(std::string*)valCpp;
@@ -372,9 +372,9 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			sprintf(*(char **)valCpp, "%.7g", (double)VAL);
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			sprintf(*(char **)valCpp, "%.7g", (double)VAL);
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				char buf[32];
@@ -436,9 +436,9 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			sprintf(*(char **)valCpp, "%.7g", VAL);
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			sprintf(*(char **)valCpp, "%.7g", VAL);
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				char buf[32];
@@ -500,9 +500,9 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			utils::_ntoa(VAL, *(char **)valCpp);
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			utils::_ntoa(VAL, *(char **)valCpp);
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				char buf[32];
@@ -571,13 +571,13 @@ namespace pgc
 		//////////////////////////////////////////////////////////////////////////
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
-				memcpy(*(char **)valCpp, valDb, lenDb);
-				(*(char **)valCpp)[lenDb] = 0;
-			}
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			{
+// 				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+// 				memcpy(*(char **)valCpp, valDb, lenDb);
+// 				(*(char **)valCpp)[lenDb] = 0;
+// 			}
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
@@ -689,22 +689,22 @@ namespace pgc
 		//////////////////////////////////////////////////////////////////////////
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
-				size_t lenCpp=0;
-
-				unsigned char *esc = PQescapeByteaConn(_con->pgcon(), (const unsigned char *)valDb, lenDb, &lenCpp);
-				if(!esc)
-				{
-					return false;
-				}
-
-				memcpy(*(char **)valCpp, esc, lenCpp);
-				PQfreemem(esc);
-				(*(char **)valCpp)[lenCpp] = 0;
-			}
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			{
+// 				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
+// 				size_t lenCpp=0;
+// 
+// 				unsigned char *esc = PQescapeByteaConn(_con->pgcon(), (const unsigned char *)valDb, lenDb, &lenCpp);
+// 				if(!esc)
+// 				{
+// 					return false;
+// 				}
+// 
+// 				memcpy(*(char **)valCpp, esc, lenCpp);
+// 				PQfreemem(esc);
+// 				(*(char **)valCpp)[lenCpp] = 0;
+// 			}
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
@@ -783,11 +783,24 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (utils::fixEndian(*(boost::uint64_t *)valDb))
+		boost::uint64_t VAL;
+		if(_con->integerDatetimes())
+		{
+			VAL = utils::fixEndian(*(boost::uint64_t *)valDb);
+		}
+		else
+		{
+			double v = utils::fixEndian(*(double *)valDb);
+			VAL = (boost::int64_t)v;
+			v -= VAL;
+			VAL *= 1000000;
+			VAL += (boost::uint64_t)(v*1000000 + 0.5);
+		}
+
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
+// 		case CppDataType<char *>::cdt_index:
 		case CppDataType<std::string>::cdt_index:
 		case CppDataType<std::tm>::cdt_index:
 			{
@@ -806,33 +819,33 @@ namespace pgc
 
 				switch(typCpp)
 				{
-				case CppDataType<char *>::cdt_index:
-					{
-						int year, month, day, hour, min, sec, fsec;
-						utils::j2date((int) date, &year, &month, &day);
-						utils::dt2time(time, &hour, &min, &sec, &fsec);
-
-						if(fsec)
-						{
-							int digs = 6;
-							while(!(fsec%10))
-							{
-								digs--;
-								fsec /= 10;
-							}
-							sprintf(*(char **)valCpp, "%04d-%02d-%02d %02d:%02d:%02d.%0*d", 
-								year, month, day,
-								hour, min, sec,
-								digs, fsec);
-						}
-						else
-						{
-							sprintf(*(char **)valCpp, "%04d-%02d-%02d %02d:%02d:%02d", 
-								year, month, day,
-								hour, min, sec);
-						}
-					}
-					break;
+// 				case CppDataType<char *>::cdt_index:
+// 					{
+// 						int year, month, day, hour, min, sec, fsec;
+// 						utils::j2date((int) date, &year, &month, &day);
+// 						utils::dt2time(time, &hour, &min, &sec, &fsec);
+// 
+// 						if(fsec)
+// 						{
+// 							int digs = 6;
+// 							while(!(fsec%10))
+// 							{
+// 								digs--;
+// 								fsec /= 10;
+// 							}
+// 							sprintf(*(char **)valCpp, "%04d-%02d-%02d %02d:%02d:%02d.%0*d", 
+// 								year, month, day,
+// 								hour, min, sec,
+// 								digs, fsec);
+// 						}
+// 						else
+// 						{
+// 							sprintf(*(char **)valCpp, "%04d-%02d-%02d %02d:%02d:%02d", 
+// 								year, month, day,
+// 								hour, min, sec);
+// 						}
+// 					}
+// 					break;
 				case CppDataType<std::string>::cdt_index:
 					{
 						int year, month, day, hour, min, sec, fsec;
@@ -982,11 +995,13 @@ namespace pgc
 			}
 			return true;
 		}
-#undef VAL
+
 
 		//assert(!"unsupported cpp type for timestamp");
 		return false;
 	}
+
+
 
 	//////////////////////////////////////////////////////////////////////////
 	bool ResultImpl::extractor_interval		(int rowIdx, int colIdx, int typCpp, void *valCpp)
@@ -1003,40 +1018,56 @@ namespace pgc
 		memcpy(buf, valDb, sizeof(PG_Interval));
 		PG_Interval &v = *(PG_Interval *)buf;
 
-		v.time = utils::fixEndian(v.time);
+		//v.time = utils::fixEndian(v.time);
 		v.day = utils::fixEndian(v.day);
 		v.month = utils::fixEndian(v.month);
 
-#define VAL (v.time + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH))
+
+		if(_con->integerDatetimes())
+		{
+			v.time = utils::fixEndian(v.time);
+		}
+		else
+		{
+			double dv = utils::fixEndian(*(double *)&v.time);
+			v.time = (boost::int64_t)dv;
+			dv -= v.time;
+			v.time *= 1000000;
+			v.time += (boost::uint64_t)(dv*1000000 + 0.5);
+		}
+		//v.time += utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH);
+
+#define VAL (v.time)
+
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			{
-				int hour, min, sec, fsec;
-				utils::dt2time(v.time, &hour, &min, &sec, &fsec);
-
-				if(fsec)
-				{
-					int digs = 6;
-					while(!(fsec%10))
-					{
-						digs--;
-						fsec /= 10;
-					}
-					sprintf(*(char **)valCpp, "%d month %d day %02d:%02d:%02d.%0*d", 
-						v.month, v.day,
-						hour, min, sec,
-						digs, fsec);
-				}
-				else
-				{
-					sprintf(*(char **)valCpp, "%d month %d day %02d:%02d:%02d", 
-						v.month, v.day,
-						hour, min, sec);
-				}
-			}
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			{
+// 				int hour, min, sec, fsec;
+// 				utils::dt2time(v.time, &hour, &min, &sec, &fsec);
+// 
+// 				if(fsec)
+// 				{
+// 					int digs = 6;
+// 					while(!(fsec%10))
+// 					{
+// 						digs--;
+// 						fsec /= 10;
+// 					}
+// 					sprintf(*(char **)valCpp, "%d month %d day %02d:%02d:%02d.%0*d", 
+// 						v.month, v.day,
+// 						hour, min, sec,
+// 						digs, fsec);
+// 				}
+// 				else
+// 				{
+// 					sprintf(*(char **)valCpp, "%d month %d day %02d:%02d:%02d", 
+// 						v.month, v.day,
+// 						hour, min, sec);
+// 				}
+// 			}
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				int hour, min, sec, fsec;
@@ -1071,34 +1102,34 @@ namespace pgc
 			*(bool *)valCpp = VAL?true:false;
 			return true;
 		case CppDataType<float>::cdt_index:
-			*(float *)valCpp = (float)VAL;
+			*(float *)valCpp = (float)(((double)(VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH)))/1000000);
 			return true;
 		case CppDataType<double>::cdt_index:
-			*(double *)valCpp = (double)VAL;
+			*(double *)valCpp = (((double)(VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH)))/1000000);
 			return true;
 		case CppDataType<boost::int8_t>::cdt_index:
-			*(boost::int8_t *)valCpp = (boost::int8_t)VAL;
+			*(boost::int8_t *)valCpp = (boost::int8_t)(VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH));
 			return true;
 		case CppDataType<boost::int16_t>::cdt_index:
-			*(boost::int16_t *)valCpp = (boost::int16_t)VAL;
+			*(boost::int16_t *)valCpp = (boost::int16_t)(VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH));
 			return true;
 		case CppDataType<boost::int32_t>::cdt_index:
-			*(boost::int32_t *)valCpp = (boost::int32_t)VAL;
+			*(boost::int32_t *)valCpp = (boost::int32_t)(VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH));
 			return true;
 		case CppDataType<boost::int64_t>::cdt_index:
-			*(boost::int64_t *)valCpp = VAL;
+			*(boost::int64_t *)valCpp = (VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH));
 			return true;
 		case CppDataType<boost::uint8_t>::cdt_index:
-			*(boost::uint8_t *)valCpp = (boost::uint8_t)VAL;
+			*(boost::uint8_t *)valCpp = (boost::uint8_t)(VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH));
 			return true;
 		case CppDataType<boost::uint16_t>::cdt_index:
-			*(boost::uint16_t *)valCpp = (boost::uint16_t)VAL;
+			*(boost::uint16_t *)valCpp = (boost::uint16_t)(VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH));
 			return true;
 		case CppDataType<boost::uint32_t>::cdt_index:
-			*(boost::uint32_t *)valCpp = (boost::uint32_t)VAL;
+			*(boost::uint32_t *)valCpp = (boost::uint32_t)(VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH));
 			return true;
 		case CppDataType<boost::uint64_t>::cdt_index:
-			*(boost::uint64_t *)valCpp = VAL;
+			*(boost::uint64_t *)valCpp = (VAL + utils::USECS_PER_DAY*(v.day + v.month*utils::DAYS_PER_MONTH));
 			return true;
 		case CppDataType<boost::posix_time::time_duration>::cdt_index:
 			{
@@ -1151,15 +1182,15 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			{
-				int year, month, day;
-				utils::j2date(VAL, &year, &month, &day);
-
-				sprintf(*(char **)valCpp, "%04d-%02d-%02d", 
-					year, month, day);
-			}
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			{
+// 				int year, month, day;
+// 				utils::j2date(VAL, &year, &month, &day);
+// 
+// 				sprintf(*(char **)valCpp, "%04d-%02d-%02d", 
+// 					year, month, day);
+// 			}
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				int year, month, day;
@@ -1251,34 +1282,46 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (utils::fixEndian(*(boost::uint64_t *)valDb))
+		boost::uint64_t VAL;
+		if(_con->integerDatetimes())
+		{
+			VAL = utils::fixEndian(*(boost::uint64_t *)valDb);
+		}
+		else
+		{
+			double v = utils::fixEndian(*(double *)valDb);
+			VAL = (boost::int64_t)v;
+			v -= VAL;
+			VAL *= 1000000;
+			VAL += (boost::uint64_t)(v*1000000 + 0.5);
+		}
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			{
-				int hour, min, sec, fsec;
-				utils::dt2time(VAL, &hour, &min, &sec, &fsec);
-
-				if(fsec)
-				{
-					int digs = 6;
-					while(!(fsec%10))
-					{
-						digs--;
-						fsec /= 10;
-					}
-					sprintf(*(char **)valCpp, "%02d:%02d:%02d.%0*d", 
-						hour, min, sec,
-						digs, fsec);
-				}
-				else
-				{
-					sprintf(*(char **)valCpp, "%02d:%02d:%02d", 
-						hour, min, sec);
-				}
-			}
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			{
+// 				int hour, min, sec, fsec;
+// 				utils::dt2time(VAL, &hour, &min, &sec, &fsec);
+// 
+// 				if(fsec)
+// 				{
+// 					int digs = 6;
+// 					while(!(fsec%10))
+// 					{
+// 						digs--;
+// 						fsec /= 10;
+// 					}
+// 					sprintf(*(char **)valCpp, "%02d:%02d:%02d.%0*d", 
+// 						hour, min, sec,
+// 						digs, fsec);
+// 				}
+// 				else
+// 				{
+// 					sprintf(*(char **)valCpp, "%02d:%02d:%02d", 
+// 						hour, min, sec);
+// 				}
+// 			}
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				int hour, min, sec, fsec;
@@ -1376,7 +1419,7 @@ namespace pgc
 			}
 			return true;
 		}
-#undef VAL
+
 
 		//assert(!"unsupported cpp type for time");
 		return false;
@@ -1396,10 +1439,10 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			(*(char **)valCpp)[0] = VAL?'1':'0';
-			(*(char **)valCpp)[1] = 0;
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			(*(char **)valCpp)[0] = VAL?'1':'0';
+// 			(*(char **)valCpp)[1] = 0;
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				(*(std::string*)valCpp) = VAL?"1":"0";
@@ -1558,24 +1601,24 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			{
-				char *strCpp = (*(char **)valCpp);
-
-				for(size_t i(0); i<v.amount; i++)
-				{
-					if((v.bits[i/8] << i%8) & 0x80)
-					{
-						strCpp[i] = '1';
-					}
-					else
-					{
-						strCpp[i] = '0';
-					}
-				}
-				strCpp[v.amount] = 0;
-			}
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			{
+// 				char *strCpp = (*(char **)valCpp);
+// 
+// 				for(size_t i(0); i<v.amount; i++)
+// 				{
+// 					if((v.bits[i/8] << i%8) & 0x80)
+// 					{
+// 						strCpp[i] = '1';
+// 					}
+// 					else
+// 					{
+// 						strCpp[i] = '0';
+// 					}
+// 				}
+// 				strCpp[v.amount] = 0;
+// 			}
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				std::string &strCpp = (*(std::string*)valCpp);
@@ -1714,9 +1757,9 @@ namespace pgc
 
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			utils::_ntoa(VAL, *(char **)valCpp);
-			return true;
+// 		case CppDataType<char *>::cdt_index:
+// 			utils::_ntoa(VAL, *(char **)valCpp);
+// 			return true;
 		case CppDataType<std::string>::cdt_index:
 			{
 				char buf[32];

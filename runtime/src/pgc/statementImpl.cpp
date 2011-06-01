@@ -221,364 +221,475 @@ namespace pgc
 		int &bindFmt,
 		bool &bindOwn)
 	{
+		if(!valCpp)
+		{
+			bindVal = NULL;
+			bindLen = 0;
+			bindOwn = false;
+		}
+
 		switch(typCpp)
 		{
-		case CppDataType<char *>::cdt_index:
-			bindTyp = 0;//untyped literal string
-			bindVal = *(char **)valCpp;
-			bindLen = 0;//ignored for text
-			bindFmt = 0;//text
-			bindOwn = false;//alien bindVal
-			break;
+// 		case CppDataType<char *>::cdt_index:
+// 			bindTyp = 0;//untyped literal string
+// 			bindVal = *(char **)valCpp;
+// 			bindLen = 0;//ignored for text
+// 			bindFmt = 0;//text
+// 			bindOwn = false;//alien bindVal
+// 			break;
 		case CppDataType<std::string>::cdt_index:
 			bindTyp = 0;//untyped literal string
-			bindVal = const_cast<char *>((*(std::string *)valCpp).data());
-			bindLen = 0;//ignored for text
 			bindFmt = 0;//text
-			bindOwn = false;//alien bindVal
+			if(valCpp)
+			{
+				bindVal = const_cast<char *>((*(std::string *)valCpp).data());
+				bindLen = 0;//ignored for text
+				bindOwn = false;//alien bindVal
+			}
 			break;
 		case CppDataType<bool>::cdt_index:
 			bindTyp = 16;//bool
-			bindVal = new char[1];
-			*bindVal = (*(bool *)valCpp);
-			bindLen = 1;
 			bindFmt = 1;//binary
-			bindOwn = true;//own bindVal wil be deleted later
+			if(valCpp)
+			{
+				bindVal = new char[1];
+				*bindVal = (*(bool *)valCpp);
+				bindLen = 1;
+				bindOwn = true;//own bindVal wil be deleted later
+			}
 			break;
 		case CppDataType<float>::cdt_index:
 			bindTyp = 700;//float4
-			bindVal = new char[4];
-			*(float *)bindVal = utils::fixEndian(*(float *)valCpp);
-			bindLen = 4;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[4];
+				*(float *)bindVal = utils::fixEndian(*(float *)valCpp);
+				bindLen = 4;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<double>::cdt_index:
 			bindTyp = 701;//float8
-			bindVal = new char[8];
-			*(double *)bindVal = utils::fixEndian(*(double *)valCpp);
-			bindLen = 8;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[8];
+				*(double *)bindVal = utils::fixEndian(*(double *)valCpp);
+				bindLen = 8;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<boost::int8_t>::cdt_index:
 			bindTyp = 21;//int2
-			bindVal = new char[2];
-			*(boost::uint16_t *)bindVal = utils::fixEndian((boost::int16_t)*(boost::int8_t *)valCpp);
-			bindLen = 2;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[2];
+				*(boost::uint16_t *)bindVal = utils::fixEndian((boost::int16_t)*(boost::int8_t *)valCpp);
+				bindLen = 2;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<boost::int16_t>::cdt_index:
 			bindTyp = 21;//int2
-			bindVal = new char[2];
-			*(boost::uint16_t *)bindVal = utils::fixEndian(*(boost::int16_t *)valCpp);
-			bindLen = 2;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[2];
+				*(boost::uint16_t *)bindVal = utils::fixEndian(*(boost::int16_t *)valCpp);
+				bindLen = 2;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<boost::int32_t>::cdt_index:
 			bindTyp = 23;//int4
-			bindVal = new char[4];
-			*(boost::uint32_t *)bindVal = utils::fixEndian(*(boost::int32_t *)valCpp);
-			bindLen = 4;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[4];
+				*(boost::uint32_t *)bindVal = utils::fixEndian(*(boost::int32_t *)valCpp);
+				bindLen = 4;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<boost::int64_t>::cdt_index:
 			bindTyp = 20;//int8
-			bindVal = new char[8];
-			*(boost::uint64_t *)bindVal = utils::fixEndian(*(boost::int64_t *)valCpp);
-			bindLen = 8;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[8];
+				*(boost::uint64_t *)bindVal = utils::fixEndian(*(boost::int64_t *)valCpp);
+				bindLen = 8;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<boost::uint8_t>::cdt_index:
 			bindTyp = 21;//int2
-			bindVal = new char[2];
-			*(boost::uint16_t *)bindVal = utils::fixEndian((boost::uint16_t)*(boost::uint8_t *)valCpp);
-			bindLen = 2;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[2];
+				*(boost::uint16_t *)bindVal = utils::fixEndian((boost::uint16_t)*(boost::uint8_t *)valCpp);
+				bindLen = 2;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<boost::uint16_t>::cdt_index:
 			bindTyp = 23;//int4
-			bindVal = new char[4];
-			*(boost::uint32_t *)bindVal = utils::fixEndian((boost::uint32_t)*(boost::uint16_t *)valCpp);
-			bindLen = 4;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[4];
+				*(boost::uint32_t *)bindVal = utils::fixEndian((boost::uint32_t)*(boost::uint16_t *)valCpp);
+				bindLen = 4;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<boost::uint32_t>::cdt_index:
 			bindTyp = 20;//int8
-			bindVal = new char[8];
-			*(boost::uint64_t *)bindVal = utils::fixEndian((boost::uint64_t)*(boost::uint32_t *)valCpp);
-			bindLen = 8;
 			bindFmt = 1;
-			bindOwn = true;
+			if(valCpp)
+			{
+				bindVal = new char[8];
+				*(boost::uint64_t *)bindVal = utils::fixEndian((boost::uint64_t)*(boost::uint32_t *)valCpp);
+				bindLen = 8;
+				bindOwn = true;
+			}
 			break;
 		case CppDataType<boost::uint64_t>::cdt_index:
 			{
-				boost::uint64_t &ui64 = *(boost::uint64_t *)valCpp;
-				if(ui64 & 0x8000000000000000ULL)
+				bindTyp = 20;//int8
+				bindFmt = 1;
+				if(valCpp)
 				{
-					bindTyp = 0;
-					bindVal = new char[32];
-					utils::_ntoa(ui64, bindVal);
-					bindLen = 0;
-					bindFmt = 0;
-					bindOwn = true;
-				}
-				else
-				{
-					bindTyp = 20;//int8
-					bindVal = new char[8];
-					*(boost::uint64_t *)bindVal = utils::fixEndian(*(boost::uint64_t *)valCpp);
-					bindLen = 8;
-					bindFmt = 1;
-					bindOwn = true;
+					boost::uint64_t &ui64 = *(boost::uint64_t *)valCpp;
+					if(ui64 & 0x8000000000000000ULL)
+					{
+						bindTyp = 0;
+						bindFmt = 0;
+						bindVal = new char[32];
+						utils::_ntoa(ui64, bindVal);
+						bindLen = 0;
+						bindOwn = true;
+					}
+					else
+					{
+						bindVal = new char[8];
+						*(boost::uint64_t *)bindVal = utils::fixEndian(*(boost::uint64_t *)valCpp);
+						bindLen = 8;
+						bindOwn = true;
+					}
 				}
 			}
 			break;
 		case CppDataType<std::tm>::cdt_index:
 			{
-				const std::tm &stm = *(const std::tm *)valCpp;
-
-				boost::int64_t ts =
-					utils::time2t(stm.tm_hour, stm.tm_min, stm.tm_sec, 0) +
-					(utils::date2j(stm.tm_year+1900, stm.tm_mon+1, stm.tm_mday) - utils::POSTGRES_EPOCH_JDATE) * utils::USECS_PER_DAY;
-
 				bindTyp = 1114;//timestamp
-				bindVal = new char[8];
-				*(boost::uint64_t *)bindVal = utils::fixEndian(ts);
-				bindLen = 8;
 				bindFmt = 1;
-				bindOwn = true;
 
+				if(valCpp)
+				{
+					const std::tm &stm = *(const std::tm *)valCpp;
+
+					boost::int64_t ts =
+						utils::time2t(stm.tm_hour, stm.tm_min, stm.tm_sec, 0) +
+						(utils::date2j(stm.tm_year+1900, stm.tm_mon+1, stm.tm_mday) - utils::POSTGRES_EPOCH_JDATE) * utils::USECS_PER_DAY;
+
+					bindVal = new char[8];
+
+					if(_con->integerDatetimes())
+						*(boost::uint64_t *)bindVal = utils::fixEndian(ts);
+					else
+						*(double *)bindVal = utils::fixEndian(double(ts/1000000)+double(ts%1000000)/1000000);
+					bindLen = 8;
+					bindOwn = true;
+				}
 			}
 			break;
 		case CppDataType<boost::gregorian::date>::cdt_index:
 			{
-				const boost::gregorian::date &bgd = *(const boost::gregorian::date *)valCpp;
-
-				boost::int32_t d =
-					utils::date2j(bgd.year(), bgd.month(), bgd.day()) - utils::POSTGRES_EPOCH_JDATE;
-
 				bindTyp = 1082;//date
-				bindVal = new char[4];
-				*(boost::uint32_t *)bindVal = utils::fixEndian(d);
-				bindLen = 4;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const boost::gregorian::date &bgd = *(const boost::gregorian::date *)valCpp;
 
+					boost::int32_t d =
+						utils::date2j(bgd.year(), bgd.month(), bgd.day()) - utils::POSTGRES_EPOCH_JDATE;
+
+					bindVal = new char[4];
+					*(boost::uint32_t *)bindVal = utils::fixEndian(d);
+					bindLen = 4;
+					bindOwn = true;
+				}
 			}
 			break;
 		case CppDataType<boost::posix_time::ptime>::cdt_index:
 			{
-				const boost::posix_time::ptime &ptm = *(const boost::posix_time::ptime *)valCpp;
-
-				boost::gregorian::date bgd = ptm.date();
-				boost::posix_time::time_duration pt = ptm.time_of_day();
-
-				boost::int64_t ts =
-					pt.total_microseconds() +
-					(utils::date2j(bgd.year(), bgd.month(), bgd.day()) - utils::POSTGRES_EPOCH_JDATE) * utils::USECS_PER_DAY;
-
 				bindTyp = 1114;//timestamp
-				bindVal = new char[8];
-				*(boost::uint64_t *)bindVal = utils::fixEndian(ts);
-				bindLen = 8;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const boost::posix_time::ptime &ptm = *(const boost::posix_time::ptime *)valCpp;
 
+					boost::gregorian::date bgd = ptm.date();
+					boost::posix_time::time_duration pt = ptm.time_of_day();
+
+					boost::int64_t ts =
+						pt.total_microseconds() +
+						(utils::date2j(bgd.year(), bgd.month(), bgd.day()) - utils::POSTGRES_EPOCH_JDATE) * utils::USECS_PER_DAY;
+
+					bindVal = new char[8];
+					if(_con->integerDatetimes())
+						*(boost::uint64_t *)bindVal = utils::fixEndian(ts);
+					else
+					{
+						*(double *)bindVal = utils::fixEndian(double(ts/1000000)+double(ts%1000000)/1000000);
+					}
+					bindLen = 8;
+					bindOwn = true;
+				}
 			}
 			break;
 		case CppDataType<boost::gregorian::date_duration>::cdt_index:
 			{
-				const boost::gregorian::date_duration &bgdd = *(const boost::gregorian::date_duration *)valCpp;
-
 				bindTyp = 1186;//interval
-				bindVal = new char[sizeof(PG_Interval)];
-				PG_Interval &pgi = *(PG_Interval *)bindVal;
-				bindLen = sizeof(PG_Interval);
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const boost::gregorian::date_duration &bgdd = *(const boost::gregorian::date_duration *)valCpp;
 
-				pgi.month = utils::fixEndian((boost::uint32_t)(bgdd.days() / utils::DAYS_PER_MONTH));
-				pgi.day = utils::fixEndian((boost::uint32_t)(bgdd.days() % utils::DAYS_PER_MONTH));
-				pgi.time = 0;
+					bindVal = new char[sizeof(PG_Interval)];
+					PG_Interval &pgi = *(PG_Interval *)bindVal;
+					bindLen = sizeof(PG_Interval);
+					bindOwn = true;
+
+					pgi.month = utils::fixEndian((boost::uint32_t)(bgdd.days() / utils::DAYS_PER_MONTH));
+					pgi.day = utils::fixEndian((boost::uint32_t)(bgdd.days() % utils::DAYS_PER_MONTH));
+					pgi.time = 0;
+				}
 			}
 			break;
 		case CppDataType<boost::posix_time::time_duration>::cdt_index:
 			{
-				const boost::posix_time::time_duration &bptd = *(const boost::posix_time::time_duration *)valCpp;
-
 				bindTyp = 1186;//interval
-				bindVal = new char[sizeof(PG_Interval)];
-				PG_Interval &pgi = *(PG_Interval *)bindVal;
-				bindLen = sizeof(PG_Interval);
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const boost::posix_time::time_duration &bptd = *(const boost::posix_time::time_duration *)valCpp;
 
-				pgi.month = 0;
-				pgi.day = 0;
-				pgi.time = utils::fixEndian(bptd.total_microseconds());
+					bindVal = new char[sizeof(PG_Interval)];
+					PG_Interval &pgi = *(PG_Interval *)bindVal;
+					bindLen = sizeof(PG_Interval);
+					bindOwn = true;
+
+					pgi.month = 0;
+					pgi.day = 0;
+					if(_con->integerDatetimes())
+						pgi.time = utils::fixEndian(bptd.total_microseconds());
+					else
+					{
+						boost::int64_t tms = bptd.total_microseconds();
+						*(double *)(void *)&pgi.time = utils::fixEndian(double(tms/1000000)+double(tms%1000000)/1000000);
+					}
+				}
 			}
 			break;
 		case CppDataType<DateTimeDuration>::cdt_index:
 			{
-				const DateTimeDuration &dtd = *(const DateTimeDuration *)valCpp;
-
-
 				bindTyp = 1186;//interval
-				bindVal = new char[sizeof(PG_Interval)];
-				PG_Interval &pgi = *(PG_Interval *)bindVal;
-				bindLen = sizeof(PG_Interval);
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const DateTimeDuration &dtd = *(const DateTimeDuration *)valCpp;
 
-				pgi.month = utils::fixEndian((boost::uint32_t)(dtd._dd.days() / utils::DAYS_PER_MONTH));
-				pgi.day = utils::fixEndian((boost::uint32_t)(dtd._dd.days() % utils::DAYS_PER_MONTH));
-				pgi.time = utils::fixEndian(dtd._td.total_microseconds());
+					bindVal = new char[sizeof(PG_Interval)];
+					PG_Interval &pgi = *(PG_Interval *)bindVal;
+					bindLen = sizeof(PG_Interval);
+					bindOwn = true;
+
+					pgi.month = utils::fixEndian((boost::uint32_t)(dtd._dd.days() / utils::DAYS_PER_MONTH));
+					pgi.day = utils::fixEndian((boost::uint32_t)(dtd._dd.days() % utils::DAYS_PER_MONTH));
+
+					if(_con->integerDatetimes())
+						pgi.time = utils::fixEndian(dtd._td.total_microseconds());
+					else
+					{
+						boost::int64_t tms = dtd._td.total_microseconds();
+						*(double *)(void *)&pgi.time = utils::fixEndian(double(tms/1000000)+double(tms%1000000)/1000000);
+					}
+				}
 			}
 			break;
 
 		case CppDataType<std::bitset<8> >::cdt_index:
 			{
-				const std::bitset<8> &bs = *(const std::bitset<8> *)valCpp;
-
 				bindTyp = 1562;//varbit
-				bindVal = new char[sizeof(PG_VarBit)-1+1];
-				PG_VarBit &vb = *(PG_VarBit *)bindVal;
-				bindLen = sizeof(PG_VarBit)-1+1;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const std::bitset<8> &bs = *(const std::bitset<8> *)valCpp;
 
-				vb.amount = utils::fixEndian((boost::uint32_t)8);
-				impl::bitset2Bits(bs, vb.bits);
+					bindVal = new char[sizeof(PG_VarBit)-1+1];
+					PG_VarBit &vb = *(PG_VarBit *)bindVal;
+					bindLen = sizeof(PG_VarBit)-1+1;
+					bindOwn = true;
+
+					vb.amount = utils::fixEndian((boost::uint32_t)8);
+					impl::bitset2Bits(bs, vb.bits);
+				}
 			}
 			break;
 		case CppDataType<std::bitset<16> >::cdt_index:
 			{
-				const std::bitset<16> &bs = *(const std::bitset<16> *)valCpp;
-
 				bindTyp = 1562;//varbit
-				bindVal = new char[sizeof(PG_VarBit)-1+2];
-				PG_VarBit &vb = *(PG_VarBit *)bindVal;
-				bindLen = sizeof(PG_VarBit)-1+2;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const std::bitset<16> &bs = *(const std::bitset<16> *)valCpp;
 
-				vb.amount = utils::fixEndian((boost::uint32_t)16);
-				impl::bitset2Bits(bs, vb.bits);
+					bindVal = new char[sizeof(PG_VarBit)-1+2];
+					PG_VarBit &vb = *(PG_VarBit *)bindVal;
+					bindLen = sizeof(PG_VarBit)-1+2;
+					bindOwn = true;
+
+					vb.amount = utils::fixEndian((boost::uint32_t)16);
+					impl::bitset2Bits(bs, vb.bits);
+				}
 			}
 			break;
 		case CppDataType<std::bitset<32> >::cdt_index:
 			{
-				const std::bitset<32> &bs = *(const std::bitset<32> *)valCpp;
-
 				bindTyp = 1562;//varbit
-				bindVal = new char[sizeof(PG_VarBit)-1+4];
-				PG_VarBit &vb = *(PG_VarBit *)bindVal;
-				bindLen = sizeof(PG_VarBit)-1+4;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const std::bitset<32> &bs = *(const std::bitset<32> *)valCpp;
 
-				vb.amount = utils::fixEndian((boost::uint32_t)32);
-				impl::bitset2Bits(bs, vb.bits);
+					bindVal = new char[sizeof(PG_VarBit)-1+4];
+					PG_VarBit &vb = *(PG_VarBit *)bindVal;
+					bindLen = sizeof(PG_VarBit)-1+4;
+					bindOwn = true;
+
+					vb.amount = utils::fixEndian((boost::uint32_t)32);
+					impl::bitset2Bits(bs, vb.bits);
+				}
 			}
 			break;
 		case CppDataType<std::bitset<64> >::cdt_index:
 			{
-				const std::bitset<64> &bs = *(const std::bitset<64> *)valCpp;
-
 				bindTyp = 1562;//varbit
-				bindVal = new char[sizeof(PG_VarBit)-1+8];
-				PG_VarBit &vb = *(PG_VarBit *)bindVal;
-				bindLen = sizeof(PG_VarBit)-1+8;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const std::bitset<64> &bs = *(const std::bitset<64> *)valCpp;
 
-				vb.amount = utils::fixEndian((boost::uint32_t)64);
-				impl::bitset2Bits(bs, vb.bits);
+					bindVal = new char[sizeof(PG_VarBit)-1+8];
+					PG_VarBit &vb = *(PG_VarBit *)bindVal;
+					bindLen = sizeof(PG_VarBit)-1+8;
+					bindOwn = true;
+
+					vb.amount = utils::fixEndian((boost::uint32_t)64);
+					impl::bitset2Bits(bs, vb.bits);
+				}
 			}
 			break;
 		case CppDataType<std::bitset<128> >::cdt_index:
 			{
-				const std::bitset<128> &bs = *(const std::bitset<128> *)valCpp;
-
 				bindTyp = 1562;//varbit
-				bindVal = new char[sizeof(PG_VarBit)-1+16];
-				PG_VarBit &vb = *(PG_VarBit *)bindVal;
-				bindLen = sizeof(PG_VarBit)-1+16;
 				bindFmt = 1;
-				bindOwn = true;
 
-				vb.amount = utils::fixEndian((boost::uint32_t)128);
-				impl::bitset2Bits(bs, vb.bits);
+				if(valCpp)
+				{
+					const std::bitset<128> &bs = *(const std::bitset<128> *)valCpp;
+
+					bindVal = new char[sizeof(PG_VarBit)-1+16];
+					PG_VarBit &vb = *(PG_VarBit *)bindVal;
+					bindLen = sizeof(PG_VarBit)-1+16;
+					bindOwn = true;
+
+					vb.amount = utils::fixEndian((boost::uint32_t)128);
+					impl::bitset2Bits(bs, vb.bits);
+				}
 			}
 			break;
 		case CppDataType<std::bitset<256> >::cdt_index:
 			{
-				const std::bitset<256> &bs = *(const std::bitset<256> *)valCpp;
-
 				bindTyp = 1562;//varbit
-				bindVal = new char[sizeof(PG_VarBit)-1+32];
-				PG_VarBit &vb = *(PG_VarBit *)bindVal;
-				bindLen = sizeof(PG_VarBit)-1+32;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const std::bitset<256> &bs = *(const std::bitset<256> *)valCpp;
 
-				vb.amount = utils::fixEndian((boost::uint32_t)256);
-				impl::bitset2Bits(bs, vb.bits);
+					bindVal = new char[sizeof(PG_VarBit)-1+32];
+					PG_VarBit &vb = *(PG_VarBit *)bindVal;
+					bindLen = sizeof(PG_VarBit)-1+32;
+					bindOwn = true;
+
+					vb.amount = utils::fixEndian((boost::uint32_t)256);
+					impl::bitset2Bits(bs, vb.bits);
+				}
 			}
 			break;
 		case CppDataType<std::bitset<512> >::cdt_index:
 			{
-				const std::bitset<512> &bs = *(const std::bitset<512> *)valCpp;
-
 				bindTyp = 1562;//varbit
-				bindVal = new char[sizeof(PG_VarBit)-1+64];
-				PG_VarBit &vb = *(PG_VarBit *)bindVal;
-				bindLen = sizeof(PG_VarBit)-1+64;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					const std::bitset<512> &bs = *(const std::bitset<512> *)valCpp;
 
-				vb.amount = utils::fixEndian((boost::uint32_t)512);
-				impl::bitset2Bits(bs, vb.bits);
+					bindVal = new char[sizeof(PG_VarBit)-1+64];
+					PG_VarBit &vb = *(PG_VarBit *)bindVal;
+					bindLen = sizeof(PG_VarBit)-1+64;
+					bindOwn = true;
+
+					vb.amount = utils::fixEndian((boost::uint32_t)512);
+					impl::bitset2Bits(bs, vb.bits);
+				}
 			}
 			break;
 		case CppDataType<std::vector<unsigned char> >::cdt_index:
 			{
-				std::vector<unsigned char> &vec = *(std::vector<unsigned char> *)valCpp;
 				bindTyp = 17;//bytea
-				bindVal = (char *)&vec[0];
-				bindLen = vec.size();
 				bindFmt = 1;
-				bindOwn = false;
+				if(valCpp)
+				{
+					std::vector<unsigned char> &vec = *(std::vector<unsigned char> *)valCpp;
+					bindVal = (char *)&vec[0];
+					bindLen = vec.size();
+					bindOwn = false;
+				}
 			}
 			break;
 		case CppDataType<Blob>::cdt_index:
 			{
-				Blob &b = *(Blob *)valCpp;
 				bindTyp = 26;//oid
-				bindVal = new char[4];
-				*(Oid *)bindVal = utils::fixEndian(b._impl->oid());
-				bindLen = 4;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					Blob &b = *(Blob *)valCpp;
+					bindVal = new char[4];
+					*(Oid *)bindVal = utils::fixEndian(b._impl->oid());
+					bindLen = 4;
+					bindOwn = true;
+				}
 			}
 			break;
 
 		case CppDataType<Money>::cdt_index:
 			{
-				boost::int64_t &i64 = ((Money *)valCpp)->_value;
 				bindTyp = 790;//money
-				bindVal = new char[8];
-				*(boost::uint64_t *)bindVal = utils::fixEndian(i64);
-				bindLen = 8;
 				bindFmt = 1;
-				bindOwn = true;
+				if(valCpp)
+				{
+					boost::int64_t &i64 = ((Money *)valCpp)->_value;
+					bindVal = new char[8];
+					*(boost::uint64_t *)bindVal = utils::fixEndian(i64);
+					bindLen = 8;
+					bindOwn = true;
+				}
 			}
 			break;
 		default:
@@ -586,9 +697,9 @@ namespace pgc
 				return false;
 				assert(!"unknown type for bind");
 				bindTyp = 0;
+				bindFmt = 0;
 				bindVal = NULL;
 				bindLen = 0;
-				bindFmt = 0;
 				bindOwn = false;
 			}
 			break;

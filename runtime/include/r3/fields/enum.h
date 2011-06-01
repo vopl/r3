@@ -14,6 +14,9 @@ namespace r3{ namespace fields
 	class Enum
 		: public Scanty<Domain>
 	{
+	public:
+		typedef Integral TValue;
+	private:
 		Integral _value;
 	public:
 		Enum();

@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Timestamp
 		: public DateTimeValue
 	{
+	public:
+		typedef boost::posix_time::ptime TValue;
+	private:
 		boost::posix_time::ptime _value;
 	public:
 		boost::posix_time::ptime &value()

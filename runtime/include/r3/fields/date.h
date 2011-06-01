@@ -12,6 +12,9 @@ namespace r3{ namespace fields
 	class Date
 		: public DateTimeValue
 	{
+	public:
+		typedef boost::gregorian::date TValue;
+	private:
 		boost::gregorian::date _value;
 	public:
 		Date();

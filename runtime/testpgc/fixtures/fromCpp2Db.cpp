@@ -22,6 +22,7 @@ public:
 	void setUp()
 	{
 		_con.open("dbname=test user=postgres password=postgres port=5432");
+		_con.log(std::cerr, pgc::lf_none);
 	}
 
 	void tearDown()
@@ -60,13 +61,6 @@ protected:
 
 #undef SQL
 #define SQL(x, val) _con.once().sql("SELECT " x).bind(val).exec().throwIfError().fetch(0,0,res)
-
-		char bufSz[4096];
-		char *sz = bufSz;
-
-		strcpy(sz, "abracadabra");
-		CPPUNIT_ASSERT( SQL("$1::varchar", sz) );
-		CPPUNIT_ASSERT_EQUAL( std::string("abracadabra"), res );
 
 		CPPUNIT_ASSERT( SQL("$1::varchar", std::string("sdflgjkwer")) );
 		CPPUNIT_ASSERT_EQUAL( std::string("sdflgjkwer"), res );
@@ -117,6 +111,7 @@ protected:
 		CPPUNIT_ASSERT_EQUAL( std::string("7562976524"), res );
 
 		//too big for int8
+		std::cout<<"now error message, is ok: ";
 		CPPUNIT_ASSERT_THROW( SQL("$1::int8", boost::uint64_t(0xf000000000000000ULL)), pgc::Exception);
 
 		CPPUNIT_ASSERT( SQL("$1::varchar", boost::uint64_t(0xf000000000000001ULL)) );
@@ -141,8 +136,8 @@ protected:
 		CPPUNIT_ASSERT_EQUAL( std::string("3234-01-22"), res );
 
 
-		CPPUNIT_ASSERT( SQL("$1::timestamp", boost::posix_time::ptime(boost::gregorian::date(3234, 1, 22), boost::posix_time::time_duration(12, 23, 4, 1234)) ) );
-		CPPUNIT_ASSERT_EQUAL( std::string("3234-01-22 12:23:04.001234"), res );
+		CPPUNIT_ASSERT( SQL("$1::timestamp", boost::posix_time::ptime(boost::gregorian::date(2000, 1, 22), boost::posix_time::time_duration(12, 23, 4, 123400)) ) );
+		CPPUNIT_ASSERT_EQUAL( std::string("2000-01-22 12:23:04.1234"), res );
 
 
 

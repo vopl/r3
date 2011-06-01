@@ -1014,48 +1014,57 @@ namespace r3
 		{
 		}
 
-		template <typename F> void bind(F *fld)
+		template <typename F> void bind(F *fld, bool isNull)
 		{
 			idx++;
-			stm.bind(fld->value(), idx+1);
+			if(isNull)	stm.bind((F::TValue *)NULL, idx+1);
+			else		stm.bind(fld->value(), idx+1);
 		}
 
-		void bind(r3::fields::File *fld)
+		void bind(r3::fields::File *fld, bool isNull)
 		{
 			idx++;
-			stm.bind(fld->name(), idx+1);
+			if(isNull)	stm.bind((r3::fields::File::TName *)NULL, idx+1);
+			else		stm.bind(fld->name(), idx+1);
+
 
 			idx++;
-			stm.bind(fld->ext(), idx+1);
+			if(isNull)	stm.bind((r3::fields::File::TExt *)NULL, idx+1);
+			else		stm.bind(fld->ext(), idx+1);
 
 			idx++;
-			stm.bind(fld->blob(), idx+1);
+			if(isNull)	stm.bind((r3::fields::File::TBlob *)NULL, idx+1);
+			else		stm.bind(fld->blob(), idx+1);
 		}
-		void bind(r3::fields::Audio *fld)
+		void bind(r3::fields::Audio *fld, bool isNull)
 		{
-			bind((r3::fields::File *)fld);
-		}
-
-		void bind(r3::fields::Image *fld)
-		{
-			bind((r3::fields::File *)fld);
-
-			idx++;
-			stm.bind(fld->width(), idx+1);
-
-			idx++;
-			stm.bind(fld->height(), idx+1);
+			bind((r3::fields::File *)fld, isNull);
 		}
 
-		void bind(r3::fields::Video *fld)
+		void bind(r3::fields::Image *fld, bool isNull)
 		{
-			bind((r3::fields::File *)fld);
+			bind((r3::fields::File *)fld, isNull);
 
 			idx++;
-			stm.bind(fld->width(), idx+1);
+			if(isNull)	stm.bind((r3::fields::Image::TWidth *)NULL, idx+1);
+			else		stm.bind(fld->width(), idx+1);
 
 			idx++;
-			stm.bind(fld->height(), idx+1);
+			if(isNull)	stm.bind((r3::fields::Image::THeight *)NULL, idx+1);
+			else		stm.bind(fld->height(), idx+1);
+		}
+
+		void bind(r3::fields::Video *fld, bool isNull)
+		{
+			bind((r3::fields::File *)fld, isNull);
+
+			idx++;
+			if(isNull)	stm.bind((r3::fields::Video::TWidth *)NULL, idx+1);
+			else		stm.bind(fld->width(), idx+1);
+
+			idx++;
+			if(isNull)	stm.bind((r3::fields::Video::THeight *)NULL, idx+1);
+			else		stm.bind(fld->height(), idx+1);
 		}
 
 		template <typename Category, typename CategoryBaseOrSelf, typename F> void operator()(
@@ -1066,7 +1075,7 @@ namespace r3
 		{
 			if(fld->fvs() != fields::fvs_notset)
 			{
-				bind(fld);
+				bind(fld, fld->fvs() == fields::fvs_null);
 			}
 		}
 	};

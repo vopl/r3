@@ -13,6 +13,12 @@ namespace r3{ namespace fields
 	class File
 		: public Field
 	{
+	public:
+		typedef std::string TName;
+		typedef std::string TExt;
+		typedef pgc::Blob TBlob;
+	
+	private:
 		std::string		_name;
 		std::string		_ext;
 		pgc::Blob		_blob;
