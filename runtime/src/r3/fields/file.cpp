@@ -7,19 +7,16 @@ namespace r3{ namespace fields
 
 	std::string &File::name()
 	{
-		fvs(fvs_set);
 		return _name;
 	}
 
 	std::string &File::ext()
 	{
-		fvs(fvs_set);
 		return _ext;
 	}
 
 	pgc::Blob &File::blob()
 	{
-		fvs(fvs_set);
 		return _blob;
 	}
 

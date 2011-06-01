@@ -16,16 +16,56 @@ namespace r3{ namespace fields
 	{
 		Integral _value;
 	public:
-		Enum()
-			: _value()
-		{
+		Enum();
+		Enum(const Integral &from);
 
-		}
-		Integral &value()
-		{
-			return _value;
-		}
+		Integral &value();
+		const Integral &value() const;
+
+		Enum &operator=(const Integral &from);
 	}; // class
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Domain>
+	inline Enum<Domain>::Enum()
+		: _value()
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Domain>
+	inline Enum<Domain>::Enum(const Integral &from)
+		: Scanty<Domain>()
+		, _value(from)
+	{
+		fvs(fvs_set);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Domain>
+	inline typename Enum<Domain>::Integral &Enum<Domain>::value()
+	{
+		return _value;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Domain>
+	inline const typename Enum<Domain>::Integral &Enum<Domain>::value() const
+	{
+		return _value;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Domain>
+	inline Enum<Domain> &Enum<Domain>::operator=(const Integral &from)
+	{
+		fvs(fvs_set);
+		_value = from;
+
+		return *this;
+	}
+
 }}  // namespace
 
 

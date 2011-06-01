@@ -15,15 +15,13 @@ namespace r3{ namespace fields
 	{
 		pgc::Money _value;
 	public:
-		pgc::Money &value()
-		{
-			return _value;
-		}
+		Money();
+		Money(const boost::int64_t &from);
 
-		Money &operator=(const boost::uint64_t &val)
-		{
-			_value._value = val;
-		}
+		pgc::Money &value();
+		const pgc::Money &value() const;
+
+		Money &operator=(const boost::int64_t &from);
 	}; // class
 }}  // namespace
 

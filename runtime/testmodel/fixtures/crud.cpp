@@ -27,6 +27,7 @@ public:
 	{
 		_mod.startInThread("dbname=test user=postgres password=postgres port=5432");
 		_t = _mod.getTest("crudTester");
+		_mod.con().log(std::cout, pgc::lf_all);
 	}
 
 	void tearDown()
@@ -120,12 +121,39 @@ protected:
 		CPPUNIT_ASSERT_NO_THROW(_t->getMockup()->ins(Mockup::Tuple_ptr(new Mockup::Tuple)));
 
 
-		People::Tuple people;
-		CPPUNIT_ASSERT_NO_THROW(_t->getPeople()->ins(people));
+		////////////////////////////////////////////////////////
+		{
+			People::Tuple people;
+			CPPUNIT_ASSERT_NO_THROW(_t->getPeople()->ins(people));
 
-		CPPUNIT_ASSERT(people.id.fvs() == r3::fields::fvs_set);
-		CPPUNIT_ASSERT(people.id.value() != 0);
+			CPPUNIT_ASSERT(people.id.fvs() == r3::fields::fvs_set);
+			CPPUNIT_ASSERT(people.id.value() != 0);
+		}
 
+		////////////////////////////////////////////////////////
+		{
+			Employee::Tuple t;
+			t.birth = boost::gregorian::date(2011, 1, 12);
+			t.department = 1;
+			t.middlename = "mname";
+			t.name = "name";
+
+			t.photo.fvs(r3::fields::fvs_set);
+			t.photo.name() = "pname";
+			t.photo.ext() = "jpg";
+			//t.photo.blob().write("asdfg", 5);
+			t.photo.width() = 220;
+			t.photo.height() = 380;
+			t.rateNight = 10012;
+			t.rateNormal = 5012;
+			t.sex = 0;
+			t.surname = "sname";
+
+			Employee::Tuple t2(t);
+
+			_t->getEmployee()->ins(t2);
+
+		}
 		int k=220;
 	}
 

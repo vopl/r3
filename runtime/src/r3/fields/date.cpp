@@ -14,7 +14,7 @@ namespace r3{ namespace fields
 		: DateTimeValue()
 		, _value(from)
 	{
-
+		fvs(fvs_set);
 	}
 
 	boost::gregorian::date &Date::value()
@@ -29,6 +29,7 @@ namespace r3{ namespace fields
 
 	Date &Date::operator=(const boost::gregorian::date &from)
 	{
+		fvs(fvs_set);
 		_value = from;
 		return *this;
 	}

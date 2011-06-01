@@ -186,6 +186,8 @@ namespace pgc
 	struct Money
 	{
 		boost::int64_t _value;
+
+		Money() : _value(0) {}
 	};
 	template <> struct CppDataType<Money>
 	{
