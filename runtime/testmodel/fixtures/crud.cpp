@@ -145,7 +145,7 @@ protected:
 			t.photo.width() = 220;
 			t.photo.height() = 380;
 			t.rateNight = 10012;
-			t.rateNormal = 5012;
+			t.rateNormal = 54.12;
 			t.sex = 0;
 			t.surname = "sname";
 

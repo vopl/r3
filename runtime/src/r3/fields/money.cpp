@@ -39,4 +39,28 @@ namespace r3{ namespace fields
 		return *this;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	Money &Money::operator=(const boost::int32_t &from)
+	{
+		fvs(fvs_set);
+		_value._value = from;
+		return *this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Money &Money::operator=(float from)
+	{
+		fvs(fvs_set);
+		_value._value = (boost::int64_t)((0.005 + from)*100);
+		return *this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Money &Money::operator=(double from)
+	{
+		fvs(fvs_set);
+		_value._value = (boost::int64_t)((0.005 + from)*100);
+		return *this;
+	}
+
 }}

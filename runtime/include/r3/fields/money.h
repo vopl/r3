@@ -21,7 +21,10 @@ namespace r3{ namespace fields
 		pgc::Money &value();
 		const pgc::Money &value() const;
 
+		Money &operator=(const boost::int32_t &from);
 		Money &operator=(const boost::int64_t &from);
+		Money &operator=(float from);
+		Money &operator=(double from);
 	}; // class
 }}  // namespace
 
