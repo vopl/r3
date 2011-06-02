@@ -81,11 +81,11 @@ namespace r3
 			{
 				//ServicePart
 				ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-				o(this, c_ServicePart, (r3::fields::String *)&tup.comment, "comment");
-				o(this, c_ServicePart, (r3::fields::Money *)&tup.cost, "cost");
-				o(this, c_ServicePart, (r3::fields::DateTimeInterval *)&tup.duration, "duration");
-				o(this, c_ServicePart, (r3::fields::Date *)&tup.start, "start");
-				o(this, c_ServicePart, (r3::fields::Date *)&tup.stop, "stop");
+				o(this, c_ServicePart, &tup.comment, "comment");
+				o(this, c_ServicePart, &tup.cost, "cost");
+				o(this, c_ServicePart, &tup.duration, "duration");
+				o(this, c_ServicePart, &tup.start, "start");
+				o(this, c_ServicePart, &tup.stop, "stop");
 			}
 			
 			template <class Oper> void ServicePart::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

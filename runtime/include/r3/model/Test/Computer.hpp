@@ -88,16 +88,16 @@ namespace r3
 			{
 				//Computer
 				Computer *c_Computer = _schema->getCategory<Computer>().get();
-				o(this, c_Computer, (r3::fields::DateTimeInterval *)&tup.equipmentInterval, "equipmentInterval");
-				o(this, c_Computer, (r3::fields::Timestamp *)&tup.equipmentStamp, "equipmentStamp");
-				o(this, c_Computer, (r3::fields::Bool *)&tup.mobile, "mobile");
-				o(this, c_Computer, (r3::fields::String *)&tup.model, "model");
+				o(this, c_Computer, &tup.equipmentInterval, "equipmentInterval");
+				o(this, c_Computer, &tup.equipmentStamp, "equipmentStamp");
+				o(this, c_Computer, &tup.mobile, "mobile");
+				o(this, c_Computer, &tup.model, "model");
 				//Stock
 				Stock *c_Stock = _schema->getCategory<Stock>().get();
-				o(this, c_Stock, (r3::fields::Money *)&tup.cost, "cost");
-				o(this, c_Stock, (r3::fields::Date *)&tup.incomingDate, "incomingDate");
-				o(this, c_Stock, (r3::fields::String *)&tup.inventoryNumber, "inventoryNumber");
-				o(this, c_Stock, (r3::fields::Enum<tuples::DomainStocksecurityStatus>*)&tup.securityStatus, "securityStatus");
+				o(this, c_Stock, &tup.cost, "cost");
+				o(this, c_Stock, &tup.incomingDate, "incomingDate");
+				o(this, c_Stock, &tup.inventoryNumber, "inventoryNumber");
+				o(this, c_Stock, &tup.securityStatus, "securityStatus");
 			}
 			
 			template <class Oper> void Computer::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

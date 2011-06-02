@@ -78,9 +78,9 @@ namespace r3
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, (r3::fields::Date *)&tup.creation, "creation");
-				o(this, c_Document, (r3::fields::File *)&tup.file, "file");
-				o(this, c_Document, (r3::fields::Timestamp *)&tup.lastModified, "lastModified");
+				o(this, c_Document, &tup.creation, "creation");
+				o(this, c_Document, &tup.file, "file");
+				o(this, c_Document, &tup.lastModified, "lastModified");
 			}
 			
 			template <class Oper> void Document::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

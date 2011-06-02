@@ -87,14 +87,14 @@ namespace r3
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, (r3::fields::Date *)&tup.creation, "creation");
-				o(this, c_Document, (r3::fields::File *)&tup.file, "file");
-				o(this, c_Document, (r3::fields::Timestamp *)&tup.lastModified, "lastModified");
+				o(this, c_Document, &tup.creation, "creation");
+				o(this, c_Document, &tup.file, "file");
+				o(this, c_Document, &tup.lastModified, "lastModified");
 				//Mockup
 				Mockup *c_Mockup = _schema->getCategory<Mockup>().get();
-				o(this, c_Mockup, (r3::fields::Audio *)&tup.audio, "audio");
-				o(this, c_Mockup, (r3::fields::Image *)&tup.image, "image");
-				o(this, c_Mockup, (r3::fields::Video *)&tup.video, "video");
+				o(this, c_Mockup, &tup.audio, "audio");
+				o(this, c_Mockup, &tup.image, "image");
+				o(this, c_Mockup, &tup.video, "video");
 			}
 			
 			template <class Oper> void Mockup::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

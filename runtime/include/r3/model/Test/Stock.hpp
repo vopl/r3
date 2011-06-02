@@ -85,10 +85,10 @@ namespace r3
 			{
 				//Stock
 				Stock *c_Stock = _schema->getCategory<Stock>().get();
-				o(this, c_Stock, (r3::fields::Money *)&tup.cost, "cost");
-				o(this, c_Stock, (r3::fields::Date *)&tup.incomingDate, "incomingDate");
-				o(this, c_Stock, (r3::fields::String *)&tup.inventoryNumber, "inventoryNumber");
-				o(this, c_Stock, (r3::fields::Enum<tuples::DomainStocksecurityStatus>*)&tup.securityStatus, "securityStatus");
+				o(this, c_Stock, &tup.cost, "cost");
+				o(this, c_Stock, &tup.incomingDate, "incomingDate");
+				o(this, c_Stock, &tup.inventoryNumber, "inventoryNumber");
+				o(this, c_Stock, &tup.securityStatus, "securityStatus");
 			}
 			
 			template <class Oper> void Stock::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

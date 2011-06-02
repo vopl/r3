@@ -83,10 +83,10 @@ namespace r3
 			{
 				//HasRights
 				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-				o(this, c_HasRights, (r3::fields::Bool *)&tup.attrInHasRights, "attrInHasRights");
+				o(this, c_HasRights, &tup.attrInHasRights, "attrInHasRights");
 				//Role
 				Role *c_Role = _schema->getCategory<Role>().get();
-				o(this, c_Role, (r3::fields::String *)&tup.name, "name");
+				o(this, c_Role, &tup.name, "name");
 			}
 			
 			template <class Oper> void Role::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

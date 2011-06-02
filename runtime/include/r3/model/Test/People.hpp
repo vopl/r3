@@ -87,12 +87,12 @@ namespace r3
 			{
 				//People
 				People *c_People = _schema->getCategory<People>().get();
-				o(this, c_People, (r3::fields::Date *)&tup.birth, "birth");
-				o(this, c_People, (r3::fields::String *)&tup.middlename, "middlename");
-				o(this, c_People, (r3::fields::String *)&tup.name, "name");
-				o(this, c_People, (r3::fields::Image *)&tup.photo, "photo");
-				o(this, c_People, (r3::fields::Enum<tuples::DomainPeoplesex>*)&tup.sex, "sex");
-				o(this, c_People, (r3::fields::String *)&tup.surname, "surname");
+				o(this, c_People, &tup.birth, "birth");
+				o(this, c_People, &tup.middlename, "middlename");
+				o(this, c_People, &tup.name, "name");
+				o(this, c_People, &tup.photo, "photo");
+				o(this, c_People, &tup.sex, "sex");
+				o(this, c_People, &tup.surname, "surname");
 			}
 			
 			template <class Oper> void People::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

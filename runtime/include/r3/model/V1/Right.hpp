@@ -83,8 +83,8 @@ namespace r3
 			{
 				//Right
 				Right *c_Right = _schema->getCategory<Right>().get();
-				o(this, c_Right, (r3::fields::String *)&tup.name, "name");
-				o(this, c_Right, (r3::fields::Enum<tuples::DomainRightvalue>*)&tup.value, "value");
+				o(this, c_Right, &tup.name, "name");
+				o(this, c_Right, &tup.value, "value");
 			}
 			
 			template <class Oper> void Right::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

@@ -87,15 +87,15 @@ namespace r3
 			{
 				//Contract
 				Contract *c_Contract = _schema->getCategory<Contract>().get();
-				o(this, c_Contract, (r3::fields::Int32 *)&tup.param1, "param1");
-				o(this, c_Contract, (r3::fields::Int64 *)&tup.param2, "param2");
-				o(this, c_Contract, (r3::fields::Int8 *)&tup.param3, "param3");
-				o(this, c_Contract, (r3::fields::Real64 *)&tup.param4, "param4");
+				o(this, c_Contract, &tup.param1, "param1");
+				o(this, c_Contract, &tup.param2, "param2");
+				o(this, c_Contract, &tup.param3, "param3");
+				o(this, c_Contract, &tup.param4, "param4");
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, (r3::fields::Date *)&tup.creation, "creation");
-				o(this, c_Document, (r3::fields::File *)&tup.file, "file");
-				o(this, c_Document, (r3::fields::Timestamp *)&tup.lastModified, "lastModified");
+				o(this, c_Document, &tup.creation, "creation");
+				o(this, c_Document, &tup.file, "file");
+				o(this, c_Document, &tup.lastModified, "lastModified");
 			}
 			
 			template <class Oper> void Contract::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

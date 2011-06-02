@@ -615,16 +615,7 @@ namespace workers
 
 				hpp
 					<<"o(this, c_"<<cat->getName()<<", "
-					<<"(r3::fields::"<<fld->getObjectMeta().name();
-
-				if(Scanty(fld))
-				{
-					Category pcat = fld->getParentModel();
-					hpp<<"<"<<"tuples::Domain"<<pcat->getName()<<fld->getName()<<">";
-				}
-
-				hpp
-					<<"*)&tup."<<fld->getName()<<", "
+					<<"&tup."<<fld->getName()<<", "
 					<<"\""<<fld->getName()<<"\""
 					<<");"
 					<<endl;

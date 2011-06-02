@@ -76,7 +76,7 @@ namespace r3
 			{
 				//HasRights
 				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-				o(this, c_HasRights, (r3::fields::Bool *)&tup.attrInHasRights, "attrInHasRights");
+				o(this, c_HasRights, &tup.attrInHasRights, "attrInHasRights");
 			}
 			
 			template <class Oper> void HasRights::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

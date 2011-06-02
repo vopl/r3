@@ -88,12 +88,12 @@ namespace r3
 			{
 				//HasRights
 				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-				o(this, c_HasRights, (r3::fields::Bool *)&tup.attrInHasRights, "attrInHasRights");
+				o(this, c_HasRights, &tup.attrInHasRights, "attrInHasRights");
 				//Owner
 				//User
 				User *c_User = _schema->getCategory<User>().get();
-				o(this, c_User, (r3::fields::String *)&tup.login, "login");
-				o(this, c_User, (r3::fields::String *)&tup.password, "password");
+				o(this, c_User, &tup.login, "login");
+				o(this, c_User, &tup.password, "password");
 			}
 			
 			template <class Oper> void User::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

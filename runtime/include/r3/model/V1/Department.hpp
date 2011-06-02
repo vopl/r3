@@ -82,7 +82,7 @@ namespace r3
 			{
 				//Department
 				Department *c_Department = _schema->getCategory<Department>().get();
-				o(this, c_Department, (r3::fields::String *)&tup.name, "name");
+				o(this, c_Department, &tup.name, "name");
 				//Owner
 			}
 			

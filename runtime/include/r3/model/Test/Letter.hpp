@@ -85,13 +85,13 @@ namespace r3
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, (r3::fields::Date *)&tup.creation, "creation");
-				o(this, c_Document, (r3::fields::File *)&tup.file, "file");
-				o(this, c_Document, (r3::fields::Timestamp *)&tup.lastModified, "lastModified");
+				o(this, c_Document, &tup.creation, "creation");
+				o(this, c_Document, &tup.file, "file");
+				o(this, c_Document, &tup.lastModified, "lastModified");
 				//Letter
 				Letter *c_Letter = _schema->getCategory<Letter>().get();
-				o(this, c_Letter, (r3::fields::String *)&tup.comment, "comment");
-				o(this, c_Letter, (r3::fields::String *)&tup.content, "content");
+				o(this, c_Letter, &tup.comment, "comment");
+				o(this, c_Letter, &tup.content, "content");
 			}
 			
 			template <class Oper> void Letter::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

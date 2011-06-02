@@ -95,17 +95,17 @@ namespace r3
 			{
 				//Furniture
 				Furniture *c_Furniture = _schema->getCategory<Furniture>().get();
-				o(this, c_Furniture, (r3::fields::Set<tuples::DomainFurnitureconstraints>*)&tup.constraints, "constraints");
-				o(this, c_Furniture, (r3::fields::Int16 *)&tup.depth, "depth");
-				o(this, c_Furniture, (r3::fields::Int16 *)&tup.height, "height");
-				o(this, c_Furniture, (r3::fields::Real32 *)&tup.weight, "weight");
-				o(this, c_Furniture, (r3::fields::Int16 *)&tup.width, "width");
+				o(this, c_Furniture, &tup.constraints, "constraints");
+				o(this, c_Furniture, &tup.depth, "depth");
+				o(this, c_Furniture, &tup.height, "height");
+				o(this, c_Furniture, &tup.weight, "weight");
+				o(this, c_Furniture, &tup.width, "width");
 				//Stock
 				Stock *c_Stock = _schema->getCategory<Stock>().get();
-				o(this, c_Stock, (r3::fields::Money *)&tup.cost, "cost");
-				o(this, c_Stock, (r3::fields::Date *)&tup.incomingDate, "incomingDate");
-				o(this, c_Stock, (r3::fields::String *)&tup.inventoryNumber, "inventoryNumber");
-				o(this, c_Stock, (r3::fields::Enum<tuples::DomainStocksecurityStatus>*)&tup.securityStatus, "securityStatus");
+				o(this, c_Stock, &tup.cost, "cost");
+				o(this, c_Stock, &tup.incomingDate, "incomingDate");
+				o(this, c_Stock, &tup.inventoryNumber, "inventoryNumber");
+				o(this, c_Stock, &tup.securityStatus, "securityStatus");
 			}
 			
 			template <class Oper> void Furniture::enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup)

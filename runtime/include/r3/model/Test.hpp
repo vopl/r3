@@ -12,6 +12,9 @@ namespace r3
 	{
 		namespace s_Test
 		{
+			class Base4fields;
+			typedef boost::shared_ptr<Base4fields> Base4fields_ptr;
+			
 			class Client;
 			typedef boost::shared_ptr<Client> Client_ptr;
 			
@@ -26,6 +29,9 @@ namespace r3
 			
 			class ContractSimple;
 			typedef boost::shared_ptr<ContractSimple> ContractSimple_ptr;
+			
+			class Derived4fields;
+			typedef boost::shared_ptr<Derived4fields> Derived4fields_ptr;
 			
 			class Document;
 			typedef boost::shared_ptr<Document> Document_ptr;
@@ -70,11 +76,13 @@ namespace r3
 		{
 		
 		private:
+			s_Test::Base4fields_ptr	_Base4fields;
 			s_Test::Client_ptr	_Client;
 			s_Test::Computer_ptr	_Computer;
 			s_Test::Contract_ptr	_Contract;
 			s_Test::ContractComplex_ptr	_ContractComplex;
 			s_Test::ContractSimple_ptr	_ContractSimple;
+			s_Test::Derived4fields_ptr	_Derived4fields;
 			s_Test::Document_ptr	_Document;
 			s_Test::Employee_ptr	_Employee;
 			s_Test::Furniture_ptr	_Furniture;
@@ -94,11 +102,13 @@ namespace r3
 			template <class Oper> void enumCategories(Oper o);
 			template <class C> boost::shared_ptr<C> getCategory();
 			
+			s_Test::Base4fields_ptr	getBase4fields();
 			s_Test::Client_ptr	getClient();
 			s_Test::Computer_ptr	getComputer();
 			s_Test::Contract_ptr	getContract();
 			s_Test::ContractComplex_ptr	getContractComplex();
 			s_Test::ContractSimple_ptr	getContractSimple();
+			s_Test::Derived4fields_ptr	getDerived4fields();
 			s_Test::Document_ptr	getDocument();
 			s_Test::Employee_ptr	getEmployee();
 			s_Test::Furniture_ptr	getFurniture();
@@ -128,11 +138,13 @@ namespace r3
 		template <class Oper> void Test::enumCategories(Oper o)
 		{
 			Test *s = (Test *)this;
+			o(s, _Base4fields);
 			o(s, _Client);
 			o(s, _Computer);
 			o(s, _Contract);
 			o(s, _ContractComplex);
 			o(s, _ContractSimple);
+			o(s, _Derived4fields);
 			o(s, _Document);
 			o(s, _Employee);
 			o(s, _Furniture);
@@ -144,6 +156,11 @@ namespace r3
 			o(s, _ServicePart);
 			o(s, _Stock);
 			o(s, _WebSite);
+		}
+		
+		template <> inline s_Test::Base4fields_ptr	Test::getCategory<s_Test::Base4fields>()
+		{
+			return _Base4fields;
 		}
 		
 		template <> inline s_Test::Client_ptr	Test::getCategory<s_Test::Client>()
@@ -169,6 +186,11 @@ namespace r3
 		template <> inline s_Test::ContractSimple_ptr	Test::getCategory<s_Test::ContractSimple>()
 		{
 			return _ContractSimple;
+		}
+		
+		template <> inline s_Test::Derived4fields_ptr	Test::getCategory<s_Test::Derived4fields>()
+		{
+			return _Derived4fields;
 		}
 		
 		template <> inline s_Test::Document_ptr	Test::getCategory<s_Test::Document>()
@@ -227,6 +249,11 @@ namespace r3
 		}
 		
 		
+		inline s_Test::Base4fields_ptr	Test::getBase4fields()
+		{
+			return _Base4fields;
+		}
+		
 		inline s_Test::Client_ptr	Test::getClient()
 		{
 			return _Client;
@@ -250,6 +277,11 @@ namespace r3
 		inline s_Test::ContractSimple_ptr	Test::getContractSimple()
 		{
 			return _ContractSimple;
+		}
+		
+		inline s_Test::Derived4fields_ptr	Test::getDerived4fields()
+		{
+			return _Derived4fields;
 		}
 		
 		inline s_Test::Document_ptr	Test::getDocument()
@@ -311,11 +343,13 @@ namespace r3
 	}
 }
 
+#include "r3/model/Test/Base4fields.hpp"
 #include "r3/model/Test/Client.hpp"
 #include "r3/model/Test/Computer.hpp"
 #include "r3/model/Test/Contract.hpp"
 #include "r3/model/Test/ContractComplex.hpp"
 #include "r3/model/Test/ContractSimple.hpp"
+#include "r3/model/Test/Derived4fields.hpp"
 #include "r3/model/Test/Document.hpp"
 #include "r3/model/Test/Employee.hpp"
 #include "r3/model/Test/Furniture.hpp"
