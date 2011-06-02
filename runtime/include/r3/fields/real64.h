@@ -27,6 +27,68 @@ namespace r3{ namespace fields
 		{
 			return _value;
 		}
+
+		Real64 &operator=(boost::int8_t from)
+		{
+			fvs(fvs_set);
+			_value = from;
+			return *this;
+		}
+		Real64 &operator=(boost::int16_t from)
+		{
+			fvs(fvs_set);
+			_value = from;
+			return *this;
+		}
+		Real64 &operator=(boost::int32_t from)
+		{
+			fvs(fvs_set);
+			_value = (float)from;
+			return *this;
+		}
+		Real64 &operator=(boost::int64_t from)
+		{
+			fvs(fvs_set);
+			_value = (float)from;
+			return *this;
+		}
+
+		Real64 &operator=(float from)
+		{
+			fvs(fvs_set);
+			_value = from;
+			return *this;
+		}
+		Real64 &operator=(double from)
+		{
+			fvs(fvs_set);
+			_value = (float)from;
+			return *this;
+		}
+
+		bool operator==(float with) const
+		{
+			if(fvs() != fvs_set)
+			{
+				return false;
+			}
+			return _value == with;
+		}
+
+		bool operator==(double with) const
+		{
+			if(fvs() != fvs_set)
+			{
+				return false;
+			}
+			return _value == with;
+		}
+
+		bool operator==(EFieldValueState fvs) const
+		{
+			return Field::operator ==(fvs);
+		}
+
 	}; // class
 }}  // namespace
 

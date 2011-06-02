@@ -17,6 +17,16 @@ namespace r3{ namespace fields
 		Audio &operator=(const std::string &from);
 		Audio &operator=(const pgc::Blob &from);
 
+		Audio &operator=(EFieldValueState from)
+		{
+			Field::operator =(from);
+			return *this;
+		}
+		bool operator==(const EFieldValueState with) const
+		{
+			return Field::operator ==(with);
+		}
+
 	}; // class
 }}  // namespace
 

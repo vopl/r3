@@ -30,6 +30,17 @@ namespace r3{ namespace fields
 		boost::int32_t &width();
 		boost::int32_t &height();
 
+		Image &operator=(EFieldValueState from)
+		{
+			Field::operator =(from);
+			return *this;
+		}
+		bool operator==(const EFieldValueState with) const
+		{
+			return Field::operator ==(with);
+		}
+
+
 	}; // class
 }}  // namespace
 

@@ -19,6 +19,11 @@ namespace r3{ namespace fields
 	protected:
 		TValue _value;
 	public:
+		Int()
+			: _value()
+		{
+		}
+
 		TValue &value()
 		{
 			return _value;

@@ -148,11 +148,9 @@ protected:
 		CPPUNIT_ASSERT_EQUAL( std::string("0 month 0 day 23:59:59.999999"), res );
 
 
-		pgc::DateTimeDuration dtd = 
-		{
+		pgc::DateTimeDuration dtd(
 			boost::gregorian::date_duration(65),
-			boost::posix_time::time_duration(23, 51, 29, 999999)
-		};
+			boost::posix_time::time_duration(23, 51, 29, 999999));
 
 		CPPUNIT_ASSERT( SQL("$1::interval", dtd)  );
 		CPPUNIT_ASSERT_EQUAL( std::string("2 month 5 day 23:51:29.999999"), res );

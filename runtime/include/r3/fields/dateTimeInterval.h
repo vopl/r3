@@ -30,7 +30,7 @@ namespace r3{ namespace fields
 				return false;
 			}
 
-			return _value._dd == with._dd && _value._td == _value._td;
+			return _value._dd == with._dd && _value._td == with._td;
 		}
 		bool operator==(EFieldValueState fvs)
 		{

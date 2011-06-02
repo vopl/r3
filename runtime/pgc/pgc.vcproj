@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="pgc"
 	ProjectGUID="{3F4A5835-832F-4058-9EAF-3CAB5702EC98}"
 	RootNamespace="pgc"

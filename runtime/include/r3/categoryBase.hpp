@@ -1144,23 +1144,72 @@ namespace r3
 		{
 		}
 
-		template <typename Category, typename CategoryBaseOrSelf> void operator()(
-			Category *c,
-			CategoryBaseOrSelf *bos,
-			r3::fields::Field *fld,
-			const char *fname)
+		void pushOne(const char *fname, const char *suffix = NULL)
 		{
-			assert(idx < T::_fieldsAmount);
-
 			if(idx)
 			{
 				fields += ",";
 			}
 
 			idx++;
+
 			fields += "\"_";
 			fields += fname;
-			fields += "_\"";
+			fields += "_";
+			if(suffix)
+			{
+				fields += suffix;
+			}
+			fields += "\"";
+		}
+
+		//file
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::File *fld,
+			const char *fname)
+		{
+			pushOne(fname, "name");
+			pushOne(fname, "ext");
+			pushOne(fname, "blob");
+		}
+
+		//image
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::Image *fld,
+			const char *fname)
+		{
+			pushOne(fname, "name");
+			pushOne(fname, "ext");
+			pushOne(fname, "blob");
+			pushOne(fname, "width");
+			pushOne(fname, "height");
+		}
+
+		//video
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::Video *fld,
+			const char *fname)
+		{
+			pushOne(fname, "name");
+			pushOne(fname, "ext");
+			pushOne(fname, "blob");
+			pushOne(fname, "width");
+			pushOne(fname, "height");
+		}
+
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
+			r3::fields::Field *fld,
+			const char *fname)
+		{
+			pushOne(fname);
 		}
 	};
 
@@ -1200,6 +1249,57 @@ namespace r3
 				fld->fvs(fields::fvs_set);
 				res.fetch(row, idx, fld->value());
 			}
+		}
+
+		void fetch(r3::fields::File *fld)
+		{
+			if(res.isNull(row, idx+1))
+			{
+				fld->fvs(fields::fvs_null);
+			}
+			else
+			{
+				fld->fvs(fields::fvs_set);
+				res.fetch(row, idx+1, fld->name());
+				res.fetch(row, idx+2, fld->ext());
+				res.fetch(row, idx+3, fld->blob());
+			}
+			idx += 3;
+		}
+
+		void fetch(r3::fields::Audio *fld)
+		{
+			fetch((r3::fields::File *)fld);
+		}
+
+		void fetch(r3::fields::Image *fld)
+		{
+			fetch((r3::fields::File *)fld);
+
+			if(fld->fvs() == fields::fvs_null)
+			{
+			}
+			else
+			{
+				res.fetch(row, idx+1, fld->width());
+				res.fetch(row, idx+2, fld->height());
+			}
+			idx += 2;
+		}
+
+		void fetch(r3::fields::Video *fld)
+		{
+			fetch((r3::fields::File *)fld);
+
+			if(fld->fvs() == fields::fvs_null)
+			{
+			}
+			else
+			{
+				res.fetch(row, idx+1, fld->width());
+				res.fetch(row, idx+2, fld->height());
+			}
+			idx += 2;
 		}
 
 		template <typename Category, typename CategoryBaseOrSelf, typename F> void operator()(

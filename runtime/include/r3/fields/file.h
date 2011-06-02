@@ -34,6 +34,18 @@ namespace r3{ namespace fields
 		operator std::string();
 		operator pgc::Blob();
 
+
+		File &operator=(EFieldValueState from)
+		{
+			Field::operator =(from);
+			return *this;
+		}
+		bool operator==(const EFieldValueState with) const
+		{
+			return Field::operator ==(with);
+		}
+
+
 	}; // class
 }}  // namespace
 
