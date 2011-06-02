@@ -355,7 +355,7 @@ namespace r3
 		{
 			pgc::Connection con = c->schema()->con();
 
-			static const size_t amount = r3::fields::Set<Domain>::amount;
+			static const size_t amount = r3::fields::Set<Domain>::bits4SetAmount;
 			char buf[64];
 			con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" BIT("+utils::_ntoa(amount, buf)+")").exec().throwIfError();
 		}

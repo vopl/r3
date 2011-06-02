@@ -11,7 +11,7 @@ namespace r3{ namespace fields
 	//*******************************************************************
 
 	class Int32
-		: public Int<boost::uint32_t>
+		: public Int<boost::int32_t>
 	{
 	}; // class
 }}  // namespace

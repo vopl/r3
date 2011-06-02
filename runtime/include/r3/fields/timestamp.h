@@ -22,6 +22,27 @@ namespace r3{ namespace fields
 		{
 			return _value;
 		}
+
+		Timestamp &operator=(const TValue &from)
+		{
+			fvs(fvs_set);
+			_value = from;
+			return *this;
+		}
+
+		bool operator==(const TValue &with)
+		{
+			if(fvs() != fvs_set)
+			{
+				return false;
+			}
+
+			return _value == with;
+		}
+		bool operator==(EFieldValueState fvs)
+		{
+			return Field::operator ==(fvs);
+		}
 	}; // class
 }}  // namespace
 

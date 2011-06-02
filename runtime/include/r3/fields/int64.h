@@ -10,7 +10,7 @@ namespace r3{ namespace fields
 	//*******************************************************************
 
 	class Int64
-		: public Int<boost::uint64_t>
+		: public Int<boost::int64_t>
 	{
 	public:
 	}; // class

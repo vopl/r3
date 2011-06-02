@@ -11,7 +11,7 @@ namespace r3{ namespace fields
 	//*******************************************************************
 
 	class Int8
-		: public Int<boost::uint8_t>
+		: public Int<boost::int8_t>
 	{
 	public:
 	}; // class

@@ -16,7 +16,7 @@ namespace r3{ namespace fields
 	{
 	public:
 		typedef Integral TValue;
-	private:
+	protected:
 		TValue _value;
 	public:
 		TValue &value()
@@ -60,6 +60,12 @@ namespace r3{ namespace fields
 			}
 			return _value == with;
 		}
+
+		bool operator==(EFieldValueState fvs) const
+		{
+			return Field::operator ==(fvs);
+		}
+
 
 	}; // class
 }}  // namespace

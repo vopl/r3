@@ -11,9 +11,35 @@ namespace r3{ namespace fields
 	//*******************************************************************
 
 	class Int16
-		: public Int<boost::uint16_t>
+		: public Int<boost::int16_t>
 	{
 	public:
+
+		Int16 &operator=(boost::int8_t from)
+		{
+			fvs(fvs_set);
+			_value = from;
+			return *this;
+		}
+		Int16 &operator=(boost::int16_t from)
+		{
+			fvs(fvs_set);
+			_value = from;
+			return *this;
+		}
+		Int16 &operator=(boost::int32_t from)
+		{
+			fvs(fvs_set);
+			_value = (boost::int16_t)from;
+			return *this;
+		}
+		Int16 &operator=(boost::int64_t from)
+		{
+			fvs(fvs_set);
+			_value = (boost::int16_t)from;
+			return *this;
+		}
+
 	}; // class
 }}  // namespace
 

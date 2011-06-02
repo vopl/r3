@@ -167,6 +167,17 @@ namespace pgc
 	{
 		boost::gregorian::date_duration		_dd;
 		boost::posix_time::time_duration	_td;
+
+		DateTimeDuration()
+			: _dd()
+			, _td()
+		{}
+
+		DateTimeDuration(boost::gregorian::date_duration dd, boost::posix_time::time_duration td)
+			: _dd(dd)
+			, _td(td)
+		{}
+
 	};
 
 	//////////////////////////////////////////////////////////////////////////

@@ -28,6 +28,27 @@ namespace r3{ namespace fields
 		{
 			return _value;
 		}
+
+		Set &operator=(EFieldValueState from)
+		{
+			Field::operator =(from);
+			return *this;
+		}
+
+		bool operator==(EFieldValueState fvs) const
+		{
+			return Field::operator ==(fvs);
+		}
+
+		bool operator==(const TSet &with) const
+		{
+			if(fvs() != fvs_set)
+			{
+				return false;
+			}
+			return _value == with;
+		}
+
 	}; // class
 }}  // namespace
 
