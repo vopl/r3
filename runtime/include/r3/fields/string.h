@@ -102,6 +102,11 @@ namespace r3{ namespace fields
 			return _value == with;
 		}
 
+		bool operator==(EFieldValueState from)
+		{
+			return Field::operator ==(from);
+		}
+
 	}; // class
 }}  // namespace
 

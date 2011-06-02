@@ -56,4 +56,9 @@ namespace r3{ namespace fields
 		return *this;
 	}
 
+	bool Date::operator==(EFieldValueState fvs) const
+	{
+		return Field::operator ==(fvs);
+	}
+
 }}

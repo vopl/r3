@@ -28,6 +28,7 @@ namespace r3{ namespace fields
 		operator boost::gregorian::date ()const;
 
 		Date &operator=(EFieldValueState from);
+		bool operator==(EFieldValueState fvs) const;
 
 	}; // class
 }}  // namespace
