@@ -34,7 +34,7 @@ namespace r3
 					r3::fields::Image photo;
 					r3::fields::Enum<DomainPeoplesex> sex;
 					r3::fields::String surname;
-					r3::relations::Relation2n<Service> observableServices;
+					r3::relations::Relation2n<s_Test::Service> observableServices;
 					
 					static const size_t _fieldsAmount = 6;
 					static const size_t _relationsAmount = 1;
@@ -99,7 +99,7 @@ namespace r3
 			{
 				//People
 				People *c_People = _schema->getCategory<People>().get();
-				o(this, c_People, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)&tup.observableServices,	"observableServices",	(r3::relations::Relation2n<People>*)NULL,	"observers",	rs_dst);
+				o(this, c_People, _schema->getCategory<Service>().get(), &tup.observableServices,	"observableServices",	(r3::relations::Relation2n<s_Test::People>*)NULL,	"observers",	rs_dst);
 			}
 			
 			template <class Oper> void People::enumIndicesFromBasesAndSelf(Oper &o)

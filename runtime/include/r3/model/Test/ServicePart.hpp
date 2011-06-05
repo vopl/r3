@@ -27,8 +27,8 @@ namespace r3
 					r3::fields::DateTimeInterval duration;
 					r3::fields::Date start;
 					r3::fields::Date stop;
-					r3::relations::Relation2n<Document> documents;
-					r3::relations::Relation2one<Service> service;
+					r3::relations::Relation2n<s_Test::Document> documents;
+					r3::relations::Relation2one<s_Test::Service> service;
 					
 					static const size_t _fieldsAmount = 5;
 					static const size_t _relationsAmount = 2;
@@ -92,8 +92,8 @@ namespace r3
 			{
 				//ServicePart
 				ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-				o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n<Document>*)&tup.documents,	"documents",	(r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	rs_src);
-				o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one<Service>*)&tup.service,	"service",	(r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	rs_dst);
+				o(this, c_ServicePart, _schema->getCategory<Document>().get(), &tup.documents,	"documents",	(r3::relations::Relation2one<s_Test::ServicePart>*)NULL,	"servicePart",	rs_src);
+				o(this, c_ServicePart, _schema->getCategory<Service>().get(), &tup.service,	"service",	(r3::relations::Relation2n<s_Test::ServicePart>*)NULL,	"parts",	rs_dst);
 			}
 			
 			template <class Oper> void ServicePart::enumIndicesFromBasesAndSelf(Oper &o)

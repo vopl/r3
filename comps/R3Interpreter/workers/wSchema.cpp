@@ -486,7 +486,7 @@ namespace workers
 					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"r3::relations::Relation2one";break;
 					}
-					hpp<<"<"<<dst->getName()<<"> "<<rel->getName1()<<";"<<endl;
+					hpp<<"<s_"<<dst->getSchema()<<"::"<<dst->getName()<<"> "<<rel->getName1()<<";"<<endl;
 				}
 				else
 				{
@@ -496,7 +496,7 @@ namespace workers
 					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"r3::relations::Relation2one";break;
 					}
-					hpp<<"<"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;
+					hpp<<"<s_"<<src->getSchema()<<"::"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;
 				}
 				relationsAmount++;
 			}
@@ -665,13 +665,7 @@ namespace workers
 				{
 					hpp<<"_schema->getCategory<"<<dst->getName()<<">().get(), ";
 
-					switch(rel->getMultiplier1())
-					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
-					}
-					hpp<<"<"<<dst->getName()<<">*)&tup."<<rel->getName1()<<",\t\""<<rel->getName1()<<"\",\t";
+					hpp<<"&tup."<<rel->getName1()<<",\t\""<<rel->getName1()<<"\",\t";
 
 					switch(rel->getMultiplier2())
 					{
@@ -679,20 +673,14 @@ namespace workers
 					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"<"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
+					hpp<<"<s_"<<src->getSchema()<<"::"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
 
 					hpp<<"rs_src";
 				}
 				else
 				{
 					hpp<<"_schema->getCategory<"<<src->getName()<<">().get(), ";
-					switch(rel->getMultiplier2())
-					{
-					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
-					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
-					}
-					hpp<<"<"<<src->getName()<<">*)&tup."<<rel->getName2()<<",\t\""<<rel->getName2()<<"\",\t";
+					hpp<<"&tup."<<rel->getName2()<<",\t\""<<rel->getName2()<<"\",\t";
 
 					switch(rel->getMultiplier1())
 					{
@@ -700,7 +688,7 @@ namespace workers
 					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"<"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
+					hpp<<"<s_"<<dst->getSchema()<<"::"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
 
 					hpp<<"rs_dst";
 				}

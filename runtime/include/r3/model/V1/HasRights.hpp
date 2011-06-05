@@ -23,7 +23,7 @@ namespace r3
 				{
 					// HasRights
 					r3::fields::Bool attrInHasRights;
-					r3::relations::Relation2n<Right> owners;
+					r3::relations::Relation2n<s_V1::Right> owners;
 					
 					static const size_t _fieldsAmount = 1;
 					static const size_t _relationsAmount = 1;
@@ -83,7 +83,7 @@ namespace r3
 			{
 				//HasRights
 				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-				o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)&tup.owners,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
+				o(this, c_HasRights, _schema->getCategory<Right>().get(), &tup.owners,	"owners",	(r3::relations::Relation2n<s_V1::HasRights>*)NULL,	"rights",	rs_dst);
 			}
 			
 			template <class Oper> void HasRights::enumIndicesFromBasesAndSelf(Oper &o)

@@ -28,7 +28,7 @@ namespace r3
 					r3::fields::Date creation;
 					r3::fields::File file;
 					r3::fields::Timestamp lastModified;
-					r3::relations::Relation2one<ServicePart> servicePart;
+					r3::relations::Relation2one<s_Test::ServicePart> servicePart;
 					// Letter
 					r3::fields::String comment;
 					r3::fields::String content;
@@ -98,7 +98,7 @@ namespace r3
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)&tup.servicePart,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
+				o(this, c_Document, _schema->getCategory<ServicePart>().get(), &tup.servicePart,	"servicePart",	(r3::relations::Relation2n<s_Test::Document>*)NULL,	"documents",	rs_dst);
 				//Letter
 			}
 			

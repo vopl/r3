@@ -28,12 +28,12 @@ namespace r3
 					r3::fields::Date creation;
 					r3::fields::File file;
 					r3::fields::Timestamp lastModified;
-					r3::relations::Relation2one<ServicePart> servicePart;
+					r3::relations::Relation2one<s_Test::ServicePart> servicePart;
 					// Mockup
 					r3::fields::Audio audio;
 					r3::fields::Image image;
 					r3::fields::Video video;
-					r3::relations::Relation2one<WebSite> webSite;
+					r3::relations::Relation2one<s_Test::WebSite> webSite;
 					
 					static const size_t _fieldsAmount = 6;
 					static const size_t _relationsAmount = 2;
@@ -101,10 +101,10 @@ namespace r3
 			{
 				//Document
 				Document *c_Document = _schema->getCategory<Document>().get();
-				o(this, c_Document, _schema->getCategory<ServicePart>().get(), (r3::relations::Relation2one<ServicePart>*)&tup.servicePart,	"servicePart",	(r3::relations::Relation2n<Document>*)NULL,	"documents",	rs_dst);
+				o(this, c_Document, _schema->getCategory<ServicePart>().get(), &tup.servicePart,	"servicePart",	(r3::relations::Relation2n<s_Test::Document>*)NULL,	"documents",	rs_dst);
 				//Mockup
 				Mockup *c_Mockup = _schema->getCategory<Mockup>().get();
-				o(this, c_Mockup, _schema->getCategory<WebSite>().get(), (r3::relations::Relation2one<WebSite>*)&tup.webSite,	"webSite",	(r3::relations::Relation2n<Mockup>*)NULL,	"mockups",	rs_src);
+				o(this, c_Mockup, _schema->getCategory<WebSite>().get(), &tup.webSite,	"webSite",	(r3::relations::Relation2n<s_Test::Mockup>*)NULL,	"mockups",	rs_src);
 			}
 			
 			template <class Oper> void Mockup::enumIndicesFromBasesAndSelf(Oper &o)

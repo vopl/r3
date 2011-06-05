@@ -26,10 +26,10 @@ namespace r3
 				{
 					// HasRights
 					r3::fields::Bool attrInHasRights;
-					r3::relations::Relation2n<Right> owners;
+					r3::relations::Relation2n<s_V1::Right> owners;
 					// Role
 					r3::fields::String name;
-					r3::relations::Relation2n<User> roles;
+					r3::relations::Relation2n<s_V1::User> roles;
 					
 					static const size_t _fieldsAmount = 2;
 					static const size_t _relationsAmount = 2;
@@ -93,10 +93,10 @@ namespace r3
 			{
 				//HasRights
 				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-				o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)&tup.owners,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
+				o(this, c_HasRights, _schema->getCategory<Right>().get(), &tup.owners,	"owners",	(r3::relations::Relation2n<s_V1::HasRights>*)NULL,	"rights",	rs_dst);
 				//Role
 				Role *c_Role = _schema->getCategory<Role>().get();
-				o(this, c_Role, _schema->getCategory<User>().get(), (r3::relations::Relation2n<User>*)&tup.roles,	"roles",	(r3::relations::Relation2n<Role>*)NULL,	"users",	rs_src);
+				o(this, c_Role, _schema->getCategory<User>().get(), &tup.roles,	"roles",	(r3::relations::Relation2n<s_V1::Role>*)NULL,	"users",	rs_src);
 			}
 			
 			template <class Oper> void Role::enumIndicesFromBasesAndSelf(Oper &o)

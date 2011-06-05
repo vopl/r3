@@ -41,7 +41,7 @@ namespace r3
 					r3::fields::Date incomingDate;
 					r3::fields::String inventoryNumber;
 					r3::fields::Enum<DomainStocksecurityStatus> securityStatus;
-					r3::relations::Relation2n<Service> services;
+					r3::relations::Relation2n<s_Test::Service> services;
 					
 					static const size_t _fieldsAmount = 9;
 					static const size_t _relationsAmount = 1;
@@ -113,7 +113,7 @@ namespace r3
 				//Furniture
 				//Stock
 				Stock *c_Stock = _schema->getCategory<Stock>().get();
-				o(this, c_Stock, _schema->getCategory<Service>().get(), (r3::relations::Relation2n<Service>*)&tup.services,	"services",	(r3::relations::Relation2n<Stock>*)NULL,	"stocks",	rs_dst);
+				o(this, c_Stock, _schema->getCategory<Service>().get(), &tup.services,	"services",	(r3::relations::Relation2n<s_Test::Stock>*)NULL,	"stocks",	rs_dst);
 			}
 			
 			template <class Oper> void Furniture::enumIndicesFromBasesAndSelf(Oper &o)

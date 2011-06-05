@@ -26,9 +26,9 @@ namespace r3
 				{
 					// Department
 					r3::fields::String name;
-					r3::relations::Relation2one<Owner> parent;
+					r3::relations::Relation2one<s_V1::Owner> parent;
 					// Owner
-					r3::relations::Relation2n<Department> childs;
+					r3::relations::Relation2n<s_V1::Department> childs;
 					
 					static const size_t _fieldsAmount = 1;
 					static const size_t _relationsAmount = 2;
@@ -90,10 +90,10 @@ namespace r3
 			{
 				//Department
 				Department *c_Department = _schema->getCategory<Department>().get();
-				o(this, c_Department, _schema->getCategory<Owner>().get(), (r3::relations::Relation2one<Owner>*)&tup.parent,	"parent",	(r3::relations::Relation2n<Department>*)NULL,	"childs",	rs_src);
+				o(this, c_Department, _schema->getCategory<Owner>().get(), &tup.parent,	"parent",	(r3::relations::Relation2n<s_V1::Department>*)NULL,	"childs",	rs_src);
 				//Owner
 				Owner *c_Owner = _schema->getCategory<Owner>().get();
-				o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)&tup.childs,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
+				o(this, c_Owner, _schema->getCategory<Department>().get(), &tup.childs,	"childs",	(r3::relations::Relation2one<s_V1::Owner>*)NULL,	"parent",	rs_dst);
 			}
 			
 			template <class Oper> void Department::enumIndicesFromBasesAndSelf(Oper &o)

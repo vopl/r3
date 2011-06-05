@@ -30,12 +30,12 @@ namespace r3
 					r3::fields::DateTimeInterval duration;
 					r3::fields::Date start;
 					r3::fields::Date stop;
-					r3::relations::Relation2n<Document> documents;
-					r3::relations::Relation2one<Service> service;
+					r3::relations::Relation2n<s_Test::Document> documents;
+					r3::relations::Relation2one<s_Test::Service> service;
 					// WebSite
 					r3::fields::String host;
 					r3::fields::String url;
-					r3::relations::Relation2n<Mockup> mockups;
+					r3::relations::Relation2n<s_Test::Mockup> mockups;
 					
 					static const size_t _fieldsAmount = 7;
 					static const size_t _relationsAmount = 3;
@@ -104,11 +104,11 @@ namespace r3
 			{
 				//ServicePart
 				ServicePart *c_ServicePart = _schema->getCategory<ServicePart>().get();
-				o(this, c_ServicePart, _schema->getCategory<Document>().get(), (r3::relations::Relation2n<Document>*)&tup.documents,	"documents",	(r3::relations::Relation2one<ServicePart>*)NULL,	"servicePart",	rs_src);
-				o(this, c_ServicePart, _schema->getCategory<Service>().get(), (r3::relations::Relation2one<Service>*)&tup.service,	"service",	(r3::relations::Relation2n<ServicePart>*)NULL,	"parts",	rs_dst);
+				o(this, c_ServicePart, _schema->getCategory<Document>().get(), &tup.documents,	"documents",	(r3::relations::Relation2one<s_Test::ServicePart>*)NULL,	"servicePart",	rs_src);
+				o(this, c_ServicePart, _schema->getCategory<Service>().get(), &tup.service,	"service",	(r3::relations::Relation2n<s_Test::ServicePart>*)NULL,	"parts",	rs_dst);
 				//WebSite
 				WebSite *c_WebSite = _schema->getCategory<WebSite>().get();
-				o(this, c_WebSite, _schema->getCategory<Mockup>().get(), (r3::relations::Relation2n<Mockup>*)&tup.mockups,	"mockups",	(r3::relations::Relation2one<WebSite>*)NULL,	"webSite",	rs_dst);
+				o(this, c_WebSite, _schema->getCategory<Mockup>().get(), &tup.mockups,	"mockups",	(r3::relations::Relation2one<s_Test::WebSite>*)NULL,	"webSite",	rs_dst);
 			}
 			
 			template <class Oper> void WebSite::enumIndicesFromBasesAndSelf(Oper &o)

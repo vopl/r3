@@ -22,7 +22,7 @@ namespace r3
 						: public TupleBase<Owner>
 				{
 					// Owner
-					r3::relations::Relation2n<Department> childs;
+					r3::relations::Relation2n<s_V1::Department> childs;
 					
 					static const size_t _fieldsAmount = 0;
 					static const size_t _relationsAmount = 1;
@@ -80,7 +80,7 @@ namespace r3
 			{
 				//Owner
 				Owner *c_Owner = _schema->getCategory<Owner>().get();
-				o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)&tup.childs,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
+				o(this, c_Owner, _schema->getCategory<Department>().get(), &tup.childs,	"childs",	(r3::relations::Relation2one<s_V1::Owner>*)NULL,	"parent",	rs_dst);
 			}
 			
 			template <class Oper> void Owner::enumIndicesFromBasesAndSelf(Oper &o)

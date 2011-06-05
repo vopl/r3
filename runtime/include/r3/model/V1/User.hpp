@@ -27,13 +27,13 @@ namespace r3
 				{
 					// HasRights
 					r3::fields::Bool attrInHasRights;
-					r3::relations::Relation2n<Right> owners;
+					r3::relations::Relation2n<s_V1::Right> owners;
 					// Owner
-					r3::relations::Relation2n<Department> childs;
+					r3::relations::Relation2n<s_V1::Department> childs;
 					// User
 					r3::fields::String login;
 					r3::fields::String password;
-					r3::relations::Relation2n<Role> users;
+					r3::relations::Relation2n<s_V1::Role> users;
 					
 					static const size_t _fieldsAmount = 3;
 					static const size_t _relationsAmount = 3;
@@ -100,13 +100,13 @@ namespace r3
 			{
 				//HasRights
 				HasRights *c_HasRights = _schema->getCategory<HasRights>().get();
-				o(this, c_HasRights, _schema->getCategory<Right>().get(), (r3::relations::Relation2n<Right>*)&tup.owners,	"owners",	(r3::relations::Relation2n<HasRights>*)NULL,	"rights",	rs_dst);
+				o(this, c_HasRights, _schema->getCategory<Right>().get(), &tup.owners,	"owners",	(r3::relations::Relation2n<s_V1::HasRights>*)NULL,	"rights",	rs_dst);
 				//Owner
 				Owner *c_Owner = _schema->getCategory<Owner>().get();
-				o(this, c_Owner, _schema->getCategory<Department>().get(), (r3::relations::Relation2n<Department>*)&tup.childs,	"childs",	(r3::relations::Relation2one<Owner>*)NULL,	"parent",	rs_dst);
+				o(this, c_Owner, _schema->getCategory<Department>().get(), &tup.childs,	"childs",	(r3::relations::Relation2one<s_V1::Owner>*)NULL,	"parent",	rs_dst);
 				//User
 				User *c_User = _schema->getCategory<User>().get();
-				o(this, c_User, _schema->getCategory<Role>().get(), (r3::relations::Relation2n<Role>*)&tup.users,	"users",	(r3::relations::Relation2n<User>*)NULL,	"roles",	rs_dst);
+				o(this, c_User, _schema->getCategory<Role>().get(), &tup.users,	"users",	(r3::relations::Relation2n<s_V1::User>*)NULL,	"roles",	rs_dst);
 			}
 			
 			template <class Oper> void User::enumIndicesFromBasesAndSelf(Oper &o)

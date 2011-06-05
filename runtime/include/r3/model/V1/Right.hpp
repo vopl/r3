@@ -30,7 +30,7 @@ namespace r3
 					// Right
 					r3::fields::String name;
 					r3::fields::Enum<DomainRightvalue> value;
-					r3::relations::Relation2n<HasRights> rights;
+					r3::relations::Relation2n<s_V1::HasRights> rights;
 					
 					static const size_t _fieldsAmount = 2;
 					static const size_t _relationsAmount = 1;
@@ -91,7 +91,7 @@ namespace r3
 			{
 				//Right
 				Right *c_Right = _schema->getCategory<Right>().get();
-				o(this, c_Right, _schema->getCategory<HasRights>().get(), (r3::relations::Relation2n<HasRights>*)&tup.rights,	"rights",	(r3::relations::Relation2n<Right>*)NULL,	"owners",	rs_src);
+				o(this, c_Right, _schema->getCategory<HasRights>().get(), &tup.rights,	"rights",	(r3::relations::Relation2n<s_V1::Right>*)NULL,	"owners",	rs_src);
 			}
 			
 			template <class Oper> void Right::enumIndicesFromBasesAndSelf(Oper &o)
