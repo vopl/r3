@@ -13,19 +13,6 @@ namespace r3{ namespace fields
 		: public Int64
 	{
 	public:
-		bool operator==(const EFieldValueState with) const
-		{
-			return Field::operator ==(with);
-		}
-
-		bool operator==(Id with)
-		{
-			if(!Field::operator ==(with))
-			{
-				return false;
-			}
-			return _value == with._value;
-		}
 
 	}; // class
 }}  // namespace

@@ -12,23 +12,11 @@ namespace r3{ namespace fields
 	class Simple
 		: public Field
 	{
+	protected:
+		Simple();
+		Simple(const Simple &v);
+
 	public:
-		Simple()
-			: Field()
-		{
-		}
-		
-		Simple(const Simple &from)
-			: Field(from)
-		{
-		}
-
-
-		Simple &operator=(const Simple &from)
-		{
-			this->Field::operator=(from);
-			return *this;
-		}
 
 	}; // class
 }}  // namespace

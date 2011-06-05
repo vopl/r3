@@ -20,7 +20,21 @@ namespace r3{ namespace fields
 		TValue _value;
 	public:
 		Int()
-			: _value()
+			: Simple()
+			, _value()
+		{
+		}
+
+		template <class I2>
+		Int(const Int<I2> &v)
+			: Simple(v)
+			, _value(v._value)
+		{
+		}
+
+		Int(const Integral &v)
+			: Simple(v)
+			, _value(v._value)
 		{
 		}
 
@@ -34,43 +48,48 @@ namespace r3{ namespace fields
 		}
 
 		template <class I2>
-		Field &operator=(const Int<I2> &from) const
+		void operator=(const Int<I2> &v) const
 		{
-			Simple::operator =(from);
-			_value = from._value;
-			return *this;
+			Simple::operator =(v);
+			_value = v._value;
 		}
 
 		template <class I2>
-		bool operator==(const Int<I2> &with) const
+		bool operator==(const Int<I2> &v) const
 		{
-			if(!Simple::operator==(with))
+			if(!Simple::operator==(v))
 			{
 				return false;
 			}
-			return _value == with._value;
+			return _value == v._value;
+		}
+		template <class I2>
+		bool operator!=(const Int<I2> &v) const
+		{
+			return !operator==(v);
 		}
 
-		Field &operator=(Integral from)
+		void operator=(const Integral &v)
 		{
 			fvs(fvs_set);
-			_value = from;
-			return *this;
+			_value = v;
 		}
-		bool operator==(const Integral &with) const
+		bool operator==(const Integral &v) const
 		{
 			if(fvs()!=fvs_set)
 			{
 				return false;
 			}
-			return _value == with;
+			return _value == v;
 		}
-
-		bool operator==(EFieldValueState fvs) const
+		template <class I2>
+		bool operator!=(const Integral &v) const
 		{
-			return Field::operator ==(fvs);
+			return !operator==(v);
 		}
 
+		using Simple::operator==;
+		using Simple::operator!=;
 
 	}; // class
 }}  // namespace

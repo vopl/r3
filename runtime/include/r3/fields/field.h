@@ -22,17 +22,19 @@ namespace r3{ namespace fields
 
 	protected:
 		Field();
-		Field(const Field &from);
-		Field (EFieldValueState from);
-		Field &operator=(const Field &from);
-		bool operator==(const Field &with) const;
+		Field(const Field &v);
+		Field (EFieldValueState v);
+		void operator=(const Field &v);
+		bool operator==(const Field &v) const;
+		bool operator!=(const Field &v) const;
 
 	public:
-		Field &operator=(EFieldValueState from);
-		bool operator==(const EFieldValueState with) const;
+		void operator=(EFieldValueState v);
+		bool operator==(EFieldValueState v) const;
+		bool operator!=(EFieldValueState v) const;
 
 		EFieldValueState fvs() const;
-		EFieldValueState fvs(EFieldValueState fvs);
+		EFieldValueState fvs(EFieldValueState v);
 	}; // class
 }}  // namespace
 

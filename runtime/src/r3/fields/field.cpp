@@ -10,36 +10,42 @@ namespace r3{ namespace fields
 	{
 	}
 
-	Field::Field(const Field &from)
-		: _fvs(from._fvs)
+	Field::Field(const Field &v)
+		: _fvs(v._fvs)
 	{
 	}
-	Field::Field(EFieldValueState from)
-		: _fvs(from)
+	Field::Field(EFieldValueState v)
+		: _fvs(v)
 	{
 
 	}
 
 
-	Field &Field::operator=(const Field &from)
+	void Field::operator=(const Field &v)
 	{
-		_fvs = from._fvs;
-		return *this;
+		_fvs = v._fvs;
 	}
 
-	Field &Field::operator=(EFieldValueState from)
+	void Field::operator=(EFieldValueState v)
 	{
-		_fvs = from;
-		return *this;
+		_fvs = v;
 	}
 
-	bool Field::operator==(const Field &with) const
+	bool Field::operator==(const Field &v) const
 	{
-		return _fvs == with._fvs;
+		return _fvs == v._fvs;
 	}
-	bool Field::operator==(const EFieldValueState with) const
+	bool Field::operator!=(const Field &v) const
 	{
-		return _fvs == with;
+		return !operator==(v);
+	}
+	bool Field::operator==(EFieldValueState v) const
+	{
+		return _fvs == v;
+	}
+	bool Field::operator!=(EFieldValueState v) const
+	{
+		return !operator==(v);
 	}
 
 
@@ -48,10 +54,10 @@ namespace r3{ namespace fields
 		return _fvs;
 	}
 
-	EFieldValueState Field::fvs(EFieldValueState fvs)
+	EFieldValueState Field::fvs(EFieldValueState v)
 	{
 		EFieldValueState prev = _fvs;
-		_fvs = fvs;
+		_fvs = v;
 		return prev;
 	}
 }}
