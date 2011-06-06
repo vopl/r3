@@ -1220,7 +1220,7 @@ namespace r3
 		enumOper_tupleSelSql oper;
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 
-		return "SELECT id,"+oper.fields+" FROM "+((C*)this)->db_sname()+" WHERE id=$1";
+		return "SELECT tableoid,id,"+oper.fields+" FROM "+((C*)this)->db_sname()+" WHERE id=$1";
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1233,7 +1233,7 @@ namespace r3
 		enumOper_tupleSelFetch(pgc::Result &res, size_t row)
 			: res(res)
 			, row(row)
-			, idx(0)
+			, idx(1)
 		{
 		}
 
@@ -1317,10 +1317,12 @@ namespace r3
 	template <class S, class C, class T>
 	void CategoryBase<S,C,T>::tupleSelFetch(Tuple &tup, pgc::Result &res, size_t row)
 	{
-		enumOper_tupleSelFetch oper(res, row);
-		res.fetch(row, 0, tup.id.value());
+		res.fetch(row, 0, tup.tableoid);
+
+		res.fetch(row, 1, tup.id.value());
 		tup.id.fvs(fields::fvs_set);
 
+		enumOper_tupleSelFetch oper(res, row);
 		((C*)this)->enumFieldsFromBasesAndSelf(oper, tup);
 	}
 

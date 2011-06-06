@@ -8,6 +8,7 @@ namespace r3
 	template <class T>
 	struct TupleBase
 	{
+		boost::uint32_t tableoid;
 		fields::Id id;
 
 		TupleBase();
@@ -17,6 +18,7 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
 	inline TupleBase<T>::TupleBase()
+		: tableoid(0)
 	{
 
 	}
