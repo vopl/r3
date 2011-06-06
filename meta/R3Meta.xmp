@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{C7979B4F-716C-4FFA-AA18-28181BB62171}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{528336DC-872A-4B2F-BB48-02ECCACDEB46}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
 	<author></author>
 
-	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Categories Exchange" >
+	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Categories Contexts" >
 		<attrdef name="Abstract" metaref = "1318" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="AllowNull" metaref = "1319" valuetype = "boolean" defvalue = "true">
@@ -39,16 +39,12 @@
 		<attrdef name="Name2" metaref = "1327" valuetype = "string" defvalue = "unnamed2">
 			<dispname>2nd name</dispname>
 		</attrdef>
-		<attrdef name="NodeManager" metaref = "1317" valuetype = "string" defvalue = "disallowAll">
-		</attrdef>
 		<attrdef name="ScantyValueKey" metaref = "1328" valuetype = "integer" defvalue = "1">
 			<dispname>Key</dispname>
 		</attrdef>
 		<attrdef name="Schema" metaref = "1329" valuetype = "string" defvalue = "Undefined">
 		</attrdef>
 		<attrdef name="ShortDescription" metaref = "1330" valuetype = "string" defvalue = "">
-		</attrdef>
-		<attrdef name="ValueAdapter" metaref = "1308" valuetype = "string" defvalue = "unchanged">
 		</attrdef>
 		<atom name = "Audio" metaref = "1331"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
@@ -110,10 +106,6 @@
 				<dispname>Field names in same and base categories must be unique</dispname>
 			</constraint>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-		</atom>
-		<atom name = "Channel" metaref = "1295" >
-				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
 		<atom name = "Date" metaref = "1333"  attributes = "AllowNull">
@@ -412,6 +404,9 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
+		<atom name = "Method" metaref = "1415" >
+				<regnode name = "namePosition" value ="4"></regnode>
+		</atom>
 		<atom name = "Money" metaref = "1341"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
@@ -508,6 +503,9 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Right" metaref = "1429" >
+				<regnode name = "namePosition" value ="4"></regnode>
 		</atom>
 		<atom name = "ScantyValue" metaref = "1344"  attributes = "LongDescription ShortDescription ScantyValueKey">
 				<regnode name = "namePosition" value ="4"></regnode>
@@ -665,38 +663,6 @@
 				</pointerspec>
 			</connjoint>
 		</connection>
-		<connection name = "CategoryInput" metaref = "1309" attributes = "ValueAdapter NodeManager" >
-				<regnode name = "color" value ="0x000070"></regnode>
-				<regnode name = "dstStyle" value ="arrow"></regnode>
-				<regnode name = "srcStyle" value ="butt"></regnode>
-				<regnode name = "lineType" value ="solid"></regnode>
-				<regnode name= "dstLabel1" value="%NodeManager%"/>
-				<regnode name= "dstLabel2" value="%ValueAdapter%"/>
-			<connjoint>
-				<pointerspec name = "src">
-					<pointeritem desc = "Channel"></pointeritem>
-				</pointerspec>
-				<pointerspec name = "dst">
-					<pointeritem desc = "CategoryReference"></pointeritem>
-				</pointerspec>
-			</connjoint>
-		</connection>
-		<connection name = "CategoryOutput" metaref = "1310" attributes = "ValueAdapter NodeManager" >
-				<regnode name = "color" value ="0x700000"></regnode>
-				<regnode name = "dstStyle" value ="arrow"></regnode>
-				<regnode name = "srcStyle" value ="butt"></regnode>
-				<regnode name = "lineType" value ="solid"></regnode>
-				<regnode name= "srcLabel1" value="%NodeManager%"/>
-				<regnode name= "srcLabel2" value="%ValueAdapter%"/>
-			<connjoint>
-				<pointerspec name = "src">
-					<pointeritem desc = "CategoryReference"></pointeritem>
-				</pointerspec>
-				<pointerspec name = "dst">
-					<pointeritem desc = "Channel"></pointeritem>
-				</pointerspec>
-			</connjoint>
-		</connection>
 		<connection name = "CategoryRelation" metaref = "1350" attributes = "Name1 Multiplier1 Name2 Multiplier2" >
 				<regnode name = "color" value ="0x007700"></regnode>
 				<regnode name = "dstStyle" value ="empty diamond"></regnode>
@@ -714,6 +680,35 @@
 				<pointerspec name = "dst">
 					<pointeritem desc = "Category"></pointeritem>
 					<pointeritem desc = "CategoryReference"></pointeritem>
+				</pointerspec>
+			</connjoint>
+		</connection>
+		<connection name = "ConnectionRight2Context" metaref = "1444" >
+				<regnode name = "color" value ="0x000000"></regnode>
+				<regnode name = "dstStyle" value ="butt"></regnode>
+				<regnode name = "srcStyle" value ="butt"></regnode>
+				<regnode name = "lineType" value ="solid"></regnode>
+			<connjoint>
+				<pointerspec name = "src">
+					<pointeritem desc = "Right"></pointeritem>
+				</pointerspec>
+				<pointerspec name = "dst">
+					<pointeritem desc = "Context"></pointeritem>
+					<pointeritem desc = "ContextReference"></pointeritem>
+				</pointerspec>
+			</connjoint>
+		</connection>
+		<connection name = "ConnectionRight2Method" metaref = "1445" >
+				<regnode name = "color" value ="0x000000"></regnode>
+				<regnode name = "dstStyle" value ="arrow"></regnode>
+				<regnode name = "srcStyle" value ="butt"></regnode>
+				<regnode name = "lineType" value ="solid"></regnode>
+			<connjoint>
+				<pointerspec name = "src">
+					<pointeritem desc = "Right"></pointeritem>
+				</pointerspec>
+				<pointerspec name = "dst">
+					<pointeritem desc = "Method"></pointeritem>
 				</pointerspec>
 			</connjoint>
 		</connection>
@@ -749,11 +744,32 @@
 				</pointerspec>
 			</connjoint>
 		</connection>
+		<connection name = "MethodResult" metaref = "1416" >
+				<regnode name = "color" value ="0x000000"></regnode>
+				<regnode name = "dstStyle" value ="arrow"></regnode>
+				<regnode name = "srcStyle" value ="butt"></regnode>
+				<regnode name = "lineType" value ="solid"></regnode>
+			<connjoint>
+				<pointerspec name = "src">
+					<pointeritem desc = "Method"></pointeritem>
+				</pointerspec>
+				<pointerspec name = "dst">
+					<pointeritem desc = "Context"></pointeritem>
+					<pointeritem desc = "ContextReference"></pointeritem>
+				</pointerspec>
+			</connjoint>
+		</connection>
 		<reference name = "CategoryReference" metaref = "1352">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 			<pointerspec name = "ref">
 				<pointeritem desc = "Category"></pointeritem>
+			</pointerspec>
+		</reference>
+		<reference name = "ContextReference" metaref = "1439">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<pointerspec name = "ref">
+				<pointeritem desc = "Context"></pointeritem>
 			</pointerspec>
 		</reference>
 		<model name = "Categories" metaref = "1353" >
@@ -834,6 +850,35 @@
 				<part metaref = "1403" role = "Video" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
+		<model name = "Context" metaref = "1417" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "ConnectionRight2Context" metaref = "1446" kind = "ConnectionRight2Context"></role>
+			<role name = "ConnectionRight2Method" metaref = "1447" kind = "ConnectionRight2Method"></role>
+			<role name = "Context" metaref = "1427" kind = "Context"></role>
+			<role name = "ContextReference" metaref = "1440" kind = "ContextReference"></role>
+			<role name = "Method" metaref = "1418" kind = "Method"></role>
+			<role name = "MethodResult" metaref = "1419" kind = "MethodResult"></role>
+			<role name = "Right" metaref = "1431" kind = "Right"></role>
+			<aspect name = "AspectContext" metaref = "1420" >
+				<part metaref = "1448" role = "ConnectionRight2Method" primary = "yes" linked = "no"></part>
+				<part metaref = "1428" role = "Context" primary = "yes" linked = "no"></part>
+				<part metaref = "1441" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
+				<part metaref = "1421" role = "Method" primary = "yes" linked = "no"></part>
+				<part metaref = "1422" role = "MethodResult" primary = "yes" linked = "no"></part>
+				<part metaref = "1432" role = "Right" primary = "yes" linked = "no"></part>
+			</aspect>
+		</model>
+		<model name = "Contexts" metaref = "1423" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "Context" metaref = "1424" kind = "Context"></role>
+			<role name = "ContextReference" metaref = "1442" kind = "ContextReference"></role>
+			<aspect name = "AspectContext" metaref = "1425" >
+				<part metaref = "1426" role = "Context" primary = "yes" linked = "no"></part>
+				<part metaref = "1443" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
+			</aspect>
+		</model>
 		<model name = "Enum" metaref = "1404" attributes = "AllowNull" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -868,20 +913,6 @@
 			<role name = "ScantyValue" metaref = "1405" kind = "ScantyValue"></role>
 			<aspect name = "AspectScanty" metaref = "1168" attributes = "AllowNull" >
 				<part metaref = "1406" role = "ScantyValue" primary = "yes" linked = "no"></part>
-			</aspect>
-		</model>
-		<model name = "Exchange" metaref = "1298" >
-				<regnode name = "namePosition" value ="4"></regnode>
-				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<role name = "CategoryInput" metaref = "1311" kind = "CategoryInput"></role>
-			<role name = "CategoryOutput" metaref = "1312" kind = "CategoryOutput"></role>
-			<role name = "CategoryReference" metaref = "1407" kind = "CategoryReference"></role>
-			<role name = "Channel" metaref = "1299" kind = "Channel"></role>
-			<aspect name = "AspectExchange" metaref = "1300" >
-				<part metaref = "1313" role = "CategoryInput" primary = "yes" linked = "no"></part>
-				<part metaref = "1314" role = "CategoryOutput" primary = "yes" linked = "no"></part>
-				<part metaref = "1408" role = "CategoryReference" primary = "yes" kindaspect = "AspectCategory" linked = "no"></part>
-				<part metaref = "1301" role = "Channel" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Set" metaref = "1409" attributes = "AllowNull" >
