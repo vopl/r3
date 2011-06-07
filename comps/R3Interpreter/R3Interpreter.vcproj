@@ -403,6 +403,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\BonX\R3Meta_BON\Binary.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Binary.h"
+					>
+				</File>
+				<File
 					RelativePath="..\BonX\R3Meta_BON\Bool.cpp"
 					>
 				</File>
@@ -435,14 +443,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\CategoryInput.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\CategoryInput.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\CategoryMember.cpp"
 					>
 				</File>
@@ -456,14 +456,6 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\CategoryOrReference.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\CategoryOutput.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\CategoryOutput.h"
 					>
 				</File>
 				<File
@@ -483,11 +475,35 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Channel.cpp"
+					RelativePath="..\BonX\R3Meta_BON\Context.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Channel.h"
+					RelativePath="..\BonX\R3Meta_BON\Context.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\ContextOrReference.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\ContextOrReference.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\ContextReference.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\ContextReference.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Contexts.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Contexts.h"
 					>
 				</File>
 				<File
@@ -528,14 +544,6 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\Enum.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Exchange.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Exchange.h"
 					>
 				</File>
 				<File
@@ -619,6 +627,22 @@
 					>
 				</File>
 				<File
+					RelativePath="..\BonX\R3Meta_BON\Method.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Method.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\MethodResult.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\MethodResult.h"
+					>
+				</File>
+				<File
 					RelativePath="..\BonX\R3Meta_BON\Money.cpp"
 					>
 				</File>
@@ -648,6 +672,30 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\Real64.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Right.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Right.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Right4Context.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Right4Context.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Right4Method.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Right4Method.h"
 					>
 				</File>
 				<File

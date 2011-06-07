@@ -140,6 +140,12 @@ namespace pgc
 	};
 
 	//////////////////////////////////////////////////////////////////////////
+	template <> struct CppDataType<std::vector<char> >
+	{
+		enum {cdt_index = CppDataType<std::vector<unsigned char> >::cdt_index};
+	};
+
+	//////////////////////////////////////////////////////////////////////////
 	template <> struct CppDataType<boost::gregorian::date>
 	{
 		enum {cdt_index = __LINE__};

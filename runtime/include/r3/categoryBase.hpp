@@ -195,6 +195,17 @@ namespace r3
 		template <typename Category, typename CategoryBaseOrSelf> void operator()(
 			Category *c,
 			CategoryBaseOrSelf *bos,
+			r3::fields::Binary *stub,
+			const char *fname)
+		{
+			pgc::Connection con = c->schema()->con();
+			con.once("ALTER TABLE "+c->db_sname()+" ADD COLUMN \"_"+fname+"_\" BYTEA").exec().throwIfError();
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		template <typename Category, typename CategoryBaseOrSelf> void operator()(
+			Category *c,
+			CategoryBaseOrSelf *bos,
 			r3::fields::Bool *stub,
 			const char *fname)
 		{

@@ -67,6 +67,23 @@ std::set<R3Meta_BON::Audio> R3Meta_BON::CategoryImpl::getAudio()
 
 
 //********************************************************************************
+// getter for role "Binary" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Binary> R3Meta_BON::CategoryImpl::getBinary()
+{
+	std::set<R3Meta_BON::Binary> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Binary");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Binary elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
 // getter for role "Bool" among "CategoryMember"s and its descendants
 //********************************************************************************
 std::set<R3Meta_BON::Bool> R3Meta_BON::CategoryImpl::getBool()
@@ -89,29 +106,30 @@ std::set<R3Meta_BON::Bool> R3Meta_BON::CategoryImpl::getBool()
 std::set<R3Meta_BON::CategoryMember> R3Meta_BON::CategoryImpl::getCategoryMember()
 {
 	std::set<R3Meta_BON::CategoryMember> res;
-	const int len = 21;
+	const int len = 22;
 	std::set<BON::FCO> roles_vec[ len];
 	roles_vec[0] = ModelImpl::getChildFCOsAs("Audio");
-	roles_vec[1] = ModelImpl::getChildFCOsAs("Bool");
-	roles_vec[2] = ModelImpl::getChildFCOsAs("Date");
-	roles_vec[3] = ModelImpl::getChildFCOsAs("DateTimeInterval");
-	roles_vec[4] = ModelImpl::getChildFCOsAs("File");
-	roles_vec[5] = ModelImpl::getChildFCOsAs("Image");
-	roles_vec[6] = ModelImpl::getChildFCOsAs("Index");
-	roles_vec[7] = ModelImpl::getChildFCOsAs("Int16");
-	roles_vec[8] = ModelImpl::getChildFCOsAs("Int32");
-	roles_vec[9] = ModelImpl::getChildFCOsAs("Int64");
-	roles_vec[10] = ModelImpl::getChildFCOsAs("Int8");
-	roles_vec[11] = ModelImpl::getChildFCOsAs("Money");
-	roles_vec[12] = ModelImpl::getChildFCOsAs("Real32");
-	roles_vec[13] = ModelImpl::getChildFCOsAs("Real64");
-	roles_vec[14] = ModelImpl::getChildFCOsAs("String");
-	roles_vec[15] = ModelImpl::getChildFCOsAs("Time");
-	roles_vec[16] = ModelImpl::getChildFCOsAs("Timestamp");
-	roles_vec[17] = ModelImpl::getChildFCOsAs("Video");
-	roles_vec[18] = ModelImpl::getChildFCOsAs("Enum");
-	roles_vec[19] = ModelImpl::getChildFCOsAs("Set");
-	roles_vec[20] = ModelImpl::getChildFCOsAs("IndexOnCategoryField");
+	roles_vec[1] = ModelImpl::getChildFCOsAs("Binary");
+	roles_vec[2] = ModelImpl::getChildFCOsAs("Bool");
+	roles_vec[3] = ModelImpl::getChildFCOsAs("Date");
+	roles_vec[4] = ModelImpl::getChildFCOsAs("DateTimeInterval");
+	roles_vec[5] = ModelImpl::getChildFCOsAs("File");
+	roles_vec[6] = ModelImpl::getChildFCOsAs("Image");
+	roles_vec[7] = ModelImpl::getChildFCOsAs("Index");
+	roles_vec[8] = ModelImpl::getChildFCOsAs("Int16");
+	roles_vec[9] = ModelImpl::getChildFCOsAs("Int32");
+	roles_vec[10] = ModelImpl::getChildFCOsAs("Int64");
+	roles_vec[11] = ModelImpl::getChildFCOsAs("Int8");
+	roles_vec[12] = ModelImpl::getChildFCOsAs("Money");
+	roles_vec[13] = ModelImpl::getChildFCOsAs("Real32");
+	roles_vec[14] = ModelImpl::getChildFCOsAs("Real64");
+	roles_vec[15] = ModelImpl::getChildFCOsAs("String");
+	roles_vec[16] = ModelImpl::getChildFCOsAs("Time");
+	roles_vec[17] = ModelImpl::getChildFCOsAs("Timestamp");
+	roles_vec[18] = ModelImpl::getChildFCOsAs("Video");
+	roles_vec[19] = ModelImpl::getChildFCOsAs("Enum");
+	roles_vec[20] = ModelImpl::getChildFCOsAs("Set");
+	roles_vec[21] = ModelImpl::getChildFCOsAs("IndexOnCategoryField");
 	for( int k = 0; k < len; ++k)
 		for( std::set<BON::FCO>::iterator i = roles_vec[k].begin(); i != roles_vec[k].end(); ++i)
 		{

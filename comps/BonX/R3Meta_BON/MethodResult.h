@@ -1,5 +1,5 @@
-#ifndef R3META_BONCATEGORYREFERENCE_H
-#define R3META_BONCATEGORYREFERENCE_H
+#ifndef R3META_BONMETHODRESULT_H
+#define R3META_BONMETHODRESULT_H
 
 #include "R3MetaBonX.h"
 
@@ -7,18 +7,18 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   CategoryReferenceImpl
+//   C  L  A  S  S   MethodResultImpl
 //*******************************************************************
-class CategoryReferenceImpl :
-	  virtual public BON::ReferenceImpl
-	, public CategoryOrReferenceImpl
+class MethodResultImpl :
+	  virtual public BON::ConnectionImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);
 
 	//
-	// ref getters
-	virtual R3Meta_BON::Category            getCategory();
+	// connectionEnd getters
+	virtual R3Meta_BON::ContextOrReference  getDst();
+	virtual R3Meta_BON::Method              getSrc();
 
 	///BUP
 	// add your own members here

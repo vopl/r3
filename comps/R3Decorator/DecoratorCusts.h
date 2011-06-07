@@ -25,6 +25,8 @@
 #define  R3_REAL32_NAME		"Real32"
 #define  R3_REAL64_NAME		"Real64"
 
+#define  R3_BINARY_NAME		"Binary"
+
 #define  R3_BOOL_NAME		"Bool"
 #define  R3_CHAR_NAME		"Char"
 #define  R3_STRING_NAME		"String"

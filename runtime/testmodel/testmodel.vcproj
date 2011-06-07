@@ -267,6 +267,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\include\r3\fields\binary.h"
+						>
+					</File>
+					<File
 						RelativePath="..\include\r3\fields\bool.h"
 						>
 					</File>
@@ -400,6 +404,10 @@
 					>
 					<File
 						RelativePath="..\src\r3\fields\audio.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\binary.cpp"
 						>
 					</File>
 					<File

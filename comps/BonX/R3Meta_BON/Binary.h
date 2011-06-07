@@ -1,5 +1,5 @@
-#ifndef R3META_BONCATEGORYREFERENCE_H
-#define R3META_BONCATEGORYREFERENCE_H
+#ifndef R3META_BONBINARY_H
+#define R3META_BONBINARY_H
 
 #include "R3MetaBonX.h"
 
@@ -7,18 +7,15 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   CategoryReferenceImpl
+//   C  L  A  S  S   BinaryImpl
 //*******************************************************************
-class CategoryReferenceImpl :
-	  virtual public BON::ReferenceImpl
-	, public CategoryOrReferenceImpl
+class BinaryImpl :
+	  virtual public BON::AtomImpl
+	, public SimpleImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);
 
-	//
-	// ref getters
-	virtual R3Meta_BON::Category            getCategory();
 
 	///BUP
 	// add your own members here

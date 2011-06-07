@@ -46,6 +46,7 @@ namespace r3{ namespace fields
 #include "./video.h"
 
 #include "./simple.h"
+#include "./binary.h"
 #include "./bool.h"
 #include "./money.h"
 #include "./string.h"

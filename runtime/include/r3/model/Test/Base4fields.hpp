@@ -47,6 +47,7 @@ namespace r3
 				{
 					// Base4fields
 					r3::fields::Audio Audio;
+					r3::fields::Binary Binary;
 					r3::fields::Bool Bool;
 					r3::fields::Date Date;
 					r3::fields::DateTimeInterval DateTimeInterval;
@@ -68,7 +69,7 @@ namespace r3
 					r3::fields::Timestamp Timestamp;
 					r3::fields::Video Video;
 					
-					static const size_t _fieldsAmount = 21;
+					static const size_t _fieldsAmount = 22;
 					static const size_t _relationsAmount = 0;
 					
 				};
@@ -120,6 +121,7 @@ namespace r3
 				//Base4fields
 				Base4fields *c_Base4fields = _schema->getCategory<Base4fields>().get();
 				o(this, c_Base4fields, &tup.Audio, "Audio");
+				o(this, c_Base4fields, &tup.Binary, "Binary");
 				o(this, c_Base4fields, &tup.Bool, "Bool");
 				o(this, c_Base4fields, &tup.Date, "Date");
 				o(this, c_Base4fields, &tup.DateTimeInterval, "DateTimeInterval");

@@ -25,6 +25,7 @@ public:
 	//
 	// kind and role getters
 	virtual std::set<R3Meta_BON::Audio>     getAudio();
+	virtual std::set<R3Meta_BON::Binary>    getBinary();
 	virtual std::set<R3Meta_BON::Bool>      getBool();
 	virtual std::set<R3Meta_BON::CategoryMember>      getCategoryMember();
 	virtual std::set<R3Meta_BON::Date>      getDate();

@@ -1,5 +1,5 @@
-#ifndef R3META_BONEXCHANGE_H
-#define R3META_BONEXCHANGE_H
+#ifndef R3META_BONCONTEXTS_H
+#define R3META_BONCONTEXTS_H
 
 #include "R3MetaBonX.h"
 
@@ -7,9 +7,9 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   ExchangeImpl
+//   C  L  A  S  S   ContextsImpl
 //*******************************************************************
-class ExchangeImpl :
+class ContextsImpl :
 	  virtual public BON::ModelImpl
 {
 public:
@@ -17,10 +17,9 @@ public:
 
 	//
 	// kind and role getters
-	virtual std::set<R3Meta_BON::CategoryInput>       getCategoryInput();
-	virtual std::set<R3Meta_BON::CategoryOutput>      getCategoryOutput();
-	virtual std::set<R3Meta_BON::CategoryReference>   getCategoryReference();
-	virtual std::set<R3Meta_BON::Channel>   getChannel();
+	virtual std::set<R3Meta_BON::Context>   getContext();
+	virtual std::set<R3Meta_BON::ContextOrReference>  getContextOrReference();
+	virtual std::set<R3Meta_BON::ContextReference>    getContextReference();
 
 	///BUP
 	// add your own members here

@@ -332,6 +332,7 @@ protected:
 		CPPUNIT_ASSERT_NO_THROW(ptup = cat->sel(tup.id));
 
 		CPPUNIT_ASSERT(ptup->Audio == r3::fields::fvs_null);
+		CPPUNIT_ASSERT(ptup->Binary == r3::fields::fvs_null);
 		CPPUNIT_ASSERT(ptup->Bool == r3::fields::fvs_null);
 		CPPUNIT_ASSERT(ptup->Date == r3::fields::fvs_null);
 		CPPUNIT_ASSERT(ptup->DateTimeInterval == r3::fields::fvs_null);
@@ -378,6 +379,7 @@ protected:
 
 		CPPUNIT_ASSERT(ptup->id == r3::fields::fvs_notset);
 		CPPUNIT_ASSERT(ptup->Audio == r3::fields::fvs_notset);
+		CPPUNIT_ASSERT(ptup->Binary == r3::fields::fvs_notset);
 		CPPUNIT_ASSERT(ptup->Bool == r3::fields::fvs_notset);
 		CPPUNIT_ASSERT(ptup->Date == r3::fields::fvs_notset);
 		CPPUNIT_ASSERT(ptup->DateTimeInterval == r3::fields::fvs_notset);
@@ -429,6 +431,11 @@ protected:
 		ptup->Audio.blob().con(_mod.con());
 		ptup->Audio.blob().write("qwert", 5);
 
+		ptup->Binary = r3::fields::fvs_set;
+		ptup->Binary.value().resize(3);
+		ptup->Binary.value()[0] = '0';
+		ptup->Binary.value()[1] = '1';
+		ptup->Binary.value()[2] = '2';
 		ptup->Bool = true;
 		ptup->Date = boost::gregorian::date(2015, 5, 5);
 		ptup->DateTimeInterval = pgc::DateTimeDuration(boost::gregorian::date_duration(178), boost::posix_time::time_duration(134, 12, 32));
@@ -538,6 +545,11 @@ protected:
 		CPPUNIT_ASSERT(ptup->Audio.name() == "asd");
 		CPPUNIT_ASSERT(ptup->Audio.ext() == "fds");
 
+		CPPUNIT_ASSERT(ptup->Binary == r3::fields::fvs_set);
+		CPPUNIT_ASSERT(ptup->Binary.value().size() == 3);
+		CPPUNIT_ASSERT(ptup->Binary.value()[0] == '0');
+		CPPUNIT_ASSERT(ptup->Binary.value()[1] == '1');
+		CPPUNIT_ASSERT(ptup->Binary.value()[2] == '2');
 		CPPUNIT_ASSERT(ptup->Bool == true);
 		CPPUNIT_ASSERT(ptup->Date == boost::gregorian::date(2015, 5, 5));
 		CPPUNIT_ASSERT(ptup->DateTimeInterval == pgc::DateTimeDuration(boost::gregorian::date_duration(178), boost::posix_time::time_duration(134, 12, 32)));

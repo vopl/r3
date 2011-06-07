@@ -18,6 +18,7 @@ IMPLEMENT_ABSTRACT_BONEXTENSION( R3Meta_BON::DateTime );
 IMPLEMENT_ABSTRACT_BONEXTENSION( R3Meta_BON::Int );
 IMPLEMENT_ABSTRACT_BONEXTENSION( R3Meta_BON::Real );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Audio, "Audio" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Binary, "Binary" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Bool, "Bool" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Image, "Image" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Money, "Money" );
@@ -37,14 +38,19 @@ IMPLEMENT_BONEXTENSION( R3Meta_BON::Timestamp, "Timestamp" );
 IMPLEMENT_ABSTRACT_BONEXTENSION( R3Meta_BON::CategoryOrReference );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Category, "Category" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryReference, "CategoryReference" );
+IMPLEMENT_ABSTRACT_BONEXTENSION( R3Meta_BON::ContextOrReference );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Context, "Context" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::ContextReference, "ContextReference" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Categories, "Categories" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::Exchange, "Exchange" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::Channel, "Channel" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Contexts, "Contexts" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Method, "Method" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Right, "Right" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::ScantyValue, "ScantyValue" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryInheritance, "CategoryInheritance" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryInput, "CategoryInput" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryOutput, "CategoryOutput" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryRelation, "CategoryRelation" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::MethodResult, "MethodResult" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Right4Context, "Right4Context" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Right4Method, "Right4Method" );
 
 
 } // namespace BON

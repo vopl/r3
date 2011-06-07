@@ -5,7 +5,7 @@
 //********************************************************************************
 // 
 //********************************************************************************
-void R3Meta_BON::CategoryReferenceImpl::accept( BON::Visitor *pVisitor)
+void R3Meta_BON::ContextReferenceImpl::accept( BON::Visitor *pVisitor)
 {
 	// visit the Reference
 	pVisitor->visitReference( BON::Reference( this));
@@ -16,10 +16,10 @@ void R3Meta_BON::CategoryReferenceImpl::accept( BON::Visitor *pVisitor)
 //********************************************************************************
 // 
 //********************************************************************************
-R3Meta_BON::Category R3Meta_BON::CategoryReferenceImpl::getCategory()
+R3Meta_BON::Context R3Meta_BON::ContextReferenceImpl::getContext()
 {
 	BON::FCO r = BON::ReferenceImpl::getReferred();
-	return R3Meta_BON::Category(r);
+	return R3Meta_BON::Context(r);
 }
 
 

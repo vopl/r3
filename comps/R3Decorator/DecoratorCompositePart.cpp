@@ -105,6 +105,7 @@ void DecoratorCompositePart::InitializeEx(CComPtr<IMgaProject>& pProject, CComPt
 				|| name == R3_VIDEO_NAME
 				|| name == R3_REAL32_NAME
 				|| name == R3_REAL64_NAME
+				|| name == R3_BINARY_NAME
 				|| name == R3_BOOL_NAME
 				|| name == R3_CHAR_NAME
 				|| name == R3_STRING_NAME

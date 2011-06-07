@@ -22,6 +22,7 @@ namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( Simple, DateTimeImpl,
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( Simple, IntImpl, Int ); }
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( Simple, RealImpl, Real ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( File, AudioImpl, Audio ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, Simple, BinaryImpl, Binary ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, Simple, BoolImpl, Bool ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( File, ImageImpl, Image ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, Simple, MoneyImpl, Money ); }
@@ -41,14 +42,19 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, DateTimeValue, Tim
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, CategoryOrReferenceImpl, CategoryOrReference ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, CategoryOrReference, CategoryImpl, Category ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, CategoryOrReference, CategoryReferenceImpl, CategoryReference ); }
+namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, ContextOrReferenceImpl, ContextOrReference ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, ContextOrReference, ContextImpl, Context ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, ContextOrReference, ContextReferenceImpl, ContextReference ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, CategoriesImpl, Categories ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, ExchangeImpl, Exchange ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, ChannelImpl, Channel ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, ContextsImpl, Contexts ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, MethodImpl, Method ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, RightImpl, Right ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, ScantyValueImpl, ScantyValue ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryInheritanceImpl, CategoryInheritance ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryInputImpl, CategoryInput ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryOutputImpl, CategoryOutput ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryRelationImpl, CategoryRelation ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, MethodResultImpl, MethodResult ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, Right4ContextImpl, Right4Context ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, Right4MethodImpl, Right4Method ); }
 
 
 #include "R3Meta_BON/CategoryMember.h"
@@ -64,6 +70,7 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryRelat
 #include "R3Meta_BON/Int.h"
 #include "R3Meta_BON/Real.h"
 #include "R3Meta_BON/Audio.h"
+#include "R3Meta_BON/Binary.h"
 #include "R3Meta_BON/Bool.h"
 #include "R3Meta_BON/Image.h"
 #include "R3Meta_BON/Money.h"
@@ -83,14 +90,19 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryRelat
 #include "R3Meta_BON/CategoryOrReference.h"
 #include "R3Meta_BON/Category.h"
 #include "R3Meta_BON/CategoryReference.h"
+#include "R3Meta_BON/ContextOrReference.h"
+#include "R3Meta_BON/Context.h"
+#include "R3Meta_BON/ContextReference.h"
 #include "R3Meta_BON/Categories.h"
-#include "R3Meta_BON/Exchange.h"
-#include "R3Meta_BON/Channel.h"
+#include "R3Meta_BON/Contexts.h"
+#include "R3Meta_BON/Method.h"
+#include "R3Meta_BON/Right.h"
 #include "R3Meta_BON/ScantyValue.h"
 #include "R3Meta_BON/CategoryInheritance.h"
-#include "R3Meta_BON/CategoryInput.h"
-#include "R3Meta_BON/CategoryOutput.h"
 #include "R3Meta_BON/CategoryRelation.h"
+#include "R3Meta_BON/MethodResult.h"
+#include "R3Meta_BON/Right4Context.h"
+#include "R3Meta_BON/Right4Method.h"
 
 ///BUP
 // add your additional class definitions here

@@ -26,11 +26,11 @@ namespace r3
 					r3::fields::String comment;
 					r3::fields::Date created;
 					r3::fields::String description;
-					r3::relations::Relation2one<s_Test::Client> client;
 					r3::relations::Relation2n<s_Test::People> observers;
 					r3::relations::Relation2n<s_Test::Stock> stocks;
-					r3::relations::Relation2one<s_Test::Employee> worker;
+					r3::relations::Relation2one<s_Test::Client> client;
 					r3::relations::Relation2n<s_Test::ServicePart> parts;
+					r3::relations::Relation2one<s_Test::Employee> worker;
 					
 					static const size_t _fieldsAmount = 4;
 					static const size_t _relationsAmount = 5;
@@ -93,11 +93,11 @@ namespace r3
 			{
 				//Service
 				Service *c_Service = _schema->getCategory<Service>().get();
-				o(this, c_Service, _schema->getCategory<Client>().get(), &tup.client,	"client",	(r3::relations::Relation2n<s_Test::Service>*)NULL,	"services",	rs_src);
 				o(this, c_Service, _schema->getCategory<People>().get(), &tup.observers,	"observers",	(r3::relations::Relation2n<s_Test::Service>*)NULL,	"observableServices",	rs_src);
 				o(this, c_Service, _schema->getCategory<Stock>().get(), &tup.stocks,	"stocks",	(r3::relations::Relation2n<s_Test::Service>*)NULL,	"services",	rs_src);
-				o(this, c_Service, _schema->getCategory<Employee>().get(), &tup.worker,	"worker",	(r3::relations::Relation2n<s_Test::Service>*)NULL,	"services",	rs_src);
+				o(this, c_Service, _schema->getCategory<Client>().get(), &tup.client,	"client",	(r3::relations::Relation2n<s_Test::Service>*)NULL,	"services",	rs_src);
 				o(this, c_Service, _schema->getCategory<ServicePart>().get(), &tup.parts,	"parts",	(r3::relations::Relation2one<s_Test::Service>*)NULL,	"service",	rs_src);
+				o(this, c_Service, _schema->getCategory<Employee>().get(), &tup.worker,	"worker",	(r3::relations::Relation2n<s_Test::Service>*)NULL,	"services",	rs_src);
 			}
 			
 			template <class Oper> void Service::enumIndicesFromBasesAndSelf(Oper &o)
