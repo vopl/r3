@@ -76,6 +76,7 @@ namespace workers
 		hpp<<"#include \"r3/dataBase.hpp\""<<endl;
 		hpp<<endl;
 
+		hpp<<"// инклюды классов схем"<<endl;
 		BOOST_FOREACH(std::string schemaName, schemas)
 		{
 			hpp<<"#include \"r3/data/"<<schemaName<<".hpp\""<<endl;
@@ -84,12 +85,14 @@ namespace workers
 
 		hpp<<"namespace r3"<<endl<<"{"<<endl;
 
+		hpp<<"// вся дата"<<endl;
 		hpp<<"class Data"<<endl;
 		hpp<<": public DataBase"<<endl;
 		hpp<<"{"<<endl;
 
 
 		//тип карты id->schema ptr
+		hpp<<"// тип карты id -> schema ptr"<<endl;
 		BOOST_FOREACH(std::string schemaName, schemas)
 		{
 			hpp<<"typedef std::map<std::string, r3::data::"<<schemaName<<"_ptr> TM"<<schemaName<<";"<<endl;
@@ -102,6 +105,7 @@ namespace workers
 
 
 		//геттеры для схем
+		hpp<<"// геттеры для схем"<<endl;
 		BOOST_FOREACH(std::string schemaName, schemas)
 		{
 			hpp<<"r3::data::"<<schemaName<<"_ptr get"<<schemaName<<"(const char *id)"<<endl;
@@ -168,6 +172,7 @@ namespace workers
 
 		hpp<<"namespace r3"<<endl<<"{"<<endl;
 
+		hpp<<"// предварительное объявление класса даты"<<endl;
 		hpp<<"class Data;"<<endl;
 		
 		hpp<<"namespace data"<<endl<<"{"<<endl;
@@ -175,6 +180,7 @@ namespace workers
 		hpp<<"namespace s_"<<name<<endl<<"{"<<endl;
 
 		//предварительные объявления типов категорий
+		hpp<<"// предварительные объявления типов категорий"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"class "<<cat->getName()<<";"<<endl;
@@ -186,12 +192,14 @@ namespace workers
 		hpp<<endl;
 
 		//указатель
+		hpp<<"// указатель"<<endl;
 		hpp<<"class "<<name<<";"<<endl;
 		hpp<<"typedef boost::shared_ptr<"<<name<<"> "<<name<<"_ptr;"<<endl;
 		hpp<<endl;
 
 
 		//класс
+		hpp<<"// класс"<<endl;
 		hpp<<"class "<<name<<endl;
 		hpp<<": public SchemaBase<"<<name<<">"<<endl;
 		hpp<<"{"<<endl;
@@ -200,6 +208,7 @@ namespace workers
 		hpp<<"private:"<<endl;
 
 		//указатели на экземпляры категорий
+		hpp<<"// указатели на экземпляры категорий"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"s_"<<name<<"::"<<cat->getName()<<"_ptr\t_"<<cat->getName()<<";"<<endl;
@@ -209,20 +218,25 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
+		hpp<<"// конструктор"<<endl;
 		hpp<<""<<name<<"(Data *data, const char *id);"<<endl;
 		//деструктор
+		hpp<<"// деструктор"<<endl;
 		hpp<<"~"<<name<<"();"<<endl;
 		hpp<<endl;
 
 		//перечисление типизированных экземпляров категорий
+		hpp<<"// перечисление типизированных экземпляров категорий"<<endl;
 		hpp<<"template <class Oper> void enumCategories(Oper o);"<<endl;
 
 
-		//шаблон для доступа к экземпляру по типу
+		//шаблон для доступа к категориям по типу
+		hpp<<"// шаблон для доступа к категориям по типу"<<endl;
 		hpp<<"template <class C> boost::shared_ptr<C> getCategory();"<<endl;
 		hpp<<endl;
 
-		//геттеры для категорий
+		//именованные геттеры для категорий
+		hpp<<"// именованные геттеры для категорий"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
 			hpp<<"s_"<<name<<"::"<<cat->getName()<<"_ptr\t"<<"get"<<cat->getName()<<"();"<<endl;
@@ -368,6 +382,7 @@ namespace workers
 		hpp<<endl;
 
 		//инклюды для базовых
+		hpp<<"// инклюды для базовых"<<endl;
 		if(basesFirst.size())
 		{
 			hpp<<"//bases"<<endl;
@@ -387,6 +402,7 @@ namespace workers
 		hpp<<endl;
 
 		//предварительное объявление схемы
+		hpp<<"// предварительное объявление схемы"<<endl;
 		hpp<<"class "<<cat->getSchema()<<";"<<endl;
 		hpp<<"typedef boost::shared_ptr<"<<cat->getSchema()<<"> "<<cat->getSchema()<<"_ptr;"<<endl;
 		hpp<<endl;
@@ -397,6 +413,7 @@ namespace workers
 
 
 		//класс
+		hpp<<"// класс"<<endl;
 		hpp<<"class "<<name<<endl;
 		hpp<<": public CategoryBase<"<<cat->getSchema()<<", "<<name<<", tuples::"<<name<<">"<<endl;
 		hpp<<"{"<<endl;
@@ -406,10 +423,12 @@ namespace workers
 		hpp<<"static const bool isAbstract = "<<(cat->isAbstract()?"true":"false")<<";"<<endl;
 		hpp<<endl;
 
+		hpp<<"// тупла с указателем"<<endl;
 		hpp<<"typedef tuples::"<<name<<" Tuple;"<<endl;
 		hpp<<"typedef tuples::"<<name<<"_ptr Tuple_ptr;"<<endl;
 		hpp<<endl;
 
+		hpp<<"// и схема"<<endl;
 		hpp<<"typedef "<<cat->getSchema()<<" Schema;"<<endl;
 		hpp<<endl;
 
@@ -419,15 +438,19 @@ namespace workers
 
 		hpp<<"public:"<<endl;
 		//перечисление базовых
+		hpp<<"// перечисление базовых"<<endl;
 		hpp<<"template <class Oper> void enumBasesFirst(Oper o);"<<endl;
 
-		//поля свои и все от базовых
+		//поля свои и от всех базовых
+		hpp<<"// поля свои и от всех базовых"<<endl;
 		hpp<<"template <class Oper> void enumFieldsFromBasesAndSelf(Oper &o, Tuple &tup);"<<endl;
 
-		//связи свои и все от базовых
+		//связи свои и от всех базовых
+		hpp<<"// связи свои и от всех базовых"<<endl;
 		hpp<<"template <class Oper> void enumRelationsFromBasesAndSelf(Oper &o, Tuple &tup);"<<endl;
 
-		//индексы свои и все от базовых
+		//индексы свои и от всех базовых
+		hpp<<"// индексы свои и от всех базовых"<<endl;
 		hpp<<"template <class Oper> void enumIndicesFromBasesAndSelf(Oper &o);"<<endl;
 		hpp<<endl;
 
@@ -435,20 +458,24 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//деструктор
+		hpp<<"// деструктор"<<endl;
 		hpp<<"~"<<name<<"();"<<endl;
 
 		//геттер для схемы
+		hpp<<"// геттер для схемы"<<endl;
 		hpp<<""<<cat->getSchema()<<" *schema();"<<endl;
 		hpp<<endl;
 
 		hpp<<"protected:"<<endl;
 		//конструктор
+		hpp<<"// конструктор"<<endl;
 		hpp<<"template <class S> friend class SchemaBase;"<<endl;
 		hpp<<""<<name<<"("<<cat->getSchema()<<" *s);"<<endl;
 		hpp<<endl;
 
 
 		hpp<<"protected:"<<endl;
+		hpp<<"// хранимый экземпляр схемы"<<endl;
 		hpp<<""<<cat->getSchema()<<" *_schema;"<<endl;
 		hpp<<endl;
 
@@ -733,9 +760,10 @@ namespace workers
 		hpp<<"#define _r3_data_"<<cat->getSchema()<<"_tuples_"<<name<<"_hpp_"<<endl;
 		hpp<<endl;
 
-		//инклюды для базовых
+		//инклюды для базовых, там могут быть домены
 		if(basesFirst.size())
 		{
+			hpp<<"// инклюды для базовых, там могут быть домены"<<endl;
 			BOOST_FOREACH(Category bcat, orderByName(basesFirst))
 			{
 				assert(bcat->getSchema() == cat->getSchema());
@@ -760,8 +788,8 @@ namespace workers
 			<<"{"<<endl;
 		hpp<<endl;
 
-		//предварительное объявление класса категории
-		hpp<<"class "<<name<<";"<<endl;
+// 		//предварительное объявление класса категории
+// 		hpp<<"class "<<name<<";"<<endl;
 
 
 
@@ -771,11 +799,11 @@ namespace workers
 
 
 		//предварительное объявление классов туплов по связям
+		hpp<<"// предварительное объявление классов туплов по связям"<<endl;
 		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
 		{
 			hpp<<"// "<<cat->getName()<<endl;
 
-			//связи
 			std::set<CategoryRelation> rels;
 			collectRelations(rels, cat, true, true);
 			BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
@@ -798,8 +826,10 @@ namespace workers
 				}
 			}
 		}
+		hpp<<"// !предварительное объявление классов туплов по связям"<<endl;
 
 		//домены
+		hpp<<"// домены"<<endl;
 		std::set<FCO> enums = cat->getChildFCOsAs("Enum");
 		std::set<FCO> sets = cat->getChildFCOsAs("Set");
 		std::set<FCO> scanties(enums);
@@ -822,12 +852,13 @@ namespace workers
 
 
 		//тупла
+		hpp<<"// тупла"<<endl;
 		hpp<<"struct "<<name<<endl;
 		hpp<<": public TupleBase<"<<name<<">"<<endl;
 		hpp<<"{"<<endl;
 
-		hpp<<"typedef r3::data::s_"<<cat->getSchema()<<"::"<<name<<" Category;"<<endl;
-		hpp<<endl;
+// 		hpp<<"typedef r3::data::s_"<<cat->getSchema()<<"::"<<name<<" Category;"<<endl;
+// 		hpp<<endl;
 
 		size_t fieldsAmount = 0;
 		size_t relationsAmount = 0;

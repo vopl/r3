@@ -1,7 +1,6 @@
 #ifndef _R3_CATEGORYBASE_HPP_
 #define _R3_CATEGORYBASE_HPP_
 
-//#include "r3/tupleBase.hpp"
 #include "r3/relations/relation.hpp"
 #include "utils/ntoa.hpp"
 
