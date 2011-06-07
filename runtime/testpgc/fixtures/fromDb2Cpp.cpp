@@ -772,7 +772,7 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	void _stdvectorchar()
 	{
-		std::vector<unsigned char> val;
+		std::vector<char> val;
 
 #undef SQL
 #define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
@@ -790,7 +790,7 @@ protected:
 		CPPUNIT_ASSERT( SQL("''::varchar") );
 		CPPUNIT_ASSERT(val.size() == 0);
 
-		std::vector<unsigned char> expect;
+		std::vector<char> expect;
 		CPPUNIT_ASSERT( SQL("'1234'::varchar") );
 
 		expect.resize(4);

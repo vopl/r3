@@ -134,15 +134,21 @@ namespace pgc
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<std::vector<unsigned char> >
+	template <> struct CppDataType<std::vector<char> >
 	{
 		enum {cdt_index = __LINE__};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <> struct CppDataType<std::vector<char> >
+	template <> struct CppDataType<std::vector<unsigned char> >
 	{
-		enum {cdt_index = CppDataType<std::vector<unsigned char> >::cdt_index};
+		enum {cdt_index = CppDataType<std::vector<char> >::cdt_index};
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <> struct CppDataType<std::vector<signed char> >
+	{
+		enum {cdt_index = CppDataType<std::vector<char> >::cdt_index};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
