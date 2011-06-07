@@ -279,6 +279,7 @@ protected:
 
 		CPPUNIT_ASSERT(tup.id == r3::fields::fvs_notset);
 		CPPUNIT_ASSERT(tup.Bool == r3::fields::fvs_notset);
+		CPPUNIT_ASSERT(tup.Binary == r3::fields::fvs_notset);
 		CPPUNIT_ASSERT(tup.Date == r3::fields::fvs_notset);
 		CPPUNIT_ASSERT(tup.DateTimeInterval == r3::fields::fvs_notset);
 		CPPUNIT_ASSERT(tup.Enum1 == r3::fields::fvs_notset);
