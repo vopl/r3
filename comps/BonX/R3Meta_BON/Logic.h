@@ -1,5 +1,5 @@
-#ifndef R3META_BONCONTEXTS_H
-#define R3META_BONCONTEXTS_H
+#ifndef R3META_BONLOGIC_H
+#define R3META_BONLOGIC_H
 
 #include "R3MetaBonX.h"
 
@@ -7,9 +7,9 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   ContextsImpl
+//   C  L  A  S  S   LogicImpl
 //*******************************************************************
-class ContextsImpl :
+class LogicImpl :
 	  virtual public BON::ModelImpl
 {
 public:

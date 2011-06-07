@@ -1,5 +1,5 @@
-#ifndef _R3_MODELBASE_HPP_
-#define _R3_MODELBASE_HPP_
+#ifndef _R3_DATABASE_HPP_
+#define _R3_DATABASE_HPP_
 
 #include "pgc/connection.hpp"
 
@@ -48,18 +48,18 @@ namespace r3
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	class Model;
+	class Data;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ModelBase
+	class DataBase
 	{
 		boost::thread_specific_ptr<pgc::Connection> _tcon;
 		std::vector<StmStorageBase *> _stmStorages;
 		boost::mutex _mtx;
 
 	public:
-		ModelBase();
-		~ModelBase();
+		DataBase();
+		~DataBase();
 
 		void startInThread(const char *conninfo);
 		void stopInThread();
@@ -122,20 +122,20 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class SP>
-	SP ModelBase::getSchemaImpl(std::map<std::string, SP> &m, const char *id)
+	SP DataBase::getSchemaImpl(std::map<std::string, SP> &m, const char *id)
 	{
 		boost::mutex::scoped_lock sl(_mtx);
 
 		SP &p = m[id];
 		if(!p)
 		{
-			p.reset(new SP::value_type((Model *)this, id));
+			p.reset(new SP::value_type((Data *)this, id));
 		}
 		return p;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class tag> pgc::Statement ModelBase::stm(const std::string &key)
+	template <class tag> pgc::Statement DataBase::stm(const std::string &key)
 	{
 		size_t idx = StmStorage<tag>::_index;
 		assert(_stmStorages.size() && _stmStorages.size() > idx);
@@ -143,9 +143,9 @@ namespace r3
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	inline pgc::Statement ModelBase::stm(const std::string &key)
+	inline pgc::Statement DataBase::stm(const std::string &key)
 	{
-		return stm<ModelBase::StmSecretType>(key);
+		return stm<DataBase::StmSecretType>(key);
 	}
 
 }

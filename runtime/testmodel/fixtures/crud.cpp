@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include <cppunit/config/SourcePrefix.h>
 #include <string>
-#include "r3/model.hpp"
+#include "r3/data.hpp"
 
-using namespace r3::model::s_Test;
+using namespace r3::data::s_Test;
 
 
 class Crud
@@ -19,29 +19,29 @@ class Crud
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
-	r3::Model _mod;
+	r3::Data _dat;
 
-	r3::model::Test_ptr _t;
+	r3::data::Test_ptr _t;
 
 
 public:
 	void setUp()
 	{
-		_mod.startInThread("dbname=test user=postgres password=postgres port=5432");
-		_t = _mod.getTest("crudTester");
-		_mod.con().log(std::cout, pgc::lf_all);
+		_dat.startInThread("dbname=test user=postgres password=postgres port=5432");
+		_t = _dat.getTest("crudTester");
+		_dat.con().log(std::cout, pgc::lf_all);
 	}
 
 	void tearDown()
 	{
 		_t.reset();
-		_mod.stopInThread();
+		_dat.stopInThread();
 	}
 
 protected:
 	void connected()
 	{
-		CPPUNIT_ASSERT( pgc::ecs_ok == _mod.con().status());
+		CPPUNIT_ASSERT( pgc::ecs_ok == _dat.con().status());
 	}
 
 
@@ -57,7 +57,7 @@ protected:
 	{
 		size_t cnt(0);
 		CPPUNIT_ASSERT_NO_THROW(
-			_mod.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(std::string("Test_crudTester")).throwIfError().fetch(0,0,cnt)
+			_dat.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(std::string("Test_crudTester")).throwIfError().fetch(0,0,cnt)
 			);
 		if(!cnt)
 		{
@@ -79,7 +79,7 @@ protected:
 	void _stock()
 	{
 		checkSchema();
-		CPPUNIT_ASSERT_NO_THROW(_mod.con().once("BEGIN").exec().throwIfError());
+		CPPUNIT_ASSERT_NO_THROW(_dat.con().once("BEGIN").exec().throwIfError());
 
 		Stock_ptr cat = _t->getStock();
 		Stock::Tuple tup;
@@ -184,7 +184,7 @@ protected:
 		CPPUNIT_ASSERT_NO_THROW(ptup = cat->sel(ptup));
 		CPPUNIT_ASSERT(!ptup);
 
-		CPPUNIT_ASSERT_NO_THROW(_mod.con().once("ROLLBACK").exec().throwIfError());
+		CPPUNIT_ASSERT_NO_THROW(_dat.con().once("ROLLBACK").exec().throwIfError());
 	}
 
 
@@ -195,7 +195,7 @@ protected:
 	void _furniture()
 	{
 		checkSchema();
-		CPPUNIT_ASSERT_NO_THROW(_mod.con().once("BEGIN").exec().throwIfError());
+		CPPUNIT_ASSERT_NO_THROW(_dat.con().once("BEGIN").exec().throwIfError());
 
 		Furniture_ptr cat = _t->getFurniture();
 		Furniture::Tuple tup;
@@ -260,7 +260,7 @@ protected:
 		CPPUNIT_ASSERT_NO_THROW(ptup = cat->sel(ptup));
 		CPPUNIT_ASSERT(!ptup);
 
-		CPPUNIT_ASSERT_NO_THROW(_mod.con().once("ROLLBACK").exec().throwIfError());
+		CPPUNIT_ASSERT_NO_THROW(_dat.con().once("ROLLBACK").exec().throwIfError());
 	}
 
 
@@ -272,7 +272,7 @@ protected:
 	void _forFields()
 	{
 		checkSchema();
-		CPPUNIT_ASSERT_NO_THROW(_mod.con().once("BEGIN").exec().throwIfError());
+		CPPUNIT_ASSERT_NO_THROW(_dat.con().once("BEGIN").exec().throwIfError());
 
 		Derived4fields_ptr cat = _t->getDerived4fields();
 		Derived4fields::Tuple tup;
@@ -429,7 +429,7 @@ protected:
 		ptup->Audio = r3::fields::fvs_set;
 		ptup->Audio.name() = "asd";
 		ptup->Audio.ext() = "fds";
-		ptup->Audio.blob().con(_mod.con());
+		ptup->Audio.blob().con(_dat.con());
 		ptup->Audio.blob().write("qwert", 5);
 
 		ptup->Binary = r3::fields::fvs_set;
@@ -445,13 +445,13 @@ protected:
 		ptup->File = r3::fields::fvs_set;
 		ptup->File.name() = "asdf";
 		ptup->File.ext() = "fdsa";
-		ptup->File.blob().con(_mod.con());
+		ptup->File.blob().con(_dat.con());
 		ptup->File.blob().write("qwerty", 6);
 
 		ptup->Image = r3::fields::fvs_set;
 		ptup->Image.name() = "asdf1";
 		ptup->Image.ext() = "fdsa1";
-		ptup->Image.blob().con(_mod.con());
+		ptup->Image.blob().con(_dat.con());
 		ptup->Image.blob().write("qwerty1", 7);
 		ptup->Image.width() = 10;
 		ptup->Image.height() = 30;
@@ -479,7 +479,7 @@ protected:
 		ptup->Video = r3::fields::fvs_set;
 		ptup->Video.name() = "asdf12";
 		ptup->Video.ext() = "fdsa12";
-		ptup->Video.blob().con(_mod.con());
+		ptup->Video.blob().con(_dat.con());
 		ptup->Video.blob().write("qwerty12", 8);
 		ptup->Video.width() = 102;
 		ptup->Video.height() = 302;
@@ -487,7 +487,7 @@ protected:
 		ptup->Audiod = r3::fields::fvs_set;
 		ptup->Audiod.name() = "asd";
 		ptup->Audiod.ext() = "fds";
-		ptup->Audiod.blob().con(_mod.con());
+		ptup->Audiod.blob().con(_dat.con());
 		ptup->Audiod.blob().write("qwert", 5);
 
 		ptup->Boold = true;
@@ -498,13 +498,13 @@ protected:
 		ptup->Filed = r3::fields::fvs_set;
 		ptup->Filed.name() = "asdf";
 		ptup->Filed.ext() = "fdsa";
-		ptup->Filed.blob().con(_mod.con());
+		ptup->Filed.blob().con(_dat.con());
 		ptup->Filed.blob().write("qwerty", 6);
 
 		ptup->Imaged = r3::fields::fvs_set;
 		ptup->Imaged.name() = "asdf1";
 		ptup->Imaged.ext() = "fdsa1";
-		ptup->Imaged.blob().con(_mod.con());
+		ptup->Imaged.blob().con(_dat.con());
 		ptup->Imaged.blob().write("qwerty1", 7);
 		ptup->Imaged.width() = 10;
 		ptup->Imaged.height() = 30;
@@ -532,7 +532,7 @@ protected:
 		ptup->Videod = r3::fields::fvs_set;
 		ptup->Videod.name() = "asdf12";
 		ptup->Videod.ext() = "fdsa12";
-		ptup->Videod.blob().con(_mod.con());
+		ptup->Videod.blob().con(_dat.con());
 		ptup->Videod.blob().write("qwerty12", 8);
 		ptup->Videod.width() = 102;
 		ptup->Videod.height() = 302;
@@ -592,7 +592,7 @@ protected:
 		CPPUNIT_ASSERT(ptup->Video.height() == 302);
 
 
-		CPPUNIT_ASSERT_NO_THROW(_mod.con().once("ROLLBACK").exec().throwIfError());
+		CPPUNIT_ASSERT_NO_THROW(_dat.con().once("ROLLBACK").exec().throwIfError());
 	}
 
 };

@@ -248,11 +248,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\r3\model.hpp"
+					RelativePath="..\include\r3\data.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\r3\modelBase.hpp"
+					RelativePath="..\include\r3\dataBase.hpp"
 					>
 				</File>
 				<File
@@ -396,7 +396,7 @@
 				Name="r3"
 				>
 				<File
-					RelativePath="..\src\r3\modelBase.cpp"
+					RelativePath="..\src\r3\dataBase.cpp"
 					>
 				</File>
 				<Filter

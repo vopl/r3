@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <cppunit/config/SourcePrefix.h>
 #include <string>
-#include "r3/model.hpp"
+#include "r3/data.hpp"
 
 
 class CreateSchema
@@ -15,23 +15,23 @@ class CreateSchema
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
-	r3::Model _mod;
+	r3::Data _dat;
 
 public:
 	void setUp()
 	{
-		_mod.startInThread("dbname=test user=postgres password=postgres port=5432");
+		_dat.startInThread("dbname=test user=postgres password=postgres port=5432");
 	}
 
 	void tearDown()
 	{
-		_mod.stopInThread();
+		_dat.stopInThread();
 	}
 
 protected:
 	void connected()
 	{
-		CPPUNIT_ASSERT( pgc::ecs_ok == _mod.con().status());
+		CPPUNIT_ASSERT( pgc::ecs_ok == _dat.con().status());
 	}
 
 
@@ -57,16 +57,16 @@ protected:
 	{
 		int cnt;
 		CPPUNIT_ASSERT_NO_THROW(
-			_mod.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(std::string("Test_myId")).throwIfError().fetch(0,0,cnt)
+			_dat.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(std::string("Test_myId")).throwIfError().fetch(0,0,cnt)
 		);
 		if(cnt)
 		{
 			CPPUNIT_ASSERT_NO_THROW(
-				_mod.con().once("DROP SCHEMA \"Test_myId\" CASCADE").exec().throwIfError()
+				_dat.con().once("DROP SCHEMA \"Test_myId\" CASCADE").exec().throwIfError()
 			);
 		}
-		CPPUNIT_ASSERT_NO_THROW(_mod.getTest("myId")->dbCreate());
-		CPPUNIT_ASSERT_NO_THROW(_mod.getTest("myId")->dbDrop());
+		CPPUNIT_ASSERT_NO_THROW(_dat.getTest("myId")->dbCreate());
+		CPPUNIT_ASSERT_NO_THROW(_dat.getTest("myId")->dbDrop());
 	}
 
 

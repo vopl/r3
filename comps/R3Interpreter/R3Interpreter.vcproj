@@ -419,14 +419,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Categories.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Categories.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Category.cpp"
 					>
 				</File>
@@ -499,11 +491,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Contexts.cpp"
+					RelativePath="..\BonX\R3Meta_BON\Data.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Contexts.h"
+					RelativePath="..\BonX\R3Meta_BON\Data.h"
 					>
 				</File>
 				<File
@@ -624,6 +616,14 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\Int8.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Logic.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Logic.h"
 					>
 				</File>
 				<File
@@ -768,11 +768,11 @@
 			Name="workers"
 			>
 			<File
-				RelativePath=".\workers\wSchema.cpp"
+				RelativePath=".\workers\wData.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\workers\wSchema.hpp"
+				RelativePath=".\workers\wData.hpp"
 				>
 			</File>
 		</Filter>

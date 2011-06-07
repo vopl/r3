@@ -25,7 +25,7 @@
 
 #include "R3MetaBonX.h"
 
-#include "workers/wSchema.hpp"
+#include "workers/wData.hpp"
 
 
 namespace BON
@@ -118,7 +118,7 @@ void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>
 		roots.insert(lroots.begin(), lroots.end());
 	}
 
-	workers::WSchema schema(genDir);
+	workers::WData schema(genDir);
 	schema(roots);
 
 	Console::Out::WriteLine("R3 Interpreter completed...");

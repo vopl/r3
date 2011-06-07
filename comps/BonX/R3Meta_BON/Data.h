@@ -1,5 +1,5 @@
-#ifndef R3META_BONCATEGORIES_H
-#define R3META_BONCATEGORIES_H
+#ifndef R3META_BONDATA_H
+#define R3META_BONDATA_H
 
 #include "R3MetaBonX.h"
 
@@ -7,9 +7,9 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   CategoriesImpl
+//   C  L  A  S  S   DataImpl
 //*******************************************************************
-class CategoriesImpl :
+class DataImpl :
 	  virtual public BON::ModelImpl
 {
 public:

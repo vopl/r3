@@ -5,7 +5,7 @@
 //********************************************************************************
 // 
 //********************************************************************************
-void R3Meta_BON::ContextsImpl::accept( BON::Visitor *pVisitor)
+void R3Meta_BON::LogicImpl::accept( BON::Visitor *pVisitor)
 {
 	// visit the Model
 	pVisitor->visitModel( BON::Model( this));
@@ -16,7 +16,7 @@ void R3Meta_BON::ContextsImpl::accept( BON::Visitor *pVisitor)
 //********************************************************************************
 // getter for role "Context" among "ContextOrReference"s and its descendants
 //********************************************************************************
-std::set<R3Meta_BON::Context> R3Meta_BON::ContextsImpl::getContext()
+std::set<R3Meta_BON::Context> R3Meta_BON::LogicImpl::getContext()
 {
 	std::set<R3Meta_BON::Context> res;
 	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Context");
@@ -33,7 +33,7 @@ std::set<R3Meta_BON::Context> R3Meta_BON::ContextsImpl::getContext()
 //********************************************************************************
 // aggregated getter for role "R3Meta_BON::" among "R3Meta_BON::ContextOrReference"s and its descendants
 //********************************************************************************
-std::set<R3Meta_BON::ContextOrReference> R3Meta_BON::ContextsImpl::getContextOrReference()
+std::set<R3Meta_BON::ContextOrReference> R3Meta_BON::LogicImpl::getContextOrReference()
 {
 	std::set<R3Meta_BON::ContextOrReference> res;
 	const int len = 2;
@@ -54,7 +54,7 @@ std::set<R3Meta_BON::ContextOrReference> R3Meta_BON::ContextsImpl::getContextOrR
 //********************************************************************************
 // getter for role "ContextReference" among "ContextOrReference"s and its descendants
 //********************************************************************************
-std::set<R3Meta_BON::ContextReference> R3Meta_BON::ContextsImpl::getContextReference()
+std::set<R3Meta_BON::ContextReference> R3Meta_BON::LogicImpl::getContextReference()
 {
 	std::set<R3Meta_BON::ContextReference> res;
 	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("ContextReference");

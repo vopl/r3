@@ -7,7 +7,7 @@
 namespace r3
 {
 	//////////////////////////////////////////////////////////////////////////
-	class Model;
+	class Data;
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S>
@@ -15,7 +15,7 @@ namespace r3
 		: public boost::enable_shared_from_this<S>
 	{
 	public:
-		SchemaBase(Model *model, const char *id, const char *name);
+		SchemaBase(Data *data, const char *id, const char *name);
 		~SchemaBase();
 
 		pgc::Connection con();
@@ -46,7 +46,7 @@ namespace r3
 		struct enumOper_createInheritances;
 
 	private:
-		Model *_model;
+		Data *_data;
 		std::string _id;
 		std::string _name;
 
@@ -122,8 +122,8 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S>
-	SchemaBase<S>::SchemaBase(Model *model, const char *id, const char *name)
-		: _model(model)
+	SchemaBase<S>::SchemaBase(Data *data, const char *id, const char *name)
+		: _data(data)
 		, _id(id)
 		, _name(name)
 	{
@@ -140,7 +140,7 @@ namespace r3
 	template <class S>
 	pgc::Connection SchemaBase<S>::con()
 	{
-		return _model->con();
+		return _data->con();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -148,14 +148,14 @@ namespace r3
 	template <class tag>
 	pgc::Statement SchemaBase<S>::stm(const std::string &key)
 	{
-		return _model->stm<std::pair<S, tag> >(key);
+		return _data->stm<std::pair<S, tag> >(key);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class S>
 	pgc::Statement SchemaBase<S>::stm(const std::string &key)
 	{
-		return _model->stm<S>(key);
+		return _data->stm<S>(key);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

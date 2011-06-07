@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "r3/modelBase.hpp"
+#include "r3/dataBase.hpp"
 
 namespace r3
 {
@@ -27,19 +27,19 @@ namespace r3
 
 
 	//////////////////////////////////////////////////////////////////////////
-	ModelBase::ModelBase()
+	DataBase::DataBase()
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ModelBase::~ModelBase()
+	DataBase::~DataBase()
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ModelBase::startInThread(const char *conninfo)
+	void DataBase::startInThread(const char *conninfo)
 	{
 		_tcon.reset(new pgc::Connection);
 		_tcon->open(conninfo);
@@ -54,7 +54,7 @@ namespace r3
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void ModelBase::stopInThread()
+	void DataBase::stopInThread()
 	{
 		assert(_stmStorages.size() == StmStorageBase::destroyers().size());
 		for(size_t i(0); i<_stmStorages.size(); i++)
@@ -67,7 +67,7 @@ namespace r3
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	pgc::Connection ModelBase::con()
+	pgc::Connection DataBase::con()
 	{
 		return *_tcon;
 	}

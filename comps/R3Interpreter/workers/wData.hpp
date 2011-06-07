@@ -1,5 +1,5 @@
-#ifndef _WORKERS_WSCHEMA_HPP_
-#define _WORKERS_WSCHEMA_HPP_
+#ifndef _WORKERS_WDATA_HPP_
+#define _WORKERS_WDATA_HPP_
 
 #include "BON.h"
 #include "BONImpl.h"
@@ -13,19 +13,19 @@ namespace workers
 	using namespace BON;
 	using namespace R3Meta_BON;
 
-	class WSchema
+	class WData
 	{
 		const boost::filesystem::path _path;
 	public:
-		WSchema(const boost::filesystem::path &path);
-		~WSchema();
+		WData(const boost::filesystem::path &path);
+		~WData();
 
 		void operator()(const std::set<FCO> &roots);
 
 	private:
-		void processModel(const std::set<std::string> &schemas);
-		void processModel_hpp(const std::set<std::string> &schemas);
-		void processModel_cpp(const std::set<std::string> &schemas);
+		void processData(const std::set<std::string> &schemas);
+		void processData_hpp(const std::set<std::string> &schemas);
+		void processData_cpp(const std::set<std::string> &schemas);
 
 		void processSchema(const std::string &name, const std::set<Category> &cats);
 		void processSchema_hpp(const std::string &name, const std::set<Category> &cats);

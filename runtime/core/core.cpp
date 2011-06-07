@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "r3/model.hpp"
+#include "r3/data.hpp"
 #include "pgc/connection.hpp"
 
 
@@ -10,7 +10,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 
 
-	r3::Model m;
+	r3::Data m;
 
 	m.startInThread("dbname=test user=postgres password=postgres port=5432");
 
@@ -19,7 +19,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	m.stm<int>("sdf").sql("SELECT 1").exec();
 	m.stm("sdf").sql("SELECT 1").exec();
 
-	r3::model::Test_ptr c2 = m.getTest("myId");
+	r3::data::Test_ptr c2 = m.getTest("myId");
 
 	c2->stm<int>("sdf").sql("SELECT 1").exec();
 	c2->stm("sdf").sql("SELECT 1").exec();
@@ -64,14 +64,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	m.con().once("BEGIN").exec();
 	try
 	{
-		r3::model::Test_ptr test = m.getTest("myId");
+		r3::data::Test_ptr test = m.getTest("myId");
 
-		r3::model::s_Test::Computer_ptr ccomp = test->getComputer();
+		r3::data::s_Test::Computer_ptr ccomp = test->getComputer();
 
 		ccomp->stm<int>("sdf").sql("SELECT 1").exec();
 		ccomp->stm("sdf").sql("SELECT 1").exec();
 
- 		r3::model::s_Test::Computer::Tuple comp;
+ 		r3::data::s_Test::Computer::Tuple comp;
 
 		comp.mobile = true;
 		comp.model = "mmodel!!";
@@ -88,11 +88,11 @@ int _tmain(int argc, _TCHAR* argv[])
 // 		comp.cost = 340;
 // 		ccomp->upd(comp);
 // 
-		r3::model::s_Test::Computer::Tuple_ptr pcomp;
+		r3::data::s_Test::Computer::Tuple_ptr pcomp;
  		pcomp = ccomp->sel(comp.id);
 
-		r3::model::s_Test::Stock_ptr cstock = test->getStock();
-		r3::model::s_Test::Stock::Tuple_ptr pstock;
+		r3::data::s_Test::Stock_ptr cstock = test->getStock();
+		r3::data::s_Test::Stock::Tuple_ptr pstock;
  		pstock = cstock->sel(comp.id);
  		//pcomp->upg(pstock);
  

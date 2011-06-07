@@ -1,5 +1,5 @@
 #include "Stdafx.h"
-#include "workers/wSchema.hpp"
+#include "workers/wData.hpp"
 #include <Console.h>
 #include <direct.h>
 #include "out/file.hpp"
@@ -10,20 +10,20 @@ namespace workers
 	using namespace GMEConsole;
 	using namespace std;
 
-	WSchema::WSchema(const boost::filesystem::path &path)
+	WData::WData(const boost::filesystem::path &path)
 		: _path(path)
 	{
 
 	}
-	WSchema::~WSchema()
+	WData::~WData()
 	{
 
 	}
 
-	void WSchema::operator()(const std::set<FCO> &roots)
+	void WData::operator()(const std::set<FCO> &roots)
 	{
-		boost::filesystem::create_directories(_path/"include/r3/model");
-		boost::filesystem::create_directories(_path/"src/r3/model");
+		boost::filesystem::create_directories(_path/"include/r3/data");
+		boost::filesystem::create_directories(_path/"src/r3/data");
 
 		//собрать все категории и распредилить по схемам
 		std::map<std::string, std::set<Category> > schema2cats;
@@ -31,15 +31,15 @@ namespace workers
 
 		BOOST_FOREACH(const FCO &fco, roots)
 		{
-			Categories categories(fco);
-			if(categories)
+			Data data(fco);
+			if(data)
 			{
-				BOOST_FOREACH(const Category &cat, categories->getCategory())
+				BOOST_FOREACH(const Category &cat, data->getCategory())
 				{
 					schema2cats[cat->getSchema()].insert(cat);
 					schemas.insert(cat->getSchema());
 				}
-				BOOST_FOREACH(const CategoryReference &catref, categories->getCategoryReference())
+				BOOST_FOREACH(const CategoryReference &catref, data->getCategoryReference())
 				{
 					const Category &cat = catref->getCategory();
 					schema2cats[cat->getSchema()].insert(cat);
@@ -48,7 +48,7 @@ namespace workers
 			}
 		}
 
-		processModel(schemas);
+		processData(schemas);
 
 		typedef std::pair<std::string, std::set<Category> > TP;
 		BOOST_FOREACH(const TP &p, schema2cats)
@@ -58,41 +58,41 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::processModel(const std::set<std::string> &schemas)
+	void WData::processData(const std::set<std::string> &schemas)
 	{
-		processModel_hpp(schemas);
-		processModel_cpp(schemas);
+		processData_hpp(schemas);
+		processData_cpp(schemas);
 	}
 
-	void WSchema::processModel_hpp(const std::set<std::string> &schemas)
+	void WData::processData_hpp(const std::set<std::string> &schemas)
 	{
-		out::File hpp(_path / "include/r3/model.hpp");
+		out::File hpp(_path / "include/r3/data.hpp");
 		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
 
-		hpp<<"#ifndef _r3_model_hpp_"<<endl;
-		hpp<<"#define _r3_model_hpp_"<<endl;
+		hpp<<"#ifndef _r3_data_hpp_"<<endl;
+		hpp<<"#define _r3_data_hpp_"<<endl;
 		hpp<<endl;
 
-		hpp<<"#include \"r3/modelBase.hpp\""<<endl;
+		hpp<<"#include \"r3/dataBase.hpp\""<<endl;
 		hpp<<endl;
 
 		BOOST_FOREACH(std::string schemaName, schemas)
 		{
-			hpp<<"#include \"r3/model/"<<schemaName<<".hpp\""<<endl;
+			hpp<<"#include \"r3/data/"<<schemaName<<".hpp\""<<endl;
 		}
 		hpp<<endl;
 
 		hpp<<"namespace r3"<<endl<<"{"<<endl;
 
-		hpp<<"class Model"<<endl;
-		hpp<<": public ModelBase"<<endl;
+		hpp<<"class Data"<<endl;
+		hpp<<": public DataBase"<<endl;
 		hpp<<"{"<<endl;
 
 
 		//тип карты id->schema ptr
 		BOOST_FOREACH(std::string schemaName, schemas)
 		{
-			hpp<<"typedef std::map<std::string, r3::model::"<<schemaName<<"_ptr> TM"<<schemaName<<";"<<endl;
+			hpp<<"typedef std::map<std::string, r3::data::"<<schemaName<<"_ptr> TM"<<schemaName<<";"<<endl;
 			hpp<<"TM"<<schemaName<<" _"<<schemaName<<";"<<endl;
 		}
 		hpp<<endl;
@@ -104,7 +104,7 @@ namespace workers
 		//геттеры для схем
 		BOOST_FOREACH(std::string schemaName, schemas)
 		{
-			hpp<<"r3::model::"<<schemaName<<"_ptr get"<<schemaName<<"(const char *id)"<<endl;
+			hpp<<"r3::data::"<<schemaName<<"_ptr get"<<schemaName<<"(const char *id)"<<endl;
 			hpp<<"{"<<endl;
 			hpp<<"return getSchemaImpl(_"<<schemaName<<", id);"<<endl;
 			hpp<<"}"<<endl;
@@ -127,14 +127,14 @@ namespace workers
 
 	}
 
-	void WSchema::processModel_cpp(const std::set<std::string> &schemas)
+	void WData::processData_cpp(const std::set<std::string> &schemas)
 	{
 
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::processSchema(const std::string &name, const std::set<Category> &cats)
+	void WData::processSchema(const std::string &name, const std::set<Category> &cats)
 	{
 		Console::Out::WriteLine(("process schema "+name).c_str());
 
@@ -153,13 +153,13 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::processSchema_hpp(const std::string &name, const std::set<Category> &cats)
+	void WData::processSchema_hpp(const std::string &name, const std::set<Category> &cats)
 	{
-		out::File hpp(_path / "include/r3/model" / (name+".hpp"));
+		out::File hpp(_path / "include/r3/data" / (name+".hpp"));
 		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
 
-		hpp<<"#ifndef _r3_model_"<<name<<"_hpp_"<<endl;
-		hpp<<"#define _r3_model_"<<name<<"_hpp_"<<endl;
+		hpp<<"#ifndef _r3_data_"<<name<<"_hpp_"<<endl;
+		hpp<<"#define _r3_data_"<<name<<"_hpp_"<<endl;
 		hpp<<endl;
 
 		hpp<<"#include \"r3/schemaBase.hpp\""<<endl;
@@ -167,9 +167,9 @@ namespace workers
 
 		hpp<<"namespace r3"<<endl<<"{"<<endl;
 
-		hpp<<"class Model;"<<endl;
+		hpp<<"class Data;"<<endl;
 		
-		hpp<<"namespace model"<<endl<<"{"<<endl;
+		hpp<<"namespace data"<<endl<<"{"<<endl;
 
 		hpp<<"namespace s_"<<name<<endl<<"{"<<endl;
 
@@ -208,7 +208,7 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<""<<name<<"(Model *model, const char *id);"<<endl;
+		hpp<<""<<name<<"(Data *data, const char *id);"<<endl;
 		//деструктор
 		hpp<<"~"<<name<<"();"<<endl;
 		hpp<<endl;
@@ -239,8 +239,8 @@ namespace workers
 		
 
 		//конструктор
-		hpp<<"inline "<<name<<"::"<<name<<"(Model *model, const char *id)"<<endl;
-		hpp<<": SchemaBase<"<<name<<">(model, id, \""<<name<<"\")"<<endl;
+		hpp<<"inline "<<name<<"::"<<name<<"(Data *data, const char *id)"<<endl;
+		hpp<<": SchemaBase<"<<name<<">(data, id, \""<<name<<"\")"<<endl;
 		hpp<<"{"<<endl;
 		hpp<<"init();"<<endl;
 		hpp<<"}"<<endl;
@@ -294,7 +294,7 @@ namespace workers
 		//include для категорий
 		BOOST_FOREACH(Category cat, orderByName(cats))
 		{
-			hpp<<"#include \"r3/model/"<<name<<"/"<<cat->getName()<<".hpp\""<<endl;
+			hpp<<"#include \"r3/data/"<<name<<"/"<<cat->getName()<<".hpp\""<<endl;
 		}
 		hpp<<endl;
 
@@ -306,14 +306,14 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::processSchema_cpp(const std::string &name, const std::set<Category> &cats)
+	void WData::processSchema_cpp(const std::string &name, const std::set<Category> &cats)
 	{
 
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::processCategory(Category cat)
+	void WData::processCategory(Category cat)
 	{
 		Console::Out::WriteLine(("process category "+cat->getName()).c_str());
 
@@ -326,9 +326,9 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::processCategory_hpp(Category cat)
+	void WData::processCategory_hpp(Category cat)
 	{
-		boost::filesystem::create_directories(_path/"include/r3/model"/cat->getSchema());
+		boost::filesystem::create_directories(_path/"include/r3/data"/cat->getSchema());
 
 		std::string name = cat->getName();
 
@@ -355,11 +355,11 @@ namespace workers
 		basesAndSelf.insert(cat);
 
 
-		out::File hpp(_path / "include/r3/model" / cat->getSchema() / (name+".hpp"));
+		out::File hpp(_path / "include/r3/data" / cat->getSchema() / (name+".hpp"));
 		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
 
-		hpp<<"#ifndef _r3_model_"<<cat->getSchema()<<"_"<<name<<"_hpp_"<<endl;
-		hpp<<"#define _r3_model_"<<cat->getSchema()<<"_"<<name<<"_hpp_"<<endl;
+		hpp<<"#ifndef _r3_data_"<<cat->getSchema()<<"_"<<name<<"_hpp_"<<endl;
+		hpp<<"#define _r3_data_"<<cat->getSchema()<<"_"<<name<<"_hpp_"<<endl;
 		hpp<<endl;
 
 		hpp<<"#include \"r3/categoryBase.hpp\""<<endl;
@@ -372,7 +372,7 @@ namespace workers
 			BOOST_FOREACH(Category bcat, orderByName(basesFirst))
 			{
 				assert(bcat->getSchema() == cat->getSchema());
-				hpp<<"#include \"r3/model/"<<bcat->getSchema()<<"/"<<bcat->getName()<<".hpp\""<<endl;
+				hpp<<"#include \"r3/data/"<<bcat->getSchema()<<"/"<<bcat->getName()<<".hpp\""<<endl;
 			}
 			hpp<<endl;
 		}
@@ -380,7 +380,7 @@ namespace workers
 
 		hpp<<"namespace r3"<<endl
 			<<"{"<<endl
-			<<"namespace model"<<endl
+			<<"namespace data"<<endl
 			<<"{"<<endl;
 		hpp<<endl;
 
@@ -801,14 +801,14 @@ namespace workers
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::processCategory_cpp(Category cat)
+	void WData::processCategory_cpp(Category cat)
 	{
 
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive)
+	void WData::collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive)
 	{
 		if(res.end() != res.find(cat))
 		{
@@ -857,7 +857,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WSchema::collectRelations(std::set<CategoryRelation> &res, Category cat, bool bases, bool recursive)
+	void WData::collectRelations(std::set<CategoryRelation> &res, Category cat, bool bases, bool recursive)
 	{
 		std::set<CategoryOrReference> cors;
 		BOOST_FOREACH(Reference ref, cat->getReferredBy())
@@ -875,7 +875,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::vector<Field> WSchema::collectFields(Category cat)
+	std::vector<Field> WData::collectFields(Category cat)
 	{
 		std::set<Category> basesAndSelf;
 		collectInheriance(basesAndSelf, cat, true, true);

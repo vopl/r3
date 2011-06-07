@@ -45,8 +45,8 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, CategoryOrRef
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, ContextOrReferenceImpl, ContextOrReference ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, ContextOrReference, ContextImpl, Context ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, ContextOrReference, ContextReferenceImpl, ContextReference ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, CategoriesImpl, Categories ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, ContextsImpl, Contexts ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, DataImpl, Data ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, LogicImpl, Logic ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, MethodImpl, Method ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, RightImpl, Right ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, ScantyValueImpl, ScantyValue ); }
@@ -93,8 +93,8 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, Right4MethodI
 #include "R3Meta_BON/ContextOrReference.h"
 #include "R3Meta_BON/Context.h"
 #include "R3Meta_BON/ContextReference.h"
-#include "R3Meta_BON/Categories.h"
-#include "R3Meta_BON/Contexts.h"
+#include "R3Meta_BON/Data.h"
+#include "R3Meta_BON/Logic.h"
 #include "R3Meta_BON/Method.h"
 #include "R3Meta_BON/Right.h"
 #include "R3Meta_BON/ScantyValue.h"
