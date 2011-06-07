@@ -148,6 +148,7 @@ namespace workers
 		BOOST_FOREACH(const Category &cat, orderByName(cats))
 		{
 			assert(name == cat->getSchema());
+			processCategoryTuple(cat);
 			processCategory(cat);
 		}
 	}
@@ -363,6 +364,7 @@ namespace workers
 		hpp<<endl;
 
 		hpp<<"#include \"r3/categoryBase.hpp\""<<endl;
+		hpp<<"#include \"r3/data/"<<cat->getSchema()<<"/tuples/"<<name<<".hpp\""<<endl;
 		hpp<<endl;
 
 		//инклюды для базовых
@@ -391,125 +393,6 @@ namespace workers
 
 		hpp<<"namespace s_"<<cat->getSchema()<<endl
 			<<"{"<<endl;
-		hpp<<endl;
-
-// 		//предварительные объявления производных
-// 		if(deriveds.size())
-// 		{
-// 			hpp<<"//deriveds"<<endl;
-// 			BOOST_FOREACH(Category dcat, orderByName(deriveds))
-// 			{
-// 				assert(dcat->getSchema() == cat->getSchema());
-// 				hpp<<"class "<<dcat->getName()<<";"<<endl;
-// 				hpp<<"typedef boost::shared_ptr<"<<dcat->getName()<<"> "<<dcat->getName()<<"_ptr;"<<endl;
-// 			}
-// 			hpp<<endl;
-// 		}
-
-
-		//////////////////////////////////////////////////////////////////////////
-		hpp<<"namespace tuples"<<endl;
-		hpp<<"{"<<endl;
-
-		//домены
-		std::set<FCO> enums = cat->getChildFCOsAs("Enum");
-		std::set<FCO> sets = cat->getChildFCOsAs("Set");
-		std::set<FCO> scanties(enums);
-		scanties.insert(sets.begin(), sets.end());
-		BOOST_FOREACH(Scanty s, orderByName(scanties))
-		{
-			assert(s);
-
-			hpp<<"struct Domain"<<name<<s->getName()<<endl;
-			hpp<<"{"<<endl;
-
-			std::set<FCO> vals = s->getChildFCOsAs("ScantyValue");
-			hpp<<"static const size_t amount = "<<vals.size()<<";"<<endl;
-
-			hpp<<"static const char *values[amount];"<<endl;
-
-			hpp<<"};"<<endl;
-			hpp<<endl;
-		}
-
-
-		//тупла
-		hpp<<"struct "<<name<<endl;
-		hpp<<": public TupleBase<"<<name<<">"<<endl;
-		hpp<<"{"<<endl;
-
-		size_t fieldsAmount = 0;
-		size_t relationsAmount = 0;
-		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
-		{
-			hpp<<"// "<<cat->getName()<<endl;
-
-			//поля
-			std::set<BON::FCO> fields = cat->getChildFCOs();
-			BOOST_FOREACH(Field fld, orderByName(fields))
-			{
-				if(!fld) continue;
-
-				hpp
-					<<"r3::fields::"<<fld->getObjectMeta().name();
-
-				if(Scanty(fld))
-				{
-					Category pcat = fld->getParentModel();
-					hpp<<"<"<<"Domain"<<pcat->getName()<<fld->getName()<<">";
-				}
-
-				hpp
-					<<" "<<fld->getName()<<";"
-					<<endl;
-				fieldsAmount++;
-			}
-
-			//связи
-			std::set<CategoryRelation> rels;
-			collectRelations(rels, cat, true, true);
-			BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
-			{
-				assert(rel);
-
-				Category src = rel->getSrc();
-				if(!src) src = CategoryReference(rel->getSrc())->getCategory();
-
-				Category dst = rel->getDst();
-				if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
-
-				if(src == cat)
-				{
-					switch(rel->getMultiplier1())
-					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
-					default:assert(0); hpp<<"r3::relations::Relation2one";break;
-					}
-					hpp<<"<s_"<<dst->getSchema()<<"::"<<dst->getName()<<"> "<<rel->getName1()<<";"<<endl;
-				}
-				else
-				{
-					switch(rel->getMultiplier2())
-					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
-					default:assert(0); hpp<<"r3::relations::Relation2one";break;
-					}
-					hpp<<"<s_"<<src->getSchema()<<"::"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;
-				}
-				relationsAmount++;
-			}
-		}
-		hpp<<endl;
-		hpp<<"static const size_t _fieldsAmount = "<<fieldsAmount<<";"<<endl;
-		hpp<<"static const size_t _relationsAmount = "<<relationsAmount<<";"<<endl;
-		hpp<<endl;
-		hpp<<"};"<<endl;
-		hpp<<"typedef boost::shared_ptr<"<<name<<"> "<<name<<"_ptr;"<<endl;
-		hpp<<endl;
-
-		hpp<<"}"<<endl;
 		hpp<<endl;
 
 
@@ -673,7 +556,7 @@ namespace workers
 					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"<s_"<<src->getSchema()<<"::"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
+					hpp<<"<r3::data::s_"<<src->getSchema()<<"::tuples::"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
 
 					hpp<<"rs_src";
 				}
@@ -688,7 +571,7 @@ namespace workers
 					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
-					hpp<<"<s_"<<dst->getSchema()<<"::"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
+					hpp<<"<r3::data::s_"<<dst->getSchema()<<"::tuples::"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
 
 					hpp<<"rs_dst";
 				}
@@ -805,6 +688,240 @@ namespace workers
 	{
 
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::processCategoryTuple(Category cat)
+	{
+		processCategoryTuple_hpp(cat);
+		processCategoryTuple_cpp(cat);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::processCategoryTuple_hpp(Category cat)
+	{
+		boost::filesystem::create_directories(_path/"include/r3/data"/cat->getSchema()/"tuples");
+
+		std::string name = cat->getName();
+
+
+		//////////////////////////////////////////////////
+		std::set<CategoryOrReference> cors;
+		BOOST_FOREACH(Reference ref, cat->getReferredBy())
+		{
+			cors.insert(ref);
+		}
+		cors.insert(cat);
+
+
+		//перечень базовых и производных
+		std::set<Category> basesFirst;
+		std::set<Category> bases;
+		std::set<Category> deriveds;
+
+		collectInheriance(basesFirst, cat, true, false);
+		collectInheriance(bases, cat, true, true);
+		collectInheriance(deriveds, cat, false, true);
+
+		std::set<Category> basesAndSelf(bases);
+		basesAndSelf.insert(cat);
+
+
+		out::File hpp(_path / "include/r3/data" / cat->getSchema() / "tuples" / (name+".hpp"));
+		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
+
+		hpp<<"#ifndef _r3_data_"<<cat->getSchema()<<"_tuples_"<<name<<"_hpp_"<<endl;
+		hpp<<"#define _r3_data_"<<cat->getSchema()<<"_tuples_"<<name<<"_hpp_"<<endl;
+		hpp<<endl;
+
+		//инклюды для базовых
+		if(basesFirst.size())
+		{
+			BOOST_FOREACH(Category bcat, orderByName(basesFirst))
+			{
+				assert(bcat->getSchema() == cat->getSchema());
+				hpp<<"#include \"r3/data/"<<bcat->getSchema()<<"/tuples/"<<bcat->getName()<<".hpp\""<<endl;
+			}
+		}
+		else
+		{
+			hpp<<"#include \"r3/tupleBase.hpp\""<<endl;
+		}
+		hpp<<endl;
+
+
+		hpp<<"namespace r3"<<endl
+			<<"{"<<endl
+			<<"namespace data"<<endl
+			<<"{"<<endl;
+		hpp<<endl;
+
+
+		hpp<<"namespace s_"<<cat->getSchema()<<endl
+			<<"{"<<endl;
+		hpp<<endl;
+
+		//предварительное объявление класса категории
+		hpp<<"class "<<name<<";"<<endl;
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		hpp<<"namespace tuples"<<endl;
+		hpp<<"{"<<endl;
+
+
+		//предварительное объявление классов туплов по связям
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
+		{
+			hpp<<"// "<<cat->getName()<<endl;
+
+			//связи
+			std::set<CategoryRelation> rels;
+			collectRelations(rels, cat, true, true);
+			BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
+			{
+				assert(rel);
+
+				Category src = rel->getSrc();
+				if(!src) src = CategoryReference(rel->getSrc())->getCategory();
+
+				Category dst = rel->getDst();
+				if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
+
+				if(src == cat)
+				{
+					hpp<<"struct "<<dst->getName()<<";"<<endl;
+				}
+				else
+				{
+					hpp<<"struct "<<src->getName()<<";"<<endl;
+				}
+			}
+		}
+
+		//домены
+		std::set<FCO> enums = cat->getChildFCOsAs("Enum");
+		std::set<FCO> sets = cat->getChildFCOsAs("Set");
+		std::set<FCO> scanties(enums);
+		scanties.insert(sets.begin(), sets.end());
+		BOOST_FOREACH(Scanty s, orderByName(scanties))
+		{
+			assert(s);
+
+			hpp<<"struct Domain"<<name<<s->getName()<<endl;
+			hpp<<"{"<<endl;
+
+			std::set<FCO> vals = s->getChildFCOsAs("ScantyValue");
+			hpp<<"static const size_t amount = "<<vals.size()<<";"<<endl;
+
+			hpp<<"static const char *values[amount];"<<endl;
+
+			hpp<<"};"<<endl;
+			hpp<<endl;
+		}
+
+
+		//тупла
+		hpp<<"struct "<<name<<endl;
+		hpp<<": public TupleBase<"<<name<<">"<<endl;
+		hpp<<"{"<<endl;
+
+		hpp<<"typedef r3::data::s_"<<cat->getSchema()<<"::"<<name<<" Category;"<<endl;
+		hpp<<endl;
+
+		size_t fieldsAmount = 0;
+		size_t relationsAmount = 0;
+		BOOST_FOREACH(Category cat, orderByName(basesAndSelf))
+		{
+			hpp<<"// "<<cat->getName()<<endl;
+
+			//поля
+			std::set<BON::FCO> fields = cat->getChildFCOs();
+			BOOST_FOREACH(Field fld, orderByName(fields))
+			{
+				if(!fld) continue;
+
+				hpp
+					<<"r3::fields::"<<fld->getObjectMeta().name();
+
+				if(Scanty(fld))
+				{
+					Category pcat = fld->getParentModel();
+					hpp<<"<"<<"Domain"<<pcat->getName()<<fld->getName()<<">";
+				}
+
+				hpp
+					<<" "<<fld->getName()<<";"
+					<<endl;
+				fieldsAmount++;
+			}
+
+			//связи
+			std::set<CategoryRelation> rels;
+			collectRelations(rels, cat, true, true);
+			BOOST_FOREACH(CategoryRelation rel, orderByName(rels))
+			{
+				assert(rel);
+
+				Category src = rel->getSrc();
+				if(!src) src = CategoryReference(rel->getSrc())->getCategory();
+
+				Category dst = rel->getDst();
+				if(!dst) dst = CategoryReference(rel->getDst())->getCategory();
+
+				if(src == cat)
+				{
+					switch(rel->getMultiplier1())
+					{
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"r3::relations::Relation2one";break;
+					}
+					hpp<<"<r3::data::s_"<<dst->getSchema()<<"::tuples::"<<dst->getName()<<"> "<<rel->getName1()<<";"<<endl;
+				}
+				else
+				{
+					switch(rel->getMultiplier2())
+					{
+					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
+					default:assert(0); hpp<<"r3::relations::Relation2one";break;
+					}
+					hpp<<"<r3::data::s_"<<src->getSchema()<<"::tuples::"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;
+				}
+				relationsAmount++;
+			}
+		}
+		hpp<<endl;
+		hpp<<"static const size_t _fieldsAmount = "<<fieldsAmount<<";"<<endl;
+		hpp<<"static const size_t _relationsAmount = "<<relationsAmount<<";"<<endl;
+		hpp<<endl;
+		hpp<<"};"<<endl;
+		hpp<<"typedef boost::shared_ptr<"<<name<<"> "<<name<<"_ptr;"<<endl;
+		hpp<<endl;
+
+		hpp<<"}"<<endl;
+		hpp<<endl;
+
+		//конец пространства имен
+		hpp<<"}"<<endl<<"}"<<endl<<"}"<<endl;
+
+		hpp<<endl;
+
+
+		hpp<<"#endif"<<endl;
+
+		hpp.close();
+		out::styler_cpp(hpp.pathName());
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::processCategoryTuple_cpp(Category cat)
+	{
+
+	}
+
 
 
 	//////////////////////////////////////////////////////////////////////////

@@ -35,6 +35,11 @@ namespace workers
 		void processCategory_hpp(Category cat);
 		void processCategory_cpp(Category cat);
 
+		void processCategoryTuple(Category cat);
+		void processCategoryTuple_hpp(Category cat);
+		void processCategoryTuple_cpp(Category cat);
+
+
 		void collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive);
 		void collectRelations(std::set<CategoryRelation> &res, Category cat, bool bases, bool recursive);
 		std::vector<Field> collectFields(Category cat);
