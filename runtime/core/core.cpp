@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "r3/contextBase.hpp"
 #include "r3/contextUser.hpp"
+#include "net/service.hpp"
 
 using namespace r3;
 
@@ -135,9 +136,62 @@ protected:
 };
 
 
+
+
+
+struct MyServiceHandler
+	: net::IServiceHandler
+{
+	virtual void onStart(net::Service *)
+	{
+	};
+	virtual void onStartInThread(net::Service *)
+	{
+	};
+
+	virtual void onError(net::Service *)
+	{
+	};
+
+	virtual void onAccept(net::IChannel *)
+	{
+	};
+	virtual void onConnect(net::IChannel *)
+	{
+	};
+
+	virtual void onStopInThread()
+	{
+	};
+	virtual void onStop()
+	{
+	};
+
+
+};
+
+
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	MyContext ctx(345, NULL);
+
+	MyServiceHandler myServiceHandler;
+
+	net::Service srv(&myServiceHandler);
+
+
+	srv.balance(4);
+
+	srv.listen("127.0.0.1", 1234);
+
+	for(;;)
+	{
+		//Sleep(10);
+	}
+
+
+	srv.balance(0);
 
 	return 0;
 }
