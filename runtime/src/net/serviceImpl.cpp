@@ -1,33 +1,29 @@
-#include "net/service.hpp"
 #include "serviceImpl.hpp"
 
 namespace net
 {
-
 	//////////////////////////////////////////////////////////////////////////
-	Service::Service(IServiceHandler *handler)
-		: _impl(new ServiceImpl(handler))
+	ServiceImpl::ServiceImpl(IServiceHandler *)
 	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Service::balance(size_t numThreads)
-	{
-		_impl->balance(numThreads);
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Service::listen(const char *host, short port)
+	void ServiceImpl::balance(size_t numThreads)
 	{
-		_impl->listen(host, port);
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Service::connect(const char *host, short port)
+	void ServiceImpl::listen(const char *host, short port)
 	{
-		_impl->connect(host, port);
+
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::connect(const char *host, short port)
+	{
+
+	}
 
 }

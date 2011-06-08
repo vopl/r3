@@ -219,6 +219,14 @@
 					RelativePath="..\src\net\service.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\net\serviceImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serviceImpl.hpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<File

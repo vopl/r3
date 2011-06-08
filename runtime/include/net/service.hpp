@@ -2,11 +2,13 @@
 #define _NET_SERVICE_HPP_
 
 #include "net/channel.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace net
 {
 	class Service;
 
+	//////////////////////////////////////////////////////////////////////////
 	struct IServiceHandler
 	{
 		virtual void onStart(Service *) {};
@@ -21,8 +23,11 @@ namespace net
 		virtual void onStop() {};
 	};
 
+	//////////////////////////////////////////////////////////////////////////
+	class ServiceImpl;
 	class Service
 	{
+		boost::shared_ptr<ServiceImpl> _impl;
 	public:
 		Service(IServiceHandler *);
 
