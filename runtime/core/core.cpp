@@ -2,111 +2,142 @@
 //
 
 #include "stdafx.h"
-#include "r3/data.hpp"
-#include "pgc/connection.hpp"
+#include "r3/contextBase.hpp"
+#include "r3/contextUser.hpp"
+
+using namespace r3;
+
+struct MyContextParent
+	: r3::ContextBase<MyContextParent, void>
+{
+};
+
+struct MyContext2
+	: r3::ContextBase<MyContext2, void>
+{
+	static const TypeId tid = 1232;
+};
+struct MyContext3
+	: r3::ContextBase<MyContext3, void>
+{
+	static const TypeId tid = 1233;
+};
+
+/////////////////////////////////////////////////
+class MyContext
+	: public r3::ContextBase<MyContext, MyContextParent>
+{
+public:
+	static const TypeId tid = 1234;
+
+public:
+	struct Event1 : EventBase
+	{
+		static const TypeId tid = 4567;
+		Event1():EventBase(tid){}
+		//Tuple1	_param1;
+		//Int64	_param2;
+	};
+	struct Event2 : EventBase
+	{
+		static const TypeId tid = 4568;
+		Event2():EventBase(tid){}
+		//String	_param1;
+	};
+
+	ContextUser<MyContext>::State _state;
+
+
+public:
+	MyContext(ContextId id, MyContextParent *parent)
+		: ContextBase(id, parent)
+	{
+
+	}
+
+	void fire(const Event2 &evt)
+	{
+		fireImpl(&evt);
+	}
+
+
+
+protected:
+	std::map<ContextId, MyContext2> map_MyContext2;
+	std::map<ContextId, MyContext3> map_MyContext3;
+
+	ContextId create(TypeId tid, ContextId id)
+	{
+		switch(tid)
+		{
+		case MyContext2::tid:
+			return createImpl(map_MyContext2, id);
+		case MyContext3::tid:
+			return createImpl(map_MyContext3, id);
+		default:
+			assert(0);
+			throw 220;
+		}
+	}
+	void destroy(TypeId tid, ContextId id)
+	{
+		switch(tid)
+		{
+		case MyContext2::tid:
+			return destroyImpl(map_MyContext2, id);
+		case MyContext3::tid:
+			return destroyImpl(map_MyContext3, id);
+		default:
+			assert(0);
+			throw 220;
+		}
+	}
+
+	void dispath(Path p, const EventBase *evt)
+	{
+		if(p.empty())
+		{
+
+			switch(evt->tid)
+			{
+			case Event_ping::tid:
+				return handleImpl((const Event_ping *)evt);
+			case Event_pong::tid:
+				return handleImpl((const Event_pong *)evt);
+			case Event_destroy::tid:
+				return handleImpl((const Event_destroy *)evt);
+			case Event1::tid:
+				return handleImpl((const Event1 *)evt);
+			case Event2::tid:
+				return handleImpl((const Event2 *)evt);
+			default:
+				assert(0);
+				throw 220;
+			}
+		}
+		else
+		{
+			ContextPathItem &pi = p.front();
+			p.pop_front();
+
+			switch(pi.tid)
+			{
+			case MyContext2::tid:
+				return dispathImpl(map_MyContext2, pi.id, p, evt);
+			case MyContext3::tid:
+				return dispathImpl(map_MyContext3, pi.id, p, evt);
+			default:
+				assert(0);
+				throw 220;
+			}
+		}
+	}
+};
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-
-
-	r3::Data m;
-
-	m.startInThread("dbname=test user=postgres password=postgres port=5432");
-
-	m.con().log(std::cout, pgc::lf_exec);
-
-	m.stm<int>("sdf").sql("SELECT 1").exec();
-	m.stm("sdf").sql("SELECT 1").exec();
-
-	r3::data::Test_ptr c2 = m.getTest("myId");
-
-	c2->stm<int>("sdf").sql("SELECT 1").exec();
-	c2->stm("sdf").sql("SELECT 1").exec();
-
-// 	try
-// 	{
-// 		c2->dbDrop();
-// 	}
-// 	catch(std::exception &e)
-// 	{
-// 		std::cout<<e.what()<<std::endl;
-// 	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	m.con().once("BEGIN").exec();
-	try
-	{
-
-		int cnt;
-		m.con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(std::string("Test_myId")).throwIfError().fetch(0,0,cnt);
-
-		if(!cnt)
-		{
-			c2->dbCreate();
-		}
-		m.con().once("COMMIT").exec();
-	}
-	catch(std::exception &e)
-	{
-		m.con().once("ROLLBACK").exec();
-		std::cout<<e.what()<<std::endl;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	m.con().once("BEGIN").exec();
-	try
-	{
-		r3::data::Test_ptr test = m.getTest("myId");
-
-		r3::data::s_Test::Computer_ptr ccomp = test->getComputer();
-
-		ccomp->stm<int>("sdf").sql("SELECT 1").exec();
-		ccomp->stm("sdf").sql("SELECT 1").exec();
-
- 		r3::data::s_Test::Computer::Tuple comp;
-
-		comp.mobile = true;
-		comp.model = "mmodel!!";
- 		ccomp->ins(comp);
-		comp.model = "mmodel2!!";
-		ccomp->ins(comp);
-		comp.model = "mmodel3!!";
-		ccomp->ins(comp);
-
-		comp.model = "mmodel3!!___";
-		ccomp->upd(comp);
-//		ccomp->del(comp);
-
-// 		comp.cost = 340;
-// 		ccomp->upd(comp);
-// 
-		r3::data::s_Test::Computer::Tuple_ptr pcomp;
- 		pcomp = ccomp->sel(comp.id);
-
-		r3::data::s_Test::Stock_ptr cstock = test->getStock();
-		r3::data::s_Test::Stock::Tuple_ptr pstock;
- 		pstock = cstock->sel(comp.id);
- 		//pcomp->upg(pstock);
- 
- 		cstock->del(pstock);
-
-		m.con().once("COMMIT").exec();
-	}
-	catch(std::exception &e)
-	{
-		m.con().once("ROLLBACK").exec();
-		std::cout<<e.what()<<std::endl;
-	}
-
-	m.stopInThread();
+	MyContext ctx(345, NULL);
 
 	return 0;
 }

@@ -404,6 +404,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\r3\contextBase.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\r3\contextUser.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\r3\data.hpp"
 					>
 				</File>
