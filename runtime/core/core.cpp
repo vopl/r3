@@ -153,10 +153,10 @@ struct MyServiceHandler
 	{
 	};
 
-	virtual void onAccept(net::IChannel *)
+	virtual void onAccept(net::Channel_ptr channel)
 	{
 	};
-	virtual void onConnect(net::IChannel *)
+	virtual void onConnect(net::Channel_ptr channel)
 	{
 	};
 
@@ -183,13 +183,21 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	srv.balance(4);
 
-	srv.listen("127.0.0.1", 1234);
-
-	for(;;)
+	if(argc>1)
 	{
-		//Sleep(10);
+		std::cout<<"connect"<<std::endl;
+
+		srv.connect("127.0.0.1", 1234);
+	}
+	else
+	{
+		std::cout<<"listen"<<std::endl;
+		srv.listen("127.0.0.1", 1234);
 	}
 
+
+	char c;
+	std::cin>>c;
 
 	srv.balance(0);
 

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "net/service.hpp"
 #include "serviceImpl.hpp"
 
@@ -6,8 +7,8 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	Service::Service(IServiceHandler *handler)
-		: _impl(new ServiceImpl(handler))
 	{
+		_impl.reset(new ServiceImpl(this, handler));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

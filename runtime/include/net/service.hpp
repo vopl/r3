@@ -11,16 +11,14 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	struct IServiceHandler
 	{
-		virtual void onStart(Service *) {};
 		virtual void onStartInThread(Service *) {};
 
 		virtual void onError(Service *) {};
 
-		virtual void onAccept(IChannel *) {};
-		virtual void onConnect(IChannel *) {};
+		virtual void onAccept(Channel_ptr channel) {};
+		virtual void onConnect(Channel_ptr channel) {};
 
 		virtual void onStopInThread() {};
-		virtual void onStop() {};
 	};
 
 	//////////////////////////////////////////////////////////////////////////
