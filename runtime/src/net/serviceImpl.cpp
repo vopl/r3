@@ -2,7 +2,8 @@
 #include "serviceImpl.hpp"
 #include "utils/ntoa.hpp"
 #include "channelImpl.hpp"
-#include <iostream>
+
+#define LOG(e) if(e){std::cerr<<__FUNCTION__<<": "<<e.message()<<"("<<e.value()<<")"<<std::endl;}
 
 namespace net
 {
@@ -38,14 +39,12 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	const std::string &ServiceImpl::handleGetPasswordSsl()
 	{
-		std::cout<<__FUNCTION__<<std::endl;
 		return _ssl_password;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::makeAcceptSsl()
 	{
-		std::cout<<__FUNCTION__<<std::endl;
 		TSslSocket_ptr socket(new TSslSocket(_io_service, _contextSsl));
 
 		_acceptorSsl.async_accept(socket->lowest_layer(),
@@ -55,16 +54,13 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleAcceptSsl(TSslSocket_ptr socket, const boost::system::error_code& e)
+	void ServiceImpl::handleAcceptSsl(TSslSocket_ptr socket, const boost::system::error_code& ec)
 	{
-		std::cout<<__FUNCTION__<<std::endl;
-		//if(swp->_stop) return;
-
 		makeAcceptSsl();
 
-		if(e)
+		if(ec)
 		{
-			std::cerr<<"TransportAsio::handleAcceptSsl: "<<e.message()<<"("<<e.value()<<")"<<std::endl;
+			LOG(ec);
 			return;
 		}
 
@@ -77,27 +73,24 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleServerHandshakeSsl(TSslSocket_ptr socket, const boost::system::error_code& e)
+	void ServiceImpl::handleServerHandshakeSsl(TSslSocket_ptr socket, const boost::system::error_code& ec)
 	{
-		std::cout<<__FUNCTION__<<std::endl;
-		if(e)
+		if(ec)
 		{
-			//std::cerr<<"TransportAsio::handleHandshakeSsl: "<<e.message()<<"("<<e.value()<<")"<<std::endl;
+			LOG(ec);
 			socket->lowest_layer().close();
 			return;
 		}
 
-		Channel_ptr channel(new ChannelImpl(socket));
-
-		_handler->onAccept(channel);
+		_handler->onAccept(Channel_ptr(new ChannelImpl(socket)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleConnectSsl(TSslSocket_ptr socket, const boost::system::error_code& e)
+	void ServiceImpl::handleConnectSsl(TSslSocket_ptr socket, const boost::system::error_code& ec)
 	{
-		std::cout<<__FUNCTION__<<std::endl;
-		if(e)
+		if(ec)
 		{
+			LOG(ec);
 			return;
 		}
 		socket->async_handshake(
@@ -110,14 +103,15 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleClientHandshakeSsl(TSslSocket_ptr socket, const boost::system::error_code& e)
+	void ServiceImpl::handleClientHandshakeSsl(TSslSocket_ptr socket, const boost::system::error_code& ec)
 	{
-		std::cout<<__FUNCTION__<<std::endl;
-		if(e)
+		if(ec)
 		{
+			LOG(ec);
 			return;
 		}
 
+		_handler->onConnect(Channel_ptr(new ChannelImpl(socket)));
 	}
 
 
@@ -130,13 +124,11 @@ namespace net
 		, _contextSsl(_io_service, ssl::context::sslv23)
 		, _acceptorSsl(_io_service)
 	{
-		std::cout<<__FUNCTION__<<std::endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::balance(size_t numThreads)
 	{
-		std::cout<<__FUNCTION__<<std::endl;
 		size_t count = 0;
 		BOOST_FOREACH(ServiceWorkerPtr &swp, _workers)
 		{
@@ -190,12 +182,17 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::listen(const char *host, short port)
 	{
-		std::cout<<__FUNCTION__<<std::endl;
 		_contextSsl.set_options(
 			ssl::context::default_workarounds
 			| ssl::context::no_sslv2
 			| ssl::context::single_dh_use);
 		_contextSsl.set_password_callback(boost::bind(&ServiceImpl::handleGetPasswordSsl, this));
+
+		_ssl_password = "test";
+		_ssl_certificate = "server.pem";
+		_ssl_privateKey = "server.pem";
+		_ssl_tmpdh = "dh512.pem";
+
 
 		if(!_ssl_certificate.empty())
 		{
@@ -232,7 +229,6 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::connect(const char *host, short port)
 	{
-		std::cout<<__FUNCTION__<<std::endl;
 		ip::tcp::resolver resolver(_io_service);
 		char sport[32];
 		ip::tcp::resolver::query query(host, utils::_ntoa(port, sport));

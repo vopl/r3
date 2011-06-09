@@ -17,3 +17,7 @@
 #include <boost/foreach.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
+
+#include <boost/enable_shared_from_this.hpp>
+
+#include <iostream>

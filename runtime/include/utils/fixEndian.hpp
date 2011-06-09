@@ -146,5 +146,19 @@ namespace utils
 		return impl::FixEndian<le>::call(v);
 	}
 
+	template <class T>
+	inline T fixEndian2Little(const T &v)
+	{
+		static const bool le = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
+		return impl::FixEndian<le==false>::call(v);
+	}
+
+	template <class T>
+	inline T fixEndian2Big(const T &v)
+	{
+		static const bool le = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
+		return impl::FixEndian<le==true>::call(v);
+	}
+
 }
 #endif

@@ -6,6 +6,7 @@
 #include "r3/contextUser.hpp"
 #include "net/service.hpp"
 
+#include <vector>
 using namespace r3;
 
 struct MyContextParent
@@ -141,7 +142,27 @@ protected:
 
 struct MyServiceHandler
 	: net::IServiceHandler
+	, net::IChannelHandler
 {
+	std::vector<char> _data;
+	virtual void onReceive(net::Channel_ptr channel, char *data, size_t size)
+	{
+		std::cout<<"receive send"<<std::endl;
+		_data.assign(data, data+size);
+		channel->send(&_data[0], size);
+	}
+
+	virtual void onError(net::Channel_ptr channel)
+	{
+
+	}
+
+	virtual void onClose(net::Channel_ptr channel)
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	virtual void onStart(net::Service *)
 	{
 	};
@@ -155,9 +176,13 @@ struct MyServiceHandler
 
 	virtual void onAccept(net::Channel_ptr channel)
 	{
+		channel->setHandler(this);
 	};
 	virtual void onConnect(net::Channel_ptr channel)
 	{
+		channel->setHandler(this);
+		std::cout<<"send"<<std::endl;
+		channel->send("asdf", 4);
 	};
 
 	virtual void onStopInThread()
