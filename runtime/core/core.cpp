@@ -47,14 +47,24 @@ public:
 		//String	_param1;
 	};
 
-	ContextUser<MyContext>::State _state;
-
 
 public:
 	MyContext(ContextId id, MyContextParent *parent)
 		: ContextBase(id, parent)
 	{
 
+	}
+
+	template <class Event>
+	void handle(const Event &evt)
+	{
+		return r3::ContextBase<MyContext, MyContextParent>::handle(evt);
+	}
+	void handle(const Event1 &evt)
+	{
+	}
+	void handle(const Event2 &evt)
+	{
 	}
 
 	void fire(const Event2 &evt)
@@ -65,8 +75,8 @@ public:
 
 
 protected:
-	std::map<ContextId, MyContext2> map_MyContext2;
-	std::map<ContextId, MyContext3> map_MyContext3;
+	std::map<ContextId, ContextUser<MyContext2>::User> map_MyContext2;
+	std::map<ContextId, ContextUser<MyContext3>::User> map_MyContext3;
 
 	ContextId create(TypeId tid, ContextId id)
 	{
@@ -139,6 +149,31 @@ protected:
 
 
 
+
+template <> struct ContextUser<MyContext>
+{
+	class User
+		: public MyContext
+	{
+
+	};
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 volatile size_t cnt=0;
 
 struct MyServiceHandler

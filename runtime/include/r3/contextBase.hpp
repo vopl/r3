@@ -52,6 +52,25 @@ namespace r3
 	public:
 		void destroy();
 
+		template <class Event>
+		void handle(const Event &evt)
+		{
+
+		}
+		template<> void handle(const Event_ping &evt)
+		{
+
+		}
+		void handle(const Event_pong &evt)
+		{
+
+		}
+		void handle(const Event_destroy &evt)
+		{
+
+		}
+
+
 	protected:
 		ContextId _id;
 		Parent *_parent;
@@ -127,9 +146,10 @@ namespace r3
 	template <class Event>
 	void ContextBase<Context, Parent>::handleImpl(const Event *evt)
 	{
-		ContextUser<Context>::handlePre((Context *)this, evt);
-		ContextUser<Context>::handle((Context *)this, evt);
-		ContextUser<Context>::handlePost((Context *)this, evt);
+		ContextUser<Context>::User *self = (ContextUser<Context>::User *)this;
+ 		//self->handlePre((Context *)this, evt);
+ 		self->handle(*evt);
+ 		//self->handlePost((Context *)this, evt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

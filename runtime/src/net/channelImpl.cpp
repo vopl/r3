@@ -36,8 +36,8 @@ namespace net
 		OutPacketWrapper_ptr packet(new OutPacketWrapper);
 		packet->_totalSended = 0;
 		packet->_size = size;
-		packet->_sizeNetOrder = utils::fixEndian2Big(packet->_size);
-		packet->_crc32NetOrder = utils::fixEndian2Big(utils::crc32(data.get(), size));
+		packet->_sizeNetOrder = utils::fixEndian(packet->_size);
+		packet->_crc32NetOrder = utils::fixEndian(utils::crc32(data.get(), size));
 		packet->_data = data;
 
 		handleSend(shared_from_this(), packet, boost::system::error_code(), 0);
@@ -138,7 +138,7 @@ namespace net
 		}
 		else if(packet->_totalReceived == 4)
 		{
-			packet->_size = utils::fixEndian2Big(packet->_size);
+			packet->_size = utils::fixEndian(packet->_size);
 			packet->_data.reset(new char [packet->_size]);
 
 			boost::array<boost::asio::mutable_buffer, 2> packedData = 
@@ -183,7 +183,7 @@ namespace net
 		}
 		else if(packet->_totalReceived == 4+packet->_size+4)
 		{
-			packet->_crc32 = utils::fixEndian2Big(packet->_crc32);
+			packet->_crc32 = utils::fixEndian(packet->_crc32);
 			boost::uint32_t crc32 = utils::crc32(&packet->_data[0], packet->_size);
 
 			if(crc32 == packet->_crc32)
