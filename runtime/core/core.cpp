@@ -11,7 +11,7 @@ using namespace r3;
 
 
 
-
+#include <boost/asio/streambuf.hpp>
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -69,9 +69,10 @@ int f()
 	bd->in_b = 12347;
 	((Der*)bd)->in_d = 64322;
 
-	std::strstream str;
+	boost::asio::streambuf sbuf;
+	std::ostream ostr(&sbuf);
 
-	utils::serialization::polymorphic_binary_portable_oarchive oa(str, boost::archive::no_header);
+	utils::serialization::polymorphic_binary_portable_oarchive oa(ostr, boost::archive::no_header);
 	//oa.register_type(static_cast<Der *>(NULL));
 	// write class instance to archive
 	oa & b;
@@ -82,14 +83,15 @@ int f()
 	oa & st;
 
 
-	char *ps = str.str();
 
 	{
 		Bas *b = NULL;
 		Der *d = NULL;
 		Bas *bd = NULL;
 
-		utils::serialization::polymorphic_binary_portable_iarchive ia(str, boost::archive::no_header);
+		std::istream istr(&sbuf);
+
+		utils::serialization::polymorphic_binary_portable_iarchive ia(istr, boost::archive::no_header);
 		//ia.register_type(static_cast<Der *>(NULL));
 		// write class instance to archive
 		ia & b;
