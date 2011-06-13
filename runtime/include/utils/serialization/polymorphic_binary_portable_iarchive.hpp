@@ -25,15 +25,15 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost { 
-namespace archive {
+namespace utils { 
+namespace serialization {
 
 class polymorphic_binary_portable_iarchive : 
-    public detail::polymorphic_iarchive_route<naked_binary_portable_iarchive>
+    public boost::archive::detail::polymorphic_iarchive_route<naked_binary_portable_iarchive>
 {
 public:
     polymorphic_binary_portable_iarchive(std::istream & is, unsigned int flags = 0) :
-        detail::polymorphic_iarchive_route<naked_binary_portable_iarchive>(is, flags)
+        boost::archive::detail::polymorphic_iarchive_route<naked_binary_portable_iarchive>(is, flags)
     {}
     ~polymorphic_binary_portable_iarchive(){}
 };
@@ -47,7 +47,7 @@ public:
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
-    boost::archive::polymorphic_binary_portable_iarchive
+    utils::serialization::polymorphic_binary_portable_iarchive
 )
 
 #endif // BOOST_ARCHIVE_POLYMORPHIC_BINARY_IARCHIVE_HPP

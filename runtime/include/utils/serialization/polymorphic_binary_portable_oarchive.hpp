@@ -20,10 +20,10 @@
 #include "utils/serialization/binary_portable_oarchive.hpp"
 #include <boost/archive/detail/polymorphic_oarchive_route.hpp>
 
-namespace boost { 
-namespace archive {
+namespace utils { 
+namespace serialization {
 
-typedef detail::polymorphic_oarchive_route<
+typedef boost::archive::detail::polymorphic_oarchive_route<
     binary_portable_oarchive_impl<
         naked_binary_portable_oarchive, 
         std::ostream::char_type, 
@@ -36,7 +36,7 @@ typedef detail::polymorphic_oarchive_route<
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
-    boost::archive::polymorphic_binary_portable_oarchive
+    utils::serialization::polymorphic_binary_portable_oarchive
 )
 
 #endif // BOOST_ARCHIVE_POLYMORPHIC_BINARY_OARCHIVE_HPP

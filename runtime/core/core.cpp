@@ -63,32 +63,41 @@ int f()
 	Bas *b = new Bas;
 	b->in_b = 12345;
 	Der *d = new Der;
-	d->in_b = 12346;
+	d->in_b = -12346;
 	d->in_d = 64321;
 	Bas *bd = new Der;
+	bd->in_b = 12347;
+	((Der*)bd)->in_d = 64322;
 
 	std::strstream str;
 
-	boost::archive::polymorphic_binary_portable_oarchive oa(str);
+	utils::serialization::polymorphic_binary_portable_oarchive oa(str, boost::archive::no_header);
 	//oa.register_type(static_cast<Der *>(NULL));
 	// write class instance to archive
 	oa & b;
 	oa & d;
 	oa & bd;
 
+	size_t st = (size_t)-3;
+	oa & st;
 
+
+	char *ps = str.str();
 
 	{
 		Bas *b = NULL;
 		Der *d = NULL;
 		Bas *bd = NULL;
 
-		boost::archive::polymorphic_binary_portable_iarchive ia(str);
+		utils::serialization::polymorphic_binary_portable_iarchive ia(str, boost::archive::no_header);
 		//ia.register_type(static_cast<Der *>(NULL));
 		// write class instance to archive
 		ia & b;
 		ia & d;
 		ia & bd;
+
+		size_t st = 0;
+		ia & st;
 
 		int k=220;
 

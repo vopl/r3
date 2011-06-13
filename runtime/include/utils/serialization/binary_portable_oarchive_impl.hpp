@@ -29,20 +29,20 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost { 
-namespace archive {
+namespace utils { 
+namespace serialization {
 
 template<class Archive, class Elem, class Tr>
 class binary_portable_oarchive_impl : 
-    public basic_binary_oprimitive<Archive, Elem, Tr>,
-    public basic_binary_oarchive<Archive>
+	public boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>,
+	public boost::archive::basic_binary_oarchive<Archive>
 {
 #ifdef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 public:
 #else
-    friend class detail::interface_oarchive<Archive>;
-    friend class basic_binary_oarchive<Archive>;
-    friend class save_access;
+	friend class boost::archive::detail::interface_oarchive<Archive>;
+    friend class boost::archive::basic_binary_oarchive<Archive>;
+    friend class boost::archive::save_access;
 protected:
 #endif
     // note: the following should not needed - but one compiler (vc 7.1)
@@ -53,7 +53,7 @@ protected:
         this->basic_binary_oarchive<Archive>::save_override(t, 0L);
     }
     void init(unsigned int flags) {
-        if(0 != (flags & no_header))
+        if(0 != (flags & boost::archive::no_header))
             return;
         #if ! defined(__MWERKS__)
             this->basic_binary_oarchive<Archive>::init();
@@ -69,7 +69,7 @@ protected:
     ) :
         basic_binary_oprimitive<Archive, Elem, Tr>(
             bsb, 
-            0 != (flags & no_codecvt)
+            0 != (flags & boost::archive::no_codecvt)
         ),
         basic_binary_oarchive<Archive>(flags)
     {
@@ -81,7 +81,7 @@ protected:
     ) :
         basic_binary_oprimitive<Archive, Elem, Tr>(
             * os.rdbuf(), 
-            0 != (flags & no_codecvt)
+            0 != (flags & boost::archive::no_codecvt)
         ),
         basic_binary_oarchive<Archive>(flags)
     {
@@ -129,8 +129,8 @@ public:
 	}
 };
 
-} // namespace archive
-} // namespace boost
+} 
+} 
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

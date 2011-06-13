@@ -25,8 +25,8 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost { 
-namespace archive {
+namespace utils { 
+namespace serialization {
 
 // do not derive from the classes below.  If you want to extend this functionality
 // via inhertance, derived from text_iarchive_impl instead.  This will
@@ -35,7 +35,7 @@ namespace archive {
 // same as binary_iarchive below - without the shared_ptr_helper
 class naked_binary_portable_iarchive : 
     public binary_portable_iarchive_impl<
-        boost::archive::naked_binary_portable_iarchive, 
+        naked_binary_portable_iarchive, 
         std::istream::char_type, 
         std::istream::traits_type
     >
@@ -53,8 +53,8 @@ public:
     {}
 };
 
-} // namespace archive
-} // namespace boost
+} 
+} 
 
 // note special treatment of shared_ptr. This type needs a special
 // structure associated with every archive.  We created a "mix-in"
@@ -62,19 +62,19 @@ public:
 // special esteem in the boost library - we included it here by default.
 #include <boost/archive/shared_ptr_helper.hpp>
 
-namespace boost { 
-namespace archive {
+namespace utils { 
+namespace serialization {
 
 // do not derive from this class.  If you want to extend this functionality
 // via inhertance, derived from binary_iarchive_impl instead.  This will
 // preserve correct static polymorphism.
 class binary_portable_iarchive : 
     public binary_portable_iarchive_impl<
-        boost::archive::binary_portable_iarchive, 
+        binary_portable_iarchive, 
         std::istream::char_type, 
         std::istream::traits_type
     >,
-    public detail::shared_ptr_helper
+    public boost::archive::detail::shared_ptr_helper
 {
 public:
     binary_portable_iarchive(std::istream & is, unsigned int flags = 0) :
@@ -89,12 +89,12 @@ public:
     {}
 };
 
-} // namespace archive
-} // namespace boost
+} 
+} 
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::binary_portable_iarchive)
-BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(boost::archive::binary_portable_iarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(utils::serialization::binary_portable_iarchive)
+BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(utils::serialization::binary_portable_iarchive)
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

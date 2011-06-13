@@ -26,8 +26,8 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost { 
-namespace archive {
+namespace utils { 
+namespace serialization {
 
 // do not derive from this class.  If you want to extend this functionality
 // via inhertance, derived from binary_oarchive_impl instead.  This will
@@ -52,12 +52,12 @@ public:
 
 typedef binary_portable_oarchive naked_binary_portable_oarchive;
 
-} // namespace archive
-} // namespace boost
+}
+}
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::binary_portable_oarchive)
-BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(boost::archive::binary_portable_oarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(utils::serialization::binary_portable_oarchive)
+BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(utils::serialization::binary_portable_oarchive)
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

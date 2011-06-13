@@ -28,20 +28,20 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost { 
-namespace archive {
+namespace utils { 
+namespace serialization {
 
 template<class Archive, class Elem, class Tr>
 class binary_portable_iarchive_impl : 
-    public basic_binary_iprimitive<Archive, Elem, Tr>,
-    public basic_binary_iarchive<Archive>
+    public boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>,
+    public boost::archive::basic_binary_iarchive<Archive>
 {
 #ifdef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 public:
 #else
-    friend class detail::interface_iarchive<Archive>;
-    friend class basic_binary_iarchive<Archive>;
-    friend class load_access;
+    friend class boost::archive::detail::interface_iarchive<Archive>;
+    friend class boost::archive::basic_binary_iarchive<Archive>;
+    friend class boost::archive::load_access;
 protected:
 #endif
     // note: the following should not needed - but one compiler (vc 7.1)
@@ -52,7 +52,7 @@ protected:
         this->basic_binary_iarchive<Archive>::load_override(t, 0L);
     }
     void init(unsigned int flags){
-        if(0 != (flags & no_header))
+        if(0 != (flags & boost::archive::no_header))
             return;
         #if ! defined(__MWERKS__)
             this->basic_binary_iarchive<Archive>::init();
@@ -68,7 +68,7 @@ protected:
     ) :
         basic_binary_iprimitive<Archive, Elem, Tr>(
             bsb, 
-            0 != (flags & no_codecvt)
+            0 != (flags & boost::archive::no_codecvt)
         ),
         basic_binary_iarchive<Archive>(flags)
     {
@@ -80,7 +80,7 @@ protected:
     ) :
         basic_binary_iprimitive<Archive, Elem, Tr>(
             * is.rdbuf(), 
-            0 != (flags & no_codecvt)
+            0 != (flags & boost::archive::no_codecvt)
         ),
         basic_binary_iarchive<Archive>(flags)
     {
@@ -92,54 +92,54 @@ public:
 	template<class T>
 	void load(T & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 	}
 
 	void load(boost::int16_t & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 		t = utils::fixEndian(t);
 	}
 	void load(boost::int32_t & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 		t = utils::fixEndian(t);
 	}
 	void load(boost::int64_t & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 		t = utils::fixEndian(t);
 	}
 	void load(boost::uint16_t & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 		t = utils::fixEndian(t);
 	}
 	void load(boost::uint32_t & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 		t = utils::fixEndian(t);
 	}
 	void load(boost::uint64_t & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 		t = utils::fixEndian(t);
 	}
 	void load(float & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 		t = utils::fixEndian(t);
 	}
 	void load(double & t)
 	{
-		basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
+		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
 		t = utils::fixEndian(t);
 	}
 
 };
 
-} // namespace archive
-} // namespace boost
+} 
+} 
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

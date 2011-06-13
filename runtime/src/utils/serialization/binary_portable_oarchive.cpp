@@ -19,21 +19,21 @@
 #include <boost/archive/impl/basic_binary_oprimitive.ipp>
 #include <boost/archive/impl/basic_binary_oarchive.ipp>
 
-namespace boost {
-namespace archive {
+namespace utils {
+namespace serialization {
 
-template class detail::archive_serializer_map<binary_portable_oarchive>;
-template class basic_binary_oprimitive<
+template class boost::archive::detail::archive_serializer_map<binary_portable_oarchive>;
+template class boost::archive::basic_binary_oprimitive<
     binary_portable_oarchive, 
     std::ostream::char_type, 
     std::ostream::traits_type
 >;
-template class basic_binary_oarchive<binary_portable_oarchive> ;
+template class boost::archive::basic_binary_oarchive<binary_portable_oarchive> ;
 template class binary_portable_oarchive_impl<
     binary_portable_oarchive, 
     std::ostream::char_type, 
     std::ostream::traits_type
 >;
 
-} // namespace archive
-} // namespace boost
+} 
+} 
