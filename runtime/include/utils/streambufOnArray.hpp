@@ -27,7 +27,6 @@ namespace utils
 		* of the streambuf's input sequence is 0.
 		*/
 		explicit StreambufOnArray()
-			: _size(0)
 		{
 			std::size_t pend = buffer_delta;
 			resize((std::max<std::size_t>)(pend, 1));
@@ -37,7 +36,6 @@ namespace utils
 
 		explicit StreambufOnArray(const buffer_type &buffer, std::size_t size)
 			: _buffer(buffer)
-			, _size(size)
 		{
 			std::size_t pend = size;
 			setg(_buffer.get(), _buffer.get(), _buffer.get() + pend);
@@ -56,7 +54,7 @@ namespace utils
 
 
 	protected:
-		enum { buffer_delta = 128 };
+		enum { buffer_delta = 16384 };
 
 		/// Override std::streambuf behaviour.
 		/**
@@ -133,19 +131,17 @@ namespace utils
 
 	private:
 		buffer_type _buffer;
-		std::size_t	_size;
 
 		void resize(std::size_t newSize)
 		{
 			buffer_type newBuf(new char[newSize]);
 			if(_buffer)
 			{
-				std::size_t moveSize = std::min(_size, newSize);
+				std::size_t moveSize = std::min(size(), newSize);
 				std::memmove(newBuf.get(), _buffer.get(), moveSize);
 			}
 
 			_buffer.swap(newBuf);
-			_size = newSize;
 		}
 	};
 }
