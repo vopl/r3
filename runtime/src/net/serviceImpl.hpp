@@ -39,14 +39,14 @@ namespace net
 		void workerProc(ServiceWorkerPtr swp);
 
 	private:
-		const std::string &handleGetPasswordSsl();
+		const std::string &handleGetPassword();
 
-		void makeAcceptSsl();
-		void handleAcceptSsl(TSocket_ptr socket, const boost::system::error_code& e);
-		void handleServerHandshakeSsl(TSocket_ptr socket, const boost::system::error_code& e);
+		void makeAccept();
+		void handleAccept(TSocket_ptr socket, const boost::system::error_code& e);
+		void handleServerHandshake(TSocket_ptr socket, const boost::system::error_code& e);
 
-		void handleConnectSsl(TSocket_ptr socket, const boost::system::error_code& e);
-		void handleClientHandshakeSsl(TSocket_ptr socket, const boost::system::error_code& e);
+		void handleConnect(TSocket_ptr socket, const boost::system::error_code& e);
+		void handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& e);
 
 	public:
 		ServiceImpl(Service *iface, IServiceHandler *);

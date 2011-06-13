@@ -19,5 +19,5 @@
 #include <boost/asio/ssl.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
-
+#include <boost/shared_array.hpp>
 #include <iostream>

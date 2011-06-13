@@ -37,26 +37,27 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	const std::string &ServiceImpl::handleGetPasswordSsl()
+	const std::string &ServiceImpl::handleGetPassword()
 	{
 		return _ssl_password;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::makeAcceptSsl()
+	void ServiceImpl::makeAccept()
 	{
-		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
+		//TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
+		TSocket_ptr socket(new TSocket(_io_service));
 
 		_acceptor.async_accept(socket->lowest_layer(),
-			boost::bind(&ServiceImpl::handleAcceptSsl, this,
+			boost::bind(&ServiceImpl::handleAccept, this,
 			socket,
 			placeholders::error));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleAcceptSsl(TSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleAccept(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
-		makeAcceptSsl();
+		makeAccept();
 
 		if(ec)
 		{
@@ -64,16 +65,17 @@ namespace net
 			return;
 		}
 
-		socket->async_handshake(
-			ssl::stream_base::server,
-			boost::bind(
-				&ServiceImpl::handleServerHandshakeSsl, this,
-				socket,
-				placeholders::error));
+// 		socket->async_handshake(
+// 			ssl::stream_base::server,
+// 			boost::bind(
+// 				&ServiceImpl::handleServerHandshakeSsl, this,
+// 				socket,
+// 				placeholders::error));
+		_handler->onAccept(Channel_ptr(new ChannelImpl(socket)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleServerHandshakeSsl(TSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleServerHandshake(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
 		if(ec)
 		{
@@ -86,23 +88,24 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleConnectSsl(TSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleConnect(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
 		if(ec)
 		{
 			LOG(ec);
 			return;
 		}
-		socket->async_handshake(
-			ssl::stream_base::client,
-			boost::bind(
-				&ServiceImpl::handleClientHandshakeSsl, this,
-				socket,
-				placeholders::error));
+// 		socket->async_handshake(
+// 			ssl::stream_base::client,
+// 			boost::bind(
+// 				&ServiceImpl::handleClientHandshakeSsl, this,
+// 				socket,
+// 				placeholders::error));
+		_handler->onConnect(Channel_ptr(new ChannelImpl(socket)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleClientHandshakeSsl(TSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
 		if(ec)
 		{
@@ -185,7 +188,7 @@ namespace net
 			ssl::context::default_workarounds
 			| ssl::context::no_sslv2
 			| ssl::context::single_dh_use);
-		_ssl_context.set_password_callback(boost::bind(&ServiceImpl::handleGetPasswordSsl, this));
+		_ssl_context.set_password_callback(boost::bind(&ServiceImpl::handleGetPassword, this));
 
 		_ssl_password = "test";
 		_ssl_certificate = "server.pem";
@@ -220,7 +223,7 @@ namespace net
 		_acceptor.bind(endpoint);
 		_acceptor.listen();
 
-		makeAcceptSsl();
+		makeAccept();
 
 
 	}
@@ -233,10 +236,11 @@ namespace net
 		ip::tcp::resolver::query query(host, utils::_ntoa(port, sport));
 		ip::tcp::endpoint endpoint = *resolver.resolve(query);
 
-		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
+		//TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
+		TSocket_ptr socket(new TSocket(_io_service));
 		socket->lowest_layer().async_connect(endpoint, 
 			boost::bind(
-				&ServiceImpl::handleConnectSsl, this,
+				&ServiceImpl::handleConnect, this,
 				socket,
 				placeholders::error));
 	}

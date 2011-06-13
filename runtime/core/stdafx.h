@@ -18,6 +18,7 @@
 #include <deque>
 #include <set>
 
+#include <boost/shared_array.hpp>
 #include <boost/date_time/gregorian_calendar.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/cstdint.hpp>

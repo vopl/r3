@@ -4,9 +4,8 @@
 
 namespace net
 {
-// 	typedef boost::asio::ip::tcp::socket TRawSocket;
-// 	typedef boost::shared_ptr<boost::asio::ip::tcp::socket> TRawSocket_ptr;
-	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> TSocket;
+ 	typedef boost::asio::ip::tcp::socket TSocket;
+	//typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> TSocket;
 	typedef boost::shared_ptr<TSocket> TSocket_ptr;
 
 
@@ -22,7 +21,7 @@ namespace net
 			size_t			_totalSended;
 			boost::uint32_t	_sizeNetOrder;
 			boost::uint32_t	_crc32NetOrder;
-			const char		*_data;
+			boost::shared_array<char> _data;
 			boost::uint32_t	_size;
 		};
 		typedef boost::shared_ptr<OutPacketWrapper> OutPacketWrapper_ptr;
@@ -32,7 +31,7 @@ namespace net
 			size_t				_totalReceived;
 			boost::uint32_t		_size;
 			boost::uint32_t		_crc32;
-			std::vector<char>	_data;
+			boost::shared_array<char> _data;
 		};
 		typedef boost::shared_ptr<InPacketWrapper> InPacketWrapper_ptr;
 
@@ -41,7 +40,7 @@ namespace net
 	public:
 		ChannelImpl(TSocket_ptr socket);
 		virtual void setHandler(IChannelHandler *);
-		virtual void send(const char *data, size_t size);
+		virtual void send(boost::shared_array<char> data, size_t size);
 		virtual void close();
 
 	private:

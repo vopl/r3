@@ -140,21 +140,18 @@ protected:
 
 
 volatile size_t cnt=0;
-char g_buf[128];
 
 struct MyServiceHandler
 	: net::IServiceHandler
 	, net::IChannelHandler
 {
-	std::vector<char> _data;
-	virtual void onReceive(net::Channel_ptr channel, char *data, size_t size)
+	virtual void onReceive(net::Channel_ptr channel, boost::shared_array<char> data, size_t size)
 	{
 		if(!((cnt++)%1000))
 		{
 			std::cout<<"receive send "<<cnt<<std::endl;
 		}
-		_data.assign(data, data+size);
-		channel->send(&_data[0], size);
+		channel->send(data, size);
 	}
 
 	virtual void onError(net::Channel_ptr channel)
@@ -188,7 +185,9 @@ struct MyServiceHandler
 		channel->setHandler(this);
 		std::cout<<"send"<<std::endl;
 
-		channel->send(g_buf, sizeof(g_buf));
+		boost::shared_array<char> data(new char[220]);
+
+		channel->send(data, 220);
 	};
 
 	virtual void onStopInThread()
