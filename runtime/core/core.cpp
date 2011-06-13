@@ -11,7 +11,7 @@ using namespace r3;
 
 
 
-#include <boost/asio/streambuf.hpp>
+#include "utils/streambufOnArray.hpp"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ int f()
 	bd->in_b = 12347;
 	((Der*)bd)->in_d = 64322;
 
-	boost::asio::streambuf sbuf;
+	utils::StreambufOnArray sbuf;
 	std::ostream ostr(&sbuf);
 
 	utils::serialization::polymorphic_binary_portable_oarchive oa(ostr, boost::archive::no_header);
@@ -78,6 +78,7 @@ int f()
 	oa & b;
 	oa & d;
 	oa & bd;
+	ostr.flush();
 
 	size_t st = (size_t)-3;
 	oa & st;
@@ -89,7 +90,9 @@ int f()
 		Der *d = NULL;
 		Bas *bd = NULL;
 
-		std::istream istr(&sbuf);
+		utils::StreambufOnArray sbuf2(sbuf.data(), sbuf.size());
+
+		std::istream istr(&sbuf2);
 
 		utils::serialization::polymorphic_binary_portable_iarchive ia(istr, boost::archive::no_header);
 		//ia.register_type(static_cast<Der *>(NULL));
@@ -100,6 +103,8 @@ int f()
 
 		size_t st = 0;
 		ia & st;
+
+		std::size_t tail = sbuf2.size();
 
 		int k=220;
 
