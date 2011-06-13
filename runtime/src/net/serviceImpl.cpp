@@ -45,16 +45,16 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::makeAcceptSsl()
 	{
-		TSslSocket_ptr socket(new TSslSocket(_io_service, _contextSsl));
+		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
 
-		_acceptorSsl.async_accept(socket->lowest_layer(),
+		_acceptor.async_accept(socket->lowest_layer(),
 			boost::bind(&ServiceImpl::handleAcceptSsl, this,
 			socket,
 			placeholders::error));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleAcceptSsl(TSslSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleAcceptSsl(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
 		makeAcceptSsl();
 
@@ -73,7 +73,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleServerHandshakeSsl(TSslSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleServerHandshakeSsl(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
 		if(ec)
 		{
@@ -86,7 +86,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleConnectSsl(TSslSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleConnectSsl(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
 		if(ec)
 		{
@@ -99,11 +99,10 @@ namespace net
 				&ServiceImpl::handleClientHandshakeSsl, this,
 				socket,
 				placeholders::error));
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleClientHandshakeSsl(TSslSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleClientHandshakeSsl(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
 		if(ec)
 		{
@@ -121,8 +120,8 @@ namespace net
 		: _iface(iface)
 		, _handler(handler)
 		, _io_service()
-		, _contextSsl(_io_service, ssl::context::sslv23)
-		, _acceptorSsl(_io_service)
+		, _ssl_context(_io_service, ssl::context::sslv23)
+		, _acceptor(_io_service)
 	{
 	}
 
@@ -182,11 +181,11 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::listen(const char *host, short port)
 	{
-		_contextSsl.set_options(
+		_ssl_context.set_options(
 			ssl::context::default_workarounds
 			| ssl::context::no_sslv2
 			| ssl::context::single_dh_use);
-		_contextSsl.set_password_callback(boost::bind(&ServiceImpl::handleGetPasswordSsl, this));
+		_ssl_context.set_password_callback(boost::bind(&ServiceImpl::handleGetPasswordSsl, this));
 
 		_ssl_password = "test";
 		_ssl_certificate = "server.pem";
@@ -196,17 +195,17 @@ namespace net
 
 		if(!_ssl_certificate.empty())
 		{
-			_contextSsl.use_certificate_chain_file(_ssl_certificate);
+			_ssl_context.use_certificate_chain_file(_ssl_certificate);
 		}
 
 		if(!_ssl_privateKey.empty())
 		{
-			_contextSsl.use_private_key_file(_ssl_privateKey, ssl::context::pem);
+			_ssl_context.use_private_key_file(_ssl_privateKey, ssl::context::pem);
 		}
 
 		if(!_ssl_tmpdh.empty())
 		{
-			_contextSsl.use_tmp_dh_file(_ssl_tmpdh);
+			_ssl_context.use_tmp_dh_file(_ssl_tmpdh);
 		}
 
 		ip::tcp::resolver resolver(_io_service);
@@ -215,11 +214,11 @@ namespace net
 		ip::tcp::endpoint endpoint = *resolver.resolve(query);
 
 
-		_acceptorSsl.open(endpoint.protocol());
-		_acceptorSsl.set_option(ip::tcp::acceptor::reuse_address(true));
-		_acceptorSsl.set_option(socket_base::enable_connection_aborted(true));
-		_acceptorSsl.bind(endpoint);
-		_acceptorSsl.listen();
+		_acceptor.open(endpoint.protocol());
+		_acceptor.set_option(ip::tcp::acceptor::reuse_address(true));
+		_acceptor.set_option(socket_base::enable_connection_aborted(true));
+		_acceptor.bind(endpoint);
+		_acceptor.listen();
 
 		makeAcceptSsl();
 
@@ -234,7 +233,7 @@ namespace net
 		ip::tcp::resolver::query query(host, utils::_ntoa(port, sport));
 		ip::tcp::endpoint endpoint = *resolver.resolve(query);
 
-		TSslSocket_ptr socket(new TSslSocket(_io_service, _contextSsl));
+		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
 		socket->lowest_layer().async_connect(endpoint, 
 			boost::bind(
 				&ServiceImpl::handleConnectSsl, this,

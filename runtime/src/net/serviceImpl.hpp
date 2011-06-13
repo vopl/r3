@@ -25,9 +25,9 @@ namespace net
 
 		boost::asio::io_service			_io_service;
 		boost::shared_ptr<boost::asio::io_service::work>	_work;
-		boost::asio::ssl::context		_contextSsl;
-		boost::asio::ip::tcp::acceptor	_acceptorSsl;
+		boost::asio::ip::tcp::acceptor	_acceptor;
 
+		boost::asio::ssl::context		_ssl_context;
 		std::string						_ssl_certificate;
 		std::string						_ssl_privateKey;
 		std::string						_ssl_tmpdh;
@@ -42,11 +42,11 @@ namespace net
 		const std::string &handleGetPasswordSsl();
 
 		void makeAcceptSsl();
-		void handleAcceptSsl(TSslSocket_ptr socket, const boost::system::error_code& e);
-		void handleServerHandshakeSsl(TSslSocket_ptr socket, const boost::system::error_code& e);
+		void handleAcceptSsl(TSocket_ptr socket, const boost::system::error_code& e);
+		void handleServerHandshakeSsl(TSocket_ptr socket, const boost::system::error_code& e);
 
-		void handleConnectSsl(TSslSocket_ptr socket, const boost::system::error_code& e);
-		void handleClientHandshakeSsl(TSslSocket_ptr socket, const boost::system::error_code& e);
+		void handleConnectSsl(TSocket_ptr socket, const boost::system::error_code& e);
+		void handleClientHandshakeSsl(TSocket_ptr socket, const boost::system::error_code& e);
 
 	public:
 		ServiceImpl(Service *iface, IServiceHandler *);

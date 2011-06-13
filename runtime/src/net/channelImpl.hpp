@@ -4,9 +4,10 @@
 
 namespace net
 {
-	typedef boost::asio::ip::tcp::socket TRawSocket;
-	typedef boost::asio::ssl::stream<TRawSocket> TSslSocket;
-	typedef boost::shared_ptr<TSslSocket> TSslSocket_ptr;
+// 	typedef boost::asio::ip::tcp::socket TRawSocket;
+// 	typedef boost::shared_ptr<boost::asio::ip::tcp::socket> TRawSocket_ptr;
+	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> TSocket;
+	typedef boost::shared_ptr<TSocket> TSocket_ptr;
 
 
 	class ChannelImpl;
@@ -35,10 +36,10 @@ namespace net
 		};
 		typedef boost::shared_ptr<InPacketWrapper> InPacketWrapper_ptr;
 
-		TSslSocket_ptr _socket;
+		TSocket_ptr _socket;
 		IChannelHandler *_handler;
 	public:
-		ChannelImpl(TSslSocket_ptr socket);
+		ChannelImpl(TSocket_ptr socket);
 		virtual void setHandler(IChannelHandler *);
 		virtual void send(const char *data, size_t size);
 		virtual void close();

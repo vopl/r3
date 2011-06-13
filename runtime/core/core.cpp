@@ -139,6 +139,8 @@ protected:
 
 
 
+volatile size_t cnt=0;
+char g_buf[128];
 
 struct MyServiceHandler
 	: net::IServiceHandler
@@ -147,7 +149,10 @@ struct MyServiceHandler
 	std::vector<char> _data;
 	virtual void onReceive(net::Channel_ptr channel, char *data, size_t size)
 	{
-		std::cout<<"receive send"<<std::endl;
+		if(!((cnt++)%1000))
+		{
+			std::cout<<"receive send "<<cnt<<std::endl;
+		}
 		_data.assign(data, data+size);
 		channel->send(&_data[0], size);
 	}
@@ -182,7 +187,8 @@ struct MyServiceHandler
 	{
 		channel->setHandler(this);
 		std::cout<<"send"<<std::endl;
-		channel->send("asdf", 4);
+
+		channel->send(g_buf, sizeof(g_buf));
 	};
 
 	virtual void onStopInThread()
@@ -206,16 +212,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	net::Service srv(&myServiceHandler);
 
 
-	srv.balance(4);
-
 	if(argc>1)
 	{
+		srv.balance(16);
 		std::cout<<"connect"<<std::endl;
-
 		srv.connect("127.0.0.1", 1234);
 	}
 	else
 	{
+		srv.balance(32);
 		std::cout<<"listen"<<std::endl;
 		srv.listen("127.0.0.1", 1234);
 	}

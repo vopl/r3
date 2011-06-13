@@ -11,7 +11,7 @@ namespace net
 	using namespace boost::asio;
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::ChannelImpl(TSslSocket_ptr socket)
+	ChannelImpl::ChannelImpl(TSocket_ptr socket)
 		: _socket(socket)
 		, _handler(NULL)
 	{
