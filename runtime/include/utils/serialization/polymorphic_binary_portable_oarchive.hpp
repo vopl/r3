@@ -23,13 +23,35 @@
 namespace utils { 
 namespace serialization {
 
-typedef boost::archive::detail::polymorphic_oarchive_route<
-    binary_portable_oarchive_impl<
-        naked_binary_portable_oarchive, 
-        std::ostream::char_type, 
-        std::ostream::traits_type
-    >
- > polymorphic_binary_portable_oarchive;
+// typedef boost::archive::detail::polymorphic_oarchive_route<
+//     binary_portable_oarchive_impl<
+//         naked_binary_portable_oarchive, 
+//         std::ostream::char_type, 
+//         std::ostream::traits_type
+//     >
+//  > polymorphic_binary_portable_oarchive;
+
+	class polymorphic_binary_portable_oarchive
+		: public boost::archive::detail::polymorphic_oarchive_route<
+			binary_portable_oarchive_impl<
+				naked_binary_portable_oarchive, 
+				std::ostream::char_type, 
+				std::ostream::traits_type>
+		>
+	{
+	public:
+		polymorphic_binary_portable_oarchive(std::streambuf & bsb, unsigned int flags = 0)
+			: boost::archive::detail::polymorphic_oarchive_route<
+				binary_portable_oarchive_impl<
+					naked_binary_portable_oarchive, 
+					std::ostream::char_type, 
+					std::ostream::traits_type>
+			>(std::ostream(&bsb), flags)
+		{
+
+		}
+
+	};
 
 } // namespace archive
 } // namespace boost

@@ -70,15 +70,13 @@ int f()
 	((Der*)bd)->in_d = 64322;
 
 	utils::StreambufOnArray sbuf;
-	std::ostream ostr(&sbuf);
 
-	utils::serialization::polymorphic_binary_portable_oarchive oa(ostr, boost::archive::no_header);
+	utils::serialization::polymorphic_binary_portable_oarchive oa(sbuf, boost::archive::no_header|boost::archive::no_codecvt);
 	//oa.register_type(static_cast<Der *>(NULL));
 	// write class instance to archive
 	oa & b;
 	oa & d;
 	oa & bd;
-	ostr.flush();
 
 	size_t st = (size_t)-3;
 	oa & st;
@@ -92,9 +90,7 @@ int f()
 
 		utils::StreambufOnArray sbuf2(sbuf.data(), sbuf.size());
 
-		std::istream istr(&sbuf2);
-
-		utils::serialization::polymorphic_binary_portable_iarchive ia(istr, boost::archive::no_header);
+		utils::serialization::polymorphic_binary_portable_iarchive ia(sbuf2, boost::archive::no_header|boost::archive::no_codecvt);
 		//ia.register_type(static_cast<Der *>(NULL));
 		// write class instance to archive
 		ia & b;

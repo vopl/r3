@@ -32,8 +32,8 @@ class polymorphic_binary_portable_iarchive :
     public boost::archive::detail::polymorphic_iarchive_route<naked_binary_portable_iarchive>
 {
 public:
-    polymorphic_binary_portable_iarchive(std::istream & is, unsigned int flags = 0) :
-        boost::archive::detail::polymorphic_iarchive_route<naked_binary_portable_iarchive>(is, flags)
+    polymorphic_binary_portable_iarchive(std::streambuf &bsb, unsigned int flags = 0) :
+	  boost::archive::detail::polymorphic_iarchive_route<naked_binary_portable_iarchive>(std::istream(&bsb), flags)
     {}
     ~polymorphic_binary_portable_iarchive(){}
 };
