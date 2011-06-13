@@ -5,9 +5,105 @@
 #include "r3/contextBase.hpp"
 #include "r3/contextUser.hpp"
 #include "net/service.hpp"
-
-#include <vector>
 using namespace r3;
+
+#include <strstream>
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+#include "utils/serialization/polymorphic_binary_portable_iarchive.hpp"
+#include "utils/serialization/polymorphic_binary_portable_oarchive.hpp"
+
+// #include <boost/archive/polymorphic_binary_iarchive.hpp>
+// #include <boost/archive/polymorphic_binary_oarchive.hpp>
+// #include <boost/archive/detail/iserializer.hpp>
+// #include <boost/archive/detail/oserializer.hpp>
+
+//#include <boost/serialization/export.hpp>
+//#include <boost/archive/impl/archive_serializer_map.ipp>
+
+struct Bas
+{
+public:
+	int in_b;
+	virtual ~Bas()
+	{
+	}
+
+	friend class boost::serialization::access;
+	template<class Archive>
+	void serialize(Archive & ar, const unsigned int version)
+	{
+		ar & in_b;
+	}
+};
+struct Der
+	: Bas
+{
+public:
+	int in_d;
+
+	friend class boost::serialization::access;
+	template<class Archive>
+	void serialize(Archive & ar, const unsigned int version)
+	{
+		ar & boost::serialization::base_object<Bas>(*this);
+		ar & in_d;
+	}
+};
+// BOOST_CLASS_EXPORT(Bas);
+// BOOST_CLASS_EXPORT(Der);
+
+int f()
+{
+	Bas *b = new Bas;
+	b->in_b = 12345;
+	Der *d = new Der;
+	d->in_b = 12346;
+	d->in_d = 64321;
+	Bas *bd = new Der;
+
+	std::strstream str;
+
+	boost::archive::polymorphic_binary_portable_oarchive oa(str);
+	//oa.register_type(static_cast<Der *>(NULL));
+	// write class instance to archive
+	oa & b;
+	oa & d;
+	oa & bd;
+
+
+
+	{
+		Bas *b = NULL;
+		Der *d = NULL;
+		Bas *bd = NULL;
+
+		boost::archive::polymorphic_binary_portable_iarchive ia(str);
+		//ia.register_type(static_cast<Der *>(NULL));
+		// write class instance to archive
+		ia & b;
+		ia & d;
+		ia & bd;
+
+		int k=220;
+
+	}
+
+	return 4;
+}
+static int i=f();
+//////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 
 struct MyContextParent
 	: r3::ContextBase<MyContextParent, void>
@@ -196,6 +292,7 @@ struct MyServiceHandler
 		{
 			std::cout<<"receive send "<<cnt<<std::endl;
 		}
+		boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
 		channel->send(data, size);
 	}
 
