@@ -25,18 +25,31 @@ namespace r3
 			: tid(tid)
 		{
 		}
+
+		virtual ~EventBase()
+		{
+		}
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 	struct Event_ping:EventBase
 	{
 		static const TypeId tid=31;
-		Event_ping():EventBase(tid){}
+		Event_ping()
+			: EventBase(tid)
+			, counter(0)
+		{}
+
+		boost::uint32_t counter;
 	};
 	struct Event_pong:EventBase
 	{
 		static const TypeId tid=32;
-		Event_pong():EventBase(tid){}
+		Event_pong(const Event_ping &ping)
+			: EventBase(tid)
+			, counter(ping.counter+1)
+		{}
+		boost::uint32_t counter;
 	};
 	struct Event_destroy:EventBase
 	{
@@ -53,23 +66,14 @@ namespace r3
 		void destroy();
 
 		template <class Event>
-		void handle(const Event &evt)
-		{
+		void handle(const Event &evt);
 
-		}
-		template<> void handle(const Event_ping &evt)
-		{
+		void handle(const Event_ping &evt);
+		void handle(const Event_pong &evt);
+		void handle(const Event_destroy &evt);
 
-		}
-		void handle(const Event_pong &evt)
-		{
-
-		}
-		void handle(const Event_destroy &evt)
-		{
-
-		}
-
+		template <class Event>
+		void fire(const Event &evt);
 
 	protected:
 		ContextId _id;
@@ -78,7 +82,7 @@ namespace r3
 	protected:
 		ContextBase(ContextId id, Parent *parent);
 
-	protected:
+	public:
 
 		template <class ContextChild>
 		ContextId createImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
@@ -92,8 +96,7 @@ namespace r3
 		template <class Event>
 		void handleImpl(const Event *evt);
 
-		template <class Event>
-		void fireImpl(const Event *evt);
+		void fireImpl(const Path &cpi, const EventBase *evt);
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -106,6 +109,44 @@ namespace r3
 			_parent->destroy(Context::tid, _id);
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class Event>
+	void ContextBase<Context, Parent>::handle(const Event &evt)
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::handle(const Event_ping &evt)
+	{
+		fire(Event_pong(evt));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::handle(const Event_pong &evt)
+	{
+		//ignore
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class Event>
+	void ContextBase<Context, Parent>::fire(const Event &evt)
+	{
+		_parent->fireImpl(Path(), &evt);
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::handle(const Event_destroy &evt)
+	{
+		destroy();
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
@@ -154,8 +195,7 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	template <class Event>
-	void ContextBase<Context, Parent>::fireImpl(const Event *evt)
+	void ContextBase<Context, Parent>::fireImpl(const Path &p, const EventBase *evt)
 	{
 		assert(!"not impl");
 	}

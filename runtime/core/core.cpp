@@ -12,6 +12,9 @@ using namespace r3;
 struct MyContextParent
 	: r3::ContextBase<MyContextParent, void>
 {
+public:
+	void destroy(TypeId tid, ContextId id);
+
 };
 
 struct MyContext2
@@ -62,14 +65,21 @@ public:
 	}
 	void handle(const Event1 &evt)
 	{
+		return r3::ContextBase<MyContext, MyContextParent>::handle(evt);
 	}
 	void handle(const Event2 &evt)
 	{
+		return r3::ContextBase<MyContext, MyContextParent>::handle(evt);
 	}
 
+	template <class Event>
+	void fire(const Event &evt)
+	{
+		return r3::ContextBase<MyContext, MyContextParent>::fire(evt);
+	}
 	void fire(const Event2 &evt)
 	{
-		fireImpl(&evt);
+		return r3::ContextBase<MyContext, MyContextParent>::fire(evt);
 	}
 
 
