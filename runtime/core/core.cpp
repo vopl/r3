@@ -185,9 +185,9 @@ struct MyServiceHandler
 		channel->setHandler(this);
 		std::cout<<"send"<<std::endl;
 
-		boost::shared_array<char> data(new char[220]);
+		boost::shared_array<char> data(new char[8]);
 
-		channel->send(data, 220);
+		channel->send(data, 8);
 	};
 
 	virtual void onStopInThread()
@@ -213,7 +213,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if(argc>1)
 	{
-		srv.balance(16);
+		srv.balance(1);
 		std::cout<<"connect"<<std::endl;
 		srv.connect("127.0.0.1", 1234);
 	}

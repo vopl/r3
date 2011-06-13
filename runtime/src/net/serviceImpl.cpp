@@ -45,8 +45,8 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::makeAccept()
 	{
-		//TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
-		TSocket_ptr socket(new TSocket(_io_service));
+		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
+		//TSocket_ptr socket(new TSocket(_io_service));
 
 		_acceptor.async_accept(socket->lowest_layer(),
 			boost::bind(&ServiceImpl::handleAccept, this,
@@ -65,13 +65,12 @@ namespace net
 			return;
 		}
 
-// 		socket->async_handshake(
-// 			ssl::stream_base::server,
-// 			boost::bind(
-// 				&ServiceImpl::handleServerHandshakeSsl, this,
-// 				socket,
-// 				placeholders::error));
-		_handler->onAccept(Channel_ptr(new ChannelImpl(socket)));
+		socket->async_handshake(
+			ssl::stream_base::server,
+			boost::bind(
+				&ServiceImpl::handleServerHandshake, this,
+				socket,
+				placeholders::error));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -95,13 +94,12 @@ namespace net
 			LOG(ec);
 			return;
 		}
-// 		socket->async_handshake(
-// 			ssl::stream_base::client,
-// 			boost::bind(
-// 				&ServiceImpl::handleClientHandshakeSsl, this,
-// 				socket,
-// 				placeholders::error));
-		_handler->onConnect(Channel_ptr(new ChannelImpl(socket)));
+		socket->async_handshake(
+			ssl::stream_base::client,
+			boost::bind(
+				&ServiceImpl::handleClientHandshake, this,
+				socket,
+				placeholders::error));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -236,8 +234,8 @@ namespace net
 		ip::tcp::resolver::query query(host, utils::_ntoa(port, sport));
 		ip::tcp::endpoint endpoint = *resolver.resolve(query);
 
-		//TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
-		TSocket_ptr socket(new TSocket(_io_service));
+		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
+		//TSocket_ptr socket(new TSocket(_io_service));
 		socket->lowest_layer().async_connect(endpoint, 
 			boost::bind(
 				&ServiceImpl::handleConnect, this,

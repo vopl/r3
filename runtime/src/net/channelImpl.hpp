@@ -4,8 +4,8 @@
 
 namespace net
 {
- 	typedef boost::asio::ip::tcp::socket TSocket;
-	//typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> TSocket;
+ 	//typedef boost::asio::ip::tcp::socket TSocket;
+	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> TSocket;
 	typedef boost::shared_ptr<TSocket> TSocket_ptr;
 
 
