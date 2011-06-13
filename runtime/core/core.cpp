@@ -15,6 +15,7 @@ using namespace r3;
 
 
 //////////////////////////////////////////////////////////////////////////
+#include <boost/serialization/export.hpp>
 #include "utils/serialization/polymorphic_binary_portable_iarchive.hpp"
 #include "utils/serialization/polymorphic_binary_portable_oarchive.hpp"
 
@@ -23,7 +24,6 @@ using namespace r3;
 // #include <boost/archive/detail/iserializer.hpp>
 // #include <boost/archive/detail/oserializer.hpp>
 
-//#include <boost/serialization/export.hpp>
 //#include <boost/archive/impl/archive_serializer_map.ipp>
 
 struct Bas
@@ -55,8 +55,10 @@ public:
 		ar & in_d;
 	}
 };
-// BOOST_CLASS_EXPORT(Bas);
-// BOOST_CLASS_EXPORT(Der);
+//BOOST_CLASS_EXPORT(Bas);
+//BOOST_CLASS_EXPORT(Der);
+BOOST_CLASS_EXPORT_KEY(Der)
+
 
 int f()
 {
@@ -71,7 +73,8 @@ int f()
 
 	utils::StreambufOnArray sbuf;
 
-	utils::serialization::polymorphic_binary_portable_oarchive oa(sbuf, boost::archive::no_header|boost::archive::no_codecvt);
+	boost::archive::polymorphic_oarchive & oa = 
+		utils::serialization::polymorphic_binary_portable_oarchive(sbuf, boost::archive::no_header|boost::archive::no_codecvt);
 	//oa.register_type(static_cast<Der *>(NULL));
 	// write class instance to archive
 	oa & b;
@@ -90,7 +93,8 @@ int f()
 
 		utils::StreambufOnArray sbuf2(sbuf.data(), sbuf.size());
 
-		utils::serialization::polymorphic_binary_portable_iarchive ia(sbuf2, boost::archive::no_header|boost::archive::no_codecvt);
+		boost::archive::polymorphic_iarchive & ia = 
+			utils::serialization::polymorphic_binary_portable_iarchive(sbuf2, boost::archive::no_header|boost::archive::no_codecvt);
 		//ia.register_type(static_cast<Der *>(NULL));
 		// write class instance to archive
 		ia & b;
@@ -300,12 +304,26 @@ struct MyServiceHandler
 {
 	virtual void onReceive(net::Channel_ptr channel, boost::shared_array<char> data, size_t size)
 	{
+		utils::StreambufOnArray sbuf(data, size);
+		boost::archive::polymorphic_iarchive & ia = 
+			utils::serialization::polymorphic_binary_portable_iarchive(sbuf, boost::archive::no_header|boost::archive::no_codecvt);
+
+		Bas *bd = NULL;
+		ia & (bd);
+
+		utils::StreambufOnArray sbuf2;
+		boost::archive::polymorphic_oarchive & oa = 
+			utils::serialization::polymorphic_binary_portable_oarchive(sbuf2, boost::archive::no_header|boost::archive::no_codecvt);
+		oa & (bd);
+
 		if(!((cnt++)%1000))
 		{
-			std::cout<<"receive send "<<cnt<<std::endl;
+			std::cout<<"receive send "<<bd->in_b<<cnt<<std::endl;
 		}
-		boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
-		channel->send(data, size);
+
+		delete bd;
+
+		channel->send(sbuf2.data(), sbuf2.size());
 	}
 
 	virtual void onError(net::Channel_ptr channel)
@@ -339,9 +357,20 @@ struct MyServiceHandler
 		channel->setHandler(this);
 		std::cout<<"send"<<std::endl;
 
-		boost::shared_array<char> data(new char[8]);
 
-		channel->send(data, 8);
+		utils::StreambufOnArray sbuf;
+		boost::archive::polymorphic_oarchive & oa = 
+			utils::serialization::polymorphic_binary_portable_oarchive(sbuf, boost::archive::no_header|boost::archive::no_codecvt);
+
+		Bas *bd = new Der;
+		bd->in_b = 12347;
+		((Der*)bd)->in_d = 64322;
+
+		oa << (bd);
+		delete bd;
+
+		channel->send(sbuf.data(), sbuf.size());
+
 	};
 
 	virtual void onStopInThread()
@@ -358,31 +387,33 @@ struct MyServiceHandler
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	MyContext ctx(345, NULL);
-
-	MyServiceHandler myServiceHandler;
-
-	net::Service srv(&myServiceHandler);
-
-
-	if(argc>1)
 	{
-		srv.balance(1);
-		std::cout<<"connect"<<std::endl;
-		srv.connect("127.0.0.1", 1234);
+		MyContext ctx(345, NULL);
+
+		MyServiceHandler myServiceHandler;
+
+		net::Service srv(&myServiceHandler);
+
+
+		if(argc>1)
+		{
+			srv.balance(1);
+			std::cout<<"connect"<<std::endl;
+			srv.connect("127.0.0.1", 1234);
+		}
+		else
+		{
+			srv.balance(32);
+			std::cout<<"listen"<<std::endl;
+			srv.listen("127.0.0.1", 1234);
+		}
+
+
+		char c;
+		std::cin>>c;
+
+		srv.balance(0);
 	}
-	else
-	{
-		srv.balance(32);
-		std::cout<<"listen"<<std::endl;
-		srv.listen("127.0.0.1", 1234);
-	}
-
-
-	char c;
-	std::cin>>c;
-
-	srv.balance(0);
 
 	return 0;
 }

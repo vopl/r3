@@ -83,7 +83,8 @@ namespace net
 			return;
 		}
 
-		_handler->onAccept(Channel_ptr(new ChannelImpl(socket)));
+		addSock(socket);
+		_handler->onAccept(Channel_ptr(new ChannelImpl(this, socket)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -111,9 +112,58 @@ namespace net
 			return;
 		}
 
-		_handler->onConnect(Channel_ptr(new ChannelImpl(socket)));
+		addSock(socket);
+		_handler->onConnect(Channel_ptr(new ChannelImpl(this, socket)));
 	}
 
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::addSock(TSocket_ptr socket)
+	{
+		_io_service.post(_socksPoolStrand.wrap(
+			boost::bind(&ServiceImpl::handleAddSock, this, socket)
+			));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::delSock(TSocket_ptr socket)
+	{
+		_io_service.post(_socksPoolStrand.wrap(
+			boost::bind(&ServiceImpl::handleDelSock, this, socket)
+			));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::closeSocks()
+	{
+		_io_service.post(_socksPoolStrand.wrap(
+			boost::bind(&ServiceImpl::handleCloseSocks, this)
+			));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::handleAddSock(TSocket_ptr socket)
+	{
+		_socks.insert(socket);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::handleDelSock(TSocket_ptr socket)
+	{
+		_socks.erase(socket);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::handleCloseSocks()
+	{
+		boost::system::error_code ec;
+		BOOST_FOREACH(TSocket_ptr &sock, _socks)
+		{
+			sock->shutdown(ec);
+			sock->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both);
+			sock->lowest_layer().close();
+		}
+	}
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -123,12 +173,55 @@ namespace net
 		, _io_service()
 		, _ssl_context(_io_service, ssl::context::sslv23)
 		, _acceptor(_io_service)
+		, _socksPoolStrand(_io_service)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::balance(size_t numThreads)
 	{
+		if(!numThreads)
+		{
+			closeSocks();
+		}
+
+// 		if(!numThreads)
+// 		{
+// 			boost::system::error_code ec;
+// 			_acceptor.cancel(ec);
+// 			_acceptor.close(ec);
+// 
+// 			if(has_service<boost::asio::detail::io_service_impl>(_io_service))
+// 			{
+// 				use_service<boost::asio::detail::io_service_impl>(_io_service).shutdown_service();
+// 			}
+// 
+// 			if(has_service<ssl::context_service>(_io_service))
+// 			{
+// 				use_service<ssl::context_service>(_io_service).shutdown_service();
+// 			}
+// 
+// 			if(has_service<deadline_timer_service<boost::posix_time::ptime> >(_io_service))
+// 			{
+// 				use_service<deadline_timer_service<boost::posix_time::ptime> >(_io_service).shutdown_service();
+// 			}
+// 
+// 			if(has_service<raw_socket_service<ip::tcp> >(_io_service))
+// 			{
+// 				use_service<raw_socket_service<ip::tcp> >(_io_service).shutdown_service();
+// 			}
+// 
+// 			if(has_service<socket_acceptor_service<ip::tcp> >(_io_service))
+// 			{
+// 				use_service<socket_acceptor_service<ip::tcp> >(_io_service).shutdown_service();
+// 			}
+// 
+// 			if(has_service<stream_socket_service<ip::tcp> >(_io_service))
+// 			{
+// 				use_service<stream_socket_service<ip::tcp> >(_io_service).shutdown_service();
+// 			}
+// 		}
+
 		size_t count = 0;
 		BOOST_FOREACH(ServiceWorkerPtr &swp, _workers)
 		{
@@ -155,6 +248,9 @@ namespace net
 			}
 		}
 
+		_work.reset();
+		_io_service.stop();
+
 		while(count<numThreads)
 		{
 			ServiceWorkerPtr swp(new ServiceWorker);
@@ -164,8 +260,6 @@ namespace net
 			count++;
 		}
 
-		_work.reset();
-		_io_service.stop();
 
 		BOOST_FOREACH(ServiceWorkerPtr &swp, stopped)
 		{
@@ -176,6 +270,11 @@ namespace net
 		{
 			_io_service.reset();
 			_work.reset(new boost::asio::io_service::work(_io_service));
+		}
+		else
+		{
+			_io_service.reset();
+			_io_service.poll();
 		}
 	}
 

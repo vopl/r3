@@ -11,6 +11,9 @@ namespace net
 
 	class ChannelImpl;
 	typedef boost::shared_ptr<ChannelImpl> ChannelImpl_ptr;
+
+	class ServiceImpl;
+
 	//////////////////////////////////////////////////////////////////////////
 	class ChannelImpl
 		: public Channel
@@ -35,10 +38,13 @@ namespace net
 		};
 		typedef boost::shared_ptr<InPacketWrapper> InPacketWrapper_ptr;
 
+
+		ServiceImpl *_serviceImpl;
 		TSocket_ptr _socket;
 		IChannelHandler *_handler;
 	public:
-		ChannelImpl(TSocket_ptr socket);
+		ChannelImpl(ServiceImpl *serviceImpl, TSocket_ptr socket);
+		~ChannelImpl();
 		virtual void setHandler(IChannelHandler *);
 		virtual void send(boost::shared_array<char> data, size_t size);
 		virtual void close();

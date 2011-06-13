@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "net/channel.hpp"
 #include "channelImpl.hpp"
+#include "serviceImpl.hpp"
 #include "utils/fixEndian.hpp"
 #include "utils/crc32.hpp"
 
@@ -11,12 +12,20 @@ namespace net
 	using namespace boost::asio;
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::ChannelImpl(TSocket_ptr socket)
-		: _socket(socket)
+	ChannelImpl::ChannelImpl(ServiceImpl *serviceImpl, TSocket_ptr socket)
+		: _serviceImpl(serviceImpl)
+		, _socket(socket)
 		, _handler(NULL)
 	{
 
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelImpl::~ChannelImpl()
+	{
+		_serviceImpl->delSock(_socket);
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::setHandler(IChannelHandler *handler)
@@ -65,7 +74,7 @@ namespace net
 				const_buffers_1(&packet->_crc32NetOrder, 4), 
 			};
 
-			async_write(*_socket, packedData, 
+			_socket->async_write_some(packedData, 
 				boost::bind(
 					&ChannelImpl::handleSend, this, selfKeeper,
 					packet, 
@@ -80,7 +89,7 @@ namespace net
 				const_buffers_1(&packet->_crc32NetOrder, 4), 
 			};
 
-			async_write(*_socket, packedData, 
+			_socket->async_write_some(packedData, 
 				boost::bind(
 					&ChannelImpl::handleSend, this, selfKeeper,
 					packet, 
@@ -89,7 +98,7 @@ namespace net
 		else if(packet->_totalSended < 4+packet->_size+4)
 		{
 			size_t lsended = packet->_totalSended - 4 - packet->_size;
-			async_write(*_socket, buffer((const char *)&packet->_crc32NetOrder+lsended, 4-lsended), 
+			_socket->async_write_some(buffer((const char *)&packet->_crc32NetOrder+lsended, 4-lsended), 
 				boost::bind(
 					&ChannelImpl::handleSend, this, selfKeeper,
 					packet, 
@@ -105,7 +114,10 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::close()
 	{
-		_socket->lowest_layer().close();
+		boost::system::error_code ec;
+		_socket->shutdown(ec);
+		//lowest_layer().close();
+		_serviceImpl->delSock(_socket);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -130,7 +142,7 @@ namespace net
 		if(packet->_totalReceived < 4)
 		{
 			size_t lreceived = packet->_totalReceived;
-			async_read(*_socket, buffer((char *)&packet->_size + lreceived, 4-lreceived), 
+			_socket->async_read_some(buffer((char *)&packet->_size + lreceived, 4-lreceived), 
 				boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 
@@ -147,7 +159,7 @@ namespace net
 				buffer(&packet->_crc32, 4), 
 			};
 
-			async_read(*_socket, packedData, 
+			_socket->async_read_some(packedData, 
 				boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 
@@ -163,7 +175,7 @@ namespace net
 				buffer(&packet->_crc32, 4), 
 			};
 
-			async_read(*_socket, packedData, 
+			_socket->async_read_some(packedData, 
 				boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 
@@ -174,7 +186,7 @@ namespace net
 		{
 			size_t lreceived = packet->_totalReceived-4-packet->_size;
 
-			async_read(*_socket, buffer((char *)&packet->_crc32+lreceived, 4-lreceived),
+			_socket->async_read_some(buffer((char *)&packet->_crc32+lreceived, 4-lreceived),
 				boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 

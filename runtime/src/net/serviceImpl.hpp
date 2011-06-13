@@ -3,6 +3,7 @@
 
 #include "net/service.hpp"
 #include "channelImpl.hpp"
+#include <set>
 
 namespace net
 {
@@ -35,6 +36,10 @@ namespace net
 
 		std::vector<ServiceWorkerPtr>	_workers;
 
+
+		boost::asio::io_service::strand	_socksPoolStrand;
+		std::set<TSocket_ptr>			_socks;
+
 	private:
 		void workerProc(ServiceWorkerPtr swp);
 
@@ -48,6 +53,14 @@ namespace net
 		void handleConnect(TSocket_ptr socket, const boost::system::error_code& e);
 		void handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& e);
 
+	public:
+		void addSock(TSocket_ptr socket);
+		void delSock(TSocket_ptr socket);
+	private:
+		void closeSocks();
+		void handleAddSock(TSocket_ptr socket);
+		void handleDelSock(TSocket_ptr socket);
+		void handleCloseSocks();
 	public:
 		ServiceImpl(Service *iface, IServiceHandler *);
 
