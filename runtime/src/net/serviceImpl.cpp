@@ -163,7 +163,7 @@ namespace net
 	void ServiceImpl::handleCloseSocks()
 	{
 		boost::system::error_code ec;
-		BOOST_FOREACH(TSocket_ptr &sock, _socks)
+		BOOST_FOREACH(TSocket_ptr sock, _socks)
 		{
 			//sock->shutdown(ec);
 			sock->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both);
@@ -309,7 +309,7 @@ namespace net
 		//TSocket_ptr socket(new TSocket(_io_service));
 
 		Allocator_ptr alloc = boost::make_shared<Allocator>();
-		socket->lowest_layer().async_connect(endpoint, 
+		socket->lowest_layer().async_connect(endpoint,
 			makeCmaHandler(*alloc, boost::bind(
 				&ServiceImpl::handleConnect, this,
 				socket,

@@ -15,21 +15,21 @@ namespace r3{ namespace fields
 		: public Scanty<Domain>
 	{
 	public:
-		typedef Integral TValue;
+		typedef typename Scanty<Domain>::Integral TValue;
 	private:
-		Integral _value;
+		TValue _value;
 	public:
 		Enum();
-		Enum(const Integral &from);
+		Enum(const TValue &from);
 
-		Integral &value();
-		const Integral &value() const;
+		TValue &value();
+		const TValue &value() const;
 
 		Enum &operator=(r3::fields::EFieldValueState fvs);
-		Enum &operator=(const Integral &from);
+		Enum &operator=(const TValue &from);
 
 		bool operator==(r3::fields::EFieldValueState fvs);
-		bool operator==(const Integral &with);
+		bool operator==(const TValue &with);
 	}; // class
 
 
@@ -42,32 +42,32 @@ namespace r3{ namespace fields
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Domain>
-	inline Enum<Domain>::Enum(const Integral &from)
+	inline Enum<Domain>::Enum(const TValue &from)
 		: Scanty<Domain>()
 		, _value(from)
 	{
-		fvs(fvs_set);
+		Scanty<Domain>::fvs(fvs_set);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Domain>
-	inline typename Enum<Domain>::Integral &Enum<Domain>::value()
+	inline typename Enum<Domain>::TValue &Enum<Domain>::value()
 	{
 		return _value;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Domain>
-	inline const typename Enum<Domain>::Integral &Enum<Domain>::value() const
+	inline const typename Enum<Domain>::TValue &Enum<Domain>::value() const
 	{
 		return _value;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Domain>
-	inline Enum<Domain> &Enum<Domain>::operator=(const Integral &from)
+	inline Enum<Domain> &Enum<Domain>::operator=(const TValue &from)
 	{
-		fvs(fvs_set);
+		Scanty<Domain>::fvs(fvs_set);
 		_value = from;
 
 		return *this;
@@ -90,9 +90,9 @@ namespace r3{ namespace fields
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Domain>
-	bool Enum<Domain>::operator==(const Integral &with)
+	bool Enum<Domain>::operator==(const TValue &with)
 	{
-		if(fvs() != fvs_set)
+		if(Scanty<Domain>::fvs() != fvs_set)
 		{
 			return false;
 		}

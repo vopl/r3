@@ -9,7 +9,7 @@
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // binary_iarchive_impl.hpp
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
+// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -28,11 +28,11 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace utils { 
+namespace utils {
 namespace serialization {
 
 template<class Archive, class Elem, class Tr>
-class binary_portable_iarchive_impl : 
+class binary_portable_iarchive_impl :
     public boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>,
     public boost::archive::basic_binary_iarchive<Archive>
 {
@@ -49,40 +49,40 @@ protected:
     // make this protected so it can be called from a derived archive
     template<class T>
     void load_override(T & t, BOOST_PFTO int){
-        this->basic_binary_iarchive<Archive>::load_override(t, 0L);
+        this->boost::archive::basic_binary_iarchive<Archive>::load_override(t, 0L);
     }
     void init(unsigned int flags){
         if(0 != (flags & boost::archive::no_header))
             return;
         #if ! defined(__MWERKS__)
-            this->basic_binary_iarchive<Archive>::init();
-            this->basic_binary_iprimitive<Archive, Elem, Tr>::init();
+            this->boost::archive::basic_binary_iarchive<Archive>::init();
+            this->boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::init();
         #else
-            basic_binary_iarchive<Archive>::init();
-            basic_binary_iprimitive<Archive, Elem, Tr>::init();
+            boost::archive::basic_binary_iarchive<Archive>::init();
+            boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::init();
         #endif
     }
     binary_portable_iarchive_impl(
-        std::basic_streambuf<Elem, Tr> & bsb, 
+        std::basic_streambuf<Elem, Tr> & bsb,
         unsigned int flags
     ) :
-        basic_binary_iprimitive<Archive, Elem, Tr>(
-            bsb, 
+        boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>(
+            bsb,
             0 != (flags & boost::archive::no_codecvt)
         ),
-        basic_binary_iarchive<Archive>(flags)
+        boost::archive::basic_binary_iarchive<Archive>(flags)
     {
         init(flags);
     }
     binary_portable_iarchive_impl(
-        std::basic_istream<Elem, Tr> & is, 
+        std::basic_istream<Elem, Tr> & is,
         unsigned int flags
     ) :
-        basic_binary_iprimitive<Archive, Elem, Tr>(
-            * is.rdbuf(), 
+        boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>(
+            * is.rdbuf(),
             0 != (flags & boost::archive::no_codecvt)
         ),
-        basic_binary_iarchive<Archive>(flags)
+        boost::archive::basic_binary_iarchive<Archive>(flags)
     {
         init(flags);
     }
@@ -138,8 +138,8 @@ public:
 
 };
 
-} 
-} 
+}
+}
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

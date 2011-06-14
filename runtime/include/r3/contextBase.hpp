@@ -1,6 +1,7 @@
 #ifndef _R3_CONTEXTBASE_HPP_
 #define _R3_CONTEXTBASE_HPP_
 
+#include "r3/contextUser.hpp"
 
 namespace r3
 {
@@ -187,7 +188,7 @@ namespace r3
 	template <class Event>
 	void ContextBase<Context, Parent>::handleImpl(const Event *evt)
 	{
-		ContextUser<Context>::User *self = (ContextUser<Context>::User *)this;
+		typename ContextUser<Context>::User *self = (typename ContextUser<Context>::User *)this;
  		//self->handlePre((Context *)this, evt);
  		self->handle(*evt);
  		//self->handlePost((Context *)this, evt);

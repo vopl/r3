@@ -31,7 +31,7 @@ namespace utils
 			std::size_t pend = buffer_delta;
 			resize((std::max<std::size_t>)(pend, 1));
 			setg(_buffer.get(), _buffer.get(), _buffer.get());
-			setp(_buffer.get(), _buffer.get(), _buffer.get() + pend);
+			setp(_buffer.get(), _buffer.get() + pend);
 		}
 
 		explicit StreambufOnArray(const buffer_type &buffer, std::size_t size)
@@ -39,7 +39,7 @@ namespace utils
 		{
 			std::size_t pend = size;
 			setg(_buffer.get(), _buffer.get(), _buffer.get() + pend);
-			setp(_buffer.get(), _buffer.get() + pend, _buffer.get() + pend);
+			setp(_buffer.get(), _buffer.get() + pend);
 		}
 
 		std::size_t size() const

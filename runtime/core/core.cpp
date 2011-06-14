@@ -72,9 +72,9 @@ int f()
 	((Der*)bd)->in_d = 64322;
 
 	utils::StreambufOnArray sbuf;
+	std::ostream os(&sbuf);
 
-	boost::archive::polymorphic_oarchive & oa = 
-		utils::serialization::polymorphic_binary_portable_oarchive(sbuf, boost::archive::no_header|boost::archive::no_codecvt);
+	utils::serialization::polymorphic_binary_portable_oarchive oa(os, boost::archive::no_header|boost::archive::no_codecvt);
 	//oa.register_type(static_cast<Der *>(NULL));
 	// write class instance to archive
 	oa & b;
@@ -92,9 +92,9 @@ int f()
 		Bas *bd = NULL;
 
 		utils::StreambufOnArray sbuf2(sbuf.data(), sbuf.size());
+        std::istream is2(&sbuf2);
 
-		boost::archive::polymorphic_iarchive & ia = 
-			utils::serialization::polymorphic_binary_portable_iarchive(sbuf2, boost::archive::no_header|boost::archive::no_codecvt);
+		utils::serialization::polymorphic_binary_portable_iarchive ia(is2, boost::archive::no_header|boost::archive::no_codecvt);
 		//ia.register_type(static_cast<Der *>(NULL));
 		// write class instance to archive
 		ia & b;
@@ -127,17 +127,36 @@ struct MyContextParent
 public:
 	void destroy(TypeId tid, ContextId id);
 
+public:
+	MyContextParent(ContextId id)
+		: ContextBase<MyContextParent, void>(id, NULL)
+	{
+
+	}
+
 };
 
 struct MyContext2
 	: r3::ContextBase<MyContext2, void>
 {
 	static const TypeId tid = 1232;
+
+	MyContext2(ContextId id)
+		: ContextBase<MyContext2, void>(id, NULL)
+	{
+
+	}
+
 };
 struct MyContext3
 	: r3::ContextBase<MyContext3, void>
 {
 	static const TypeId tid = 1233;
+	MyContext3(ContextId id)
+		: ContextBase<MyContext3, void>(id, NULL)
+	{
+
+	}
 };
 
 /////////////////////////////////////////////////
@@ -165,7 +184,7 @@ public:
 
 public:
 	MyContext(ContextId id, MyContextParent *parent)
-		: ContextBase(id, parent)
+		: ContextBase<MyContext, MyContextParent>(id, parent)
 	{
 
 	}
@@ -271,16 +290,23 @@ protected:
 
 
 
-
-template <> struct ContextUser<MyContext>
+namespace r3
 {
-	class User
-		: public MyContext
-	{
+    template <> struct ContextUser<MyContext>
+    {
+        class User
+            : public MyContext
+        {
+        public:
+            User()
+            : MyContext(435,NULL)
+            {
 
-	};
-};
+            }
 
+        };
+    };
+}
 
 
 
@@ -306,15 +332,15 @@ struct MyServiceHandler
 	virtual void onReceive(net::Channel_ptr channel, boost::shared_array<char> data, size_t size)
 	{
 		utils::StreambufOnArray sbuf(data, size);
-		boost::archive::polymorphic_iarchive & ia = 
-			utils::serialization::polymorphic_binary_portable_iarchive(sbuf, boost::archive::no_header|boost::archive::no_codecvt);
+        std::istream is(&sbuf);
+		utils::serialization::polymorphic_binary_portable_iarchive ia(is, boost::archive::no_header|boost::archive::no_codecvt);
 
 		Bas *bd = NULL;
 		ia & (bd);
 
 		utils::StreambufOnArray sbuf2;
-		boost::archive::polymorphic_oarchive & oa = 
-			utils::serialization::polymorphic_binary_portable_oarchive(sbuf2, boost::archive::no_header|boost::archive::no_codecvt);
+        std::ostream os2(&sbuf2);
+		utils::serialization::polymorphic_binary_portable_oarchive oa(os2, boost::archive::no_header|boost::archive::no_codecvt);
 		oa & (bd);
 
 		if(!(cnt%1000))
@@ -370,8 +396,8 @@ struct MyServiceHandler
 
 
 		utils::StreambufOnArray sbuf;
-		boost::archive::polymorphic_oarchive & oa = 
-			utils::serialization::polymorphic_binary_portable_oarchive(sbuf, boost::archive::no_header|boost::archive::no_codecvt);
+        std::ostream os(&sbuf);
+		utils::serialization::polymorphic_binary_portable_oarchive oa(os, boost::archive::no_header|boost::archive::no_codecvt);
 
 		Bas *bd = new Der;
 		bd->in_b = 12347;

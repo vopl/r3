@@ -9,7 +9,7 @@
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // binary_oarchive_impl.hpp
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
+// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -29,11 +29,11 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace utils { 
+namespace utils {
 namespace serialization {
 
 template<class Archive, class Elem, class Tr>
-class binary_portable_oarchive_impl : 
+class binary_portable_oarchive_impl :
 	public boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>,
 	public boost::archive::basic_binary_oarchive<Archive>
 {
@@ -50,40 +50,40 @@ protected:
     // make this protected so it can be called from a derived archive
     template<class T>
     void save_override(T & t, BOOST_PFTO int){
-        this->basic_binary_oarchive<Archive>::save_override(t, 0L);
+        this->boost::archive::basic_binary_oarchive<Archive>::save_override(t, 0L);
     }
     void init(unsigned int flags) {
         if(0 != (flags & boost::archive::no_header))
             return;
         #if ! defined(__MWERKS__)
-            this->basic_binary_oarchive<Archive>::init();
-            this->basic_binary_oprimitive<Archive, Elem, Tr>::init();
+            this->boost::archive::basic_binary_oarchive<Archive>::init();
+            this->boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::init();
         #else
-            basic_binary_oarchive<Archive>::init();
-            basic_binary_oprimitive<Archive, Elem, Tr>::init();
+            boost::archive::basic_binary_oarchive<Archive>::init();
+            boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::init();
         #endif
     }
     binary_portable_oarchive_impl(
-        std::basic_streambuf<Elem, Tr> & bsb, 
+        std::basic_streambuf<Elem, Tr> & bsb,
         unsigned int flags
     ) :
-        basic_binary_oprimitive<Archive, Elem, Tr>(
-            bsb, 
+        boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>(
+            bsb,
             0 != (flags & boost::archive::no_codecvt)
         ),
-        basic_binary_oarchive<Archive>(flags)
+        boost::archive::basic_binary_oarchive<Archive>(flags)
     {
         init(flags);
     }
     binary_portable_oarchive_impl(
-        std::basic_ostream<Elem, Tr> & os, 
+        std::basic_ostream<Elem, Tr> & os,
         unsigned int flags
     ) :
-        basic_binary_oprimitive<Archive, Elem, Tr>(
-            * os.rdbuf(), 
+        boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>(
+            * os.rdbuf(),
             0 != (flags & boost::archive::no_codecvt)
         ),
-        basic_binary_oarchive<Archive>(flags)
+        boost::archive::basic_binary_oarchive<Archive>(flags)
     {
         init(flags);
     }
@@ -93,44 +93,44 @@ public:
 	template<class T>
 	void save(const T & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(t);
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(t);
 	}
 	void save(const boost::int16_t & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
 	}
 	void save(const boost::int32_t & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
 	}
 	void save(const boost::int64_t & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
 	}
 	void save(const boost::uint16_t & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
 	}
 	void save(const boost::uint32_t & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
 	}
 	void save(const boost::uint64_t & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
 	}
 	void save(const float & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
 	}
 	void save(const double & t)
 	{
-		basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
 	}
 };
 
-} 
-} 
+}
+}
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

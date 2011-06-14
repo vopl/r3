@@ -13,6 +13,11 @@ namespace r3
 			: public Context
 		{
 		public:
+            User()
+                : Context(0, NULL)
+            {
+
+            }
 
 		} User;
 	};

@@ -27,7 +27,7 @@ namespace r3
 		virtual void stopInThread();
 		virtual pgc::Statement call(const std::string &key)=0;
 	};
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	template <class tag> class StmStorage
 		: public StmStorageBase
@@ -63,7 +63,7 @@ namespace r3
 
 		void startInThread(const char *conninfo);
 		void stopInThread();
-		
+
 		pgc::Connection con();
 		template <class tag>
 		pgc::Statement stm(const std::string &key);
@@ -72,7 +72,7 @@ namespace r3
 	private:
 		struct StmSecretType;
 
-		
+
 	protected:
 		template <class SP>
 		SP getSchemaImpl(std::map<std::string, SP> &m, const char *id);
@@ -129,7 +129,7 @@ namespace r3
 		SP &p = m[id];
 		if(!p)
 		{
-			p.reset(new SP::value_type((Data *)this, id));
+			p.reset(new typename SP::value_type((Data *)this, id));
 		}
 		return p;
 	}

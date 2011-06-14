@@ -9,7 +9,7 @@
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // polymorphic_binary_oarchive.hpp
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
+// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -20,41 +20,19 @@
 #include "utils/serialization/binary_portable_oarchive.hpp"
 #include <boost/archive/detail/polymorphic_oarchive_route.hpp>
 
-namespace utils { 
+namespace utils {
 namespace serialization {
 
-// typedef boost::archive::detail::polymorphic_oarchive_route<
-//     binary_portable_oarchive_impl<
-//         naked_binary_portable_oarchive, 
-//         std::ostream::char_type, 
-//         std::ostream::traits_type
-//     >
-//  > polymorphic_binary_portable_oarchive;
+ typedef boost::archive::detail::polymorphic_oarchive_route<
+     binary_portable_oarchive_impl<
+         naked_binary_portable_oarchive,
+         std::ostream::char_type,
+         std::ostream::traits_type
+     >
+  > polymorphic_binary_portable_oarchive;
 
-	class polymorphic_binary_portable_oarchive
-		: public boost::archive::detail::polymorphic_oarchive_route<
-			binary_portable_oarchive_impl<
-				naked_binary_portable_oarchive, 
-				std::ostream::char_type, 
-				std::ostream::traits_type>
-		>
-	{
-	public:
-		polymorphic_binary_portable_oarchive(std::streambuf & bsb, unsigned int flags = 0)
-			: boost::archive::detail::polymorphic_oarchive_route<
-				binary_portable_oarchive_impl<
-					naked_binary_portable_oarchive, 
-					std::ostream::char_type, 
-					std::ostream::traits_type>
-			>(std::ostream(&bsb), flags)
-		{
-
-		}
-
-	};
-
-} // namespace archive
-} // namespace boost
+}
+}
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
