@@ -39,7 +39,7 @@ namespace utils
 		{
 			std::size_t pend = size;
 			setg(_buffer.get(), _buffer.get(), _buffer.get() + pend);
-			setp(_buffer.get(), _buffer.get() + pend);
+			setp(_buffer.get() + pend, _buffer.get() + pend);
 		}
 
 		std::size_t size() const
