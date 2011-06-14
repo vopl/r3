@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{5AA5C437-C200-4014-B768-9447B4D42765}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{96FB458B-0362-48A2-863B-116522341F2E}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -11,8 +11,6 @@
 		<attrdef name="Abstract" metaref = "1460" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="AllowNull" metaref = "1461" valuetype = "boolean" defvalue = "true">
-		</attrdef>
-		<attrdef name="CanTransite" metaref = "1557" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="IndexType" metaref = "1462" valuetype = "enum" defvalue = "tree">
 			<enumitem dispname = "tree" value = "tree"></enumitem>
@@ -437,10 +435,6 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
-		<atom name = "Method" metaref = "1558"  attributes = "CanTransite">
-				<regnode name = "namePosition" value ="4"></regnode>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-		</atom>
 		<atom name = "Money" metaref = "1484"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
@@ -751,21 +745,6 @@
 				</pointerspec>
 			</connjoint>
 		</connection>
-		<connection name = "MethodResult" metaref = "1560" >
-				<regnode name = "color" value ="0x000000"></regnode>
-				<regnode name = "dstStyle" value ="arrow"></regnode>
-				<regnode name = "srcStyle" value ="butt"></regnode>
-				<regnode name = "lineType" value ="solid"></regnode>
-			<connjoint>
-				<pointerspec name = "src">
-					<pointeritem desc = "Method"></pointeritem>
-				</pointerspec>
-				<pointerspec name = "dst">
-					<pointeritem desc = "Context"></pointeritem>
-					<pointeritem desc = "ContextReference"></pointeritem>
-				</pointerspec>
-			</connjoint>
-		</connection>
 		<connection name = "Right4Context" metaref = "1561" >
 				<regnode name = "color" value ="0x000000"></regnode>
 				<regnode name = "dstStyle" value ="arrow"></regnode>
@@ -781,7 +760,7 @@
 				</pointerspec>
 			</connjoint>
 		</connection>
-		<connection name = "Right4Method" metaref = "1562" >
+		<connection name = "Right4Event" metaref = "1585" >
 				<regnode name = "color" value ="0x000000"></regnode>
 				<regnode name = "dstStyle" value ="arrow"></regnode>
 				<regnode name = "srcStyle" value ="butt"></regnode>
@@ -791,11 +770,11 @@
 					<pointeritem desc = "Right"></pointeritem>
 				</pointerspec>
 				<pointerspec name = "dst">
-					<pointeritem desc = "Method"></pointeritem>
+					<pointeritem desc = "Event"></pointeritem>
 				</pointerspec>
 			</connjoint>
 		</connection>
-		<reference name = "CategoryReference" metaref = "1495">
+		<reference name = "CategoryReference" metaref = "1586">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 			<pointerspec name = "ref">
@@ -807,6 +786,12 @@
 			<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 			<pointerspec name = "ref">
 				<pointeritem desc = "Context"></pointeritem>
+			</pointerspec>
+		</reference>
+		<reference name = "EventReference" metaref = "1587">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<pointerspec name = "ref">
+				<pointeritem desc = "Event"></pointeritem>
 			</pointerspec>
 		</reference>
 		<model name = "Category" metaref = "1496" attributes = "Abstract Schema" >
@@ -881,19 +866,16 @@
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
 			<role name = "Context" metaref = "1565" kind = "Context"></role>
 			<role name = "ContextReference" metaref = "1566" kind = "ContextReference"></role>
-			<role name = "Method" metaref = "1567" kind = "Method"></role>
-			<role name = "MethodResult" metaref = "1568" kind = "MethodResult"></role>
+			<role name = "Event" metaref = "1588" kind = "Event"></role>
 			<role name = "Right" metaref = "1569" kind = "Right"></role>
 			<role name = "Right4Context" metaref = "1570" kind = "Right4Context"></role>
-			<role name = "Right4Method" metaref = "1571" kind = "Right4Method"></role>
+			<role name = "Right4Event" metaref = "1589" kind = "Right4Event"></role>
 			<aspect name = "AspectContext" metaref = "1420" >
 				<part metaref = "1572" role = "Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1573" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
-				<part metaref = "1574" role = "Method" primary = "yes" linked = "no"></part>
-				<part metaref = "1575" role = "MethodResult" primary = "yes" linked = "no"></part>
+				<part metaref = "1573" role = "ContextReference" primary = "yes" linked = "no"></part>
 				<part metaref = "1576" role = "Right" primary = "yes" linked = "no"></part>
 				<part metaref = "1577" role = "Right4Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1578" role = "Right4Method" primary = "yes" linked = "no"></part>
+				<part metaref = "1590" role = "Right4Event" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Data" metaref = "1541" >
@@ -901,12 +883,12 @@
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
 			<role name = "Category" metaref = "1542" kind = "Category"></role>
 			<role name = "CategoryInheritance" metaref = "1543" kind = "CategoryInheritance"></role>
-			<role name = "CategoryReference" metaref = "1544" kind = "CategoryReference"></role>
+			<role name = "CategoryReference" metaref = "1591" kind = "CategoryReference"></role>
 			<role name = "CategoryRelation" metaref = "1545" kind = "CategoryRelation"></role>
 			<aspect name = "AspectCategories" metaref = "1546" >
 				<part metaref = "1547" role = "Category" primary = "yes" linked = "no"></part>
 				<part metaref = "1548" role = "CategoryInheritance" primary = "yes" linked = "no"></part>
-				<part metaref = "1549" role = "CategoryReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1592" role = "CategoryReference" primary = "yes" linked = "no"></part>
 				<part metaref = "1550" role = "CategoryRelation" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
@@ -944,6 +926,58 @@
 			<role name = "ScantyValue" metaref = "1552" kind = "ScantyValue"></role>
 			<aspect name = "AspectScanty" metaref = "1168" attributes = "AllowNull" >
 				<part metaref = "1553" role = "ScantyValue" primary = "yes" linked = "no"></part>
+			</aspect>
+		</model>
+		<model name = "Event" metaref = "1593" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "Audio" metaref = "1594" kind = "Audio"></role>
+			<role name = "Binary" metaref = "1595" kind = "Binary"></role>
+			<role name = "Bool" metaref = "1596" kind = "Bool"></role>
+			<role name = "CategoryReference" metaref = "1597" kind = "CategoryReference"></role>
+			<role name = "Date" metaref = "1598" kind = "Date"></role>
+			<role name = "DateTimeInterval" metaref = "1599" kind = "DateTimeInterval"></role>
+			<role name = "Enum" metaref = "1600" kind = "Enum"></role>
+			<role name = "Event" metaref = "1601" kind = "Event"></role>
+			<role name = "EventReference" metaref = "1602" kind = "EventReference"></role>
+			<role name = "File" metaref = "1603" kind = "File"></role>
+			<role name = "Image" metaref = "1604" kind = "Image"></role>
+			<role name = "Int16" metaref = "1605" kind = "Int16"></role>
+			<role name = "Int32" metaref = "1606" kind = "Int32"></role>
+			<role name = "Int64" metaref = "1607" kind = "Int64"></role>
+			<role name = "Int8" metaref = "1608" kind = "Int8"></role>
+			<role name = "Money" metaref = "1609" kind = "Money"></role>
+			<role name = "Real32" metaref = "1610" kind = "Real32"></role>
+			<role name = "Real64" metaref = "1611" kind = "Real64"></role>
+			<role name = "Set" metaref = "1612" kind = "Set"></role>
+			<role name = "String" metaref = "1613" kind = "String"></role>
+			<role name = "Time" metaref = "1614" kind = "Time"></role>
+			<role name = "Timestamp" metaref = "1615" kind = "Timestamp"></role>
+			<role name = "Video" metaref = "1616" kind = "Video"></role>
+			<aspect name = "AspectEvent" metaref = "1617" >
+				<part metaref = "1618" role = "Audio" primary = "yes" linked = "no"></part>
+				<part metaref = "1619" role = "Binary" primary = "yes" linked = "no"></part>
+				<part metaref = "1620" role = "Bool" primary = "yes" linked = "no"></part>
+				<part metaref = "1621" role = "CategoryReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1622" role = "Date" primary = "yes" linked = "no"></part>
+				<part metaref = "1623" role = "DateTimeInterval" primary = "yes" linked = "no"></part>
+				<part metaref = "1624" role = "Enum" primary = "yes" linked = "no"></part>
+				<part metaref = "1625" role = "Event" primary = "yes" linked = "no"></part>
+				<part metaref = "1626" role = "EventReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1627" role = "File" primary = "yes" linked = "no"></part>
+				<part metaref = "1628" role = "Image" primary = "yes" linked = "no"></part>
+				<part metaref = "1629" role = "Int16" primary = "yes" linked = "no"></part>
+				<part metaref = "1630" role = "Int32" primary = "yes" linked = "no"></part>
+				<part metaref = "1631" role = "Int64" primary = "yes" linked = "no"></part>
+				<part metaref = "1632" role = "Int8" primary = "yes" linked = "no"></part>
+				<part metaref = "1633" role = "Money" primary = "yes" linked = "no"></part>
+				<part metaref = "1634" role = "Real32" primary = "yes" linked = "no"></part>
+				<part metaref = "1635" role = "Real64" primary = "yes" linked = "no"></part>
+				<part metaref = "1636" role = "Set" primary = "yes" linked = "no"></part>
+				<part metaref = "1637" role = "String" primary = "yes" linked = "no"></part>
+				<part metaref = "1638" role = "Time" primary = "yes" linked = "no"></part>
+				<part metaref = "1639" role = "Timestamp" primary = "yes" linked = "no"></part>
+				<part metaref = "1640" role = "Video" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Logic" metaref = "1579" >
