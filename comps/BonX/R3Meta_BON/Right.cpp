@@ -34,14 +34,14 @@ std::set<R3Meta_BON::Right4Context> R3Meta_BON::RightImpl::getOutRight4ContextLi
 //********************************************************************************
 // 
 //********************************************************************************
-std::set<R3Meta_BON::Right4Method> R3Meta_BON::RightImpl::getOutRight4MethodLinks()
+std::set<R3Meta_BON::Right4Event> R3Meta_BON::RightImpl::getOutRight4EventLinks()
 {
-	std::set<R3Meta_BON::Right4Method> result;
+	std::set<R3Meta_BON::Right4Event> result;
 	std::set<BON::Connection> conns = ConnectionEndImpl::getOutConnLinks();
 	std::set<BON::Connection>::iterator it = conns.begin();
 	for( ; it != conns.end(); ++it)
 	{
-		R3Meta_BON::Right4Method c( *it);
+		R3Meta_BON::Right4Event c( *it);
 		if (c)
 			result.insert( c);
 	}
@@ -69,16 +69,16 @@ std::multiset<R3Meta_BON::ContextOrReference> R3Meta_BON::RightImpl::getRight4Co
 
 
 //********************************************************************************
-// returns dst R3Meta_BON::Methods
+// returns dst R3Meta_BON::EventOrReferences
 //********************************************************************************
-std::multiset<R3Meta_BON::Method> R3Meta_BON::RightImpl::getRight4MethodDsts()
+std::multiset<R3Meta_BON::EventOrReference> R3Meta_BON::RightImpl::getRight4EventDsts()
 {
-	std::multiset<R3Meta_BON::Method> res;
+	std::multiset<R3Meta_BON::EventOrReference> res;
 	{
-		std::multiset<BON::ConnectionEnd> out_ends = BON::ConnectionEndImpl::getOutConnEnds("Right4Method");
+		std::multiset<BON::ConnectionEnd> out_ends = BON::ConnectionEndImpl::getOutConnEnds("Right4Event");
 		for ( std::multiset<BON::ConnectionEnd>::iterator cit = out_ends.begin() ; cit != out_ends.end() ; ++cit )
 		{
-			R3Meta_BON::Method dst( *cit );
+			R3Meta_BON::EventOrReference dst( *cit );
 			ASSERT(dst);
 			res.insert( dst);
 		}

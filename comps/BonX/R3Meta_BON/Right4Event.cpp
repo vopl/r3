@@ -5,7 +5,7 @@
 //********************************************************************************
 // 
 //********************************************************************************
-void R3Meta_BON::Right4MethodImpl::accept( BON::Visitor *pVisitor)
+void R3Meta_BON::Right4EventImpl::accept( BON::Visitor *pVisitor)
 {
 	// visit the Connection
 	pVisitor->visitConnection( BON::Connection( this));
@@ -14,16 +14,16 @@ void R3Meta_BON::Right4MethodImpl::accept( BON::Visitor *pVisitor)
 
 
 //********************************************************************************
-// getDst() return value is a ConnectionEnd casted to R3Meta_BON::Method
+// getDst() return value is a ConnectionEnd casted to R3Meta_BON::EventOrReference
 //********************************************************************************
-R3Meta_BON::Method R3Meta_BON::Right4MethodImpl::getDst()
+R3Meta_BON::EventOrReference R3Meta_BON::Right4EventImpl::getDst()
 {
 	BON::ConnectionEnd ce = ConnectionImpl::getDst();
-	R3Meta_BON::Method sp( ce);
+	R3Meta_BON::EventOrReference sp( ce);
 	if ( sp)
 		return sp;
 
-	R3Meta_BON::Method empty;
+	R3Meta_BON::EventOrReference empty;
 	return empty;
 }
 
@@ -31,7 +31,7 @@ R3Meta_BON::Method R3Meta_BON::Right4MethodImpl::getDst()
 //********************************************************************************
 // getSrc() return value is a ConnectionEnd casted to R3Meta_BON::Right
 //********************************************************************************
-R3Meta_BON::Right R3Meta_BON::Right4MethodImpl::getSrc()
+R3Meta_BON::Right R3Meta_BON::Right4EventImpl::getSrc()
 {
 	BON::ConnectionEnd ce = ConnectionImpl::getSrc();
 	R3Meta_BON::Right sp( ce);

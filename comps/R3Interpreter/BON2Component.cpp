@@ -26,6 +26,7 @@
 #include "R3MetaBonX.h"
 
 #include "workers/wData.hpp"
+#include "workers/wProtocol.hpp"
 
 
 namespace BON
@@ -118,8 +119,14 @@ void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>
 		roots.insert(lroots.begin(), lroots.end());
 	}
 
-	workers::WData schema(genDir);
-	schema(roots);
+	{
+		workers::WData w(genDir);
+		w(roots);
+	}
+	{
+		workers::WProtocol w(genDir);
+		w(roots);
+	}
 
 	Console::Out::WriteLine("R3 Interpreter completed...");
 }
@@ -213,7 +220,9 @@ bool Component::browseGenDir(Project& project, boost::filesystem::path &genDir)
 	genDir.normalize();
 
 	TCHAR brPath[MAX_PATH*10];
-	strcpy(brPath, genDir.native_directory_string().c_str());
+	strcpy(brPath, genDir.string().c_str());
+	std::replace(brPath, brPath+strlen(brPath), '/', '\\');
+
 
 	BROWSEINFO bi = {};
 	bi.lpszTitle = "select generation target directory";
@@ -273,7 +282,10 @@ bool Component::browseGenDir(Project& project, boost::filesystem::path &genDir)
 
 	if(genRelDir2 != genRelDir)
 	{
-		rootFolder->getRegistry()->setValueByPath("/R3/GeneratePath", genRelDir2.native_directory_string());
+		strcpy(brPath, genRelDir2.string().c_str());
+		std::replace(brPath, brPath+strlen(brPath), '/', '\\');
+
+		rootFolder->getRegistry()->setValueByPath("/R3/GeneratePath", brPath);
 	}
 
 	return true;

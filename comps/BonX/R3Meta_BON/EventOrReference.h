@@ -1,5 +1,5 @@
-#ifndef R3META_BONMETHODRESULT_H
-#define R3META_BONMETHODRESULT_H
+#ifndef R3META_BONEVENTORREFERENCE_H
+#define R3META_BONEVENTORREFERENCE_H
 
 #include "R3MetaBonX.h"
 
@@ -7,18 +7,17 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   MethodResultImpl
+//   C  L  A  S  S   EventOrReferenceImpl
 //*******************************************************************
-class MethodResultImpl :
-	  virtual public BON::ConnectionImpl
+class EventOrReferenceImpl :
+	  virtual public BON::FCOImpl
 {
 public:
-	virtual void        accept( BON::Visitor *pVisitor);
 
 	//
 	// connectionEnd getters
-	virtual R3Meta_BON::ContextOrReference  getDst();
-	virtual R3Meta_BON::Method              getSrc();
+	virtual std::set<R3Meta_BON::Right4Event>         getInRight4EventLinks();
+	virtual std::multiset<R3Meta_BON::Right>          getRight4EventSrcs();
 
 	///BUP
 	// add your own members here

@@ -539,6 +539,30 @@
 					>
 				</File>
 				<File
+					RelativePath="..\BonX\R3Meta_BON\Event.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Event.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\EventOrReference.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\EventOrReference.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\EventReference.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\EventReference.h"
+					>
+				</File>
+				<File
 					RelativePath="..\BonX\R3Meta_BON\Field.cpp"
 					>
 				</File>
@@ -619,35 +643,19 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Logic.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Logic.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Method.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Method.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\MethodResult.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\MethodResult.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Money.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\Money.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Protocol.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Protocol.h"
 					>
 				</File>
 				<File
@@ -691,11 +699,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Right4Method.cpp"
+					RelativePath="..\BonX\R3Meta_BON\Right4Event.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Right4Method.h"
+					RelativePath="..\BonX\R3Meta_BON\Right4Event.h"
 					>
 				</File>
 				<File
@@ -773,6 +781,14 @@
 			</File>
 			<File
 				RelativePath=".\workers\wData.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\workers\wProtocol.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\workers\wProtocol.hpp"
 				>
 			</File>
 		</Filter>

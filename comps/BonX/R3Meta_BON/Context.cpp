@@ -69,32 +69,15 @@ std::set<R3Meta_BON::ContextReference> R3Meta_BON::ContextImpl::getContextRefere
 
 
 //********************************************************************************
-// getter for role "Method" among "R3Meta_BON::Method"s
+// getter for role "Event" among "R3Meta_BON::Event"s
 //********************************************************************************
-std::set<R3Meta_BON::Method> R3Meta_BON::ContextImpl::getMethod()
+std::set<R3Meta_BON::Event> R3Meta_BON::ContextImpl::getEvent()
 {
-	std::set<R3Meta_BON::Method> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Method");
+	std::set<R3Meta_BON::Event> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Event");
 	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
 	{
-		R3Meta_BON::Method elem(*i);
-		ASSERT(elem);
-		res.insert(elem);
-	}
-	return res;
-}
-
-
-//********************************************************************************
-// getter for role "MethodResult" among "R3Meta_BON::MethodResult"s
-//********************************************************************************
-std::set<R3Meta_BON::MethodResult> R3Meta_BON::ContextImpl::getMethodResult()
-{
-	std::set<R3Meta_BON::MethodResult> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("MethodResult");
-	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
-	{
-		R3Meta_BON::MethodResult elem(*i);
+		R3Meta_BON::Event elem(*i);
 		ASSERT(elem);
 		res.insert(elem);
 	}
@@ -137,15 +120,15 @@ std::set<R3Meta_BON::Right4Context> R3Meta_BON::ContextImpl::getRight4Context()
 
 
 //********************************************************************************
-// getter for role "Right4Method" among "R3Meta_BON::Right4Method"s
+// getter for role "Right4Event" among "R3Meta_BON::Right4Event"s
 //********************************************************************************
-std::set<R3Meta_BON::Right4Method> R3Meta_BON::ContextImpl::getRight4Method()
+std::set<R3Meta_BON::Right4Event> R3Meta_BON::ContextImpl::getRight4Event()
 {
-	std::set<R3Meta_BON::Right4Method> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Right4Method");
+	std::set<R3Meta_BON::Right4Event> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Right4Event");
 	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
 	{
-		R3Meta_BON::Right4Method elem(*i);
+		R3Meta_BON::Right4Event elem(*i);
 		ASSERT(elem);
 		res.insert(elem);
 	}

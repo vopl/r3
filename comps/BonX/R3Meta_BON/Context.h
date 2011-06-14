@@ -21,11 +21,10 @@ public:
 	virtual std::set<R3Meta_BON::Context>   getContext();
 	virtual std::set<R3Meta_BON::ContextOrReference>  getContextOrReference();
 	virtual std::set<R3Meta_BON::ContextReference>    getContextReference();
-	virtual std::set<R3Meta_BON::Method>    getMethod();
-	virtual std::set<R3Meta_BON::MethodResult>        getMethodResult();
+	virtual std::set<R3Meta_BON::Event>     getEvent();
 	virtual std::set<R3Meta_BON::Right>     getRight();
 	virtual std::set<R3Meta_BON::Right4Context>       getRight4Context();
-	virtual std::set<R3Meta_BON::Right4Method>        getRight4Method();
+	virtual std::set<R3Meta_BON::Right4Event>         getRight4Event();
 
 	///BUP
 	// add your own members here

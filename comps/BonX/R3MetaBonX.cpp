@@ -41,16 +41,17 @@ IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryReference, "CategoryReference" );
 IMPLEMENT_ABSTRACT_BONEXTENSION( R3Meta_BON::ContextOrReference );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Context, "Context" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::ContextReference, "ContextReference" );
+IMPLEMENT_ABSTRACT_BONEXTENSION( R3Meta_BON::EventOrReference );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Event, "Event" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::EventReference, "EventReference" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Data, "Data" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::Logic, "Logic" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::Method, "Method" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Protocol, "Protocol" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Right, "Right" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::ScantyValue, "ScantyValue" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryInheritance, "CategoryInheritance" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryRelation, "CategoryRelation" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::MethodResult, "MethodResult" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Right4Context, "Right4Context" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::Right4Method, "Right4Method" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Right4Event, "Right4Event" );
 
 
 } // namespace BON

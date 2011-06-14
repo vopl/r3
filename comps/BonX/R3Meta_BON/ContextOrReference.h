@@ -16,9 +16,7 @@ public:
 
 	//
 	// connectionEnd getters
-	virtual std::set<R3Meta_BON::MethodResult>        getInMethodResultLinks();
 	virtual std::set<R3Meta_BON::Right4Context>       getInRight4ContextLinks();
-	virtual std::multiset<R3Meta_BON::Method>         getMethodResultSrcs();
 	virtual std::multiset<R3Meta_BON::Right>          getRight4ContextSrcs();
 
 	///BUP

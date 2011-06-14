@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{FEA23DD3-6C6A-47B9-BFF8-09547B242207}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{688F394D-3747-40BE-8E62-3495B2247AEA}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
 	<author></author>
 
-	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Data Logic" >
+	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Data Protocol" >
 		<attrdef name="Abstract" metaref = "1460" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="AllowNull" metaref = "1461" valuetype = "boolean" defvalue = "true">
@@ -532,7 +532,7 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
-		<atom name = "Right" metaref = "1559" >
+		<atom name = "Right" metaref = "1641" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
@@ -745,7 +745,7 @@
 				</pointerspec>
 			</connjoint>
 		</connection>
-		<connection name = "Right4Context" metaref = "1561" >
+		<connection name = "Right4Context" metaref = "1642" >
 				<regnode name = "color" value ="0x000000"></regnode>
 				<regnode name = "dstStyle" value ="arrow"></regnode>
 				<regnode name = "srcStyle" value ="butt"></regnode>
@@ -760,7 +760,7 @@
 				</pointerspec>
 			</connjoint>
 		</connection>
-		<connection name = "Right4Event" metaref = "1585" >
+		<connection name = "Right4Event" metaref = "1643" >
 				<regnode name = "color" value ="0x000000"></regnode>
 				<regnode name = "dstStyle" value ="arrow"></regnode>
 				<regnode name = "srcStyle" value ="butt"></regnode>
@@ -781,14 +781,14 @@
 				<pointeritem desc = "Category"></pointeritem>
 			</pointerspec>
 		</reference>
-		<reference name = "ContextReference" metaref = "1563">
+		<reference name = "ContextReference" metaref = "1644">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 			<pointerspec name = "ref">
 				<pointeritem desc = "Context"></pointeritem>
 			</pointerspec>
 		</reference>
-		<reference name = "EventReference" metaref = "1587">
+		<reference name = "EventReference" metaref = "1645">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<pointerspec name = "ref">
 				<pointeritem desc = "Event"></pointeritem>
@@ -860,23 +860,23 @@
 				<part metaref = "1540" role = "Video" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
-		<model name = "Context" metaref = "1564" >
+		<model name = "Context" metaref = "1646" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<role name = "Context" metaref = "1565" kind = "Context"></role>
-			<role name = "ContextReference" metaref = "1566" kind = "ContextReference"></role>
-			<role name = "Event" metaref = "1588" kind = "Event"></role>
-			<role name = "Right" metaref = "1569" kind = "Right"></role>
-			<role name = "Right4Context" metaref = "1570" kind = "Right4Context"></role>
-			<role name = "Right4Event" metaref = "1589" kind = "Right4Event"></role>
+			<role name = "Context" metaref = "1647" kind = "Context"></role>
+			<role name = "ContextReference" metaref = "1648" kind = "ContextReference"></role>
+			<role name = "Event" metaref = "1649" kind = "Event"></role>
+			<role name = "Right" metaref = "1650" kind = "Right"></role>
+			<role name = "Right4Context" metaref = "1651" kind = "Right4Context"></role>
+			<role name = "Right4Event" metaref = "1652" kind = "Right4Event"></role>
 			<aspect name = "AspectContext" metaref = "1420" >
-				<part metaref = "1572" role = "Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1573" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
-				<part metaref = "1641" role = "Event" primary = "yes" linked = "no"></part>
-				<part metaref = "1576" role = "Right" primary = "yes" linked = "no"></part>
-				<part metaref = "1577" role = "Right4Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1590" role = "Right4Event" primary = "yes" linked = "no"></part>
+				<part metaref = "1653" role = "Context" primary = "yes" linked = "no"></part>
+				<part metaref = "1654" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
+				<part metaref = "1655" role = "Event" primary = "yes" linked = "no"></part>
+				<part metaref = "1656" role = "Right" primary = "yes" linked = "no"></part>
+				<part metaref = "1657" role = "Right4Context" primary = "yes" linked = "no"></part>
+				<part metaref = "1658" role = "Right4Event" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Data" metaref = "1541" >
@@ -929,7 +929,7 @@
 				<part metaref = "1553" role = "ScantyValue" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
-		<model name = "Event" metaref = "1593" >
+		<model name = "Event" metaref = "1659" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
 			<role name = "Audio" metaref = "1594" kind = "Audio"></role>
@@ -939,8 +939,8 @@
 			<role name = "Date" metaref = "1598" kind = "Date"></role>
 			<role name = "DateTimeInterval" metaref = "1599" kind = "DateTimeInterval"></role>
 			<role name = "Enum" metaref = "1600" kind = "Enum"></role>
-			<role name = "Event" metaref = "1601" kind = "Event"></role>
-			<role name = "EventReference" metaref = "1602" kind = "EventReference"></role>
+			<role name = "Event" metaref = "1660" kind = "Event"></role>
+			<role name = "EventReference" metaref = "1661" kind = "EventReference"></role>
 			<role name = "File" metaref = "1603" kind = "File"></role>
 			<role name = "Image" metaref = "1604" kind = "Image"></role>
 			<role name = "Int16" metaref = "1605" kind = "Int16"></role>
@@ -963,8 +963,8 @@
 				<part metaref = "1622" role = "Date" primary = "yes" linked = "no"></part>
 				<part metaref = "1623" role = "DateTimeInterval" primary = "yes" linked = "no"></part>
 				<part metaref = "1624" role = "Enum" primary = "yes" linked = "no"></part>
-				<part metaref = "1625" role = "Event" primary = "yes" linked = "no"></part>
-				<part metaref = "1626" role = "EventReference" primary = "yes" kindaspect = "AspectEvent" linked = "no"></part>
+				<part metaref = "1662" role = "Event" primary = "yes" linked = "no"></part>
+				<part metaref = "1663" role = "EventReference" primary = "yes" kindaspect = "AspectEvent" linked = "no"></part>
 				<part metaref = "1627" role = "File" primary = "yes" linked = "no"></part>
 				<part metaref = "1628" role = "Image" primary = "yes" linked = "no"></part>
 				<part metaref = "1629" role = "Int16" primary = "yes" linked = "no"></part>
@@ -981,14 +981,14 @@
 				<part metaref = "1640" role = "Video" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
-		<model name = "Logic" metaref = "1579" >
+		<model name = "Protocol" metaref = "1664" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<role name = "Context" metaref = "1580" kind = "Context"></role>
-			<role name = "ContextReference" metaref = "1581" kind = "ContextReference"></role>
-			<aspect name = "AspectContexts" metaref = "1582" >
-				<part metaref = "1583" role = "Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1584" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
+			<role name = "Context" metaref = "1665" kind = "Context"></role>
+			<role name = "ContextReference" metaref = "1666" kind = "ContextReference"></role>
+			<aspect name = "AspectProtocol" metaref = "1670" >
+				<part metaref = "1671" role = "Context" primary = "yes" linked = "no"></part>
+				<part metaref = "1672" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Set" metaref = "1554" attributes = "AllowNull" >

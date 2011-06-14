@@ -45,16 +45,17 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, CategoryOrRef
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, ContextOrReferenceImpl, ContextOrReference ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, ContextOrReference, ContextImpl, Context ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, ContextOrReference, ContextReferenceImpl, ContextReference ); }
+namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, EventOrReferenceImpl, EventOrReference ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, EventOrReference, EventImpl, Event ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, EventOrReference, EventReferenceImpl, EventReference ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, DataImpl, Data ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, LogicImpl, Logic ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, MethodImpl, Method ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, ProtocolImpl, Protocol ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, RightImpl, Right ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, ScantyValueImpl, ScantyValue ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryInheritanceImpl, CategoryInheritance ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryRelationImpl, CategoryRelation ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, MethodResultImpl, MethodResult ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, Right4ContextImpl, Right4Context ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, Right4MethodImpl, Right4Method ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, Right4EventImpl, Right4Event ); }
 
 
 #include "R3Meta_BON/CategoryMember.h"
@@ -93,16 +94,17 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, Right4MethodI
 #include "R3Meta_BON/ContextOrReference.h"
 #include "R3Meta_BON/Context.h"
 #include "R3Meta_BON/ContextReference.h"
+#include "R3Meta_BON/EventOrReference.h"
+#include "R3Meta_BON/Event.h"
+#include "R3Meta_BON/EventReference.h"
 #include "R3Meta_BON/Data.h"
-#include "R3Meta_BON/Logic.h"
-#include "R3Meta_BON/Method.h"
+#include "R3Meta_BON/Protocol.h"
 #include "R3Meta_BON/Right.h"
 #include "R3Meta_BON/ScantyValue.h"
 #include "R3Meta_BON/CategoryInheritance.h"
 #include "R3Meta_BON/CategoryRelation.h"
-#include "R3Meta_BON/MethodResult.h"
 #include "R3Meta_BON/Right4Context.h"
-#include "R3Meta_BON/Right4Method.h"
+#include "R3Meta_BON/Right4Event.h"
 
 ///BUP
 // add your additional class definitions here

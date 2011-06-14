@@ -1,5 +1,5 @@
-#ifndef R3META_BONRIGHT4METHOD_H
-#define R3META_BONRIGHT4METHOD_H
+#ifndef R3META_BONRIGHT4EVENT_H
+#define R3META_BONRIGHT4EVENT_H
 
 #include "R3MetaBonX.h"
 
@@ -7,9 +7,9 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   Right4MethodImpl
+//   C  L  A  S  S   Right4EventImpl
 //*******************************************************************
-class Right4MethodImpl :
+class Right4EventImpl :
 	  virtual public BON::ConnectionImpl
 {
 public:
@@ -17,7 +17,7 @@ public:
 
 	//
 	// connectionEnd getters
-	virtual R3Meta_BON::Method              getDst();
+	virtual R3Meta_BON::EventOrReference    getDst();
 	virtual R3Meta_BON::Right               getSrc();
 
 	///BUP
