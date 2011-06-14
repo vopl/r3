@@ -57,14 +57,16 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::handleAccept(TSocket_ptr socket, const boost::system::error_code& ec)
 	{
-		makeAccept();
-
 		if(ec)
 		{
 			LOG(ec);
 			return;
 		}
 
+		makeAccept();
+
+// 		addSock(socket);
+// 		_handler->onAccept(Channel_ptr(new ChannelImpl(this, socket)));
 		socket->async_handshake(
 			ssl::stream_base::server,
 			boost::bind(
@@ -95,6 +97,8 @@ namespace net
 			LOG(ec);
 			return;
 		}
+// 		addSock(socket);
+// 		_handler->onConnect(Channel_ptr(new ChannelImpl(this, socket)));
 		socket->async_handshake(
 			ssl::stream_base::client,
 			boost::bind(
@@ -159,7 +163,7 @@ namespace net
 		boost::system::error_code ec;
 		BOOST_FOREACH(TSocket_ptr &sock, _socks)
 		{
-			sock->shutdown(ec);
+			//sock->shutdown(ec);
 			sock->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both);
 			sock->lowest_layer().close();
 		}
@@ -182,6 +186,9 @@ namespace net
 	{
 		if(!numThreads)
 		{
+			boost::system::error_code ec;
+			_acceptor.cancel(ec);
+			_acceptor.close(ec);
 			closeSocks();
 		}
 
@@ -335,6 +342,7 @@ namespace net
 
 		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
 		//TSocket_ptr socket(new TSocket(_io_service));
+
 		socket->lowest_layer().async_connect(endpoint, 
 			boost::bind(
 				&ServiceImpl::handleConnect, this,

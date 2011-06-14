@@ -115,8 +115,10 @@ namespace net
 	void ChannelImpl::close()
 	{
 		boost::system::error_code ec;
-		_socket->shutdown(ec);
-		//lowest_layer().close();
+		//_socket->shutdown(ec);
+		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both);
+		_socket->lowest_layer().close();
+		
 		_serviceImpl->delSock(_socket);
 	}
 
@@ -200,8 +202,8 @@ namespace net
 
 			if(crc32 == packet->_crc32)
 			{
+				_socket->get_io_service().post(boost::bind(&ChannelImpl::handleReceiveComplete, this, shared_from_this(), packet->_data, packet->_size));
 				makeReceive();
-				_handler->onReceive(shared_from_this(), packet->_data, packet->_size);
 			}
 			else
 			{
@@ -215,6 +217,12 @@ namespace net
 		}
 
 
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelImpl::handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size)
+	{
+		_handler->onReceive(selfKeeper, data, size);
 	}
 
 }

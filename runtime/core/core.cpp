@@ -297,6 +297,7 @@ template <> struct ContextUser<MyContext>
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 volatile size_t cnt=0;
+volatile bool isServer = true;
 
 struct MyServiceHandler
 	: net::IServiceHandler
@@ -316,12 +317,22 @@ struct MyServiceHandler
 			utils::serialization::polymorphic_binary_portable_oarchive(sbuf2, boost::archive::no_header|boost::archive::no_codecvt);
 		oa & (bd);
 
-		if(!((cnt++)%1000))
+		if(!(cnt%1000))
 		{
-			std::cout<<"receive send "<<bd->in_b<<cnt<<std::endl;
+			std::cout<<"receive send "<<bd->in_b<<" "<<cnt<<std::endl;
 		}
+		cnt++;
 
 		delete bd;
+
+		if(isServer)
+		{
+// 			for(size_t i(0); i<10000; i++)
+// 			{
+// 				char buf[256];
+// 				sprintf(buf, "%08x", rand());
+// 			}
+		}
 
 		channel->send(sbuf2.data(), sbuf2.size());
 	}
@@ -397,13 +408,14 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		if(argc>1)
 		{
+			isServer = false;
 			srv.balance(1);
 			std::cout<<"connect"<<std::endl;
 			srv.connect("127.0.0.1", 1234);
 		}
 		else
 		{
-			srv.balance(32);
+			srv.balance(4);
 			std::cout<<"listen"<<std::endl;
 			srv.listen("127.0.0.1", 1234);
 		}
