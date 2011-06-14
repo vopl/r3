@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{96FB458B-0362-48A2-863B-116522341F2E}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{FEA23DD3-6C6A-47B9-BFF8-09547B242207}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -872,7 +872,8 @@
 			<role name = "Right4Event" metaref = "1589" kind = "Right4Event"></role>
 			<aspect name = "AspectContext" metaref = "1420" >
 				<part metaref = "1572" role = "Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1573" role = "ContextReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1573" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
+				<part metaref = "1641" role = "Event" primary = "yes" linked = "no"></part>
 				<part metaref = "1576" role = "Right" primary = "yes" linked = "no"></part>
 				<part metaref = "1577" role = "Right4Context" primary = "yes" linked = "no"></part>
 				<part metaref = "1590" role = "Right4Event" primary = "yes" linked = "no"></part>
@@ -888,7 +889,7 @@
 			<aspect name = "AspectCategories" metaref = "1546" >
 				<part metaref = "1547" role = "Category" primary = "yes" linked = "no"></part>
 				<part metaref = "1548" role = "CategoryInheritance" primary = "yes" linked = "no"></part>
-				<part metaref = "1592" role = "CategoryReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1592" role = "CategoryReference" primary = "yes" kindaspect = "AspectCategory" linked = "no"></part>
 				<part metaref = "1550" role = "CategoryRelation" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
@@ -958,12 +959,12 @@
 				<part metaref = "1618" role = "Audio" primary = "yes" linked = "no"></part>
 				<part metaref = "1619" role = "Binary" primary = "yes" linked = "no"></part>
 				<part metaref = "1620" role = "Bool" primary = "yes" linked = "no"></part>
-				<part metaref = "1621" role = "CategoryReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1621" role = "CategoryReference" primary = "yes" kindaspect = "AspectCategory" linked = "no"></part>
 				<part metaref = "1622" role = "Date" primary = "yes" linked = "no"></part>
 				<part metaref = "1623" role = "DateTimeInterval" primary = "yes" linked = "no"></part>
 				<part metaref = "1624" role = "Enum" primary = "yes" linked = "no"></part>
 				<part metaref = "1625" role = "Event" primary = "yes" linked = "no"></part>
-				<part metaref = "1626" role = "EventReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1626" role = "EventReference" primary = "yes" kindaspect = "AspectEvent" linked = "no"></part>
 				<part metaref = "1627" role = "File" primary = "yes" linked = "no"></part>
 				<part metaref = "1628" role = "Image" primary = "yes" linked = "no"></part>
 				<part metaref = "1629" role = "Int16" primary = "yes" linked = "no"></part>
@@ -987,7 +988,7 @@
 			<role name = "ContextReference" metaref = "1581" kind = "ContextReference"></role>
 			<aspect name = "AspectContexts" metaref = "1582" >
 				<part metaref = "1583" role = "Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1584" role = "ContextReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1584" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Set" metaref = "1554" attributes = "AllowNull" >
