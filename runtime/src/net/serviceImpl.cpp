@@ -48,14 +48,16 @@ namespace net
 		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
 		//TSocket_ptr socket(new TSocket(_io_service));
 
+		Allocator_ptr alloc = boost::make_shared<Allocator>();
+
 		_acceptor.async_accept(socket->lowest_layer(),
-			boost::bind(&ServiceImpl::handleAccept, this,
-			socket,
-			placeholders::error));
+			makeCmaHandler(*alloc, boost::bind(&ServiceImpl::handleAccept, this,
+				socket,
+				placeholders::error, alloc)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleAccept(TSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleAccept(TSocket_ptr socket, const boost::system::error_code& ec, Allocator_ptr alloc)
 	{
 		if(ec)
 		{
@@ -69,14 +71,14 @@ namespace net
 // 		_handler->onAccept(Channel_ptr(new ChannelImpl(this, socket)));
 		socket->async_handshake(
 			ssl::stream_base::server,
-			boost::bind(
+			makeCmaHandler(*alloc, boost::bind(
 				&ServiceImpl::handleServerHandshake, this,
 				socket,
-				placeholders::error));
+				placeholders::error, alloc)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleServerHandshake(TSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleServerHandshake(TSocket_ptr socket, const boost::system::error_code& ec, Allocator_ptr alloc)
 	{
 		if(ec)
 		{
@@ -85,12 +87,12 @@ namespace net
 			return;
 		}
 
-		addSock(socket);
+		addSock(socket, alloc);
 		_handler->onAccept(Channel_ptr(new ChannelImpl(this, socket)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleConnect(TSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleConnect(TSocket_ptr socket, const boost::system::error_code& ec, Allocator_ptr alloc)
 	{
 		if(ec)
 		{
@@ -101,14 +103,14 @@ namespace net
 // 		_handler->onConnect(Channel_ptr(new ChannelImpl(this, socket)));
 		socket->async_handshake(
 			ssl::stream_base::client,
-			boost::bind(
+			makeCmaHandler(*alloc, boost::bind(
 				&ServiceImpl::handleClientHandshake, this,
 				socket,
-				placeholders::error));
+				placeholders::error, alloc)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& ec)
+	void ServiceImpl::handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& ec, Allocator_ptr alloc)
 	{
 		if(ec)
 		{
@@ -116,16 +118,16 @@ namespace net
 			return;
 		}
 
-		addSock(socket);
+		addSock(socket, alloc);
 		_handler->onConnect(Channel_ptr(new ChannelImpl(this, socket)));
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::addSock(TSocket_ptr socket)
+	void ServiceImpl::addSock(TSocket_ptr socket, Allocator_ptr alloc)
 	{
 		_io_service.post(_socksPoolStrand.wrap(
-			boost::bind(&ServiceImpl::handleAddSock, this, socket)
+			makeCmaHandler(*alloc, boost::bind(&ServiceImpl::handleAddSock, this, socket, alloc))
 			));
 	}
 
@@ -146,7 +148,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleAddSock(TSocket_ptr socket)
+	void ServiceImpl::handleAddSock(TSocket_ptr socket, Allocator_ptr alloc)
 	{
 		_socks.insert(socket);
 	}
@@ -343,11 +345,12 @@ namespace net
 		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
 		//TSocket_ptr socket(new TSocket(_io_service));
 
+		Allocator_ptr alloc = boost::make_shared<Allocator>();
 		socket->lowest_layer().async_connect(endpoint, 
-			boost::bind(
+			makeCmaHandler(*alloc, boost::bind(
 				&ServiceImpl::handleConnect, this,
 				socket,
-				placeholders::error));
+				placeholders::error, alloc)));
 	}
 
 }

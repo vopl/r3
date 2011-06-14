@@ -21,3 +21,6 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_array.hpp>
 #include <iostream>
+
+#include <boost/aligned_storage.hpp>
+#include <boost/make_shared.hpp>

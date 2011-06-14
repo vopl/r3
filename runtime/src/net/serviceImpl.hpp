@@ -3,6 +3,7 @@
 
 #include "net/service.hpp"
 #include "channelImpl.hpp"
+#include "cmaHandler.hpp"
 #include <set>
 
 namespace net
@@ -47,18 +48,18 @@ namespace net
 		const std::string &handleGetPassword();
 
 		void makeAccept();
-		void handleAccept(TSocket_ptr socket, const boost::system::error_code& e);
-		void handleServerHandshake(TSocket_ptr socket, const boost::system::error_code& e);
+		void handleAccept(TSocket_ptr socket, const boost::system::error_code& e, Allocator_ptr alloc);
+		void handleServerHandshake(TSocket_ptr socket, const boost::system::error_code& e, Allocator_ptr alloc);
 
-		void handleConnect(TSocket_ptr socket, const boost::system::error_code& e);
-		void handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& e);
+		void handleConnect(TSocket_ptr socket, const boost::system::error_code& e, Allocator_ptr alloc);
+		void handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& e, Allocator_ptr alloc);
 
 	public:
-		void addSock(TSocket_ptr socket);
+		void addSock(TSocket_ptr socket, Allocator_ptr alloc);
 		void delSock(TSocket_ptr socket);
 	private:
 		void closeSocks();
-		void handleAddSock(TSocket_ptr socket);
+		void handleAddSock(TSocket_ptr socket, Allocator_ptr alloc);
 		void handleDelSock(TSocket_ptr socket);
 		void handleCloseSocks();
 	public:

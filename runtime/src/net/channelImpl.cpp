@@ -49,14 +49,16 @@ namespace net
 		packet->_crc32NetOrder = utils::fixEndian(utils::crc32(data.get(), size));
 		packet->_data = data;
 
-		handleSend(shared_from_this(), packet, boost::system::error_code(), 0);
+		Allocator_ptr alloc = boost::make_shared<Allocator>();
+		handleSend(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::handleSend(
 		ChannelImpl_ptr selfKeeper,
 		OutPacketWrapper_ptr packet, 
-		const boost::system::error_code& ec, const size_t sended)
+		const boost::system::error_code& ec, const size_t sended,
+		Allocator_ptr alloc)
 	{
 		packet->_totalSended += sended;
 		if(ec)
@@ -75,10 +77,10 @@ namespace net
 			};
 
 			_socket->async_write_some(packedData, 
-				boost::bind(
+				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleSend, this, selfKeeper,
 					packet, 
-					placeholders::error, placeholders::bytes_transferred));
+					placeholders::error, placeholders::bytes_transferred, alloc)));
 		}
 		else if(packet->_totalSended < 4+packet->_size)
 		{
@@ -90,19 +92,19 @@ namespace net
 			};
 
 			_socket->async_write_some(packedData, 
-				boost::bind(
+				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleSend, this, selfKeeper,
 					packet, 
-					placeholders::error, placeholders::bytes_transferred));
+					placeholders::error, placeholders::bytes_transferred, alloc)));
 		}
 		else if(packet->_totalSended < 4+packet->_size+4)
 		{
 			size_t lsended = packet->_totalSended - 4 - packet->_size;
 			_socket->async_write_some(buffer((const char *)&packet->_crc32NetOrder+lsended, 4-lsended), 
-				boost::bind(
+				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleSend, this, selfKeeper,
 					packet, 
-					placeholders::error, placeholders::bytes_transferred));
+					placeholders::error, placeholders::bytes_transferred, alloc)));
 		}
 		else
 		{
@@ -129,11 +131,13 @@ namespace net
 		packet->_totalReceived = 0;
 		packet->_size = 0;
 		packet->_crc32 = 0;
-		handleReceive(shared_from_this(), packet, boost::system::error_code(), 0);
+
+		Allocator_ptr alloc = boost::make_shared<Allocator>();
+		handleReceive(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleReceive(ChannelImpl_ptr selfKeeper, InPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t received)
+	void ChannelImpl::handleReceive(ChannelImpl_ptr selfKeeper, InPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t received, Allocator_ptr alloc)
 	{
 		if(ec)
 		{
@@ -145,10 +149,10 @@ namespace net
 		{
 			size_t lreceived = packet->_totalReceived;
 			_socket->async_read_some(buffer((char *)&packet->_size + lreceived, 4-lreceived), 
-				boost::bind(
+				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 
-					placeholders::error, placeholders::bytes_transferred));
+					placeholders::error, placeholders::bytes_transferred, alloc)));
 		}
 		else if(packet->_totalReceived == 4)
 		{
@@ -162,10 +166,10 @@ namespace net
 			};
 
 			_socket->async_read_some(packedData, 
-				boost::bind(
+				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 
-					placeholders::error, placeholders::bytes_transferred));
+					placeholders::error, placeholders::bytes_transferred, alloc)));
 
 		}
 		else if(packet->_totalReceived < 4+packet->_size)
@@ -178,10 +182,10 @@ namespace net
 			};
 
 			_socket->async_read_some(packedData, 
-				boost::bind(
+				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 
-					placeholders::error, placeholders::bytes_transferred));
+					placeholders::error, placeholders::bytes_transferred, alloc)));
 
 		}
 		else if(packet->_totalReceived < 4+packet->_size+4)
@@ -189,10 +193,10 @@ namespace net
 			size_t lreceived = packet->_totalReceived-4-packet->_size;
 
 			_socket->async_read_some(buffer((char *)&packet->_crc32+lreceived, 4-lreceived),
-				boost::bind(
+				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 
-					placeholders::error, placeholders::bytes_transferred));
+					placeholders::error, placeholders::bytes_transferred, alloc)));
 
 		}
 		else if(packet->_totalReceived == 4+packet->_size+4)
@@ -202,7 +206,9 @@ namespace net
 
 			if(crc32 == packet->_crc32)
 			{
-				_socket->get_io_service().post(boost::bind(&ChannelImpl::handleReceiveComplete, this, shared_from_this(), packet->_data, packet->_size));
+				_socket->get_io_service().post(
+					makeCmaHandler(*alloc, boost::bind(&ChannelImpl::handleReceiveComplete, this, shared_from_this(), packet->_data, packet->_size, alloc))
+					);
 				makeReceive();
 			}
 			else
@@ -220,7 +226,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size)
+	void ChannelImpl::handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size, Allocator_ptr alloc)
 	{
 		_handler->onReceive(selfKeeper, data, size);
 	}

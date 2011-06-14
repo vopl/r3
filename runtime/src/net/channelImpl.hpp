@@ -1,6 +1,7 @@
 #ifndef _NET_CHANNELIMPL_HPP_
 #define _NET_CHANNELIMPL_HPP_
 
+#include "cmaHandler.hpp"
 
 namespace net
 {
@@ -50,12 +51,12 @@ namespace net
 		virtual void close();
 
 	private:
-		void handleSend(ChannelImpl_ptr selfKeeper, OutPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t sended);
+		void handleSend(ChannelImpl_ptr selfKeeper, OutPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t sended, Allocator_ptr alloc);
 
 	private:
 		void makeReceive();
-		void handleReceive(ChannelImpl_ptr selfKeeper, InPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t received);
-		void handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size);
+		void handleReceive(ChannelImpl_ptr selfKeeper, InPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t received, Allocator_ptr alloc);
+		void handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size, Allocator_ptr alloc);
 	};
 
 
