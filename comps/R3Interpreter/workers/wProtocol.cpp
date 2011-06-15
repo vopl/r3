@@ -129,6 +129,11 @@ namespace workers
 		hpp<<"#define "<<evalContextPath(ctx, isServer, cpt_hppGuard)<<"_hpp_"<<endl;
 		hpp<<endl;
 
+		hpp<<"#include \"r3/contextBase.hpp\"\n";
+		hpp<<"#include \"r3/logic.hpp\"\n";
+		hpp<<endl;
+
+
 		//пространство имен
 		hpp<<"namespace r3 \n{\n namespace protocol \n{\n namespace "<<(isServer?"server":"client")<<"\n{"<<endl;
 
