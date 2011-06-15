@@ -15,7 +15,17 @@ class EventImpl :
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);
+	typedef enum
+	{
+		s2c_Direction_Type,
+		c2s_Direction_Type,
+		both_Direction_Type
+	} Direction_Type;
 
+	//
+	// attribute getters and setters
+	virtual R3Meta_BON::EventImpl::Direction_Type     getDirection();
+	virtual void        setDirection( EventImpl::Direction_Type val);
 	//
 	// kind and role getters
 	virtual std::set<R3Meta_BON::Audio>     getAudio();

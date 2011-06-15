@@ -23,6 +23,8 @@ namespace workers
 		void operator()(const std::set<FCO> &roots);
 
 	private:
+		void processContext(Context ctx, bool isServer);
+		boost::filesystem::path evalContextHppPath(Context ctx, bool isServer);
 	};
 }
 #endif

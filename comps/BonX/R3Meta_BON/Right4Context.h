@@ -17,7 +17,7 @@ public:
 
 	//
 	// connectionEnd getters
-	virtual R3Meta_BON::ContextOrReference  getDst();
+	virtual R3Meta_BON::Context             getDst();
 	virtual R3Meta_BON::Right               getSrc();
 
 	///BUP

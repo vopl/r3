@@ -50,16 +50,16 @@ std::set<R3Meta_BON::Right4Event> R3Meta_BON::RightImpl::getOutRight4EventLinks(
 
 
 //********************************************************************************
-// returns dst R3Meta_BON::ContextOrReferences
+// returns dst R3Meta_BON::Contexts
 //********************************************************************************
-std::multiset<R3Meta_BON::ContextOrReference> R3Meta_BON::RightImpl::getRight4ContextDsts()
+std::multiset<R3Meta_BON::Context> R3Meta_BON::RightImpl::getRight4ContextDsts()
 {
-	std::multiset<R3Meta_BON::ContextOrReference> res;
+	std::multiset<R3Meta_BON::Context> res;
 	{
 		std::multiset<BON::ConnectionEnd> out_ends = BON::ConnectionEndImpl::getOutConnEnds("Right4Context");
 		for ( std::multiset<BON::ConnectionEnd>::iterator cit = out_ends.begin() ; cit != out_ends.end() ; ++cit )
 		{
-			R3Meta_BON::ContextOrReference dst( *cit );
+			R3Meta_BON::Context dst( *cit );
 			ASSERT(dst);
 			res.insert( dst);
 		}

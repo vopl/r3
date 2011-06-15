@@ -14,6 +14,36 @@ void R3Meta_BON::EventImpl::accept( BON::Visitor *pVisitor)
 
 
 //********************************************************************************
+// 
+//********************************************************************************
+R3Meta_BON::EventImpl::Direction_Type R3Meta_BON::EventImpl::getDirection()
+{
+	std::string val = FCOImpl::getAttribute("Direction")->getStringValue();
+
+	if ( val == "s2c") return s2c_Direction_Type;
+	else if ( val == "c2s") return c2s_Direction_Type;
+	else if ( val == "both") return both_Direction_Type;
+	else throw("None of the possible items");
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
+void R3Meta_BON::EventImpl::setDirection( EventImpl::Direction_Type val)
+{
+	std::string str_val = "";
+
+	if ( val == s2c_Direction_Type) str_val = "s2c";
+	else if ( val == c2s_Direction_Type) str_val = "c2s";
+	else if ( val == both_Direction_Type) str_val = "both";
+	else throw("None of the possible items");
+
+	FCOImpl::getAttribute("Direction")->setStringValue( str_val);
+}
+
+
+//********************************************************************************
 // getter for role "Audio" among "Field"s and its descendants
 //********************************************************************************
 std::set<R3Meta_BON::Audio> R3Meta_BON::EventImpl::getAudio()

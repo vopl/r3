@@ -475,22 +475,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\ContextOrReference.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\ContextOrReference.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\ContextReference.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\ContextReference.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Data.cpp"
 					>
 				</File>

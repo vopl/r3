@@ -14,7 +14,44 @@ void R3Meta_BON::ContextImpl::accept( BON::Visitor *pVisitor)
 
 
 //********************************************************************************
-// getter for role "Context" among "ContextOrReference"s and its descendants
+// 
+//********************************************************************************
+std::set<R3Meta_BON::Right4Context> R3Meta_BON::ContextImpl::getInRight4ContextLinks()
+{
+	std::set<R3Meta_BON::Right4Context> result;
+	std::set<BON::Connection> conns = ConnectionEndImpl::getInConnLinks();
+	std::set<BON::Connection>::iterator it = conns.begin();
+	for( ; it != conns.end(); ++it)
+	{
+		R3Meta_BON::Right4Context c( *it);
+		if (c)
+			result.insert( c);
+	}
+	return result;
+}
+
+
+//********************************************************************************
+// returns src R3Meta_BON::Rights
+//********************************************************************************
+std::multiset<R3Meta_BON::Right> R3Meta_BON::ContextImpl::getRight4ContextSrcs()
+{
+	std::multiset<R3Meta_BON::Right> res;
+	{
+		std::multiset<BON::ConnectionEnd> in_ends = BON::ConnectionEndImpl::getInConnEnds("Right4Context");
+		for ( std::multiset<BON::ConnectionEnd>::iterator cit = in_ends.begin() ; cit != in_ends.end() ; ++cit )
+		{
+			R3Meta_BON::Right dst( *cit );
+			ASSERT(dst);
+			res.insert( dst);
+		}
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Context" among "R3Meta_BON::Context"s
 //********************************************************************************
 std::set<R3Meta_BON::Context> R3Meta_BON::ContextImpl::getContext()
 {
@@ -23,44 +60,6 @@ std::set<R3Meta_BON::Context> R3Meta_BON::ContextImpl::getContext()
 	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
 	{
 		R3Meta_BON::Context elem(*i);
-		ASSERT(elem);
-		res.insert(elem);
-	}
-	return res;
-}
-
-
-//********************************************************************************
-// aggregated getter for role "R3Meta_BON::" among "R3Meta_BON::ContextOrReference"s and its descendants
-//********************************************************************************
-std::set<R3Meta_BON::ContextOrReference> R3Meta_BON::ContextImpl::getContextOrReference()
-{
-	std::set<R3Meta_BON::ContextOrReference> res;
-	const int len = 2;
-	std::set<BON::FCO> roles_vec[ len];
-	roles_vec[0] = ModelImpl::getChildFCOsAs("Context");
-	roles_vec[1] = ModelImpl::getChildFCOsAs("ContextReference");
-	for( int k = 0; k < len; ++k)
-		for( std::set<BON::FCO>::iterator i = roles_vec[k].begin(); i != roles_vec[k].end(); ++i)
-		{
-			R3Meta_BON::ContextOrReference elem(*i);
-			ASSERT(elem);
-			res.insert(elem);
-		}
-	return res;
-}
-
-
-//********************************************************************************
-// getter for role "ContextReference" among "ContextOrReference"s and its descendants
-//********************************************************************************
-std::set<R3Meta_BON::ContextReference> R3Meta_BON::ContextImpl::getContextReference()
-{
-	std::set<R3Meta_BON::ContextReference> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("ContextReference");
-	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
-	{
-		R3Meta_BON::ContextReference elem(*i);
 		ASSERT(elem);
 		res.insert(elem);
 	}

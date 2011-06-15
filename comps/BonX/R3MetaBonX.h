@@ -42,12 +42,10 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, DateTimeValue, Tim
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, CategoryOrReferenceImpl, CategoryOrReference ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, CategoryOrReference, CategoryImpl, Category ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, CategoryOrReference, CategoryReferenceImpl, CategoryReference ); }
-namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, ContextOrReferenceImpl, ContextOrReference ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, ContextOrReference, ContextImpl, Context ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, ContextOrReference, ContextReferenceImpl, ContextReference ); }
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, EventOrReferenceImpl, EventOrReference ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, EventOrReference, EventImpl, Event ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, EventOrReference, EventReferenceImpl, EventReference ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, ContextImpl, Context ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, DataImpl, Data ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, ProtocolImpl, Protocol ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, RightImpl, Right ); }
@@ -91,12 +89,10 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, Right4EventIm
 #include "R3Meta_BON/CategoryOrReference.h"
 #include "R3Meta_BON/Category.h"
 #include "R3Meta_BON/CategoryReference.h"
-#include "R3Meta_BON/ContextOrReference.h"
-#include "R3Meta_BON/Context.h"
-#include "R3Meta_BON/ContextReference.h"
 #include "R3Meta_BON/EventOrReference.h"
 #include "R3Meta_BON/Event.h"
 #include "R3Meta_BON/EventReference.h"
+#include "R3Meta_BON/Context.h"
 #include "R3Meta_BON/Data.h"
 #include "R3Meta_BON/Protocol.h"
 #include "R3Meta_BON/Right.h"

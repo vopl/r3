@@ -11,16 +11,17 @@ namespace R3Meta_BON
 //*******************************************************************
 class ContextImpl :
 	  virtual public BON::ModelImpl
-	, public ContextOrReferenceImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);
 
 	//
+	// connectionEnd getters
+	virtual std::set<R3Meta_BON::Right4Context>       getInRight4ContextLinks();
+	virtual std::multiset<R3Meta_BON::Right>          getRight4ContextSrcs();
+	//
 	// kind and role getters
 	virtual std::set<R3Meta_BON::Context>   getContext();
-	virtual std::set<R3Meta_BON::ContextOrReference>  getContextOrReference();
-	virtual std::set<R3Meta_BON::ContextReference>    getContextReference();
 	virtual std::set<R3Meta_BON::Event>     getEvent();
 	virtual std::set<R3Meta_BON::Right>     getRight();
 	virtual std::set<R3Meta_BON::Right4Context>       getRight4Context();

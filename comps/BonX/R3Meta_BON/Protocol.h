@@ -18,8 +18,6 @@ public:
 	//
 	// kind and role getters
 	virtual std::set<R3Meta_BON::Context>   getContext();
-	virtual std::set<R3Meta_BON::ContextOrReference>  getContextOrReference();
-	virtual std::set<R3Meta_BON::ContextReference>    getContextReference();
 
 	///BUP
 	// add your own members here

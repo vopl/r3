@@ -14,16 +14,16 @@ void R3Meta_BON::Right4ContextImpl::accept( BON::Visitor *pVisitor)
 
 
 //********************************************************************************
-// getDst() return value is a ConnectionEnd casted to R3Meta_BON::ContextOrReference
+// getDst() return value is a ConnectionEnd casted to R3Meta_BON::Context
 //********************************************************************************
-R3Meta_BON::ContextOrReference R3Meta_BON::Right4ContextImpl::getDst()
+R3Meta_BON::Context R3Meta_BON::Right4ContextImpl::getDst()
 {
 	BON::ConnectionEnd ce = ConnectionImpl::getDst();
-	R3Meta_BON::ContextOrReference sp( ce);
+	R3Meta_BON::Context sp( ce);
 	if ( sp)
 		return sp;
 
-	R3Meta_BON::ContextOrReference empty;
+	R3Meta_BON::Context empty;
 	return empty;
 }
 

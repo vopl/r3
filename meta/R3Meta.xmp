@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{003A856E-9462-426A-886B-B66479E1FFDD}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{688EA810-F45B-4A65-9170-D3EE6F1D057E}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -11,6 +11,11 @@
 		<attrdef name="Abstract" metaref = "1460" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="AllowNull" metaref = "1461" valuetype = "boolean" defvalue = "true">
+		</attrdef>
+		<attrdef name="Direction" metaref = "1673" valuetype = "enum" defvalue = "s2c">
+			<enumitem dispname = "s2c" value = "s2c"></enumitem>
+			<enumitem dispname = "c2s" value = "c2s"></enumitem>
+			<enumitem dispname = "both" value = "both"></enumitem>
 		</attrdef>
 		<attrdef name="IndexType" metaref = "1462" valuetype = "enum" defvalue = "tree">
 			<enumitem dispname = "tree" value = "tree"></enumitem>
@@ -756,7 +761,6 @@
 				</pointerspec>
 				<pointerspec name = "dst">
 					<pointeritem desc = "Context"></pointeritem>
-					<pointeritem desc = "ContextReference"></pointeritem>
 				</pointerspec>
 			</connjoint>
 		</connection>
@@ -779,13 +783,6 @@
 			<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 			<pointerspec name = "ref">
 				<pointeritem desc = "Category"></pointeritem>
-			</pointerspec>
-		</reference>
-		<reference name = "ContextReference" metaref = "1644">
-				<regnode name = "namePosition" value ="4"></regnode>
-			<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-			<pointerspec name = "ref">
-				<pointeritem desc = "Context"></pointeritem>
 			</pointerspec>
 		</reference>
 		<reference name = "EventReference" metaref = "1645">
@@ -862,17 +859,14 @@
 		</model>
 		<model name = "Context" metaref = "1646" >
 				<regnode name = "namePosition" value ="4"></regnode>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
 			<role name = "Context" metaref = "1647" kind = "Context"></role>
-			<role name = "ContextReference" metaref = "1648" kind = "ContextReference"></role>
 			<role name = "Event" metaref = "1649" kind = "Event"></role>
 			<role name = "Right" metaref = "1650" kind = "Right"></role>
 			<role name = "Right4Context" metaref = "1651" kind = "Right4Context"></role>
 			<role name = "Right4Event" metaref = "1652" kind = "Right4Event"></role>
 			<aspect name = "AspectContext" metaref = "1420" >
 				<part metaref = "1653" role = "Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1654" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
 				<part metaref = "1655" role = "Event" primary = "yes" linked = "no"></part>
 				<part metaref = "1656" role = "Right" primary = "yes" linked = "no"></part>
 				<part metaref = "1657" role = "Right4Context" primary = "yes" linked = "no"></part>
@@ -929,7 +923,7 @@
 				<part metaref = "1553" role = "ScantyValue" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
-		<model name = "Event" metaref = "1659" >
+		<model name = "Event" metaref = "1659" attributes = "Direction" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
 			<role name = "Audio" metaref = "1594" kind = "Audio"></role>
@@ -955,7 +949,7 @@
 			<role name = "Time" metaref = "1614" kind = "Time"></role>
 			<role name = "Timestamp" metaref = "1615" kind = "Timestamp"></role>
 			<role name = "Video" metaref = "1616" kind = "Video"></role>
-			<aspect name = "AspectEvent" metaref = "1617" >
+			<aspect name = "AspectEvent" metaref = "1617" attributes = "Direction" >
 				<part metaref = "1618" role = "Audio" primary = "yes" linked = "no"></part>
 				<part metaref = "1619" role = "Binary" primary = "yes" linked = "no"></part>
 				<part metaref = "1620" role = "Bool" primary = "yes" linked = "no"></part>
@@ -985,10 +979,8 @@
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
 			<role name = "Context" metaref = "1665" kind = "Context"></role>
-			<role name = "ContextReference" metaref = "1666" kind = "ContextReference"></role>
 			<aspect name = "AspectProtocol" metaref = "1670" >
 				<part metaref = "1671" role = "Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1672" role = "ContextReference" primary = "yes" kindaspect = "AspectContext" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Set" metaref = "1554" attributes = "AllowNull" >
