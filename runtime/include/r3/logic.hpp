@@ -13,11 +13,11 @@ namespace r3
 			: public ProtocolContext
 		{
 		public:
-            Context()
-                : ProtocolContext(0, NULL)
-            {
+			Context()
+				: ProtocolContext(0, NULL)
+			{
 
-            }
+			}
 
 		} Context;
 	};

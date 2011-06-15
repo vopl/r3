@@ -83,7 +83,9 @@ namespace r3
 	protected:
 		ContextBase(ContextId id, Parent *parent);
 
-	public:
+	protected:
+		template <class Parent>
+		friend struct DoWithParent;
 
 		template <class ContextChild>
 		ContextId createImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
@@ -99,6 +101,8 @@ namespace r3
 
 		void fireImpl(const Path &cpi, const EventBase *evt);
 
+		void dispatchCommon(const EventBase *evt);
+
 	private:
 	};
 
@@ -107,22 +111,59 @@ namespace r3
 	template <class Parent>
 	struct DoWithParent
 	{
-		template <class Event>
-		static void fire(Parent *p, const Event &evt)
+		template <class Context, class Event>
+		static void fire(Context *self, Parent *p, const Event &evt)
 		{
-			p->fireImpl(Path(), &evt);
+			Logic<Context>::Context *lself = (Logic<Context>::Context *)self;
+			lself->fireImpl(Path(), &evt);
+		}
+
+		template <class Context>
+		static void fireImpl(Context *self, Parent *p, const Path &path, const EventBase *evt)
+		{
+			Logic<Parent>::Context *lp = (Logic<Parent>::Context *)p;
+			Path newPath(path);
+			ContextPathItem cpi = {Context::tid, self->_id};
+			newPath.push_back(cpi);
+			lp->fireImpl(newPath, evt);
+		}
+
+		template <class Context>
+		static void destroy(Context *self, Parent *p)
+		{
+			Logic<Parent>::Context *lp = (Logic<Parent>::Context *)p;
+			lp->destroy(Context::tid, self->_id);
 		}
 	};
 	//////////////////////////////////////////////////////////////////////////
 	template <>
 	struct DoWithParent<void>
 	{
-		template <class Event>
-		static void fire(void *p, const Event &evt)
+		template <class Context, class Event>
+		static void fire(Context *self, void *p, const Event &evt)
+		{
+			Logic<Context>::Context *lself = (Logic<Context>::Context *)self;
+			lself->fireImpl(Path(), &evt);
+		}
+		template <class Context>
+		static void fireImpl(Context *self, void *p, const Path &path, const EventBase *evt)
+		{
+			assert(!"unimplemented method");
+		}
+		template <class Context>
+		static void destroy(Context *self, void *p)
 		{
 			assert(!"unimplemented method");
 		}
 	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::destroy()
+	{
+		DoWithParent<Parent>::destroy((Context *)this, _parent);
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
@@ -135,7 +176,8 @@ namespace r3
 	template <class Context, class Parent>
 	void ContextBase<Context, Parent>::handle(const Event_ping &evt)
 	{
-		fire(Event_pong(evt));
+		Logic<Context>::Context *lself = (Logic<Context>::Context *)this;
+		lself->fire(Event_pong(evt));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -150,7 +192,7 @@ namespace r3
 	template <class Event>
 	void ContextBase<Context, Parent>::fire(const Event &evt)
 	{
-		DoWithParent<Parent>::fire(_parent, evt);
+		DoWithParent<Parent>::fire((Context *)this, _parent, evt);
 	}
 
 
@@ -211,7 +253,28 @@ namespace r3
 	template <class Context, class Parent>
 	void ContextBase<Context, Parent>::fireImpl(const Path &p, const EventBase *evt)
 	{
-		assert(!"not impl");
+		DoWithParent<Parent>::fireImpl((Context *)this, _parent, p, evt);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::dispatchCommon(const EventBase *evt)
+	{
+		switch(evt->tid)
+		{
+		case Event_ping::tid:
+			return handleImpl((const Event_ping *)evt);
+
+		case Event_pong::tid:
+			return handleImpl((const Event_pong *)evt);
+
+		case Event_destroy::tid:
+			return handleImpl((const Event_destroy *)evt);
+
+		default:
+			assert(0);
+			throw 220;
+		}
 	}
 
 }

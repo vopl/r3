@@ -743,6 +743,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="logic"
+					>
+					<File
+						RelativePath="..\src\r3\logic\client.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\logic\server.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="utils"

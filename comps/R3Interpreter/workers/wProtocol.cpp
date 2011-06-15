@@ -42,8 +42,8 @@ namespace workers
 		hppServer<<endl;
 
 		hppClient<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
-		hppClient<<"#ifndef _r3_protocol_server_hpp_"<<endl;
-		hppClient<<"#define _r3_protocol_server_hpp_"<<endl;
+		hppClient<<"#ifndef _r3_protocol_client_hpp_"<<endl;
+		hppClient<<"#define _r3_protocol_client_hpp_"<<endl;
 		hppClient<<endl;
 
 		hppClient<<"#include \"r3/contextBase.hpp\"\n";
@@ -90,6 +90,35 @@ namespace workers
 		string parentType;
 		if(Context(ctx->getParent())) parentType = evalContextPath(Context(ctx->getParent()), isServer, cpt_classScope);
 		else parentType = "void";
+
+
+		std::set<R3Meta_BON::Event> eventsIn, eventsOut;
+
+		BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+		{
+			switch(evt->getDirection())
+			{
+			case EventImpl::s2c_Direction_Type:
+				if(isServer) eventsOut.insert(evt);
+				else eventsIn.insert(evt);
+				break;
+			case EventImpl::c2s_Direction_Type:
+				if(isServer) eventsIn.insert(evt);
+				else eventsOut.insert(evt);
+				break;
+			case EventImpl::both_Direction_Type:
+				eventsIn.insert(evt);
+				eventsOut.insert(evt);
+				break;
+			default:
+				assert(!"unknown event direction");
+			}
+		}
+
+
+
+
+
 
 		path hppDirectory = evalContextPath(ctx, isServer, cpt_directoryAbs);
 		create_directories(hppDirectory);
@@ -143,30 +172,11 @@ namespace workers
 		hpp<<"template <class Event> void handle(const Event &evt)\n{\n";
 		hpp<<"return BaseType::handle(evt);\n";
 		hpp<<"}\n";
-		BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+		BOOST_FOREACH(R3Meta_BON::Event evt, eventsIn)
 		{
-			bool doImpl = false;
-			switch(evt->getDirection())
-			{
-			case EventImpl::s2c_Direction_Type:
-				doImpl = isServer;
-				break;
-			case EventImpl::c2s_Direction_Type:
-				doImpl = !isServer;
-				break;
-			case EventImpl::both_Direction_Type:
-				doImpl = true;
-				break;
-			default:
-				assert(!"unknown event direction");
-			}
-
-			if(doImpl)
-			{
-				hpp<<"void handle(const Event_"<<evt->getName()<<" &evt)\n{\n";
-				hpp<<"return BaseType::handle(evt);\n";
-				hpp<<"}\n";
-			}
+			hpp<<"void handle(const Event_"<<evt->getName()<<" &evt)\n{\n";
+			hpp<<"return BaseType::handle(evt);\n";
+			hpp<<"}\n";
 		}
 		hpp<<endl;
 
@@ -175,30 +185,11 @@ namespace workers
 		hpp<<"template <class Event> void fire(const Event &evt)\n{\n";
 		hpp<<"return BaseType::fire(evt);\n";
 		hpp<<"}\n";
-		BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+		BOOST_FOREACH(R3Meta_BON::Event evt, eventsOut)
 		{
-			bool doImpl = false;
-			switch(evt->getDirection())
-			{
-			case EventImpl::s2c_Direction_Type:
-				doImpl = !isServer;
-				break;
-			case EventImpl::c2s_Direction_Type:
-				doImpl = isServer;
-				break;
-			case EventImpl::both_Direction_Type:
-				doImpl = true;
-				break;
-			default:
-				assert(!"unknown event direction");
-			}
-
-			if(doImpl)
-			{
-				hpp<<"void fire(const Event_"<<evt->getName()<<" &evt)\n{\n";
-				hpp<<"return BaseType::fire(evt);\n";
-				hpp<<"}\n";
-			}
+			hpp<<"void fire(const Event_"<<evt->getName()<<" &evt)\n{\n";
+			hpp<<"return BaseType::fire(evt);\n";
+			hpp<<"}\n";
 		}
 		hpp<<endl;
 
@@ -219,7 +210,7 @@ namespace workers
 		hpp<<endl;
 
 
-		hpp<<"private:\n";
+		hpp<<"public:\n";
 		//создание экземпляра дочернего контекста
 		hpp<<"// создание экземпляра дочернего контекста\n";
 		hpp<<"ContextId create(TypeId tid, ContextId id);\n";
@@ -244,7 +235,7 @@ namespace workers
 		BOOST_FOREACH(Context child, ctx->getContext())
 		{
 			processContext(child, isServer);
-			hpp<<"#include \""<<evalContextPath(child, true, cpt_directoryRel)<<".hpp\"\n";
+			hpp<<"#include \""<<evalContextPath(child, isServer, cpt_directoryRel)<<".hpp\"\n";
 		}
 		hpp<<endl;
 
@@ -304,47 +295,28 @@ namespace workers
 		hpp<<"{\n";
 
 		hpp<<"if(p.empty())\n"
-			"{\n"
-			"	switch(evt->tid)\n"
-			"	{\n"
-			"	case Event_ping::tid:\n"
-			"		return handleImpl((const Event_ping *)evt);\n"
-			"	case Event_pong::tid:\n"
-			"		return handleImpl((const Event_pong *)evt);\n"
-			"	case Event_destroy::tid:\n"
-			"		return handleImpl((const Event_destroy *)evt);\n";
+			"{\n";
 
-		BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+		if(eventsIn.size())
 		{
-			bool doImpl = false;
-			switch(evt->getDirection())
-			{
-			case EventImpl::s2c_Direction_Type:
-				doImpl = isServer;
-				break;
-			case EventImpl::c2s_Direction_Type:
-				doImpl = !isServer;
-				break;
-			case EventImpl::both_Direction_Type:
-				doImpl = true;
-				break;
-			default:
-				assert(!"unknown event direction");
-			}
+			hpp<<"	switch(evt->tid)\n"
+				"	{\n";
 
-			if(doImpl)
+			BOOST_FOREACH(R3Meta_BON::Event evt, eventsIn)
 			{
 				hpp<<"	case Event_"<<evt->getName()<<"::tid:\n"
 					"		return handleImpl((const Event_"<<evt->getName()<<" *)evt);\n";
-
 			}
-		}
 
-		hpp<<"	default:\n"
-			"		assert(0);\n"
-			"		throw 220;\n"
-			"	}\n"
-			"}\n"
+			hpp<<"	default:\n"
+				"		dispatchCommon(evt);\n"
+				"	}\n";
+		}
+		else
+		{
+			hpp<<"dispatchCommon(evt);\n";
+		}
+		hpp<<"}\n"
 			"else\n"
 			"{\n"
 			"	ContextPathItem &pi = p.front();\n"

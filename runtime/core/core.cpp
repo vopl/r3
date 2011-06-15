@@ -6,6 +6,9 @@
 #include "r3/protocol/server.hpp"
 #include "r3/protocol/client.hpp"
 
+#include "../src/r3/logic/client.hpp"
+#include "../src/r3/logic/server.hpp"
+
 #include "net/service.hpp"
 using namespace r3;
 
@@ -416,6 +419,20 @@ struct MyServiceHandler
 int _tmain(int argc, _TCHAR* argv[])
 {
 	{
+		Logic<r3::protocol::server::Connection>::Context sc;
+		Logic<r3::protocol::client::Connection>::Context cc;
+
+
+		r3::Path p;
+		Event_ping evt;
+		sc.dispatch(p, &evt);
+
+
+		int k=220;
+	}
+
+	return 0;
+	{
 		MyContext ctx(345, NULL);
 
 		MyServiceHandler myServiceHandler;
@@ -443,6 +460,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		srv.balance(0);
 	}
+
+
 
 	return 0;
 }
