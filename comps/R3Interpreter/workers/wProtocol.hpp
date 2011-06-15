@@ -16,6 +16,8 @@ namespace workers
 	class WProtocol
 	{
 		const boost::filesystem::path _path;
+		size_t _tid4C;
+		size_t _tid4E;
 	public:
 		WProtocol(const boost::filesystem::path &path);
 		~WProtocol();
@@ -24,7 +26,18 @@ namespace workers
 
 	private:
 		void processContext(Context ctx, bool isServer);
-		boost::filesystem::path evalContextHppPath(Context ctx, bool isServer);
+
+		enum EContextPathType
+		{
+			cpt_directoryAbs,
+			cpt_directoryRel,
+			cpt_hppGuard,
+			cpt_classScope,
+		};
+		std::string evalContextPath(Context ctx, bool isServer, EContextPathType cpt);
+
+		size_t getCTid();
+		size_t getETid();
 	};
 }
 #endif

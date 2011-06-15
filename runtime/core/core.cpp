@@ -2,8 +2,10 @@
 //
 
 #include "stdafx.h"
-#include "r3/contextBase.hpp"
-#include "r3/contextUser.hpp"
+
+#include "r3/protocol/server.hpp"
+#include "r3/protocol/client.hpp"
+
 #include "net/service.hpp"
 using namespace r3;
 
@@ -15,17 +17,6 @@ using namespace r3;
 
 
 //////////////////////////////////////////////////////////////////////////
-#include <boost/serialization/export.hpp>
-#include "utils/serialization/polymorphic_binary_portable_iarchive.hpp"
-#include "utils/serialization/polymorphic_binary_portable_oarchive.hpp"
-
-// #include <boost/archive/polymorphic_binary_iarchive.hpp>
-// #include <boost/archive/polymorphic_binary_oarchive.hpp>
-// #include <boost/archive/detail/iserializer.hpp>
-// #include <boost/archive/detail/oserializer.hpp>
-
-//#include <boost/archive/impl/archive_serializer_map.ipp>
-
 struct Bas
 {
 public:

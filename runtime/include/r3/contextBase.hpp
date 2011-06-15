@@ -98,18 +98,31 @@ namespace r3
 		void handleImpl(const Event *evt);
 
 		void fireImpl(const Path &cpi, const EventBase *evt);
+
+	private:
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Context, class Parent>
-	void ContextBase<Context, Parent>::destroy()
+	//помогалка для разделения рекурсивных по иерархии действий между узлами и корнем
+	template <class Parent>
+	struct DoWithParent
 	{
-		assert(_parent);
-		if(_parent)
+		template <class Event>
+		static void fire(Parent *p, const Event &evt)
 		{
-			_parent->destroy(Context::tid, _id);
+			p->fireImpl(Path(), &evt);
 		}
-	}
+	};
+	//////////////////////////////////////////////////////////////////////////
+	template <>
+	struct DoWithParent<void>
+	{
+		template <class Event>
+		static void fire(void *p, const Event &evt)
+		{
+			assert(!"unimplemented method");
+		}
+	};
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
@@ -137,7 +150,7 @@ namespace r3
 	template <class Event>
 	void ContextBase<Context, Parent>::fire(const Event &evt)
 	{
-		_parent->fireImpl(Path(), &evt);
+		DoWithParent<Parent>::fire(_parent, evt);
 	}
 
 
