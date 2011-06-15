@@ -207,8 +207,8 @@ public:
 
 
 protected:
-	std::map<ContextId, ContextUser<MyContext2>::User> map_MyContext2;
-	std::map<ContextId, ContextUser<MyContext3>::User> map_MyContext3;
+	std::map<ContextId, Logic<MyContext2>::Context> map_MyContext2;
+	std::map<ContextId, Logic<MyContext3>::Context> map_MyContext3;
 
 	ContextId create(TypeId tid, ContextId id)
 	{
@@ -267,9 +267,9 @@ protected:
 			switch(pi.tid)
 			{
 			case MyContext2::tid:
-				return dispathImpl(map_MyContext2, pi.id, p, evt);
+				return dispatchImpl(map_MyContext2, pi.id, p, evt);
 			case MyContext3::tid:
-				return dispathImpl(map_MyContext3, pi.id, p, evt);
+				return dispatchImpl(map_MyContext3, pi.id, p, evt);
 			default:
 				assert(0);
 				throw 220;
@@ -283,13 +283,13 @@ protected:
 
 namespace r3
 {
-    template <> struct ContextUser<MyContext>
+    template <> struct Logic<MyContext>
     {
-        class User
+        class Context
             : public MyContext
         {
         public:
-            User()
+            Context()
             : MyContext(435,NULL)
             {
 

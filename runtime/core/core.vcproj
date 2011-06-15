@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="core"
 	ProjectGUID="{A52B51E4-E717-4F19-BD43-4BE941420B08}"
 	RootNamespace="core"
@@ -408,15 +408,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\r3\contextUser.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\include\r3\data.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\include\r3\dataBase.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\r3\logic.hpp"
 					>
 				</File>
 				<File

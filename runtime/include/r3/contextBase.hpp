@@ -1,7 +1,7 @@
 #ifndef _R3_CONTEXTBASE_HPP_
 #define _R3_CONTEXTBASE_HPP_
 
-#include "r3/contextUser.hpp"
+#include "r3/logic.hpp"
 
 namespace r3
 {
@@ -92,7 +92,7 @@ namespace r3
 		void destroyImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
 
 		template <class ContextChild>
-		void dispathImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id, Path p, const EventBase *evt);
+		void dispatchImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id, Path p, const EventBase *evt);
 
 		template <class Event>
 		void handleImpl(const Event *evt);
@@ -191,7 +191,7 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
 	template <class ContextChild>
-	void ContextBase<Context, Parent>::dispathImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id, Path p, const EventBase *evt)
+	void ContextBase<Context, Parent>::dispatchImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id, Path p, const EventBase *evt)
 	{
 		assert(!"not impl");
 	}
@@ -201,7 +201,7 @@ namespace r3
 	template <class Event>
 	void ContextBase<Context, Parent>::handleImpl(const Event *evt)
 	{
-		typename ContextUser<Context>::User *self = (typename ContextUser<Context>::User *)this;
+		typename Logic<Context>::Context *self = (typename Logic<Context>::Context *)this;
  		//self->handlePre((Context *)this, evt);
  		self->handle(*evt);
  		//self->handlePost((Context *)this, evt);

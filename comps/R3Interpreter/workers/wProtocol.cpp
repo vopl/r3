@@ -38,7 +38,7 @@ namespace workers
 		hppServer<<endl;
 
 		hppServer<<"#include \"r3/contextBase.hpp\"\n";
-		hppServer<<"#include \"r3/contextUser.hpp\"\n";
+		hppServer<<"#include \"r3/logic.hpp\"\n";
 		hppServer<<endl;
 
 		hppClient<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
@@ -47,7 +47,7 @@ namespace workers
 		hppClient<<endl;
 
 		hppClient<<"#include \"r3/contextBase.hpp\"\n";
-		hppClient<<"#include \"r3/contextUser.hpp\"\n";
+		hppClient<<"#include \"r3/logic.hpp\"\n";
 		hppClient<<endl;
 
 		hppServer<<"namespace r3\n{\nnamespace protocol\n{\nnamespace server\n{\n";
@@ -106,7 +106,7 @@ namespace workers
 		//класс контекста
 		hpp<<"// класс контекста\n";
 		hpp<<"class "<<evalContextPath(ctx, isServer, cpt_classScope)<<endl;
-		hpp<<"	: public r3::ContextBase<"<<evalContextPath(ctx, isServer, cpt_classScope)<<", "<<parentType<<">\n{"<<endl;
+		hpp<<"	: public ContextBase<"<<evalContextPath(ctx, isServer, cpt_classScope)<<", "<<parentType<<">\n{"<<endl;
 
 		hpp<<"typedef ContextBase<"<<evalContextPath(ctx, isServer, cpt_classScope)<<", "<<parentType<<"> BaseType;\n";
 		hpp<<endl;
@@ -130,14 +130,6 @@ namespace workers
 		}
 		hpp<<endl;
 
-
-		//передварительные объ€влени€ дочерних контекстов
-		hpp<<"public:// передварительные объ€влени€ дочерних контекстов\n";
-		BOOST_FOREACH(Context child, ctx->getContext())
-		{
-			hpp<<"class "<<child->getName()<<";\n";
-		}
-		hpp<<endl;
 
 		hpp<<"public:// конструктор\n";
 		hpp<<ctx->getName()<<"(ContextId id, "<<parentType<<" *parent)\n";
@@ -210,6 +202,35 @@ namespace workers
 		}
 		hpp<<endl;
 
+		//передварительные объ€влени€ дочерних контекстов
+		hpp<<"public:// передварительные объ€влени€ дочерних контекстов\n";
+		BOOST_FOREACH(Context child, ctx->getContext())
+		{
+			hpp<<"class "<<child->getName()<<";\n";
+		}
+		hpp<<endl;
+
+		//контейнеры дочерних контекстов
+		hpp<<"private:// контейнеры дочерних контекстов\n";
+		BOOST_FOREACH(Context child, ctx->getContext())
+		{
+			hpp<<"std::map<ContextId, Logic<"<<child->getName()<<">::Context> map_"<<child->getName()<<";\n";
+		}
+		hpp<<endl;
+
+
+		hpp<<"private:\n";
+		//создание экземпл€ра дочернего контекста
+		hpp<<"// создание экземпл€ра дочернего контекста\n";
+		hpp<<"ContextId create(TypeId tid, ContextId id);\n";
+
+		//уничтожение экземпл€ра дочернего контекста
+		hpp<<"// уничтожение экземпл€ра дочернего контекста\n";
+		hpp<<"void destroy(TypeId tid, ContextId id);\n";
+
+		//проводка вход€щего сообщени€ в экземпл€р дочернего контекста
+		hpp<<"// проводка вход€щего сообщени€ в экземпл€р дочернего контекста\n";
+		hpp<<"void dispatch(Path p, const EventBase *evt);\n";
 
 
 		hpp<<"};// конец класса контекста"<<endl;
@@ -226,6 +247,134 @@ namespace workers
 			hpp<<"#include \""<<evalContextPath(child, true, cpt_directoryRel)<<".hpp\"\n";
 		}
 		hpp<<endl;
+
+		//пространство имен
+		hpp<<"namespace r3 \n{\n namespace protocol \n{\n namespace "<<(isServer?"server":"client")<<"\n{"<<endl;
+
+		//create
+		hpp<<"inline ContextId "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::create(TypeId tid, ContextId id)\n";
+		hpp<<"{\n";
+
+		if(ctx->getContext().size())
+		{
+			hpp<<"switch(tid)\n{\n";
+
+			BOOST_FOREACH(Context child, ctx->getContext())
+			{
+				hpp<<"case "<<child->getName()<<"::tid:\n";
+				hpp<<"return createImpl(map_"<<child->getName()<<", id);\n";
+			}
+
+			hpp<<"default:\nassert(0);throw 220;\n}\n";
+		}
+		else
+		{
+			hpp<<"//нет дочерних, некого создавать\n";
+			hpp<<"assert(0);\n";
+		}
+		hpp<<"}\n";
+		hpp<<endl;
+
+		//destroy
+		hpp<<"inline void "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::destroy(TypeId tid, ContextId id)\n";
+		hpp<<"{\n";
+
+		if(ctx->getContext().size())
+		{
+			hpp<<"switch(tid)\n{\n";
+
+			BOOST_FOREACH(Context child, ctx->getContext())
+			{
+				hpp<<"case "<<child->getName()<<"::tid:\n";
+				hpp<<"return destroyImpl(map_"<<child->getName()<<", id);\n";
+			}
+
+			hpp<<"default:\nassert(0);throw 220;\n}\n";
+		}
+		else
+		{
+			hpp<<"//нет дочерних, некого уничтожать\n";
+			hpp<<"assert(0);\n";
+		}
+		hpp<<"}\n";
+		hpp<<endl;
+
+		//dispatch
+		hpp<<"inline void "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::dispatch(Path p, const EventBase *evt)\n";
+		hpp<<"{\n";
+
+		hpp<<"if(p.empty())\n"
+			"{\n"
+			"	switch(evt->tid)\n"
+			"	{\n"
+			"	case Event_ping::tid:\n"
+			"		return handleImpl((const Event_ping *)evt);\n"
+			"	case Event_pong::tid:\n"
+			"		return handleImpl((const Event_pong *)evt);\n"
+			"	case Event_destroy::tid:\n"
+			"		return handleImpl((const Event_destroy *)evt);\n";
+
+		BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+		{
+			bool doImpl = false;
+			switch(evt->getDirection())
+			{
+			case EventImpl::s2c_Direction_Type:
+				doImpl = isServer;
+				break;
+			case EventImpl::c2s_Direction_Type:
+				doImpl = !isServer;
+				break;
+			case EventImpl::both_Direction_Type:
+				doImpl = true;
+				break;
+			default:
+				assert(!"unknown event direction");
+			}
+
+			if(doImpl)
+			{
+				hpp<<"	case Event_"<<evt->getName()<<"::tid:\n"
+					"		return handleImpl((const Event_"<<evt->getName()<<" *)evt);\n";
+
+			}
+		}
+
+		hpp<<"	default:\n"
+			"		assert(0);\n"
+			"		throw 220;\n"
+			"	}\n"
+			"}\n"
+			"else\n"
+			"{\n"
+			"	ContextPathItem &pi = p.front();\n"
+			"	p.pop_front();\n";
+
+		if(ctx->getContext().size())
+		{
+			hpp<<"switch(pi.tid)\n{\n";
+
+			BOOST_FOREACH(Context child, ctx->getContext())
+			{
+				hpp<<"case "<<child->getName()<<"::tid:\n";
+				hpp<<"return dispatchImpl(map_"<<child->getName()<<", pi.id, p, evt);\n";
+			}
+
+			hpp<<"default:\nassert(0);throw 220;\n}\n";
+		}
+		else
+		{
+			hpp<<"//нет дочерних, некому проводить\n";
+			hpp<<"assert(0);\n";
+		}
+		hpp<<"}\n";
+
+		hpp<<"}\n";
+		hpp<<endl;
+
+		//конец пространства имен
+		hpp<<"}\n}\n}\n"<<endl;
+
 
 		hpp<<"#endif"<<endl;
 		hpp<<endl;
