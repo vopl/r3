@@ -218,11 +218,11 @@ namespace workers
 		hpp<<"public:\n";
 		//создание экземпляра дочернего контекста
 		hpp<<"// создание экземпляра дочернего контекста\n";
-		hpp<<"ContextId create(TypeId tid, ContextId id);\n";
+		hpp<<"ContextId startup(TypeId tid, ContextId id);\n";
 
 		//уничтожение экземпляра дочернего контекста
 		hpp<<"// уничтожение экземпляра дочернего контекста\n";
-		hpp<<"void destroy(TypeId tid, ContextId id);\n";
+		hpp<<"void shutdown(TypeId tid, ContextId id);\n";
 
 		//проводка входящего сообщения в экземпляр дочернего контекста
 		hpp<<"// проводка входящего сообщения в экземпляр дочернего контекста\n";
@@ -247,8 +247,8 @@ namespace workers
 		//пространство имен
 		hpp<<"namespace r3 \n{\n namespace protocol \n{\n namespace "<<(isServer?"server":"client")<<"\n{"<<endl;
 
-		//create
-		hpp<<"inline ContextId "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::create(TypeId tid, ContextId id)\n";
+		//startup
+		hpp<<"inline ContextId "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::startup(TypeId tid, ContextId id)\n";
 		hpp<<"{\n";
 
 		if(ctx->getContext().size())
@@ -258,7 +258,7 @@ namespace workers
 			BOOST_FOREACH(Context child, ctx->getContext())
 			{
 				hpp<<"case "<<child->getName()<<"::tid:\n";
-				hpp<<"return createImpl(map_"<<child->getName()<<", id);\n";
+				hpp<<"return startupImpl(map_"<<child->getName()<<", id);\n";
 			}
 
 			hpp<<"default:\nassert(0);throw 220;\n}\n";
@@ -271,8 +271,8 @@ namespace workers
 		hpp<<"}\n";
 		hpp<<endl;
 
-		//destroy
-		hpp<<"inline void "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::destroy(TypeId tid, ContextId id)\n";
+		//shutdown
+		hpp<<"inline void "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::shutdown(TypeId tid, ContextId id)\n";
 		hpp<<"{\n";
 
 		if(ctx->getContext().size())
@@ -282,7 +282,7 @@ namespace workers
 			BOOST_FOREACH(Context child, ctx->getContext())
 			{
 				hpp<<"case "<<child->getName()<<"::tid:\n";
-				hpp<<"return destroyImpl(map_"<<child->getName()<<", id);\n";
+				hpp<<"return shutdownImpl(map_"<<child->getName()<<", id);\n";
 			}
 
 			hpp<<"default:\nassert(0);throw 220;\n}\n";

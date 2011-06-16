@@ -52,10 +52,10 @@ namespace r3
 		{}
 		boost::uint32_t counter;
 	};
-	struct Event_destroy:EventBase
+	struct Event_shutdown:EventBase
 	{
 		static const TypeId tid=33;
-		Event_destroy():EventBase(tid){}
+		Event_shutdown():EventBase(tid){}
 	};
 
 
@@ -64,14 +64,14 @@ namespace r3
 	class ContextBase
 	{
 	public:
-		void destroy();
+		void shutdown();
 
 		template <class Event>
 		void handle(const Event &evt);
 
 		void handle(const Event_ping &evt);
 		void handle(const Event_pong &evt);
-		void handle(const Event_destroy &evt);
+		void handle(const Event_shutdown &evt);
 
 		template <class Event>
 		void fire(const Event &evt);
@@ -88,10 +88,10 @@ namespace r3
 		friend struct DoWithParent;
 
 		template <class ContextChild>
-		ContextId createImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
+		ContextId startupImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
 
 		template <class ContextChild>
-		void destroyImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
+		void shutdownImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
 
 		template <class ContextChild>
 		void dispatchImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id, Path p, const EventBase *evt);
@@ -129,10 +129,10 @@ namespace r3
 		}
 
 		template <class Context>
-		static void destroy(Context *self, Parent *p)
+		static void shutdown(Context *self, Parent *p)
 		{
 			Logic<Parent>::Context *lp = (Logic<Parent>::Context *)p;
-			lp->destroy(Context::tid, self->_id);
+			lp->shutdown(Context::tid, self->_id);
 		}
 	};
 	//////////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ namespace r3
 			assert(!"unimplemented method");
 		}
 		template <class Context>
-		static void destroy(Context *self, void *p)
+		static void shutdown(Context *self, void *p)
 		{
 			assert(!"unimplemented method");
 		}
@@ -159,9 +159,9 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	void ContextBase<Context, Parent>::destroy()
+	void ContextBase<Context, Parent>::shutdown()
 	{
-		DoWithParent<Parent>::destroy((Context *)this, _parent);
+		DoWithParent<Parent>::shutdown((Context *)this, _parent);
 	}
 
 
@@ -198,9 +198,9 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	void ContextBase<Context, Parent>::handle(const Event_destroy &evt)
+	void ContextBase<Context, Parent>::handle(const Event_shutdown &evt)
 	{
-		destroy();
+		shutdown();
 	}
 
 
@@ -216,7 +216,7 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
 	template <class ContextChild>
-	ContextId ContextBase<Context, Parent>::createImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id)
+	ContextId ContextBase<Context, Parent>::startupImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id)
 	{
 		assert(!"not impl");
 		return id;
@@ -225,7 +225,7 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
 	template <class ContextChild>
-	void ContextBase<Context, Parent>::destroyImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id)
+	void ContextBase<Context, Parent>::shutdownImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id)
 	{
 		assert(!"not impl");
 	}
@@ -268,8 +268,8 @@ namespace r3
 		case Event_pong::tid:
 			return handleImpl((const Event_pong *)evt);
 
-		case Event_destroy::tid:
-			return handleImpl((const Event_destroy *)evt);
+		case Event_shutdown::tid:
+			return handleImpl((const Event_shutdown *)evt);
 
 		default:
 			assert(0);
