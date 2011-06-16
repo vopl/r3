@@ -29,13 +29,23 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	DataBase::DataBase()
 	{
-
+		assert(_stmStorages.empty());
+		_stmStorages.resize(StmStorageBase::creators().size());
+		for(size_t i(0); i<_stmStorages.size(); i++)
+		{
+			_stmStorages[i] = StmStorageBase::creators()[i]();
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	DataBase::~DataBase()
 	{
-
+		assert(_stmStorages.size() == StmStorageBase::destroyers().size());
+		for(size_t i(0); i<_stmStorages.size(); i++)
+		{
+			StmStorageBase::destroyers()[i](_stmStorages[i]);
+		}
+		_stmStorages.clear();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -44,25 +54,20 @@ namespace r3
 		_tcon.reset(new pgc::Connection);
 		_tcon->open(conninfo);
 
-		assert(_stmStorages.empty());
-		_stmStorages.resize(StmStorageBase::creators().size());
 		for(size_t i(0); i<_stmStorages.size(); i++)
 		{
-			_stmStorages[i] = StmStorageBase::creators()[i]();
 			_stmStorages[i]->startInThread(*_tcon);
 		}
+
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	void DataBase::stopInThread()
 	{
-		assert(_stmStorages.size() == StmStorageBase::destroyers().size());
 		for(size_t i(0); i<_stmStorages.size(); i++)
 		{
-			StmStorageBase::destroyers()[i](_stmStorages[i]);
+			_stmStorages[i]->stopInThread();
 		}
-		_stmStorages.clear();
-
 		_tcon.reset();
 	}
 

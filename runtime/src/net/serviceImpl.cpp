@@ -12,8 +12,8 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::workerProc(ServiceWorkerPtr swp)
 	{
-		std::cout<<"workerProc start\n";
-		std::cout.flush();
+// 		std::cout<<"workerProc start\n";
+// 		std::cout.flush();
 
 		_handler->onStartInThread(_iface);
 
@@ -25,13 +25,13 @@ namespace net
 			{
 				break;
 			}
-			std::cout<<"workerProc sleep\n";
-			std::cout.flush();
+// 			std::cout<<"workerProc sleep\n";
+// 			std::cout.flush();
 			swp->_thread.sleep(boost::get_system_time() + boost::posix_time::milliseconds(500));
 		}
 
-		std::cout<<"workerProc stop\n";
-		std::cout.flush();
+// 		std::cout<<"workerProc stop\n";
+// 		std::cout.flush();
 
 		_handler->onStopInThread();
 	}

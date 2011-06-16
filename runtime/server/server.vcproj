@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../include;../src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -60,6 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="../Debug/libpgc.lib ../Debug/libnet.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -132,6 +134,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="../Release/libpgc.lib ../Release/libnet.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -210,6 +213,162 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="src"
+			>
+			<Filter
+				Name="r3"
+				>
+				<File
+					RelativePath="..\src\r3\dataBase.cpp"
+					>
+				</File>
+				<Filter
+					Name="server"
+					>
+					<File
+						RelativePath="..\src\r3\server\instance.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\server\instance.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="fields"
+					>
+					<File
+						RelativePath="..\src\r3\fields\audio.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\binary.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\bool.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\date.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\dateTime.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\dateTimeInterval.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\dateTimeValue.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\enum.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\field.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\file.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\id.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\image.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\int.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\int16.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\int32.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\int64.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\int8.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\money.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\real.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\real32.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\real64.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\scanty.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\set.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\simple.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\string.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\time.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\timestamp.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\r3\fields\video.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="logic"
+					>
+					<Filter
+						Name="server"
+						>
+						<File
+							RelativePath="..\src\r3\logic\server\connection.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\src\r3\logic\server\connection.hpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
