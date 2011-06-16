@@ -19,7 +19,6 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			Connection::~Connection()
 			{
-				r3::server::instance()->onConnectionDelete(shared_from_this());
 			}
 			
 			//////////////////////////////////////////////////////////////////////////
@@ -31,6 +30,7 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::onError(net::Channel_ptr channel)
 			{
+				_channel->close();
 				r3::server::instance()->onConnectionError(shared_from_this());
 			}
 			

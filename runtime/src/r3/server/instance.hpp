@@ -26,7 +26,6 @@ namespace r3
 			friend class r3::logic::server::Connection;
 			void onConnectionClose(Connection_ptr con);
 			void onConnectionError(Connection_ptr con);
-			void onConnectionDelete(Connection_ptr con);
 
 
 		private:

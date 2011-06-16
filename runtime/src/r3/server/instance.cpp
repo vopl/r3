@@ -24,17 +24,12 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onConnectionClose(Connection_ptr con)
 		{
-
+			boost::mutex::scoped_lock l(_mtx);
+			_connections.erase(con);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onConnectionError(Connection_ptr con)
-		{
-
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onConnectionDelete(Connection_ptr con)
 		{
 			boost::mutex::scoped_lock l(_mtx);
 			_connections.erase(con);
