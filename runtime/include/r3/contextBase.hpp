@@ -34,6 +34,10 @@ namespace r3
 			: tid(tid)
 		{
 		}
+		EventBase()
+			: tid(0)
+		{
+		}
 
 		virtual ~EventBase()
 		{
@@ -314,5 +318,11 @@ namespace r3
 	}
 
 }
+
+BOOST_CLASS_EXPORT_KEY(r3::EventBase);
+BOOST_CLASS_EXPORT_KEY(r3::Event_ping);
+BOOST_CLASS_EXPORT_KEY(r3::Event_pong);
+BOOST_CLASS_EXPORT_KEY(r3::Event_shutdown);
+
 
 #endif

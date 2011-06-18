@@ -3,7 +3,6 @@
 #include <QtNetwork/QSslCipher>
 #include <QMessageBox>
 #include "utils/streambufOnArray.hpp"
-#include "r3/protocol/serialization.hpp"
 #include "utils/serialization.hpp"
 
 namespace r3

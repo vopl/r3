@@ -43,8 +43,6 @@ namespace workers
 		size_t getCTid();
 		size_t getETid();
 
-		void makeSerializationEvents();
-
 	};
 }
 #endif
