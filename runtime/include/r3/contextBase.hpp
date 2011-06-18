@@ -14,6 +14,14 @@ namespace r3
 	{
 		TypeId tid;
 		ContextId id;
+
+		template<class Archive>
+		inline void serialize(Archive &ar, const unsigned int file_version)
+		{
+			ar & tid;
+			ar & id;
+		}
+
 	};
 
 	typedef std::deque<ContextPathItem> Path;
@@ -30,6 +38,13 @@ namespace r3
 		virtual ~EventBase()
 		{
 		}
+
+		template<class Archive>
+		inline void serialize(Archive &ar, const unsigned int file_version)
+		{
+			ar & tid;
+		}
+
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -42,6 +57,14 @@ namespace r3
 		{}
 
 		boost::uint32_t counter;
+
+		template<class Archive>
+		inline void serialize(Archive &ar, const unsigned int file_version)
+		{
+			ar & (EventBase &)*this;
+			ar & counter;
+		}
+
 	};
 	struct Event_pong:EventBase
 	{
@@ -51,11 +74,24 @@ namespace r3
 			, counter(ping.counter+1)
 		{}
 		boost::uint32_t counter;
+
+		template<class Archive>
+		inline void serialize(Archive &ar, const unsigned int file_version)
+		{
+			ar & (EventBase &)*this;
+			ar & counter;
+		}
 	};
 	struct Event_shutdown:EventBase
 	{
 		static const TypeId tid=33;
 		Event_shutdown():EventBase(tid){}
+
+		template<class Archive>
+		inline void serialize(Archive &ar, const unsigned int file_version)
+		{
+			ar & (EventBase &)*this;
+		}
 	};
 
 
@@ -87,14 +123,14 @@ namespace r3
 		template <class Parent>
 		friend struct DoWithParent;
 
-		template <class ContextChild>
-		ContextId startupImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
+		template <class ContextChild_ptr>
+		ContextId startupImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id);
 
-		template <class ContextChild>
-		void shutdownImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id);
+		template <class ContextChild_ptr>
+		void shutdownImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id);
 
-		template <class ContextChild>
-		void dispatchImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id, Path p, const EventBase *evt);
+		template <class ContextChild_ptr>
+		void dispatchImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, Path p, const EventBase *evt);
 
 		template <class Event>
 		void handleImpl(const Event *evt);
@@ -215,8 +251,8 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	template <class ContextChild>
-	ContextId ContextBase<Context, Parent>::startupImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id)
+	template <class ContextChild_ptr>
+	ContextId ContextBase<Context, Parent>::startupImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id)
 	{
 		assert(!"not impl");
 		return id;
@@ -224,16 +260,16 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	template <class ContextChild>
-	void ContextBase<Context, Parent>::shutdownImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id)
+	template <class ContextChild_ptr>
+	void ContextBase<Context, Parent>::shutdownImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id)
 	{
 		assert(!"not impl");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	template <class ContextChild>
-	void ContextBase<Context, Parent>::dispatchImpl(std::map<ContextId, ContextChild> &map_childs, ContextId id, Path p, const EventBase *evt)
+	template <class ContextChild_ptr>
+	void ContextBase<Context, Parent>::dispatchImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, Path p, const EventBase *evt)
 	{
 		assert(!"not impl");
 	}

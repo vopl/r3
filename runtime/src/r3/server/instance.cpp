@@ -22,6 +22,16 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Instance::reset()
+		{
+			BOOST_FOREACH(Connection_ptr c, _connections)
+			{
+				c->close();
+			}
+			_connections.clear();
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		void Instance::onConnectionClose(Connection_ptr con)
 		{
 			boost::mutex::scoped_lock l(_mtx);

@@ -2,6 +2,8 @@
 #define CONNECTION_H
 
 #include <QWidget>
+#include <QtNetwork/QAbstractSocket>
+#include <QtNetwork/QSslSocket>
 #include "ui_connection.h"
 
 #include "r3/logic.hpp"
@@ -22,6 +24,21 @@ namespace r3
 
 		private:
 			Ui::Connection ui;
+
+		private:
+			QSslSocket *_socket;
+
+			void open();
+			void close();
+
+		private slots:
+			void socketStateChanged(QAbstractSocket::SocketState state);
+			void socketEncrypted();
+			void sslErrors(const QList<QSslError> &errors);
+			void socketReadyRead();
+
+		public:
+			void fireImpl(const Path &cpi, const EventBase *evt);
 		};
 	}
 

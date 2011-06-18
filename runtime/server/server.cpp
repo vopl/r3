@@ -56,6 +56,7 @@ int main(int argc, char* argv[])
 		} while(!bStop);
 
 		ns.balance(0);
+		instance.reset();
 	}
 	catch(...)
 	{

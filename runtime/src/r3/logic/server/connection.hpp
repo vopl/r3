@@ -21,6 +21,8 @@ namespace r3
 				Connection(net::Channel_ptr channel);
 				~Connection();
 
+				void close();
+
 			private:
 				virtual void onReceive(net::Channel_ptr channel, boost::shared_array<char> data, size_t size);
 				virtual void onError(net::Channel_ptr channel);

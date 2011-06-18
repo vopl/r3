@@ -3,7 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include "ui_client.h"
-#include "connection.h"
+#include "connection.hpp"
 
 class Client : public QMainWindow
 {
@@ -11,7 +11,7 @@ class Client : public QMainWindow
 
 private:
 
-	r3::logic::Connection _connection;
+	r3::logic::Connection *_connection;
 
 public:
 	Client(QWidget *parent = 0, Qt::WFlags flags = 0);
@@ -20,12 +20,12 @@ public:
 public slots:
 	void show_c()
 	{
-		_connection.show();
+		_connection->show();
 
 	}
 	void hide_c()
 	{
-		_connection.hide();
+		_connection->hide();
 	}
 
 private:

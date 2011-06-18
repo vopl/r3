@@ -166,8 +166,8 @@ namespace net
 		BOOST_FOREACH(TSocket_ptr sock, _socks)
 		{
 			//sock->shutdown(ec);
-			sock->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both);
-			sock->lowest_layer().close();
+			sock->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+			sock->lowest_layer().close(ec);
 		}
 	}
 

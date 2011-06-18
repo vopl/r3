@@ -82,6 +82,7 @@ namespace workers
 		hppClient.close();
 		out::styler_cpp(hppClient.pathName());
 
+		makeSerializationEvents();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -115,6 +116,11 @@ namespace workers
 			}
 		}
 
+		//для сериализации накопить все события
+		_allEvents.insert(eventsIn.begin(), eventsIn.end());
+		_allEvents.insert(eventsOut.begin(), eventsOut.end());
+		_allContexts.insert(ctx);
+
 
 
 
@@ -129,8 +135,17 @@ namespace workers
 		hpp<<"#define "<<evalContextPath(ctx, isServer, cpt_hppGuard)<<"_hpp_"<<endl;
 		hpp<<endl;
 
-		hpp<<"#include \"r3/contextBase.hpp\"\n";
-		hpp<<"#include \"r3/logic.hpp\"\n";
+		if(isServer)
+		{
+			//серверные заголовки вклучают клиентские
+			hpp<<"#include \""<<evalContextPath(ctx, false, cpt_directoryRel)<<".hpp\"\n";
+		}
+		else
+		{
+			//клиентские не включают серверные
+			hpp<<"#include \"r3/contextBase.hpp\"\n";
+			hpp<<"#include \"r3/logic.hpp\"\n";
+		}
 		hpp<<endl;
 
 
@@ -152,15 +167,27 @@ namespace workers
 
 		//классы событий
 		hpp<<"public:// классы событий\n";
-		BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+		if(isServer)
 		{
-			hpp<<"/////////////////////////////////\n";
-			hpp<<"struct Event_"<<evt->getName()<<"\n";
-			hpp<<": public EventBase\n{\n";
-			hpp<<"static const TypeId tid = "<<getETid()<<";\n";
-			hpp<<"Event_"<<evt->getName()<<"() : EventBase(tid){}\n";
-			hpp<<"};\n";
-			hpp<<endl;
+			//сервер берет клиентские события
+			BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+			{
+				hpp<<"typedef r3::protocol::client::"<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<" Event_"<<evt->getName()<<";\n";
+			}
+		}
+		else
+		{
+			//клиент опеределяет события сам
+			BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+			{
+				hpp<<"/////////////////////////////////\n";
+				hpp<<"struct Event_"<<evt->getName()<<"\n";
+				hpp<<": public EventBase\n{\n";
+				hpp<<"static const TypeId tid = "<<getETid()<<";\n";
+				hpp<<"Event_"<<evt->getName()<<"() : EventBase(tid){}\n";
+				hpp<<"};\n";
+				hpp<<endl;
+			}
 		}
 		hpp<<endl;
 
@@ -203,6 +230,7 @@ namespace workers
 		BOOST_FOREACH(Context child, ctx->getContext())
 		{
 			hpp<<"class "<<child->getName()<<";\n";
+			hpp<<"typedef boost::shared_ptr<"<<child->getName()<<"> "<<child->getName()<<"_ptr;\n";
 		}
 		hpp<<endl;
 
@@ -210,7 +238,7 @@ namespace workers
 		hpp<<"private:// контейнеры дочерних контекстов\n";
 		BOOST_FOREACH(Context child, ctx->getContext())
 		{
-			hpp<<"std::map<ContextId, Logic<"<<child->getName()<<">::Context> map_"<<child->getName()<<";\n";
+			hpp<<"std::map<ContextId, boost::shared_ptr<Logic<"<<child->getName()<<">::Context> > map_"<<child->getName()<<";\n";
 		}
 		hpp<<endl;
 
@@ -419,6 +447,46 @@ namespace workers
 	size_t WProtocol::getETid()
 	{
 		return _tid4E++;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WProtocol::makeSerializationEvents()
+	{
+		create_directories(_path / "src/r3/protocol/");
+		out::File hpp(_path / "src/r3/protocol/serialization.hpp");
+		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
+
+		hpp<<"#ifndef _R3_PROTOCOL_SERIALIZATION_hpp_"<<endl;
+		hpp<<"#define _R3_PROTOCOL_SERIALIZATION_hpp_"<<endl;
+		hpp<<endl;
+
+		BOOST_FOREACH(R3Meta_BON::Context ctx, _allContexts)
+		{
+			hpp<<"#include \""<<evalContextPath(ctx, false, cpt_directoryRel)<<".hpp\""<<endl;
+		}
+		hpp<<endl;
+
+		hpp<<"namespace boost\n{\nnamespace serialization\n{\n";
+
+		BOOST_FOREACH(R3Meta_BON::Event evt, _allEvents)
+		{
+			Context ctx = Context(evt->getParent());
+			
+			hpp<<"//////////////////////////////////////////////////////////////////////////\n";
+			hpp<<"template<class Archive>\n";
+			hpp<<"inline void serialize(Archive & ar, r3::protocol::client::"<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<" &t, const unsigned int file_version)\n";
+			hpp<<"{\n";
+			hpp<<"ar & t.tid;\n";
+			hpp<<"}\n";
+		}
+
+		hpp<<"}\n}\n";
+
+		hpp<<"#endif"<<endl;
+		hpp<<endl;
+		hpp.close();
+		out::styler_cpp(hpp.pathName());
+
 	}
 
 }

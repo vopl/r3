@@ -18,6 +18,10 @@ namespace workers
 		const boost::filesystem::path _path;
 		size_t _tid4C;
 		size_t _tid4E;
+
+		//для сериализации аккумулятор всех событий в обе стороны
+		std::set<R3Meta_BON::Context> _allContexts;
+		std::set<R3Meta_BON::Event> _allEvents;
 	public:
 		WProtocol(const boost::filesystem::path &path);
 		~WProtocol();
@@ -38,6 +42,9 @@ namespace workers
 
 		size_t getCTid();
 		size_t getETid();
+
+		void makeSerializationEvents();
+
 	};
 }
 #endif

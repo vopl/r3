@@ -22,6 +22,8 @@ namespace r3
 			Instance();
 			~Instance();
 
+			void reset();
+
 		private:
 			friend class r3::logic::server::Connection;
 			void onConnectionClose(Connection_ptr con);

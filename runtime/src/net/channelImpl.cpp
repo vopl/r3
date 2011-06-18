@@ -118,8 +118,8 @@ namespace net
 	{
 		boost::system::error_code ec;
 		//_socket->shutdown(ec);
-		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both);
-		_socket->lowest_layer().close();
+		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both,ec);
+		_socket->lowest_layer().close(ec);
 		
 		_serviceImpl->delSock(_socket);
 	}

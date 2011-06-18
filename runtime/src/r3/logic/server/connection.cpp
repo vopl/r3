@@ -20,7 +20,13 @@ namespace r3
 			Connection::~Connection()
 			{
 			}
-			
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::close()
+			{
+				_channel->close();
+			}
+
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::onReceive(net::Channel_ptr channel, boost::shared_array<char> data, size_t size)
 			{
