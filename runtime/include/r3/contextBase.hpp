@@ -2,6 +2,10 @@
 #define _R3_CONTEXTBASE_HPP_
 
 #include "r3/logic.hpp"
+#include <deque>
+#include <map>
+#include <boost/cstdint.hpp>
+#include <cassert>
 
 namespace r3
 {
@@ -14,14 +18,18 @@ namespace r3
 	{
 		TypeId tid;
 		ContextId id;
-
-		template<class Archive>
-		inline void serialize(Archive &ar, const unsigned int file_version)
+		ContextPathItem(TypeId tid, ContextId id)
+			: tid(tid)
+			, id(id)
 		{
-			ar & tid;
-			ar & id;
 		}
-
+		ContextPathItem()
+			: tid(0)
+			, id(0)
+		{
+		}
+		virtual ~ContextPathItem(){}
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
 	};
 
 	typedef std::deque<ContextPathItem> Path;
@@ -42,13 +50,7 @@ namespace r3
 		virtual ~EventBase()
 		{
 		}
-
-		template<class Archive>
-		inline void serialize(Archive &ar, const unsigned int file_version)
-		{
-			ar & tid;
-		}
-
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -59,17 +61,11 @@ namespace r3
 			: EventBase(tid)
 			, counter(0)
 		{}
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
 
 		boost::uint32_t counter;
-
-		template<class Archive>
-		inline void serialize(Archive &ar, const unsigned int file_version)
-		{
-			ar & (EventBase &)*this;
-			ar & counter;
-		}
-
 	};
+
 	struct Event_pong:EventBase
 	{
 		static const TypeId tid=32;
@@ -77,25 +73,20 @@ namespace r3
 			: EventBase(tid)
 			, counter(ping.counter+1)
 		{}
-		boost::uint32_t counter;
+		Event_pong()
+			: EventBase(tid)
+			, counter(0)
+		{}
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
 
-		template<class Archive>
-		inline void serialize(Archive &ar, const unsigned int file_version)
-		{
-			ar & (EventBase &)*this;
-			ar & counter;
-		}
+		boost::uint32_t counter;
 	};
 	struct Event_shutdown:EventBase
 	{
 		static const TypeId tid=33;
 		Event_shutdown():EventBase(tid){}
 
-		template<class Archive>
-		inline void serialize(Archive &ar, const unsigned int file_version)
-		{
-			ar & (EventBase &)*this;
-		}
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
 	};
 
 
@@ -163,7 +154,7 @@ namespace r3
 		{
 			Logic<Parent>::Context *lp = (Logic<Parent>::Context *)p;
 			Path newPath(path);
-			ContextPathItem cpi = {Context::tid, self->_id};
+			ContextPathItem cpi(Context::tid, self->_id);
 			newPath.push_back(cpi);
 			lp->fireImpl(newPath, evt);
 		}
@@ -319,10 +310,10 @@ namespace r3
 
 }
 
-BOOST_CLASS_EXPORT_KEY(r3::EventBase);
-BOOST_CLASS_EXPORT_KEY(r3::Event_ping);
-BOOST_CLASS_EXPORT_KEY(r3::Event_pong);
-BOOST_CLASS_EXPORT_KEY(r3::Event_shutdown);
+// BOOST_CLASS_EXPORT(r3::EventBase);
+// BOOST_CLASS_EXPORT(r3::Event_ping);
+// BOOST_CLASS_EXPORT(r3::Event_pong);
+// BOOST_CLASS_EXPORT(r3::Event_shutdown);
 
 
 #endif

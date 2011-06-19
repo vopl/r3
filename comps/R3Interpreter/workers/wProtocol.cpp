@@ -82,6 +82,10 @@ namespace workers
 		hppClient.close();
 		out::styler_cpp(hppClient.pathName());
 
+
+		makeEventsSerialization_hpp();
+		makeEventsSerialization_cpp();
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -136,15 +140,22 @@ namespace workers
 
 		if(isServer)
 		{
-			//серверные заголовки вклучают клиентские
-			hpp<<"#include \""<<evalContextPath(ctx, false, cpt_directoryRel)<<".hpp\"\n";
+			//серверные заголовки не вклучают клиентские
+			if(Context(ctx->getParent()))
+			{
+				//hpp<<"#include \""<<evalContextPath(Context(ctx->getParent()), true, cpt_directoryRel)<<".hpp\"\n";
+			}
+			else
+			{
+				hpp<<"#include \"r3/contextBase.hpp\"\n";
+				hpp<<"#include \"r3/logic.hpp\"\n";
+				hpp<<"#include \"r3/fields/field.h\"\n";
+			}
 		}
 		else
 		{
-			//клиентские не включают серверные
-			hpp<<"#include \"r3/contextBase.hpp\"\n";
-			hpp<<"#include \"r3/logic.hpp\"\n";
-			hpp<<"#include \"r3/fields/field.h\"\n";
+			//клиентские включают серверные
+			hpp<<"#include \""<<evalContextPath(ctx, true, cpt_directoryRel)<<".hpp\"\n";
 		}
 		hpp<<endl;
 
@@ -169,15 +180,7 @@ namespace workers
 		hpp<<"public:// классы событий\n";
 		if(isServer)
 		{
-			//сервер берет клиентские события
-			BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
-			{
-				hpp<<"typedef r3::protocol::client::"<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<" Event_"<<evt->getName()<<";\n";
-			}
-		}
-		else
-		{
-			//клиент опеределяет события сам
+			//сервер опеределяет события сам
 			BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
 			{
 				hpp<<"/////////////////////////////////\n";
@@ -190,24 +193,19 @@ namespace workers
 				}
 				hpp<<"\n";
 				hpp<<"Event_"<<evt->getName()<<"() : EventBase(tid){}\n";
-				hpp<<"\n";
 
-
-
-				hpp<<"template<class Archive>\n";
-				hpp<<"void serialize(Archive & ar, const unsigned int file_version)\n";
-				hpp<<"{\n";
-				hpp<<"ar & tid;\n";
-
-				BOOST_FOREACH(Field fld, evt->getField())
-				{
-					hpp<<"ar & "<<fld->getName()<<";\n";
-				}
-
-				hpp<<"}\n";
+				hpp<<"template<class Archive> void serialize(Archive & ar, const unsigned int file_version);\n";
 
 				hpp<<"};\n";
 				hpp<<endl;
+			}
+		}
+		else
+		{
+			//клиент берет клиентские события
+			BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+			{
+				hpp<<"typedef r3::protocol::server::"<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<" Event_"<<evt->getName()<<";\n";
 			}
 		}
 		hpp<<endl;
@@ -402,16 +400,16 @@ namespace workers
 		hpp<<"}\n}\n}\n"<<endl;
 
 
-		if(!isServer)
+		if(isServer)
 		{
-			BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
-			{
-				Context ctx = evt->getParent();
-				hpp<<"BOOST_CLASS_EXPORT_KEY(";
-				hpp<<"r3::protocol::client::";
-				hpp<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<");\n";
-			}
-			hpp<<endl;
+// 			BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
+// 			{
+// 				Context ctx = evt->getParent();
+// 				hpp<<"BOOST_CLASS_EXPORT_KEY(";
+// 				hpp<<"r3::protocol::client::";
+// 				hpp<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<");\n";
+// 			}
+// 			hpp<<endl;
 		}
 
 
@@ -483,4 +481,74 @@ namespace workers
 	{
 		return _tid4E++;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WProtocol::makeEventsSerialization_hpp()
+	{
+		create_directories(_path / "src/r3/protocol");
+		out::File hpp(_path / "src/r3/protocol/serialization.hpp");
+		hpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
+
+		hpp<<"#ifndef _R3_PROTOCOL_SERIALIZATION_HPP_"<<endl;
+		hpp<<"#define _R3_PROTOCOL_SERIALIZATION_HPP_"<<endl;
+		hpp<<endl;
+
+		BOOST_FOREACH(Context ctx, _allContexts)
+		{
+			if(!Context(ctx->getParent()))
+			{
+				hpp<<"#include \""<<evalContextPath(ctx, true, cpt_directoryRel)<<".hpp\"\n";
+			}
+		}
+		hpp<<endl;
+
+		BOOST_FOREACH(R3Meta_BON::Event evt, _allEvents)
+		{
+			Context ctx = evt->getParent();
+
+			hpp<<"//////////////////////////////////////////////////////////////////////////\n";
+			hpp<<"template<class Archive>\n";
+			hpp<<"void r3::protocol::server::"<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<"::serialize(Archive & ar, const unsigned int file_version)\n";
+			hpp<<"{\n";
+			hpp<<"ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(EventBase);\n";
+
+			BOOST_FOREACH(Field fld, evt->getField())
+			{
+				hpp<<"ar & BOOST_SERIALIZATION_NVP("<<fld->getName()<<");\n";
+			}
+
+			hpp<<"}\n\n";
+		}
+
+		hpp<<endl;
+		hpp<<"#endif";
+		hpp<<endl;
+		hpp.close();
+		out::styler_cpp(hpp.pathName());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WProtocol::makeEventsSerialization_cpp()
+	{
+		create_directories(_path / "src/r3/protocol");
+		out::File cpp(_path / "src/r3/protocol/serialization_protocol.cpp");
+		cpp<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
+
+		cpp<<"#include \"stdafx.h\"\n";
+		cpp<<"#include \"r3/protocol/serialization.hpp\"\n";
+		cpp<<"#include <boost/serialization/export.hpp>\n";
+		cpp<<endl;
+
+		BOOST_FOREACH(R3Meta_BON::Event evt, _allEvents)
+		{
+			Context ctx = evt->getParent();
+
+			cpp<<"BOOST_CLASS_EXPORT(r3::protocol::server::"<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<");\n";
+		}
+
+		cpp<<endl;
+		cpp.close();
+		out::styler_cpp(cpp.pathName());
+	}
+
 }

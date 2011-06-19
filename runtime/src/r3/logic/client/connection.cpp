@@ -133,8 +133,23 @@ namespace r3
 
 				utils::serialization::polymorphic_binary_portable_oarchive oa(os, boost::archive::no_header|boost::archive::no_codecvt);
 
-				oa << cpi;
-				oa << evt;
+				oa << BOOST_SERIALIZATION_NVP(cpi);
+				oa << BOOST_SERIALIZATION_NVP(evt);
+			}
+
+			{
+				utils::StreambufOnArray sbuf2(sbuf.data(), sbuf.size());
+				std::istream is(&sbuf2);
+				utils::serialization::polymorphic_binary_portable_iarchive ia(is, boost::archive::no_header|boost::archive::no_codecvt);
+
+
+				Path cpi2;
+				EventBase *evt2;
+
+				ia >> BOOST_SERIALIZATION_NVP(cpi2);
+				ia >> BOOST_SERIALIZATION_NVP(evt2);
+				
+				int k=220;
 			}
 
 			_socket->write(sbuf.data().get(), sbuf.size());
