@@ -13,18 +13,13 @@ namespace r3{ namespace fields
 	class String
 		: public Simple
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 		typedef std::string TValue;
 	private:
 		std::string _value;
-
-		friend class boost::serialization::access;
-		template<class Archive> void serialize(Archive &ar, const unsigned int file_version)
-		{
-			//ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(EventBase);
-			ar &BOOST_SERIALIZATION_NVP(_value);
-		}
-
 
 	public:
 		String()

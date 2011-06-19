@@ -12,6 +12,12 @@ namespace r3{ namespace fields
 	class Date
 		: public DateTimeValue
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version)
+		{
+
+		}
+
 	public:
 		typedef boost::gregorian::date TValue;
 	private:

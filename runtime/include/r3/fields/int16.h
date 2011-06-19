@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Int16
 		: public Int<boost::int16_t>
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 
 		Int16 &operator=(boost::int8_t from)

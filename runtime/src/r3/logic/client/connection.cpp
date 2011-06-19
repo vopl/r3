@@ -5,6 +5,8 @@
 #include "utils/streambufOnArray.hpp"
 #include "utils/serialization.hpp"
 
+#include "r3/data.hpp"
+
 namespace r3
 {
 	namespace logic
@@ -127,6 +129,8 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Connection::fireImpl(const Path &cpi, const EventBase *evt)
 		{
+			r3::data::s_Test::Derived4fields::Tuple t;
+
 			utils::StreambufOnArray sbuf;
 			{
 				std::ostream os(&sbuf);
@@ -135,6 +139,7 @@ namespace r3
 
 				oa << BOOST_SERIALIZATION_NVP(cpi);
 				oa << BOOST_SERIALIZATION_NVP(evt);
+				oa << BOOST_SERIALIZATION_NVP(t.Enum1);
 			}
 
 			{
@@ -148,11 +153,22 @@ namespace r3
 
 				ia >> BOOST_SERIALIZATION_NVP(cpi2);
 				ia >> BOOST_SERIALIZATION_NVP(evt2);
-				
+				ia >> BOOST_SERIALIZATION_NVP(t.Enum1);
+
 				int k=220;
 			}
 
 			_socket->write(sbuf.data().get(), sbuf.size());
+
+
+
+
+
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
 
 		
 		}

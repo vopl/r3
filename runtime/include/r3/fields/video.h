@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Video
 		: public File
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 		typedef boost::int32_t TWidth;
 		typedef boost::int32_t THeight;

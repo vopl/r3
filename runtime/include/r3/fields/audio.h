@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Audio
 		: public File
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 		Audio &operator=(const std::string &from);
 		Audio &operator=(const pgc::Blob &from);

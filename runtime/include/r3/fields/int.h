@@ -14,6 +14,11 @@ namespace r3{ namespace fields
 	class Int
 		: public Simple
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
+		static BoostGuidIniter<Int<Integral> > _BoostGuidIniter;
+
 	public:
 		typedef Integral TValue;
 	protected:

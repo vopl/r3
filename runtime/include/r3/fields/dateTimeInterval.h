@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class DateTimeInterval
 		: public DateTime
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 		typedef pgc::DateTimeDuration TValue;
 	private:

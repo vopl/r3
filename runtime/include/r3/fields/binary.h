@@ -12,6 +12,12 @@ namespace r3{ namespace fields
 	class Binary
 		: public Simple
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version)
+		{
+
+		}
+
 	public:
 		typedef std::vector<char> TValue;
 	private:

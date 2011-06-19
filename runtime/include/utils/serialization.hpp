@@ -1,3 +1,5 @@
+#include <boost/serialization/export.hpp>
+
 #include "utils/serialization/polymorphic_binary_portable_iarchive.hpp"
 #include "utils/serialization/polymorphic_binary_portable_oarchive.hpp"
 

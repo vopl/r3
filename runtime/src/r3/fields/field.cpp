@@ -1,9 +1,15 @@
 #include "stdafx.h"
 #include "r3/fields/field.h"
+#include "utils/serialization.hpp"
 
 
 namespace r3{ namespace fields
 {
+	template<class Archive> void Field::serialize(Archive &ar, const unsigned int file_version)
+	{
+		ar &BOOST_SERIALIZATION_NVP(_fvs);
+	}
+
 
 	Field::Field()
 		: _fvs(fvs_notset)
@@ -19,6 +25,12 @@ namespace r3{ namespace fields
 	{
 
 	}
+
+	Field::~Field()
+	{
+
+	}
+
 
 
 	void Field::operator=(const Field &v)
@@ -61,3 +73,5 @@ namespace r3{ namespace fields
 		return prev;
 	}
 }}
+
+BOOST_CLASS_EXPORT(r3::fields::Field);

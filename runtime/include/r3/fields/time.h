@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Time
 		: public DateTimeValue
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 		typedef boost::posix_time::time_duration TValue;
 

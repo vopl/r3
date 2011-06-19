@@ -44,6 +44,11 @@ namespace r3{ namespace fields
 	class Scanty
 		: public Field
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
+		static BoostGuidIniter<Scanty<Domain> > _BoostGuidIniter;
+
 	public:
 		static const size_t amount = Domain::amount;
 

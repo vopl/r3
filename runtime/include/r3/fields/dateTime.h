@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class DateTime
 		: public Simple
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 	}; // class
 }}  // namespace

@@ -17,6 +17,9 @@ namespace r3{ namespace fields
 	//*******************************************************************
 	class Field
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	private:
 		EFieldValueState _fvs;
 
@@ -24,6 +27,7 @@ namespace r3{ namespace fields
 		Field();
 		Field(const Field &v);
 		Field (EFieldValueState v);
+		virtual ~Field();
 		void operator=(const Field &v);
 		bool operator==(const Field &v) const;
 		bool operator!=(const Field &v) const;
@@ -36,6 +40,16 @@ namespace r3{ namespace fields
 		EFieldValueState fvs() const;
 		EFieldValueState fvs(EFieldValueState v);
 	}; // class
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class T>
+	struct BoostGuidIniter
+	{
+		static boost::archive::detail::extra_detail::guid_initializer< T > const & g;
+	};
+	template<class T>
+	boost::archive::detail::extra_detail::guid_initializer< T > const & BoostGuidIniter< T >::g = ::boost::serialization::singleton<guid_initializer< T > >::get_mutable_instance().export_guid();
+
 }}  // namespace
 
 

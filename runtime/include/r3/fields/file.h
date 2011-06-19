@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class File
 		: public Field
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 		typedef std::string TName;
 		typedef std::string TExt;

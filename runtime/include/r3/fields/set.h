@@ -14,6 +14,11 @@ namespace r3{ namespace fields
 	class Set
 		: public Scanty<Domain>
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
+		static BoostGuidIniter<Set<Domain> > _BoostGuidIniter;
+
 	public:
 		typedef std::bitset<Scanty<Domain>::bits4SetAmount> TSet;
 

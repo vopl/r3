@@ -12,6 +12,9 @@ namespace r3{ namespace fields
 	class Int64
 		: public Int<boost::int64_t>
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 		void operator=(boost::int8_t from)
 		{

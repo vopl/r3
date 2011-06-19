@@ -13,6 +13,9 @@ namespace r3{ namespace fields
 	class Real32
 		: public Real
 	{
+		friend class boost::serialization::access;
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
 	public:
 		typedef float TValue;
 	private:
