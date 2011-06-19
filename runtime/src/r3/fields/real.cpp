@@ -5,6 +5,12 @@
 
 namespace r3{ namespace fields
 {
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive> void Real::serialize(Archive &ar, const unsigned int file_version)
+	{
+
+	}
+
 
 }}
 

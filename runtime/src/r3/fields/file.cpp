@@ -5,6 +5,14 @@
 
 namespace r3{ namespace fields
 {
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive> void File::serialize(Archive &ar, const unsigned int file_version)
+	{
+		ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(Field);
+		ar &BOOST_SERIALIZATION_NVP(_name);
+		ar &BOOST_SERIALIZATION_NVP(_ext);
+		//ar &BOOST_SERIALIZATION_NVP(_blob);
+	}
 
 	std::string &File::name()
 	{

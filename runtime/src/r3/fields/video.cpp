@@ -5,6 +5,12 @@
 
 namespace r3{ namespace fields
 {
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive> void Video::serialize(Archive &ar, const unsigned int file_version)
+	{
+
+	}
+
 	boost::int32_t &Video::width()
 	{
 		return _width;

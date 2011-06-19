@@ -140,6 +140,7 @@ namespace r3
 				oa << BOOST_SERIALIZATION_NVP(cpi);
 				oa << BOOST_SERIALIZATION_NVP(evt);
 				oa << BOOST_SERIALIZATION_NVP(t.Enum1);
+				oa << BOOST_SERIALIZATION_NVP(t.Audio);
 			}
 
 			{
@@ -154,6 +155,7 @@ namespace r3
 				ia >> BOOST_SERIALIZATION_NVP(cpi2);
 				ia >> BOOST_SERIALIZATION_NVP(evt2);
 				ia >> BOOST_SERIALIZATION_NVP(t.Enum1);
+				ia >> BOOST_SERIALIZATION_NVP(t.Audio);
 
 				int k=220;
 			}

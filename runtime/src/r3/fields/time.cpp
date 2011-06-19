@@ -5,6 +5,11 @@
 
 namespace r3{ namespace fields
 {
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive> void Time::serialize(Archive &ar, const unsigned int file_version)
+	{
+
+	}
 
 }}
 

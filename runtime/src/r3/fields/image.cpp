@@ -5,6 +5,13 @@
 
 namespace r3{ namespace fields
 {
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive> void Image::serialize(Archive &ar, const unsigned int file_version)
+	{
+		ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(File);
+		ar &BOOST_SERIALIZATION_NVP(_width);
+		ar &BOOST_SERIALIZATION_NVP(_height);
+	}
 
 	boost::int32_t &Image::width()
 	{

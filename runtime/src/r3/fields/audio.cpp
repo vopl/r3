@@ -5,6 +5,12 @@
 
 namespace r3{ namespace fields
 {
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive> void Audio::serialize(Archive &ar, const unsigned int file_version)
+	{
+		ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(File);
+	}
+
 
 	Audio &Audio::operator=(const std::string &from)
 	{

@@ -5,6 +5,11 @@
 
 namespace r3{ namespace fields
 {
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive> void Id::serialize(Archive &ar, const unsigned int file_version)
+	{
+		ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(Int64);
+	}
 
 
 }}
