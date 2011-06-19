@@ -16,6 +16,7 @@ namespace r3
 		Connection::Connection(QWidget *parent)
 			: QWidget(parent)
 			, r3::protocol::client::Connection(0, NULL)
+			, _reconnectTimerId(0)
 			, _socket(NULL)
 			, _incomingReaded(0)
 			, _incomingSize(0)
@@ -32,10 +33,22 @@ namespace r3
 		{
 
 		}
+		//////////////////////////////////////////////////////////////////////////
+		void Connection::timerEvent(QTimerEvent *te)
+		{
+			if(te->timerId() == _reconnectTimerId)
+			{
+				killTimer(_reconnectTimerId);
+				_reconnectTimerId = 0;
+				open();
+			}
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		void Connection::open()
 		{
+			assert(!_socket);
 			_incomingReaded = 0;
 			_incomingSize = 0;
 
@@ -90,6 +103,9 @@ namespace r3
 			{
 				_socket->deleteLater();
 				_socket = 0;
+
+				assert(!_reconnectTimerId);
+				_reconnectTimerId = startTimer(1000);
 			}
 
 			if(state == QAbstractSocket::ConnectedState)

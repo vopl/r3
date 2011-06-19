@@ -64,6 +64,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
+			if(_handler) _handler->onError(shared_from_this());
 			return;
 		}
 		if(packet->_totalSended < 4)
@@ -142,6 +143,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
+			if(_handler) _handler->onError(shared_from_this());
 			return;
 		}
 		packet->_totalReceived += received;

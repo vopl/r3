@@ -26,6 +26,9 @@ namespace r3
 			Ui::Connection ui;
 
 		private:
+			int _reconnectTimerId;
+			void timerEvent(QTimerEvent *);
+
 			QSslSocket *_socket;
 			boost::uint32_t _incomingReaded;
 			boost::uint32_t _incomingSize;

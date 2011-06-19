@@ -62,6 +62,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
+			if(_handler) _handler->onError(_iface);
 			return;
 		}
 
@@ -83,6 +84,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
+			if(_handler) _handler->onError(_iface);
 			socket->lowest_layer().close();
 			return;
 		}
@@ -97,6 +99,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
+			if(_handler) _handler->onError(_iface);
 			return;
 		}
 // 		addSock(socket);
@@ -115,6 +118,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
+			if(_handler) _handler->onError(_iface);
 			return;
 		}
 
