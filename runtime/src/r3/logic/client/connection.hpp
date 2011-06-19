@@ -19,19 +19,42 @@ namespace r3
 			Q_OBJECT
 
 		public:
-			Connection(QWidget *parent = 0);
+			Connection(QMainWindow *parent = 0);
 			~Connection();
 
 		private:
 			Ui::Connection ui;
 
+			QLabel *_labelConnected;
+			QLabel *_labelSendReceive;
+			QLabel *_labelPing;
+
+			QPixmap _pixmapNull;
+			QPixmap _pixmapConnected;
+			QPixmap _pixmapDisconnected;
+			QPixmap _pixmapSend;
+			QPixmap _pixmapRerceive;
+			QPixmap _pixmapSendRerceive;
+
+			QTime _lastPingTime;
+
+		private:
+			bool _sendWas;
+			bool _receiveWas;
+			bool _sendNow;
+			bool _receiveNow;
+			void updateSendReceive();
+
 		private:
 			int _reconnectTimerId;
+			int _pingTimerId;
 			void timerEvent(QTimerEvent *);
 
 			QSslSocket *_socket;
 			boost::uint32_t _incomingReaded;
 			boost::uint32_t _incomingSize;
+
+			boost::uint32_t _outcomingSize;
 
 			void open();
 			void close();
@@ -50,6 +73,7 @@ namespace r3
 			void socketEncrypted();
 			void sslErrors(const QList<QSslError> &errors);
 			void socketReadyRead();
+			void socketBytesWritten(qint64 bytes);
 
 		public:
 			void fireImpl(const Path &cpi, const EventBase *evt);

@@ -1,4 +1,10 @@
 <RCC>
-    <qresource prefix="Client">
+    <qresource prefix="/Client">
+        <file>images/receive.png</file>
+        <file>images/send.png</file>
+        <file>images/sendreceive.png</file>
+        <file>images/connected.png</file>
+        <file>images/disconnected.png</file>
+        <file>images/null.png</file>
     </qresource>
 </RCC>

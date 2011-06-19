@@ -33,7 +33,7 @@ namespace net
 		bool handlerWas = _handler?true:false;
 		_handler = handler;
 
-		if(!handlerWas)
+		if(!handlerWas && _handler)
 		{
 			makeReceive();
 		}

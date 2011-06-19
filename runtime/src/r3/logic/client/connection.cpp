@@ -13,16 +13,39 @@ namespace r3
 	namespace logic
 	{
 		//////////////////////////////////////////////////////////////////////////
-		Connection::Connection(QWidget *parent)
+		Connection::Connection(QMainWindow *parent)
 			: QWidget(parent)
 			, r3::protocol::client::Connection(0, NULL)
 			, _reconnectTimerId(0)
+			, _pingTimerId(0)
 			, _socket(NULL)
 			, _incomingReaded(0)
 			, _incomingSize(0)
+			, _outcomingSize(0)
+			, _pixmapNull(":/Client/images/null.png")
+			, _pixmapConnected(":/Client/images/connected.png")
+			, _pixmapDisconnected(":/Client/images/disconnected.png")
+			, _pixmapSend(":/Client/images/send.png")
+			, _pixmapRerceive(":/Client/images/receive.png")
+			, _pixmapSendRerceive(":/Client/images/sendreceive.png")
+			, _sendNow(false)
+			, _receiveNow(false)
+			, _sendWas(false)
+			, _receiveWas(false)
 
 		{
 			ui.setupUi(this);
+
+			_labelConnected = new QLabel(parent->statusBar());
+			_labelConnected->setPixmap(_pixmapNull);
+			_labelSendReceive = new QLabel(parent->statusBar());
+			_labelSendReceive->setPixmap(_pixmapNull);
+			_labelPing = new QLabel(parent->statusBar());
+			_labelPing->setText("_labelPing");
+
+			parent->statusBar()->addPermanentWidget(_labelPing);
+			parent->statusBar()->addPermanentWidget(_labelSendReceive);
+			parent->statusBar()->addPermanentWidget(_labelConnected);
 
 			open();
 
@@ -31,8 +54,37 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		Connection::~Connection()
 		{
-
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Connection::updateSendReceive()
+		{
+			if(_sendNow != _sendWas ||
+				_receiveNow != _receiveWas)
+			{
+				if(_sendNow && _receiveNow)
+				{
+					_labelSendReceive->setPixmap(_pixmapSendRerceive);
+				}
+				else if(_sendNow)
+				{
+					_labelSendReceive->setPixmap(_pixmapSend);
+				}
+				else if(_receiveNow)
+				{
+					_labelSendReceive->setPixmap(_pixmapRerceive);
+				}
+				else
+				{
+					_labelSendReceive->setPixmap(_pixmapNull);
+				}
+
+				_sendWas = _sendNow;
+				_receiveWas = _receiveNow;
+			}
+		}
+
+
 		//////////////////////////////////////////////////////////////////////////
 		void Connection::timerEvent(QTimerEvent *te)
 		{
@@ -41,6 +93,14 @@ namespace r3
 				killTimer(_reconnectTimerId);
 				_reconnectTimerId = 0;
 				open();
+			}
+			else if(te->timerId() == _pingTimerId)
+			{
+				if(_socket)
+				{
+					_lastPingTime = QTime::currentTime();
+					fire(Event_ping());
+				}
 			}
 		}
 
@@ -51,6 +111,14 @@ namespace r3
 			assert(!_socket);
 			_incomingReaded = 0;
 			_incomingSize = 0;
+			_outcomingSize = 0;
+			_labelConnected->setPixmap(_pixmapDisconnected);
+
+			_sendNow = false;
+			_receiveNow = false;
+			updateSendReceive();
+
+			_labelPing->setText("inf");
 
 			if(!QSslSocket::supportsSsl())
 			{
@@ -69,6 +137,8 @@ namespace r3
 				this, SLOT(sslErrors(QList<QSslError>)));
 			connect(_socket, SIGNAL(readyRead()),
 				this, SLOT(socketReadyRead()));
+			connect(_socket, SIGNAL(bytesWritten(qint64)),
+				this, SLOT(socketBytesWritten(qint64)));
 
 			_socket->connectToHostEncrypted("127.0.0.1", 1234);
 		}
@@ -76,18 +146,24 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Connection::close()
 		{
+			_labelConnected->setPixmap(_pixmapDisconnected);
 			if(_socket)
 			{
 				_socket->close();
 				_socket->deleteLater();
 				_socket = 0;
 			}
+
+			_sendNow = false;
+			_receiveNow = false;
+			updateSendReceive();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Connection::handle(const Event_pong &evt)
 		{
-			fire(Event_ping());
+			int ms = _lastPingTime.msecsTo(QTime::currentTime());
+			_labelPing->setNum(ms);
 		}
 
 
@@ -96,6 +172,12 @@ namespace r3
 		{
 			if(!_socket)
 			{
+				_labelConnected->setPixmap(_pixmapDisconnected);
+				_sendNow = false;
+				_receiveNow = false;
+				updateSendReceive();
+				_labelPing->setText("inf");
+
 				return;
 			}
 
@@ -104,13 +186,33 @@ namespace r3
 				_socket->deleteLater();
 				_socket = 0;
 
+				if(_pingTimerId)
+				{
+					killTimer(_pingTimerId);
+					_pingTimerId = 0;
+				}
+				_labelPing->setText("inf");
+
+
 				assert(!_reconnectTimerId);
 				_reconnectTimerId = startTimer(1000);
+
+				_labelConnected->setPixmap(_pixmapDisconnected);
+				_sendNow = false;
+				_receiveNow = false;
+				updateSendReceive();
 			}
 
 			if(state == QAbstractSocket::ConnectedState)
 			{
+				_labelConnected->setPixmap(_pixmapConnected);
+
+				assert(!_pingTimerId);
+				_pingTimerId = startTimer(1000);
+
+				_lastPingTime = QTime::currentTime();
 				fire(Event_ping());
+
 			}
 		}
 
@@ -157,6 +259,9 @@ namespace r3
 		{
 			if(_incomingReaded < 4)
 			{
+				_receiveNow = true;
+				updateSendReceive();
+
 				if(_socket->bytesAvailable() < 4)
 				{
 					return;
@@ -180,6 +285,9 @@ namespace r3
 			assert(4+_incomingSize+4 == _incomingReaded);
 			incomingCrc = utils::fixEndian(incomingCrc);
 
+
+			_receiveNow = false;
+			updateSendReceive();
 
 			boost::uint32_t crc = utils::crc32(incomingData.get(), _incomingSize);
 
@@ -217,6 +325,16 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Connection::socketBytesWritten(qint64 bytes)
+		{
+			_outcomingSize -= bytes;
+
+			_sendNow = _outcomingSize != 0;
+			updateSendReceive();
+		}
+
+
+		//////////////////////////////////////////////////////////////////////////
 		void Connection::fireImpl(const Path &cpi, const EventBase *evt)
 		{
 			if(!_socket)
@@ -241,6 +359,11 @@ namespace r3
 			_socket->write((const char *)&size, 4);
 			_socket->write(sbuf.data().get(), sbuf.size());
 			_socket->write((const char *)&crc, 4);
+
+			_outcomingSize += 4 + sbuf.size() + 4;
+
+			_sendNow = _outcomingSize != 0;
+			updateSendReceive();
 		}
 
 
