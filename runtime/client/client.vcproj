@@ -455,13 +455,29 @@
 								<Tool
 									Name="VCCustomBuildTool"
 									Description="Moc&apos;ing $(InputFileName)..."
-									CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DBOOST_NO_STD_WSTRING___  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;..\src\r3\logic\client\connection.hpp&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\logic\client\connection.hpp&quot;&#x0D;&#x0A;"
+									CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\logic\client\connection.hpp&quot;  -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DBOOST_NO_STD_WSTRING___ &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot;&#x0D;&#x0A;"
 									AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 									Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 								/>
 							</FileConfiguration>
 						</File>
 					</Filter>
+				</Filter>
+				<Filter
+					Name="utils"
+					>
+					<File
+						RelativePath="..\src\utils\crc32.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
 				</Filter>
 			</Filter>
 		</Filter>

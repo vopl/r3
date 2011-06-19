@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "connection.hpp"
 #include "r3/server/instance.hpp"
+#include "utils/streambufOnArray.hpp"
 
 namespace r3
 {
@@ -30,7 +31,27 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::onReceive(net::Channel_ptr channel, boost::shared_array<char> data, size_t size)
 			{
-				//deserialize & dispatch
+				Path cpi;
+				EventBase *evt = NULL;
+
+				try
+				{
+					utils::StreambufOnArray sbuf(data, size);
+					{
+						std::istream is(&sbuf);
+						utils::serialization::polymorphic_binary_portable_iarchive ia(is, boost::archive::no_header|boost::archive::no_codecvt);
+
+						ia >> BOOST_SERIALIZATION_NVP(cpi);
+						ia >> BOOST_SERIALIZATION_NVP(evt);
+					}
+
+					this->dispatch(cpi, evt);
+				}
+				catch(...)
+				{
+					std::cerr<<"exception in "<<__FUNCTION__<<std::endl;
+				}
+				delete evt;
 			}
 			
 			//////////////////////////////////////////////////////////////////////////
@@ -49,11 +70,15 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::fireImpl(const Path &cpi, const EventBase *evt)
 			{
-				//serialize & send
-				//_channel->send()
-				std::cout<<"connection fireImpl"<<std::endl;
-				int k=220;
+				utils::StreambufOnArray sbuf;
+				{
+					std::ostream os(&sbuf);
+					utils::serialization::polymorphic_binary_portable_oarchive oa(os, boost::archive::no_header|boost::archive::no_codecvt);
 
+					oa << BOOST_SERIALIZATION_NVP(cpi);
+					oa << BOOST_SERIALIZATION_NVP(evt);
+				}
+				_channel->send(sbuf.data(), sbuf.size());
 			}
 
 		}

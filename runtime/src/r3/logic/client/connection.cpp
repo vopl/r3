@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include "utils/streambufOnArray.hpp"
 #include "utils/serialization.hpp"
+#include "utils/crc32.hpp"
 
 #include "r3/data.hpp"
 
@@ -16,6 +17,9 @@ namespace r3
 			: QWidget(parent)
 			, r3::protocol::client::Connection(0, NULL)
 			, _socket(NULL)
+			, _incomingReaded(0)
+			, _incomingSize(0)
+
 		{
 			ui.setupUi(this);
 
@@ -32,6 +36,9 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Connection::open()
 		{
+			_incomingReaded = 0;
+			_incomingSize = 0;
+
 			if(!QSslSocket::supportsSsl())
 			{
 				QMessageBox::information(0, "Secure Socket Client",
@@ -51,8 +58,6 @@ namespace r3
 				this, SLOT(socketReadyRead()));
 
 			_socket->connectToHostEncrypted("127.0.0.1", 1234);
-
-			fire(Event_ping());
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -64,6 +69,12 @@ namespace r3
 				_socket->deleteLater();
 				_socket = 0;
 			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Connection::handle(const Event_pong &evt)
+		{
+			fire(Event_ping());
 		}
 
 
@@ -79,6 +90,11 @@ namespace r3
 			{
 				_socket->deleteLater();
 				_socket = 0;
+			}
+
+			if(state == QAbstractSocket::ConnectedState)
+			{
+				fire(Event_ping());
 			}
 		}
 
@@ -123,13 +139,75 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Connection::socketReadyRead()
 		{
+			if(_incomingReaded < 4)
+			{
+				if(_socket->bytesAvailable() < 4)
+				{
+					return;
+				}
+				_incomingReaded += _socket->read((char *)&_incomingSize, 4);
+				assert(4 == _incomingReaded);
+				_incomingSize = utils::fixEndian(_incomingSize);
+			}
+			
+			if(_socket->bytesAvailable() < _incomingSize+4)
+			{
+				return;
+			}
 
+			boost::shared_array<char> incomingData(new char[_incomingSize]);
+			_incomingReaded += _socket->read(incomingData.get(), _incomingSize);
+			assert(4+_incomingSize == _incomingReaded);
+
+			boost::uint32_t incomingCrc;
+			_incomingReaded += _socket->read((char *)&incomingCrc, 4);
+			assert(4+_incomingSize+4 == _incomingReaded);
+			incomingCrc = utils::fixEndian(incomingCrc);
+
+
+			boost::uint32_t crc = utils::crc32(incomingData.get(), _incomingSize);
+
+			if(crc != incomingCrc)
+			{
+				assert(0);
+				_socket->close();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			Path cpi;
+			EventBase *evt = NULL;
+
+			try
+			{
+				utils::StreambufOnArray sbuf(incomingData, _incomingSize);
+				{
+					std::istream is(&sbuf);
+					utils::serialization::polymorphic_binary_portable_iarchive ia(is, boost::archive::no_header|boost::archive::no_codecvt);
+
+					ia >> BOOST_SERIALIZATION_NVP(cpi);
+					ia >> BOOST_SERIALIZATION_NVP(evt);
+				}
+
+				this->dispatch(cpi, evt);
+			}
+			catch(...)
+			{
+				assert(0);
+				std::cerr<<"exception in "<<__FUNCTION__<<std::endl;
+			}
+			delete evt;
+			_incomingReaded = 0;
+			_incomingSize = 0;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Connection::fireImpl(const Path &cpi, const EventBase *evt)
 		{
-			r3::data::s_Test::Derived4fields::Tuple t;
+			if(!_socket)
+			{
+				return;
+			}
+
 
 			utils::StreambufOnArray sbuf;
 			{
@@ -139,40 +217,14 @@ namespace r3
 
 				oa << BOOST_SERIALIZATION_NVP(cpi);
 				oa << BOOST_SERIALIZATION_NVP(evt);
-				oa << BOOST_SERIALIZATION_NVP(t.Enum1);
-				oa << BOOST_SERIALIZATION_NVP(t.Audio);
 			}
 
-			{
-				utils::StreambufOnArray sbuf2(sbuf.data(), sbuf.size());
-				std::istream is(&sbuf2);
-				utils::serialization::polymorphic_binary_portable_iarchive ia(is, boost::archive::no_header|boost::archive::no_codecvt);
+			boost::uint32_t size = utils::fixEndian((boost::uint32_t)sbuf.size());
+			boost::uint32_t crc = utils::fixEndian(utils::crc32(sbuf.data().get(), sbuf.size()));
 
-
-				Path cpi2;
-				EventBase *evt2;
-
-				ia >> BOOST_SERIALIZATION_NVP(cpi2);
-				ia >> BOOST_SERIALIZATION_NVP(evt2);
-				ia >> BOOST_SERIALIZATION_NVP(t.Enum1);
-				ia >> BOOST_SERIALIZATION_NVP(t.Audio);
-
-				int k=220;
-			}
-
+			_socket->write((const char *)&size, 4);
 			_socket->write(sbuf.data().get(), sbuf.size());
-
-
-
-
-
-
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-
-		
+			_socket->write((const char *)&crc, 4);
 		}
 
 

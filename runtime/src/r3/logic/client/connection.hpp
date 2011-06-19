@@ -27,9 +27,20 @@ namespace r3
 
 		private:
 			QSslSocket *_socket;
+			boost::uint32_t _incomingReaded;
+			boost::uint32_t _incomingSize;
 
 			void open();
 			void close();
+
+		public:
+			template <class Event>
+			void handle(const Event &evt)
+			{
+				//
+			}
+			void handle(const Event_pong &evt);
+
 
 		private slots:
 			void socketStateChanged(QAbstractSocket::SocketState state);
