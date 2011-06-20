@@ -38,7 +38,7 @@ namespace workers
 		hppServer<<endl;
 
 		hppServer<<"#include \"r3/contextBase.hpp\"\n";
-		hppServer<<"#include \"r3/logic.hpp\"\n";
+		//hppServer<<"#include \"r3/logic.hpp\"\n";
 		hppServer<<endl;
 
 		hppClient<<"// AUTOMATIC GENERATED FILE. DO NOT EDIT MANUALLY!"<<endl<<endl;
@@ -47,7 +47,7 @@ namespace workers
 		hppClient<<endl;
 
 		hppClient<<"#include \"r3/contextBase.hpp\"\n";
-		hppClient<<"#include \"r3/logic.hpp\"\n";
+		//hppClient<<"#include \"r3/logic.hpp\"\n";
 		hppClient<<endl;
 
 		hppServer<<"namespace r3\n{\nnamespace protocol\n{\nnamespace server\n{\n";
@@ -148,7 +148,7 @@ namespace workers
 			else
 			{
 				hpp<<"#include \"r3/contextBase.hpp\"\n";
-				hpp<<"#include \"r3/logic.hpp\"\n";
+				//hpp<<"#include \"r3/logic.hpp\"\n";
 				hpp<<"#include \"r3/fields/field.h\"\n";
 			}
 		}
@@ -257,7 +257,7 @@ namespace workers
 		hpp<<"private:// контейнеры дочерних контекстов\n";
 		BOOST_FOREACH(Context child, ctx->getContext())
 		{
-			hpp<<"std::map<ContextId, boost::shared_ptr<Logic<"<<child->getName()<<">::Context> > map_"<<child->getName()<<";\n";
+			hpp<<"std::map<ContextId, "<<child->getName()<<"_ptr > map_"<<child->getName()<<";\n";
 		}
 		hpp<<endl;
 

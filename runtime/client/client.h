@@ -11,7 +11,7 @@ class Client : public QMainWindow
 
 private:
 
-	r3::logic::Connection *_connection;
+	r3::logic::client::Connection *_connection;
 
 public:
 	Client(QWidget *parent = 0, Qt::WFlags flags = 0);

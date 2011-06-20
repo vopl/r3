@@ -14,7 +14,8 @@ Client::Client(QWidget *parent, Qt::WFlags flags)
 		ui.pushButton_hide, SIGNAL(clicked()),
 		this, SLOT(hide_c()));
 
-	_connection = new r3::logic::Connection(this);
+	_connection = new r3::logic::client::Connection(this);
+	setCentralWidget(_connection);
 }
 
 Client::~Client()

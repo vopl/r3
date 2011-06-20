@@ -14,6 +14,10 @@ public:
 
 private:
 	Ui::LoginWidget ui;
+
+private:
+	virtual void resizeEvent(QResizeEvent *);
+
 };
 
 #endif // LOGINWIDGET_H

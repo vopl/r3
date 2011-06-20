@@ -9,7 +9,7 @@ namespace r3
 	template <class ProtocolContext>
 	struct Logic
 	{
-		typedef class Context
+		class Context
 			: public ProtocolContext
 		{
 		public:
@@ -19,7 +19,7 @@ namespace r3
 
 			}
 
-		} Context;
+		};
 	};
 }
 

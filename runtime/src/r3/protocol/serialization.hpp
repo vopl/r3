@@ -7,14 +7,6 @@
 
 //////////////////////////////////////////////////////////////////////////
 template<class Archive>
-void r3::protocol::server::Connection::Event_session::serialize(Archive &ar, const unsigned int file_version)
-{
-	ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(EventBase);
-	ar &BOOST_SERIALIZATION_NVP(sid);
-}
-
-//////////////////////////////////////////////////////////////////////////
-template<class Archive>
 void r3::protocol::server::Connection::Event_login::serialize(Archive &ar, const unsigned int file_version)
 {
 	ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(EventBase);
@@ -28,6 +20,14 @@ template<class Archive>
 void r3::protocol::server::Connection::Event_badLogin::serialize(Archive &ar, const unsigned int file_version)
 {
 	ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(EventBase);
+}
+
+//////////////////////////////////////////////////////////////////////////
+template<class Archive>
+void r3::protocol::server::Connection::Event_session::serialize(Archive &ar, const unsigned int file_version)
+{
+	ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(EventBase);
+	ar &BOOST_SERIALIZATION_NVP(sid);
 }
 
 //////////////////////////////////////////////////////////////////////////
