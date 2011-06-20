@@ -3,7 +3,7 @@
  <class>Connection</class>
  <widget class="QWidget" name="Connection">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -14,10 +14,13 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="cursor">
+   <cursorShape>CrossCursor</cursorShape>
   </property>
   <property name="windowTitle">
    <string>Connection</string>
