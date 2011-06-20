@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="R3Decorator"
 	ProjectGUID="{88B5DE24-4C88-4CAC-B4A5-2BB556B527B2}"
 	RootNamespace="R3Decorator"
@@ -327,6 +327,38 @@
 			</File>
 			<File
 				RelativePath=".\parts\CategoryPart.h"
+				>
+			</File>
+			<File
+				RelativePath=".\parts\ContextAttributePart.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\parts\ContextAttributePart.h"
+				>
+			</File>
+			<File
+				RelativePath=".\parts\ContextPart.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\parts\ContextPart.h"
+				>
+			</File>
+			<File
+				RelativePath=".\parts\EventAttributePart.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\parts\EventAttributePart.h"
+				>
+			</File>
+			<File
+				RelativePath=".\parts\EventPart.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\parts\EventPart.h"
 				>
 			</File>
 			<File

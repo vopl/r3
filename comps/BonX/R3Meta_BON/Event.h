@@ -35,9 +35,6 @@ public:
 	virtual std::set<R3Meta_BON::Date>      getDate();
 	virtual std::set<R3Meta_BON::DateTimeInterval>    getDateTimeInterval();
 	virtual std::set<R3Meta_BON::Enum>      getEnum();
-	virtual std::set<R3Meta_BON::Event>     getEvent();
-	virtual std::set<R3Meta_BON::EventOrReference>    getEventOrReference();
-	virtual std::set<R3Meta_BON::EventReference>      getEventReference();
 	virtual std::set<R3Meta_BON::Field>     getField();
 	virtual std::set<R3Meta_BON::File>      getFile();
 	virtual std::set<R3Meta_BON::Image>     getImage();

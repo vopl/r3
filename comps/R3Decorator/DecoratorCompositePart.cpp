@@ -24,6 +24,9 @@
 #include "parts/ScantyPart.h"
 #include "parts/ScantyValuePart.h"
 
+#include "parts/ContextPart.h"
+#include "parts/EventPart.h"
+
 static const unsigned int	CTX_MENU_ID_SAMPLE		= DECORATOR_CTX_MENU_MINID + 100;	// Should be unique
 static const char*			CTX_MENU_STR_SAMPLE		= "Decorator Ctx Menu Item";
 
@@ -124,6 +127,14 @@ void DecoratorCompositePart::InitializeEx(CComPtr<IMgaProject>& pProject, CComPt
 			else if(name == R3_SCANTYVALUE_NAME)
 			{
 				AddObjectPart(new ScantyValuePart(this, m_eventSink));
+			}
+			else if(name == R3_CONTEXT_NAME)
+			{
+				AddObjectPart(new ContextPart(this, m_eventSink));
+			}
+			else if(name == R3_EVENT_NAME)
+			{
+				AddObjectPart(new EventPart(this, m_eventSink));
 			}
 			else
 			{

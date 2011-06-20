@@ -163,61 +163,6 @@ std::set<R3Meta_BON::Enum> R3Meta_BON::EventImpl::getEnum()
 
 
 //********************************************************************************
-// getter for role "Event" among "EventOrReference"s and its descendants
-//********************************************************************************
-std::set<R3Meta_BON::Event> R3Meta_BON::EventImpl::getEvent()
-{
-	std::set<R3Meta_BON::Event> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Event");
-	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
-	{
-		R3Meta_BON::Event elem(*i);
-		ASSERT(elem);
-		res.insert(elem);
-	}
-	return res;
-}
-
-
-//********************************************************************************
-// aggregated getter for role "R3Meta_BON::" among "R3Meta_BON::EventOrReference"s and its descendants
-//********************************************************************************
-std::set<R3Meta_BON::EventOrReference> R3Meta_BON::EventImpl::getEventOrReference()
-{
-	std::set<R3Meta_BON::EventOrReference> res;
-	const int len = 2;
-	std::set<BON::FCO> roles_vec[ len];
-	roles_vec[0] = ModelImpl::getChildFCOsAs("Event");
-	roles_vec[1] = ModelImpl::getChildFCOsAs("EventReference");
-	for( int k = 0; k < len; ++k)
-		for( std::set<BON::FCO>::iterator i = roles_vec[k].begin(); i != roles_vec[k].end(); ++i)
-		{
-			R3Meta_BON::EventOrReference elem(*i);
-			ASSERT(elem);
-			res.insert(elem);
-		}
-	return res;
-}
-
-
-//********************************************************************************
-// getter for role "EventReference" among "EventOrReference"s and its descendants
-//********************************************************************************
-std::set<R3Meta_BON::EventReference> R3Meta_BON::EventImpl::getEventReference()
-{
-	std::set<R3Meta_BON::EventReference> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("EventReference");
-	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
-	{
-		R3Meta_BON::EventReference elem(*i);
-		ASSERT(elem);
-		res.insert(elem);
-	}
-	return res;
-}
-
-
-//********************************************************************************
 // aggregated getter for role "R3Meta_BON::" among "R3Meta_BON::Field"s and its descendants
 //********************************************************************************
 std::set<R3Meta_BON::Field> R3Meta_BON::EventImpl::getField()
