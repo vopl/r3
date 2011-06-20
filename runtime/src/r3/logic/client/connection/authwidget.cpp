@@ -1,7 +1,7 @@
 #include "StdAfx.h"
-#include "loginwidget.h"
+#include "authwidget.h"
 
-LoginWidget::LoginWidget(QWidget *parent)
+AuthWidget::AuthWidget(QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
@@ -11,26 +11,26 @@ LoginWidget::LoginWidget(QWidget *parent)
 	connect(ui.pushButton_cancel, SIGNAL(clicked()), 
 		this, SLOT(onCancel()));
 
-	//onCancel();
+	onCancel();
 
 }
 
-LoginWidget::~LoginWidget()
+AuthWidget::~AuthWidget()
 {
 
 }
 
-void LoginWidget::onError(QString err)
+void AuthWidget::onError(QString err)
 {
 	ui.label_error->show();
 	ui.label_error->setText(err);
 }
 
-void LoginWidget::onGo()
+void AuthWidget::onGo()
 {
 	doGo(ui.lineEdit_login->text(), ui.lineEdit_password->text());
 }
-void LoginWidget::onCancel()
+void AuthWidget::onCancel()
 {
 	ui.lineEdit_login->clear();
 	ui.lineEdit_password->clear();

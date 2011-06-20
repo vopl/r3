@@ -35,7 +35,7 @@ namespace r3
 				, _receiveNow(false)
 				, _sendWas(false)
 				, _receiveWas(false)
-				, _loginWidget(NULL)
+				, _authWidget(NULL)
 
 			{
 				ui.setupUi(this);
@@ -58,10 +58,10 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			Connection::~Connection()
 			{
-				if(_loginWidget)
+				if(_authWidget)
 				{
-					_loginWidget->deleteLater();
-					_loginWidget = 0;
+					_authWidget->deleteLater();
+					_authWidget = 0;
 				}
 
 				if(_session)
@@ -73,9 +73,9 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::resizeEvent(QResizeEvent *evt)
 			{
-				if(_loginWidget)
+				if(_authWidget)
 				{
-					_loginWidget->resize(evt->size());
+					_authWidget->resize(evt->size());
 				}
 				if(_session)
 				{
@@ -101,19 +101,19 @@ namespace r3
 					{
 						if(!_session)
 						{
-							_loginWidget = new LoginWidget(this);
-							_loginWidget->resize(size());
-							_loginWidget->show();
-							connect(_loginWidget, SIGNAL(doGo(QString, QString)), 
+							_authWidget = new AuthWidget(this);
+							_authWidget->resize(size());
+							_authWidget->show();
+							connect(_authWidget, SIGNAL(doGo(QString, QString)), 
 								this, SLOT(onLoginGo(QString, QString)));
 						}
 					}
 					else
 					{
-						if(_loginWidget)
+						if(_authWidget)
 						{
-							_loginWidget->deleteLater();
-							_loginWidget = 0;
+							_authWidget->deleteLater();
+							_authWidget = 0;
 						}
 					}
 				}
@@ -233,9 +233,9 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::handle(const Event_badLogin &evt)
 			{
-				if(_loginWidget)
+				if(_authWidget)
 				{
-					_loginWidget->onError(QString("Event_badLogin"));
+					_authWidget->onError(QString("Event_badLogin"));
 				}
 			}
 

@@ -1,16 +1,16 @@
-#ifndef LOGINWIDGET_H
-#define LOGINWIDGET_H
+#ifndef AUTHWIDGET_H
+#define AUTHWIDGET_H
 
 #include <QWidget>
-#include "ui_loginwidget.h"
+#include "ui_authwidget.h"
 
-class LoginWidget : public QWidget
+class AuthWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	LoginWidget(QWidget *parent = 0);
-	~LoginWidget();
+	AuthWidget(QWidget *parent = 0);
+	~AuthWidget();
 public Q_SLOTS:
 	void onError(QString err);
 	void onGo();
@@ -20,7 +20,7 @@ Q_SIGNALS:
 	void doGo(QString login, QString password);
 
 private:
-	Ui::LoginWidget ui;
+	Ui::AuthWidget ui;
 };
 
 #endif // LOGINWIDGET_H

@@ -8,7 +8,7 @@
 
 #include "r3/logic.hpp"
 #include "r3/protocol/client/Connection.hpp"
-#include "r3/logic/client/connection/loginwidget.h"
+#include "r3/logic/client/connection/authwidget.h"
 
 namespace r3
 {
@@ -29,7 +29,7 @@ namespace r3
 			private:
 				Ui::Connection ui;
 
-				LoginWidget *_loginWidget;
+				AuthWidget *_authWidget;
 
 			public:
 				class Session;
