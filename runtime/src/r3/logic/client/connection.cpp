@@ -30,16 +30,18 @@ namespace r3
 				, _pixmapSend(":/Client/images/send.png")
 				, _pixmapRerceive(":/Client/images/receive.png")
 				, _pixmapSendRerceive(":/Client/images/sendreceive.png")
+				, _connectedWas(false)
 				, _sendNow(false)
 				, _receiveNow(false)
 				, _sendWas(false)
 				, _receiveWas(false)
+				, _loginWidget(NULL)
 
 			{
 				ui.setupUi(this);
 
 				_labelConnected = new QLabel(parent->statusBar());
-				_labelConnected->setPixmap(_pixmapNull);
+				_labelConnected->setPixmap(_pixmapDisconnected);
 				_labelSendReceive = new QLabel(parent->statusBar());
 				_labelSendReceive->setPixmap(_pixmapNull);
 				_labelPing = new QLabel(parent->statusBar());
@@ -51,18 +53,21 @@ namespace r3
 
 				open();
 
-				_loginWidget = new LoginWidget(this);
-				_session.reset(new Session(220, this));
-
 			}
 
 			//////////////////////////////////////////////////////////////////////////
 			Connection::~Connection()
 			{
-				_loginWidget->deleteLater();
-				_loginWidget = 0;
-				_session->deleteLater();
-				_session.reset();
+				if(_loginWidget)
+				{
+					_loginWidget->deleteLater();
+					_loginWidget = 0;
+				}
+
+				if(_session)
+				{
+					_session.reset();
+				}
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -75,6 +80,40 @@ namespace r3
 				if(_session)
 				{
 					_session->resize(evt->size());
+				}
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::updateConnected()
+			{
+				bool connected = false;
+				if(_socket && QAbstractSocket::ConnectedState == _socket->state())
+				{
+					connected = true;
+				}
+
+				if(_connectedWas != connected)
+				{
+					_connectedWas = connected;
+					_labelConnected->setPixmap(connected?_pixmapConnected:_pixmapDisconnected);
+
+					if(connected)
+					{
+						if(!_session)
+						{
+							_loginWidget = new LoginWidget(this);
+							_loginWidget->resize(size());
+							_loginWidget->show();
+						}
+					}
+					else
+					{
+						if(_loginWidget)
+						{
+							_loginWidget->deleteLater();
+							_loginWidget = 0;
+						}
+					}
 				}
 			}
 
@@ -131,10 +170,11 @@ namespace r3
 			void Connection::open()
 			{
 				assert(!_socket);
+				updateConnected();
+
 				_incomingReaded = 0;
 				_incomingSize = 0;
 				_outcomingSize = 0;
-				_labelConnected->setPixmap(_pixmapDisconnected);
 
 				_sendNow = false;
 				_receiveNow = false;
@@ -168,13 +208,13 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::close()
 			{
-				_labelConnected->setPixmap(_pixmapDisconnected);
 				if(_socket)
 				{
 					_socket->close();
 					_socket->deleteLater();
 					_socket = 0;
 				}
+				updateConnected();
 
 				_sendNow = false;
 				_receiveNow = false;
@@ -194,7 +234,7 @@ namespace r3
 			{
 				if(!_socket)
 				{
-					_labelConnected->setPixmap(_pixmapDisconnected);
+					updateConnected();
 					_sendNow = false;
 					_receiveNow = false;
 					updateSendReceive();
@@ -219,7 +259,7 @@ namespace r3
 					assert(!_reconnectTimerId);
 					_reconnectTimerId = startTimer(1000);
 
-					_labelConnected->setPixmap(_pixmapDisconnected);
+					updateConnected();
 					_sendNow = false;
 					_receiveNow = false;
 					updateSendReceive();
@@ -227,7 +267,7 @@ namespace r3
 
 				if(state == QAbstractSocket::ConnectedState)
 				{
-					_labelConnected->setPixmap(_pixmapConnected);
+					updateConnected();
 
 					assert(!_pingTimerId);
 					_pingTimerId = startTimer(1000);

@@ -52,6 +52,9 @@ namespace r3
 				QTime _lastPingTime;
 
 			private:
+				bool _connectedWas;
+				void updateConnected();
+
 				bool _sendWas;
 				bool _receiveWas;
 				bool _sendNow;
