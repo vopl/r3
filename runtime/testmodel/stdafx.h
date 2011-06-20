@@ -25,5 +25,10 @@
 #include <boost/cstdint.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/serialization/access.hpp>
+
+#include "utils/serialization.hpp"
+
 
 #include "r3/data.hpp"
+
