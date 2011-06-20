@@ -334,10 +334,10 @@ namespace r3
 				if(_incomingReaded < 4)
 				{
 					_receiveNow = true;
-					updateSendReceive();
 
 					if(_socket->bytesAvailable() < 4)
 					{
+						updateSendReceive();
 						return;
 					}
 					_incomingReaded += _socket->read((char *)&_incomingSize, 4);
@@ -347,29 +347,33 @@ namespace r3
 
 				if(_socket->bytesAvailable() < _incomingSize+4)
 				{
+					updateSendReceive();
 					return;
 				}
 
-				boost::shared_array<char> incomingData(new char[_incomingSize]);
-				_incomingReaded += _socket->read(incomingData.get(), _incomingSize);
-				assert(4+_incomingSize == _incomingReaded);
+				boost::uint32_t incomingSize = _incomingSize;
+				boost::shared_array<char> incomingData(new char[incomingSize]);
+				assert(4 == _incomingReaded);
+				_incomingReaded += _socket->read(incomingData.get(), incomingSize);
+				assert(4+incomingSize == _incomingReaded);
 
 				boost::uint32_t incomingCrc;
 				_incomingReaded += _socket->read((char *)&incomingCrc, 4);
-				assert(4+_incomingSize+4 == _incomingReaded);
+				assert(4+incomingSize+4 == _incomingReaded);
 				incomingCrc = utils::fixEndian(incomingCrc);
 
-
-				_receiveNow = false;
-				updateSendReceive();
-
-				boost::uint32_t crc = utils::crc32(incomingData.get(), _incomingSize);
+				boost::uint32_t crc = utils::crc32(incomingData.get(), incomingSize);
 
 				if(crc != incomingCrc)
 				{
-					assert(0);
+					//assert(0);
 					_socket->close();
 				}
+				_incomingReaded = 0;
+				_incomingSize = 0;
+
+				_receiveNow = false;
+				updateSendReceive();
 
 				//////////////////////////////////////////////////////////////////////////
 				Path cpi;
@@ -377,7 +381,7 @@ namespace r3
 
 				try
 				{
-					utils::StreambufOnArray sbuf(incomingData, _incomingSize);
+					utils::StreambufOnArray sbuf(incomingData, incomingSize);
 					{
 						std::istream is(&sbuf);
 						utils::serialization::polymorphic_binary_portable_iarchive ia(is, boost::archive::no_header|boost::archive::no_codecvt);
@@ -394,8 +398,6 @@ namespace r3
 					std::cerr<<"exception in "<<__FUNCTION__<<std::endl;
 				}
 				delete evt;
-				_incomingReaded = 0;
-				_incomingSize = 0;
 			}
 
 			//////////////////////////////////////////////////////////////////////////

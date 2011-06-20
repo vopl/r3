@@ -43,6 +43,9 @@ namespace net
 		ServiceImpl *_serviceImpl;
 		TSocket_ptr _socket;
 		IChannelHandler *_handler;
+
+		boost::mutex _sendQueueMtx;
+		std::queue<OutPacketWrapper_ptr> _sendQueue;
 	public:
 		ChannelImpl(ServiceImpl *serviceImpl, TSocket_ptr socket);
 		~ChannelImpl();

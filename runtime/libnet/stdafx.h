@@ -24,3 +24,5 @@
 
 #include <boost/aligned_storage.hpp>
 #include <boost/make_shared.hpp>
+
+#include <queue>

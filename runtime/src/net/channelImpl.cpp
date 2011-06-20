@@ -49,8 +49,14 @@ namespace net
 		packet->_crc32NetOrder = utils::fixEndian(utils::crc32(data.get(), size));
 		packet->_data = data;
 
-		Allocator_ptr alloc = boost::make_shared<Allocator>();
-		handleSend(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
+		boost::mutex::scoped_lock l(_sendQueueMtx);
+		_sendQueue.push(packet);
+
+		if(1 == _sendQueue.size())
+		{
+			Allocator_ptr alloc = boost::make_shared<Allocator>();
+			handleSend(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -110,6 +116,18 @@ namespace net
 		else
 		{
 			assert(packet->_totalSended == 4+packet->_size+4);
+
+			boost::mutex::scoped_lock l(_sendQueueMtx);
+			assert(_sendQueue.size());
+			assert(packet == _sendQueue.front());
+			_sendQueue.pop();
+
+			if(!_sendQueue.empty())
+			{
+				packet = _sendQueue.front();
+				handleSend(selfKeeper, packet, boost::system::error_code(), 0, alloc);
+			}
+
 		}
 	}
 
@@ -230,7 +248,10 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size, Allocator_ptr alloc)
 	{
-		_handler->onReceive(selfKeeper, data, size);
+		if(_handler)
+		{
+			_handler->onReceive(selfKeeper, data, size);
+		}
 	}
 
 }
