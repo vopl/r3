@@ -52,6 +52,10 @@ namespace r3{ namespace fields
 		{
 			return _value;
 		}
+		const std::string &value() const
+		{
+			return _value;
+		}
 
 		String &operator=(const String &from)
 		{

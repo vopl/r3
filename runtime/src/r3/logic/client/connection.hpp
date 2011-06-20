@@ -82,6 +82,7 @@ namespace r3
 					//
 				}
 				void handle(const Event_pong &evt);
+				void handle(const Event_badLogin &evt);
 
 
 				private slots:
@@ -93,6 +94,11 @@ namespace r3
 
 			public:
 				void fireImpl(const Path &cpi, const EventBase *evt);
+
+			private:
+			public Q_SLOTS:
+				void onLoginOk(QString login, QString password);
+
 			};
 		}
 	}

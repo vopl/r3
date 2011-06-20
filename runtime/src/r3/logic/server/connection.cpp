@@ -82,6 +82,18 @@ namespace r3
 				_channel->send(sbuf.data(), sbuf.size());
 			}
 
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::handle(const Event_login &evt)
+			{
+				std::cout<<__FUNCTION__<<std::endl;
+				std::cout<<evt.login.value()<<", "<<evt.password.value()<<std::endl;
+
+				Event_session evts;
+				evts.sid=1;
+				fire(evts);
+			}
+
+
 		}
 	}
 }

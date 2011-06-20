@@ -31,6 +31,14 @@ namespace r3
 
 			public:// генераторы исходящих сообщений
 				void fireImpl(const Path &cpi, const EventBase *evt);
+
+			public:
+				template <class Event> void handle(const Event &evt)
+				{
+					return BaseType::handle(evt);
+				}
+				void handle(const Event_login &evt);
+
 			};
 
 		}

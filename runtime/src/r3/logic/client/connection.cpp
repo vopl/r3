@@ -104,6 +104,8 @@ namespace r3
 							_loginWidget = new LoginWidget(this);
 							_loginWidget->resize(size());
 							_loginWidget->show();
+							connect(_loginWidget, SIGNAL(doOk(QString, QString)), 
+								this, SLOT(onLoginOk(QString, QString)));
 						}
 					}
 					else
@@ -227,6 +229,16 @@ namespace r3
 				int ms = _lastPingTime.msecsTo(QTime::currentTime());
 				_labelPing->setNum(ms);
 			}
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::handle(const Event_badLogin &evt)
+			{
+				if(_loginWidget)
+				{
+					_loginWidget->onError(QString("Event_badLogin"));
+				}
+			}
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -427,6 +439,16 @@ namespace r3
 				_sendNow = _outcomingSize != 0;
 				updateSendReceive();
 			}
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::onLoginOk(QString login, QString password)
+			{
+				Event_login evt;
+				evt.login = login.toUtf8().data();
+				evt.password = password.toUtf8().data();
+				fire(evt);
+			}
+
 
 		}
 	}

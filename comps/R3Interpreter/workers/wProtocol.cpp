@@ -168,6 +168,7 @@ namespace workers
 		hpp<<"class "<<evalContextPath(ctx, isServer, cpt_classScope)<<endl;
 		hpp<<"	: public ContextBase<"<<evalContextPath(ctx, isServer, cpt_classScope)<<", "<<parentType<<">\n{"<<endl;
 
+		hpp<<"public:// \n";
 		hpp<<"typedef ContextBase<"<<evalContextPath(ctx, isServer, cpt_classScope)<<", "<<parentType<<"> BaseType;\n";
 		hpp<<endl;
 
@@ -537,6 +538,7 @@ namespace workers
 		cpp<<"#include \"stdafx.h\"\n";
 		cpp<<"#include \"r3/protocol/serialization.hpp\"\n";
 		cpp<<"#include <boost/serialization/export.hpp>\n";
+		cpp<<"#include <boost/archive/impl/archive_serializer_map.ipp>\n";
 		cpp<<endl;
 
 		BOOST_FOREACH(R3Meta_BON::Event evt, _allEvents)

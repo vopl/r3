@@ -11,6 +11,13 @@ class LoginWidget : public QWidget
 public:
 	LoginWidget(QWidget *parent = 0);
 	~LoginWidget();
+public Q_SLOTS:
+	void onError(QString err);
+	void onOk();
+	void onCancel();
+
+Q_SIGNALS:
+	void doOk(QString login, QString password);
 
 private:
 	Ui::LoginWidget ui;
