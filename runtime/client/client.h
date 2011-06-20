@@ -17,16 +17,8 @@ public:
 	Client(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~Client();
 
-public slots:
-	void show_c()
-	{
-		_connection->show();
-
-	}
-	void hide_c()
-	{
-		_connection->hide();
-	}
+private:
+	virtual void resizeEvent(QResizeEvent *);
 
 private:
 	Ui::ClientClass ui;

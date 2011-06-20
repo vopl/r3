@@ -104,8 +104,8 @@ namespace r3
 							_loginWidget = new LoginWidget(this);
 							_loginWidget->resize(size());
 							_loginWidget->show();
-							connect(_loginWidget, SIGNAL(doOk(QString, QString)), 
-								this, SLOT(onLoginOk(QString, QString)));
+							connect(_loginWidget, SIGNAL(doGo(QString, QString)), 
+								this, SLOT(onLoginGo(QString, QString)));
 						}
 					}
 					else
@@ -443,7 +443,7 @@ namespace r3
 			}
 
 			//////////////////////////////////////////////////////////////////////////
-			void Connection::onLoginOk(QString login, QString password)
+			void Connection::onLoginGo(QString login, QString password)
 			{
 				Event_login evt;
 				evt.login = login.toUtf8().data();

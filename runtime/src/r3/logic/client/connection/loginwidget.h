@@ -13,11 +13,11 @@ public:
 	~LoginWidget();
 public Q_SLOTS:
 	void onError(QString err);
-	void onOk();
+	void onGo();
 	void onCancel();
 
 Q_SIGNALS:
-	void doOk(QString login, QString password);
+	void doGo(QString login, QString password);
 
 private:
 	Ui::LoginWidget ui;

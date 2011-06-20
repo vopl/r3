@@ -97,7 +97,7 @@ namespace r3
 
 			private:
 			public Q_SLOTS:
-				void onLoginOk(QString login, QString password);
+				void onLoginGo(QString login, QString password);
 
 			};
 		}
