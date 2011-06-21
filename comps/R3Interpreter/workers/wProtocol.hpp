@@ -19,6 +19,9 @@ namespace workers
 		size_t _tid4C;
 		size_t _tid4E;
 
+		std::map<Context, size_t> _tid4C_cache;
+		std::map<R3Meta_BON::Event, size_t> _tid4E_cache;
+
 		//для сериализации аккумулятор всех событий в обе стороны
 		std::set<R3Meta_BON::Context> _allContexts;
 		std::set<R3Meta_BON::Event> _allEvents;
@@ -40,8 +43,8 @@ namespace workers
 		};
 		std::string evalContextPath(Context ctx, bool isServer, EContextPathType cpt);
 
-		size_t getCTid();
-		size_t getETid();
+		size_t getCTid(Context ctx);
+		size_t getETid(R3Meta_BON::Event evt);
 
 
 		void makeEventsSerialization_hpp();

@@ -81,9 +81,22 @@ namespace r3
 
 		boost::uint32_t counter;
 	};
-	struct Event_shutdown:EventBase
+
+	struct Event_startup:EventBase
 	{
 		static const TypeId tid=33;
+		Event_startup():EventBase(tid),ctid(0),cid(0){}
+		Event_startup(TypeId ctid, ContextId cid):EventBase(tid),ctid(ctid),cid(cid){}
+
+		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
+
+		TypeId		ctid;
+		ContextId	cid;
+	};
+
+	struct Event_shutdown:EventBase
+	{
+		static const TypeId tid=34;
 		Event_shutdown():EventBase(tid){}
 
 		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
@@ -95,6 +108,7 @@ namespace r3
 	class ContextBase
 	{
 	public:
+		ContextId id();
 		void shutdown();
 
 		template <class Event>
@@ -102,6 +116,7 @@ namespace r3
 
 		void handle(const Event_ping &evt);
 		void handle(const Event_pong &evt);
+		void handle(const Event_startup &evt);
 		void handle(const Event_shutdown &evt);
 
 		template <class Event>
@@ -111,15 +126,19 @@ namespace r3
 		ContextId _id;
 		Parent *_parent;
 
-	protected:
-		ContextBase(ContextId id, Parent *parent);
+	public:
+		ContextBase();
+		void setPlace(ContextId id, Parent *parent);
+
+		template <class ChildContext>
+		bool makeNewChild(boost::shared_ptr<ChildContext> &child, ContextId id);
 
 	protected:
 		template <class Parent>
 		friend struct DoWithParent;
 
 		template <class ContextChild_ptr>
-		ContextId startupImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id);
+		ContextId startupImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, ContextChild_ptr child=ContextChild_ptr());
 
 		template <class ContextChild_ptr>
 		void shutdownImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id);
@@ -145,25 +164,34 @@ namespace r3
 		template <class Context, class Event>
 		static void fire(Context *self, Parent *p, const Event &evt)
 		{
-			Logic<Context>::Context *lself = (Logic<Context>::Context *)self;
-			lself->fireImpl(Path(), &evt);
+			if(self)
+			{
+				Logic<Context>::Context *lself = static_cast<Logic<Context>::Context *>(self);
+				lself->fireImpl(Path(), &evt);
+			}
 		}
 
 		template <class Context>
 		static void fireImpl(Context *self, Parent *p, const Path &path, const EventBase *evt)
 		{
-			Logic<Parent>::Context *lp = (Logic<Parent>::Context *)p;
-			Path newPath(path);
-			ContextPathItem cpi(Context::tid, self->_id);
-			newPath.push_back(cpi);
-			lp->fireImpl(newPath, evt);
+			if(p)
+			{
+				Logic<Parent>::Context *lp = static_cast<Logic<Parent>::Context *>(p);
+				Path newPath(path);
+				ContextPathItem cpi(Context::tid, self->_id);
+				newPath.push_back(cpi);
+				lp->fireImpl(newPath, evt);
+			}
 		}
 
 		template <class Context>
 		static void shutdown(Context *self, Parent *p)
 		{
-			Logic<Parent>::Context *lp = (Logic<Parent>::Context *)p;
-			lp->shutdown(Context::tid, self->_id);
+			if(p)
+			{
+				Logic<Parent>::Context *lp = static_cast<Logic<Parent>::Context *>(p);
+				lp->shutdown(Context::tid, self->_id);
+			}
 		}
 	};
 	//////////////////////////////////////////////////////////////////////////
@@ -173,8 +201,11 @@ namespace r3
 		template <class Context, class Event>
 		static void fire(Context *self, void *p, const Event &evt)
 		{
-			Logic<Context>::Context *lself = (Logic<Context>::Context *)self;
-			lself->fireImpl(Path(), &evt);
+			if(self)
+			{
+				Logic<Context>::Context *lself = static_cast<Logic<Context>::Context *>(self);
+				lself->fireImpl(Path(), &evt);
+			}
 		}
 		template <class Context>
 		static void fireImpl(Context *self, void *p, const Path &path, const EventBase *evt)
@@ -187,6 +218,13 @@ namespace r3
 			assert(!"unimplemented method");
 		}
 	};
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	ContextId ContextBase<Context, Parent>::id()
+	{
+		return _id;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
@@ -207,7 +245,7 @@ namespace r3
 	template <class Context, class Parent>
 	void ContextBase<Context, Parent>::handle(const Event_ping &evt)
 	{
-		Logic<Context>::Context *lself = (Logic<Context>::Context *)this;
+		Logic<Context>::Context *lself = static_cast<Logic<Context>::Context *>(this);
 		lself->fire(Event_pong(evt));
 	}
 
@@ -229,6 +267,13 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::handle(const Event_startup &evt)
+	{
+		static_cast<Context *>(this)->startup(evt.ctid, evt.cid);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
 	void ContextBase<Context, Parent>::handle(const Event_shutdown &evt)
 	{
 		shutdown();
@@ -237,19 +282,54 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	ContextBase<Context, Parent>::ContextBase(ContextId id, Parent *parent)
-		: _id(id)
-		, _parent(parent)
+	ContextBase<Context, Parent>::ContextBase()
+		: _id(0)
+		, _parent(NULL)
 	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::setPlace(ContextId id, Parent *parent)
+	{
+		_id = id;
+		_parent = parent;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class ChildContext>
+	bool ContextBase<Context, Parent>::makeNewChild(boost::shared_ptr<ChildContext> &child, ContextId id)
+	{
+		
+		child.reset(new Logic<ChildContext>::Context);
+		return false;
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
 	template <class ContextChild_ptr>
-	ContextId ContextBase<Context, Parent>::startupImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id)
+	ContextId ContextBase<Context, Parent>::startupImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, ContextChild_ptr child)
 	{
-		assert(!"not impl");
+		if(map_childs.end() != map_childs.find(id))
+		{
+			return id;
+		}
+
+		if(!child)
+		{
+			Logic<Context>::Context *lself = static_cast<Logic<Context>::Context *>(this);
+			if(!lself->makeNewChild(child, id) || !child)
+			{
+				return 0;
+			}
+		}
+
+		child->setPlace(id, static_cast<Context *>(this));
+
+		map_childs[id] = child;
+		fire(Event_startup(ContextChild_ptr::value_type::tid, id));
 		return id;
 	}
 
@@ -258,7 +338,15 @@ namespace r3
 	template <class ContextChild_ptr>
 	void ContextBase<Context, Parent>::shutdownImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id)
 	{
-		assert(!"not impl");
+		std::map<ContextId, ContextChild_ptr>::iterator iter = map_childs.find(id);
+		if(map_childs.end() == iter)
+		{
+			return;
+		}
+		ContextChild_ptr child = iter->second;
+		child->fire(Event_shutdown());
+		child->setPlace(0, NULL);
+		map_childs.erase(iter);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -266,7 +354,13 @@ namespace r3
 	template <class ContextChild_ptr>
 	void ContextBase<Context, Parent>::dispatchImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, Path p, const EventBase *evt)
 	{
-		assert(!"not impl");
+		std::map<ContextId, ContextChild_ptr>::iterator iter = map_childs.find(id);
+		if(map_childs.end() == iter)
+		{
+			static_cast<Context *>(this)->shutdown(ContextChild_ptr::value_type::tid, id);
+			return;
+		}
+		iter->second->dispatch(p, evt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -274,7 +368,7 @@ namespace r3
 	template <class Event>
 	void ContextBase<Context, Parent>::handleImpl(const Event *evt)
 	{
-		typename Logic<Context>::Context *self = (typename Logic<Context>::Context *)this;
+		typename Logic<Context>::Context *self = static_cast<typename Logic<Context>::Context *>(this);
  		//self->handlePre((Context *)this, evt);
  		self->handle(*evt);
  		//self->handlePost((Context *)this, evt);
@@ -284,7 +378,7 @@ namespace r3
 	template <class Context, class Parent>
 	void ContextBase<Context, Parent>::fireImpl(const Path &p, const EventBase *evt)
 	{
-		DoWithParent<Parent>::fireImpl((Context *)this, _parent, p, evt);
+		DoWithParent<Parent>::fireImpl(static_cast<Context *>(this), _parent, p, evt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -294,13 +388,16 @@ namespace r3
 		switch(evt->tid)
 		{
 		case Event_ping::tid:
-			return handleImpl((const Event_ping *)evt);
+			return handleImpl(static_cast<const Event_ping *>(evt));
 
 		case Event_pong::tid:
-			return handleImpl((const Event_pong *)evt);
+			return handleImpl(static_cast<const Event_pong *>(evt));
+
+		case Event_startup::tid:
+			return handleImpl(static_cast<const Event_startup *>(evt));
 
 		case Event_shutdown::tid:
-			return handleImpl((const Event_shutdown *)evt);
+			return handleImpl(static_cast<const Event_shutdown *>(evt));
 
 		default:
 			assert(0);

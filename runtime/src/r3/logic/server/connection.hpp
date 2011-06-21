@@ -16,6 +16,11 @@ namespace r3
 				, public net::IChannelHandler
 				, public boost::enable_shared_from_this<Connection>
 			{
+			public:
+				class Session;
+				typedef boost::shared_ptr<Session> Session_ptr;
+
+			private:
 				net::Channel_ptr _channel;
 			public:
 				Connection(net::Channel_ptr channel);
@@ -39,6 +44,10 @@ namespace r3
 				}
 				void handle(const Event_login &evt);
 
+				bool makeNewChild(boost::shared_ptr<r3::protocol::server::Connection::Session> &child, ContextId id)
+				{
+					return false;
+				}
 			};
 
 		}
@@ -51,4 +60,15 @@ namespace r3
 	};
 }
 
+#include "r3/logic/server/connection/session.hpp"
+
+namespace r3
+{
+	namespace logic
+	{
+		namespace server
+		{
+		}
+	}
+}
 #endif

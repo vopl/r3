@@ -19,11 +19,26 @@ namespace r3
 				Q_OBJECT
 
 			public:
-				Session(ContextId id, r3::logic::client::Connection *parent);
+				Session(QWidget *parent);
 				~Session();
 
+				template <class Event>
+				void handle(const Event &evt)
+				{
+					r3::protocol::client::Connection::Session::handle(evt);
+				}
+
+				void handle(const Event_shutdown &evt);
+				void handle(const Event_logout &evt);
 			private:
 				Ui::Session ui;
+
+			public slots:
+				void onBlock();
+				void onLogout();
+
+			signals:
+				void doShutdown();
 			};
 		}
 	}

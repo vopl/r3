@@ -11,7 +11,7 @@ namespace r3
 		{
 			//////////////////////////////////////////////////////////////////////////
 			Connection::Connection(net::Channel_ptr channel)
-				: r3::protocol::server::Connection(0,NULL)
+				: r3::protocol::server::Connection()
 				, _channel(channel)
 			{
 				_channel->setHandler(this);
@@ -21,6 +21,12 @@ namespace r3
 			Connection::~Connection()
 			{
 				_channel->setHandler(NULL);
+
+				BOOST_FOREACH(TMap_Session::value_type p, map_Session)
+				{
+					r3::server::instance()->sessionManager()->unget(boost::static_pointer_cast<Session>(p.second), false);
+				}
+				map_Session.clear();
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -85,15 +91,25 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::handle(const Event_login &evt)
 			{
-				std::cout<<__FUNCTION__<<std::endl;
-				std::cout<<evt.login.value()<<", "<<evt.password.value()<<std::endl;
+				//авторизовать
+				if(evt.login.fvs() != r3::fields::fvs_set ||
+					evt.password.fvs() != r3::fields::fvs_set)
+				{
+					fire(Event_badLogin());
+					return;
+				}
+				if(evt.login.value() != "test" ||
+					evt.password.value() != "test")
+				{
+					fire(Event_badLogin());
+					return;
+				}
 
-				Event_session evts;
-				evts.sid=1;
-				fire(evts);
+				//восстановить или поднять сессию
+				Session_ptr session = r3::server::instance()->sessionManager()->get(evt.sid.fvs() == r3::fields::fvs_set ? evt.sid.value() : 0);
+
+				startup(session, session->sid());
 			}
-
-
 		}
 	}
 }

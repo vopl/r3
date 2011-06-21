@@ -8,17 +8,46 @@ namespace r3
 		namespace client
 		{
 
-			Connection::Session::Session(ContextId id, r3::logic::client::Connection *parent)
+			//////////////////////////////////////////////////////////////////////////
+			Connection::Session::Session(QWidget *parent)
 				: QWidget(parent)
-				, r3::protocol::client::Connection::Session(id, parent)
+				, r3::protocol::client::Connection::Session()
 			{
 				ui.setupUi(this);
+
+				connect(ui.pushButton, SIGNAL(clicked()),
+					this, SLOT(onLogout()));
 			}
 
+			//////////////////////////////////////////////////////////////////////////
 			Connection::Session::~Session()
 			{
 
 			}
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::Session::handle(const Event_shutdown &evt)
+			{
+				doShutdown();
+			}
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::Session::handle(const Event_logout &evt)
+			{
+				doShutdown();
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::Session::onBlock()
+			{
+
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::Session::onLogout()
+			{
+				doShutdown();
+			}
+
 		}
 	}
 }

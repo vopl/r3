@@ -37,6 +37,15 @@ void r3::Event_pong::serialize(Archive &ar, const unsigned int file_version)
 
 //////////////////////////////////////////////////////////////////////////
 template<class Archive>
+void r3::Event_startup::serialize(Archive &ar, const unsigned int file_version)
+{
+	ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(EventBase);
+	ar &BOOST_SERIALIZATION_NVP(cid);
+	ar &BOOST_SERIALIZATION_NVP(ctid);
+}
+
+//////////////////////////////////////////////////////////////////////////
+template<class Archive>
 void r3::Event_shutdown::serialize(Archive &ar, const unsigned int file_version)
 {
 	ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(EventBase);

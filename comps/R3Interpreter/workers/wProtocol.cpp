@@ -28,6 +28,9 @@ namespace workers
 		_tid4C = 1000;
 		_tid4E = 1000;
 
+		_tid4C_cache.clear();
+		_tid4E_cache.clear();
+
 		create_directories(_path / "include/r3/protocol");
 		out::File hppServer(_path / "include/r3/protocol/server.hpp");
 		out::File hppClient(_path / "include/r3/protocol/client.hpp");
@@ -174,7 +177,7 @@ namespace workers
 
 		//идент типа
 		hpp<<"public:// идент типа\n";
-		hpp<<"static const TypeId tid = "<<getCTid()<<";\n";
+		hpp<<"static const TypeId tid = "<<getCTid(ctx)<<";\n";
 		hpp<<endl;
 
 		//классы событий
@@ -187,7 +190,7 @@ namespace workers
 				hpp<<"/////////////////////////////////\n";
 				hpp<<"struct Event_"<<evt->getName()<<"\n";
 				hpp<<": public EventBase\n{\n";
-				hpp<<"static const TypeId tid = "<<getETid()<<";\n";
+				hpp<<"static const TypeId tid = "<<getETid(evt)<<";\n";
 				BOOST_FOREACH(Field fld, evt->getField())
 				{
 					hpp<<"r3::fields::"<<fld->getObjectMeta().name()<<" "<<fld->getName()<<";\n";
@@ -212,9 +215,9 @@ namespace workers
 		hpp<<endl;
 
 
-		hpp<<"public:// конструктор\n";
-		hpp<<ctx->getName()<<"(ContextId id, "<<parentType<<" *parent)\n";
-		hpp<<"	: BaseType(id, parent)\n";
+		hpp<<"protected:// конструктор\n";
+		hpp<<ctx->getName()<<"()\n";
+		hpp<<"	: BaseType()\n";
 		hpp<<"{\n}\n";
 		hpp<<endl;
 
@@ -255,10 +258,11 @@ namespace workers
 		hpp<<endl;
 
 		//контейнеры дочерних контекстов
-		hpp<<"private:// контейнеры дочерних контекстов\n";
+		hpp<<"protected:// контейнеры дочерних контекстов\n";
 		BOOST_FOREACH(Context child, ctx->getContext())
 		{
-			hpp<<"std::map<ContextId, "<<child->getName()<<"_ptr > map_"<<child->getName()<<";\n";
+			hpp<<"typedef std::map<ContextId, "<<child->getName()<<"_ptr > TMap_"<<child->getName()<<";\n";
+			hpp<<"TMap_"<<child->getName()<<" map_"<<child->getName()<<";\n";
 		}
 		hpp<<endl;
 
@@ -268,9 +272,15 @@ namespace workers
 		hpp<<"// создание экземпл€ра дочернего контекста\n";
 		hpp<<"ContextId startup(TypeId tid, ContextId id);\n";
 
+		BOOST_FOREACH(Context child, ctx->getContext())
+		{
+			hpp<<"ContextId startup("<<child->getName()<<"_ptr ctx, ContextId id);\n";
+		}
+
 		//уничтожение экземпл€ра дочернего контекста
 		hpp<<"// уничтожение экземпл€ра дочернего контекста\n";
 		hpp<<"void shutdown(TypeId tid, ContextId id);\n";
+		hpp<<"void shutdown();\n";
 
 		//проводка вход€щего сообщени€ в экземпл€р дочернего контекста
 		hpp<<"// проводка вход€щего сообщени€ в экземпл€р дочернего контекста\n";
@@ -306,6 +316,8 @@ namespace workers
 			BOOST_FOREACH(Context child, ctx->getContext())
 			{
 				hpp<<"case "<<child->getName()<<"::tid:\n";
+
+
 				hpp<<"return startupImpl(map_"<<child->getName()<<", id);\n";
 			}
 
@@ -316,8 +328,18 @@ namespace workers
 			hpp<<"//нет дочерних, некого создавать\n";
 			hpp<<"assert(0);\n";
 		}
+		hpp<<"return 0;\n";
 		hpp<<"}\n";
+
+		BOOST_FOREACH(Context child, ctx->getContext())
+		{
+			hpp<<"inline ContextId "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::startup("<<child->getName()<<"_ptr ctx, ContextId id)\n";
+			hpp<<"{\n";
+			hpp<<"return startupImpl(map_"<<child->getName()<<", id, ctx);\n";
+			hpp<<"}\n";
+		}
 		hpp<<endl;
+
 
 		//shutdown
 		hpp<<"inline void "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::shutdown(TypeId tid, ContextId id)\n";
@@ -341,6 +363,11 @@ namespace workers
 			hpp<<"assert(0);\n";
 		}
 		hpp<<"}\n";
+		hpp<<"inline void "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::shutdown()\n";
+		hpp<<"{\n";
+		hpp<<"BaseType::shutdown();\n";
+		hpp<<"}\n";
+
 		hpp<<endl;
 
 		//dispatch
@@ -473,14 +500,22 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	size_t WProtocol::getCTid()
+	size_t WProtocol::getCTid(Context ctx)
 	{
-		return _tid4C++;
+		if(!_tid4C_cache[ctx])
+		{
+			_tid4C_cache[ctx] = _tid4C++;
+		}
+		return _tid4C_cache[ctx];
 	}
 	//////////////////////////////////////////////////////////////////////////
-	size_t WProtocol::getETid()
+	size_t WProtocol::getETid(R3Meta_BON::Event evt)
 	{
-		return _tid4E++;
+		if(!_tid4E_cache[evt])
+		{
+			_tid4E_cache[evt] = _tid4E++;
+		}
+		return _tid4E_cache[evt];
 	}
 
 	//////////////////////////////////////////////////////////////////////////

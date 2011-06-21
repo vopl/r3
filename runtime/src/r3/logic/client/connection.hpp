@@ -30,6 +30,8 @@ namespace r3
 				Ui::Connection ui;
 
 				AuthWidget *_authWidget;
+				QString _login;
+				QString _password;
 
 			public:
 				class Session;
@@ -83,7 +85,11 @@ namespace r3
 				}
 				void handle(const Event_pong &evt);
 				void handle(const Event_badLogin &evt);
+				void handle(const Event_startup &evt);
 
+
+				bool makeNewChild(boost::shared_ptr<r3::protocol::client::Connection::Session> &child, ContextId id);
+				
 
 				private slots:
 					void socketStateChanged(QAbstractSocket::SocketState state);
@@ -98,6 +104,7 @@ namespace r3
 			private:
 			public Q_SLOTS:
 				void onLoginGo(QString login, QString password);
+				void onSessionShutdown();
 
 			};
 		}

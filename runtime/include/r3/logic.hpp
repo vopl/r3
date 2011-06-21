@@ -14,7 +14,7 @@ namespace r3
 		{
 		public:
 			Context()
-				: ProtocolContext(0, NULL)
+				: ProtocolContext()
 			{
 
 			}

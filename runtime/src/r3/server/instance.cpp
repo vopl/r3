@@ -33,6 +33,13 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		SessionManager *Instance::sessionManager()
+		{
+			return &_sessionManager;
+		}
+
+
+		//////////////////////////////////////////////////////////////////////////
 		void Instance::onConnectionClose(Connection_ptr con)
 		{
 			boost::mutex::scoped_lock l(_mtx);

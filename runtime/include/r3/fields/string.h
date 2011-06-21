@@ -114,6 +114,20 @@ namespace r3{ namespace fields
 			return Field::operator ==(from);
 		}
 
+		bool operator!=(const char *with)
+		{
+			return !operator==(with);
+		}
+		bool operator!=(const std::string &with)
+		{
+			return !operator==(with);
+		}
+
+		bool operator!=(EFieldValueState from)
+		{
+			return !operator==(from);
+		}
+
 	}; // class
 }}  // namespace
 

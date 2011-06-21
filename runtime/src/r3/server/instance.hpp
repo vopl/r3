@@ -5,6 +5,7 @@
 //#include "pgc/connection.hpp"
 #include "r3/data.hpp"
 #include "r3/logic/server/connection.hpp"
+#include "r3/server/sessionManager.hpp"
 
 namespace r3
 {
@@ -13,9 +14,12 @@ namespace r3
 		class Instance
 			: public net::IServiceHandler
 		{
-			boost::mutex _mtx;
 			r3::Data _data;
 
+			SessionManager _sessionManager;
+
+
+			boost::mutex _mtx;
 			typedef boost::shared_ptr<r3::logic::server::Connection> Connection_ptr;
 			std::set<Connection_ptr> _connections;
 		public:
@@ -23,6 +27,8 @@ namespace r3
 			~Instance();
 
 			void reset();
+
+			SessionManager *sessionManager();
 
 		private:
 			friend class r3::logic::server::Connection;

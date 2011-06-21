@@ -17,7 +17,7 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			Connection::Connection(QMainWindow *parent)
 				: QWidget(parent)
-				, r3::protocol::client::Connection(0, NULL)
+				, r3::protocol::client::Connection()
 				, _reconnectTimerId(0)
 				, _pingTimerId(0)
 				, _socket(NULL)
@@ -106,6 +106,10 @@ namespace r3
 							_authWidget->show();
 							connect(_authWidget, SIGNAL(doGo(QString, QString)), 
 								this, SLOT(onLoginGo(QString, QString)));
+						}
+						else
+						{
+							onLoginGo(_login, _password);
 						}
 					}
 					else
@@ -233,11 +237,58 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::handle(const Event_badLogin &evt)
 			{
+				if(_session)
+				{
+					_session->shutdown();
+					_session.reset();
+				}
+				if(!_authWidget)
+				{
+					_authWidget = new AuthWidget(this);
+					_authWidget->resize(size());
+					_authWidget->show();
+					connect(_authWidget, SIGNAL(doGo(QString, QString)), 
+						this, SLOT(onLoginGo(QString, QString)));
+				}
+				_authWidget->onError(QString("Event_badLogin"));
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::handle(const Event_startup &evt)
+			{
 				if(_authWidget)
 				{
-					_authWidget->onError(QString("Event_badLogin"));
+					_authWidget->close();
+					_authWidget->deleteLater();
+					_authWidget = 0;
 				}
+
+				if(_session && evt.cid != _session->id())
+				{
+					_session->close();
+					_session->shutdown();
+					_session.reset();
+				}
+
+				if(!_session)
+				{
+					_session.reset(new Session(this));
+
+					connect(_session.get(), SIGNAL(doShutdown()), 
+						this, SLOT(onSessionShutdown()));
+					_session->resize(size());
+					_session->show();
+				}
+				r3::protocol::client::Connection::handle(evt);
 			}
+
+			//////////////////////////////////////////////////////////////////////////
+			bool Connection::makeNewChild(boost::shared_ptr<r3::protocol::client::Connection::Session> &child, ContextId id)
+			{
+				child = _session;
+				return true;
+			}
+
 
 
 
@@ -445,11 +496,41 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::onLoginGo(QString login, QString password)
 			{
+				_login = login;
+				_password = password;
+
 				Event_login evt;
-				evt.login = login.toUtf8().data();
-				evt.password = password.toUtf8().data();
+				evt.login = _login.toUtf8().data();
+				evt.password = _password.toUtf8().data();
+
+				if(_session)
+				{
+					evt.sid = _session->id();
+				}
+
 				fire(evt);
 			}
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::onSessionShutdown()
+			{
+				if(_session)
+				{
+					_session->close();
+					_session->shutdown();
+					_session.reset();
+				}
+
+				if(!_authWidget)
+				{
+					_authWidget = new AuthWidget(this);
+					_authWidget->resize(size());
+					_authWidget->show();
+					connect(_authWidget, SIGNAL(doGo(QString, QString)), 
+						this, SLOT(onLoginGo(QString, QString)));
+				}
+			}
+
 
 
 		}
