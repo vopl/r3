@@ -28,8 +28,8 @@ namespace r3
 				, _pixmapConnected(":/Client/images/connected.png")
 				, _pixmapDisconnected(":/Client/images/disconnected.png")
 				, _pixmapSend(":/Client/images/send.png")
-				, _pixmapRerceive(":/Client/images/receive.png")
-				, _pixmapSendRerceive(":/Client/images/sendreceive.png")
+				, _pixmapReceive(":/Client/images/receive.png")
+				, _pixmapSendReceive(":/Client/images/sendreceive.png")
 				, _connectedWas(false)
 				, _sendNow(false)
 				, _receiveNow(false)
@@ -52,7 +52,6 @@ namespace r3
 				parent->statusBar()->addPermanentWidget(_labelConnected);
 
 				open();
-
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -96,34 +95,23 @@ namespace r3
 				{
 					_connectedWas = connected;
 					_labelConnected->setPixmap(connected?_pixmapConnected:_pixmapDisconnected);
-				}
-				if(connected)
-				{
-					if(!_session)
+
+					if(connected)
 					{
-						if(!_authWidget)
+						this->setEnabled(true);
+						if(_session)
 						{
-							_authWidget = new AuthWidget(this);
-							_authWidget->resize(size());
-							_authWidget->show();
-							connect(_authWidget, SIGNAL(doGo(QString, QString)), 
-								this, SLOT(onLoginGo(QString, QString)));
+							onLoginGo(_login, _password);
 						}
 					}
 					else
 					{
-						onLoginGo(_login, _password);
+						this->setEnabled(false);
 					}
 				}
-				else
-				{
-					if(_authWidget)
-					{
-						_authWidget->deleteLater();
-						_authWidget = 0;
-					}
-				}
+				updateWidget();
 			}
+
 
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::updateSendReceive()
@@ -133,7 +121,7 @@ namespace r3
 				{
 					if(_sendNow && _receiveNow)
 					{
-						_labelSendReceive->setPixmap(_pixmapSendRerceive);
+						_labelSendReceive->setPixmap(_pixmapSendReceive);
 					}
 					else if(_sendNow)
 					{
@@ -141,7 +129,7 @@ namespace r3
 					}
 					else if(_receiveNow)
 					{
-						_labelSendReceive->setPixmap(_pixmapRerceive);
+						_labelSendReceive->setPixmap(_pixmapReceive);
 					}
 					else
 					{
@@ -150,6 +138,31 @@ namespace r3
 
 					_sendWas = _sendNow;
 					_receiveWas = _receiveNow;
+				}
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			void Connection::updateWidget()
+			{
+				if(_session)
+				{
+					if(_authWidget)
+					{
+						_authWidget->deleteLater();
+						_authWidget = 0;
+					}
+				}
+				else
+				{
+					if(!_authWidget)
+					{
+						_authWidget = new AuthWidget(this);
+						_authWidget->resize(size());
+						_authWidget->show();
+						connect(_authWidget, SIGNAL(doGo(QString, QString)), 
+							this, SLOT(onLoginGo(QString, QString)));
+					}
 				}
 			}
 
@@ -245,7 +258,8 @@ namespace r3
 					_session.reset();
 				}
 
-				updateConnected();
+				updateWidget();
+
 				if(_authWidget)
 				{
 					_authWidget->onError(QString("Event_badLogin"));
@@ -255,13 +269,6 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::handle(const Event_startup &evt)
 			{
-				if(_authWidget)
-				{
-					_authWidget->close();
-					_authWidget->deleteLater();
-					_authWidget = 0;
-				}
-
 				if(_session && evt.cid != _session->id())
 				{
 					_session->close();
@@ -279,6 +286,8 @@ namespace r3
 					_session->show();
 				}
 				r3::protocol::client::Connection::handle(evt);
+
+				updateWidget();
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -518,7 +527,8 @@ namespace r3
 					_session->close();
 					_session.reset();
 				}
-				updateConnected();
+
+				updateWidget();
 			}
 		}
 	}

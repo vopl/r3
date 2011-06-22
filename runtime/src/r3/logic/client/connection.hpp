@@ -48,8 +48,8 @@ namespace r3
 				QPixmap _pixmapConnected;
 				QPixmap _pixmapDisconnected;
 				QPixmap _pixmapSend;
-				QPixmap _pixmapRerceive;
-				QPixmap _pixmapSendRerceive;
+				QPixmap _pixmapReceive;
+				QPixmap _pixmapSendReceive;
 
 				QTime _lastPingTime;
 
@@ -62,6 +62,9 @@ namespace r3
 				bool _sendNow;
 				bool _receiveNow;
 				void updateSendReceive();
+
+				void updateWidget();
+
 
 			private:
 				int _reconnectTimerId;
