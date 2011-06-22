@@ -2,6 +2,7 @@
 #define _R3_SERVER_SESSIONMANAGER_HPP_
 
 #include "r3/logic/server/connection.hpp"
+#include <boost/random.hpp>
 
 namespace r3
 {
@@ -15,13 +16,19 @@ namespace r3
 
 			boost::mutex _mtx;
 			typedef std::map<ContextId, Session_ptr> TMSessions;
+			TMSessions _mGettedSessions;
 			TMSessions _mUngettedSessions;
 
-			ContextId _sidGen;
+		private:
+			boost::mt19937 _sidEng;
+			boost::variate_generator<boost::mt19937&, boost::uniform_int<boost::int32_t> > _sidGen;
 
 		public:
 			SessionManager();
 			~SessionManager();
+
+			void reset();
+
 			Session_ptr get(ContextId sid=0);
 			void unget(Session_ptr s, bool destroy);
 		};

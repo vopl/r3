@@ -64,6 +64,7 @@ namespace net
 		void handleCloseSocks();
 	public:
 		ServiceImpl(Service *iface, IServiceHandler *);
+		~ServiceImpl();
 
 		void balance(size_t numThreads);
 

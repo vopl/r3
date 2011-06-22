@@ -28,6 +28,7 @@ namespace net
 		boost::shared_ptr<ServiceImpl> _impl;
 	public:
 		Service(IServiceHandler *);
+		~Service();
 
 		void balance(size_t numThreads);
 

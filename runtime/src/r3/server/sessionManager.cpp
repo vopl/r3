@@ -7,9 +7,15 @@ namespace r3
 	{
 		//////////////////////////////////////////////////////////////////////////
 		SessionManager::SessionManager()
-			: _sidGen(1000)
+			: _sidEng()
+			, _sidGen(
+				_sidEng, 
+				boost::uniform_int<boost::int32_t>(
+					std::numeric_limits<boost::int32_t>::min(), 
+					std::numeric_limits<boost::int32_t>::max()))
 		{
-
+			time_t t;
+			_sidEng.seed((boost::uint32_t)time(&t));
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -17,6 +23,15 @@ namespace r3
 		{
 
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void SessionManager::reset()
+		{
+			boost::mutex::scoped_lock l(_mtx);
+			_mUngettedSessions.clear();
+			_mGettedSessions.clear();
+		}
+
 		
 		//////////////////////////////////////////////////////////////////////////
 		SessionManager::Session_ptr SessionManager::get(ContextId sid)
@@ -30,18 +45,33 @@ namespace r3
 				{
 					Session_ptr res = iter->second;
 					_mUngettedSessions.erase(iter);
+					_mGettedSessions.insert(std::make_pair(sid, res));
 					return res;
 				}
 			}
 
-			sid = _sidGen++;
-			return Session_ptr(new Session(sid));
+			do 
+			{
+				sid = _sidGen();
+			} while(	_mUngettedSessions.end()!=_mUngettedSessions.find(sid) ||
+						_mGettedSessions.end()!=_mGettedSessions.find(sid));
+
+			Session_ptr res = Session_ptr(new Session(sid));
+			_mGettedSessions.insert(std::make_pair(sid, res));
+			return res;
 		}
 		
 		//////////////////////////////////////////////////////////////////////////
 		void SessionManager::unget(Session_ptr s, bool destroy)
 		{
 			boost::mutex::scoped_lock l(_mtx);
+
+			TMSessions::iterator iter = _mGettedSessions.find(s->sid());
+			if(_mGettedSessions.end() != iter)
+			{
+				Session_ptr res = iter->second;
+				_mGettedSessions.erase(iter);
+			}
 
 			if(destroy)
 			{

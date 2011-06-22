@@ -30,6 +30,7 @@ namespace r3
 				c->close();
 			}
 			_connections.clear();
+			_sessionManager.reset();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
