@@ -21,6 +21,7 @@ namespace r3
 				, _reconnectTimerId(0)
 				, _pingTimerId(0)
 				, _socket(NULL)
+				, _socketReady(false)
 				, _incomingReaded(0)
 				, _incomingSize(0)
 				, _outcomingSize(0)
@@ -51,6 +52,7 @@ namespace r3
 				parent->statusBar()->addPermanentWidget(_labelSendReceive);
 				parent->statusBar()->addPermanentWidget(_labelConnected);
 
+				setEnabled(false);
 				open();
 			}
 
@@ -86,7 +88,7 @@ namespace r3
 			void Connection::updateConnected()
 			{
 				bool connected = false;
-				if(_socket && QAbstractSocket::ConnectedState == _socket->state())
+				if(_socketReady)
 				{
 					connected = true;
 				}
@@ -98,7 +100,7 @@ namespace r3
 
 					if(connected)
 					{
-						this->setEnabled(true);
+						setEnabled(true);
 						if(_session)
 						{
 							onLoginGo(_login, _password);
@@ -106,9 +108,39 @@ namespace r3
 					}
 					else
 					{
-						this->setEnabled(false);
+						setEnabled(false);
 					}
 				}
+
+				if(connected)
+				{
+					if(!_pingTimerId)
+					{
+						_pingTimerId = startTimer(1000);
+						_lastPingTime = QTime::currentTime();
+						fire(Event_ping());
+					}
+
+					if(_reconnectTimerId)
+					{
+						killTimer(_reconnectTimerId);
+						_reconnectTimerId = 0;
+					}
+				}
+				else
+				{
+					if(_pingTimerId)
+					{
+						killTimer(_pingTimerId);
+						_pingTimerId = 0;
+					}
+
+					if(!_reconnectTimerId)
+					{
+						_reconnectTimerId = startTimer(1000);
+					}
+				}
+
 				updateWidget();
 			}
 
@@ -172,13 +204,17 @@ namespace r3
 			{
 				if(te->timerId() == _reconnectTimerId)
 				{
-					killTimer(_reconnectTimerId);
-					_reconnectTimerId = 0;
-					open();
+					if(!_socket)
+					{
+						killTimer(_reconnectTimerId);
+						_reconnectTimerId = 0;
+
+						open();
+					}
 				}
 				else if(te->timerId() == _pingTimerId)
 				{
-					if(_socket)
+					if(_socketReady)
 					{
 						_lastPingTime = QTime::currentTime();
 						fire(Event_ping());
@@ -191,6 +227,7 @@ namespace r3
 			void Connection::open()
 			{
 				assert(!_socket);
+				assert(!_socketReady);
 				updateConnected();
 
 				_incomingReaded = 0;
@@ -234,6 +271,7 @@ namespace r3
 					_socket->close();
 					_socket->deleteLater();
 					_socket = 0;
+					_socketReady = false;
 				}
 				updateConnected();
 
@@ -305,6 +343,7 @@ namespace r3
 			{
 				if(!_socket)
 				{
+					assert(!_socketReady);
 					updateConnected();
 					_sendNow = false;
 					_receiveNow = false;
@@ -316,8 +355,7 @@ namespace r3
 
 				if (state == QAbstractSocket::UnconnectedState)
 				{
-					_socket->deleteLater();
-					_socket = 0;
+					close();
 
 					if(_pingTimerId)
 					{
@@ -325,10 +363,6 @@ namespace r3
 						_pingTimerId = 0;
 					}
 					_labelPing->setText("inf");
-
-
-					assert(!_reconnectTimerId);
-					_reconnectTimerId = startTimer(1000);
 
 					updateConnected();
 					_sendNow = false;
@@ -339,30 +373,29 @@ namespace r3
 				if(state == QAbstractSocket::ConnectedState)
 				{
 					updateConnected();
-
-					assert(!_pingTimerId);
-					_pingTimerId = startTimer(1000);
-
-					_lastPingTime = QTime::currentTime();
-					fire(Event_ping());
-
 				}
 			}
 
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::socketEncrypted()
 			{
-				if (!_socket)
-				{
-					return;                 // might have disconnected already
-				}
+				assert(_socket);
+				assert(QAbstractSocket::ConnectedState == _socket->state());
+				_socketReady = true;
 
+				updateConnected();
 
-				QSslCipher ciph = _socket->sessionCipher();
-				QString cipher = QString("%1, %2 (%3/%4)").arg(ciph.authenticationMethod())
-					.arg(ciph.name()).arg(ciph.usedBits()).arg(ciph.supportedBits());;
-
-				int k=220;
+// 				if (!_socket)
+// 				{
+// 					return;                 // might have disconnected already
+// 				}
+// 
+// 
+// 				QSslCipher ciph = _socket->sessionCipher();
+// 				QString cipher = QString("%1, %2 (%3/%4)").arg(ciph.authenticationMethod())
+// 					.arg(ciph.name()).arg(ciph.usedBits()).arg(ciph.supportedBits());;
+// 
+// 				int k=220;
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -370,21 +403,22 @@ namespace r3
 			{
 				QString errs;
 
+				QList<QSslError> ignored;
 				foreach (const QSslError &error, errors)
 				{
-					errs += "\n\n";
-					errs += error.errorString();
+					switch(error.error())
+					{
+					case QSslError::HostNameMismatch:
+					case QSslError::SelfSignedCertificateInChain:
+						//ok
+						ignored.append(error);
+						break;
+					default:
+						errs += "\n\n";
+						errs += error.errorString();
+					}
 				}
-
-				_socket->ignoreSslErrors();
-
-				// did the socket state change?
-				if (_socket->state() != QAbstractSocket::ConnectedState)
-				{
-					socketStateChanged(_socket->state());
-				}
-
-				int k=220;
+				_socket->ignoreSslErrors(ignored);
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -426,7 +460,7 @@ namespace r3
 				if(crc != incomingCrc)
 				{
 					//assert(0);
-					_socket->close();
+					close();
 				}
 				_incomingReaded = 0;
 				_incomingSize = 0;
@@ -472,7 +506,7 @@ namespace r3
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::fireImpl(const Path &cpi, const EventBase *evt)
 			{
-				if(!_socket)
+				if(!_socketReady)
 				{
 					return;
 				}

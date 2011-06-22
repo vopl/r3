@@ -71,6 +71,7 @@ namespace net
 		{
 			LOG(ec);
 			if(_handler) _handler->onError(shared_from_this());
+			close();
 			return;
 		}
 		if(packet->_totalSended < 4)
@@ -136,7 +137,6 @@ namespace net
 	void ChannelImpl::close()
 	{
 		boost::system::error_code ec;
-		//_socket->shutdown(ec);
 		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both,ec);
 		_socket->lowest_layer().close(ec);
 		
@@ -162,6 +162,7 @@ namespace net
 		{
 			LOG(ec);
 			if(_handler) _handler->onError(shared_from_this());
+			close();
 			return;
 		}
 		packet->_totalReceived += received;

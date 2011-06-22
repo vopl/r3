@@ -72,6 +72,7 @@ namespace r3
 				void timerEvent(QTimerEvent *);
 
 				QSslSocket *_socket;
+				bool _socketReady;
 				boost::uint32_t _incomingReaded;
 				boost::uint32_t _incomingSize;
 

@@ -63,6 +63,12 @@ namespace net
 		{
 			LOG(ec);
 			if(_handler) _handler->onError(_iface);
+			{
+				boost::system::error_code ec;
+				socket->shutdown(ec);
+				socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+				socket->lowest_layer().close(ec);
+			}
 			return;
 		}
 
@@ -85,7 +91,12 @@ namespace net
 		{
 			LOG(ec);
 			if(_handler) _handler->onError(_iface);
-			socket->lowest_layer().close();
+			{
+				boost::system::error_code ec;
+				socket->shutdown(ec);
+				socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+				socket->lowest_layer().close(ec);
+			}
 			return;
 		}
 
@@ -100,6 +111,12 @@ namespace net
 		{
 			LOG(ec);
 			if(_handler) _handler->onError(_iface);
+			{
+				boost::system::error_code ec;
+				socket->shutdown(ec);
+				socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+				socket->lowest_layer().close(ec);
+			}
 			return;
 		}
 // 		addSock(socket);
@@ -119,6 +136,12 @@ namespace net
 		{
 			LOG(ec);
 			if(_handler) _handler->onError(_iface);
+			{
+				boost::system::error_code ec;
+				socket->shutdown(ec);
+				socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+				socket->lowest_layer().close(ec);
+			}
 			return;
 		}
 
@@ -167,12 +190,13 @@ namespace net
 	void ServiceImpl::handleCloseSocks()
 	{
 		boost::system::error_code ec;
-		BOOST_FOREACH(TSocket_ptr sock, _socks)
+		BOOST_FOREACH(TSocket_ptr socket, _socks)
 		{
-			//sock->shutdown(ec);
-			sock->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
-			sock->lowest_layer().close(ec);
+			socket->shutdown(ec);
+			socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+			socket->lowest_layer().close(ec);
 		}
+		_socks.clear();
 	}
 
 
