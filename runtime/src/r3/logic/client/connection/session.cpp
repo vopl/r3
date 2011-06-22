@@ -29,11 +29,13 @@ namespace r3
 			void Connection::Session::handle(const Event_shutdown &evt)
 			{
 				doShutdown();
+				BaseType::handle(evt);
 			}
 			//////////////////////////////////////////////////////////////////////////
 			void Connection::Session::handle(const Event_logout &evt)
 			{
 				doShutdown();
+				shutdown();
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -46,6 +48,7 @@ namespace r3
 			void Connection::Session::onLogout()
 			{
 				doShutdown();
+				shutdown();
 			}
 
 		}

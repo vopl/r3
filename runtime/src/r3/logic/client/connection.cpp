@@ -96,10 +96,12 @@ namespace r3
 				{
 					_connectedWas = connected;
 					_labelConnected->setPixmap(connected?_pixmapConnected:_pixmapDisconnected);
-
-					if(connected)
+				}
+				if(connected)
+				{
+					if(!_session)
 					{
-						if(!_session)
+						if(!_authWidget)
 						{
 							_authWidget = new AuthWidget(this);
 							_authWidget->resize(size());
@@ -107,18 +109,18 @@ namespace r3
 							connect(_authWidget, SIGNAL(doGo(QString, QString)), 
 								this, SLOT(onLoginGo(QString, QString)));
 						}
-						else
-						{
-							onLoginGo(_login, _password);
-						}
 					}
 					else
 					{
-						if(_authWidget)
-						{
-							_authWidget->deleteLater();
-							_authWidget = 0;
-						}
+						onLoginGo(_login, _password);
+					}
+				}
+				else
+				{
+					if(_authWidget)
+					{
+						_authWidget->deleteLater();
+						_authWidget = 0;
 					}
 				}
 			}
@@ -242,15 +244,12 @@ namespace r3
 					_session->shutdown();
 					_session.reset();
 				}
-				if(!_authWidget)
+
+				updateConnected();
+				if(_authWidget)
 				{
-					_authWidget = new AuthWidget(this);
-					_authWidget->resize(size());
-					_authWidget->show();
-					connect(_authWidget, SIGNAL(doGo(QString, QString)), 
-						this, SLOT(onLoginGo(QString, QString)));
+					_authWidget->onError(QString("Event_badLogin"));
 				}
-				_authWidget->onError(QString("Event_badLogin"));
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -517,22 +516,10 @@ namespace r3
 				if(_session)
 				{
 					_session->close();
-					_session->shutdown();
 					_session.reset();
 				}
-
-				if(!_authWidget)
-				{
-					_authWidget = new AuthWidget(this);
-					_authWidget->resize(size());
-					_authWidget->show();
-					connect(_authWidget, SIGNAL(doGo(QString, QString)), 
-						this, SLOT(onLoginGo(QString, QString)));
-				}
+				updateConnected();
 			}
-
-
-
 		}
 	}
 }
