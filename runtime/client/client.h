@@ -20,6 +20,9 @@ public:
 private:
 	virtual void resizeEvent(QResizeEvent *);
 
+private slots:
+	void onFullScreen();
+
 private:
 	Ui::ClientClass ui;
 };
