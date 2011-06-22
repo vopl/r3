@@ -26,6 +26,12 @@ int main(int argc, char* argv[])
 	try
 	{
 		r3::server::Instance instance;
+
+		if(!instance.setDBInfo("dbname=test user=postgres password=postgres port=5432"))
+		{
+			std::cerr<<"instance.setDBInfo failed"<<std::endl;
+			return EXIT_FAILURE;
+		}
 		net::Service ns(&instance);
 
 		ns.listen("127.0.0.1", 1234);
@@ -63,6 +69,6 @@ int main(int argc, char* argv[])
 		std::cout<<"exception";
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 

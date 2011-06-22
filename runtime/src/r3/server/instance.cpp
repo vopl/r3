@@ -22,6 +22,22 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		bool Instance::setDBInfo(const char *connInfo)
+		{
+			_connInfo = connInfo;
+
+			//подключится к базе
+			//выгрести перечень схем
+			//сформировать локальную схему или взять готовую
+			//отключится
+
+			//еслм что не так выкинуть false, сервер должен остановиться
+
+			return true;
+		}
+
+
+		//////////////////////////////////////////////////////////////////////////
 		void Instance::reset()
 		{
 			boost::mutex::scoped_lock l(_mtx);
@@ -57,7 +73,7 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onStartInThread(net::Service *)
 		{
-			_data.startInThread("dbname=test user=postgres password=postgres port=5432");
+			_data.startInThread(_connInfo.c_str());
 
 		}
 

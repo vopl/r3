@@ -14,9 +14,22 @@ namespace r3
 		class Instance
 			: public net::IServiceHandler
 		{
+			std::string _connInfo;
 			r3::Data _data;
 
 			SessionManager _sessionManager;
+
+			//управл€лка экземпл€рами схем в базе, создание, удаление
+			//DataManager _dataManager;
+
+			//текуща€ локальна€ рабоча€ схема, ее используют все клиенты
+			//SchemaInstance _localSchema;
+
+			//глоб состо€ни€ текущего запроса
+			//формируетс€ в Session, разрушаетс€ там же... или это сам Session и есть
+			//используетс€ логиками контекста
+			//thread_ptr<SessionData> ...
+
 
 
 			boost::mutex _mtx;
@@ -26,9 +39,15 @@ namespace r3
 			Instance();
 			~Instance();
 
+			//инициализаци€ базы, создание системных таблиц, вычитка из них перечн€ схем, локальной схемы
+			bool setDBInfo(const char *connInfo);
+
 			void reset();
 
 			SessionManager *sessionManager();
+			//SchemaInstance *localSchema();
+			//SessionData_ptr currentSession();
+			//RequestData_ptr currentRequest();
 
 		private:
 			friend class r3::logic::server::Connection;
