@@ -579,8 +579,8 @@ namespace workers
 
 					switch(rel->getMultiplier2())
 					{
-					case CategoryRelationImpl::_1_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					case CategoryRelationImpl::one_Multiplier2_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::many_Multiplier2_Type:  hpp<<"(r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
 					hpp<<"<r3::data::s_"<<src->getSchema()<<"::tuples::"<<src->getName()<<">*)NULL,\t\""<<rel->getName2()<<"\",\t";
@@ -594,8 +594,8 @@ namespace workers
 
 					switch(rel->getMultiplier1())
 					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
+					case CategoryRelationImpl::one_Multiplier1_Type: hpp<<"(r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::many_Multiplier1_Type:  hpp<<"(r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"(r3::relations::Relation2one";break;
 					}
 					hpp<<"<r3::data::s_"<<dst->getSchema()<<"::tuples::"<<dst->getName()<<">*)NULL,\t\""<<rel->getName1()<<"\",\t";
@@ -904,8 +904,8 @@ namespace workers
 				{
 					switch(rel->getMultiplier1())
 					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
+					case CategoryRelationImpl::one_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::many_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"r3::relations::Relation2one";break;
 					}
 					hpp<<"<r3::data::s_"<<dst->getSchema()<<"::tuples::"<<dst->getName()<<"> "<<rel->getName1()<<";"<<endl;
@@ -914,8 +914,8 @@ namespace workers
 				{
 					switch(rel->getMultiplier2())
 					{
-					case CategoryRelationImpl::_1_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
-					case CategoryRelationImpl::n_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
+					case CategoryRelationImpl::one_Multiplier1_Type: hpp<<"r3::relations::Relation2one"; break;
+					case CategoryRelationImpl::many_Multiplier1_Type:  hpp<<"r3::relations::Relation2n"; break;
 					default:assert(0); hpp<<"r3::relations::Relation2one";break;
 					}
 					hpp<<"<r3::data::s_"<<src->getSchema()<<"::tuples::"<<src->getName()<<"> "<<rel->getName2()<<";"<<endl;

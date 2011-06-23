@@ -20,8 +20,8 @@ R3Meta_BON::CategoryRelationImpl::Multiplier1_Type R3Meta_BON::CategoryRelationI
 {
 	std::string val = FCOImpl::getAttribute("Multiplier1")->getStringValue();
 
-	if ( val == "1") return _1_Multiplier1_Type;
-	else if ( val == "n") return n_Multiplier1_Type;
+	if ( val == "one") return one_Multiplier1_Type;
+	else if ( val == "many") return many_Multiplier1_Type;
 	else throw("None of the possible items");
 }
 
@@ -33,8 +33,8 @@ R3Meta_BON::CategoryRelationImpl::Multiplier2_Type R3Meta_BON::CategoryRelationI
 {
 	std::string val = FCOImpl::getAttribute("Multiplier2")->getStringValue();
 
-	if ( val == "1") return _1_Multiplier2_Type;
-	else if ( val == "n") return n_Multiplier2_Type;
+	if ( val == "one") return one_Multiplier2_Type;
+	else if ( val == "many") return many_Multiplier2_Type;
 	else throw("None of the possible items");
 }
 
@@ -64,8 +64,8 @@ void R3Meta_BON::CategoryRelationImpl::setMultiplier1( CategoryRelationImpl::Mul
 {
 	std::string str_val = "";
 
-	if ( val == _1_Multiplier1_Type) str_val = "1";
-	else if ( val == n_Multiplier1_Type) str_val = "n";
+	if ( val == one_Multiplier1_Type) str_val = "one";
+	else if ( val == many_Multiplier1_Type) str_val = "many";
 	else throw("None of the possible items");
 
 	FCOImpl::getAttribute("Multiplier1")->setStringValue( str_val);
@@ -79,8 +79,8 @@ void R3Meta_BON::CategoryRelationImpl::setMultiplier2( CategoryRelationImpl::Mul
 {
 	std::string str_val = "";
 
-	if ( val == _1_Multiplier2_Type) str_val = "1";
-	else if ( val == n_Multiplier2_Type) str_val = "n";
+	if ( val == one_Multiplier2_Type) str_val = "one";
+	else if ( val == many_Multiplier2_Type) str_val = "many";
 	else throw("None of the possible items");
 
 	FCOImpl::getAttribute("Multiplier2")->setStringValue( str_val);

@@ -138,13 +138,19 @@ namespace r3
 		friend struct DoWithParent;
 
 		template <class ContextChild_ptr>
-		ContextId startupImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, ContextChild_ptr child=ContextChild_ptr());
+		ContextId startupImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id, ContextChild_ptr child=ContextChild_ptr());
+		template <class ContextChild_ptr>
+		ContextId startupImpl(ContextChild_ptr &one_child, ContextId id, ContextChild_ptr child=ContextChild_ptr());
 
 		template <class ContextChild_ptr>
-		void shutdownImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id);
+		void shutdownImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id);
+		template <class ContextChild_ptr>
+		void shutdownImpl(ContextChild_ptr &one_child, ContextId id);
 
 		template <class ContextChild_ptr>
-		void dispatchImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, Path p, const EventBase *evt);
+		void dispatchImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id, Path p, const EventBase *evt);
+		template <class ContextChild_ptr>
+		void dispatchImpl(ContextChild_ptr &one_child, ContextId id, Path p, const EventBase *evt);
 
 		template <class Event>
 		void handleImpl(const Event *evt);
@@ -310,9 +316,23 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
 	template <class ContextChild_ptr>
-	ContextId ContextBase<Context, Parent>::startupImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, ContextChild_ptr child)
+	ContextId ContextBase<Context, Parent>::startupImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id, ContextChild_ptr child)
 	{
-		if(map_childs.end() != map_childs.find(id))
+		std::map<ContextId, ContextChild_ptr>::iterator iter = many_childs.find(id);
+		if(many_childs.end() != iter)
+		{
+			return id;
+		}
+
+		return startupImpl(many_childs[id], id, child);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class ContextChild_ptr>
+	ContextId ContextBase<Context, Parent>::startupImpl(ContextChild_ptr &one_child, ContextId id, ContextChild_ptr child)
+	{
+		if(one_child)
 		{
 			return id;
 		}
@@ -328,7 +348,7 @@ namespace r3
 
 		child->setPlace(id, static_cast<Context *>(this));
 
-		map_childs[id] = child;
+		one_child = child;
 		fire(Event_startup(ContextChild_ptr::value_type::tid, id));
 		return id;
 	}
@@ -336,31 +356,56 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
 	template <class ContextChild_ptr>
-	void ContextBase<Context, Parent>::shutdownImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id)
+	void ContextBase<Context, Parent>::shutdownImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id)
 	{
-		std::map<ContextId, ContextChild_ptr>::iterator iter = map_childs.find(id);
-		if(map_childs.end() == iter)
+		std::map<ContextId, ContextChild_ptr>::iterator iter = many_childs.find(id);
+		if(many_childs.end() == iter)
 		{
 			return;
 		}
-		ContextChild_ptr child = iter->second;
-		child->fire(Event_shutdown());
-		child->setPlace(0, NULL);
-		map_childs.erase(iter);
+		shutdownImpl(iter->second);
+		many_childs.erase(iter);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
 	template <class ContextChild_ptr>
-	void ContextBase<Context, Parent>::dispatchImpl(std::map<ContextId, ContextChild_ptr> &map_childs, ContextId id, Path p, const EventBase *evt)
+	void ContextBase<Context, Parent>::shutdownImpl(ContextChild_ptr &one_child, ContextId id)
 	{
-		std::map<ContextId, ContextChild_ptr>::iterator iter = map_childs.find(id);
-		if(map_childs.end() == iter)
+		if(!one_child)
+		{
+			return;
+		}
+		one_child->fire(Event_shutdown());
+		one_child->setPlace(0, NULL);
+		one_child.reset();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class ContextChild_ptr>
+	void ContextBase<Context, Parent>::dispatchImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id, Path p, const EventBase *evt)
+	{
+		std::map<ContextId, ContextChild_ptr>::iterator iter = many_childs.find(id);
+		if(many_childs.end() == iter)
 		{
 			static_cast<Context *>(this)->shutdown(ContextChild_ptr::value_type::tid, id);
 			return;
 		}
 		iter->second->dispatch(p, evt);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class ContextChild_ptr>
+	void ContextBase<Context, Parent>::dispatchImpl(ContextChild_ptr &one_child, ContextId id, Path p, const EventBase *evt)
+	{
+		if(!one_child)
+		{
+			static_cast<Context *>(this)->shutdown(ContextChild_ptr::value_type::tid, id);
+			return;
+		}
+		one_child->dispatch(p, evt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

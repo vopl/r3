@@ -22,11 +22,10 @@ namespace r3
 			{
 				_channel->setHandler(NULL);
 
-				BOOST_FOREACH(TMap_Session::value_type p, map_Session)
+				if(one_Session)
 				{
-					r3::server::instance()->sessionManager()->unget(boost::static_pointer_cast<Session>(p.second), false);
+					r3::server::instance()->sessionManager()->unget(boost::static_pointer_cast<Session>(one_Session), false);
 				}
-				map_Session.clear();
 			}
 
 			//////////////////////////////////////////////////////////////////////////

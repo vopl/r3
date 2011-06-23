@@ -51,6 +51,34 @@ std::multiset<R3Meta_BON::Right> R3Meta_BON::ContextImpl::getRight4ContextSrcs()
 
 
 //********************************************************************************
+// 
+//********************************************************************************
+R3Meta_BON::ContextImpl::Mult_Type R3Meta_BON::ContextImpl::getMult()
+{
+	std::string val = FCOImpl::getAttribute("Mult")->getStringValue();
+
+	if ( val == "one") return one_Mult_Type;
+	else if ( val == "many") return many_Mult_Type;
+	else throw("None of the possible items");
+}
+
+
+//********************************************************************************
+// 
+//********************************************************************************
+void R3Meta_BON::ContextImpl::setMult( ContextImpl::Mult_Type val)
+{
+	std::string str_val = "";
+
+	if ( val == one_Mult_Type) str_val = "one";
+	else if ( val == many_Mult_Type) str_val = "many";
+	else throw("None of the possible items");
+
+	FCOImpl::getAttribute("Mult")->setStringValue( str_val);
+}
+
+
+//********************************************************************************
 // getter for role "Context" among "R3Meta_BON::Context"s
 //********************************************************************************
 std::set<R3Meta_BON::Context> R3Meta_BON::ContextImpl::getContext()

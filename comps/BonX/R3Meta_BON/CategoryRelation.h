@@ -16,13 +16,13 @@ public:
 	virtual void        accept( BON::Visitor *pVisitor);
 	typedef enum
 	{
-		_1_Multiplier1_Type,
-		n_Multiplier1_Type
+		one_Multiplier1_Type,
+		many_Multiplier1_Type
 	} Multiplier1_Type;
 	typedef enum
 	{
-		_1_Multiplier2_Type,
-		n_Multiplier2_Type
+		one_Multiplier2_Type,
+		many_Multiplier2_Type
 	} Multiplier2_Type;
 
 	//

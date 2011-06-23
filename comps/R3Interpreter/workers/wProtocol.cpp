@@ -261,8 +261,18 @@ namespace workers
 		hpp<<"protected:// контейнеры дочерних контекстов\n";
 		BOOST_FOREACH(Context child, ctx->getContext())
 		{
-			hpp<<"typedef std::map<ContextId, "<<child->getName()<<"_ptr > TMap_"<<child->getName()<<";\n";
-			hpp<<"TMap_"<<child->getName()<<" map_"<<child->getName()<<";\n";
+			switch(child->getMult())
+			{
+			default:
+				assert(!"unknown context mult");
+			case ContextImpl::one_Mult_Type:
+				hpp<<child->getName()<<"_ptr one_"<<child->getName()<<";\n";
+				break;
+			case ContextImpl::many_Mult_Type:
+				hpp<<"typedef std::map<ContextId, "<<child->getName()<<"_ptr > TMany_"<<child->getName()<<";\n";
+				hpp<<"TMany_"<<child->getName()<<" many_"<<child->getName()<<";\n";
+				break;
+			}
 		}
 		hpp<<endl;
 
@@ -317,8 +327,17 @@ namespace workers
 			{
 				hpp<<"case "<<child->getName()<<"::tid:\n";
 
-
-				hpp<<"return startupImpl(map_"<<child->getName()<<", id);\n";
+				switch(child->getMult())
+				{
+				default:
+					assert(!"unknown context mult");
+				case ContextImpl::one_Mult_Type:
+					hpp<<"return startupImpl(one_"<<child->getName()<<", id);\n";
+					break;
+				case ContextImpl::many_Mult_Type:
+					hpp<<"return startupImpl(many_"<<child->getName()<<", id);\n";
+					break;
+				}
 			}
 
 			hpp<<"default:\nassert(0);throw 220;\n}\n";
@@ -335,7 +354,17 @@ namespace workers
 		{
 			hpp<<"inline ContextId "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::startup("<<child->getName()<<"_ptr ctx, ContextId id)\n";
 			hpp<<"{\n";
-			hpp<<"return startupImpl(map_"<<child->getName()<<", id, ctx);\n";
+			switch(child->getMult())
+			{
+			default:
+				assert(!"unknown context mult");
+			case ContextImpl::one_Mult_Type:
+				hpp<<"return startupImpl(one_"<<child->getName()<<", id, ctx);\n";
+				break;
+			case ContextImpl::many_Mult_Type:
+				hpp<<"return startupImpl(many_"<<child->getName()<<", id, ctx);\n";
+				break;
+			}
 			hpp<<"}\n";
 		}
 		hpp<<endl;
@@ -352,7 +381,17 @@ namespace workers
 			BOOST_FOREACH(Context child, ctx->getContext())
 			{
 				hpp<<"case "<<child->getName()<<"::tid:\n";
-				hpp<<"return shutdownImpl(map_"<<child->getName()<<", id);\n";
+				switch(child->getMult())
+				{
+				default:
+					assert(!"unknown context mult");
+				case ContextImpl::one_Mult_Type:
+					hpp<<"return shutdownImpl(one_"<<child->getName()<<", id);\n";
+					break;
+				case ContextImpl::many_Mult_Type:
+					hpp<<"return shutdownImpl(many_"<<child->getName()<<", id);\n";
+					break;
+				}
 			}
 
 			hpp<<"default:\nassert(0);throw 220;\n}\n";
@@ -409,7 +448,17 @@ namespace workers
 			BOOST_FOREACH(Context child, ctx->getContext())
 			{
 				hpp<<"case "<<child->getName()<<"::tid:\n";
-				hpp<<"return dispatchImpl(map_"<<child->getName()<<", pi.id, p, evt);\n";
+				switch(child->getMult())
+				{
+				default:
+					assert(!"unknown context mult");
+				case ContextImpl::one_Mult_Type:
+					hpp<<"return dispatchImpl(one_"<<child->getName()<<", pi.id, p, evt);\n";
+					break;
+				case ContextImpl::many_Mult_Type:
+					hpp<<"return dispatchImpl(many_"<<child->getName()<<", pi.id, p, evt);\n";
+					break;
+				}
 			}
 
 			hpp<<"default:\nassert(0);throw 220;\n}\n";
