@@ -6,6 +6,7 @@
 #include "r3/data.hpp"
 #include "r3/logic/server/connection.hpp"
 #include "r3/server/sessionManager.hpp"
+#include "r3/server/threadLocalStorage.hpp"
 
 namespace r3
 {
@@ -23,12 +24,12 @@ namespace r3
 			//DataManager _dataManager;
 
 			//текущая локальная рабочая схема, ее используют все клиенты
-			//SchemaInstance _localSchema;
+			r3::data::V1_ptr _localSchema;
 
 			//глоб состояния текущего запроса
 			//формируется в Session, разрушается там же... или это сам Session и есть
 			//используется логиками контекста
-			//thread_ptr<SessionData> ...
+			boost::thread_specific_ptr<ThreadLocalStorage> _tls;
 
 
 
@@ -45,8 +46,8 @@ namespace r3
 			void reset();
 
 			SessionManager *sessionManager();
-			//SchemaInstance *localSchema();
-			//SessionData_ptr currentSession();
+			r3::data::V1_ptr localSchema();
+			ThreadLocalStorage *tls();
 			//RequestData_ptr currentRequest();
 
 		private:

@@ -24,16 +24,54 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		bool Instance::setDBInfo(const char *connInfo)
 		{
-			_connInfo = connInfo;
-
 			//подключится к базе
-			//выгрести перечень схем
+			_data.startInThread(connInfo);
+
+			switch(_data.con().status())
+			{
+			case pgc::ecs_ok:
+				break;
+			default:
+				std::cerr<<"unable connect to database"<<std::endl;
+				return false;
+			}
+
+			bool res = true;
 			//сформировать локальную схему или взять готовую
-			//отключится
+			_data.con().once("BEGIN").exec();
+
+			try
+			{
+				{
+					r3::data::Test_ptr s = _data.getTest("local");
+					if(!s->dbExists())
+					{
+						s->dbCreate();
+					}
+				}
+				{
+					r3::data::V1_ptr s = _data.getV1("local");
+					if(!s->dbExists())
+					{
+						s->dbCreate();
+					}
+				}
+				_data.con().once("COMMIT").exec();
+			}
+			catch(...)
+			{
+				std::cerr<<"exception in local schema creation"<<std::endl;
+				_data.con().once("ROLLBACK").exec();
+				res = true;
+			}
 
 			//еслм что не так выкинуть false, сервер должен остановиться
 
-			return true;
+			_connInfo = connInfo;
+			_data.stopInThread();
+
+			_localSchema = _data.getV1("local");
+			return res;
 		}
 
 
@@ -55,6 +93,20 @@ namespace r3
 			return &_sessionManager;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		r3::data::V1_ptr Instance::localSchema()
+		{
+			return _localSchema;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		ThreadLocalStorage *Instance::tls()
+		{
+			return _tls.get();
+		}
+
+
+
 
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onConnectionClose(Connection_ptr con)
@@ -73,8 +125,10 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onStartInThread(net::Service *)
 		{
-			_data.startInThread(_connInfo.c_str());
+			assert(!_tls.get());
+			_tls.reset(new ThreadLocalStorage);
 
+			_data.startInThread(_connInfo.c_str());
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -100,6 +154,8 @@ namespace r3
 		void Instance::onStopInThread()
 		{
 			_data.stopInThread();
+			assert(_tls.get());
+			delete _tls.release();
 		}
 
 		//////////////////////////////////////////////////////////////////////////

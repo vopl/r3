@@ -240,6 +240,10 @@
 						RelativePath="..\src\r3\server\sessionManager.hpp"
 						>
 					</File>
+					<File
+						RelativePath="..\src\r3\server\threadLocalStorage.hpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="logic"

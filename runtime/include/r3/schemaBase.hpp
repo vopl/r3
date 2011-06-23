@@ -30,6 +30,7 @@ namespace r3
 
 	public:
 		void dbCreate();
+		bool dbExists();
 		void dbDrop();
 
 		fields::Id idGen();
@@ -203,6 +204,15 @@ namespace r3
 
 		//наследование таблиц
 		s->enumCategories(enumOper_createInheritances());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class S>
+	bool SchemaBase<S>::dbExists()
+	{
+		boost::uint32_t cnt;
+		con().once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1").exec(_name+"_"+_id).throwIfError().fetch(0,0,cnt);
+		return cnt>0;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -22,7 +22,7 @@ namespace r3
 
 	void StmStorageBase::stopInThread()
 	{
-		_tcon.reset();
+		delete _tcon.release();
 	}
 
 
@@ -53,6 +53,7 @@ namespace r3
 	{
 		_tcon.reset(new pgc::Connection);
 		_tcon->open(conninfo);
+		_tcon->log(std::cout, pgc::lf_all);
 
 		for(size_t i(0); i<_stmStorages.size(); i++)
 		{
@@ -68,7 +69,7 @@ namespace r3
 		{
 			_stmStorages[i]->stopInThread();
 		}
-		_tcon.reset();
+		delete _tcon.release();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
