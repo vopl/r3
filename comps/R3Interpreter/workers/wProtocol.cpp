@@ -209,11 +209,35 @@ namespace workers
 			//клиент берет клиентские события
 			BOOST_FOREACH(R3Meta_BON::Event evt, ctx->getEvent())
 			{
-				hpp<<"typedef r3::protocol::server::"<<evalContextPath(ctx, false, cpt_classScope)<<"::Event_"<<evt->getName()<<" Event_"<<evt->getName()<<";\n";
+				hpp<<"typedef r3::protocol::server::"<<evalContextPath(ctx, true, cpt_classScope)<<"::Event_"<<evt->getName()<<" Event_"<<evt->getName()<<";\n";
 			}
 		}
 		hpp<<endl;
 
+
+		//классы прав
+		hpp<<"public:// классы прав\n";
+		if(isServer)
+		{
+			//сервер опеределяет права сам
+			BOOST_FOREACH(R3Meta_BON::Right right, ctx->getRight())
+			{
+				hpp<<"/////////////////////////////////\n";
+				hpp<<"struct Right_"<<right->getName()<<"\n";
+				hpp<<"{\n";
+				hpp<<"};\n";
+				hpp<<endl;
+			}
+		}
+		else
+		{
+			//клиент берет клиентские права
+			BOOST_FOREACH(R3Meta_BON::Right right, ctx->getRight())
+			{
+				hpp<<"typedef r3::protocol::server::"<<evalContextPath(ctx, true, cpt_classScope)<<"::Right_"<<right->getName()<<" Right_"<<right->getName()<<";\n";
+			}
+		}
+		hpp<<endl;
 
 		hpp<<"protected:// конструктор\n";
 		hpp<<ctx->getName()<<"()\n";
