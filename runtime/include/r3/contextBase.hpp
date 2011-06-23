@@ -34,6 +34,15 @@ namespace r3
 
 	typedef std::deque<ContextPathItem> Path;
 
+
+	//////////////////////////////////////////////////////////////////////////
+	enum ERightValue
+	{
+		rv_null,
+		rv_grant,
+		rv_deny,
+	};
+
 	//////////////////////////////////////////////////////////////////////////
 	struct EventBase
 	{
@@ -158,6 +167,10 @@ namespace r3
 		void fireImpl(const Path &cpi, const EventBase *evt);
 
 		void dispatchCommon(const EventBase *evt);
+
+	protected:
+		template <class Right, class ContextChild>
+		ERightValue checkContextRight(Right right, ContextChild *stub4type);
 
 	private:
 	};
@@ -449,6 +462,16 @@ namespace r3
 			throw 220;
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class Right, class ContextChild>
+	ERightValue ContextBase<Context, Parent>::checkContextRight(Right right, ContextChild *stub4type)
+	{
+		//return globalRightEvaluator->eval(this, right, stub4type)
+		return rv_deny;
+	}
+
 
 }
 
