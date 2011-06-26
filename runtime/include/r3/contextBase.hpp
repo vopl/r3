@@ -481,17 +481,11 @@ namespace r3
 	template <class Right>
 	ERightValue ContextBase<Context, Parent>::checkRight4ContextImpl(Right right)
 	{
-		//return getRightEvaluator(this)->eval(right);
-		return erv_deny;
+		//return getRightEvaluator()->eval4Context(this, right);
+		return erv_grant;
 	}
 
 
 }
-
-// BOOST_CLASS_EXPORT(r3::EventBase);
-// BOOST_CLASS_EXPORT(r3::Event_ping);
-// BOOST_CLASS_EXPORT(r3::Event_pong);
-// BOOST_CLASS_EXPORT(r3::Event_shutdown);
-
 
 #endif
