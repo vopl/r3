@@ -7,3 +7,4 @@
 #include "utils/serialization/collection_size_type.hpp"
 #include <boost/serialization/deque.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>

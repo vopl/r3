@@ -14,6 +14,15 @@ namespace r3
 	typedef boost::int32_t TypeId;
 
 	//////////////////////////////////////////////////////////////////////////
+	enum ERightValue
+	{
+		erv_null,
+		erv_grant,
+		erv_deny,
+	};
+
+
+	//////////////////////////////////////////////////////////////////////////
 	struct ContextPathItem
 	{
 		TypeId tid;
@@ -85,13 +94,16 @@ namespace r3
 	struct Event_startup:EventBase
 	{
 		static const TypeId tid=33;
+		typedef std::map<TypeId, ERightValue> TRightValues;
 		Event_startup():EventBase(tid),ctid(0),cid(0){}
 		Event_startup(TypeId ctid, ContextId cid):EventBase(tid),ctid(ctid),cid(cid){}
+		Event_startup(TypeId ctid, ContextId cid, const TRightValues &rightBalues):EventBase(tid),ctid(ctid),cid(cid),rightValues(rightBalues){}
 
 		template<class Archive> void serialize(Archive &ar, const unsigned int file_version);
 
 		TypeId		ctid;
 		ContextId	cid;
+		TRightValues rightValues;
 	};
 
 	struct Event_shutdown:EventBase
@@ -103,19 +115,12 @@ namespace r3
 	};
 
 
-	//////////////////////////////////////////////////////////////////////////
-	enum ERightValue
-	{
-		erv_null,
-		erv_grant,
-		erv_deny,
-	};
-
-
 	/////////////////////////////////////////////////
 	template <class Context, class Parent>
 	class ContextBase
 	{
+	public:
+		typedef Event_startup::TRightValues TRightValues;
 	public:
 		ContextId id();
 		void shutdown();
@@ -135,9 +140,16 @@ namespace r3
 		template <class Right>
 		ERightValue checkRight4Context(Right right);
 
+		void dropRights();
+		void fillRights();
+		void fillRights(const TRightValues &from);
+		const TRightValues &getRights();
+
 	protected:
 		ContextId _id;
 		Parent *_parent;
+
+		TRightValues _rightValues;
 
 	public:
 		ContextBase();
@@ -154,6 +166,11 @@ namespace r3
 		ContextId startupImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id, ContextChild_ptr child=ContextChild_ptr());
 		template <class ContextChild_ptr>
 		ContextId startupImpl(ContextChild_ptr &one_child, ContextId id, ContextChild_ptr child=ContextChild_ptr());
+
+		template <class ContextChild_ptr>
+		void setRightsImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id, const TRightValues &rights);
+		template <class ContextChild_ptr>
+		void setRightsImpl(ContextChild_ptr &one_child, ContextId id, const TRightValues &rights);
 
 		template <class ContextChild_ptr>
 		void shutdownImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id);
@@ -253,7 +270,7 @@ namespace r3
 	template <class Context, class Parent>
 	void ContextBase<Context, Parent>::shutdown()
 	{
-		DoWithParent<Parent>::shutdown((Context *)this, _parent);
+		DoWithParent<Parent>::shutdown(static_cast<Context *>(this), _parent);
 	}
 
 
@@ -281,10 +298,28 @@ namespace r3
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::handle(const Event_startup &evt)
+	{
+		ContextId cid = static_cast<Context *>(this)->startup(evt.ctid, evt.cid);
+		if(!Context::isServer && cid)
+		{
+			static_cast<Context *>(this)->setRights(evt.ctid, cid, evt.rightValues);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::handle(const Event_shutdown &evt)
+	{
+		shutdown();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
 	template <class Event>
 	void ContextBase<Context, Parent>::fire(const Event &evt)
 	{
-		DoWithParent<Parent>::fire((Context *)this, _parent, evt);
+		DoWithParent<Parent>::fire(static_cast<Context *>(this), _parent, evt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -296,21 +331,44 @@ namespace r3
 		return lself->checkRight4ContextImpl(right);
 	}
 
-
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	void ContextBase<Context, Parent>::handle(const Event_startup &evt)
+	void ContextBase<Context, Parent>::dropRights()
 	{
-		static_cast<Context *>(this)->startup(evt.ctid, evt.cid);
+		if(Context::isServer)
+		{
+			_rightValues.clear();
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
-	void ContextBase<Context, Parent>::handle(const Event_shutdown &evt)
+	void ContextBase<Context, Parent>::fillRights()
 	{
-		shutdown();
+		if(Context::isServer)
+		{
+			//tratata
+			_rightValues[220] = erv_grant;
+		}
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	void ContextBase<Context, Parent>::fillRights(const TRightValues &from)
+	{
+		if(!Context::isServer)
+		{
+			_rightValues = from;
+		}
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	const typename ContextBase<Context, Parent>::TRightValues &ContextBase<Context, Parent>::getRights()
+	{
+		return _rightValues;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Context, class Parent>
@@ -375,8 +433,46 @@ namespace r3
 		child->setPlace(id, static_cast<Context *>(this));
 
 		one_child = child;
-		fire(Event_startup(ContextChild_ptr::value_type::tid, id));
+
+		if(ContextChild_ptr::value_type::isServer)
+		{
+			Logic<ContextChild_ptr::value_type>::Context *lchild = static_cast<Logic<ContextChild_ptr::value_type>::Context *>(child.get());
+			lchild->dropRights();
+			lchild->fillRights();
+			fire(Event_startup(ContextChild_ptr::value_type::tid, id, lchild->getRights()));
+		}
+		else
+		{
+			fire(Event_startup(ContextChild_ptr::value_type::tid, id));
+		}
 		return id;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class ContextChild_ptr>
+	void ContextBase<Context, Parent>::setRightsImpl(std::map<ContextId, ContextChild_ptr> &many_childs, ContextId id, const TRightValues &rights)
+	{
+		std::map<ContextId, ContextChild_ptr>::iterator iter = many_childs.find(id);
+		if(many_childs.end() != iter)
+		{
+			return;
+		}
+
+		return setRightsImpl(many_childs[id], id, rights);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class ContextChild_ptr>
+	void ContextBase<Context, Parent>::setRightsImpl(ContextChild_ptr &one_child, ContextId id, const TRightValues &rights)
+	{
+		if(!one_child)
+		{
+			return;
+		}
+
+		one_child->fillRights(rights);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -481,8 +577,12 @@ namespace r3
 	template <class Right>
 	ERightValue ContextBase<Context, Parent>::checkRight4ContextImpl(Right right)
 	{
-		//return getRightEvaluator()->eval4Context(this, right);
-		return erv_grant;
+		TRightValues::iterator iter = _rightValues.find(right.tid);
+		if(_rightValues.end() == iter)
+		{
+			return erv_null;
+		}
+		return iter->second;
 	}
 
 

@@ -53,7 +53,8 @@ namespace r3
 			do 
 			{
 				sid = _sidGen();
-			} while(	_mUngettedSessions.end()!=_mUngettedSessions.find(sid) ||
+			} while(	!sid ||
+						_mUngettedSessions.end()!=_mUngettedSessions.find(sid) ||
 						_mGettedSessions.end()!=_mGettedSessions.find(sid));
 
 			Session_ptr res = Session_ptr(new Session(sid));

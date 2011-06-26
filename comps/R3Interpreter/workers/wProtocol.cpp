@@ -27,9 +27,11 @@ namespace workers
 	{
 		_tid4C = 1000;
 		_tid4E = 1000;
+		_tid4R = 1000;
 
 		_tid4C_cache.clear();
 		_tid4E_cache.clear();
+		_tid4R_cache.clear();
 
 		create_directories(_path / "include/r3/protocol");
 		out::File hppServer(_path / "include/r3/protocol/server.hpp");
@@ -175,6 +177,11 @@ namespace workers
 		hpp<<"typedef ContextBase<"<<evalContextPath(ctx, isServer, cpt_classScope)<<", "<<parentType<<"> BaseType;\n";
 		hpp<<endl;
 
+		//признак сервера
+		hpp<<"public:// признак сервера\n";
+		hpp<<"static const bool isServer = "<<(isServer?"true":"false")<<";\n";
+		hpp<<endl;
+
 		//идент типа
 		hpp<<"public:// идент типа\n";
 		hpp<<"static const TypeId tid = "<<getCTid(ctx)<<";\n";
@@ -225,6 +232,7 @@ namespace workers
 				hpp<<"/////////////////////////////////\n";
 				hpp<<"struct Right_"<<right->getName()<<"\n";
 				hpp<<"{\n";
+				hpp<<"static const TypeId tid = "<<getRTid(right)<<";\n";
 				hpp<<"};\n";
 				hpp<<endl;
 			}
@@ -239,6 +247,7 @@ namespace workers
 		}
 		hpp<<endl;
 
+		// конструктор
 		hpp<<"protected:// конструктор\n";
 		hpp<<ctx->getName()<<"()\n";
 		hpp<<"	: BaseType()\n";
@@ -305,6 +314,8 @@ namespace workers
 		//создание экземпл€ра дочернего контекста
 		hpp<<"// создание экземпл€ра дочернего контекста\n";
 		hpp<<"ContextId startup(TypeId tid, ContextId id);\n";
+		hpp<<"void setRights(TypeId tid, ContextId id, const TRightValues &rights);\n";
+		
 
 		BOOST_FOREACH(Context child, ctx->getContext())
 		{
@@ -381,6 +392,40 @@ namespace workers
 			hpp<<"assert(0);\n";
 		}
 		hpp<<"return 0;\n";
+		hpp<<"}\n";
+
+		hpp<<"inline void "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::setRights(TypeId tid, ContextId id, const TRightValues &rights)\n";
+		hpp<<"{\n";
+
+		if(ctx->getContext().size())
+		{
+			hpp<<"switch(tid)\n{\n";
+
+			BOOST_FOREACH(Context child, ctx->getContext())
+			{
+				hpp<<"case "<<child->getName()<<"::tid:\n";
+
+				switch(child->getMult())
+				{
+				default:
+					assert(!"unknown context mult");
+				case ContextImpl::one_Mult_Type:
+					hpp<<"return setRightsImpl(one_"<<child->getName()<<", id, rights);\n";
+					break;
+				case ContextImpl::many_Mult_Type:
+					hpp<<"return setRightsImpl(many_"<<child->getName()<<", id, rights);\n";
+					break;
+				}
+			}
+
+			hpp<<"default:\nassert(0);throw 220;\n}\n";
+		}
+		else
+		{
+			hpp<<"//нет дочерних, некому набавл€ть права\n";
+			hpp<<"assert(0);\n";
+		}
+		hpp<<"return;\n";
 		hpp<<"}\n";
 
 		BOOST_FOREACH(Context child, ctx->getContext())
@@ -607,6 +652,16 @@ namespace workers
 			_tid4E_cache[evt] = _tid4E++;
 		}
 		return _tid4E_cache[evt];
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	size_t WProtocol::getRTid(Right right)
+	{
+		if(!_tid4R_cache[right])
+		{
+			_tid4R_cache[right] = _tid4R++;
+		}
+		return _tid4R_cache[right];
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -18,9 +18,11 @@ namespace workers
 		const boost::filesystem::path _path;
 		size_t _tid4C;
 		size_t _tid4E;
+		size_t _tid4R;
 
-		std::map<Context, size_t> _tid4C_cache;
-		std::map<R3Meta_BON::Event, size_t> _tid4E_cache;
+		std::map<Context, size_t>				_tid4C_cache;
+		std::map<R3Meta_BON::Event, size_t>		_tid4E_cache;
+		std::map<Right, size_t>					_tid4R_cache;
 
 		//для сериализации аккумулятор всех событий в обе стороны
 		std::set<R3Meta_BON::Context> _allContexts;
@@ -45,6 +47,7 @@ namespace workers
 
 		size_t getCTid(Context ctx);
 		size_t getETid(R3Meta_BON::Event evt);
+		size_t getRTid(Right right);
 
 
 		void makeEventsSerialization_hpp();
