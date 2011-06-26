@@ -214,7 +214,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\r3\rightEvaluator.hpp"
+					RelativePath="..\include\r3\rightFiller.hpp"
 					>
 				</File>
 				<File
@@ -423,6 +423,10 @@
 				>
 				<File
 					RelativePath="..\src\r3\dataBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\r3\rightFiller.cpp"
 					>
 				</File>
 				<File

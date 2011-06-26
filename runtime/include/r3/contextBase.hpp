@@ -2,6 +2,7 @@
 #define _R3_CONTEXTBASE_HPP_
 
 #include "r3/logic.hpp"
+#include "r3/rightFiller.hpp"
 #include <deque>
 #include <map>
 #include <boost/cstdint.hpp>
@@ -12,14 +13,6 @@ namespace r3
 	//////////////////////////////////////////////////////////////////////////
 	typedef boost::int32_t ContextId;
 	typedef boost::int32_t TypeId;
-
-	//////////////////////////////////////////////////////////////////////////
-	enum ERightValue
-	{
-		erv_null,
-		erv_grant,
-		erv_deny,
-	};
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -347,8 +340,7 @@ namespace r3
 	{
 		if(Context::isServer)
 		{
-			//tratata
-			_rightValues[220] = erv_grant;
+			r3::RightFiller<Context::isServer>::instance()->fillRights(static_cast<Context *>(this), _rightValues);
 		}
 	}
 
