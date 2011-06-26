@@ -103,6 +103,15 @@ namespace r3
 	};
 
 
+	//////////////////////////////////////////////////////////////////////////
+	enum ERightValue
+	{
+		erv_null,
+		erv_grant,
+		erv_deny,
+	};
+
+
 	/////////////////////////////////////////////////
 	template <class Context, class Parent>
 	class ContextBase
@@ -121,6 +130,10 @@ namespace r3
 
 		template <class Event>
 		void fire(const Event &evt);
+
+
+		template <class Right>
+		ERightValue checkRight4Context(Right right);
 
 	protected:
 		ContextId _id;
@@ -158,6 +171,10 @@ namespace r3
 		void fireImpl(const Path &cpi, const EventBase *evt);
 
 		void dispatchCommon(const EventBase *evt);
+
+		template <class Right>
+		ERightValue checkRight4ContextImpl(Right right);
+
 
 	private:
 	};
@@ -268,6 +285,15 @@ namespace r3
 	void ContextBase<Context, Parent>::fire(const Event &evt)
 	{
 		DoWithParent<Parent>::fire((Context *)this, _parent, evt);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class Right>
+	ERightValue ContextBase<Context, Parent>::checkRight4Context(Right right)
+	{
+		Logic<Context>::Context *lself = static_cast<Logic<Context>::Context *>(this);
+		return lself->checkRight4ContextImpl(right);
 	}
 
 
@@ -449,6 +475,16 @@ namespace r3
 			throw 220;
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Context, class Parent>
+	template <class Right>
+	ERightValue ContextBase<Context, Parent>::checkRight4ContextImpl(Right right)
+	{
+		//return getRightEvaluator(this)->eval(right);
+		return erv_deny;
+	}
+
 
 }
 

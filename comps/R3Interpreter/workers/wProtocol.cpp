@@ -351,6 +351,15 @@ namespace workers
 			{
 				hpp<<"case "<<child->getName()<<"::tid:\n";
 
+				BOOST_FOREACH(Right right, child->getRight4ContextSrcs())
+				{
+					hpp<<"if(erv_grant != checkRight4Context(Right_"<<right->getName()<<"()))\n";
+					hpp<<"{\n";
+					hpp<<"return 0;\n";
+					hpp<<"}\n";
+				}
+				
+
 				switch(child->getMult())
 				{
 				default:
@@ -378,6 +387,15 @@ namespace workers
 		{
 			hpp<<"inline ContextId "<<evalContextPath(ctx, isServer, cpt_classScope)<<"::startup("<<child->getName()<<"_ptr ctx, ContextId id)\n";
 			hpp<<"{\n";
+
+			BOOST_FOREACH(Right right, child->getRight4ContextSrcs())
+			{
+				hpp<<"if(erv_grant != checkRight4Context(Right_"<<right->getName()<<"()))\n";
+				hpp<<"{\n";
+				hpp<<"return 0;\n";
+				hpp<<"}\n";
+			}
+
 			switch(child->getMult())
 			{
 			default:
