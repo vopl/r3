@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -214,6 +215,130 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="litesql"
+			>
+			<File
+				RelativePath=".\litesql\backend.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\compatibility.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\cursor.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\database.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\datasource.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\datetime.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\except.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\expr.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\litesql\expr.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\field.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\operations.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\persistent.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\relation.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\selectquery.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\litesql\selectquery.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\split.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\litesql\split.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\string.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\litesql\string.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\types.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\updatequery.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\litesql\utils.hpp"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
