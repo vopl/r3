@@ -2,14 +2,17 @@
 #define _R3_SERVER_INSTANCE_HPP_
 
 #include "net/service.hpp"
-//#include "pgc/connection.hpp"
 #include "r3/data.hpp"
 #include "r3/logic/server/connection.hpp"
 #include "r3/server/sessionManager.hpp"
 #include "r3/server/threadLocalStorage.hpp"
+#include "r3/rightFillerServer.hpp"
 
 namespace r3
 {
+
+
+	//////////////////////////////////////////////////////////////////////////
 	namespace server
 	{
 		class Instance

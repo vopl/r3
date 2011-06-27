@@ -96,6 +96,8 @@ namespace workers
 	//////////////////////////////////////////////////////////////////////////
 	void WProtocol::processContext(Context ctx, bool isServer)
 	{
+		Console::Out::WriteLine(("process context "+ctx->getName()+" for "+(isServer?"server":"client")).c_str());
+
 		string parentType;
 		if(Context(ctx->getParent())) parentType = evalContextPath(Context(ctx->getParent()), isServer, cpt_classScope);
 		else parentType = "void";
@@ -245,6 +247,20 @@ namespace workers
 				hpp<<"typedef r3::protocol::server::"<<evalContextPath(ctx, true, cpt_classScope)<<"::Right_"<<right->getName()<<" Right_"<<right->getName()<<";\n";
 			}
 		}
+		hpp<<endl;
+
+		//перечисление прав
+		hpp<<"// перечисление прав\n";
+		hpp<<"template <class Oper>\n";
+		hpp<<"static size_t enumRights(Oper &oper)\n";
+		hpp<<"{\n";
+		BOOST_FOREACH(R3Meta_BON::Right right, ctx->getRight())
+		{
+			hpp<<"oper(Right_"<<right->getName()<<"());\n";
+		}
+
+		hpp<<"return "<<ctx->getRight().size()<<";\n";
+		hpp<<"}\n";
 		hpp<<endl;
 
 		// конструктор

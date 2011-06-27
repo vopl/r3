@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="server"
-	ProjectGUID="{AC9E7E4E-5D59-465B-87E8-E69D911A2514}"
-	RootNamespace="server"
+	Name="victim"
+	ProjectGUID="{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}"
+	RootNamespace="victim"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="0"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,8 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,7 +60,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../Debug/libpgc.lib ../Debug/libnet.lib ../Debug/libmodel.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -116,8 +114,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../include;../src"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -135,7 +132,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../Release/libpgc.lib ../Release/libnet.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -175,10 +171,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\server.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -198,6 +190,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\victim.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -208,6 +204,10 @@
 				RelativePath=".\stdafx.h"
 				>
 			</File>
+			<File
+				RelativePath=".\targetver.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -215,70 +215,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
-		<Filter
-			Name="src"
+		<File
+			RelativePath=".\ReadMe.txt"
 			>
-			<Filter
-				Name="r3"
-				>
-				<File
-					RelativePath="..\src\r3\rightFillerServer.hpp"
-					>
-				</File>
-				<Filter
-					Name="server"
-					>
-					<File
-						RelativePath="..\src\r3\server\instance.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\r3\server\instance.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\r3\server\sessionManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\r3\server\sessionManager.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\r3\server\threadLocalStorage.hpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="logic"
-					>
-					<Filter
-						Name="server"
-						>
-						<File
-							RelativePath="..\src\r3\logic\server\connection.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\r3\logic\server\connection.hpp"
-							>
-						</File>
-						<Filter
-							Name="connection"
-							>
-							<File
-								RelativePath="..\src\r3\logic\server\connection\session.cpp"
-								>
-							</File>
-							<File
-								RelativePath="..\src\r3\logic\server\connection\session.hpp"
-								>
-							</File>
-						</Filter>
-					</Filter>
-				</Filter>
-			</Filter>
-		</Filter>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
