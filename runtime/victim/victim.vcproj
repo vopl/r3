@@ -224,6 +224,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\litesql\compatibility.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\litesql\compatibility.hpp"
 				>
 			</File>
@@ -262,6 +274,18 @@
 			<File
 				RelativePath=".\litesql\expr.hpp"
 				>
+			</File>
+			<File
+				RelativePath=".\litesql\field.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\litesql\field.hpp"
