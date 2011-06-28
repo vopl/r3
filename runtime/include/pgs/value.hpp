@@ -1,7 +1,7 @@
 #ifndef _PGS_VALUE_HPP_
 #define _PGS_VALUE_HPP_
 
-#include "pgs/atom.hpp"
+#include "pgs/expr.hpp"
 
 namespace pgs
 {
@@ -24,9 +24,8 @@ namespace pgs
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class CppType>
 	class Value
-		: public Atom<CppType>
+		: public Expr
 	{
 // 		union
 // 		{
@@ -36,10 +35,18 @@ namespace pgs
 // 
 // 		int		_dataMode;
 	public:
-		Value(const CppType *v=NULL, int dataMode = dsm_ptr|ddm_drop|dom_own);
+		Value();
+
+		template <class CppType>
+		Value(const CppType *v, int dataMode = dsm_ptr|ddm_drop|dom_own);
+
+		template <class CppType>
 		void set(const CppType *v=NULL, int dataMode = dsm_ptr|ddm_drop|dom_own);
 
+		template <class CppType>
 		Value(const CppType &v, int dataMode = dsm_value);
+
+		template <class CppType>
 		void set(const CppType &v, int dataMode = dsm_value);
 
 		~Value();

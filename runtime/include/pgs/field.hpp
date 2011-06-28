@@ -1,14 +1,13 @@
 #ifndef _PGS_FIELD_HPP_
 #define _PGS_FIELD_HPP_
 
-#include "pgs/atom.hpp"
+#include "pgs/expr.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	template <class CppType>
 	class Field
-		: public Atom<CppType>
+		: public Expr
 	{
 
 // 		string _table;

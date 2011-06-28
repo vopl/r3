@@ -1,21 +1,18 @@
 #ifndef _PGS_SUGAR_HPP_
 #define _PGS_SUGAR_HPP_
 
-#include "pgs/atom.hpp"
-#include "pgs/value.hpp"
-#include "pgs/field.hpp"
-#include "pgs/select.hpp"
+#include "pgs/expr.hpp"
 
 namespace pgs
 {
-	Where operator==(const Atom<int> &v1, const Atom<int> &v2)
+	Expr operator==(const Expr &v1, const Expr &v2)
 	{
-		return v1.eq(v2);
+		return eq(v1, v2);
 	}
 
-	Where operator||(const Where &v1, const Where &v2)
+	Expr operator||(const Expr &v1, const Expr &v2)
 	{
-		return v1.or(v2);
+		return or(v1, v2);
 	}
 }
 #endif

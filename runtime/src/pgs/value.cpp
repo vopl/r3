@@ -4,39 +4,35 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	Value<CppType>::Value(const CppType *v, int dataMode)
+	Value::Value(const CppType *v, int dataMode)
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	void Value<CppType>::set(const CppType *v, int dataMode)
+	void Value::set(const CppType *v, int dataMode)
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	Value<CppType>::Value(const CppType &v, int dataMode)
+	Value::Value(const CppType &v, int dataMode)
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	void Value<CppType>::set(const CppType &v, int dataMode)
+	void Value::set(const CppType &v, int dataMode)
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class CppType>
-	Value<CppType>::~Value()
+	Value::~Value()
 	{
 
 	}
 }
-
-#include "instantiate4pgctypes.hpp"
-INSTANTIATE4PGCTYPES(pgs::Value)

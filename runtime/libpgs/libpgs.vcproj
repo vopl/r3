@@ -197,7 +197,7 @@
 				Name="pgs"
 				>
 				<File
-					RelativePath="..\include\pgs\atom.hpp"
+					RelativePath="..\include\pgs\expr.hpp"
 					>
 				</File>
 				<File
@@ -229,7 +229,7 @@
 				Name="pgs"
 				>
 				<File
-					RelativePath="..\src\pgs\atom.cpp"
+					RelativePath="..\src\pgs\expr.cpp"
 					>
 				</File>
 				<File
