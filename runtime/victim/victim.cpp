@@ -7,16 +7,22 @@
 
 #include "pgs/sugar.hpp"
 
+struct SS
+{
+
+};
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	{
 		using namespace pgs;
 
-		Data<int> d1;
+		Value<int> v1;
+		Field<int> f1("fn1", "tn1", "sn1", "tid1");
+		Field<int> f2("fn2", "tn2", "sn2", "tid2");
 
 		Select s;
-		s.set(Field<int>() == Value<int>(d1) || Value<int>(10) == Field<int>());
+		s.set( f1 == v1 || Value<int>(10) == f2);
 
 		//d1.set(220);
 		//s.bind(executor)

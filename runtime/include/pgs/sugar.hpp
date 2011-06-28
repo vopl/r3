@@ -2,7 +2,6 @@
 #define _PGS_SUGAR_HPP_
 
 #include "pgs/atom.hpp"
-#include "pgs/data.hpp"
 #include "pgs/value.hpp"
 #include "pgs/field.hpp"
 #include "pgs/select.hpp"

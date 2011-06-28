@@ -1,6 +1,8 @@
 #ifndef _PGS_FIELD_HPP_
 #define _PGS_FIELD_HPP_
 
+#include "pgs/atom.hpp"
+
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -8,12 +10,12 @@ namespace pgs
 	class Field
 		: public Atom<CppType>
 	{
+
 // 		string _table;
 // 		string _name;
 	public:
-		Field()
-		{
-		}
+		Field(const char *field, const char *table, const char *schema, const char *tableId=NULL);
+		~Field();
 	};
 
 }

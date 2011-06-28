@@ -1,6 +1,8 @@
 #ifndef _PGS_SELECT_HPP_
 #define _PGS_SELECT_HPP_
 
+#include "pgs/where.hpp"
+
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////

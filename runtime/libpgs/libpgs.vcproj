@@ -41,11 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories=".;../include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -200,10 +201,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\pgs\data.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\include\pgs\field.hpp"
 					>
 				</File>
@@ -221,6 +218,42 @@
 				</File>
 				<File
 					RelativePath="..\include\pgs\where.hpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="src"
+			>
+			<Filter
+				Name="pgs"
+				>
+				<File
+					RelativePath="..\src\pgs\atom.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\field.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\instantiate4pgctypes.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\select.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\sugar.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\value.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\where.cpp"
 					>
 				</File>
 			</Filter>
