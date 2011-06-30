@@ -3,17 +3,29 @@
 
 #include "pgs/expr.hpp"
 #include <vector>
+#include <boost/enable_shared_from_this.hpp>
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
+	class ExprImpl;
+	typedef boost::shared_ptr<ExprImpl> ExprImpl_ptr;
+
+	//////////////////////////////////////////////////////////////////////////
+	class ContainerImpl;
+	typedef boost::shared_ptr<ContainerImpl> ContainerImpl_ptr;
+
+
+	//////////////////////////////////////////////////////////////////////////
 	class ExprImpl
+		: public boost::enable_shared_from_this<ExprImpl>
 	{
 	protected:
 		ExprImpl();
 
 	public:
-		virtual void mkSql(std::string &result);
+		virtual void reg(ContainerImpl_ptr *c) =0;
+		virtual void mkSql(std::string &result) =0;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -27,6 +39,7 @@ namespace pgs
 		ExprImpl_op1(const char *name, const Expr &a, bool isPre=true);
 		~ExprImpl_op1();
 
+		virtual void reg(ContainerImpl_ptr *c);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -41,6 +54,7 @@ namespace pgs
 		ExprImpl_op2(const char *name, const Expr &a, const Expr &b);
 		~ExprImpl_op2();
 
+		virtual void reg(ContainerImpl_ptr *c);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -52,6 +66,7 @@ namespace pgs
 		ExprImpl_op3(const char *name1, const char *name2, const Expr &a, const Expr &b, const Expr &c);
 		~ExprImpl_op3();
 
+		virtual void reg(ContainerImpl_ptr *c);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -69,6 +84,7 @@ namespace pgs
 
 		void pushArg(const Expr &a);
 
+		virtual void reg(ContainerImpl_ptr *c);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -83,6 +99,7 @@ namespace pgs
 		void pushPair(const Expr &c, const Expr &r);
 		void pushElse(const Expr &e);
 
+		virtual void reg(ContainerImpl_ptr *c);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -97,6 +114,7 @@ namespace pgs
 		void pushPair(const Expr &v, const Expr &r);
 		void pushElse(const Expr &e);
 
+		virtual void reg(ContainerImpl_ptr *c);
 		virtual void mkSql(std::string &result);
 	};
 

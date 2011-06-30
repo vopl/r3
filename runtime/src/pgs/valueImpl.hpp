@@ -45,7 +45,8 @@ namespace pgs
 
 		~ValueImpl();
 
-		void mkSql(std::string &result);
+		virtual void reg(ContainerImpl_ptr *c);
+		virtual void mkSql(std::string &result);
 	};
 
 

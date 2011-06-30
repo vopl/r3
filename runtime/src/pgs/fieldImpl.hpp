@@ -18,7 +18,8 @@ namespace pgs
 		FieldImpl(const char *field, const char *table, const char *schema, const char *tableId=NULL);
 		~FieldImpl();
 
-		void mkSql(std::string &result);
+		virtual void reg(ContainerImpl_ptr *c);
+		virtual void mkSql(std::string &result);
 	};
 
 }
