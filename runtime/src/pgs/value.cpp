@@ -4,6 +4,13 @@
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
+	Value::Value()
+		: Expr(ExprImpl_ptr(new ValueImpl()))
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
 	Value::Value(const CppType *v, int dataMode)
 		: Expr(ExprImpl_ptr(new ValueImpl(v, dataMode)))
@@ -39,3 +46,14 @@ namespace pgs
 
 	}
 }
+
+
+#define INST_METHOD template pgs::Value::Value(const PGCTYPE *v, int dataMode);
+#include "instantiate4pgctypes.hpp"
+#define INST_METHOD template void pgs::Value::set(const PGCTYPE *v, int dataMode);
+#include "instantiate4pgctypes.hpp"
+
+#define INST_METHOD template pgs::Value::Value(const PGCTYPE &v, int dataMode);
+#include "instantiate4pgctypes.hpp"
+#define INST_METHOD template void pgs::Value::set(const PGCTYPE &v, int dataMode);
+#include "instantiate4pgctypes.hpp"

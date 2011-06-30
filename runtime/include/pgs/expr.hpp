@@ -13,8 +13,10 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	class Expr
 	{
+		ExprImpl_ptr _impl;
 	public:
 		Expr(ExprImpl_ptr impl);
+		~Expr();
 	};
 
 

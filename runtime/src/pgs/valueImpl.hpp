@@ -27,5 +27,33 @@ namespace pgs
 		~ValueImpl();
 	};
 
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class CppType>
+	ValueImpl::ValueImpl(const CppType *v, int dataMode)
+	{
+		assert(0);
+	}
+
+	template <class CppType>
+	void ValueImpl::set(const CppType *v, int dataMode)
+	{
+		assert(0);
+	}
+
+	template <class CppType>
+	ValueImpl::ValueImpl(const CppType &v, int dataMode)
+	{
+		assert(0);
+	}
+
+	template <class CppType>
+	void ValueImpl::set(const CppType &v, int dataMode)
+	{
+		assert(0);
+	}
+
+
 }
 #endif

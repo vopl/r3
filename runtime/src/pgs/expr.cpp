@@ -3,18 +3,35 @@
 
 namespace pgs
 {
+	//////////////////////////////////////////////////////////////////////////
+	Expr::Expr(ExprImpl_ptr impl)
+		: _impl(impl)
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Expr::~Expr()
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	Expr op1_pre(const char *name, const Expr &a)
 	{
 		return Expr(ExprImpl_ptr(new ExprImpl_op1(name, a, true)));
 	}
+	//////////////////////////////////////////////////////////////////////////
 	Expr op1_post(const char *name, const Expr &a)
 	{
 		return Expr(ExprImpl_ptr(new ExprImpl_op1(name, a, false)));
 	}
+	//////////////////////////////////////////////////////////////////////////
 	Expr op2(const char *name, const Expr &a, const Expr &b)
 	{
 		return Expr(ExprImpl_ptr(new ExprImpl_op2(name, a, b)));
 	}
+	//////////////////////////////////////////////////////////////////////////
 	Expr op3(const char *name1, const char *name2, const Expr &a, const Expr &b, const Expr &c)
 	{
 		return Expr(ExprImpl_ptr(new ExprImpl_op3(name1, name2, a, b, c)));
