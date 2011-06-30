@@ -1,48 +1,28 @@
 #include "pgs/expr.hpp"
 #include "exprImpl.hpp"
+#include "exprAccess.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Expr::Expr(ExprImpl_ptr impl)
-		: _impl(impl)
-	{
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Expr::~Expr()
-	{
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Expr::mkSql(std::string &result)
-	{
-		assert(_impl);
-		_impl->mkSql(result);
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
 	Expr op1_pre(const char *name, const Expr &a)
 	{
-		return Expr(ExprImpl_ptr(new ExprImpl_op1(name, a, true)));
+		return ExprAccess(ExprImpl_ptr(new ExprImpl_op1(name, a, true)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expr op1_post(const char *name, const Expr &a)
 	{
-		return Expr(ExprImpl_ptr(new ExprImpl_op1(name, a, false)));
+		return ExprAccess(ExprImpl_ptr(new ExprImpl_op1(name, a, false)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expr op2(const char *name, const Expr &a, const Expr &b)
 	{
-		return Expr(ExprImpl_ptr(new ExprImpl_op2(name, a, b)));
+		return ExprAccess(ExprImpl_ptr(new ExprImpl_op2(name, a, b)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expr op3(const char *name1, const char *name2, const Expr &a, const Expr &b, const Expr &c)
 	{
-		return Expr(ExprImpl_ptr(new ExprImpl_op3(name1, name2, a, b, c)));
+		return ExprAccess(ExprImpl_ptr(new ExprImpl_op3(name1, name2, a, b, c)));
 	}
 
 
@@ -212,7 +192,7 @@ namespace pgs
 	Expr func(const char *name)
 	{
 		ExprImpl_func *p = new ExprImpl_func(name);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -220,7 +200,7 @@ namespace pgs
 	{
 		ExprImpl_func *p = new ExprImpl_func(name);
 		p->pushArg(a);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -229,7 +209,7 @@ namespace pgs
 		ExprImpl_func *p = new ExprImpl_func(name);
 		p->pushArg(a);
 		p->pushArg(b);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -239,7 +219,7 @@ namespace pgs
 		p->pushArg(a);
 		p->pushArg(b);
 		p->pushArg(c);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -250,7 +230,7 @@ namespace pgs
 		p->pushArg(b);
 		p->pushArg(c);
 		p->pushArg(d);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -282,7 +262,7 @@ namespace pgs
 	{
 		ExprImpl_casec *p = new ExprImpl_casec();
 		p->pushPair(c1, r1);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -291,7 +271,7 @@ namespace pgs
 		ExprImpl_casec *p = new ExprImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushElse(el);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -300,7 +280,7 @@ namespace pgs
 		ExprImpl_casec *p = new ExprImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -310,7 +290,7 @@ namespace pgs
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushElse(el);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -320,7 +300,7 @@ namespace pgs
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -331,7 +311,7 @@ namespace pgs
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
 		p->pushElse(el);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -342,7 +322,7 @@ namespace pgs
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
 		p->pushPair(c4, r4);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -354,7 +334,7 @@ namespace pgs
 		p->pushPair(c3, r3);
 		p->pushPair(c4, r4);
 		p->pushElse(el);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -362,7 +342,7 @@ namespace pgs
 	{
 		ExprImpl_casee *p = new ExprImpl_casee(e);
 		p->pushPair(v1, r1);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -371,7 +351,7 @@ namespace pgs
 		ExprImpl_casee *p = new ExprImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushElse(el);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -380,7 +360,7 @@ namespace pgs
 		ExprImpl_casee *p = new ExprImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -390,7 +370,7 @@ namespace pgs
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushElse(el);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -400,7 +380,7 @@ namespace pgs
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -411,7 +391,7 @@ namespace pgs
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
 		p->pushElse(el);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -422,7 +402,7 @@ namespace pgs
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
 		p->pushPair(v4, r4);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -434,7 +414,7 @@ namespace pgs
 		p->pushPair(v3, r3);
 		p->pushPair(v4, r4);
 		p->pushElse(el);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -442,7 +422,7 @@ namespace pgs
 	{
 		ExprImpl_func *p = new ExprImpl_func("IN");
 		p->pushArg(v1);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -451,7 +431,7 @@ namespace pgs
 		ExprImpl_func *p = new ExprImpl_func("IN");
 		p->pushArg(v1);
 		p->pushArg(v2);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -461,7 +441,7 @@ namespace pgs
 		p->pushArg(v1);
 		p->pushArg(v2);
 		p->pushArg(v3);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -472,7 +452,7 @@ namespace pgs
 		p->pushArg(v2);
 		p->pushArg(v3);
 		p->pushArg(v4);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -480,7 +460,7 @@ namespace pgs
 	{
 		ExprImpl_func *p = new ExprImpl_func("ANY");
 		p->pushArg(a);
-		return Expr(ExprImpl_ptr(p));
+		return ExprAccess(ExprImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

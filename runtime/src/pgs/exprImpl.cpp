@@ -1,4 +1,5 @@
 #include "exprImpl.hpp"
+#include "exprAccess.hpp"
 
 namespace pgs
 {
@@ -18,7 +19,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	ExprImpl_op1::ExprImpl_op1(const char *name, const Expr &a, bool isPre)
 		: _name(name)
-		, _a(a)
+		, _a(ExprAccess(a))
 		, _isPre(isPre)
 	{
 	}
@@ -37,8 +38,8 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	ExprImpl_op2::ExprImpl_op2(const char *name, const Expr &a, const Expr &b)
 		: _name(name)
-		, _a(a)
-		, _b(b)
+		, _a(ExprAccess(a))
+		, _b(ExprAccess(b))
 	{
 	}
 
@@ -51,9 +52,9 @@ namespace pgs
 	void ExprImpl_op2::mkSql(std::string &result)
 	{
 		result += "(";
-		_a.mkSql(result);
+		_a->mkSql(result);
 		result += _name;
-		_b.mkSql(result);
+		_b->mkSql(result);
 		result += ")";
 	}
 
@@ -89,7 +90,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	void ExprImpl_func::pushArg(const Expr &a)
 	{
-		_args.push_back(a);
+		_args.push_back(ExprAccess(a));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -103,7 +104,7 @@ namespace pgs
 			{
 				result += ",";
 			}
-			_args[i].mkSql(result);
+			_args[i]->mkSql(result);
 		}
 		result += ")";
 	}

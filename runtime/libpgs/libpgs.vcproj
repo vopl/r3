@@ -233,6 +233,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\exprAccess.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\exprAccess.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\exprImpl.cpp"
 					>
 				</File>

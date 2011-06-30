@@ -1,11 +1,12 @@
 #include "pgs/value.hpp"
 #include "valueImpl.hpp"
+#include "exprAccess.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Value::Value()
-		: Expr(ExprImpl_ptr(new ValueImpl()))
+		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl())))
 	{
 
 	}
@@ -13,7 +14,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
 	Value::Value(const CppType *v, int dataMode)
-		: Expr(ExprImpl_ptr(new ValueImpl(v, dataMode)))
+		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(v, dataMode))))
 	{
 
 	}
@@ -28,7 +29,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
 	Value::Value(const CppType &v, int dataMode)
-		: Expr(ExprImpl_ptr(new ValueImpl(v, dataMode)))
+		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(v, dataMode))))
 	{
 
 	}

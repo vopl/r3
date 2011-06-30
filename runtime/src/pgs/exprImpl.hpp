@@ -21,7 +21,7 @@ namespace pgs
 		: public ExprImpl
 	{
 		std::string	_name;
-		Expr		_a;
+		ExprImpl_ptr		_a;
 		bool		_isPre;
 	public:
 		ExprImpl_op1(const char *name, const Expr &a, bool isPre=true);
@@ -35,8 +35,8 @@ namespace pgs
 		: public ExprImpl
 	{
 		std::string	_name;
-		Expr		_a;
-		Expr		_b;
+		ExprImpl_ptr		_a;
+		ExprImpl_ptr		_b;
 	public:
 		ExprImpl_op2(const char *name, const Expr &a, const Expr &b);
 		~ExprImpl_op2();
@@ -61,7 +61,7 @@ namespace pgs
 	{
 		std::string			_name;
 
-		typedef std::vector<Expr> TVArgs;
+		typedef std::vector<ExprImpl_ptr> TVArgs;
 		TVArgs _args;
 	public:
 		ExprImpl_func(const char *name);

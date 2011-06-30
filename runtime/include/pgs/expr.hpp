@@ -1,5 +1,5 @@
-#ifndef _PGS_ATOM_HPP_
-#define _PGS_ATOM_HPP_
+#ifndef _PGS_EXPR_HPP_
+#define _PGS_EXPR_HPP_
 
 #include <boost/shared_ptr.hpp>
 
@@ -10,12 +10,8 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	class Expr
 	{
+	protected:
 		ExprImpl_ptr _impl;
-	public:
-		Expr(ExprImpl_ptr impl);
-		~Expr();
-
-		void mkSql(std::string &result);
 	};
 
 
