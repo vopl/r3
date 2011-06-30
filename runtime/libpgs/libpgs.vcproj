@@ -269,6 +269,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\statementImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\statementImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\sugar.cpp"
 					>
 				</File>

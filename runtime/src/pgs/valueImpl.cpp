@@ -22,6 +22,7 @@ namespace pgs
 		, _data(NULL)
 		, _cdt(0)
 		, _dataDeleter(NULL)
+		, _number(0)
 	{
 	}
 
@@ -32,7 +33,14 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ValueImpl::reg(ContainerImpl_ptr *c)
+	void ValueImpl::setNumber(size_t num)
+	{
+		_number = num;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	void ValueImpl::reg(StatementImpl *s)
 	{
 		assert(0);
 	}

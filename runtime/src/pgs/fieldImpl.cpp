@@ -17,7 +17,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void FieldImpl::reg(ContainerImpl_ptr *c)
+	void FieldImpl::reg(StatementImpl *s)
 	{
 		assert(0);
 	}

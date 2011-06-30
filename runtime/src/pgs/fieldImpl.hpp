@@ -18,9 +18,11 @@ namespace pgs
 		FieldImpl(const char *field, const char *table, const char *schema, const char *tableId=NULL);
 		~FieldImpl();
 
-		virtual void reg(ContainerImpl_ptr *c);
+		virtual void reg(StatementImpl *s);
 		virtual void mkSql(std::string &result);
 	};
+
+	typedef boost::shared_ptr<FieldImpl> FieldImpl_ptr;
 
 }
 #endif

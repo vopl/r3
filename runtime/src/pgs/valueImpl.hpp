@@ -14,6 +14,7 @@ namespace pgs
 		int		_dataMode;
 		const void	*_data;
 		int		_cdt;
+		size_t	_number;
 
 		typedef void (ValueImpl:: *TDataDeleter)();
 
@@ -45,9 +46,12 @@ namespace pgs
 
 		~ValueImpl();
 
-		virtual void reg(ContainerImpl_ptr *c);
+		void setNumber(size_t num);
+
+		virtual void reg(StatementImpl *s);
 		virtual void mkSql(std::string &result);
 	};
+	typedef boost::shared_ptr<ValueImpl> ValueImpl_ptr;
 
 
 	//////////////////////////////////////////////////////////////////////////

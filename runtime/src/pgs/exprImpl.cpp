@@ -30,7 +30,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ExprImpl_op1::reg(ContainerImpl_ptr *c)
+	void ExprImpl_op1::reg(StatementImpl *s)
 	{
 		assert(0);
 	}
@@ -55,7 +55,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ExprImpl_op2::reg(ContainerImpl_ptr *c)
+	void ExprImpl_op2::reg(StatementImpl *s)
 	{
 		assert(0);
 	}
@@ -83,7 +83,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ExprImpl_op3::reg(ContainerImpl_ptr *c)
+	void ExprImpl_op3::reg(StatementImpl *s)
 	{
 		assert(0);
 	}
@@ -112,7 +112,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ExprImpl_func::reg(ContainerImpl_ptr *c)
+	void ExprImpl_func::reg(StatementImpl *s)
 	{
 		assert(0);
 	}
@@ -158,7 +158,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ExprImpl_casec::reg(ContainerImpl_ptr *c)
+	void ExprImpl_casec::reg(StatementImpl *s)
 	{
 		assert(0);
 	}
@@ -194,7 +194,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ExprImpl_casee::reg(ContainerImpl_ptr *c)
+	void ExprImpl_casee::reg(StatementImpl *s)
 	{
 		assert(0);
 	}

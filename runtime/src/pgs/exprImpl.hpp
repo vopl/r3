@@ -12,8 +12,7 @@ namespace pgs
 	typedef boost::shared_ptr<ExprImpl> ExprImpl_ptr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ContainerImpl;
-	typedef boost::shared_ptr<ContainerImpl> ContainerImpl_ptr;
+	class StatementImpl;
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -24,7 +23,7 @@ namespace pgs
 		ExprImpl();
 
 	public:
-		virtual void reg(ContainerImpl_ptr *c) =0;
+		virtual void reg(StatementImpl *s) =0;
 		virtual void mkSql(std::string &result) =0;
 	};
 
@@ -32,14 +31,14 @@ namespace pgs
 	class ExprImpl_op1
 		: public ExprImpl
 	{
-		std::string	_name;
-		ExprImpl_ptr		_a;
-		bool		_isPre;
+		std::string		_name;
+		ExprImpl_ptr	_a;
+		bool			_isPre;
 	public:
 		ExprImpl_op1(const char *name, const Expr &a, bool isPre=true);
 		~ExprImpl_op1();
 
-		virtual void reg(ContainerImpl_ptr *c);
+		virtual void reg(StatementImpl *s);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -47,14 +46,14 @@ namespace pgs
 	class ExprImpl_op2
 		: public ExprImpl
 	{
-		std::string	_name;
-		ExprImpl_ptr		_a;
-		ExprImpl_ptr		_b;
+		std::string		_name;
+		ExprImpl_ptr	_a;
+		ExprImpl_ptr	_b;
 	public:
 		ExprImpl_op2(const char *name, const Expr &a, const Expr &b);
 		~ExprImpl_op2();
 
-		virtual void reg(ContainerImpl_ptr *c);
+		virtual void reg(StatementImpl *s);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -66,7 +65,7 @@ namespace pgs
 		ExprImpl_op3(const char *name1, const char *name2, const Expr &a, const Expr &b, const Expr &c);
 		~ExprImpl_op3();
 
-		virtual void reg(ContainerImpl_ptr *c);
+		virtual void reg(StatementImpl *s);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -74,7 +73,7 @@ namespace pgs
 	class ExprImpl_func
 		: public ExprImpl
 	{
-		std::string			_name;
+		std::string	_name;
 
 		typedef std::vector<ExprImpl_ptr> TVArgs;
 		TVArgs _args;
@@ -84,7 +83,7 @@ namespace pgs
 
 		void pushArg(const Expr &a);
 
-		virtual void reg(ContainerImpl_ptr *c);
+		virtual void reg(StatementImpl *s);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -99,7 +98,7 @@ namespace pgs
 		void pushPair(const Expr &c, const Expr &r);
 		void pushElse(const Expr &e);
 
-		virtual void reg(ContainerImpl_ptr *c);
+		virtual void reg(StatementImpl *s);
 		virtual void mkSql(std::string &result);
 	};
 
@@ -114,7 +113,7 @@ namespace pgs
 		void pushPair(const Expr &v, const Expr &r);
 		void pushElse(const Expr &e);
 
-		virtual void reg(ContainerImpl_ptr *c);
+		virtual void reg(StatementImpl *s);
 		virtual void mkSql(std::string &result);
 	};
 

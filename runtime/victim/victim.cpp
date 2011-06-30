@@ -9,8 +9,8 @@
 #include "pgs/value.hpp"
 #include "pgs/field.hpp"
 
+#include "../src/pgs/statementImpl.hpp"
 #include "../src/pgs/exprAccess.hpp"
-#include "../src/pgs/exprImpl.hpp"
 
 struct SS
 {
@@ -28,9 +28,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		Expr e = f1 == v1 || Value(10) == f2 && Value(2)==any(f2);
 
-		std::string sql;
-		ExprAccess(e).impl()->mkSql(sql);
-		std::cout<<sql<<std::endl;
+		StatementImpl s;
+
+		s.addExpr(ExprAccess(e));
+		s.compile();
 
 		//d1.set(220);
 		//s.bind(executor)
