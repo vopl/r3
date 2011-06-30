@@ -17,6 +17,14 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void Expr::mkSql(std::string &result)
+	{
+		assert(_impl);
+		_impl->mkSql(result);
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	Expr op1_pre(const char *name, const Expr &a)
 	{
 		return Expr(ExprImpl_ptr(new ExprImpl_op1(name, a, true)));
@@ -41,19 +49,19 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	Expr and(const Expr &a, const Expr &b)
 	{
-		return op2("AND", a, b);
+		return op2(" AND ", a, b);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expr or(const Expr &a, const Expr &b)
 	{
-		return op2("OR", a, b);
+		return op2(" OR ", a, b);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expr not(const Expr &a)
 	{
-		return op1_pre("NOT", a);
+		return op1_pre("NOT ", a);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -95,13 +103,13 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	Expr between(const Expr &a, const Expr &b, const Expr &c)
 	{
-		return op3("BETWEEN", "AND", a, b, c);
+		return op3("BETWEEN ", " AND ", a, b, c);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expr isNull(const Expr &a)
 	{
-		return op1_post("IS NULL", a);
+		return op1_post(" IS NULL", a);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -248,13 +256,13 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	Expr like(const Expr &a, const Expr &b)
 	{
-		return op2("LIKE", a, b);
+		return op2(" LIKE ", a, b);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expr similar(const Expr &a, const Expr &b)
 	{
-		return op2("SIMILAR TO", a, b);
+		return op2(" SIMILAR TO ", a, b);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -468,10 +476,10 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Expr eqAny(const Expr &a, const Expr &vs)
+	Expr any(const Expr &a)
 	{
-		ExprImpl_func *p = new ExprImpl_func("=ANY");
-		p->pushArg(vs);
+		ExprImpl_func *p = new ExprImpl_func("ANY");
+		p->pushArg(a);
 		return Expr(ExprImpl_ptr(p));
 	}
 

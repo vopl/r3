@@ -2,6 +2,8 @@
 #define _PGS_VALUEIMPL_HPP_
 
 #include "exprImpl.hpp"
+#include "pgs/value.hpp"
+#include "pgc/blob.hpp"
 
 namespace pgs
 {
@@ -9,6 +11,23 @@ namespace pgs
 	class ValueImpl
 		: public ExprImpl
 	{
+		int		_dataMode;
+		const void	*_data;
+		int		_cdt;
+
+		typedef void (ValueImpl:: *TDataDeleter)();
+
+		TDataDeleter _dataDeleter;
+
+
+		ValueImpl(const ValueImpl &);
+		void operator=(const ValueImpl &);
+
+		template <class CppType>
+		void dataDeleter();
+
+		void reset();
+
 	public:
 		ValueImpl();
 
@@ -25,33 +44,82 @@ namespace pgs
 		void set(const CppType &v, int dataMode = dsm_value);
 
 		~ValueImpl();
+
+		void mkSql(std::string &result);
 	};
 
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class CppType>
+	void ValueImpl::dataDeleter()
+	{
+		delete (CppType *)_data;
+	}
 
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
 	ValueImpl::ValueImpl(const CppType *v, int dataMode)
+		: _dataMode(0)
+		, _data(NULL)
+		, _cdt(0)
+		, _dataDeleter(NULL)
 	{
-		assert(0);
+		set(v, dataMode);
 	}
 
 	template <class CppType>
 	void ValueImpl::set(const CppType *v, int dataMode)
 	{
-		assert(0);
+		reset();
+
+		_dataMode = dataMode;
+		if(dm_isCopy & _dataMode)
+		{
+			if(v)
+			{
+				_dataDeleter = &ValueImpl::dataDeleter<CppType>;
+				_data = new CppType(*v);
+			}
+		}
+		else
+		{
+			if(dm_doDeleteOnFree & _dataMode)
+			{
+				_dataDeleter = &ValueImpl::dataDeleter<CppType>;
+			}
+			_data = v;
+		}
+		_cdt = pgc::CppDataType<CppType>::cdt_index;
 	}
 
 	template <class CppType>
 	ValueImpl::ValueImpl(const CppType &v, int dataMode)
+		: _dataMode(0)
+		, _data(NULL)
+		, _cdt(0)
+		, _dataDeleter(NULL)
 	{
-		assert(0);
+		set(v, dataMode);
 	}
 
 	template <class CppType>
 	void ValueImpl::set(const CppType &v, int dataMode)
 	{
-		assert(0);
+		reset();
+
+		_dataMode = dataMode;
+		if(dm_isCopy & _dataMode)
+		{
+			_dataDeleter = &ValueImpl::dataDeleter<CppType>;
+			_data = new CppType(v);
+		}
+		else
+		{
+			assert(!(dm_doDeleteOnFree & _dataMode));
+			_data = &v;
+		}
+		_cdt = pgc::CppDataType<CppType>::cdt_index;
 	}
 
 

@@ -47,6 +47,7 @@ namespace pgs
 	}
 }
 
+#include "pgc/cppDataType.hpp"
 
 #define INST_METHOD template pgs::Value::Value(const PGCTYPE *v, int dataMode);
 #include "instantiate4pgctypes.hpp"

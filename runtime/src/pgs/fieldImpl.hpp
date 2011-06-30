@@ -10,11 +10,15 @@ namespace pgs
 		: public ExprImpl
 	{
 
-		// 		string _table;
-		// 		string _name;
+		std::string _field;
+		std::string _table;
+		std::string _schema;
+		std::string _tableId;
 	public:
 		FieldImpl(const char *field, const char *table, const char *schema, const char *tableId=NULL);
 		~FieldImpl();
+
+		void mkSql(std::string &result);
 	};
 
 }

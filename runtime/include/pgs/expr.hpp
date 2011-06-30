@@ -1,10 +1,7 @@
 #ifndef _PGS_ATOM_HPP_
 #define _PGS_ATOM_HPP_
 
-#include "pgs/where.hpp"
 #include <boost/shared_ptr.hpp>
-#include <boost/static_assert.hpp>
-#include "pgc/cppDataType.hpp"
 
 namespace pgs
 {
@@ -17,6 +14,8 @@ namespace pgs
 	public:
 		Expr(ExprImpl_ptr impl);
 		~Expr();
+
+		void mkSql(std::string &result);
 	};
 
 
@@ -159,6 +158,6 @@ namespace pgs
 // 			expression operator ANY (subquery)
 // 
 // 			x =any(array)
-	Expr eqAny(const Expr &a, const Expr &vs);
+	Expr any(const Expr &a);
 }
 #endif

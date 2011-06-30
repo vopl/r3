@@ -4,13 +4,22 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	FieldImpl::FieldImpl(const char *field, const char *table, const char *schema, const char *tableId)
+		: _field(field)
+		, _table(table)
+		, _schema(schema)
+		, _tableId(tableId?tableId:table)
 	{
-		assert(0);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	FieldImpl::~FieldImpl()
 	{
-		assert(0);
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void FieldImpl::mkSql(std::string &result)
+	{
+		result += _field;
+	}
+
 }

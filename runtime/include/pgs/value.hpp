@@ -5,22 +5,16 @@
 
 namespace pgs
 {
-	enum EDataStorageMode
+	enum EDataMode
 	{
-		dsm_ptr=0,
-		dsm_value=1,
-	};
+		//владеет копией объекта
+		dm_isCopy = 1,
 
-	enum EDataDropMode
-	{
-		ddm_drop=0,
-		ddm_nodrop=1,
-	};
+		//надо разрушать при отсвобождении
+		dm_doDeleteOnFree = 2,
 
-	enum EDataOwnerMode
-	{
-		dom_own=0,
-		dom_alien=4,
+		//надо освобождать после первого использования
+		dm_doFreeAfterUse = 4,
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -31,16 +25,16 @@ namespace pgs
 		Value();
 
 		template <class CppType>
-		Value(const CppType *v, int dataMode = dsm_ptr|ddm_drop|dom_own);
+		Value(const CppType *v, int dataMode = dm_doFreeAfterUse);
 
 		template <class CppType>
-		void set(const CppType *v=NULL, int dataMode = dsm_ptr|ddm_drop|dom_own);
+		void set(const CppType *v=NULL, int dataMode = dm_doFreeAfterUse);
 
 		template <class CppType>
-		Value(const CppType &v, int dataMode = dsm_value);
+		Value(const CppType &v, int dataMode = dm_doFreeAfterUse);
 
 		template <class CppType>
-		void set(const CppType &v, int dataMode = dsm_value);
+		void set(const CppType &v, int dataMode = dm_doFreeAfterUse);
 
 		~Value();
 	};
