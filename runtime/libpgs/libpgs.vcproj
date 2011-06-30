@@ -233,7 +233,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\exprImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\field.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\fieldImpl.hpp"
 					>
 				</File>
 				<File
@@ -250,6 +258,10 @@
 				</File>
 				<File
 					RelativePath="..\src\pgs\value.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\valueImpl.hpp"
 					>
 				</File>
 				<File

@@ -27,13 +27,6 @@ namespace pgs
 	class Value
 		: public Expr
 	{
-// 		union
-// 		{
-// 			char			_data[sizeof(CppType)];
-// 			const CppType	*_ptr;
-// 		} _value;
-// 
-// 		int		_dataMode;
 	public:
 		Value();
 

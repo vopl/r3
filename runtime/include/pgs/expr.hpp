@@ -8,10 +8,13 @@
 
 namespace pgs
 {
+	class ExprImpl;
+	typedef boost::shared_ptr<ExprImpl> ExprImpl_ptr;
 	//////////////////////////////////////////////////////////////////////////
 	class Expr
 	{
 	public:
+		Expr(ExprImpl_ptr impl);
 	};
 
 
@@ -73,7 +76,7 @@ namespace pgs
 	Expr exp(const Expr &a, const Expr &b);
 	Expr sqrt(const Expr &a, const Expr &b);
 	Expr curt(const Expr &a, const Expr &b);
-	Expr fact(const Expr &a, const Expr &b);
+	Expr fact(const Expr &a);
 	Expr abs(const Expr &a);
 	Expr band(const Expr &a, const Expr &b);
 	Expr bor(const Expr &a, const Expr &b);
@@ -120,8 +123,11 @@ namespace pgs
 // 			END
 	Expr casec(const Expr &c1, const Expr &r1);
 	Expr casec(const Expr &c1, const Expr &r1, const Expr &el);
+	Expr casec(const Expr &c1, const Expr &r1, const Expr &c2, const Expr &r2);
 	Expr casec(const Expr &c1, const Expr &r1, const Expr &c2, const Expr &r2, const Expr &el);
+	Expr casec(const Expr &c1, const Expr &r1, const Expr &c2, const Expr &r2, const Expr &c3, const Expr &r3);
 	Expr casec(const Expr &c1, const Expr &r1, const Expr &c2, const Expr &r2, const Expr &c3, const Expr &r3, const Expr &el);
+	Expr casec(const Expr &c1, const Expr &r1, const Expr &c2, const Expr &r2, const Expr &c3, const Expr &r3, const Expr &c4, const Expr &r4);
 	Expr casec(const Expr &c1, const Expr &r1, const Expr &c2, const Expr &r2, const Expr &c3, const Expr &r3, const Expr &c4, const Expr &r4, const Expr &el);
 
 // 
@@ -132,8 +138,11 @@ namespace pgs
 // 			END
 	Expr casee(const Expr &e, const Expr &v1, const Expr &r1);
 	Expr casee(const Expr &e, const Expr &v1, const Expr &r1, const Expr &el);
+	Expr casee(const Expr &e, const Expr &v1, const Expr &r1, const Expr &v2, const Expr &r2);
 	Expr casee(const Expr &e, const Expr &v1, const Expr &r1, const Expr &v2, const Expr &r2, const Expr &el);
+	Expr casee(const Expr &e, const Expr &v1, const Expr &r1, const Expr &v2, const Expr &r2, const Expr &v3, const Expr &r3);
 	Expr casee(const Expr &e, const Expr &v1, const Expr &r1, const Expr &v2, const Expr &r2, const Expr &v3, const Expr &r3, const Expr &el);
+	Expr casee(const Expr &e, const Expr &v1, const Expr &r1, const Expr &v2, const Expr &r2, const Expr &v3, const Expr &r3, const Expr &v4, const Expr &r4);
 	Expr casee(const Expr &e, const Expr &v1, const Expr &r1, const Expr &v2, const Expr &r2, const Expr &v3, const Expr &r3, const Expr &v4, const Expr &r4, const Expr &el);
 
 // 
@@ -148,6 +157,6 @@ namespace pgs
 // 			expression operator ANY (subquery)
 // 
 // 			x =any(array)
-	Expr any(const Expr &a, const Expr &vs);
+	Expr eqAny(const Expr &a, const Expr &vs);
 }
 #endif

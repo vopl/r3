@@ -1,10 +1,12 @@
 #include "pgs/value.hpp"
+#include "valueImpl.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
 	Value::Value(const CppType *v, int dataMode)
+		: Expr(ExprImpl_ptr(new ValueImpl(v, dataMode)))
 	{
 
 	}
@@ -19,6 +21,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
 	Value::Value(const CppType &v, int dataMode)
+		: Expr(ExprImpl_ptr(new ValueImpl(v, dataMode)))
 	{
 
 	}
