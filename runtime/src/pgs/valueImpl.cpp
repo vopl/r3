@@ -1,4 +1,6 @@
 #include "valueImpl.hpp"
+#include "statementImpl.hpp"
+#include "utils/ntoa.hpp"
 
 namespace pgs
 {
@@ -42,13 +44,15 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	void ValueImpl::reg(StatementImpl *s)
 	{
-		assert(0);
+		s->regValue(boost::shared_static_cast<ValueImpl>(shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ValueImpl::mkSql(std::string &result)
 	{
-		result += "v";
+		result += "$";
+		char buf[32];
+		result += utils::_ntoa(_number, buf);
 	}
 
 }

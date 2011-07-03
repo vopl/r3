@@ -1,4 +1,5 @@
 #include "fieldImpl.hpp"
+#include "statementImpl.hpp"
 
 namespace pgs
 {
@@ -19,7 +20,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	void FieldImpl::reg(StatementImpl *s)
 	{
-		assert(0);
+		s->regField(boost::shared_static_cast<FieldImpl>(shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

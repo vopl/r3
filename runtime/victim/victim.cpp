@@ -26,7 +26,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		Field f1("fn1", "tn1", "sn1", "tid1");
 		Field f2("fn2", "tn2", "sn2", "tid2");
 
-		Expr e = f1 == v1 || Value(10) == f2 && Value(2)==any(f2);
+		Expr e = f1 == v1 || Value(10) == f2 && Value(2)==any(f2) && v1==any(f2);
 
 		StatementImpl s;
 
