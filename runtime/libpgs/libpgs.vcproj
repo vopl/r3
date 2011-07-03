@@ -205,6 +205,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\pgs\link.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\pgs\select.hpp"
 					>
 				</File>
@@ -258,6 +262,18 @@
 				</File>
 				<File
 					RelativePath="..\src\pgs\instantiate4pgctypes.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\link.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\linkImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\linkImpl.hpp"
 					>
 				</File>
 				<File

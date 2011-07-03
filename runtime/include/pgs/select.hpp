@@ -18,6 +18,7 @@ namespace pgs
 		~Select();
 
 		Select &what(Expr e);
+		//Select &from(Field f, Link l1, ...);
 		Select &where(Expr e);
 		Select &limit(Expr e);
 		Select &offset(Expr e);

@@ -31,6 +31,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		Select s((f1, f2, f2, AValue(20), v1));
 
 		s.where(e);
+		s.orderBy(e==AValue(220));
 		s.compile();
 
 		//d1.set(220);
