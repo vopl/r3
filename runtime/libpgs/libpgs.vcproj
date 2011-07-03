@@ -216,10 +216,6 @@
 					RelativePath="..\include\pgs\value.hpp"
 					>
 				</File>
-				<File
-					RelativePath="..\include\pgs\where.hpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -269,6 +265,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\selectImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\selectImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\statementImpl.cpp"
 					>
 				</File>
@@ -290,10 +294,6 @@
 				</File>
 				<File
 					RelativePath="..\src\pgs\valueImpl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\pgs\where.cpp"
 					>
 				</File>
 			</Filter>

@@ -5,8 +5,10 @@
 
 namespace pgs
 {
+	//////////////////////////////////////////////////////////////////////////
 	class ExprImpl;
 	typedef boost::shared_ptr<ExprImpl> ExprImpl_ptr;
+
 	//////////////////////////////////////////////////////////////////////////
 	class Expr
 	{
@@ -155,5 +157,8 @@ namespace pgs
 // 
 // 			x =any(array)
 	Expr any(const Expr &a);
+
+	Expr list(const Expr &v1, const Expr &v2);
+
 }
 #endif

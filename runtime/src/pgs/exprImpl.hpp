@@ -28,6 +28,35 @@ namespace pgs
 	};
 
 	//////////////////////////////////////////////////////////////////////////
+	class ExprImpl_list
+		: public ExprImpl
+	{
+		std::vector<ExprImpl_ptr> _list;
+	public:
+		ExprImpl_list();
+		~ExprImpl_list();
+
+		void push(const Expr &a);
+
+		virtual void reg(StatementImpl *s);
+		virtual void mkSql(std::string &result);
+	};
+	typedef boost::shared_ptr<ExprImpl_list> ExprImpl_list_ptr;
+
+	//////////////////////////////////////////////////////////////////////////
+	class ExprImpl_op0
+		: public ExprImpl
+	{
+		std::string		_name;
+	public:
+		ExprImpl_op0(const char *name);
+		~ExprImpl_op0();
+
+		virtual void reg(StatementImpl *s);
+		virtual void mkSql(std::string &result);
+	};
+
+	//////////////////////////////////////////////////////////////////////////
 	class ExprImpl_op1
 		: public ExprImpl
 	{

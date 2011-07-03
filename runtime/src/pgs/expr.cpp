@@ -464,5 +464,20 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	Expr list(const Expr &v1, const Expr &v2)
+	{
+		ExprImpl_list_ptr l1 = boost::shared_dynamic_cast<ExprImpl_list>(ExprAccess(v1).impl());
+		if(l1)
+		{
+			l1->push(v2);
+			return v1;
+		}
+
+		ExprImpl_list_ptr l(new ExprImpl_list);
+		l->push(v1);
+		l->push(v2);
+
+		return ExprAccess(l);
+	}
 
 }

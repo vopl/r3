@@ -13,5 +13,7 @@ namespace pgs
 
 	Expr operator!(const Expr &v1);
 
+	Expr operator,(const Expr &v1, const Expr &v2);
+
 }
 #endif

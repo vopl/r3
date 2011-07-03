@@ -11,10 +11,11 @@ namespace pgs
 	class ValueImpl
 		: public ExprImpl
 	{
-		int		_dataMode;
+		std::string	_name;
+		int			_dataMode;
 		const void	*_data;
-		int		_cdt;
-		size_t	_number;
+		int			_cdt;
+		size_t		_number;
 
 		typedef void (ValueImpl:: *TDataDeleter)();
 
@@ -30,19 +31,19 @@ namespace pgs
 		void reset();
 
 	public:
-		ValueImpl();
+		ValueImpl(const char *name);
 
 		template <class CppType>
-		ValueImpl(const CppType *v, int dataMode = dsm_ptr|ddm_drop|dom_own);
+		ValueImpl(const char *name, const CppType *v, int dataMode);
 
 		template <class CppType>
-		void set(const CppType *v=NULL, int dataMode = dsm_ptr|ddm_drop|dom_own);
+		void set(const CppType *v, int dataMode);
 
 		template <class CppType>
-		ValueImpl(const CppType &v, int dataMode = dsm_value);
+		ValueImpl(const char *name, const CppType &v, int dataMode);
 
 		template <class CppType>
-		void set(const CppType &v, int dataMode = dsm_value);
+		void set(const CppType &v, int dataMode);
 
 		~ValueImpl();
 
@@ -64,8 +65,9 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	ValueImpl::ValueImpl(const CppType *v, int dataMode)
-		: _dataMode(0)
+	ValueImpl::ValueImpl(const char *name, const CppType *v, int dataMode)
+		: _name(name)
+		, _dataMode(0)
 		, _data(NULL)
 		, _cdt(0)
 		, _dataDeleter(NULL)
@@ -99,8 +101,9 @@ namespace pgs
 	}
 
 	template <class CppType>
-	ValueImpl::ValueImpl(const CppType &v, int dataMode)
-		: _dataMode(0)
+	ValueImpl::ValueImpl(const char *name, const CppType &v, int dataMode)
+		: _name(name)
+		, _dataMode(0)
 		, _data(NULL)
 		, _cdt(0)
 		, _dataDeleter(NULL)

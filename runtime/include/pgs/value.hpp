@@ -22,21 +22,35 @@ namespace pgs
 		: public Expr
 	{
 	public:
-		Value();
+		Value(const char *name);
 
 		template <class CppType>
-		Value(const CppType *v, int dataMode = dm_doFreeAfterUse);
+		Value(const char *name, const CppType *v, int dataMode = dm_doFreeAfterUse);
 
 		template <class CppType>
 		void set(const CppType *v=NULL, int dataMode = dm_doFreeAfterUse);
 
 		template <class CppType>
-		Value(const CppType &v, int dataMode = dm_doFreeAfterUse);
+		Value(const char *name, const CppType &v, int dataMode = dm_doFreeAfterUse);
 
 		template <class CppType>
 		void set(const CppType &v, int dataMode = dm_doFreeAfterUse);
 
 		~Value();
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	class AValue
+		: public Value
+	{
+	public:
+		AValue();
+
+		template <class CppType>
+		AValue(const CppType *v, int dataMode = dm_doFreeAfterUse);
+
+		template <class CppType>
+		AValue(const CppType &v, int dataMode = dm_doFreeAfterUse);
 	};
 
 }

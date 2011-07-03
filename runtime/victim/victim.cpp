@@ -9,11 +9,11 @@
 #include "pgs/value.hpp"
 #include "pgs/field.hpp"
 
-#include "../src/pgs/statementImpl.hpp"
-#include "../src/pgs/exprAccess.hpp"
+#include "pgs/select.hpp"
 
 struct SS
 {
+
 
 };
 
@@ -22,15 +22,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		using namespace pgs;
 
-		Value v1;
+		Value v1("v1");
 		Field f1("fn1", "tn1", "sn1", "tid1");
 		Field f2("fn2", "tn2", "sn2", "tid2");
 
-		Expr e = f1 == v1 || Value(10) == f2 && Value(2)==any(f2) && v1==any(f2);
+		Expr e = f1 == v1 || AValue(10) == f2 && AValue(2)==any(f2) && v1==any(f2);
 
-		StatementImpl s;
+		Select s((f1, f2, f2, AValue(20), v1));
 
-		s.addExpr(ExprAccess(e));
+		s.where(e);
 		s.compile();
 
 		//d1.set(220);

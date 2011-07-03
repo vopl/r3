@@ -5,16 +5,18 @@
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Value::Value()
-		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl())))
+	Value::Value(const char *name)
+		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(name))))
 	{
 
 	}
 
+
+
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	Value::Value(const CppType *v, int dataMode)
-		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(v, dataMode))))
+	Value::Value(const char *name, const CppType *v, int dataMode)
+		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(name, v, dataMode))))
 	{
 
 	}
@@ -28,8 +30,8 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	Value::Value(const CppType &v, int dataMode)
-		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(v, dataMode))))
+	Value::Value(const char *name, const CppType &v, int dataMode)
+		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(name, v, dataMode))))
 	{
 
 	}
@@ -46,16 +48,49 @@ namespace pgs
 	{
 
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	AValue::AValue()
+		: Value("")
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class CppType>
+	AValue::AValue(const CppType *v, int dataMode)
+		: Value("", v, dataMode)
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class CppType>
+	AValue::AValue(const CppType &v, int dataMode)
+		: Value("", v, dataMode)
+	{
+
+	}
+
 }
 
 #include "pgc/cppDataType.hpp"
 
-#define INST_METHOD template pgs::Value::Value(const PGCTYPE *v, int dataMode);
+#define INST_METHOD template pgs::Value::Value(const char *name, const PGCTYPE *v, int dataMode);
 #include "instantiate4pgctypes.hpp"
 #define INST_METHOD template void pgs::Value::set(const PGCTYPE *v, int dataMode);
 #include "instantiate4pgctypes.hpp"
 
-#define INST_METHOD template pgs::Value::Value(const PGCTYPE &v, int dataMode);
+#define INST_METHOD template pgs::Value::Value(const char *name, const PGCTYPE &v, int dataMode);
 #include "instantiate4pgctypes.hpp"
 #define INST_METHOD template void pgs::Value::set(const PGCTYPE &v, int dataMode);
+#include "instantiate4pgctypes.hpp"
+
+
+
+
+#define INST_METHOD template pgs::AValue::AValue(const PGCTYPE *v, int dataMode);
+#include "instantiate4pgctypes.hpp"
+
+#define INST_METHOD template pgs::AValue::AValue(const PGCTYPE &v, int dataMode);
 #include "instantiate4pgctypes.hpp"

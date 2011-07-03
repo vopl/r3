@@ -17,10 +17,10 @@ namespace pgs
 		_dataMode = 0;
 	}
 
-
 	//////////////////////////////////////////////////////////////////////////
-	ValueImpl::ValueImpl()
-		: _dataMode(0)
+	ValueImpl::ValueImpl(const char *name)
+		: _name(name)
+		, _dataMode(0)
 		, _data(NULL)
 		, _cdt(0)
 		, _dataDeleter(NULL)

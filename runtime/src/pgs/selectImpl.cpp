@@ -1,41 +1,47 @@
-#include "pgs/sugar.hpp"
+#include "selectImpl.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Expr operator==(const Expr &v1, const Expr &v2)
+	SelectImpl::SelectImpl()
 	{
-		return eq(v1, v2);
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Expr operator!=(const Expr &v1, const Expr &v2)
+	SelectImpl::~SelectImpl()
 	{
-		return ne(v1, v2);
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Expr operator||(const Expr &v1, const Expr &v2)
+	void SelectImpl::setWhat(const ExprImpl_ptr &e)
 	{
-		return or(v1, v2);
+		addExpr(e);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Expr operator&&(const Expr &v1, const Expr &v2)
+	void SelectImpl::setWhere(const ExprImpl_ptr &e)
 	{
-		return and(v1, v2);
+		addExpr(e);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Expr operator!(const Expr &v1)
+	void SelectImpl::setLimit(const ExprImpl_ptr &e)
 	{
-		return not(v1);
+		addExpr(e);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Expr operator,(const Expr &v1, const Expr &v2)
+	void SelectImpl::setOffset(const ExprImpl_ptr &e)
 	{
-		return list(v1, v2);
+		addExpr(e);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void SelectImpl::setOrderBy(const ExprImpl_ptr &e)
+	{
+		addExpr(e);
 	}
 
 }
