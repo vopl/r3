@@ -55,6 +55,10 @@ void CategoryAttributePart::InitializeEx(CComPtr<IMgaProject>& pProject, CComPtr
 		m_crText = R3_ENUM_ATTRIBUTE_PART_COLOR;
 		m_iFontKey = R3_ENUM_ATTRIBUTE_PART_FONT;
 		break;
+	case ecak_link:
+		m_crText = R3_CATEGORY_ATTRIBUTE_PART_COLOR_LINK;
+		m_iFontKey = R3_CATEGORY_ATTRIBUTE_PART_FONT_LINK;
+		break;
 	default:
 		ASSERT(!"unknown ECategoryAttributeKind value");
 	}

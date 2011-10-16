@@ -171,7 +171,6 @@ void CategoryPart::CollectAttributes(CComPtr<IMgaFCO> fco)
 	{
 		AddAttributes(*iter, ecak_inherited);
 	}
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -369,7 +368,59 @@ void CategoryPart::AddAttributes(CComPtr<IMgaFCO> mgaFco, ECategoryAttributeKind
 
 		m_AttributeParts.push_back(new CategoryAttributePart(this, m_eventSink, CString(nameFco), CString(nameMeta), kind, fco));
 	}
+
+	AddLinks(mgaFco);
+
 }
+
+//////////////////////////////////////////////////////////////////////////
+void CategoryPart::AddLinks(CComPtr<IMgaFCO> mgaFco)
+{
+	CComPtr<IMgaConnPoints> connPoints;
+	COMTHROW(mgaFco->get_PartOfConns(&connPoints));
+
+	long count = 0;
+	COMTHROW(connPoints->get_Count(&count));
+
+	for(long i(0); i<count; i++)
+	{
+		CComPtr<IMgaConnPoint> connPoint;
+		COMTHROW(connPoints->get_Item(i+1, &connPoint));
+
+		CComPtr<IMgaConnection> connection;
+		COMTHROW(connPoint->get_Owner(&connection));
+
+		CComPtr<IMgaMetaFCO> connectionMeta;
+		COMTHROW(connection->get_Meta(&connectionMeta));
+
+		CComBSTR bs;
+		connectionMeta->get_Name(&bs);
+
+		if(bs == R3_CATEGORYRELATION_NAME)
+		{
+			bs.Attach(NULL);
+			COMTHROW(connPoint->get_ConnRole(&bs));//src dst
+
+
+			CComBSTR bsName;
+			CComBSTR bsMult;
+			CComBSTR bsAlienCat;
+			if(bs == R3_CONNECTION_SRC)
+			{
+ 				COMTHROW(connection->get_StrAttrByName(CComBSTR(R3_CONNECTION_SRC_NAME), &bsName));
+ 				COMTHROW(connection->get_StrAttrByName(CComBSTR(R3_CONNECTION_SRC_MULT), &bsMult));
+			}
+			else
+			{
+ 				COMTHROW(connection->get_StrAttrByName(CComBSTR(R3_CONNECTION_DST_NAME), &bsName));
+ 				COMTHROW(connection->get_StrAttrByName(CComBSTR(R3_CONNECTION_DST_MULT), &bsMult));
+			}
+
+			m_AttributeParts.push_back(new CategoryAttributePart(this, m_eventSink, CString(bsName), CString(bsMult), ecak_link, CComPtr<IMgaFCO>()));
+		}
+	}
+}
+
 
 
 void CategoryPart::ModifyAttributes(CComPtr<IMgaFCO> mgaFco)

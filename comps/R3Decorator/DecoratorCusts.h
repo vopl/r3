@@ -11,6 +11,15 @@
 #define  R3_CATEGORYREFERENCE_NAME		"CategoryReference"
 #define  R3_CATEGORYRELATION_NAME		"CategoryRelation"
 
+#define  R3_CONNECTION_SRC		"src"
+#define  R3_CONNECTION_DST		"dst"
+
+#define  R3_CONNECTION_SRC_NAME	"Name1"
+#define  R3_CONNECTION_SRC_MULT	"Multiplier1"
+
+#define  R3_CONNECTION_DST_NAME	"Name2"
+#define  R3_CONNECTION_DST_MULT	"Multiplier2"
+
 
 
 #define  R3_SET_NAME		"Set"
@@ -65,13 +74,17 @@
 //шрифт текста собственного атрибута
 #define R3_CATEGORY_ATTRIBUTE_PART_FONT_OWN		FONT_PORTNAME
 
+//атрибут - связь
+#define R3_CATEGORY_ATTRIBUTE_PART_COLOR_LINK	RGB(0x44, 0x44, 0x00)
+#define R3_CATEGORY_ATTRIBUTE_PART_FONT_LINK	FONT_PORTNAME
+
+//сепаратор
 #define R3_CATEGORY_ATTRIBUTE_PART_COLOR_SEP	RGB(0x00, 0x00, 0x77)
 #define R3_CATEGORY_ATTRIBUTE_PART_FONT_SEP		FONT_TYPE
 
-
+//атрибут перечисления
 #define R3_ENUM_ATTRIBUTE_PART_COLOR			RGB(0x00, 0x00, 0x00)
 #define R3_ENUM_ATTRIBUTE_PART_FONT				FONT_PORTNAME
-
 
 
 

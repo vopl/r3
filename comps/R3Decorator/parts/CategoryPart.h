@@ -27,6 +27,7 @@ public:
 	void CollectBases(CComPtr<IMgaFCO> from, TSFco &bases);
 
 	void AddAttributes(CComPtr<IMgaFCO> mgaFco, ECategoryAttributeKind kind);
+	void AddLinks(CComPtr<IMgaFCO> mgaFco);
 
 	void ModifyAttributes(CComPtr<IMgaFCO> mgaFco);
 

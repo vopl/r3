@@ -14,6 +14,7 @@ namespace Decor {
 		ecak_inherited,
 		ecak_separator,
 		ecak_enumValue,
+		ecak_link,
 	};
 class CategoryAttributePart: public DecoratorSDK::AttributePart
 {
