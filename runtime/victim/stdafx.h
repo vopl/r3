@@ -17,3 +17,9 @@
 #include <map>
 #include <vector>
 #include <deque>
+#include <string>
+
+#include <cassert>
+
+
+#include <boost/foreach.hpp>

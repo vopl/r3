@@ -1103,13 +1103,37 @@ namespace workers
 
 		hpp<<"class "<<data->getName()<<"\n	: public ::dbMeta::Schema\n{"<<endl;
 
-		//свои категории
+
+		hpp<<"std::vector<::dbMeta::CategoryPtr> _vcategories;"<<endl;
+
+		hpp<<"void init()\n{"<<endl;
+
+		//свои категории, вектор указателей на экземпл€ры
+		hpp<<"_vcategories.clear();"<<endl;
+		BOOST_FOREACH(const Category &cat, data->getCategory())
+		{
+			hpp<<"_vcategories.push_back(&category_"<<cat->getName()<<");"<<endl;
+		}
+		hpp<<"}"<<endl;
+
+		hpp<<"public:"<<endl;
+
+		//свои категории, типы
 		BOOST_FOREACH(const Category &cat, data->getCategory())
 		{
 			mkCategory(hpp, cat);
 		}
 
 		//св€зи
+
+		//наименование
+		hpp<<"std::string getName()\n{"<<endl;
+		hpp<<"return \""<<data->getName()<<"\";"<<endl;
+		hpp<<"}"<<endl;
+
+		//категории
+		hpp<<"const std::vector<::dbMeta::CategoryPtr> &getCategories()\n{\nreturn _vcategories;\n}"<<endl;
+
 
 		hpp<<"};"<<endl;
 
@@ -1148,7 +1172,7 @@ namespace workers
 			}
 		}
 
-		hpp<<"};\n"<<endl;
+		hpp<<"} category_"<<cat->getName()<<";\n"<<endl;
 
 	}
 
