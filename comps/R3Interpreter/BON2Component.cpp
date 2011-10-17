@@ -121,12 +121,13 @@ void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>
 
 	{
 		workers::WData w(genDir);
-		w(roots);
+		//w(roots);
+		w.mk(roots);
 	}
-	{
-		workers::WProtocol w(genDir);
-		w(roots);
-	}
+// 	{
+// 		workers::WProtocol w(genDir);
+// 		w(roots);
+// 	}
 
 	Console::Out::WriteLine("R3 Interpreter completed...");
 }

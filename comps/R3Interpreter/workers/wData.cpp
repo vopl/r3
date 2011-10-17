@@ -2,7 +2,6 @@
 #include "workers/wData.hpp"
 #include <Console.h>
 #include <direct.h>
-#include "out/file.hpp"
 #include "out/styler.hpp"
 
 namespace workers
@@ -1041,6 +1040,169 @@ namespace workers
 		}
 
 		return orderByName(fields);
+	}
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mk(const std::set<FCO> &roots)
+	{
+		//собрать все категории и распредилить по схемам
+		BOOST_FOREACH(const FCO &fco, roots)
+		{
+			Data data(fco);
+			if(data)
+			{
+				mkData(data);
+			}
+		}
+	}
+
+	
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkData(const Data &data)
+	{
+		Console::Out::WriteLine(("mkData: "+data->getName()).c_str());
+
+		boost::filesystem::create_directories(_path/"schemas");
+		out::File hpp(_path / "schemas" / (data->getName()+".hpp"));
+
+		hpp<<"// data: "<<data->getName()<<endl;
+		hpp<<"#ifndef _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
+		hpp<<"#define _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
+		hpp<<endl;
+
+
+// 		//подключить заголовки с зависимостями от других схем
+// 		std::set<std::string> datasOnRefs;
+// 		BOOST_FOREACH(const CategoryReference &catRef, data->getCategoryReference())
+// 		{
+// 			Category cat = catRef->getCategory();
+// 			Data d = cat->getParentModel("Data");
+// 			datasOnRefs.insert(d->getName());
+// 		}
+// 		datasOnRefs.erase(data->getName());
+// 		if(!datasOnRefs.empty())
+// 		{
+// 			BOOST_FOREACH(const std::string &s, datasOnRefs)
+// 			{
+// 				hpp<<"#include \"data/"<<s<<".hpp\""<<endl;
+// 			}
+// 			hpp<<endl;
+// 		}
+
+		hpp<<"namespace dbMeta\n{\nnamespace schemas\n{"<<endl;
+
+		hpp<<"class "<<data->getName()<<"\n	: public ::dbMeta::Schema\n{"<<endl;
+
+		//свои категории
+		BOOST_FOREACH(const Category &cat, data->getCategory())
+		{
+			mkCategory(hpp, cat);
+		}
+
+		//связи
+
+		hpp<<"};"<<endl;
+
+		hpp<<"}\n}"<<endl;
+		hpp<<"#endif"<<endl;
+		hpp<<endl;
+		hpp.close();
+		out::styler_cpp(hpp.pathName());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkCategory(out::File &hpp, const Category &cat)
+	{
+		Console::Out::WriteLine(("cat: "+cat->getName()).c_str());
+
+		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
+		hpp<<"class "<<cat->getName()<<"\n : public ::dbMeta::Category\n{"<<endl;
+
+
+		//свои поля
+		BOOST_FOREACH(const FCO &childFco, cat->getChildFCOs())
+		{
+			Field fld(childFco);
+			if(fld)
+			{
+				mkField(hpp, fld);
+			}
+		}
+		//свои индексы
+		BOOST_FOREACH(const FCO &childFco, cat->getChildFCOs())
+		{
+			Index idx(childFco);
+			if(idx)
+			{
+				mkIndex(hpp, idx);
+			}
+		}
+
+		hpp<<"};\n"<<endl;
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkField(out::File &hpp, const Field &fld)
+	{
+		Console::Out::WriteLine(("fld: "+fld->getName()).c_str());
+
+		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
+		hpp<<"class "<<fld->getName()<<"\n : public ::dbMeta::Field\n{"<<endl;
+
+
+		hpp<<"};\n"<<endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkIndex(out::File &hpp, const Index &idx)
+	{
+		Console::Out::WriteLine(("idx: "+idx->getName()).c_str());
+
+		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
+		hpp<<"class "<<idx->getName()<<"\n : public ::dbMeta::Index\n{"<<endl;
+
+		//наименование
+		hpp<<"std::string getName()\n{\n return \"";
+		hpp<<idx->getName();
+		hpp<<"\";\n}"<<endl;
+
+		//тип индекса
+		hpp<<"EIndexType getType()\n{\n return ";
+		switch(idx->getIndexType())
+		{
+		case IndexImpl::tree_IndexType_Type:
+			hpp<<"eitTree";
+			break;
+		case IndexImpl::hash_IndexType_Type:
+			hpp<<"eitHash";
+			break;
+		default:
+			Console::Out::WriteLine(("idx: "+idx->getName()+", bad index type").c_str());
+		}
+		hpp<<";\n}"<<endl;
+
+		//поля индекса
+		hpp<<"FieldPtrs getFields()\n{"<<endl;
+		hpp<<"FieldPtrs ret;"<<endl;
+		BOOST_FOREACH(const Field &fld, idx->getIndexOnCategoryFieldSrcs())
+		{
+			hpp<<"ret.insert(getCategory()->getField(\""<<fld->getName()<<"\"));"<<endl;
+		}
+		hpp<<"return ret;"<<endl;
+		hpp<<"}\n";
+
+		hpp<<"};\n"<<endl;
 	}
 
 }

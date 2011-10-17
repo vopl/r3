@@ -7,6 +7,7 @@
 #include "R3MetaBonX.h"
 #include <algorithm>
 #include <boost/filesystem.hpp>
+#include "out/file.hpp"
 
 namespace workers
 {
@@ -39,7 +40,6 @@ namespace workers
 		void processCategoryTuple_hpp(Category cat);
 		void processCategoryTuple_cpp(Category cat);
 
-
 		void collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive);
 		void collectRelations(std::set<CategoryRelation> &res, Category cat, bool bases, bool recursive);
 		std::vector<Field> collectFields(Category cat);
@@ -64,6 +64,15 @@ namespace workers
 			std::sort(res.begin(), res.end(), OrderCatsPred());
 			return res;
 		}
+
+
+	public:
+		void mk(const std::set<FCO> &roots);
+	private:
+		void mkData(const Data &data);
+		void mkCategory(out::File &hpp, const Category &cat);
+		void mkField(out::File &hpp, const Field &fld);
+		void mkIndex(out::File &hpp, const Index &idx);
 	};
 }
 #endif

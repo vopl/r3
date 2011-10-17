@@ -365,6 +365,30 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="dbMeta"
+			>
+			<File
+				RelativePath=".\dbMeta\category.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\field.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\index.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\schema.hpp"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>
