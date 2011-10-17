@@ -15,7 +15,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	dbMeta::Manager man;
 
-	//man.add<>()
+	man.add<dbMeta::schemas::TestCategories>();
 	return 0;
 }
 

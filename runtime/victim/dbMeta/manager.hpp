@@ -11,6 +11,8 @@ namespace dbMeta
 	class Manager
 	{
 	public:
+		template <class Schema>
+		void add();
 
 		const SchemaPtr getSchema(const std::string &name) const;
 	};
