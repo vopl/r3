@@ -380,9 +380,9 @@ namespace workers
 
 				BOOST_FOREACH(Right right, child->getRight4ContextSrcs())
 				{
-					hpp<<"if(erv_grant != checkRight4Context(Right_"<<right->getName()<<"()))\n";
-					hpp<<"{\n";
-					hpp<<"return 0;\n";
+					hpp<<"if(rv_grant != checkContextRight(Right_"<<right->getName()<<"(), ("<<child->getName()<<" *)NULL)) return 0;\n";
+				}
+
 					hpp<<"}\n";
 				}
 				
@@ -451,9 +451,9 @@ namespace workers
 
 			BOOST_FOREACH(Right right, child->getRight4ContextSrcs())
 			{
-				hpp<<"if(erv_grant != checkRight4Context(Right_"<<right->getName()<<"()))\n";
-				hpp<<"{\n";
-				hpp<<"return 0;\n";
+				hpp<<"if(rv_grant != checkContextRight(Right_"<<right->getName()<<"(), ("<<child->getName()<<" *)NULL)) return 0;\n";
+			}
+
 				hpp<<"}\n";
 			}
 

@@ -64,13 +64,13 @@ int main(int argc, char* argv[])
 		ns.balance(0);
 		instance.reset();
 	}
-	catch(std::exception &e)
+	catch(const std::exception &e)
 	{
-		std::cout<<"std exception: "<<e.what();
+		std::cerr<<"std::exception: "<<e.what()<<std::endl;;
 	}
 	catch(...)
 	{
-		std::cout<<"unknown exception";
+		std::cerr<<"unknown exception";
 	}
 
 	return EXIT_SUCCESS;
