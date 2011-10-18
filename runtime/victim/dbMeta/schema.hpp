@@ -7,6 +7,7 @@ namespace dbMeta
 
 	class Category;
 	typedef Category * CategoryPtr;
+	typedef std::vector<CategoryPtr> CategoryPtrs;
 
 	class Schema
 	{
@@ -14,14 +15,17 @@ namespace dbMeta
 		virtual void init(const Manager *man);
 		virtual void init() =0;
 
-		std::map<std::string, CategoryPtr> _mcategories;
+		typedef std::map<std::string, CategoryPtr> TMCategories;
+		TMCategories _mcategories;
 	public:
-		virtual const std::vector<CategoryPtr> &getCategories() const;
+		virtual std::string getName() const=0;
+
+		virtual const std::vector<CategoryPtr> &getCategories() const=0;
 		const CategoryPtr getCategory(const std::string &name) const;
 	};
 
 	typedef Schema * SchemaPtr;
-	typedef std::set<SchemaPtr> SchemaPtrs;
+	typedef std::vector<SchemaPtr> SchemaPtrs;
 
 }
 

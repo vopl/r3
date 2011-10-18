@@ -23,7 +23,13 @@ namespace dbMeta
 	//////////////////////////////////////////////////////////////////////////
 	const CategoryPtr Schema::getCategory(const std::string &name) const
 	{
-		assert(0);
-		return NULL;
+		TMCategories::const_iterator iter = _mcategories.find(name);
+		if(_mcategories.end() == iter)
+		{
+			throw std::domain_error("category "+name+" absent");
+			return NULL;
+		}
+
+		return iter->second;
 	}
 }

@@ -10,13 +10,17 @@ namespace dbMeta
 {
 	class Manager
 	{
-		std::vector<SchemaPtr> _vschemas;
-		std::map<std::string, SchemaPtr> _mschemas;
+		SchemaPtrs _vschemas;
+
+		typedef std::map<std::string, SchemaPtr> TMSchemas;
+		TMSchemas _mschemas;
+
 	public:
 		template <class Schema>
 		void add();
 
 		const SchemaPtr getSchema(const std::string &name) const;
+		const SchemaPtrs &getSchemas() const;
 	};
 
 	///

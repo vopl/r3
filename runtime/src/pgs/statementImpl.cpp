@@ -36,7 +36,7 @@ namespace pgs
 		{
 			std::string sql;
 			e->mkSql(sql);
-			std::cout<<sql<<std::endl;
+			//std::cout<<sql<<std::endl;
 		}
 	}
 

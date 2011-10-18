@@ -1127,12 +1127,12 @@ namespace workers
 		//связи
 
 		//наименование
-		hpp<<"std::string getName()\n{"<<endl;
+		hpp<<"std::string getName() const\n{"<<endl;
 		hpp<<"return \""<<data->getName()<<"\";"<<endl;
 		hpp<<"}"<<endl;
 
 		//категории
-		hpp<<"const std::vector<::dbMeta::CategoryPtr> &getCategories()\n{\nreturn _vcategories;\n}"<<endl;
+		hpp<<"const std::vector<::dbMeta::CategoryPtr> &getCategories() const\n{\nreturn _vcategories;\n}"<<endl;
 
 
 		hpp<<"};"<<endl;
@@ -1172,6 +1172,11 @@ namespace workers
 			}
 		}
 
+		//наименование
+		hpp<<"std::string getName() const\n{"<<endl;
+		hpp<<"return \""<<cat->getName()<<"\";"<<endl;
+		hpp<<"}"<<endl;
+
 		hpp<<"} category_"<<cat->getName()<<";\n"<<endl;
 
 	}
@@ -1184,6 +1189,11 @@ namespace workers
 		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
 		hpp<<"class "<<fld->getName()<<"\n : public ::dbMeta::Field\n{"<<endl;
 
+
+		//наименование
+		hpp<<"std::string getName() const\n{"<<endl;
+		hpp<<"return \""<<fld->getName()<<"\";"<<endl;
+		hpp<<"}"<<endl;
 
 		hpp<<"};\n"<<endl;
 	}
@@ -1225,6 +1235,12 @@ namespace workers
 		}
 		hpp<<"return ret;"<<endl;
 		hpp<<"}\n";
+
+
+		//наименование
+		hpp<<"std::string getName() const\n{"<<endl;
+		hpp<<"return \""<<idx->getName()<<"\";"<<endl;
+		hpp<<"}"<<endl;
 
 		hpp<<"};\n"<<endl;
 	}

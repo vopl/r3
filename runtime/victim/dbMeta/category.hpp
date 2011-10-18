@@ -16,13 +16,13 @@ namespace dbMeta
 	{
 	public:
 		const SchemaPtr getSchema() const;
-		std::string getName() const;
+		virtual std::string getName() const =0;
 		const FieldPtr getField(const std::string &name) const;
 		const IndexPtr getIndex(const std::string &name) const;
 	};
 
 	typedef Category * CategoryPtr;
-	typedef std::set<CategoryPtr> CategoryPtrs;
+	typedef std::vector<CategoryPtr> CategoryPtrs;
 
 }
 

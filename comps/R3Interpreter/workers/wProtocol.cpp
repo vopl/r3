@@ -383,9 +383,6 @@ namespace workers
 					hpp<<"if(rv_grant != checkContextRight(Right_"<<right->getName()<<"(), ("<<child->getName()<<" *)NULL)) return 0;\n";
 				}
 
-					hpp<<"}\n";
-				}
-				
 
 				switch(child->getMult())
 				{
@@ -454,8 +451,6 @@ namespace workers
 				hpp<<"if(rv_grant != checkContextRight(Right_"<<right->getName()<<"(), ("<<child->getName()<<" *)NULL)) return 0;\n";
 			}
 
-				hpp<<"}\n";
-			}
 
 			switch(child->getMult())
 			{
