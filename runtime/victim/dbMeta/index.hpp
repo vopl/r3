@@ -1,27 +1,33 @@
 #ifndef _DBMETA_INDEX_HPP_
 #define _DBMETA_INDEX_HPP_
 
+#include "dbMeta/common.hpp"
+
 namespace dbMeta
 {
+	//////////////////////////////////////////////////////////////////////////
 	enum EIndexType
 	{
 		eitTree,
 		eitHash,
 	};
 
-	class Category;
-	typedef Category *CategoryPtr;
-
+	//////////////////////////////////////////////////////////////////////////
 	class Index
 	{
+	protected:
+		Index(
+			const CategoryPtr _category,
+			const EIndexType _type,
+			const std::string _name,
+			const FieldPtrs _fields);
+
 	public:
-		const CategoryPtr getCategory() const;
-
+		const CategoryPtr	_category;
+		const EIndexType	_type;
+		const std::string	_name;
+		const FieldPtrs		_fields;
 	};
-
-	typedef Index * IndexPtr;
-	typedef std::set<IndexPtr> IndexPtrs;
-
 }
 
 #endif

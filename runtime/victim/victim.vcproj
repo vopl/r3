@@ -426,6 +426,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dbMeta\common.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dbMeta\field.cpp"
 				>
 			</File>
@@ -447,6 +451,14 @@
 			</File>
 			<File
 				RelativePath=".\dbMeta\manager.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\relation.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\relationEnd.hpp"
 				>
 			</File>
 			<File

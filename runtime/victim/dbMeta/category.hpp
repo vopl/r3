@@ -1,29 +1,31 @@
 #ifndef _DBMETA_CATEGORY_HPP_
 #define _DBMETA_CATEGORY_HPP_
 
+#include "dbMeta/common.hpp"
+
 namespace dbMeta
 {
-	class Schema;
-	typedef Schema *SchemaPtr;
-
-	class Field;
-	typedef Field *FieldPtr;
-
-	class Index;
-	typedef Index *IndexPtr;
-
 	class Category
 	{
+	protected:
+		Category(
+			const SchemaPtr _schema,
+			const bool _isAbstract,
+			const std::string _name,
+			const FieldPtrs _fields,
+			const IndexPtrs _indices,
+			const RelationEndPtrs _relations);
+
 	public:
-		const SchemaPtr getSchema() const;
-		virtual std::string getName() const =0;
-		const FieldPtr getField(const std::string &name) const;
-		const IndexPtr getIndex(const std::string &name) const;
+		const SchemaPtr			_schema;
+		const bool				_isAbstract;
+		const std::string		_name;
+		const FieldPtrs			_fields;
+		const IndexPtrs			_indices;
+		const RelationEndPtrs	_relationEnds;
+
+		const FieldPtr	getField(const std::string &name);
 	};
-
-	typedef Category * CategoryPtr;
-	typedef std::vector<CategoryPtr> CategoryPtrs;
-
 }
 
 #endif

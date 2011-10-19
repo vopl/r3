@@ -27,18 +27,18 @@ namespace dbMeta
 	template <class T>
 	void Manager::add()
 	{
-		T *p = new T();
-
-		if(_mschemas.end() != _mschemas.find(p->getName()))
-		{
-			throw std::logic_error("schema "+p->getName()+" already added");
-			return;
-		}
-
-		((dbMeta::Schema *)p)->init(this);
-
-		_vschemas.push_back(p);
-		_mschemas[p->getName()] = p;
+// 		T *p = new T();
+// 
+// 		if(_mschemas.end() != _mschemas.find(p->getName()))
+// 		{
+// 			throw std::logic_error("schema "+p->getName()+" already added");
+// 			return;
+// 		}
+// 
+// 		((dbMeta::Schema *)p)->init(this);
+// 
+// 		_vschemas.push_back(p);
+// 		_mschemas[p->getName()] = p;
 	}
 
 }

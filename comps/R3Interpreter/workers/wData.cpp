@@ -1080,6 +1080,13 @@ namespace workers
 		hpp<<"#define _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
 		hpp<<endl;
 
+		hpp<<"#include \"dbMeta/relation.hpp\""<<endl;
+		hpp<<endl;
+
+		hpp<<"//warning C4355: 'this' : used in base member initializer list"<<endl;
+		hpp<<"#pragma warning( disable : 4355 )"<<endl;
+		hpp<<endl;
+
 
 // 		//подключить заголовки с зависимостями от других схем
 // 		std::set<std::string> datasOnRefs;
@@ -1101,22 +1108,43 @@ namespace workers
 
 		hpp<<"namespace dbMeta\n{\nnamespace schemas\n{"<<endl;
 
-		hpp<<"class "<<data->getName()<<"\n	: public ::dbMeta::Schema\n{"<<endl;
-
-
-		hpp<<"std::vector<::dbMeta::CategoryPtr> _vcategories;"<<endl;
-
-		hpp<<"void init()\n{"<<endl;
-
-		//свои категории, вектор указателей на экземпляры
-		hpp<<"_vcategories.clear();"<<endl;
-		BOOST_FOREACH(const Category &cat, data->getCategory())
-		{
-			hpp<<"_vcategories.push_back(&category_"<<cat->getName()<<");"<<endl;
-		}
-		hpp<<"}"<<endl;
+		hpp<<"class Schema_"<<data->getName()<<"\n	: public ::dbMeta::Schema\n{"<<endl;
 
 		hpp<<"public:"<<endl;
+
+		hpp<<"Schema_"<<data->getName()<<"(ManagerPtr manager)"<<endl;
+		hpp<<": ::dbMeta::Schema("<<endl;
+			//объемлющий менеджер
+			hpp<<"manager,"<<endl;
+			//наименование
+			hpp<<"\""<<data->getName()<<"\","<<endl;
+			//категории
+			hpp<<"boost::assign::list_of<const CategoryPtr>()";
+			BOOST_FOREACH(const Category &cat, data->getCategory())
+			{
+				hpp<<" (&"<<cat->getName()<<")";
+			}
+			hpp<<","<<endl;
+			//связи
+			hpp<<"boost::assign::list_of<const RelationPtr>()";
+			BOOST_FOREACH(const CategoryRelation &rel, data->getCategoryRelation())
+			{
+				hpp<<" (&relation_"<<relName(rel)<<")";
+			}
+		hpp<<")"<<endl;
+
+		//категории
+		BOOST_FOREACH(const Category &cat, data->getCategory())
+		{
+			hpp<<", "<<cat->getName()<<"(this)"<<endl;
+		}
+		//связи
+		BOOST_FOREACH(const CategoryRelation &rel, data->getCategoryRelation())
+		{
+			hpp<<", relation_"<<relName(rel)<<"(this)"<<endl;
+		}
+
+		hpp<<"{}"<<endl;
 
 		//свои категории, типы
 		BOOST_FOREACH(const Category &cat, data->getCategory())
@@ -1125,19 +1153,20 @@ namespace workers
 		}
 
 		//связи
+		BOOST_FOREACH(const CategoryRelation &rel, data->getCategoryRelation())
+		{
+			mkRelation(hpp, rel);
+		}
+		
 
-		//наименование
-		hpp<<"std::string getName() const\n{"<<endl;
-		hpp<<"return \""<<data->getName()<<"\";"<<endl;
-		hpp<<"}"<<endl;
-
-		//категории
-		hpp<<"const std::vector<::dbMeta::CategoryPtr> &getCategories() const\n{\nreturn _vcategories;\n}"<<endl;
 
 
 		hpp<<"};"<<endl;
 
 		hpp<<"}\n}"<<endl;
+
+		hpp<<"#pragma warning( default : 4355 )"<<endl;
+
 		hpp<<"#endif"<<endl;
 		hpp<<endl;
 		hpp.close();
@@ -1150,7 +1179,73 @@ namespace workers
 		Console::Out::WriteLine(("cat: "+cat->getName()).c_str());
 
 		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
-		hpp<<"class "<<cat->getName()<<"\n : public ::dbMeta::Category\n{"<<endl;
+		hpp<<"class Category_"<<cat->getName()<<"\n : public ::dbMeta::Category\n{"<<endl;
+
+		hpp<<"public:"<<endl;
+
+		//конструктор
+		hpp<<"Category_"<<cat->getName()<<"(const SchemaPtr schema)"<<endl;
+		hpp<<": ::dbMeta::Category("<<endl;
+			//родительская схема
+			hpp<<"schema,"<<endl;
+			//абстракт
+			hpp<<(cat->isAbstract()?"true":"false")<<","<<endl;
+			//наименование
+			hpp<<"\""<<cat->getName()<<"\","<<endl;
+			//поля
+			hpp<<"boost::assign::list_of<const FieldPtr>()";
+			BOOST_FOREACH(const FCO &childFco, cat->getChildFCOs())
+			{
+				Field fld(childFco);
+				if(fld)
+				{
+					hpp<<" (&"<<fld->getName()<<")";
+				}
+			}
+			hpp<<","<<endl;
+			//индексы
+			hpp<<"boost::assign::list_of<const IndexPtr>()";
+			BOOST_FOREACH(const FCO &childFco, cat->getChildFCOs())
+			{
+				Index idx(childFco);
+				if(idx)
+				{
+					hpp<<" (&index_"<<idx->getName()<<")";
+				}
+			}
+			hpp<<","<<endl;
+			//подключенные связи
+			hpp<<"boost::assign::list_of<const RelationEndPtr>()";
+			BOOST_FOREACH(const CategoryRelation &rel, cat->getInCategoryRelationLinks())
+			{
+				hpp<<" (schema->getRelation(\""<<relName(rel)<<"\")->getOutputEnd())";
+			}
+			BOOST_FOREACH(const CategoryRelation &rel, cat->getOutCategoryRelationLinks())
+			{
+				hpp<<" (schema->getRelation(\""<<relName(rel)<<"\")->getInputEnd())";
+			}
+		hpp<<")\n";
+
+		//свои поля
+		BOOST_FOREACH(const FCO &childFco, cat->getChildFCOs())
+		{
+			Field fld(childFco);
+			if(fld)
+			{
+				hpp<<", "<<fld->getName()<<"(this)\n";
+			}
+		}
+		//свои индексы
+		BOOST_FOREACH(const FCO &childFco, cat->getChildFCOs())
+		{
+			Index idx(childFco);
+			if(idx)
+			{
+				hpp<<", index_"<<idx->getName()<<"(this)\n";
+			}
+		}
+
+		hpp<<"{\n};"<<endl;
 
 
 		//свои поля
@@ -1172,12 +1267,7 @@ namespace workers
 			}
 		}
 
-		//наименование
-		hpp<<"std::string getName() const\n{"<<endl;
-		hpp<<"return \""<<cat->getName()<<"\";"<<endl;
-		hpp<<"}"<<endl;
-
-		hpp<<"} category_"<<cat->getName()<<";\n"<<endl;
+		hpp<<"} "<<cat->getName()<<";\n"<<endl;
 
 	}
 
@@ -1187,15 +1277,24 @@ namespace workers
 		Console::Out::WriteLine(("fld: "+fld->getName()).c_str());
 
 		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
-		hpp<<"class "<<fld->getName()<<"\n : public ::dbMeta::Field\n{"<<endl;
+		hpp<<"class Field_"<<fld->getName()<<"\n : public ::dbMeta::Field\n{"<<endl;
 
+		hpp<<"public:"<<endl;
 
-		//наименование
-		hpp<<"std::string getName() const\n{"<<endl;
-		hpp<<"return \""<<fld->getName()<<"\";"<<endl;
-		hpp<<"}"<<endl;
+		//конструктор
+		hpp<<"Field_"<<fld->getName()<<"(const CategoryPtr category)"<<endl;
+		hpp<<": ::dbMeta::Field("<<endl;
+			//родительская категория
+			hpp<<"category,"<<endl;
+			//тип поля
+			hpp<<"eft"<<fld->getFCOMeta().name()<<","<<endl;
+			//наименование
+			hpp<<"\""<<fld->getName()<<"\","<<endl;
+			//нул
+			hpp<<(fld->isAllowNull()?"true":"false");
+		hpp<<")\n{\n};"<<endl;
 
-		hpp<<"};\n"<<endl;
+		hpp<<"} "<<fld->getName()<<";\n"<<endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1204,45 +1303,77 @@ namespace workers
 		Console::Out::WriteLine(("idx: "+idx->getName()).c_str());
 
 		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
-		hpp<<"class "<<idx->getName()<<"\n : public ::dbMeta::Index\n{"<<endl;
+		hpp<<"class Index_"<<idx->getName()<<"\n : public ::dbMeta::Index\n{"<<endl;
 
-		//наименование
-		hpp<<"std::string getName()\n{\n return \"";
-		hpp<<idx->getName();
-		hpp<<"\";\n}"<<endl;
+		hpp<<"public:"<<endl;
 
-		//тип индекса
-		hpp<<"EIndexType getType()\n{\n return ";
-		switch(idx->getIndexType())
-		{
-		case IndexImpl::tree_IndexType_Type:
-			hpp<<"eitTree";
-			break;
-		case IndexImpl::hash_IndexType_Type:
-			hpp<<"eitHash";
-			break;
-		default:
-			Console::Out::WriteLine(("idx: "+idx->getName()+", bad index type").c_str());
-		}
-		hpp<<";\n}"<<endl;
+		//конструктор
+		hpp<<"Index_"<<idx->getName()<<"(const CategoryPtr category)"<<endl;
+		hpp<<": ::dbMeta::Index("<<endl;
+			//родительская категория
+			hpp<<"category,"<<endl;
+			//тип индекса
+			switch(idx->getIndexType())
+			{
+			case IndexImpl::tree_IndexType_Type:
+				hpp<<"eitTree";
+				break;
+			case IndexImpl::hash_IndexType_Type:
+				hpp<<"eitHash";
+				break;
+			default:
+				Console::Out::WriteLine(("idx: "+idx->getName()+", bad index type").c_str());
+			}
+			hpp<<","<<endl;
+			//наименование
+			hpp<<"\""<<idx->getName()<<"\","<<endl;
+			//поля
+			hpp<<"boost::assign::list_of<const FieldPtr>()";
 
-		//поля индекса
-		hpp<<"FieldPtrs getFields()\n{"<<endl;
-		hpp<<"FieldPtrs ret;"<<endl;
-		BOOST_FOREACH(const Field &fld, idx->getIndexOnCategoryFieldSrcs())
-		{
-			hpp<<"ret.insert(getCategory()->getField(\""<<fld->getName()<<"\"));"<<endl;
-		}
-		hpp<<"return ret;"<<endl;
-		hpp<<"}\n";
+			BOOST_FOREACH(const Field &fld, idx->getIndexOnCategoryFieldSrcs())
+			{
+				hpp<<" (category->getField(\""<<fld->getName()<<"\"))";
+			}
+
+		hpp<<")\n{\n};"<<endl;
 
 
-		//наименование
-		hpp<<"std::string getName() const\n{"<<endl;
-		hpp<<"return \""<<idx->getName()<<"\";"<<endl;
-		hpp<<"}"<<endl;
 
-		hpp<<"};\n"<<endl;
+		hpp<<"} index_"<<idx->getName()<<";\n"<<endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkRelation(out::File &hpp, const CategoryRelation &rel)
+	{
+		Console::Out::WriteLine(("rel: "+relName(rel)).c_str());
+
+		hpp<<"//////////////////////////////////////////////////////////////////////////"<<endl;
+		hpp<<"class Relation_"<<relName(rel)<<"\n : public ::dbMeta::Relation\n{"<<endl;
+
+		hpp<<"public:"<<endl;
+
+		//конструктор
+		hpp<<"Relation_"<<relName(rel)<<"(const SchemaPtr schema)"<<endl;
+		hpp<<": ::dbMeta::Relation("<<endl;
+			//родительская схема
+			hpp<<"schema"<<endl;
+		hpp<<")\n{\n};"<<endl;
+
+		hpp<<"} relation_"<<relName(rel)<<";\n"<<endl;
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::string WData::relName(const CategoryRelation &rel)
+	{
+		
+		return 
+			rel->getSrc()->getName()+"_"+
+			(CategoryRelationImpl::one_Multiplier1_Type == rel->getMultiplier1() ? "one":"many")+"_"+
+			rel->getName1()+"_"+
+			rel->getDst()->getName()+"_"+
+			(CategoryRelationImpl::one_Multiplier2_Type == rel->getMultiplier2() ? "one":"many")+"_"+
+			rel->getName2();
 	}
 
 }

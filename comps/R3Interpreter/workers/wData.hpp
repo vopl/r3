@@ -73,6 +73,9 @@ namespace workers
 		void mkCategory(out::File &hpp, const Category &cat);
 		void mkField(out::File &hpp, const Field &fld);
 		void mkIndex(out::File &hpp, const Index &idx);
+		void mkRelation(out::File &hpp, const CategoryRelation &rel);
+
+		std::string relName(const CategoryRelation &rel);
 	};
 }
 #endif

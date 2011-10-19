@@ -1,32 +1,29 @@
 #ifndef _DBMETA_SCHEMA_HPP_
 #define _DBMETA_SCHEMA_HPP_
 
+#include "dbMeta/common.hpp"
+
 namespace dbMeta
 {
-	class Manager;
-
-	class Category;
-	typedef Category * CategoryPtr;
-	typedef std::vector<CategoryPtr> CategoryPtrs;
-
+	
+	//////////////////////////////////////////////////////////////////////////
 	class Schema
 	{
-		friend class Manager;
-		virtual void init(const Manager *man);
-		virtual void init() =0;
+	protected:
+		Schema(
+			ManagerPtr manager,
+			const std::string _name,
+			const CategoryPtrs _categories,
+			const RelationPtrs _relations);
 
-		typedef std::map<std::string, CategoryPtr> TMCategories;
-		TMCategories _mcategories;
 	public:
-		virtual std::string getName() const=0;
+		const std::string	_name;
+		const CategoryPtrs	_categories;
+		const RelationPtrs	_relations;
 
-		virtual const std::vector<CategoryPtr> &getCategories() const=0;
-		const CategoryPtr getCategory(const std::string &name) const;
+
+		const RelationPtr getRelation(const std::string &name);
 	};
-
-	typedef Schema * SchemaPtr;
-	typedef std::vector<SchemaPtr> SchemaPtrs;
-
 }
 
 #endif
