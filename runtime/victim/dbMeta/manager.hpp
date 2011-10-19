@@ -17,7 +17,7 @@ namespace dbMeta
 
 	public:
 		template <class Schema>
-		void add();
+		const Schema &add();
 
 		const SchemaPtr getSchema(const std::string &name) const;
 		const SchemaPtrs &getSchemas() const;
@@ -25,20 +25,20 @@ namespace dbMeta
 
 	///
 	template <class T>
-	void Manager::add()
+	const T &Manager::add()
 	{
-// 		T *p = new T();
-// 
-// 		if(_mschemas.end() != _mschemas.find(p->getName()))
-// 		{
-// 			throw std::logic_error("schema "+p->getName()+" already added");
-// 			return;
-// 		}
-// 
-// 		((dbMeta::Schema *)p)->init(this);
-// 
-// 		_vschemas.push_back(p);
-// 		_mschemas[p->getName()] = p;
+		T *p = new T(this);
+
+		if(_mschemas.end() != _mschemas.find(p->_name))
+		{
+			delete p;
+			throw std::logic_error("schema "+p->_name+" already added");
+		}
+
+		_vschemas.push_back(p);
+		_mschemas[p->_name] = p;
+
+		return *p;
 	}
 
 }

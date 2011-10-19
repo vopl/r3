@@ -20,29 +20,11 @@ namespace workers
 	public:
 		WData(const boost::filesystem::path &path);
 		~WData();
-
-		void operator()(const std::set<FCO> &roots);
-
 	private:
-		void processData(const std::set<std::string> &schemas);
-		void processData_hpp(const std::set<std::string> &schemas);
-		void processData_cpp(const std::set<std::string> &schemas);
-
-		void processSchema(const std::string &name, const std::set<Category> &cats);
-		void processSchema_hpp(const std::string &name, const std::set<Category> &cats);
-		void processSchema_cpp(const std::string &name, const std::set<Category> &cats);
-		
-		void processCategory(Category cat);
-		void processCategory_hpp(Category cat);
-		void processCategory_cpp(Category cat);
-
-		void processCategoryTuple(Category cat);
-		void processCategoryTuple_hpp(Category cat);
-		void processCategoryTuple_cpp(Category cat);
-
 		void collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive);
-		void collectRelations(std::set<CategoryRelation> &res, Category cat, bool bases, bool recursive);
+		std::set<CategoryRelation> collectRelations(Category cat, bool in, bool out);
 		std::vector<Field> collectFields(Category cat);
+		std::vector<Index> collectIndices(Category cat);
 
 
 		//////////////////////////////////////////////////////////////////////////
