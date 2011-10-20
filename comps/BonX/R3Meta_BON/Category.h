@@ -18,10 +18,8 @@ public:
 
 	//
 	// attribute getters and setters
-	virtual std::string getSchema() ;
 	virtual bool        isAbstract() ;
 	virtual void        setAbstract( bool val);
-	virtual void        setSchema( const std::string& val);
 	//
 	// kind and role getters
 	virtual std::set<R3Meta_BON::Audio>     getAudio();

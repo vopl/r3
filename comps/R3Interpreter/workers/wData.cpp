@@ -384,17 +384,31 @@ namespace workers
 			//наименование
 			hpp<<"\""<<data->getName()<<"\","<<endl;
 			//категории
-			hpp<<"boost::assign::list_of<const CategoryPtr>()";
-			BOOST_FOREACH(const Category &cat, data->getCategory())
+			if(data->getCategory().empty())
 			{
-				hpp<<" (&"<<cat->getName()<<")";
+				hpp<<"CategoryPtrs()";
+			}
+			else
+			{
+				hpp<<"boost::assign::list_of<const CategoryPtr>";
+				BOOST_FOREACH(const Category &cat, data->getCategory())
+				{
+					hpp<<" (&"<<cat->getName()<<")";
+				}
 			}
 			hpp<<","<<endl;
 			//связи
-			hpp<<"boost::assign::list_of<const RelationPtr>()";
-			BOOST_FOREACH(const CategoryRelation &rel, data->getCategoryRelation())
+			if(data->getCategoryRelation().empty())
 			{
-				hpp<<" (&__schemaInternals.relation_"<<relName(rel)<<")";
+				hpp<<"RelationPtrs()";
+			}
+			else
+			{
+				hpp<<"boost::assign::list_of<const RelationPtr>";
+				BOOST_FOREACH(const CategoryRelation &rel, data->getCategoryRelation())
+				{
+					hpp<<" (&__schemaInternals.relation_"<<relName(rel)<<")";
+				}
 			}
 		hpp<<")"<<endl;
 		//категории
@@ -610,28 +624,49 @@ namespace workers
 		//наименование
 		hpp<<"\""<<cat->getName()<<"\","<<endl;
 		//поля
-		hpp<<"boost::assign::list_of<const FieldPtr>()";
-		BOOST_FOREACH(const Field &fld, collectFields(cat))
+		if(collectFields(cat).empty())
 		{
-			hpp<<" (&schema.__schemaInternals.field_"<<fld->getParent()->getName()<<"_"<<fld->getName()<<")";
+			hpp<<"FieldPtrs()";
+		}
+		else
+		{
+			hpp<<"boost::assign::list_of<const FieldPtr>";
+			BOOST_FOREACH(const Field &fld, collectFields(cat))
+			{
+				hpp<<" (&schema.__schemaInternals.field_"<<fld->getParent()->getName()<<"_"<<fld->getName()<<")";
+			}
 		}
 		hpp<<","<<endl;
 		//индексы
-		hpp<<"boost::assign::list_of<const IndexPtr>()";
-		BOOST_FOREACH(const Index &idx, collectIndices(cat))
+		if(collectIndices(cat).empty())
 		{
-			hpp<<" (&schema.__schemaInternals.index_"<<idx->getParent()->getName()<<"_"<<idx->getName()<<")";
+			hpp<<"IndexPtrs()";
+		}
+		else
+		{
+			hpp<<"boost::assign::list_of<const IndexPtr>";
+			BOOST_FOREACH(const Index &idx, collectIndices(cat))
+			{
+				hpp<<" (&schema.__schemaInternals.index_"<<idx->getParent()->getName()<<"_"<<idx->getName()<<")";
+			}
 		}
 		hpp<<","<<endl;
 		//подключенные связи
-		hpp<<"boost::assign::list_of<const RelationEndPtr>()";
-		BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, true, false))
+		if(collectRelations(cat, true, true).empty())
 		{
-			hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<"._inputEnd)";
+			hpp<<"RelationEndPtrs()";
 		}
-		BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, false, true))
+		else
 		{
-			hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<"._outputEnd)";
+			hpp<<"boost::assign::list_of<const RelationEndPtr>";
+			BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, true, false))
+			{
+				hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<"._inputEnd)";
+			}
+			BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, false, true))
+			{
+				hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<"._outputEnd)";
+			}
 		}
 		hpp<<")\n";
 
@@ -706,11 +741,17 @@ namespace workers
 		//наименование
 		hpp<<"\""<<idx->getName()<<"\","<<endl;
 		//поля
-		hpp<<"boost::assign::list_of<const FieldPtr>()";
-
-		BOOST_FOREACH(const Field &fld, idx->getIndexOnCategoryFieldSrcs())
+		if(idx->getIndexOnCategoryFieldSrcs().empty())
 		{
-			hpp<<" (&category."<<fld->getName()<<")";
+			hpp<<"FieldPtrs()";
+		}
+		else
+		{
+			hpp<<"boost::assign::list_of<const FieldPtr>";
+			BOOST_FOREACH(const Field &fld, idx->getIndexOnCategoryFieldSrcs())
+			{
+				hpp<<" (&category."<<fld->getName()<<")";
+			}
 		}
 		hpp<<")"<<endl;
 

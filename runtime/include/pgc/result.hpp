@@ -40,6 +40,12 @@ namespace pgc
 		template <class T> bool fetch(int rowIdx, int colIdx, T &v);
 		template <class T> bool fetch(int rowIdx, const char *colName, T &v);
 
+		int fetchInt(int rowIdx, int colIdx);
+		int fetchInt(int rowIdx, const char *colName);
+
+		std::string fetchString(int rowIdx, int colIdx);
+		std::string fetchString(int rowIdx, const char *colName);
+
 		bool isNull(int rowIdx, int colIdx);
 		bool isNull(int rowIdx, const char *colName);
 	};
