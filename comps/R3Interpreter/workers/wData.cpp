@@ -300,7 +300,7 @@ namespace workers
 		hpp<<"struct __SchemaInternals\n{"<<endl;
 		hpp<<"int stub;"<<endl;
 
-		hpp<<"__SchemaInternals(const "<<data->getName()<<" *schema);"<<endl;
+		hpp<<"__SchemaInternals(const "<<data->getName()<<" &schema);"<<endl;
 		//объекты полей
 		BOOST_FOREACH(const Field &fld, allFields)
 		{
@@ -334,7 +334,7 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<data->getName()<<"(ManagerPtr manager);"<<endl;
+		hpp<<data->getName()<<"(const Manager &manager);"<<endl;
 
 
 		//конец класса схемы
@@ -377,7 +377,7 @@ namespace workers
 
 
 		//тело конструктора
-		hpp<<"inline "<<data->getName()<<"::"<<data->getName()<<"(ManagerPtr manager)"<<endl;
+		hpp<<"inline "<<data->getName()<<"::"<<data->getName()<<"(const Manager &manager)"<<endl;
 		hpp<<": ::dbMeta::Schema("<<endl;
 			//объемлющий менеджер
 			hpp<<"manager,"<<endl;
@@ -400,14 +400,14 @@ namespace workers
 		//категории
 		BOOST_FOREACH(const Category &cat, data->getCategory())
 		{
-			hpp<<", "<<cat->getName()<<"(this)"<<endl;
+			hpp<<", "<<cat->getName()<<"(*this)"<<endl;
 		}
 
-		hpp<<", __schemaInternals(this)"<<endl;
+		hpp<<", __schemaInternals(*this)"<<endl;
 
 		hpp<<"{}"<<endl;
 
-		hpp<<"inline "<<data->getName()<<"::"<<"__SchemaInternals::__SchemaInternals(const "<<data->getName()<<" *schema)"<<endl;
+		hpp<<"inline "<<data->getName()<<"::"<<"__SchemaInternals::__SchemaInternals(const "<<data->getName()<<" &schema)"<<endl;
 		hpp<<": stub()"<<endl;
 		//связи
 		BOOST_FOREACH(const CategoryRelation &rel, data->getCategoryRelation())
@@ -417,12 +417,12 @@ namespace workers
 		//поля
 		BOOST_FOREACH(const Field &fld, allFields)
 		{
-			hpp<<", field_"<<fld->getParent()->getName()<<"_"<<fld->getName()<<"(&schema->"<<fld->getParent()->getName()<<")"<<endl;
+			hpp<<", field_"<<fld->getParent()->getName()<<"_"<<fld->getName()<<"(schema."<<fld->getParent()->getName()<<")"<<endl;
 		}
 		//индексы
 		BOOST_FOREACH(const Index &idx, allIndices)
 		{
-			hpp<<", index_"<<idx->getParent()->getName()<<"_"<<idx->getName()<<"(&schema->"<<idx->getParent()->getName()<<")"<<endl;
+			hpp<<", index_"<<idx->getParent()->getName()<<"_"<<idx->getName()<<"(schema."<<idx->getParent()->getName()<<")"<<endl;
 		}
 		hpp<<"{}"<<endl;
 
@@ -451,7 +451,10 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<cat->getName()<<"(const "<<cat->getParent()->getName()<<"* schema);"<<endl;
+		hpp<<cat->getName()<<"(const "<<cat->getParent()->getName()<<" &schema);"<<endl;
+
+		//контейнер
+		hpp<<"const "<<cat->getParent()->getName()<<" &_schema;"<<endl;
 
 		//поля
 		BOOST_FOREACH(const Field &fld, collectFields(cat))
@@ -490,7 +493,10 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<fld->getParent()->getName()<<"_"<<fld->getName()<<"(const categories::"<<fld->getParent()->getName()<<"* category);"<<endl;
+		hpp<<fld->getParent()->getName()<<"_"<<fld->getName()<<"(const categories::"<<fld->getParent()->getName()<<" &category);"<<endl;
+
+		//контейнер
+		hpp<<"const categories::"<<fld->getParent()->getName()<<" &_category;"<<endl;
 
 		hpp<<"};\n"<<endl;
 	}
@@ -509,7 +515,10 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<idx->getParent()->getName()<<"_"<<idx->getName()<<"(const categories::"<<idx->getParent()->getName()<<"* category);"<<endl;
+		hpp<<idx->getParent()->getName()<<"_"<<idx->getName()<<"(const categories::"<<idx->getParent()->getName()<<" &category);"<<endl;
+
+		//контейнер
+		hpp<<"const categories::"<<idx->getParent()->getName()<<" &_category;"<<endl;
 
 
 		hpp<<"};\n"<<endl;
@@ -529,7 +538,10 @@ namespace workers
 		hpp<<"public:"<<endl;
 
 		//конструктор
-		hpp<<relName(rel)<<"(const "<<rel->getParent()->getName()<<"* schema);"<<endl;
+		hpp<<relName(rel)<<"(const "<<rel->getParent()->getName()<<" &schema);"<<endl;
+
+		//контейнер
+		hpp<<"const "<<rel->getParent()->getName()<<" &_schema;"<<endl;
 
 		hpp<<"};\n"<<endl;
 
@@ -589,7 +601,7 @@ namespace workers
 	void WData::mkCategoryCode(out::File &hpp, const Category &cat)
 	{
 		//конструктор
-		hpp<<"inline "<<cat->getName()<<"::"<<cat->getName()<<"(const "<<cat->getParent()->getName()<<"* schema)"<<endl;
+		hpp<<"inline "<<cat->getName()<<"::"<<cat->getName()<<"(const "<<cat->getParent()->getName()<<" &schema)"<<endl;
 		hpp<<": ::dbMeta::Category("<<endl;
 		//родительская схема
 		hpp<<"schema,"<<endl;
@@ -601,46 +613,49 @@ namespace workers
 		hpp<<"boost::assign::list_of<const FieldPtr>()";
 		BOOST_FOREACH(const Field &fld, collectFields(cat))
 		{
-			hpp<<" (&schema->__schemaInternals.field_"<<fld->getParent()->getName()<<"_"<<fld->getName()<<")";
+			hpp<<" (&schema.__schemaInternals.field_"<<fld->getParent()->getName()<<"_"<<fld->getName()<<")";
 		}
 		hpp<<","<<endl;
 		//индексы
 		hpp<<"boost::assign::list_of<const IndexPtr>()";
 		BOOST_FOREACH(const Index &idx, collectIndices(cat))
 		{
-			hpp<<" (&schema->__schemaInternals.index_"<<idx->getParent()->getName()<<"_"<<idx->getName()<<")";
+			hpp<<" (&schema.__schemaInternals.index_"<<idx->getParent()->getName()<<"_"<<idx->getName()<<")";
 		}
 		hpp<<","<<endl;
 		//подключенные связи
 		hpp<<"boost::assign::list_of<const RelationEndPtr>()";
 		BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, true, false))
 		{
-			hpp<<" (schema->__schemaInternals.relation_"<<relName(rel)<<"._inputEnd)";
+			hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<"._inputEnd)";
 		}
 		BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, false, true))
 		{
-			hpp<<" (schema->__schemaInternals.relation_"<<relName(rel)<<"._outputEnd)";
+			hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<"._outputEnd)";
 		}
 		hpp<<")\n";
+
+		hpp<<", _schema(schema)\n";
+		
 
 		//поля
 		BOOST_FOREACH(const Field &fld, collectFields(cat))
 		{
-			hpp<<", "<<fld->getName()<<"(schema->__schemaInternals.field_"<<fld->getParent()->getName()<<"_"<<fld->getName()<<")\n";
+			hpp<<", "<<fld->getName()<<"(schema.__schemaInternals.field_"<<fld->getParent()->getName()<<"_"<<fld->getName()<<")\n";
 		}
 		//индексы
 		BOOST_FOREACH(const Index &idx, collectIndices(cat))
 		{
-			hpp<<", index_"<<idx->getName()<<"(schema->__schemaInternals.index_"<<idx->getParent()->getName()<<"_"<<idx->getName()<<")\n";
+			hpp<<", index_"<<idx->getName()<<"(schema.__schemaInternals.index_"<<idx->getParent()->getName()<<"_"<<idx->getName()<<")\n";
 		}
 		//подключенные связи
 		BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, true, false))
 		{
-			hpp<<", "<<relEndName(rel, false)<<"(*schema->__schemaInternals.relation_"<<relName(rel)<<"._inputEnd)\n";
+			hpp<<", "<<relEndName(rel, false)<<"(schema.__schemaInternals.relation_"<<relName(rel)<<"._inputEnd)\n";
 		}
 		BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, false, true))
 		{
-			hpp<<", "<<relEndName(rel, true)<<"(*schema->__schemaInternals.relation_"<<relName(rel)<<"._outputEnd)\n";
+			hpp<<", "<<relEndName(rel, true)<<"(schema.__schemaInternals.relation_"<<relName(rel)<<"._outputEnd)\n";
 		}
 
 		hpp<<"{\n};"<<endl;
@@ -650,7 +665,7 @@ namespace workers
 	void WData::mkFieldCode(out::File &hpp, const Field &fld)
 	{
 		//конструктор
-		hpp<<"inline "<<fld->getParent()->getName()<<"_"<<fld->getName()<<"::"<<fld->getParent()->getName()<<"_"<<fld->getName()<<"(const categories::"<<fld->getParent()->getName()<<"* category)"<<endl;
+		hpp<<"inline "<<fld->getParent()->getName()<<"_"<<fld->getName()<<"::"<<fld->getParent()->getName()<<"_"<<fld->getName()<<"(const categories::"<<fld->getParent()->getName()<<" &category)"<<endl;
 		hpp<<": ::dbMeta::Field("<<endl;
 		//родительская категория
 		hpp<<"category,"<<endl;
@@ -660,14 +675,18 @@ namespace workers
 		hpp<<"\""<<fld->getName()<<"\","<<endl;
 		//нул
 		hpp<<(fld->isAllowNull()?"true":"false");
-		hpp<<")\n{\n};"<<endl;
+		hpp<<")"<<endl;
+
+		hpp<<", _category(category)\n";
+
+		hpp<<"{\n};"<<endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void WData::mkIndexCode(out::File &hpp, const Index &idx)
 	{
 		//конструктор
-		hpp<<"inline "<<idx->getParent()->getName()<<"_"<<idx->getName()<<"::"<<idx->getParent()->getName()<<"_"<<idx->getName()<<"(const categories::"<<idx->getParent()->getName()<<"* category)"<<endl;
+		hpp<<"inline "<<idx->getParent()->getName()<<"_"<<idx->getName()<<"::"<<idx->getParent()->getName()<<"_"<<idx->getName()<<"(const categories::"<<idx->getParent()->getName()<<" &category)"<<endl;
 		hpp<<": ::dbMeta::Index("<<endl;
 		//родительская категория
 		hpp<<"category,"<<endl;
@@ -691,21 +710,29 @@ namespace workers
 
 		BOOST_FOREACH(const Field &fld, idx->getIndexOnCategoryFieldSrcs())
 		{
-			hpp<<" (&category->"<<fld->getName()<<")";
+			hpp<<" (&category."<<fld->getName()<<")";
 		}
+		hpp<<")"<<endl;
 
-		hpp<<")\n{\n};"<<endl;
+		hpp<<", _category(category)\n";
+
+		hpp<<"{\n};"<<endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void WData::mkRelationCode(out::File &hpp, const CategoryRelation &rel)
 	{
 		//конструктор
-		hpp<<"inline "<<relName(rel)<<"::"<<relName(rel)<<"(const "<<rel->getParent()->getName()<<"* schema)"<<endl;
+		hpp<<"inline "<<relName(rel)<<"::"<<relName(rel)<<"(const "<<rel->getParent()->getName()<<" &schema)"<<endl;
 		hpp<<": ::dbMeta::Relation("<<endl;
 		//родительская схема
 		hpp<<"schema"<<endl;
-		hpp<<")\n{\n};"<<endl;
+		hpp<<", \""<<relName(rel)<<"\"";
+		hpp<<")"<<endl;
+
+		hpp<<", _schema(schema)\n";
+
+		hpp<<"{\n};"<<endl;
 	}
 
 }

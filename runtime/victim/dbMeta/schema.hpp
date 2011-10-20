@@ -11,12 +11,13 @@ namespace dbMeta
 	{
 	protected:
 		Schema(
-			ManagerPtr manager,
-			const std::string _name,
-			const CategoryPtrs _categories,
-			const RelationPtrs _relations);
+			const Manager &manager,
+			const std::string &name,
+			const CategoryPtrs categories,
+			const RelationPtrs relations);
 
 	public:
+		const Manager &		_manager;
 		const std::string	_name;
 		const CategoryPtrs	_categories;
 		const RelationPtrs	_relations;

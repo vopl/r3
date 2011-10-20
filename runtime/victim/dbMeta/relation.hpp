@@ -2,17 +2,21 @@
 #define _DBMETA_RELATION_HPP_
 
 #include "dbMeta/common.hpp"
+#include "dbMeta/relationEnd.hpp"
 
 namespace dbMeta
 {
 	class Relation
 	{
 	public:
-		Relation(const SchemaPtr shcema);
+		Relation(
+			const Schema &schema, 
+			const std::string &name);
 
+		const Schema &		_schema;
 		const std::string	_name;
-		const RelationEndPtr _inputEnd;
-		const RelationEndPtr _outputEnd;
+		const RelationEnd	_inputEnd;
+		const RelationEnd	_outputEnd;
 	};
 }
 

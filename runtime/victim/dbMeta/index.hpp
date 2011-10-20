@@ -17,13 +17,13 @@ namespace dbMeta
 	{
 	protected:
 		Index(
-			const CategoryPtr _category,
-			const EIndexType _type,
-			const std::string _name,
-			const FieldPtrs _fields);
+			const Category &category,
+			const EIndexType type,
+			const std::string &name,
+			const FieldPtrs fields);
 
 	public:
-		const CategoryPtr	_category;
+		const Category		&_category;
 		const EIndexType	_type;
 		const std::string	_name;
 		const FieldPtrs		_fields;

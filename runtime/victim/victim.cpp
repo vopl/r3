@@ -19,8 +19,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	const dbMeta::schemas::TestCategories &tc = man.add<dbMeta::schemas::TestCategories>();
 
 	//tc.Furniture.cost;
-	//сырые объекты полей, связей вынести в контейнер чтоб ыне захламляли пространство схемы
-	tc.Service.comment._name;
+	tc.ContractSimple.param4._category._schema.Stock.index_Index._category;
 
 	pgc::Connection con;
 	//con.log(std::cerr, pgc::lf_all);

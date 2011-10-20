@@ -9,22 +9,20 @@ namespace dbMeta
 	{
 	protected:
 		Category(
-			const SchemaPtr _schema,
-			const bool _isAbstract,
-			const std::string _name,
-			const FieldPtrs _fields,
-			const IndexPtrs _indices,
-			const RelationEndPtrs _relations);
+			const Schema &schema,
+			const bool isAbstract,
+			const std::string &name,
+			const FieldPtrs fields,
+			const IndexPtrs indices,
+			const RelationEndPtrs relationEnds);
 
 	public:
-		const SchemaPtr			_schema;
+		const Schema &			_schema;
 		const bool				_isAbstract;
 		const std::string		_name;
 		const FieldPtrs			_fields;
 		const IndexPtrs			_indices;
 		const RelationEndPtrs	_relationEnds;
-
-		const FieldPtr	getField(const std::string &name);
 	};
 }
 

@@ -27,7 +27,7 @@ namespace dbMeta
 	template <class T>
 	const T &Manager::add()
 	{
-		T *p = new T(this);
+		T *p = new T(*this);
 
 		if(_mschemas.end() != _mschemas.find(p->_name))
 		{

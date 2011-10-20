@@ -34,13 +34,13 @@ namespace dbMeta
 	{
 	protected:
 		Field(
-			const CategoryPtr _category,
-			const EFieldType _type,
-			const std::string _name,
-			const bool _allowNull);
+			const Category &category,
+			const EFieldType type,
+			const std::string &name,
+			const bool allowNull);
 
 	public:
-		const CategoryPtr	_category;
+		const Category &	_category;
 		const EFieldType	_type;
 		const std::string	_name;
 		const bool			_allowNull;
