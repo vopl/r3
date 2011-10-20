@@ -11,8 +11,8 @@ namespace dbMeta
 		Relation(const SchemaPtr shcema);
 
 		const std::string	_name;
-		const RelationEndPtr getInputEnd();
-		const RelationEndPtr getOutputEnd();
+		const RelationEndPtr _inputEnd;
+		const RelationEndPtr _outputEnd;
 	};
 }
 

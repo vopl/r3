@@ -20,9 +20,6 @@ namespace dbMeta
 		const std::string	_name;
 		const CategoryPtrs	_categories;
 		const RelationPtrs	_relations;
-
-
-		const RelationPtr getRelation(const std::string &name);
 	};
 }
 

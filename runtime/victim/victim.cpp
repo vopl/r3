@@ -19,9 +19,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	const dbMeta::schemas::TestCategories &tc = man.add<dbMeta::schemas::TestCategories>();
 
 	//tc.Furniture.cost;
-	//конструкторы генерировать после типов а не вместе
 	//сырые объекты полей, связей вынести в контейнер чтоб ыне захламляли пространство схемы
-	//tc.Furniture.index_Index.
+	tc.Service.comment._name;
 
 	pgc::Connection con;
 	//con.log(std::cerr, pgc::lf_all);

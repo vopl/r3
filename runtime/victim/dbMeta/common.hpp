@@ -13,32 +13,32 @@ namespace dbMeta
 
 	//////////////////////////////////////////////////////////////////////////
 	class Schema;
-	typedef Schema *SchemaPtr;
+	typedef const Schema *SchemaPtr;
 	typedef std::vector<SchemaPtr> SchemaPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Field;
-	typedef Field *FieldPtr;
+	typedef const Field *FieldPtr;
 	typedef std::vector<FieldPtr> FieldPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Index;
-	typedef Index *IndexPtr;
+	typedef const Index *IndexPtr;
 	typedef std::vector<IndexPtr> IndexPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Category;
-	typedef Category * CategoryPtr;
+	typedef const Category * CategoryPtr;
 	typedef std::vector<CategoryPtr> CategoryPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Relation;
-	typedef Relation * RelationPtr;
+	typedef const Relation * RelationPtr;
 	typedef std::vector<RelationPtr> RelationPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class RelationEnd;
-	typedef RelationEnd * RelationEndPtr;
+	typedef const RelationEnd * RelationEndPtr;
 	typedef std::vector<RelationEndPtr> RelationEndPtrs;
 
 }
