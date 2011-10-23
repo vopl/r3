@@ -17,7 +17,7 @@ namespace dbMeta
 			const RelationPtrs relations);
 
 	public:
-		const Manager &		_manager;
+		const Manager *	_manager;
 		const std::string	_name;
 		const CategoryPtrs	_categories;
 		const RelationPtrs	_relations;

@@ -11,7 +11,7 @@ namespace dbMeta
 		const FieldPtrs fields,
 		const IndexPtrs indices,
 		const RelationEndPtrs relationEnds)
-		: _schema(schema)
+		: _schema(&schema)
 		, _isAbstract(isAbstract)
 		, _name(name)
 		, _fields(fields)
