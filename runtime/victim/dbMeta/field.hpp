@@ -40,7 +40,7 @@ namespace dbMeta
 			const bool allowNull);
 
 	public:
-		const Category &	_category;
+		const CategoryPtr	_category;
 		const EFieldType	_type;
 		const std::string	_name;
 		const bool			_allowNull;
