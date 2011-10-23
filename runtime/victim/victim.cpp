@@ -14,6 +14,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
+
 	dbMeta::Manager man;
 
 	const dbMeta::schemas::TestCategories &tc = man.add<dbMeta::schemas::TestCategories>();
