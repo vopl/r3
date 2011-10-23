@@ -274,10 +274,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\relationEnd.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dbMeta\relationEnd.hpp"
 				>
 			</File>

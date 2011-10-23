@@ -17,7 +17,7 @@ namespace dbMeta
 			const RelationEndPtrs relationEnds);
 
 	public:
-		const SchemaPtr			_schema;
+		const Schema &			_schema;
 		const bool				_isAbstract;
 		const std::string		_name;
 		const FieldPtrs			_fields;

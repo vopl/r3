@@ -33,12 +33,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	ss.init(&tc, con, "_test1");
 	//ss.check();
-	TSyncLog slog;
+	SchemaSyncronizer::TSyncLog slog;
 	ss.sync(slog);
 
-	BOOST_FOREACH(const SyncLogLine &line, slog)
+	BOOST_FOREACH(const std::string &line, slog)
 	{
-		std::cout<<line._msg<<", "<<line._data1<<", "<<line._data2<<", "<<line._data3<<endl;
+		std::cout<<line<<endl;
 	}
 	//ss.drop();
 
