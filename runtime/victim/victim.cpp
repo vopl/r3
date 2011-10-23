@@ -23,7 +23,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	SchemaSyncronizer ss;
 	pgc::Connection con;
-	//con.log(std::cerr, pgc::lf_all);
+	con.log(std::cerr, pgc::lf_all);
 	con.open("dbname=test user=postgres password=postgres port=5432");
 	if(pgc::ecs_ok != con.status())
 	{
