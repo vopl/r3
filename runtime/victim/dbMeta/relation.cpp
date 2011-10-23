@@ -27,6 +27,8 @@ namespace dbMeta
 	{
 		__inputEnd.__categories.clear();
 		__outputEnd.__categories.clear();
+
+		//_schema->_manager->getSchema("Mixed")
 		return true;
 	}
 
