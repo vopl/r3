@@ -661,11 +661,11 @@ namespace workers
 			hpp<<"boost::assign::list_of<const RelationEndPtr>";
 			BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, true, false))
 			{
-				hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<"._inputEnd)";
+				hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<".inputEnd)";
 			}
 			BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, false, true))
 			{
-				hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<"._outputEnd)";
+				hpp<<" (&schema.__schemaInternals.relation_"<<relName(rel)<<".outputEnd)";
 			}
 		}
 		hpp<<")\n";
@@ -686,11 +686,11 @@ namespace workers
 		//подключенные связи
 		BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, true, false))
 		{
-			hpp<<", "<<relEndName(rel, false)<<"(schema.__schemaInternals.relation_"<<relName(rel)<<"._inputEnd)\n";
+			hpp<<", "<<relEndName(rel, false)<<"(schema.__schemaInternals.relation_"<<relName(rel)<<".inputEnd)\n";
 		}
 		BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, false, true))
 		{
-			hpp<<", "<<relEndName(rel, true)<<"(schema.__schemaInternals.relation_"<<relName(rel)<<"._outputEnd)\n";
+			hpp<<", "<<relEndName(rel, true)<<"(schema.__schemaInternals.relation_"<<relName(rel)<<".outputEnd)\n";
 		}
 
 		hpp<<"{\n};"<<endl;
@@ -768,7 +768,9 @@ namespace workers
 		hpp<<": ::dbMeta::Relation("<<endl;
 		//родительская схема
 		hpp<<"schema"<<endl;
-		hpp<<", \""<<relName(rel)<<"\"";
+		hpp<<", \""<<relName(rel)<<"\""<<endl;
+		hpp<<", "<<(CategoryRelationImpl::one_Multiplier1_Type == rel->getMultiplier1() ? "ermOne":"ermMany")<<endl;
+		hpp<<", "<<(CategoryRelationImpl::one_Multiplier2_Type == rel->getMultiplier2() ? "ermOne":"ermMany");
 		hpp<<")"<<endl;
 
 		hpp<<", _schema(schema)\n";

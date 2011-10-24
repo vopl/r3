@@ -14,6 +14,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
+
 	dbMeta::Manager man;
 
 	const dbMeta::schemas::TestCategories &tc = man.add<dbMeta::schemas::TestCategories>();
@@ -33,12 +34,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	ss.init(&tc, con, "_test1");
 	//ss.check();
-	SchemaSyncronizer::TSyncLog slog;
+	TSyncLog slog;
 	ss.sync(slog);
 
-	BOOST_FOREACH(const std::string &line, slog)
+	BOOST_FOREACH(const SyncLogLine &line, slog)
 	{
-		std::cout<<line<<endl;
+		std::cout<<line._msg<<", "<<line._data1<<", "<<line._data2<<", "<<line._data3<<endl;
 	}
 	//ss.drop();
 
