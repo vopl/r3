@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <boost/assign/list_of.hpp>
+#include "dbMeta/ptrContainer.hpp"
 
 namespace dbMeta
 {
@@ -14,42 +15,42 @@ namespace dbMeta
 	//////////////////////////////////////////////////////////////////////////
 	class Schema;
 	typedef Schema *SchemaPtr;
-	typedef std::vector<SchemaPtr> SchemaPtrs;
+	typedef PtrContainer<Schema*, const Schema *> SchemaPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Field;
 	typedef Field *FieldPtr;
-	typedef std::vector<FieldPtr> FieldPtrs;
+	typedef PtrContainer<Field*, const Field *> FieldPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class FieldScanty;
 	typedef FieldScanty *FieldScantyPtr;
-	typedef std::vector<FieldScantyPtr> FieldScantyPtrs;
+	typedef PtrContainer<FieldScanty*, const FieldScanty *> FieldScantyPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class FieldScantyValue;
 	typedef FieldScantyValue *FieldScantyValuePtr;
-	typedef std::vector<FieldScantyValuePtr> FieldScantyValuePtrs;
+	typedef PtrContainer<FieldScantyValue*, const FieldScantyValue *> FieldScantyValuePtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Index;
 	typedef Index *IndexPtr;
-	typedef std::vector<IndexPtr> IndexPtrs;
+	typedef PtrContainer<Index*, const Index *> IndexPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Category;
 	typedef Category * CategoryPtr;
-	typedef std::vector<CategoryPtr> CategoryPtrs;
+	typedef PtrContainer<Category*, const Category *> CategoryPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Relation;
 	typedef Relation * RelationPtr;
-	typedef std::vector<RelationPtr> RelationPtrs;
+	typedef PtrContainer<Relation*, const Relation *> RelationPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class RelationEnd;
 	typedef RelationEnd * RelationEndPtr;
-	typedef std::vector<RelationEndPtr> RelationEndPtrs;
+	typedef PtrContainer<RelationEnd*, const RelationEnd *> RelationEndPtrs;
 
 }
 

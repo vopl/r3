@@ -185,7 +185,13 @@ namespace workers
 		hpp<<"#define _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
 		hpp<<endl;
 
+		hpp<<"#include \"dbMeta/schema.hpp\""<<endl;
+		hpp<<"#include \"dbMeta/category.hpp\""<<endl;
 		hpp<<"#include \"dbMeta/relation.hpp\""<<endl;
+		hpp<<"#include \"dbMeta/relationend.hpp\""<<endl;
+		hpp<<"#include \"dbMeta/field.hpp\""<<endl;
+		hpp<<"#include \"dbMeta/index.hpp\""<<endl;
+		hpp<<"#include \"dbMeta/schemaInitializer.hpp\""<<endl;
 		hpp<<endl;
 
 // 		hpp<<"//warning C4355: 'this' : used in base member initializer list"<<endl;
@@ -308,7 +314,13 @@ namespace workers
 
 
 
-		hpp<<"}\n}"<<endl;
+		hpp<<"}"<<endl;
+
+		mkSchemaInitializerDeps(hpp, data);
+		mkSchemaInitializerCreate(hpp, data);
+		mkSchemaInitializerLinks(hpp, data);
+
+		hpp<<"}"<<endl;
 
 // 		hpp<<"#pragma warning( default : 4355 )"<<endl;
 
@@ -479,6 +491,31 @@ namespace workers
 
 
 
+	void WData::mkSchemaInitializerDeps(out::File &hpp, const Data &data)
+	{
+		hpp<<"template <>\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::checkDependencies()\n"
+			"{\n"
+			"return false;\n"
+			"}\n"<<endl;
+
+	}
+	void WData::mkSchemaInitializerCreate(out::File &hpp, const Data &data)
+	{
+		hpp<<"template <>\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::createObjects()\n"
+			"{\n"
+			"return false;\n"
+			"}\n"<<endl;
+	}
+	void WData::mkSchemaInitializerLinks(out::File &hpp, const Data &data)
+	{
+		hpp<<"template <>\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::linkObjects()\n"
+			"{\n"
+			"return false;\n"
+			"}\n"<<endl;
+	}
 
 
 

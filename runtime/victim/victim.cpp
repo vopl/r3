@@ -10,14 +10,17 @@ using namespace std;
 #include "dbMeta/index.hpp"
 #include "dbMeta/category.hpp"
 #include "dbMeta/schemas/TestCategories.hpp"
+#include "dbMeta/manager.hpp"
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
-	dbMeta::schemas::TestCategories *tc;
+	dbMeta::Manager man;
 
-	tc->Employee->rateNight;
+	man.add<dbMeta::schemas::TestCategories>();
+	man.initialize();
+
 	return 0;
 }
 

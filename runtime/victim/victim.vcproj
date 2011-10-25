@@ -5,6 +5,10 @@
 	Name="victim"
 	ProjectGUID="{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}"
 	RootNamespace="victim"
+	SccProjectName="&lt;Project Location In Database&gt;"
+	SccAuxPath="&lt;Source Control Database&gt;"
+	SccLocalPath="&lt;Local Binding Root of Project&gt;"
+	SccProvider="Mercurial Source Control Package"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -258,6 +262,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dbMeta\ptrContainer.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dbMeta\relation.hpp"
 				>
 			</File>
@@ -267,6 +275,10 @@
 			</File>
 			<File
 				RelativePath=".\dbMeta\schema.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\schemaInitializer.hpp"
 				>
 			</File>
 		</Filter>
