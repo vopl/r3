@@ -14,18 +14,16 @@ namespace dbMeta
 	//////////////////////////////////////////////////////////////////////////
 	class RelationEnd
 	{
-		CategoryPtr		__category;
-		CategoryPtrs	__categories;
-		friend class Relation;
-
 	public:
-		RelationEnd(const Relation &relation, ERelationMult mult);
+		//множитель
+		ERelationMult	_mult;
 
-		const RelationPtr	_relation;
-		const ERelationMult	_mult;
+		//связанная категория
+		CategoryPtr		_category;
 
-		const CategoryPtr	&_category;
-		const CategoryPtrs	_categories;
+		//объемлющая связь
+		RelationPtr		_relation;
+
 	};
 }
 

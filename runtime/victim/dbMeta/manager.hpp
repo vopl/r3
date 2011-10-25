@@ -10,35 +10,19 @@ namespace dbMeta
 {
 	class Manager
 	{
-		SchemaPtrs _vschemas;
-
-		typedef std::map<std::string, SchemaPtr> TMSchemas;
-		TMSchemas _mschemas;
-
 	public:
-		template <class Schema>
-		const Schema &add();
+		//добавить по типу
+		template <class Schema> void add();
 
-		const SchemaPtr getSchema(const std::string &name) const;
-		const SchemaPtrs &getSchemas() const;
+		//сериализация
+		void serialize();
 	};
 
 	///
 	template <class T>
-	const T &Manager::add()
+	void Manager::add()
 	{
-		T *p = new T(*this);
-
-		if(_mschemas.end() != _mschemas.find(p->_name))
-		{
-			delete p;
-			throw std::logic_error("schema "+p->_name+" already added");
-		}
-
-		_vschemas.push_back(p);
-		_mschemas[p->_name] = p;
-
-		return *p;
+		return;
 	}
 
 }

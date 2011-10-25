@@ -15,18 +15,18 @@ namespace dbMeta
 	//////////////////////////////////////////////////////////////////////////
 	class Index
 	{
-	protected:
-		Index(
-			const Category &category,
-			const EIndexType type,
-			const std::string &name,
-			const FieldPtrs fields);
-
 	public:
-		const CategoryPtr	_category;
-		const EIndexType	_type;
-		const std::string	_name;
-		const FieldPtrs		_fields;
+		//наименование
+		std::string	_name;
+
+		//тип индекса
+		EIndexType	_type;
+
+		//задействованные поля
+		FieldPtrs	_fields;
+
+		//объемлющая категория
+		CategoryPtr	_category;
 	};
 }
 

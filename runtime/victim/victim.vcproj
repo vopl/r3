@@ -230,10 +230,6 @@
 			Name="dbMeta"
 			>
 			<File
-				RelativePath=".\dbMeta\category.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dbMeta\category.hpp"
 				>
 			</File>
@@ -242,15 +238,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\field.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dbMeta\field.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\index.cpp"
+				RelativePath=".\dbMeta\fieldScanty.hpp"
 				>
 			</File>
 			<File
@@ -266,23 +258,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\relation.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dbMeta\relation.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\relationEnd.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dbMeta\relationEnd.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\schema.cpp"
 				>
 			</File>
 			<File

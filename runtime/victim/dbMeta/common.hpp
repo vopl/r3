@@ -13,32 +13,42 @@ namespace dbMeta
 
 	//////////////////////////////////////////////////////////////////////////
 	class Schema;
-	typedef const Schema *SchemaPtr;
+	typedef Schema *SchemaPtr;
 	typedef std::vector<SchemaPtr> SchemaPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Field;
-	typedef const Field *FieldPtr;
+	typedef Field *FieldPtr;
 	typedef std::vector<FieldPtr> FieldPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
+	class FieldScanty;
+	typedef FieldScanty *FieldScantyPtr;
+	typedef std::vector<FieldScantyPtr> FieldScantyPtrs;
+
+	//////////////////////////////////////////////////////////////////////////
+	class FieldScantyValue;
+	typedef FieldScantyValue *FieldScantyValuePtr;
+	typedef std::vector<FieldScantyValuePtr> FieldScantyValuePtrs;
+
+	//////////////////////////////////////////////////////////////////////////
 	class Index;
-	typedef const Index *IndexPtr;
+	typedef Index *IndexPtr;
 	typedef std::vector<IndexPtr> IndexPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Category;
-	typedef const Category * CategoryPtr;
+	typedef Category * CategoryPtr;
 	typedef std::vector<CategoryPtr> CategoryPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Relation;
-	typedef const Relation * RelationPtr;
+	typedef Relation * RelationPtr;
 	typedef std::vector<RelationPtr> RelationPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class RelationEnd;
-	typedef const RelationEnd * RelationEndPtr;
+	typedef RelationEnd * RelationEndPtr;
 	typedef std::vector<RelationEndPtr> RelationEndPtrs;
 
 }
