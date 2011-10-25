@@ -188,8 +188,9 @@ namespace workers
 		hpp<<"#include \"dbMeta/schema.hpp\""<<endl;
 		hpp<<"#include \"dbMeta/category.hpp\""<<endl;
 		hpp<<"#include \"dbMeta/relation.hpp\""<<endl;
-		hpp<<"#include \"dbMeta/relationend.hpp\""<<endl;
+		hpp<<"#include \"dbMeta/relationEnd.hpp\""<<endl;
 		hpp<<"#include \"dbMeta/field.hpp\""<<endl;
+		hpp<<"#include \"dbMeta/fieldScanty.hpp\""<<endl;
 		hpp<<"#include \"dbMeta/index.hpp\""<<endl;
 		hpp<<"#include \"dbMeta/schemaInitializer.hpp\""<<endl;
 		hpp<<endl;
@@ -316,9 +317,11 @@ namespace workers
 
 		hpp<<"}"<<endl;
 
+		mkSchemaInitializerPre(hpp, data);
 		mkSchemaInitializerDeps(hpp, data);
 		mkSchemaInitializerCreate(hpp, data);
 		mkSchemaInitializerLinks(hpp, data);
+		mkSchemaInitializerPost(hpp, data);
 
 		hpp<<"}"<<endl;
 
@@ -373,7 +376,16 @@ namespace workers
 			return;
 		}
 
-		hpp<<"\n : public ::dbMeta::Field\n{"<<endl;
+		hpp<<"\n : public ::dbMeta::";
+		if(Scanty(fld))
+		{
+			hpp<<"FieldScanty";
+		}
+		else
+		{
+			hpp<<"Field";
+		}
+		hpp<<"\n{"<<endl;
 		hpp<<"public:"<<endl;
 
 		hpp<<"};\n"<<endl;
@@ -490,24 +502,127 @@ namespace workers
 
 
 
-
-	void WData::mkSchemaInitializerDeps(out::File &hpp, const Data &data)
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkSchemaInitializerPre(out::File &hpp, const Data &data)
 	{
 		hpp<<"template <>\n"
-			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::checkDependencies()\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::preInit()\n"
 			"{\n"
-			"return false;\n"
+				"_schema->_name = \""<<data->getName()<<"\";\n"
+				"if(_storage->_schemas[_schema->_name]) \n"
+				"{\n"
+					"assert(!\"duplicated category: "<<data->getName()<<"\");\n"
+					"return false;\n"
+				"}\n"
+				"_schema->_storage = _storage;\n"
+				"_storage->_schemas.push_back(_schema);\n"
+				"return true;\n"
+			"}\n"<<endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkSchemaInitializerDeps(out::File &hpp, const Data &data)
+	{
+
+		std::set<Data> aliens;
+		BOOST_FOREACH(CategoryReference ref, data->getCategoryReference())
+		{
+			Category alienCat = ref->getCategory();
+			if(data != alienCat->getParent())
+			{
+				aliens.insert(Data(alienCat->getParent()));
+			}
+		}
+
+
+		hpp<<"template <>\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::checkDependencies()\n"
+			"{\n";
+
+
+		BOOST_FOREACH(Data alien, aliens)
+		{
+			hpp<<"if(!_storage->_schemas[\""<<alien->getName()<<"\"])\n"
+			"{\n"
+				"assert(!\"dependency absent: "<<alien->getName()<<" for "<<data->getName()<<"\");\n"
+				"return false;\n"
+			"}\n";
+		}
+
+
+		hpp<<"return true;\n"
 			"}\n"<<endl;
 
 	}
+	
+	//////////////////////////////////////////////////////////////////////////
 	void WData::mkSchemaInitializerCreate(out::File &hpp, const Data &data)
 	{
 		hpp<<"template <>\n"
 			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::createObjects()\n"
-			"{\n"
-			"return false;\n"
+			"{\n";
+
+			BOOST_FOREACH(Category cat, data->getCategory())
+			{
+				hpp<<
+				"{\n"
+				"	boost::shared_ptr<schemas::categories::"<<categoryClassName(cat)<<"> c(new schemas::categories::"<<categoryClassName(cat)<<");\n"
+				"	c->_name = \""<<cat->getName()<<"\";"
+				"	c->_isAbstract = "<<(cat->isAbstract()?"true":"false")<<";\n"
+				"	c->_schema = _schema;\n"
+				"	_storage->_categories_heap.push_back(c);\n"
+				"	_schema->_categories.push_back(c.get());\n";
+
+				BOOST_FOREACH(Field fld, cat->getChildFCOs())
+				{
+					if(fld)
+					{
+						hpp<<
+							"{\n"
+							"	boost::shared_ptr<schemas::fields::"<<fieldClassName(fld)<<"> f(new schemas::fields::"<<fieldClassName(fld)<<");\n"
+							"	f->_name = \""<<fld->getName()<<"\";\n"
+							"	f->_type = eft"<<fld->getFCOMeta().name()<<";\n"
+							"	f->_category = c.get();\n";
+							
+							if(Scanty(fld))
+							{
+								Scanty sf(fld);
+								hpp<<"f->_values.reserve("<<sf->getScantyValue().size()<<");\n";
+
+								BOOST_FOREACH(ScantyValue sv, sf->getScantyValue())
+								{
+									hpp<<"{\n"
+										"boost::shared_ptr<FieldScantyValue> sv(new FieldScantyValue);"
+										"sv->_name = \""<<sv->getName()<<"\";\n"
+										"sv->_key = "<<sv->getScantyValueKey()<<";\n"
+										"sv->_shortDescription = \""<<sv->getShortDescription()<<"\";\n"
+										"sv->_longDescription = \""<<sv->getLongDescription()<<"\";\n"
+										"sv->_field = f.get();\n"
+										"_storage->_fieldScantyValues_heap.push_back(sv);\n"
+										"f->_values.push_back(sv.get());\n";
+
+									hpp<<"}\n";
+								}
+							}
+
+							hpp<<
+							"	_storage->_fields_heap.push_back(f);\n"
+							"	c->_ownFields.push_back(f.get());\n";
+							
+							hpp<<"}\n";
+					}
+				}
+
+				//теперь индексы
+				hpp<<
+				"}\n";
+			}
+
+			hpp<<"return true;\n"
 			"}\n"<<endl;
 	}
+	
+	//////////////////////////////////////////////////////////////////////////
 	void WData::mkSchemaInitializerLinks(out::File &hpp, const Data &data)
 	{
 		hpp<<"template <>\n"
@@ -518,6 +633,15 @@ namespace workers
 	}
 
 
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkSchemaInitializerPost(out::File &hpp, const Data &data)
+	{
+		hpp<<"template <>\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::postInit()\n"
+			"{\n"
+			"return false;\n"
+			"}\n"<<endl;
+	}
 
 
 

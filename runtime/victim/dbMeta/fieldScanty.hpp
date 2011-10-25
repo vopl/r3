@@ -10,16 +10,17 @@ namespace dbMeta
 	class FieldScantyValue
 	{
 	public:
-		std::string _name;
-		int			_key;
-		std::string _shortDescription;
-		std::string _longDescription;
+		std::string		_name;
+		int				_key;
+		std::string		_shortDescription;
+		std::string		_longDescription;
+		FieldScantyPtr	_field;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 	//set, enum
 	class FieldScanty
-		: Field
+		: public Field
 	{
 	public:
 		//значения

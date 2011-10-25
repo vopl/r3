@@ -20,7 +20,7 @@ namespace dbMeta
 		RelationPtrs	_relations;
 
 		//объемлющий менеджер
-		ManagerPtr		_manager;
+		ManagerStoragePtr		_storage;
 	};
 }
 

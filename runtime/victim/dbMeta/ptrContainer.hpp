@@ -55,10 +55,12 @@ namespace dbMeta
 
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
+	template <class T>
 	class PtrContainer
-		: public std::vector<Ptr>
+		: public std::vector<T *>
 	{
+		typedef T *Ptr;
+		typedef const T *ConstPtr;
 		typedef std::vector<Ptr> Base;
 
 		typedef std::multimap<std::string, Ptr> TMMap;
@@ -75,13 +77,13 @@ namespace dbMeta
 		template <class I> PtrContainer(const I &);
 
 		Ptr operator[](size_type idx);
-		const ConstPtr operator[](size_type idx) const;
+		ConstPtr operator[](size_type idx) const;
 
 		Ptr operator[](const char *name);
-		const ConstPtr operator[](const char *name) const;
+		ConstPtr operator[](const char *name) const;
 
 		Ptr operator[](const std::string &name);
-		const ConstPtr operator[](const std::string &name) const;
+		ConstPtr operator[](const std::string &name) const;
 
 		void resize ( size_type sz, Ptr c = Ptr() );
 
@@ -101,20 +103,20 @@ namespace dbMeta
 		iterator erase ( iterator position );
 		iterator erase ( iterator first, iterator last );
 
-		void swap ( PtrContainer<Ptr, ConstPtr>& cnt );
+		void swap ( PtrContainer<T>& cnt );
 		void clear ( );
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::insertToMap(const Ptr &c)
+	template <class T>
+	void PtrContainer<T>::insertToMap(const Ptr &c)
 	{
 		_map.insert(std::make_pair(c->_name, c));
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::eraseFromMap(const Ptr &c)
+	template <class T>
+	void PtrContainer<T>::eraseFromMap(const Ptr &c)
 	{
 		TMMap::iterator iter = _map.find(c->_name);
 		TMMap::iterator end = _map.end();
@@ -133,25 +135,25 @@ namespace dbMeta
 
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	PtrContainer<Ptr, ConstPtr>::PtrContainer()
+	template <class T>
+	PtrContainer<T>::PtrContainer()
 		: Base()
 		, _map()
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	PtrContainer<Ptr, ConstPtr>::PtrContainer(const PtrContainer &cnt)
+	template <class T>
+	PtrContainer<T>::PtrContainer(const PtrContainer &cnt)
 		: Base(cnt)
 		, _map(cnt._map)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
+	template <class T>
 	template <class I> 
-	PtrContainer<Ptr, ConstPtr>::PtrContainer(const I &i)
+	PtrContainer<T>::PtrContainer(const I &i)
 		: Base(i)
 		, _map()
 	{
@@ -164,8 +166,8 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	Ptr PtrContainer<Ptr, ConstPtr>::operator[](size_type idx)
+	template <class T>
+	typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](size_type idx)
 	{
 		if(idx < size())
 		{
@@ -175,8 +177,8 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	const ConstPtr PtrContainer<Ptr, ConstPtr>::operator[](size_type idx) const
+	template <class T>
+	typename PtrContainer<T>::ConstPtr PtrContainer<T>::operator[](size_type idx) const
 	{
 		if(idx < size())
 		{
@@ -186,60 +188,58 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	Ptr PtrContainer<Ptr, ConstPtr>::operator[](const char *name)
+	template <class T>
+	typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](const char *name)
 	{
 		const std::string key(name);
 		TMMap::iterator iter = _map.find(key);
 		if(_map.end() != iter)
 		{
-			return *iter;
+			return iter->second;
 		}
 		return Ptr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	const ConstPtr PtrContainer<Ptr, ConstPtr>::operator[](const char *name) const
+	template <class T>
+	typename PtrContainer<T>::ConstPtr PtrContainer<T>::operator[](const char *name) const
 	{
 		const std::string key(name);
 		TMMap::const_iterator iter = _map.find(key);
 		if(_map.end() != iter)
 		{
-			return *iter;
+			return iter->second;
 		}
 		return const Ptr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	Ptr PtrContainer<Ptr, ConstPtr>::operator[](const std::string &name)
+	template <class T>
+	typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](const std::string &name)
 	{
-		const std::string key(name);
 		TMMap::iterator iter = _map.find(name);
 		if(_map.end() != iter)
 		{
-			return *iter;
+			return iter->second;
 		}
 		return Ptr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	const ConstPtr PtrContainer<Ptr, ConstPtr>::operator[](const std::string &name) const
+	template <class T>
+	typename PtrContainer<T>::ConstPtr PtrContainer<T>::operator[](const std::string &name) const
 	{
-		const std::string key(name);
 		TMMap::const_iterator iter = _map.find(name);
 		if(_map.end() != iter)
 		{
-			return *iter;
+			return iter->second;
 		}
 		return ConstPtr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::resize ( size_type sz, Ptr c = Ptr() )
+	template <class T>
+	void PtrContainer<T>::resize ( size_type sz, Ptr c = Ptr() )
 	{
 		if(sz < size())
 		{
@@ -259,9 +259,9 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
+	template <class T>
 	template <class InputIterator>
-	void PtrContainer<Ptr, ConstPtr>::assign ( InputIterator first, InputIterator last )
+	void PtrContainer<T>::assign ( InputIterator first, InputIterator last )
 	{
 		Base::assign(first, last);
 
@@ -273,8 +273,8 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::assign ( size_type n, const Ptr& u )
+	template <class T>
+	void PtrContainer<T>::assign ( size_type n, const Ptr& u )
 	{
 		Base::assign(first, last);
 
@@ -286,32 +286,32 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::push_back ( const Ptr& x )
+	template <class T>
+	void PtrContainer<T>::push_back ( const Ptr& x )
 	{
 		Base::push_back(x);
 		insertToMap(x);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::pop_back ( )
+	template <class T>
+	void PtrContainer<T>::pop_back ( )
 	{
 		eraseFromMap(back());
 		Base::pop_back();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	typename PtrContainer<Ptr, ConstPtr>::iterator PtrContainer<Ptr, ConstPtr>::insert ( iterator position, const Ptr& x )
+	template <class T>
+	typename PtrContainer<T>::iterator PtrContainer<T>::insert ( iterator position, const Ptr& x )
 	{
 		Base::insert(position, x);
 		insertToMap(x);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::insert ( iterator position, size_type n, const Ptr& x )
+	template <class T>
+	void PtrContainer<T>::insert ( iterator position, size_type n, const Ptr& x )
 	{
 		Base::insert(position, n, x);
 		for(size_type i(0); i<n; i++)
@@ -321,9 +321,9 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
+	template <class T>
 	template <class InputIterator>
-	void PtrContainer<Ptr, ConstPtr>::insert ( iterator position, InputIterator first, InputIterator last )
+	void PtrContainer<T>::insert ( iterator position, InputIterator first, InputIterator last )
 	{
 		Base::insert(position, first, last);
 		for(InputIterator iter=first; iter!=last; iter++)
@@ -333,16 +333,16 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	typename PtrContainer<Ptr, ConstPtr>::iterator PtrContainer<Ptr, ConstPtr>::erase ( iterator position )
+	template <class T>
+	typename PtrContainer<T>::iterator PtrContainer<T>::erase ( iterator position )
 	{
 		eraseFromMap(*position);
 		Base::erase(position);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	typename PtrContainer<Ptr, ConstPtr>::iterator PtrContainer<Ptr, ConstPtr>::erase ( iterator first, iterator last )
+	template <class T>
+	typename PtrContainer<T>::iterator PtrContainer<T>::erase ( iterator first, iterator last )
 	{
 		for(InputIterator iter=first; iter!=last; iter++)
 		{
@@ -352,16 +352,16 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::swap ( PtrContainer<Ptr, ConstPtr>& cnt )
+	template <class T>
+	void PtrContainer<T>::swap ( PtrContainer<T>& cnt )
 	{
 		Base::swap(cnt);
 		_map.swap(cnt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class Ptr, class ConstPtr>
-	void PtrContainer<Ptr, ConstPtr>::clear ( )
+	template <class T>
+	void PtrContainer<T>::clear ( )
 	{
 		Base::clear();
 		_map.clear();

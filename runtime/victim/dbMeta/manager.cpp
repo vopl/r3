@@ -4,8 +4,31 @@
 namespace dbMeta
 {
 	//////////////////////////////////////////////////////////////////////////
+	Manager::Manager()
+		: _isInitialized(false)
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void Manager::initialize()
 	{
+		if(_isInitialized)
+		{
+			assert(!"already initialized");
+			throw "already initialized";
+			return;
+		}
+
+		BOOST_FOREACH(boost::shared_ptr<SchemaInitializerBase> si, _schemaInitializers)
+		{
+			if(!si->preInit())
+			{
+				assert(!"preInit failed");
+				throw "preInit failed";
+				return;
+			}
+		}
 		BOOST_FOREACH(boost::shared_ptr<SchemaInitializerBase> si, _schemaInitializers)
 		{
 			if(!si->checkDependencies())
@@ -33,6 +56,17 @@ namespace dbMeta
 				return;
 			}
 		}
+		BOOST_FOREACH(boost::shared_ptr<SchemaInitializerBase> si, _schemaInitializers)
+		{
+			if(!si->postInit())
+			{
+				assert(!"postInit failed");
+				throw "postInit failed";
+				return;
+			}
+		}
+
+		_isInitialized = true;
 	}
 
 }

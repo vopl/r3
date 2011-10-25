@@ -9,8 +9,11 @@ using namespace std;
 #include "dbMeta/field.hpp"
 #include "dbMeta/index.hpp"
 #include "dbMeta/category.hpp"
-#include "dbMeta/schemas/TestCategories.hpp"
 #include "dbMeta/manager.hpp"
+
+#include "dbMeta/schemas/TestCategories.hpp"
+#include "dbMeta/schemas/Mixed.hpp"
+#include "dbMeta/schemas/ForFields.hpp"
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -19,6 +22,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	dbMeta::Manager man;
 
 	man.add<dbMeta::schemas::TestCategories>();
+	man.add<dbMeta::schemas::Mixed>();
+	man.add<dbMeta::schemas::ForFields>();
 	man.initialize();
 
 	return 0;

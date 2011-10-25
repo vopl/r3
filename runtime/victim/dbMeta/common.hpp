@@ -9,48 +9,48 @@
 namespace dbMeta
 {
 	//////////////////////////////////////////////////////////////////////////
-	class Manager;
-	typedef Manager *ManagerPtr;
+	class ManagerStorage;
+	typedef ManagerStorage *ManagerStoragePtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Schema;
 	typedef Schema *SchemaPtr;
-	typedef PtrContainer<Schema*, const Schema *> SchemaPtrs;
+	typedef PtrContainer<Schema> SchemaPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Field;
 	typedef Field *FieldPtr;
-	typedef PtrContainer<Field*, const Field *> FieldPtrs;
+	typedef PtrContainer<Field> FieldPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class FieldScanty;
 	typedef FieldScanty *FieldScantyPtr;
-	typedef PtrContainer<FieldScanty*, const FieldScanty *> FieldScantyPtrs;
+	typedef PtrContainer<FieldScanty> FieldScantyPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class FieldScantyValue;
 	typedef FieldScantyValue *FieldScantyValuePtr;
-	typedef PtrContainer<FieldScantyValue*, const FieldScantyValue *> FieldScantyValuePtrs;
+	typedef PtrContainer<FieldScantyValue> FieldScantyValuePtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Index;
 	typedef Index *IndexPtr;
-	typedef PtrContainer<Index*, const Index *> IndexPtrs;
+	typedef PtrContainer<Index> IndexPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Category;
 	typedef Category * CategoryPtr;
-	typedef PtrContainer<Category*, const Category *> CategoryPtrs;
+	typedef PtrContainer<Category> CategoryPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Relation;
 	typedef Relation * RelationPtr;
-	typedef PtrContainer<Relation*, const Relation *> RelationPtrs;
+	typedef PtrContainer<Relation> RelationPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class RelationEnd;
 	typedef RelationEnd * RelationEndPtr;
-	typedef PtrContainer<RelationEnd*, const RelationEnd *> RelationEndPtrs;
+	typedef PtrContainer<RelationEnd> RelationEndPtrs;
 
 }
 

@@ -8,9 +8,11 @@ namespace dbMeta
 	class SchemaInitializerBase
 	{
 	public:
+		virtual bool preInit()=0;
 		virtual bool checkDependencies()=0;
 		virtual bool createObjects()=0;
 		virtual bool linkObjects()=0;
+		virtual bool postInit()=0;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -18,23 +20,34 @@ namespace dbMeta
 	class SchemaInitializer
 		: public SchemaInitializerBase
 	{
-		ManagerPtr _manager;
+		ManagerStorage *_storage;
 		SchemaPtr _schema;
 
 	public:
-		SchemaInitializer(ManagerPtr manager, SchemaPtr schema);
+		SchemaInitializer(ManagerStorage *storage, SchemaPtr schema);
 
+		bool preInit();
 		bool checkDependencies();
 		bool createObjects();
 		bool linkObjects();
+		bool postInit();
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Schema>
-	SchemaInitializer<Schema>::SchemaInitializer(ManagerPtr manager, SchemaPtr schema)
-		: _manager(manager)
+	SchemaInitializer<Schema>::SchemaInitializer(ManagerStorage *storage, SchemaPtr schema)
+		: _storage(storage)
 		, _schema(schema)
 	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Schema>
+	bool SchemaInitializer<Schema>::preInit()
+	{
+		assert(!"must be reimplemented in target schema");
+		throw "must be reimplemented in target schema";
+		return false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -58,6 +71,15 @@ namespace dbMeta
 	//////////////////////////////////////////////////////////////////////////
 	template <class Schema>
 	bool SchemaInitializer<Schema>::linkObjects()
+	{
+		assert(!"must be reimplemented in target schema");
+		throw "must be reimplemented in target schema";
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Schema>
+	bool SchemaInitializer<Schema>::postInit()
 	{
 		assert(!"must be reimplemented in target schema");
 		throw "must be reimplemented in target schema";

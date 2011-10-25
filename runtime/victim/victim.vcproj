@@ -262,6 +262,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dbMeta\managerStorage.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dbMeta\ptrContainer.hpp"
 				>
 			</File>
