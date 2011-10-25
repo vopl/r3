@@ -10,11 +10,24 @@ namespace dbMeta
 {
 	class Manager
 	{
+		//объекты из кучи
+		SchemaPtrs			_schemas;
+		CategoryPtrs		_categories;
+		RelationPtrs		_relations;
+		RelationEndPtrs		_relationEnds;
+		FieldPtrs			_fields;
+		IndexPtrs			_indices;
+
+		bool _isStartedUp;
+
 	public:
-		//добавить по типу
+		//добавить одну категорию по типу
 		template <class Schema> void add();
 
-		//сериализация
+		//после добавления нескольких типизированных необходима эта процедура
+		void startup();
+
+		//сериализация, стартапов никаких не нужно
 		void serialize();
 	};
 

@@ -51,19 +51,19 @@ namespace workers
 	public:
 		void mk(const std::set<FCO> &roots);
 	private:
-		void mkData(const Data &data);
+		void mkSchema(const Data &data);
 		void mkCategoryClass(out::File &hpp, const Category &cat, bool fwd=false);
 		void mkFieldClass(out::File &hpp, const Field &fld, bool fwd=false);
 		void mkIndexClass(out::File &hpp, const Index &idx, bool fwd=false);
 		void mkRelationClass(out::File &hpp, const CategoryRelation &rel, bool fwd=false);
 
-		void mkCategoryCode(out::File &hpp, const Category &cat);
-		void mkFieldCode(out::File &hpp, const Field &fld);
-		void mkIndexCode(out::File &hpp, const Index &idx);
-		void mkRelationCode(out::File &hpp, const CategoryRelation &rel);
-
-		std::string relName(const CategoryRelation &rel);
 		std::string relEndName(const CategoryRelation &rel, bool src);
+
+		std::string fieldClassName(const Field &obj);
+		std::string indexClassName(const Index &obj);
+		std::string relationClassName(const CategoryRelation &obj);
+		std::string categoryClassName(const Category &obj);
+		std::string schemaClassName(const Data &obj);
 	};
 }
 #endif
