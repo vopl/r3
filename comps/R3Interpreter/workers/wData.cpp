@@ -176,30 +176,54 @@ namespace workers
 	void WData::mkSchema(const Data &data)
 	{
 		Console::Out::WriteLine(("mkSchema: "+data->getName()).c_str());
-
 		boost::filesystem::create_directories(_path/"schemas");
-		out::File hpp(_path / "schemas" / (data->getName()+".hpp"));
 
-		hpp<<"// data: "<<data->getName()<<endl;
-		hpp<<"#ifndef _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
-		hpp<<"#define _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
-		hpp<<endl;
+		{
+			out::File hpp(_path / "schemas" / (data->getName()+".hpp"));
+			hpp<<"// data: "<<data->getName()<<endl;
+			hpp<<"#ifndef _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
+			hpp<<"#define _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
+			hpp<<endl;
+			hpp<<"#include \"dbMeta/schema.hpp\""<<endl;
+			hpp<<"#include \"dbMeta/category.hpp\""<<endl;
+			hpp<<"#include \"dbMeta/relation.hpp\""<<endl;
+			hpp<<"#include \"dbMeta/relationEnd.hpp\""<<endl;
+			hpp<<"#include \"dbMeta/field.hpp\""<<endl;
+			hpp<<"#include \"dbMeta/fieldScanty.hpp\""<<endl;
+			hpp<<"#include \"dbMeta/index.hpp\""<<endl;
+			hpp<<endl;
 
-		hpp<<"#include \"dbMeta/schema.hpp\""<<endl;
-		hpp<<"#include \"dbMeta/category.hpp\""<<endl;
-		hpp<<"#include \"dbMeta/relation.hpp\""<<endl;
-		hpp<<"#include \"dbMeta/relationEnd.hpp\""<<endl;
-		hpp<<"#include \"dbMeta/field.hpp\""<<endl;
-		hpp<<"#include \"dbMeta/fieldScanty.hpp\""<<endl;
-		hpp<<"#include \"dbMeta/index.hpp\""<<endl;
-		hpp<<"#include \"dbMeta/schemaInitializer.hpp\""<<endl;
-		hpp<<endl;
+			mkSchemaTypes(hpp, data);
 
-// 		hpp<<"//warning C4355: 'this' : used in base member initializer list"<<endl;
-// 		hpp<<"#pragma warning( disable : 4355 )"<<endl;
-// 		hpp<<endl;
+			hpp<<"#endif"<<endl;
+			hpp<<endl;
+			hpp.close();
+			out::styler_cpp(hpp.pathName());
+		}
 
+		{
+			out::File hpp(_path / "schemas" / (data->getName()+"_initializer.hpp"));
+			hpp<<"// data: "<<data->getName()<<endl;
+			hpp<<"#ifndef _DBMETA_SCHEMAS_"<<data->getName()<<"_INITIALIZER_hpp"<<endl;
+			hpp<<"#define _DBMETA_SCHEMAS_"<<data->getName()<<"_INITIALIZER_hpp"<<endl;
+			hpp<<endl;
+			hpp<<"#include \"dbMeta/schemas/"<<data->getName()<<".hpp\""<<endl;
+			hpp<<"#include \"dbMeta/schemaInitializer.hpp\""<<endl;
+			hpp<<endl;
 
+			mkSchemaInitializer(hpp, data);
+
+			hpp<<"#endif"<<endl;
+			hpp<<endl;
+			hpp.close();
+			out::styler_cpp(hpp.pathName());
+		}
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkSchemaTypes(out::File &hpp, const Data &data)
+	{
 		//////////////////////////////////////////////////////////////////////////
 		hpp<<"namespace dbMeta\n{\nnamespace schemas\n{"<<endl;
 
@@ -316,21 +340,7 @@ namespace workers
 
 
 		hpp<<"}"<<endl;
-
-		mkSchemaInitializerPre(hpp, data);
-		mkSchemaInitializerDeps(hpp, data);
-		mkSchemaInitializerCreate(hpp, data);
-		mkSchemaInitializerLinks(hpp, data);
-		mkSchemaInitializerPost(hpp, data);
-
 		hpp<<"}"<<endl;
-
-// 		hpp<<"#pragma warning( default : 4355 )"<<endl;
-
-		hpp<<"#endif"<<endl;
-		hpp<<endl;
-		hpp.close();
-		out::styler_cpp(hpp.pathName());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -499,7 +509,20 @@ namespace workers
 
 
 
+	//////////////////////////////////////////////////////////////////////////
+	void WData::mkSchemaInitializer(out::File &hpp, const Data &data)
+	{
+		//////////////////////////////////////////////////////////////////////////
+		hpp<<"namespace dbMeta\n{"<<endl;
 
+		mkSchemaInitializerPre(hpp, data);
+		mkSchemaInitializerDeps(hpp, data);
+		mkSchemaInitializerCreate(hpp, data);
+		mkSchemaInitializerLinks(hpp, data);
+		mkSchemaInitializerPost(hpp, data);
+
+		hpp<<"}"<<endl;
+	}
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -614,10 +637,82 @@ namespace workers
 				}
 
 				//теперь индексы
+				BOOST_FOREACH(Index idx, cat->getIndex())
+				{
+					hpp<<
+						"{\n"
+						"	boost::shared_ptr<schemas::indices::"<<indexClassName(idx)<<"> i(new schemas::indices::"<<indexClassName(idx)<<");\n"
+						"	i->_name = \""<<idx->getName()<<"\";\n"
+						"	i->_type = eit";
+						switch(idx->getIndexType())
+						{
+						default:
+							assert(0);
+						case IndexImpl::tree_IndexType_Type:
+							hpp<<"Tree";
+							break;
+						case IndexImpl::hash_IndexType_Type:
+							hpp<<"Hash";
+							break;
+						}
+						hpp<<";\n"
+						"	i->_category = c.get();\n";
+
+					hpp<<
+						"	_storage->_indices_heap.push_back(i);\n"
+						"	c->_ownIndices.push_back(i.get());\n";
+
+					hpp<<"}\n";
+				}
+
 				hpp<<
 				"}\n";
 			}
 
+
+			BOOST_FOREACH(CategoryRelation rel, data->getCategoryRelation())
+			{
+				hpp<<
+					"{\n"
+					"	boost::shared_ptr<schemas::relations::"<<relationClassName(rel)<<"> r(new schemas::relations::"<<relationClassName(rel)<<");\n"
+					"	r->_name = \""<<relationClassName(rel)<<"\";"
+					"	r->_schema = _schema;\n"
+
+					"	r->inputEnd._mult = erm";
+					switch(rel->getMultiplier1())
+					{
+					default:
+						assert(0);
+					case CategoryRelationImpl::one_Multiplier1_Type:
+						hpp<<"One";
+						break;
+					case CategoryRelationImpl::many_Multiplier1_Type:
+						hpp<<"Many";
+						break;
+					}
+					hpp<<";\n"
+					"	r->inputEnd._relation = r.get();\n"
+
+					"	r->outputEnd._mult = erm";
+					switch(rel->getMultiplier2())
+					{
+					default:
+						assert(0);
+					case CategoryRelationImpl::one_Multiplier2_Type:
+						hpp<<"One";
+						break;
+					case CategoryRelationImpl::many_Multiplier2_Type:
+						hpp<<"Many";
+						break;
+					}
+					hpp<<";\n"
+					"	r->outputEnd._relation = r.get();\n"
+
+					"	_storage->_relations_heap.push_back(r);\n"
+					"	_schema->_relations.push_back(r.get());\n";
+
+				hpp<<"}\n"<<endl;
+			}
 			hpp<<"return true;\n"
 			"}\n"<<endl;
 	}
@@ -625,10 +720,49 @@ namespace workers
 	//////////////////////////////////////////////////////////////////////////
 	void WData::mkSchemaInitializerLinks(out::File &hpp, const Data &data)
 	{
+		//теперь связывание
 		hpp<<"template <>\n"
 			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::linkObjects()\n"
-			"{\n"
-			"return false;\n"
+			"{\n";
+
+		BOOST_FOREACH(Category cat, data->getCategory())
+		{
+			hpp<<"{\n";
+			hpp<<"CategoryPtr c = _schema->_categories[\""<<cat->getName()<<"\"];\n";
+
+			std::set<Category> cats;
+			//bases
+			cats.clear(); collectInheriance(cats, cat, true, false);
+			BOOST_FOREACH(Category cat2, cats)
+			{
+				hpp<<"c->_bases.push_back(_storage->_schemas[\""<<cat2->getParent()->getName()<<"\"]->_categories[\""<<cat2->getName()<<"\"]);\n";
+			}
+			//all bases
+			cats.clear(); collectInheriance(cats, cat, true, true);
+			BOOST_FOREACH(Category cat2, cats)
+			{
+				hpp<<"c->_allBases.push_back(_storage->_schemas[\""<<cat2->getParent()->getName()<<"\"]->_categories[\""<<cat2->getName()<<"\"]);\n";
+			}
+			//deriveds
+			cats.clear(); collectInheriance(cats, cat, false, false);
+			BOOST_FOREACH(Category cat2, cats)
+			{
+				hpp<<"c->_deriveds.push_back(_storage->_schemas[\""<<cat2->getParent()->getName()<<"\"]->_categories[\""<<cat2->getName()<<"\"]);\n";
+			}
+			//all deriveds
+			cats.clear(); collectInheriance(cats, cat, false, true);
+			BOOST_FOREACH(Category cat2, cats)
+			{
+				hpp<<"c->_allDeriveds.push_back(_storage->_schemas[\""<<cat2->getParent()->getName()<<"\"]->_categories[\""<<cat2->getName()<<"\"]);\n";
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			//поля и индексы
+
+			hpp<<"}\n";
+		}
+
+		hpp<<"return true;\n"
 			"}\n"<<endl;
 	}
 

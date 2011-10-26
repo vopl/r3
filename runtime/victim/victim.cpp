@@ -14,6 +14,11 @@ using namespace std;
 #include "dbMeta/schemas/TestCategories.hpp"
 #include "dbMeta/schemas/Mixed.hpp"
 #include "dbMeta/schemas/ForFields.hpp"
+
+#include "dbMeta/schemas/TestCategories_initializer.hpp"
+#include "dbMeta/schemas/Mixed_initializer.hpp"
+#include "dbMeta/schemas/ForFields_initializer.hpp"
+
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////

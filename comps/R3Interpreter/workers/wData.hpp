@@ -52,11 +52,14 @@ namespace workers
 		void mk(const std::set<FCO> &roots);
 	private:
 		void mkSchema(const Data &data);
+		void mkSchemaTypes(out::File &hpp, const Data &data);
+
 		void mkCategoryClass(out::File &hpp, const Category &cat, bool fwd=false);
 		void mkFieldClass(out::File &hpp, const Field &fld, bool fwd=false);
 		void mkIndexClass(out::File &hpp, const Index &idx, bool fwd=false);
 		void mkRelationClass(out::File &hpp, const CategoryRelation &rel, bool fwd=false);
 
+		void mkSchemaInitializer(out::File &hpp, const Data &data);
 		void mkSchemaInitializerPre(out::File &hpp, const Data &data);
 		void mkSchemaInitializerDeps(out::File &hpp, const Data &data);
 		void mkSchemaInitializerCreate(out::File &hpp, const Data &data);
