@@ -23,6 +23,8 @@ namespace dbMeta
 		ClusterStoragePtr	_storage;
 		SchemaPtr			_schema;
 
+		static const std::string _sname;
+
 	public:
 		SchemaInitializer(ClusterStorage *storage, SchemaPtr schema);
 
@@ -31,6 +33,8 @@ namespace dbMeta
 		bool createObjects();
 		bool linkObjects();
 		bool postInit();
+
+		static const std::string &getName();
 
 	private:
 		template <class Field>
@@ -90,6 +94,13 @@ namespace dbMeta
 		assert(!"must be reimplemented in target schema");
 		throw "must be reimplemented in target schema";
 		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Schema>
+	const std::string &SchemaInitializer<Schema>::getName()
+	{
+		return _sname;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

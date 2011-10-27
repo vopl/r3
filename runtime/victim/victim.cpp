@@ -27,6 +27,18 @@ int _tmain(int argc, _TCHAR* argv[])
 	cl.add<dbMeta::schemas::ForFields>();
 	cl.initialize();
 
+	{
+		dbMeta::SchemaCPtr s = cl.getByName("TestCategories");
+		s->_categories["Document"]->_name;
+		s->_categories["Contract"]->_fields["file"]->_name;
+	}
+
+	{
+		dbMeta::schemas::TestCategoriesCPtr s = cl.get<dbMeta::schemas::TestCategories>();
+		s->Contract->file->_name;
+
+		int k=220;
+	}
 	return 0;
 }
 

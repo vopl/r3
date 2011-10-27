@@ -17,16 +17,17 @@ namespace dbMeta
 	{
 	public:
 		//наименование
-		std::string	_name;
+		std::string		_name;
 
 		//тип индекса
-		EIndexType	_type;
+		EIndexType		_type;
 
 		//задействованные поля
-		FieldPtrs	_fields;
+		FieldPtrs		_fields;
 
 		//объемлющая категория
-		CategoryPtr	_category;
+		CategoryPtr		_category;
+		CategoryPtrs	_categories;
 	};
 }
 

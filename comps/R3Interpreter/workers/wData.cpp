@@ -225,7 +225,7 @@ namespace workers
 	void WData::mkSchemaTypes(out::File &hpp, const Data &data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		hpp<<"namespace dbMeta\n{\nnamespace schemas\n{"<<endl;
+		hpp<<"namespace dbMeta\n{"<<endl;
 
 		//////////////////////////////////////////////////////////////////////////
 
@@ -268,8 +268,13 @@ namespace workers
 			mkRelationClass(hpp, rel, true);
 		}
 		hpp<<"}"<<endl;
+
 		//предварительное объ€вление класса схемы
+		hpp<<"namespace schemas\n{"<<endl;
 		hpp<<"class "<<schemaClassName(data)<<";"<<endl;
+		hpp<<"typedef "<<schemaClassName(data)<<" *"<<schemaClassName(data)<<"Ptr;"<<endl;
+		hpp<<"typedef const "<<schemaClassName(data)<<" *"<<schemaClassName(data)<<"CPtr;"<<endl;
+		hpp<<"}"<<endl;
 
 
 
@@ -306,6 +311,7 @@ namespace workers
 
 		//////////////////////////////////////////////////////////////////////////
 		//класс схемы
+		hpp<<"namespace schemas\n{"<<endl;
 		hpp<<"class "<<schemaClassName(data)<<"\n	: public ::dbMeta::Schema\n{"<<endl;
 
 		hpp<<"public:"<<endl;
@@ -549,7 +555,7 @@ namespace workers
 			{
 				hpp<<
 				"{\n"
-				"	boost::shared_ptr<schemas::categories::"<<categoryClassName(cat)<<"> c(new schemas::categories::"<<categoryClassName(cat)<<");\n"
+				"	boost::shared_ptr<categories::"<<categoryClassName(cat)<<"> c(new categories::"<<categoryClassName(cat)<<");\n"
 				"	c->_name = \""<<cat->getName()<<"\";"
 				"	c->_isAbstract = "<<(cat->isAbstract()?"true":"false")<<";\n"
 				"	c->_schema = _schema;\n"
@@ -562,7 +568,7 @@ namespace workers
 					{
 						hpp<<
 							"{\n"
-							"	boost::shared_ptr<schemas::fields::"<<fieldClassName(fld)<<"> f(new schemas::fields::"<<fieldClassName(fld)<<");\n"
+							"	boost::shared_ptr<fields::"<<fieldClassName(fld)<<"> f(new fields::"<<fieldClassName(fld)<<");\n"
 							"	f->_name = \""<<fld->getName()<<"\";\n"
 							"	f->_type = eft"<<fld->getFCOMeta().name()<<";\n"
 							"	f->_category = c.get();\n";
@@ -634,7 +640,7 @@ namespace workers
 			{
 				hpp<<
 					"{\n"
-					"	boost::shared_ptr<schemas::relations::"<<relationClassName(rel)<<"> r(new schemas::relations::"<<relationClassName(rel)<<");\n"
+					"	boost::shared_ptr<relations::"<<relationClassName(rel)<<"> r(new relations::"<<relationClassName(rel)<<");\n"
 					"	r->_name = \""<<relationClassName(rel)<<"\";"
 					"	r->_schema = _schema;\n";
 
@@ -756,15 +762,19 @@ namespace workers
 			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::postInit()\n"
 			"{\n";
 
+			hpp<<"schemas::"<<schemaClassName(data)<<" *s = static_cast<schemas::"<<schemaClassName(data)<<" *>(_schema);\n";
+
 		BOOST_FOREACH(Category cat, data->getCategory())
 		{
 			hpp<<"{\n";
-			hpp<<"schemas::categories::"<<categoryClassName(cat)<<" *c = static_cast<schemas::categories::"<<categoryClassName(cat)<<" *>(_schema->_categories[\""<<cat->getName()<<"\"]);\n";
+			hpp<<"categories::"<<categoryClassName(cat)<<" *c = static_cast<categories::"<<categoryClassName(cat)<<" *>(_schema->_categories[\""<<cat->getName()<<"\"]);\n";
+
+			hpp<<"s->"<<cat->getName()<<" = c;\n";
 
 			//пол€
 			BOOST_FOREACH(const Field &fld, collectFields(cat))
 			{
-				hpp<<"c->"<<fld->getName()<<" = adoptField<schemas::fields::"<<fieldClassName(fld)<<">(c, \""<<fld->getName()<<"\");\n";
+				hpp<<"c->"<<fld->getName()<<" = adoptField<fields::"<<fieldClassName(fld)<<">(c, \""<<fld->getName()<<"\");\n";
 			}
 
 			//подключенные св€зи
@@ -789,6 +799,13 @@ namespace workers
 
 		hpp<<"return true;\n"
 			"}\n"<<endl;
+
+
+
+
+		hpp<<"template <>\n"
+			"const std::string SchemaInitializer<schemas::"<<schemaClassName(data)<<">::_sname=\""<<data->getName()<<"\";\n";
+
 	}
 
 

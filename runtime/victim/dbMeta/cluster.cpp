@@ -45,6 +45,27 @@ namespace dbMeta
 			}
 		}
 
+		BOOST_FOREACH(SchemaPtr s, _schemas)
+		{
+			BOOST_FOREACH(CategoryPtr c, s->_categories)
+			{
+				BOOST_FOREACH(FieldPtr f, c->_ownFields)
+				{
+					f->_categories.push_back(c);
+					f->_categories.insert(f->_categories.end(), c->_allDeriveds.begin(), c->_allDeriveds.end());
+				}
+				BOOST_FOREACH(IndexPtr i, c->_ownIndices)
+				{
+					i->_categories.push_back(c);
+					i->_categories.insert(i->_categories.end(), c->_allDeriveds.begin(), c->_allDeriveds.end());
+				}
+				BOOST_FOREACH(RelationEndPtr re, c->_ownRelationEnds)
+				{
+					re->_categories.push_back(c);
+					re->_categories.insert(re->_categories.end(), c->_allDeriveds.begin(), c->_allDeriveds.end());
+				}
+			}
+		}
 
 		return true;
 	}
@@ -122,6 +143,12 @@ namespace dbMeta
 
 		_schemaInitializers.clear();
 		_isInitialized = true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	SchemaCPtr Cluster::getByName(const std::string &name)
+	{
+		return _schemas[name];
 	}
 
 }
