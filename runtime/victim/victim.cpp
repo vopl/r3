@@ -21,6 +21,20 @@ using namespace std;
 #include "pgc/connection.hpp"
 //////////////////////////////////////////////////////////////////////////
 
+class Cluster
+{
+public:
+	Cluster(dbMeta::Cluster *cluster, const std::string &prefix, const std::string &suffix);
+
+// 	bool structureSync(log &log);
+// 	bool structureDrop(log &log);
+
+// 	select
+// 	insert
+// 	update
+// 	delete
+};
+
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
