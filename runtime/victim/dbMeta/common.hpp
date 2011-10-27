@@ -1,16 +1,13 @@
 #ifndef _DBMETA_COMMON_HPP_
 #define _DBMETA_COMMON_HPP_
 
-#include <vector>
-#include <string>
-#include <boost/assign/list_of.hpp>
 #include "dbMeta/ptrContainer.hpp"
 
 namespace dbMeta
 {
 	//////////////////////////////////////////////////////////////////////////
-	class ManagerStorage;
-	typedef ManagerStorage *ManagerStoragePtr;
+	class ClusterStorage;
+	typedef ClusterStorage *ClusterStoragePtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Schema;

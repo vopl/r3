@@ -238,6 +238,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dbMeta\cluster.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\cluster.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\clusterStorage.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dbMeta\common.hpp"
 				>
 			</File>
@@ -251,18 +263,6 @@
 			</File>
 			<File
 				RelativePath=".\dbMeta\index.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\managerStorage.hpp"
 				>
 			</File>
 			<File

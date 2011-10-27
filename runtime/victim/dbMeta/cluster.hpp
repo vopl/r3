@@ -1,15 +1,19 @@
-#ifndef _DBMETA_MANAGER_HPP_
-#define _DBMETA_MANAGER_HPP_
+#ifndef _DBMETA_CLUSTER_HPP_
+#define _DBMETA_CLUSTER_HPP_
 
-#include "dbMeta/managerStorage.hpp"
+#include "dbMeta/clusterStorage.hpp"
 #include "dbMeta/schemaInitializer.hpp"
+#include "dbMeta/schema.hpp"
+#include "dbMeta/field.hpp"
+#include "dbMeta/index.hpp"
+#include "dbMeta/category.hpp"
 
 namespace dbMeta
 {
 
 	//////////////////////////////////////////////////////////////////////////
-	class Manager
-		: private ManagerStorage
+	class Cluster
+		: private ClusterStorage
 	{
 		//инициализаторы
 		typedef std::vector<boost::shared_ptr<SchemaInitializerBase> > TVSchemaInitializers;
@@ -20,7 +24,7 @@ namespace dbMeta
 		bool collectInheritance(CategoryPtrs &res, CategoryPtr c, bool bases);
 
 	public:
-		Manager();
+		Cluster();
 
 		//добавить одну категорию по типу
 		template <class Schema> void add();
@@ -34,7 +38,7 @@ namespace dbMeta
 
 	///
 	template <class Schema>
-	void Manager::add()
+	void Cluster::add()
 	{
 		if(_isInitialized)
 		{

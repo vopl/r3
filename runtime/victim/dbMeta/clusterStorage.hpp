@@ -1,5 +1,5 @@
-#ifndef _DBMETA_MANAGERSTORAGE_HPP_
-#define _DBMETA_MANAGERSTORAGE_HPP_
+#ifndef _DBMETA_CLUSTERSTORAGE_HPP_
+#define _DBMETA_CLUSTERSTORAGE_HPP_
 
 #include "dbMeta/common.hpp"
 
@@ -7,7 +7,7 @@
 namespace dbMeta
 {
 	//////////////////////////////////////////////////////////////////////////
-	class ManagerStorage
+	class ClusterStorage
 	{
 	public:
 		//объекты из кучи

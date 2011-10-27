@@ -5,11 +5,7 @@
 #include <iostream>
 using namespace std;
 
-#include "dbMeta/schema.hpp"
-#include "dbMeta/field.hpp"
-#include "dbMeta/index.hpp"
-#include "dbMeta/category.hpp"
-#include "dbMeta/manager.hpp"
+#include "dbMeta/cluster.hpp"
 
 #include "dbMeta/schemas/TestCategories.hpp"
 #include "dbMeta/schemas/Mixed.hpp"
@@ -24,12 +20,12 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
-	dbMeta::Manager man;
+	dbMeta::Cluster cl;
 
-	man.add<dbMeta::schemas::TestCategories>();
-	man.add<dbMeta::schemas::Mixed>();
-	man.add<dbMeta::schemas::ForFields>();
-	man.initialize();
+	cl.add<dbMeta::schemas::TestCategories>();
+	cl.add<dbMeta::schemas::Mixed>();
+	cl.add<dbMeta::schemas::ForFields>();
+	cl.initialize();
 
 	return 0;
 }

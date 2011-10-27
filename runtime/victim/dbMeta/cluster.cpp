@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "dbMeta/manager.hpp"
+#include "dbMeta/cluster.hpp"
 #include "dbMeta/schema.hpp"
 #include "dbMeta/category.hpp"
 #include "dbMeta/relation.hpp"
@@ -11,7 +11,7 @@
 namespace dbMeta
 {
 	//////////////////////////////////////////////////////////////////////////
-	bool Manager::collectInheritance(CategoryPtrs &res, CategoryPtr c, bool bases)
+	bool Cluster::collectInheritance(CategoryPtrs &res, CategoryPtr c, bool bases)
 	{
 		CategoryPtrs &list = bases?c->_bases:c->_deriveds;
 
@@ -24,7 +24,7 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Manager::doInheritance()
+	bool Cluster::doInheritance()
 	{
 		BOOST_FOREACH(SchemaPtr s, _schemas)
 		{
@@ -50,14 +50,14 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Manager::Manager()
+	Cluster::Cluster()
 		: _isInitialized(false)
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Manager::initialize()
+	void Cluster::initialize()
 	{
 		if(_isInitialized)
 		{

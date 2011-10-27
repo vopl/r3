@@ -11,16 +11,16 @@ namespace dbMeta
 	{
 	public:
 		//наименование
-		std::string		_name;
+		std::string			_name;
 
 		//все категории
-		CategoryPtrs	_categories;
+		CategoryPtrs		_categories;
 
 		//все связи
-		RelationPtrs	_relations;
+		RelationPtrs		_relations;
 
 		//объемлющий менеджер
-		ManagerStoragePtr		_storage;
+		ClusterStoragePtr	_storage;
 	};
 }
 

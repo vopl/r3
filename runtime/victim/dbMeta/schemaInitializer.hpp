@@ -20,11 +20,11 @@ namespace dbMeta
 	class SchemaInitializer
 		: public SchemaInitializerBase
 	{
-		ManagerStorage *_storage;
-		SchemaPtr _schema;
+		ClusterStoragePtr	_storage;
+		SchemaPtr			_schema;
 
 	public:
-		SchemaInitializer(ManagerStorage *storage, SchemaPtr schema);
+		SchemaInitializer(ClusterStorage *storage, SchemaPtr schema);
 
 		bool preInit();
 		bool checkDependencies();
@@ -41,7 +41,7 @@ namespace dbMeta
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Schema>
-	SchemaInitializer<Schema>::SchemaInitializer(ManagerStorage *storage, SchemaPtr schema)
+	SchemaInitializer<Schema>::SchemaInitializer(ClusterStorage *storage, SchemaPtr schema)
 		: _storage(storage)
 		, _schema(schema)
 	{
