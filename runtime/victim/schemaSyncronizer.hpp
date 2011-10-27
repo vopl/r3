@@ -25,7 +25,7 @@ typedef std::deque<SyncLogLine> TSyncLog;
 //////////////////////////////////////////////////////////////////////////
 class SchemaSyncronizer
 {
-	dbMeta::SchemaPtr _s;
+	dbMeta::SchemaCPtr _s;
 	pgc::Connection _con;
 	std::string _suffix;
 
@@ -45,7 +45,7 @@ class SchemaSyncronizer
 public:
 	SchemaSyncronizer();
 	void init(
-		dbMeta::SchemaPtr s, 
+		dbMeta::SchemaCPtr s, 
 		pgc::Connection con, 
 		const std::string &suffix);
 

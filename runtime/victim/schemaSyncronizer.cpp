@@ -79,7 +79,7 @@ SchemaSyncronizer::SchemaSyncronizer()
 
 //////////////////////////////////////////////////////////////////////////
 void SchemaSyncronizer::init(
-		  const dbMeta::SchemaPtr s, 
+		  const dbMeta::SchemaCPtr s, 
 		  pgc::Connection con, 
 		  const std::string &suffix)
 {

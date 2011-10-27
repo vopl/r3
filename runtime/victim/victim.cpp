@@ -15,6 +15,10 @@ using namespace std;
 #include "dbMeta/schemas/Mixed_initializer.hpp"
 #include "dbMeta/schemas/ForFields_initializer.hpp"
 
+
+#include "schemaSyncronizer.hpp"
+
+#include "pgc/connection.hpp"
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,6 +43,19 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		int k=220;
 	}
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	pgc::Connection con;
+	con.open("dbname=test user=postgres password=postgres port=5432");
+
+	SchemaSyncronizer ss;
+	ss.init(cl.get<dbMeta::schemas::TestCategories>(), con, "_suf");
+	TSyncLog log;
+	ss.sync(log, true, true, true);
 	return 0;
 }
 
