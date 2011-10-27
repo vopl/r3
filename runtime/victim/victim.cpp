@@ -37,6 +37,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		dbMeta::schemas::TestCategoriesCPtr s = cl.get<dbMeta::schemas::TestCategories>();
 		s->Contract->file->_name;
 
+// 		BOOST_FOREACH(dbMeta::CategoryPtr cat, s->_categories)
+// 		{
+// 			cat->_name = "sdfg";
+// 		}
 		int k=220;
 	}
 	return 0;
