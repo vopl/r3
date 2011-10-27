@@ -9,24 +9,18 @@ namespace dbMeta
 	//////////////////////////////////////////////////////////////////////////
 	class Relation
 	{
-		RelationEnd		__inputEnd;
-		RelationEnd		__outputEnd;
-
-		friend class Manager;
-		virtual bool setCategories();
-
 	public:
-		Relation(
-			const Schema &schema, 
-			const std::string &name,
-			ERelationMult inputMult,
-			ERelationMult outputMult);
+		//наименование
+		std::string		_name;
 
-		const SchemaPtr			_schema;
-		const std::string		_name;
+		//входящий край
+		RelationEndPtr	_inputEnd;
 
-		const RelationEnd		&inputEnd;
-		const RelationEnd		&outputEnd;
+		//исходящий край
+		RelationEndPtr	_outputEnd;
+
+		//объемлющая схема
+		SchemaPtr		_schema;
 	};
 }
 

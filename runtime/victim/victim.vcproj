@@ -5,6 +5,10 @@
 	Name="victim"
 	ProjectGUID="{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}"
 	RootNamespace="victim"
+	SccProjectName="&lt;Project Location In Database&gt;"
+	SccAuxPath="&lt;Source Control Database&gt;"
+	SccLocalPath="&lt;Local Binding Root of Project&gt;"
+	SccProvider="Mercurial Source Control Package"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -230,11 +234,19 @@
 			Name="dbMeta"
 			>
 			<File
-				RelativePath=".\dbMeta\category.cpp"
+				RelativePath=".\dbMeta\category.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\category.hpp"
+				RelativePath=".\dbMeta\cluster.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\cluster.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbMeta\clusterStorage.hpp"
 				>
 			</File>
 			<File
@@ -242,15 +254,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\field.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dbMeta\field.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\index.cpp"
+				RelativePath=".\dbMeta\fieldScanty.hpp"
 				>
 			</File>
 			<File
@@ -258,15 +266,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\relation.cpp"
+				RelativePath=".\dbMeta\ptrContainer.hpp"
 				>
 			</File>
 			<File
@@ -274,19 +274,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\relationEnd.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dbMeta\relationEnd.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\schema.cpp"
+				RelativePath=".\dbMeta\schema.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dbMeta\schema.hpp"
+				RelativePath=".\dbMeta\schemaInitializer.hpp"
 				>
 			</File>
 		</Filter>

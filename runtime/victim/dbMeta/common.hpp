@@ -1,45 +1,53 @@
 #ifndef _DBMETA_COMMON_HPP_
 #define _DBMETA_COMMON_HPP_
 
-#include <vector>
-#include <string>
-#include <boost/assign/list_of.hpp>
+#include "dbMeta/ptrContainer.hpp"
 
 namespace dbMeta
 {
 	//////////////////////////////////////////////////////////////////////////
-	class Manager;
-	typedef Manager *ManagerPtr;
+	class ClusterStorage;
+	typedef ClusterStorage *ClusterStoragePtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Schema;
-	typedef const Schema *SchemaPtr;
-	typedef std::vector<SchemaPtr> SchemaPtrs;
+	typedef Schema *SchemaPtr;
+	typedef PtrContainer<Schema> SchemaPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Field;
-	typedef const Field *FieldPtr;
-	typedef std::vector<FieldPtr> FieldPtrs;
+	typedef Field *FieldPtr;
+	typedef PtrContainer<Field> FieldPtrs;
+
+	//////////////////////////////////////////////////////////////////////////
+	class FieldScanty;
+	typedef FieldScanty *FieldScantyPtr;
+	typedef PtrContainer<FieldScanty> FieldScantyPtrs;
+
+	//////////////////////////////////////////////////////////////////////////
+	class FieldScantyValue;
+	typedef FieldScantyValue *FieldScantyValuePtr;
+	typedef PtrContainer<FieldScantyValue> FieldScantyValuePtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Index;
-	typedef const Index *IndexPtr;
-	typedef std::vector<IndexPtr> IndexPtrs;
+	typedef Index *IndexPtr;
+	typedef PtrContainer<Index> IndexPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Category;
-	typedef const Category * CategoryPtr;
-	typedef std::vector<CategoryPtr> CategoryPtrs;
+	typedef Category * CategoryPtr;
+	typedef PtrContainer<Category> CategoryPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Relation;
-	typedef const Relation * RelationPtr;
-	typedef std::vector<RelationPtr> RelationPtrs;
+	typedef Relation * RelationPtr;
+	typedef PtrContainer<Relation> RelationPtrs;
 
 	//////////////////////////////////////////////////////////////////////////
 	class RelationEnd;
-	typedef const RelationEnd * RelationEndPtr;
-	typedef std::vector<RelationEndPtr> RelationEndPtrs;
+	typedef RelationEnd * RelationEndPtr;
+	typedef PtrContainer<RelationEnd> RelationEndPtrs;
 
 }
 

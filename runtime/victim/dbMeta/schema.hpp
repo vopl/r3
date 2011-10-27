@@ -9,18 +9,18 @@ namespace dbMeta
 	//////////////////////////////////////////////////////////////////////////
 	class Schema
 	{
-	protected:
-		Schema(
-			const Manager &manager,
-			const std::string &name,
-			const CategoryPtrs categories,
-			const RelationPtrs relations);
-
 	public:
-		const Manager *	_manager;
-		const std::string	_name;
-		const CategoryPtrs	_categories;
-		const RelationPtrs	_relations;
+		//наименование
+		std::string			_name;
+
+		//все категории
+		CategoryPtrs		_categories;
+
+		//все связи
+		RelationPtrs		_relations;
+
+		//объемлющий менеджер
+		ClusterStoragePtr	_storage;
 	};
 }
 

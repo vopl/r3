@@ -32,18 +32,19 @@ namespace dbMeta
 	//////////////////////////////////////////////////////////////////////////
 	class Field
 	{
-	protected:
-		Field(
-			const Category &category,
-			const EFieldType type,
-			const std::string &name,
-			const bool allowNull);
-
 	public:
-		const CategoryPtr	_category;
-		const EFieldType	_type;
-		const std::string	_name;
-		const bool			_allowNull;
+
+		//наименование
+		std::string		_name;
+
+		//тип поля
+		EFieldType		_type;
+
+		//индексы исходной категории, в которых задействовано это поле
+		IndexPtrs		_indices;
+
+		//исходная категория, в которой объявлено это поле
+		CategoryPtr		_category;
 	};
 }
 
