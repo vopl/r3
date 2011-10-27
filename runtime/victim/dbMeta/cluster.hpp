@@ -32,6 +32,9 @@ namespace dbMeta
 		//после добавления нескольких типизированных необходима эта процедура
 		void initialize();
 
+		template <class Schema> const Schema* get();
+		SchemaCPtr getByName(const std::string &name);
+
 		//сериализация, стартапов никаких не нужно
 		//void serialize();
 	};
@@ -54,6 +57,13 @@ namespace dbMeta
 		_schemas_heap.push_back(schema);
 
 		return;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Schema> 
+	const Schema* Cluster::get()
+	{
+		return static_cast<Schema*>(_schemas[SchemaInitializer<Schema>::getName()]);
 	}
 
 }

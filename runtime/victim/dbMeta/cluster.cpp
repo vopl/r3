@@ -145,4 +145,10 @@ namespace dbMeta
 		_isInitialized = true;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	SchemaCPtr Cluster::getByName(const std::string &name)
+	{
+		return _schemas[name];
+	}
+
 }
