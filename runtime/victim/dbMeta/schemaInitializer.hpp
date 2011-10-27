@@ -31,6 +31,12 @@ namespace dbMeta
 		bool createObjects();
 		bool linkObjects();
 		bool postInit();
+
+	private:
+		template <class Field>
+		Field *adoptField(CategoryPtr c, const char *name);
+		RelationEndPtr adoptRelationEnd(CategoryPtr c, const char *name);
+		IndexPtr adoptIndex(CategoryPtr c, const char *name);
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -84,6 +90,61 @@ namespace dbMeta
 		assert(!"must be reimplemented in target schema");
 		throw "must be reimplemented in target schema";
 		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Schema>
+	template <class Field>
+	Field *SchemaInitializer<Schema>::adoptField(CategoryPtr c, const char *name)
+	{
+		Field *fld = static_cast<Field *>(c->_fields[name]);
+		if(fld->_category != c)
+		{
+			boost::shared_ptr<Field> adopted(new Field);
+			*adopted = *fld;
+			adopted->_category = c;
+
+			c->_fields.replace(adopted.get());
+			_storage->_fields_heap.push_back(adopted);
+		}
+
+		return fld;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Schema>
+	RelationEndPtr SchemaInitializer<Schema>::adoptRelationEnd(CategoryPtr c, const char *name)
+	{
+		RelationEndPtr re = c->_relationEnds[name];
+		if(re->_category != c)
+		{
+			boost::shared_ptr<RelationEnd> adopted(new RelationEnd);
+			*adopted = *re;
+			adopted->_category = c;
+
+			c->_relationEnds.replace(adopted.get());
+			_storage->_relationEnds_heap.push_back(adopted);
+		}
+
+		return re;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Schema>
+	IndexPtr SchemaInitializer<Schema>::adoptIndex(CategoryPtr c, const char *name)
+	{
+		IndexPtr idx = c->_indices[name];
+		if(idx->_category != c)
+		{
+			boost::shared_ptr<Index> adopted(new Index);
+			*adopted = *idx;
+			adopted->_category = c;
+
+			c->_indices.replace(adopted.get());
+			_storage->_indices_heap.push_back(adopted);
+		}
+
+		return idx;
 	}
 
 }

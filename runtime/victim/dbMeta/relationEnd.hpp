@@ -15,6 +15,9 @@ namespace dbMeta
 	class RelationEnd
 	{
 	public:
+		//наименование
+		std::string		_name;
+
 		//множитель
 		ERelationMult	_mult;
 

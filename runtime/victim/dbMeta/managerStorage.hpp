@@ -1,11 +1,7 @@
 #ifndef _DBMETA_MANAGERSTORAGE_HPP_
 #define _DBMETA_MANAGERSTORAGE_HPP_
 
-#include "dbMeta/field.hpp"
-#include "dbMeta/index.hpp"
-#include "dbMeta/category.hpp"
-#include "dbMeta/schema.hpp"
-#include "dbMeta/schemaInitializer.hpp"
+#include "dbMeta/common.hpp"
 
 #include <boost/shared_ptr.hpp>
 namespace dbMeta

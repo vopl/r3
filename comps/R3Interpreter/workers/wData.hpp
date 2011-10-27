@@ -56,7 +56,6 @@ namespace workers
 
 		void mkCategoryClass(out::File &hpp, const Category &cat, bool fwd=false);
 		void mkFieldClass(out::File &hpp, const Field &fld, bool fwd=false);
-		void mkIndexClass(out::File &hpp, const Index &idx, bool fwd=false);
 		void mkRelationClass(out::File &hpp, const CategoryRelation &rel, bool fwd=false);
 
 		void mkSchemaInitializer(out::File &hpp, const Data &data);
@@ -69,7 +68,6 @@ namespace workers
 		std::string relEndName(const CategoryRelation &rel, bool src);
 
 		std::string fieldClassName(const Field &obj);
-		std::string indexClassName(const Index &obj);
 		std::string relationClassName(const CategoryRelation &obj);
 		std::string categoryClassName(const Category &obj);
 		std::string schemaClassName(const Data &obj);

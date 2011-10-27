@@ -16,6 +16,9 @@ namespace dbMeta
 		TVSchemaInitializers _schemaInitializers;
 		bool _isInitialized;
 
+		bool doInheritance();
+		bool collectInheritance(CategoryPtrs &res, CategoryPtr c, bool bases);
+
 	public:
 		Manager();
 

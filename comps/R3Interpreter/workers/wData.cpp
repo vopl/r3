@@ -253,14 +253,6 @@ namespace workers
 		}
 		hpp<<"}"<<endl;
 
-		//типы индексов
-		hpp<<"namespace indices\n{"<<endl;
-		BOOST_FOREACH(const Index &idx, allIndices)
-		{
-			mkIndexClass(hpp, idx, true);
-		}
-		hpp<<"}"<<endl;
-
 		//типы категорий
 		hpp<<"namespace categories\n{"<<endl;
 		BOOST_FOREACH(const Category &cat, data->getCategory())
@@ -289,14 +281,6 @@ namespace workers
 		BOOST_FOREACH(const Field &fld, allFields)
 		{
 			mkFieldClass(hpp, fld);
-		}
-		hpp<<"}"<<endl;
-
-		//типы индексов
-		hpp<<"namespace indices\n{"<<endl;
-		BOOST_FOREACH(const Index &idx, allIndices)
-		{
-			mkIndexClass(hpp, idx);
 		}
 		hpp<<"}"<<endl;
 
@@ -402,22 +386,6 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkIndexClass(out::File &hpp, const Index &idx, bool fwd)
-	{
-		hpp<<"class "<<indexClassName(idx);
-		if(fwd)
-		{
-			hpp<<";"<<endl;
-			return;
-		}
-
-		hpp<<"\n : public ::dbMeta::Index\n{"<<endl;
-		hpp<<"public:"<<endl;
-
-		hpp<<"};\n"<<endl;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	void WData::mkRelationClass(out::File &hpp, const CategoryRelation &rel, bool fwd)
 	{
 		hpp<<"class "<<relationClassName(rel);
@@ -444,17 +412,9 @@ namespace workers
 		return rel->getName2();
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	std::string WData::fieldClassName(const Field &obj)
-	{
-		return 
-			obj->getParent()->getParent()->getName()+"_"+
-			obj->getParent()->getName()+"_"+
-			obj->getName();
-	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string WData::indexClassName(const Index &obj)
+	std::string WData::fieldClassName(const Field &obj)
 	{
 		return 
 			obj->getParent()->getParent()->getName()+"_"+
@@ -641,7 +601,7 @@ namespace workers
 				{
 					hpp<<
 						"{\n"
-						"	boost::shared_ptr<schemas::indices::"<<indexClassName(idx)<<"> i(new schemas::indices::"<<indexClassName(idx)<<");\n"
+						"	boost::shared_ptr<Index> i(new Index);\n"
 						"	i->_name = \""<<idx->getName()<<"\";\n"
 						"	i->_type = eit";
 						switch(idx->getIndexType())
@@ -676,37 +636,51 @@ namespace workers
 					"{\n"
 					"	boost::shared_ptr<schemas::relations::"<<relationClassName(rel)<<"> r(new schemas::relations::"<<relationClassName(rel)<<");\n"
 					"	r->_name = \""<<relationClassName(rel)<<"\";"
-					"	r->_schema = _schema;\n"
+					"	r->_schema = _schema;\n";
 
-					"	r->inputEnd._mult = erm";
-					switch(rel->getMultiplier1())
-					{
-					default:
-						assert(0);
-					case CategoryRelationImpl::one_Multiplier1_Type:
-						hpp<<"One";
-						break;
-					case CategoryRelationImpl::many_Multiplier1_Type:
-						hpp<<"Many";
-						break;
-					}
-					hpp<<";\n"
-					"	r->inputEnd._relation = r.get();\n"
+					hpp<<"{\n"
+						"boost::shared_ptr<RelationEnd> re(new RelationEnd);\n"
 
-					"	r->outputEnd._mult = erm";
-					switch(rel->getMultiplier2())
-					{
-					default:
-						assert(0);
-					case CategoryRelationImpl::one_Multiplier2_Type:
-						hpp<<"One";
-						break;
-					case CategoryRelationImpl::many_Multiplier2_Type:
-						hpp<<"Many";
-						break;
-					}
-					hpp<<";\n"
-					"	r->outputEnd._relation = r.get();\n"
+						"re->_name = \""<<relEndName(rel, true)<<"\";\n"
+						"re->_mult = erm";
+						switch(rel->getMultiplier1())
+						{
+						default:
+							assert(0);
+						case CategoryRelationImpl::one_Multiplier1_Type:
+							hpp<<"One";
+							break;
+						case CategoryRelationImpl::many_Multiplier1_Type:
+							hpp<<"Many";
+							break;
+						}
+						hpp<<";\n"
+						"re->_relation = r.get();\n"
+						"r->_inputEnd = re.get();\n"
+						"_storage->_relationEnds_heap.push_back(re);\n";
+					hpp<<"}\n";
+
+					hpp<<"{\n"
+						"boost::shared_ptr<RelationEnd> re(new RelationEnd);\n"
+
+						"re->_name = \""<<relEndName(rel, false)<<"\";\n"
+						"re->_mult = erm";
+						switch(rel->getMultiplier2())
+						{
+						default:
+							assert(0);
+						case CategoryRelationImpl::one_Multiplier2_Type:
+							hpp<<"One";
+							break;
+						case CategoryRelationImpl::many_Multiplier2_Type:
+							hpp<<"Many";
+							break;
+						}
+						hpp<<";\n"
+						"re->_relation = r.get();\n"
+						"r->_outputEnd = re.get();\n"
+						"_storage->_relationEnds_heap.push_back(re);\n";
+					hpp<<"}\n"
 
 					"	_storage->_relations_heap.push_back(r);\n"
 					"	_schema->_relations.push_back(r.get());\n";
@@ -737,31 +711,39 @@ namespace workers
 			{
 				hpp<<"c->_bases.push_back(_storage->_schemas[\""<<cat2->getParent()->getName()<<"\"]->_categories[\""<<cat2->getName()<<"\"]);\n";
 			}
-			//all bases
-			cats.clear(); collectInheriance(cats, cat, true, true);
-			BOOST_FOREACH(Category cat2, cats)
-			{
-				hpp<<"c->_allBases.push_back(_storage->_schemas[\""<<cat2->getParent()->getName()<<"\"]->_categories[\""<<cat2->getName()<<"\"]);\n";
-			}
 			//deriveds
 			cats.clear(); collectInheriance(cats, cat, false, false);
 			BOOST_FOREACH(Category cat2, cats)
 			{
 				hpp<<"c->_deriveds.push_back(_storage->_schemas[\""<<cat2->getParent()->getName()<<"\"]->_categories[\""<<cat2->getName()<<"\"]);\n";
 			}
-			//all deriveds
-			cats.clear(); collectInheriance(cats, cat, false, true);
-			BOOST_FOREACH(Category cat2, cats)
-			{
-				hpp<<"c->_allDeriveds.push_back(_storage->_schemas[\""<<cat2->getParent()->getName()<<"\"]->_categories[\""<<cat2->getName()<<"\"]);\n";
-			}
-
-			//////////////////////////////////////////////////////////////////////////
-			//поля и индексы
-
 			hpp<<"}\n";
 		}
 
+		BOOST_FOREACH(CategoryRelation rel, data->getCategoryRelation())
+		{
+			hpp<<"{\n";
+			Category catSrc = rel->getSrc();
+			if(!catSrc) catSrc = CategoryReference(rel->getSrc())->getCategory();
+
+			Category catDst = rel->getDst();
+			if(!catDst) catDst = CategoryReference(rel->getDst())->getCategory();
+
+			hpp<<
+				"RelationPtr r = _storage->_schemas[\""<<rel->getParent()->getName()<<"\"]->_relations[\""<<relationClassName(rel)<<"\"];\n"
+				"CategoryPtr in = _storage->_schemas[\""<<catSrc->getParent()->getName()<<"\"]->_categories[\""<<catSrc->getName()<<"\"];\n"
+				"CategoryPtr out = _storage->_schemas[\""<<catDst->getParent()->getName()<<"\"]->_categories[\""<<catDst->getName()<<"\"];\n"
+
+
+				"r->_inputEnd->_category = in;\n"
+				"in->_ownRelationEnds.push_back(r->_inputEnd);\n"
+
+				"r->_outputEnd->_category = out;\n"
+				"out->_ownRelationEnds.push_back(r->_outputEnd);\n";
+
+
+			hpp<<"}\n"<<endl;
+		}
 		hpp<<"return true;\n"
 			"}\n"<<endl;
 	}
@@ -772,8 +754,40 @@ namespace workers
 	{
 		hpp<<"template <>\n"
 			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::postInit()\n"
-			"{\n"
-			"return false;\n"
+			"{\n";
+
+		BOOST_FOREACH(Category cat, data->getCategory())
+		{
+			hpp<<"{\n";
+			hpp<<"schemas::categories::"<<categoryClassName(cat)<<" *c = static_cast<schemas::categories::"<<categoryClassName(cat)<<" *>(_schema->_categories[\""<<cat->getName()<<"\"]);\n";
+
+			//поля
+			BOOST_FOREACH(const Field &fld, collectFields(cat))
+			{
+				hpp<<"c->"<<fld->getName()<<" = adoptField<schemas::fields::"<<fieldClassName(fld)<<">(c, \""<<fld->getName()<<"\");\n";
+			}
+
+			//подключенные связи
+			BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, true, false))
+			{
+				hpp<<"c->"<<relEndName(rel, false)<<" = adoptRelationEnd(c, \""<<relEndName(rel, false)<<"\");\n";
+			}
+			BOOST_FOREACH(const CategoryRelation &rel, collectRelations(cat, false, true))
+			{
+				hpp<<"c->"<<relEndName(rel, true)<<" = adoptRelationEnd(c, \""<<relEndName(rel, true)<<"\");\n";
+			}
+
+			//индексы
+			BOOST_FOREACH(const Index &idx, collectIndices(cat))
+			{
+				hpp<<"adoptIndex(c, \""<<idx->getName()<<"\");\n";
+			}
+
+
+			hpp<<"}\n";
+		}
+
+		hpp<<"return true;\n"
 			"}\n"<<endl;
 	}
 

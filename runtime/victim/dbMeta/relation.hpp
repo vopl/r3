@@ -14,10 +14,10 @@ namespace dbMeta
 		std::string		_name;
 
 		//входящий край
-		RelationEnd		inputEnd;
+		RelationEndPtr	_inputEnd;
 
 		//исходящий край
-		RelationEnd		outputEnd;
+		RelationEndPtr	_outputEnd;
 
 		//объемлющая схема
 		SchemaPtr		_schema;

@@ -94,6 +94,8 @@ namespace dbMeta
 		void push_back ( const Ptr& x );
 		void pop_back ( );
 
+		void replace ( const Ptr& x );
+
 		iterator insert ( iterator position, const Ptr& x );
 		void insert ( iterator position, size_type n, const Ptr& x );
 		
@@ -300,6 +302,23 @@ namespace dbMeta
 		eraseFromMap(back());
 		Base::pop_back();
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class T>
+	void PtrContainer<T>::replace ( const Ptr& x )
+	{
+		TMMap::iterator iter = _map.find(x->_name);
+		if(_map.end() != iter)
+		{
+			*std::find(begin(), end(), iter->second) = x;
+			iter->second = x;
+		}
+		else
+		{
+			assert(!"absent");
+		}
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
