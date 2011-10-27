@@ -23,6 +23,7 @@ namespace dbMeta
 
 		//связанная категория
 		CategoryPtr		_category;
+		CategoryPtrs	_categories;
 
 		//объемлющая связь
 		RelationPtr		_relation;

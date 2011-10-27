@@ -45,6 +45,7 @@ namespace dbMeta
 
 		//исходна€ категори€, в которой объ€влено это поле
 		CategoryPtr		_category;
+		CategoryPtrs	_categories;
 	};
 }
 
