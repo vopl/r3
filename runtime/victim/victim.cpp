@@ -30,6 +30,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		dbMeta::SchemaCPtr s = cl.getByName("TestCategories");
 		s->_categories["Document"]->_name;
+		s->_categories["Contract"]->_fields["file"]->_name;
 	}
 
 	{
