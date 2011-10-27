@@ -33,10 +33,10 @@ class SchemaSyncronizer
 
 	std::string db_quoteId(const std::string &name);
 	std::string db_name(const std::string &name, const std::string &name2="");
-	std::string db_fldType(dbMeta::FieldPtr fld);
+	std::string db_fldType(dbMeta::FieldCPtr fld);
 
 	bool syncTableField(
-		dbMeta::FieldPtr fld,
+		dbMeta::FieldCPtr fld,
 		TSyncLog &log,
 		bool allowCreate = true,
 		bool allowAlter = true,

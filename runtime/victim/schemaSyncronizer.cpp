@@ -17,7 +17,7 @@ std::string SchemaSyncronizer::db_name(const std::string &name, const std::strin
 }
 
 //////////////////////////////////////////////////////////////////////////
-std::string SchemaSyncronizer::db_fldType(dbMeta::FieldPtr fld)
+std::string SchemaSyncronizer::db_fldType(dbMeta::FieldCPtr fld)
 {
 	switch(fld->_type)
 	{
@@ -140,7 +140,7 @@ void SchemaSyncronizer::sync(TSyncLog &log,
 	if(!canContinue) return;
 
 	//наличие табличек категорий
-	BOOST_FOREACH(dbMeta::CategoryPtr cat, _s->_categories)
+	BOOST_FOREACH(dbMeta::CategoryCPtr cat, _s->_categories)
 	{
 		pgr = _con.once("SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2").exec(_s->_name+_suffix, cat->_name).throwIfError();
 		if(!pgr.rows())
@@ -160,9 +160,9 @@ void SchemaSyncronizer::sync(TSyncLog &log,
 	if(!canContinue) return;
 
 	//поля в табличках
-	BOOST_FOREACH(dbMeta::CategoryPtr cat, _s->_categories)
+	BOOST_FOREACH(dbMeta::CategoryCPtr cat, _s->_categories)
 	{
-		BOOST_FOREACH(dbMeta::FieldPtr fld, cat->_fields)
+		BOOST_FOREACH(dbMeta::FieldCPtr fld, cat->_fields)
 		{
 			canContinue &= syncTableField(fld, log, allowCreate, allowAlter, allowDrop);
 		}
@@ -170,7 +170,7 @@ void SchemaSyncronizer::sync(TSyncLog &log,
 	if(!canContinue) return;
 
 	//связи
-	BOOST_FOREACH(dbMeta::RelationPtr rel, _s->_relations)
+	BOOST_FOREACH(dbMeta::RelationCPtr rel, _s->_relations)
 	{
 		//canContinue &= syncRelation(rel, log, allowCreate, allowAlter, allowDrop);
 	}
@@ -183,7 +183,7 @@ void SchemaSyncronizer::sync(TSyncLog &log,
 
 //////////////////////////////////////////////////////////////////////////
 bool SchemaSyncronizer::syncTableField(
-										dbMeta::FieldPtr fld,
+										dbMeta::FieldCPtr fld,
 										TSyncLog &log,
 										bool allowCreate,
 										bool allowAlter,
