@@ -40,8 +40,11 @@ namespace pgc
 		template <class T> bool fetch(int rowIdx, int colIdx, T &v);
 		template <class T> bool fetch(int rowIdx, const char *colName, T &v);
 
-		int fetchInt(int rowIdx, int colIdx);
-		int fetchInt(int rowIdx, const char *colName);
+		boost::int32_t fetchInt32(int rowIdx, int colIdx);
+		boost::int32_t fetchInt32(int rowIdx, const char *colName);
+
+		boost::uint32_t fetchUInt32(int rowIdx, int colIdx);
+		boost::uint32_t fetchUInt32(int rowIdx, const char *colName);
 
 		std::string fetchString(int rowIdx, int colIdx);
 		std::string fetchString(int rowIdx, const char *colName);

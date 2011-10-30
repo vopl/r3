@@ -39,8 +39,18 @@ namespace dbCreator
 		std::string _prefix;
 		std::string _suffix;
 
-		//соответствия мета и таблиц базы
 		typedef boost::uint32_t TOid;
+
+		//соответствия мета и схем базы
+		//schema oid -> schema
+		typedef std::map<TOid, dbMeta::SchemaCPtr> TMOid2Schema;
+		TMOid2Schema _oid2schema;
+
+		//schema -> schema oid
+		typedef std::map<dbMeta::SchemaCPtr, TOid> TMSchema2Oid;
+		TMSchema2Oid _schema2oid;
+
+		//соответствия мета и таблиц базы
 		//table oid -> category
 		typedef std::map<TOid, dbMeta::CategoryCPtr> TMOid2Cat;
 		TMOid2Cat _oid2cat;
@@ -48,6 +58,7 @@ namespace dbCreator
 		//category -> table oid
 		typedef std::map<dbMeta::CategoryCPtr, TOid> TMCat2Oid;
 		TMCat2Oid _cat2oid;
+
 
 		//признак инициализированности
 		bool _isSynced;
@@ -73,7 +84,7 @@ namespace dbCreator
 		bool sync_tableExistence(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
 		bool sync_columnExistence(TSyncLog &log, dbMeta::FieldCPtr f, bool allowCreate);
 		bool sync_columnExistence(TSyncLog &log, dbMeta::RelationEndCPtr re, bool allowCreate);
-		bool sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate);
+		bool sync_tableInherits(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
 
 	public:
 		Cluster(boost::shared_ptr<dbMeta::Cluster> metaCluster);

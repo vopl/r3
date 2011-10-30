@@ -141,7 +141,7 @@ namespace dbCreator
 			.exec(schemaName(s, false, false))
 			.throwIfError();
 
-		if(!pgr.fetchInt(0,0))
+		if(!pgr.fetchInt32(0,0))
 		{
 			log.push_back(SyncLogLine("schema absent", schemaName(s, false, false)));
 
@@ -157,9 +157,23 @@ namespace dbCreator
 			}
 		}
 
+		//oid
+		pgr = _con
+			.once("SELECT oid FROM pg_catalog.pg_namespace WHERE nspname=$1")
+			.exec(schemaName(s, false, false))
+			.throwIfError();
+		if(pgr.rows() != 1)
+		{
+			log.push_back(SyncLogLine("obtain schema oid failed", schemaName(s, false, false)));
+			return false;
+		}
+		TOid oid = pgr.fetchUInt32(0, 0);
+		_schema2oid[s] = oid;
+		_oid2schema[oid] = s;
+
 		//генератор идентификаторов объектов
 		pgr = _con.once("SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2").exec(schemaName(s, false, false), idGenName(s, false, false)).throwIfError();
-		if(!pgr.fetchInt(0, 0))
+		if(!pgr.fetchInt32(0, 0))
 		{
 			log.push_back(SyncLogLine("idGen absent", schemaName(s, false, false), idGenName(s, false, false)));
 
@@ -195,6 +209,20 @@ namespace dbCreator
 			}
 		}
 
+		//oid
+		pgr = _con
+			.once("SELECT oid FROM pg_catalog.pg_class WHERE relname=$1 AND relnamespace=$2")
+			.exec(tableName(c, false, false), _schema2oid[c->_schema])
+			.throwIfError();
+		if(pgr.rows() != 1)
+		{
+			log.push_back(SyncLogLine("obtain table oid failed", schemaName(c->_schema, false, false), tableName(c, false, false)));
+			return false;
+		}
+		TOid oid = pgr.fetchUInt32(0, 0);
+		_cat2oid[c] = oid;
+		_oid2cat[oid] = c;
+
 		return true;
 	}
 
@@ -224,11 +252,7 @@ namespace dbCreator
 	{
 		dbMeta::RelationEndCPtr are = re->_anotherEnd;
 
-		enum {
-			nothing,
-			fk,
-			cross,
-		}mode = nothing;
+		bool makeFk = false;
 
 		if(re->_mult == dbMeta::ermOne)
 		{
@@ -239,7 +263,7 @@ namespace dbCreator
 				if(re->_isInput)
 				{
 					//делать внешний ключ на категорию другого края
-					mode = fk;
+					makeFk = true;
 				}
 				else
 				{
@@ -249,11 +273,8 @@ namespace dbCreator
 			else
 			{
 				//one -> many
-				//own fk
-				{
-					//делать внешний ключ на категорию другого края
-					mode = fk;
-				}
+				//alien fk
+				//ничего не делать, будет сделано с другого края
 			}
 		}
 		else
@@ -261,9 +282,10 @@ namespace dbCreator
 			if(are->_mult == dbMeta::ermOne)
 			{
 				//many -> one
-				//another fk
+				//own fk
 				{
-					//ничего не делать, будет сделано с другого края
+					//делать внешний ключ на категорию другого края
+					makeFk = true;
 				}
 			}
 			else
@@ -271,68 +293,67 @@ namespace dbCreator
 				//many -> many
 				//cross
 
-				if(re->_isInput)
-				{
-					//делать кросс между этой категорией и категорией другого края
-					mode = cross;
-				}
-				else
-				{
-					//ничего не делать, будет сделано с другого края
-				}
+				//own fk
+				//alien fk
+				//делать кросс между этой категорией и категорией другого края
+				makeFk = true;
 			}
 		}
 
-		switch(mode)
+		if(makeFk)
 		{
-		case nothing:
-			break;
-		case fk:
-			//std::cout<<"fk: "<<re->_category->_name<<"."<<re->_name<<" -> "<<are->_category->_name<<"."<<are->_name<<std::endl;
+			pgc::Result pgr = _con.once("SELECT * FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2 AND column_name=$3").exec(schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)).throwIfError();
+			if(!pgr.rows())
 			{
-				pgc::Result pgr = _con.once("SELECT * FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2 AND column_name=$3").exec(schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)).throwIfError();
-				if(!pgr.rows())
+				log.push_back(SyncLogLine("re column absent", schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)));
+				if(allowCreate)
 				{
-					log.push_back(SyncLogLine("re column absent", schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)));
-					if(allowCreate)
-					{
-						_con.once("ALTER TABLE "+tableName(re->_category, true, true)+" ADD COLUMN "+columnName(re, true, false)+" BIGINT").exec().throwIfError();
-						log.push_back(SyncLogLine("re column created", schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)));
-					}
-					else
-					{
-						return false;
-					}
+					_con.once("ALTER TABLE "+tableName(re->_category, true, true)+" ADD COLUMN "+columnName(re, true, false)+" BIGINT").exec().throwIfError();
+					log.push_back(SyncLogLine("re column created", schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)));
+				}
+				else
+				{
+					return false;
 				}
 			}
-			break;
-		case cross:
-			//std::cout<<"cross: "<<re->_category->_name<<"."<<re->_name<<" <-> "<<are->_category->_name<<"."<<are->_name<<std::endl;
-			//позже будут сделаны кроссы на базовые категории
-			break;
 		}
 
 		return true;
 	}
 
+
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate)
+	bool Cluster::sync_tableInherits(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate)
 	{
-		pgc::Result pgr = _con.once("SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2").exec(schemaName(r->_schema, false, false), tableName(r, false, false)).throwIfError();
-		if(!pgr.rows())
+		pgc::Result pgr = _con
+			.once("SELECT inhparent FROM pg_catalog.pg_inherits WHERE inhrelid=$1")
+			.exec(_cat2oid[c])
+			.throwIfError();
+
+		std::set<TOid> baseOids;
+		for(int i(0); i<pgr.rows(); i++)
 		{
-			log.push_back(SyncLogLine("cross table absent", schemaName(r->_schema, false, false), tableName(r, false, false)));
-			if(allowCreate)
-			{
-				_con.once("CREATE TABLE "+tableName(r, true, true)+"(input BIGINT, output BIGINT)").exec().throwIfError();
-				log.push_back(SyncLogLine("cross table created", schemaName(r->_schema, false, false), tableName(r, false, false)));
-			}
-			else
-			{
-				return false;
-			}
+			baseOids.insert(pgr.fetchUInt32(i, 0));
 		}
 
+
+		BOOST_FOREACH(dbMeta::CategoryCPtr b, c->_bases)
+		{
+			if(baseOids.end() == baseOids.find(_cat2oid[b]))
+			{
+				log.push_back(SyncLogLine("inheritance absent", schemaName(c->_schema, false, false), tableName(c, false, false), tableName(b, false, false)));
+				if(allowCreate)
+				{
+					_con.once("ALTER TABLE "+tableName(c, true, true)+" INHERIT "+tableName(b, true, true)).exec().throwIfError();
+					baseOids.insert(_cat2oid[b]);
+					log.push_back(SyncLogLine("inheritance created", schemaName(c->_schema, false, false), tableName(c, false, false), tableName(b, false, false)));
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 
@@ -351,6 +372,9 @@ namespace dbCreator
 	void Cluster::setUnicators(const std::string &prefix, const std::string &suffix)
 	{
 		_isSynced = false;
+
+		_oid2schema.clear();
+		_schema2oid.clear();
 		_oid2cat.clear();
 		_cat2oid.clear();
 
@@ -369,6 +393,9 @@ namespace dbCreator
 	bool Cluster::sync(TSyncLog &log, bool allowCreate)
 	{
 		_isSynced = false;
+
+		_oid2schema.clear();
+		_schema2oid.clear();
 		_oid2cat.clear();
 		_cat2oid.clear();
 
@@ -423,15 +450,12 @@ namespace dbCreator
 			return res;
 		}
 
-		//наличие кроссов многие-многие
+		//наследование
 		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
 		{
-			BOOST_FOREACH(dbMeta::RelationCPtr r, s->_relations)
+			BOOST_FOREACH(dbMeta::CategoryCPtr c, s->_categories)
 			{
-				if(r->_inputEnd->_mult == dbMeta::ermMany && r->_outputEnd->_mult == dbMeta::ermMany)
-				{
-					res &= sync_crossExistence(log, r, allowCreate);
-				}
+				res &= sync_tableInherits(log, c, allowCreate);
 			}
 		}
 		return true;

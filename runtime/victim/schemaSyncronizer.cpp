@@ -104,7 +104,7 @@ void SchemaSyncronizer::sync(TSyncLog &log,
 		.once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1")
 		.exec(_s->_name+_suffix)
 		.throwIfError();
-	if(!pgr.fetchInt(0,0))
+	if(!pgr.fetchInt32(0,0))
 	{
 		log.push_back(SyncLogLine("schema absent", _s->_name));
 
@@ -123,7 +123,7 @@ void SchemaSyncronizer::sync(TSyncLog &log,
 
 	//генератор идентификаторов объектов
 	pgr = _con.once("SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2").exec(_s->_name+_suffix, std::string("idGen")).throwIfError();
-	if(!pgr.fetchInt(0, 0))
+	if(!pgr.fetchInt32(0, 0))
 	{
 		log.push_back(SyncLogLine("idGen absent", _s->_name));
 
