@@ -648,6 +648,7 @@ namespace workers
 						"boost::shared_ptr<RelationEnd> re(new RelationEnd);\n"
 
 						"re->_name = \""<<relEndName(rel, true)<<"\";\n"
+						"re->_isInput = true;\n"
 						"re->_mult = erm";
 						switch(rel->getMultiplier1())
 						{
@@ -670,6 +671,7 @@ namespace workers
 						"boost::shared_ptr<RelationEnd> re(new RelationEnd);\n"
 
 						"re->_name = \""<<relEndName(rel, false)<<"\";\n"
+						"re->_isInput = false;\n"
 						"re->_mult = erm";
 						switch(rel->getMultiplier2())
 						{
@@ -687,6 +689,9 @@ namespace workers
 						"r->_outputEnd = re.get();\n"
 						"_storage->_relationEnds_heap.push_back(re);\n";
 					hpp<<"}\n"
+
+					"	r->_outputEnd->_anotherEnd = r->_inputEnd;\n"
+					"	r->_inputEnd->_anotherEnd = r->_outputEnd;\n"
 
 					"	_storage->_relations_heap.push_back(r);\n"
 					"	_schema->_relations.push_back(r.get());\n";

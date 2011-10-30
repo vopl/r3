@@ -268,7 +268,7 @@ namespace dbMeta
 		{
 			return iter->second;
 		}
-		return const Ptr();
+		return Ptr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

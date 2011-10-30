@@ -55,6 +55,26 @@ namespace dbCreator
 		//соединение с базой 
 		pgc::Connection _con;
 
+	private:
+		std::string escapeName	(const std::string &name, bool escape);
+
+		std::string schemaName	(dbMeta::SchemaCPtr s,			bool escape,	bool full);
+		std::string idGenName	(dbMeta::SchemaCPtr s,			bool escape,	bool full);
+		std::string tableName	(dbMeta::CategoryCPtr c,		bool escape,	bool full);
+		std::string tableName	(dbMeta::RelationCPtr r,		bool escape,	bool full);
+		std::string columnName	(dbMeta::FieldCPtr f,			bool escape,	bool full);
+		std::string columnName	(dbMeta::RelationEndCPtr re,	bool escape,	bool full);
+
+		std::string columnType	(dbMeta::FieldCPtr f);
+
+
+	private:
+		bool sync_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s, bool allowCreate);
+		bool sync_tableExistence(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
+		bool sync_columnExistence(TSyncLog &log, dbMeta::FieldCPtr f, bool allowCreate);
+		bool sync_columnExistence(TSyncLog &log, dbMeta::RelationEndCPtr re, bool allowCreate);
+		bool sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate);
+
 	public:
 		Cluster(boost::shared_ptr<dbMeta::Cluster> metaCluster);
 		void setUnicators(const std::string &prefix, const std::string &suffix);

@@ -55,6 +55,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//////////////////////////////////////////////////////////////////////////
 	pgc::Connection con;
+	con.log(std::cout, pgc::lf_all);
 	con.open("dbname=test user=postgres password=postgres port=5432");
 
 	boost::shared_ptr<dbCreator::Cluster> ccl(new dbCreator::Cluster(mcl));
