@@ -91,6 +91,8 @@ namespace dbCreator
 		bool sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate);
 		bool sync_tableInherits(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
 
+		bool createTable2CrossTrigger(TSyncLog &log, dbMeta::RelationEndCPtr re, const std::string &who);
+
 	public:
 		Cluster(boost::shared_ptr<dbMeta::Cluster> metaCluster);
 		void setUnicators(const std::string &prefix, const std::string &suffix);

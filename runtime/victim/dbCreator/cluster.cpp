@@ -313,58 +313,24 @@ namespace dbCreator
 					).exec().throwIfError();
 
 
-				//тригер на удаление из первой категории
-				_con.once(
-					"CREATE OR REPLACE FUNCTION "+triggerFuncName(r->_inputEnd->_category, r->_inputEnd->_name+"_upd_del")+"()\n"
-					"	RETURNS trigger AS\n"
-					"	$BODY$\n"
-					"	BEGIN\n"
-					"		IF EXISTS (SELECT id FROM "+tableName(r, true, true)+" WHERE input_id=OLD.id) THEN\n"
-					"			RAISE EXCEPTION 'unable to update/delete input record %, cross record present', OLD.id;\n"
-					"		END IF;\n"
-					"		IF (TG_OP = 'DELETE') THEN\n"
-					"			RETURN OLD;\n"
-					"		END IF;\n"
-					"		RETURN NEW;\n"
-					"	END\n"
-					"	$BODY$\n"
-					"	LANGUAGE plpgsql;\n"
-					).exec().throwIfError();
-
-				_con.once(
-					"CREATE TRIGGER "+triggerName(r, r->_inputEnd->_name+"_upd_del")+"\n"
-					"	BEFORE INSERT OR UPDATE\n"
-					"	ON "+tableName(r->_inputEnd->_category, true, true)+"\n"
-					"	FOR EACH ROW\n"
-					"	EXECUTE PROCEDURE "+triggerFuncName(r->_inputEnd->_category, r->_inputEnd->_name+"_upd_del")+"();\n"
-					).exec().throwIfError();
-
-
-				//тригер на удаление из второй категории
-				_con.once(
-					"CREATE OR REPLACE FUNCTION "+triggerFuncName(r->_outputEnd->_category, r->_outputEnd->_name+"_upd_del")+"()\n"
-					"	RETURNS trigger AS\n"
-					"	$BODY$\n"
-					"	BEGIN\n"
-					"		IF EXISTS (SELECT id FROM "+tableName(r, true, true)+" WHERE output_id=OLD.id) THEN\n"
-					"			RAISE EXCEPTION 'unable to update/delete output record %, cross record present', OLD.id;\n"
-					"		END IF;\n"
-					"		IF (TG_OP = 'DELETE') THEN\n"
-					"			RETURN OLD;\n"
-					"		END IF;\n"
-					"		RETURN NEW;\n"
-					"	END\n"
-					"	$BODY$\n"
-					"	LANGUAGE plpgsql;\n"
-					).exec().throwIfError();
-
-				_con.once(
-					"CREATE TRIGGER "+triggerName(r, r->_outputEnd->_name+"_upd_del")+"\n"
-					"	BEFORE INSERT OR UPDATE\n"
-					"	ON "+tableName(r->_outputEnd->_category, true, true)+"\n"
-					"	FOR EACH ROW\n"
-					"	EXECUTE PROCEDURE "+triggerFuncName(r->_outputEnd->_category, r->_outputEnd->_name+"_upd_del")+"();\n"
-					).exec().throwIfError();
+				BOOST_FOREACH(dbMeta::CategoryCPtr c, r->_inputEnd->_categories)
+				{
+					dbMeta::RelationEndCPtr re = c->_relationEnds[r->_inputEnd->_name];
+					if(!createTable2CrossTrigger(log, re, "in"))
+					{
+						log.push_back(SyncLogLine("table triggers creation failed", schemaName(r->_schema, false, false), tableName(c, false, false)));
+						return false;
+					}
+				}
+				BOOST_FOREACH(dbMeta::CategoryCPtr c, r->_outputEnd->_categories)
+				{
+					dbMeta::RelationEndCPtr re = c->_relationEnds[r->_outputEnd->_name];
+					if(!createTable2CrossTrigger(log, re, "out"))
+					{
+						log.push_back(SyncLogLine("table triggers creation failed", schemaName(r->_schema, false, false), tableName(c, false, false)));
+						return false;
+					}
+				}
 			}
 			else
 			{
@@ -411,6 +377,57 @@ namespace dbCreator
 		return true;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool Cluster::createTable2CrossTrigger(TSyncLog &log, dbMeta::RelationEndCPtr re, const std::string &who)
+	{
+		//////////////////////////////////////////////////////////////////////////
+		//тригер на удаление
+		_con.once(
+			"CREATE OR REPLACE FUNCTION "+triggerFuncName(re->_category, re->_name+"_del")+"()\n"
+			"	RETURNS trigger AS\n"
+			"	$BODY$\n"
+			"	BEGIN\n"
+			"		IF EXISTS (SELECT id FROM "+tableName(re->_relation, true, true)+" WHERE "+who+"put_id=OLD.id) THEN\n"
+			"			RAISE EXCEPTION 'unable to delete "+who+"put record %, cross record present', OLD.id;\n"
+			"		END IF;\n"
+			"		RETURN OLD;\n"
+			"	END\n"
+			"	$BODY$\n"
+			"	LANGUAGE plpgsql;\n"
+			).exec().throwIfError();
+		_con.once(
+			"CREATE TRIGGER "+triggerName(re->_category, re->_name+"_del")+"\n"
+			"	BEFORE DELETE\n"
+			"	ON "+tableName(re->_category, true, true)+"\n"
+			"	FOR EACH ROW\n"
+			"	EXECUTE PROCEDURE "+triggerFuncName(re->_category, re->_name+"_del")+"();\n"
+			).exec().throwIfError();
+
+		//////////////////////////////////////////////////////////////////////////
+		//на обновление
+		_con.once(
+			"CREATE OR REPLACE FUNCTION "+triggerFuncName(re->_category, re->_name+"_upd")+"()\n"
+			"	RETURNS trigger AS\n"
+			"	$BODY$\n"
+			"	BEGIN\n"
+			"		IF OLD.id != NEW.id AND EXISTS (SELECT id FROM "+tableName(re->_relation, true, true)+" WHERE "+who+"put_id=OLD.id) THEN\n"
+			"			RAISE EXCEPTION 'unable to update "+who+"put record %, cross record present', OLD.id;\n"
+			"		END IF;\n"
+			"		RETURN NEW;\n"
+			"	END\n"
+			"	$BODY$\n"
+			"	LANGUAGE plpgsql;\n"
+			).exec().throwIfError();
+		_con.once(
+			"CREATE TRIGGER "+triggerName(re->_category, re->_name+"_upd")+"\n"
+			"	BEFORE UPDATE\n"
+			"	ON "+tableName(re->_category, true, true)+"\n"
+			"	FOR EACH ROW\n"
+			"	EXECUTE PROCEDURE "+triggerFuncName(re->_category, re->_name+"_upd")+"();\n"
+			).exec().throwIfError();
+
+		return true;
+	}
 
 
 	//////////////////////////////////////////////////////////////////////////
