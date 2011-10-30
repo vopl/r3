@@ -458,6 +458,12 @@ namespace dbCreator
 				res &= sync_tableInherits(log, c, allowCreate);
 			}
 		}
+		if(!res)
+		{
+			return res;
+		}
+
+		_isSynced = true;
 		return true;
 	}
 

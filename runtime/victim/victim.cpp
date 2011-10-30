@@ -55,12 +55,14 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//////////////////////////////////////////////////////////////////////////
 	pgc::Connection con;
-	con.log(std::cout, pgc::lf_all);
+	//con.log(std::cout, pgc::lf_all);
 	con.open("dbname=test user=postgres password=postgres port=5432");
 
 	boost::shared_ptr<dbCreator::Cluster> ccl(new dbCreator::Cluster(mcl));
 	ccl->setUnicators("pref", "suff");
 	ccl->setConnection(con);
+
+	con.once("BEGIN").exec();
 
 	dbCreator::TSyncLog log;
 	bool b = ccl->sync(log, true);
