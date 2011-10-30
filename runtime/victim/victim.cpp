@@ -16,43 +16,30 @@ using namespace std;
 #include "dbMeta/schemas/ForFields_initializer.hpp"
 
 
-#include "schemaSyncronizer.hpp"
-
 #include "pgc/connection.hpp"
+
+#include "dbCreator/cluster.hpp"
 //////////////////////////////////////////////////////////////////////////
 
-class Cluster
-{
-public:
-	Cluster(dbMeta::Cluster *cluster, const std::string &prefix, const std::string &suffix);
-
-// 	bool structureSync(log &log);
-// 	bool structureDrop(log &log);
-
-// 	select
-// 	insert
-// 	update
-// 	delete
-};
 
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
-	dbMeta::Cluster cl;
+	boost::shared_ptr<dbMeta::Cluster> mcl(new dbMeta::Cluster);
 
-	cl.add<dbMeta::schemas::TestCategories>();
-	cl.add<dbMeta::schemas::Mixed>();
-	cl.add<dbMeta::schemas::ForFields>();
-	cl.initialize();
+	mcl->add<dbMeta::schemas::TestCategories>();
+	mcl->add<dbMeta::schemas::Mixed>();
+	mcl->add<dbMeta::schemas::ForFields>();
+	mcl->initialize();
 
 	{
-		dbMeta::SchemaCPtr s = cl.getByName("TestCategories");
+		dbMeta::SchemaCPtr s = mcl->getByName("TestCategories");
 		s->_categories["Document"]->_name;
 		s->_categories["Contract"]->_fields["file"]->_name;
 	}
 
 	{
-		dbMeta::schemas::TestCategoriesCPtr s = cl.get<dbMeta::schemas::TestCategories>();
+		dbMeta::schemas::TestCategoriesCPtr s = mcl->get<dbMeta::schemas::TestCategories>();
 		s->Contract->file->_name;
 
 // 		BOOST_FOREACH(dbMeta::CategoryPtr cat, s->_categories)
@@ -70,10 +57,19 @@ int _tmain(int argc, _TCHAR* argv[])
 	pgc::Connection con;
 	con.open("dbname=test user=postgres password=postgres port=5432");
 
-	SchemaSyncronizer ss;
-	ss.init(cl.get<dbMeta::schemas::TestCategories>(), con, "_suf");
-	TSyncLog log;
-	ss.sync(log, true, true, true);
+	boost::shared_ptr<dbCreator::Cluster> ccl(new dbCreator::Cluster(mcl));
+	ccl->setUnicators("pref", "suff");
+	ccl->setConnection(con);
+
+	dbCreator::TSyncLog log;
+	bool b = ccl->sync(log, true);
+
+	std::cout<<b<<std::endl;
+
+	BOOST_FOREACH(const dbCreator::SyncLogLine &l, log)
+	{
+		std::cout<<l._msg<<", "<<l._data1<<", "<<l._data2<<", "<<l._data3<<std::endl;
+	}
 	return 0;
 }
 

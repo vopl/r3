@@ -240,6 +240,14 @@
 			<File
 				RelativePath=".\dbMeta\cluster.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(SafeParentName)\"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\dbMeta\cluster.hpp"
@@ -283,6 +291,26 @@
 			</File>
 			<File
 				RelativePath=".\dbMeta\schemaInitializer.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="dbCreator"
+			>
+			<File
+				RelativePath=".\dbCreator\cluster.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(SafeParentName)\"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\dbCreator\cluster.hpp"
 				>
 			</File>
 		</Filter>
