@@ -78,12 +78,17 @@ namespace dbCreator
 
 		std::string columnType	(dbMeta::FieldCPtr f);
 
+		std::string triggerFuncName	(dbMeta::CategoryCPtr c, const std::string &suffix);
+		std::string triggerFuncName	(dbMeta::RelationCPtr r, const std::string &suffix);
+
+		std::string triggerName	(dbMeta::CategoryCPtr c, const std::string &suffix);
+		std::string triggerName	(dbMeta::RelationCPtr r, const std::string &suffix);
 
 	private:
 		bool sync_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s, bool allowCreate);
 		bool sync_tableExistence(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
 		bool sync_columnExistence(TSyncLog &log, dbMeta::FieldCPtr f, bool allowCreate);
-		bool sync_columnExistence(TSyncLog &log, dbMeta::RelationEndCPtr re, bool allowCreate);
+		bool sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate);
 		bool sync_tableInherits(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
 
 	public:

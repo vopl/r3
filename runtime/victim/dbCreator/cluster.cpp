@@ -132,6 +132,30 @@ namespace dbCreator
 		return "";
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	std::string Cluster::triggerFuncName	(dbMeta::CategoryCPtr c, const std::string &suffix)
+	{
+		return schemaName(c->_schema, true, true)+"."+escapeName(c->_name+"_"+suffix, true);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	std::string Cluster::triggerFuncName	(dbMeta::RelationCPtr r, const std::string &suffix)
+	{
+		return schemaName(r->_schema, true, true)+"."+escapeName(r->_name+"_"+suffix, true);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::string Cluster::triggerName	(dbMeta::CategoryCPtr c, const std::string &suffix)
+	{
+		return escapeName(c->_name+"_"+suffix, true);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	std::string Cluster::triggerName	(dbMeta::RelationCPtr r, const std::string &suffix)
+	{
+		return escapeName(r->_name+"_"+suffix, true);
+	}
+
 	
 	//////////////////////////////////////////////////////////////////////////
 	bool Cluster::sync_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s, bool allowCreate)
@@ -248,73 +272,103 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::sync_columnExistence(TSyncLog &log, dbMeta::RelationEndCPtr re, bool allowCreate)
+	bool Cluster::sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate)
 	{
-		dbMeta::RelationEndCPtr are = re->_anotherEnd;
-
-		bool makeFk = false;
-
-		if(re->_mult == dbMeta::ermOne)
+		pgc::Result pgr = _con.once("SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2").exec(schemaName(r->_schema, false, false), tableName(r, false, false)).throwIfError();
+		if(!pgr.rows())
 		{
-			if(are->_mult == dbMeta::ermOne)
+			log.push_back(SyncLogLine("cross table absent", schemaName(r->_schema, false, false), tableName(r, false, false)));
+			if(allowCreate)
 			{
-				//one -> one
-				//fk
-				if(re->_isInput)
-				{
-					//делать внешний ключ на категорию другого края
-					makeFk = true;
-				}
-				else
-				{
-					//ничего не делать, будет сделано с другого края
-				}
+				_con.once("CREATE TABLE "+tableName(r, true, true)+"("
+					" id BIGINT DEFAULT nextval('"+idGenName(r->_schema, true, true)+"'::regclass) PRIMARY KEY "
+					", input_id BIGINT"
+					", output_id BIGINT)").exec().throwIfError();
+				log.push_back(SyncLogLine("cross table created", schemaName(r->_schema, false, false), tableName(r, false, false)));
+
+				//тригер на добавление в кросс
+				_con.once(
+					"CREATE OR REPLACE FUNCTION "+triggerFuncName(r, "ins_upd")+"()\n"
+					"	RETURNS trigger AS\n"
+					"	$BODY$\n"
+					"	BEGIN\n"
+					"		IF NOT EXISTS (SELECT id FROM "+tableName(r->_inputEnd->_category, true, true)+" WHERE id=NEW.input_id) THEN\n"
+					"			RAISE EXCEPTION 'unable to insert/update cross record %, input record % absent', NEW.id, NEW.input_id;\n"
+					"		END IF;\n"
+					"		IF NOT EXISTS (SELECT id FROM "+tableName(r->_outputEnd->_category, true, true)+" WHERE id=NEW.output_id) THEN\n"
+					"			RAISE EXCEPTION 'unable to insert/update cross record %, output record % absent', NEW.id, NEW.output_id;\n"
+					"		END IF;\n"
+					"		RETURN NEW;\n"
+					"	END\n"
+					"	$BODY$\n"
+					"	LANGUAGE plpgsql;\n"
+					).exec().throwIfError();
+
+				_con.once(
+					"CREATE TRIGGER "+triggerName(r, "ins_upd")+"\n"
+					"	BEFORE INSERT OR UPDATE\n"
+					"	ON "+tableName(r, true, true)+"\n"
+					"	FOR EACH ROW\n"
+					"	EXECUTE PROCEDURE "+triggerFuncName(r, "ins_upd")+"();\n"
+					).exec().throwIfError();
+
+
+				//тригер на удаление из первой категории
+				_con.once(
+					"CREATE OR REPLACE FUNCTION "+triggerFuncName(r->_inputEnd->_category, r->_inputEnd->_name+"_upd_del")+"()\n"
+					"	RETURNS trigger AS\n"
+					"	$BODY$\n"
+					"	BEGIN\n"
+					"		IF EXISTS (SELECT id FROM "+tableName(r, true, true)+" WHERE input_id=OLD.id) THEN\n"
+					"			RAISE EXCEPTION 'unable to update/delete input record %, cross record present', OLD.id;\n"
+					"		END IF;\n"
+					"		IF (TG_OP = 'DELETE') THEN\n"
+					"			RETURN OLD;\n"
+					"		END IF;\n"
+					"		RETURN NEW;\n"
+					"	END\n"
+					"	$BODY$\n"
+					"	LANGUAGE plpgsql;\n"
+					).exec().throwIfError();
+
+				_con.once(
+					"CREATE TRIGGER "+triggerName(r, r->_inputEnd->_name+"_upd_del")+"\n"
+					"	BEFORE INSERT OR UPDATE\n"
+					"	ON "+tableName(r->_inputEnd->_category, true, true)+"\n"
+					"	FOR EACH ROW\n"
+					"	EXECUTE PROCEDURE "+triggerFuncName(r->_inputEnd->_category, r->_inputEnd->_name+"_upd_del")+"();\n"
+					).exec().throwIfError();
+
+
+				//тригер на удаление из второй категории
+				_con.once(
+					"CREATE OR REPLACE FUNCTION "+triggerFuncName(r->_outputEnd->_category, r->_outputEnd->_name+"_upd_del")+"()\n"
+					"	RETURNS trigger AS\n"
+					"	$BODY$\n"
+					"	BEGIN\n"
+					"		IF EXISTS (SELECT id FROM "+tableName(r, true, true)+" WHERE output_id=OLD.id) THEN\n"
+					"			RAISE EXCEPTION 'unable to update/delete output record %, cross record present', OLD.id;\n"
+					"		END IF;\n"
+					"		IF (TG_OP = 'DELETE') THEN\n"
+					"			RETURN OLD;\n"
+					"		END IF;\n"
+					"		RETURN NEW;\n"
+					"	END\n"
+					"	$BODY$\n"
+					"	LANGUAGE plpgsql;\n"
+					).exec().throwIfError();
+
+				_con.once(
+					"CREATE TRIGGER "+triggerName(r, r->_outputEnd->_name+"_upd_del")+"\n"
+					"	BEFORE INSERT OR UPDATE\n"
+					"	ON "+tableName(r->_outputEnd->_category, true, true)+"\n"
+					"	FOR EACH ROW\n"
+					"	EXECUTE PROCEDURE "+triggerFuncName(r->_outputEnd->_category, r->_outputEnd->_name+"_upd_del")+"();\n"
+					).exec().throwIfError();
 			}
 			else
 			{
-				//one -> many
-				//alien fk
-				//ничего не делать, будет сделано с другого края
-			}
-		}
-		else
-		{
-			if(are->_mult == dbMeta::ermOne)
-			{
-				//many -> one
-				//own fk
-				{
-					//делать внешний ключ на категорию другого края
-					makeFk = true;
-				}
-			}
-			else
-			{
-				//many -> many
-				//cross
-
-				//own fk
-				//alien fk
-				//делать кросс между этой категорией и категорией другого края
-				makeFk = true;
-			}
-		}
-
-		if(makeFk)
-		{
-			pgc::Result pgr = _con.once("SELECT * FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2 AND column_name=$3").exec(schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)).throwIfError();
-			if(!pgr.rows())
-			{
-				log.push_back(SyncLogLine("re column absent", schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)));
-				if(allowCreate)
-				{
-					_con.once("ALTER TABLE "+tableName(re->_category, true, true)+" ADD COLUMN "+columnName(re, true, false)+" BIGINT").exec().throwIfError();
-					log.push_back(SyncLogLine("re column created", schemaName(re->_category->_schema, false, false), tableName(re->_category, false, false), columnName(re, false, false)));
-				}
-				else
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 
@@ -439,10 +493,19 @@ namespace dbCreator
 				{
 					res &= sync_columnExistence(log, f, allowCreate);
 				}
-				BOOST_FOREACH(dbMeta::RelationEndCPtr re, c->_relationEnds)
-				{
-					res &= sync_columnExistence(log, re, allowCreate);
-				}
+			}
+		}
+		if(!res)
+		{
+			return res;
+		}
+
+		//наличие таблиц связей
+		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		{
+			BOOST_FOREACH(dbMeta::RelationCPtr r, s->_relations)
+			{
+				res &= sync_crossExistence(log, r, allowCreate);
 			}
 		}
 		if(!res)

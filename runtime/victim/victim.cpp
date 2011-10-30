@@ -62,7 +62,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	ccl->setUnicators("pref", "suff");
 	ccl->setConnection(con);
 
-	con.once("BEGIN").exec();
+	//con.once("BEGIN").exec();
 
 	dbCreator::TSyncLog log;
 	bool b = ccl->sync(log, true);

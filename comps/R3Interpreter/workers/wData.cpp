@@ -442,6 +442,16 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	std::string WData::relationName(const CategoryRelation &obj)
+	{
+		return 
+			obj->getSrc()->getName()+"_"+
+			obj->getName1()+"_"+
+			obj->getDst()->getName()+"_"+
+			obj->getName2();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	std::string WData::categoryClassName(const Category &obj)
 	{
 		return 
@@ -641,7 +651,7 @@ namespace workers
 				hpp<<
 					"{\n"
 					"	boost::shared_ptr<relations::"<<relationClassName(rel)<<"> r(new relations::"<<relationClassName(rel)<<");\n"
-					"	r->_name = \""<<relationClassName(rel)<<"\";"
+					"	r->_name = \""<<relationName(rel)<<"\";"
 					"	r->_schema = _schema;\n";
 
 					hpp<<"{\n"
@@ -741,7 +751,7 @@ namespace workers
 			if(!catDst) catDst = CategoryReference(rel->getDst())->getCategory();
 
 			hpp<<
-				"RelationPtr r = _storage->_schemas[\""<<rel->getParent()->getName()<<"\"]->_relations[\""<<relationClassName(rel)<<"\"];\n"
+				"RelationPtr r = _storage->_schemas[\""<<rel->getParent()->getName()<<"\"]->_relations[\""<<relationName(rel)<<"\"];\n"
 				"CategoryPtr in = _storage->_schemas[\""<<catSrc->getParent()->getName()<<"\"]->_categories[\""<<catSrc->getName()<<"\"];\n"
 				"CategoryPtr out = _storage->_schemas[\""<<catDst->getParent()->getName()<<"\"]->_categories[\""<<catDst->getName()<<"\"];\n"
 
