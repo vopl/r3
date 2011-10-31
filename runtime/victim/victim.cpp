@@ -81,15 +81,30 @@ int _tmain(int argc, _TCHAR* argv[])
 	//////////////////////////////////////////////////////////////////////////
 	dbWorker::Cluster wcl(ccl);
 
-	dbMeta::schemas::TestCategoriesPtr testCats = mcl->get<dbMeta::schemas::TestCategories>();
+	dbMeta::schemas::TestCategoriesCPtr testCats = mcl->get<dbMeta::schemas::TestCategories>();
 
-	dbWorker::schemas::TestCategories::LetterTuple lt;
+	dbMeta::Tuple<dbMeta::schemas::TestCategories> lt;
 	lt = wcl.select(testCats->Letter).where(testCats->Letter->comment < 220);
 
 	lt.comment = "380";
 	wcl.update(lt, lt.comment);
 	wcl.insert(lt);
 	wcl.delete(lt);
+
+	dbMeta::categories::TestCategories_LetterCPtr letter = testCats->Letter;
+
+	lt = wcl
+		.select(letter)
+		.distinct(letter->servisePart->cost)
+		.link(letter->servisePart)
+		
+		.where(letter->lastModified < 220 &&
+			letter->servisePart->cost < 380)
+		.limit(10)
+		.offset(3)
+		.order(letter->servisePart->cost, letter->lastModified);
+
+	lt.servisePart[0].cost;
 
 	return 0;
 }
