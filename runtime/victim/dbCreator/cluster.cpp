@@ -429,6 +429,25 @@ namespace dbCreator
 		return true;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool Cluster::drop_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s)
+	{
+		pgc::Result pgr = _con
+			.once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1")
+			.exec(schemaName(s, false, false))
+			.throwIfError();
+
+		if(pgr.fetchInt32(0,0))
+		{
+			log.push_back(SyncLogLine("schema present", schemaName(s, false, false)));
+
+			_con.once("DROP SCHEMA "+schemaName(s, true, true)+" CASCADE").exec().throwIfError();
+			log.push_back(SyncLogLine("schema droppped", schemaName(s, false, false)));
+		}
+
+		return true;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	Cluster::Cluster(boost::shared_ptr<dbMeta::Cluster> metaCluster)
@@ -550,8 +569,32 @@ namespace dbCreator
 	//////////////////////////////////////////////////////////////////////////
 	bool Cluster::drop(TSyncLog &log)
 	{
-		assert(0);
-		return false;
+		if(!_metaCluster->isInitialized())
+		{
+			log.push_back(SyncLogLine("meta cluster is not initialized"));
+			return false;
+		}
+
+		bool res = true;
+
+		//схемы
+		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		{
+			res &= drop_schemaExistence(log, s);
+		}
+		if(!res)
+		{
+			return res;
+		}
+
+		_isSynced = false;
+
+		_oid2schema.clear();
+		_schema2oid.clear();
+		_oid2cat.clear();
+		_cat2oid.clear();
+
+		return true;
 	}
 
 }

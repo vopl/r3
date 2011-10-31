@@ -55,7 +55,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//////////////////////////////////////////////////////////////////////////
 	pgc::Connection con;
-	//con.log(std::cout, pgc::lf_all);
+	con.log(std::cout, pgc::lf_all);
 	con.open("dbname=test user=postgres password=postgres port=5432");
 
 	boost::shared_ptr<dbCreator::Cluster> ccl(new dbCreator::Cluster(mcl));
@@ -65,9 +65,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	//con.once("BEGIN").exec();
 
 	dbCreator::TSyncLog log;
-	bool b = ccl->sync(log, true);
+	bool bc = ccl->sync(log, true);
+	bool bd = ccl->drop(log);
 
-	std::cout<<b<<std::endl;
+	std::cout<<bc<<", "<<bd<<std::endl;
 
 	BOOST_FOREACH(const dbCreator::SyncLogLine &l, log)
 	{

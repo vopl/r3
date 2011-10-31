@@ -93,6 +93,9 @@ namespace dbCreator
 
 		bool createTable2CrossTrigger(TSyncLog &log, dbMeta::RelationEndCPtr re, const std::string &who);
 
+	private:
+		bool drop_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s);
+
 	public:
 		Cluster(boost::shared_ptr<dbMeta::Cluster> metaCluster);
 		void setUnicators(const std::string &prefix, const std::string &suffix);
