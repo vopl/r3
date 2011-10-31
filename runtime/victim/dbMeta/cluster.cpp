@@ -146,9 +146,21 @@ namespace dbMeta
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	SchemaCPtr Cluster::getByName(const std::string &name)
+	bool Cluster::isInitialized() const
+	{
+		return _isInitialized;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	SchemaCPtr Cluster::getByName(const std::string &name) const
 	{
 		return _schemas[name];
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const SchemaPtrs &Cluster::getSchemas() const
+	{
+		return _schemas;
 	}
 
 }

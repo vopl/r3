@@ -1,11 +1,6 @@
 #ifndef _DBMETA_PTRCONTAINER_HPP_
 #define _DBMETA_PTRCONTAINER_HPP_
 
-// #include <boost/multi_index_container.hpp>
-// #include <boost/multi_index/member.hpp>
-// #include <boost/multi_index/ordered_index.hpp>
-// #include <boost/multi_index/random_access_index.hpp>
-
 #include <vector>
 #include <string>
 #include <map>
@@ -13,59 +8,91 @@
 
 namespace dbMeta
 {
-	/*
-	//очень т€желый дл€ компил€ции
-	template <class Ptr>
-	struct PtrContainer_nameExtractor
+	//////////////////////////////////////////////////////////////////////////
+	template <class T>
+	class PWrapper
 	{
-		typedef const std::string result_type;
-		result_type &operator()(const Ptr& r)const // operator() must be const
+		T *_p;
+
+	public:
+		/////////////////////
+		PWrapper()
+			: _p(NULL)
 		{
-			return r->_name;
+		}
+
+		PWrapper(T *p)
+			: _p(p)
+		{
+
+		}
+		PWrapper(const PWrapper &pw)
+			: _p(pw._p)
+		{
+
+		}
+
+		/////////////////////
+		T &operator *()
+		{
+			return *_p;
+		}
+		const T &operator *() const
+		{
+			return *_p;
+		}
+
+		/////////////////////
+		T* operator->()
+		{
+			return _p;
+		}
+		const T* operator->() const
+		{
+			return _p;
+		}
+
+		/////////////////////
+		operator T*()
+		{
+			return _p;
+		}
+		operator const T*() const
+		{
+			return _p;
+		}
+
+		/////////////////////
+		template <class Y>
+		operator Y*()
+		{
+			return static_cast<Y*>(_p);
+		}
+		template <class Y>
+		operator const Y*() const
+		{
+			return static_cast<Y*>(_p);
+		}
+
+		/////////////////////
+		bool operator == (const PWrapper &pw) const
+		{
+			return _p == pw._p;
+		}
+		/////////////////////
+		bool operator != (const PWrapper &pw) const
+		{
+			return _p != pw._p;
 		}
 	};
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class T, bool isSmart=false>
-	class PtrContainer;
-
-	template <class T>
-	class PtrContainer<T, false>
-		: public 
-			boost::multi_index::multi_index_container<
-				T*,
-				boost::multi_index::indexed_by<
-					boost::multi_index::random_access<>,
-					boost::multi_index::ordered_non_unique<PtrContainer_nameExtractor<T*> >
-				>
-			>
-	{
-	};
-
-	template <class T>
-	class PtrContainer<T, true>
-		: public 
-			boost::multi_index::multi_index_container<
-			boost::shared_ptr<T>,
-				boost::multi_index::indexed_by<
-					boost::multi_index::random_access<>,
-					boost::multi_index::ordered_non_unique<PtrContainer_nameExtractor<boost::shared_ptr<T> > >
-				>
-			>
-	{
-	};
-	*/
-
-
 
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
 	class PtrContainer
-		: public std::vector<T *>
+		: public std::vector<PWrapper<T> >
 	{
-		typedef T *Ptr;
-		typedef const T *ConstPtr;
+		typedef PWrapper<T> Ptr;
 		typedef std::vector<Ptr> Base;
 
 		typedef std::multimap<std::string, Ptr> TMMap;
@@ -82,13 +109,13 @@ namespace dbMeta
 		template <class I> PtrContainer(const I &);
 
 		Ptr operator[](size_type idx);
-		ConstPtr operator[](size_type idx) const;
+		const Ptr operator[](size_type idx) const;
 
 		Ptr operator[](const char *name);
-		ConstPtr operator[](const char *name) const;
+		const Ptr operator[](const char *name) const;
 
 		Ptr operator[](const std::string &name);
-		ConstPtr operator[](const std::string &name) const;
+		const Ptr operator[](const std::string &name) const;
 
 		void resize ( size_type sz, Ptr c = Ptr() );
 
@@ -103,7 +130,7 @@ namespace dbMeta
 
 		iterator insert ( iterator position, const Ptr& x );
 		void insert ( iterator position, size_type n, const Ptr& x );
-		
+
 		template <class InputIterator>
 		void insert ( iterator position, InputIterator first, InputIterator last );
 
@@ -120,7 +147,7 @@ namespace dbMeta
 	{
 		_map.insert(std::make_pair(c->_name, c));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
 	void PtrContainer<T>::eraseFromMap(const Ptr &c)
@@ -185,13 +212,13 @@ namespace dbMeta
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
-	typename PtrContainer<T>::ConstPtr PtrContainer<T>::operator[](size_type idx) const
+	typename const PtrContainer<T>::Ptr PtrContainer<T>::operator[](size_type idx) const
 	{
 		if(idx < size())
 		{
 			return Base::operator [](idx);
 		}
-		return ConstPtr();
+		return const Ptr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -209,7 +236,7 @@ namespace dbMeta
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
-	typename PtrContainer<T>::ConstPtr PtrContainer<T>::operator[](const char *name) const
+	typename const PtrContainer<T>::Ptr PtrContainer<T>::operator[](const char *name) const
 	{
 		const std::string key(name);
 		TMMap::const_iterator iter = _map.find(key);
@@ -217,7 +244,7 @@ namespace dbMeta
 		{
 			return iter->second;
 		}
-		return ConstPtr();
+		return Ptr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -234,14 +261,14 @@ namespace dbMeta
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
-	typename PtrContainer<T>::ConstPtr PtrContainer<T>::operator[](const std::string &name) const
+	typename const PtrContainer<T>::Ptr PtrContainer<T>::operator[](const std::string &name) const
 	{
 		TMMap::const_iterator iter = _map.find(name);
 		if(_map.end() != iter)
 		{
 			return iter->second;
 		}
-		return ConstPtr();
+		return Ptr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

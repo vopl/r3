@@ -7,6 +7,8 @@
 #include "dbMeta/field.hpp"
 #include "dbMeta/index.hpp"
 #include "dbMeta/category.hpp"
+#include "dbMeta/relation.hpp"
+#include "dbMeta/relationEnd.hpp"
 
 namespace dbMeta
 {
@@ -31,9 +33,12 @@ namespace dbMeta
 
 		//после добавления нескольких типизированных необходима эта процедура
 		void initialize();
+		bool isInitialized() const;
 
-		template <class Schema> const Schema* get();
-		SchemaCPtr getByName(const std::string &name);
+
+		template <class Schema> const Schema* get() const;
+		SchemaCPtr getByName(const std::string &name) const;
+		const SchemaPtrs &getSchemas() const;
 
 		//сериализация, стартапов никаких не нужно
 		//void serialize();
@@ -61,9 +66,9 @@ namespace dbMeta
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Schema> 
-	const Schema* Cluster::get()
+	const Schema* Cluster::get() const
 	{
-		return static_cast<Schema*>(_schemas[SchemaInitializer<Schema>::getName()]);
+		return static_cast<const Schema*>(_schemas[SchemaInitializer<Schema>::getName()]);
 	}
 
 }

@@ -25,7 +25,7 @@ typedef std::deque<SyncLogLine> TSyncLog;
 //////////////////////////////////////////////////////////////////////////
 class SchemaSyncronizer
 {
-	dbMeta::SchemaPtr _s;
+	dbMeta::SchemaCPtr _s;
 	pgc::Connection _con;
 	std::string _suffix;
 
@@ -33,10 +33,10 @@ class SchemaSyncronizer
 
 	std::string db_quoteId(const std::string &name);
 	std::string db_name(const std::string &name, const std::string &name2="");
-	std::string db_fldType(dbMeta::FieldPtr fld);
+	std::string db_fldType(dbMeta::FieldCPtr fld);
 
 	bool syncTableField(
-		dbMeta::FieldPtr fld,
+		dbMeta::FieldCPtr fld,
 		TSyncLog &log,
 		bool allowCreate = true,
 		bool allowAlter = true,
@@ -45,7 +45,7 @@ class SchemaSyncronizer
 public:
 	SchemaSyncronizer();
 	void init(
-		dbMeta::SchemaPtr s, 
+		dbMeta::SchemaCPtr s, 
 		pgc::Connection con, 
 		const std::string &suffix);
 

@@ -442,6 +442,16 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	std::string WData::relationName(const CategoryRelation &obj)
+	{
+		return 
+			obj->getSrc()->getName()+"_"+
+			obj->getName1()+"_"+
+			obj->getDst()->getName()+"_"+
+			obj->getName2();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	std::string WData::categoryClassName(const Category &obj)
 	{
 		return 
@@ -621,7 +631,15 @@ namespace workers
 							hpp<<"Hash";
 							break;
 						}
-						hpp<<";\n"
+						hpp<<";\n";
+
+
+					BOOST_FOREACH(Field fld, idx->getIndexOnCategoryFieldSrcs())
+					{
+						hpp<<"	i->_fields.push_back(c->_ownFields[\""+fld->getName()+"\"]);\n";
+					}
+
+					hpp<<
 						"	i->_category = c.get();\n";
 
 					hpp<<
@@ -641,13 +659,14 @@ namespace workers
 				hpp<<
 					"{\n"
 					"	boost::shared_ptr<relations::"<<relationClassName(rel)<<"> r(new relations::"<<relationClassName(rel)<<");\n"
-					"	r->_name = \""<<relationClassName(rel)<<"\";"
+					"	r->_name = \""<<relationName(rel)<<"\";"
 					"	r->_schema = _schema;\n";
 
 					hpp<<"{\n"
 						"boost::shared_ptr<RelationEnd> re(new RelationEnd);\n"
 
 						"re->_name = \""<<relEndName(rel, true)<<"\";\n"
+						"re->_isInput = true;\n"
 						"re->_mult = erm";
 						switch(rel->getMultiplier1())
 						{
@@ -670,6 +689,7 @@ namespace workers
 						"boost::shared_ptr<RelationEnd> re(new RelationEnd);\n"
 
 						"re->_name = \""<<relEndName(rel, false)<<"\";\n"
+						"re->_isInput = false;\n"
 						"re->_mult = erm";
 						switch(rel->getMultiplier2())
 						{
@@ -687,6 +707,9 @@ namespace workers
 						"r->_outputEnd = re.get();\n"
 						"_storage->_relationEnds_heap.push_back(re);\n";
 					hpp<<"}\n"
+
+					"	r->_outputEnd->_anotherEnd = r->_inputEnd;\n"
+					"	r->_inputEnd->_anotherEnd = r->_outputEnd;\n"
 
 					"	_storage->_relations_heap.push_back(r);\n"
 					"	_schema->_relations.push_back(r.get());\n";
@@ -736,7 +759,7 @@ namespace workers
 			if(!catDst) catDst = CategoryReference(rel->getDst())->getCategory();
 
 			hpp<<
-				"RelationPtr r = _storage->_schemas[\""<<rel->getParent()->getName()<<"\"]->_relations[\""<<relationClassName(rel)<<"\"];\n"
+				"RelationPtr r = _storage->_schemas[\""<<rel->getParent()->getName()<<"\"]->_relations[\""<<relationName(rel)<<"\"];\n"
 				"CategoryPtr in = _storage->_schemas[\""<<catSrc->getParent()->getName()<<"\"]->_categories[\""<<catSrc->getName()<<"\"];\n"
 				"CategoryPtr out = _storage->_schemas[\""<<catDst->getParent()->getName()<<"\"]->_categories[\""<<catDst->getName()<<"\"];\n"
 

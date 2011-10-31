@@ -69,6 +69,7 @@ namespace workers
 
 		std::string fieldClassName(const Field &obj);
 		std::string relationClassName(const CategoryRelation &obj);
+		std::string relationName(const CategoryRelation &obj);
 		std::string categoryClassName(const Category &obj);
 		std::string schemaClassName(const Data &obj);
 	};
