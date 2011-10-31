@@ -66,7 +66,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	dbCreator::TSyncLog log;
 	bool bc = ccl->sync(log, true);
-	bool bd = ccl->drop(log);
+	bool bd = true;//ccl->drop(log);
 
 	std::cout<<bc<<", "<<bd<<std::endl;
 
@@ -74,6 +74,23 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		std::cout<<l._msg<<", "<<l._data1<<", "<<l._data2<<", "<<l._data3<<std::endl;
 	}
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	dbWorker::Cluster wcl(ccl);
+
+	dbMeta::schemas::TestCategoriesPtr testCats = mcl->get<dbMeta::schemas::TestCategories>();
+
+	dbWorker::schemas::TestCategories::LetterTuple lt;
+	lt = wcl.select(testCats->Letter).where(testCats->Letter->comment < 220);
+
+	lt.comment = "380";
+	wcl.update(lt, lt.comment);
+	wcl.insert(lt);
+	wcl.delete(lt);
+
 	return 0;
 }
 
