@@ -69,13 +69,24 @@ namespace dbCreator
 		return n;
 	}
 
+// 	//////////////////////////////////////////////////////////////////////////
+// 	std::string Cluster::columnName(dbMeta::RelationEndCPtr re, bool escape, bool full)
+// 	{
+// 		std::string n = escapeName(re->_name, escape);
+// 		if(full)
+// 		{
+// 			return tableName(re->_category, escape, full)+"."+n;
+// 		}
+// 		return n;
+// 	}
+
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::columnName(dbMeta::RelationEndCPtr re, bool escape, bool full)
+	std::string Cluster::indexName	(dbMeta::IndexCPtr i,			bool escape,	bool full)
 	{
-		std::string n = escapeName(re->_name, escape);
+		std::string n = escapeName(i->_category->_name+"_"+i->_name, escape);
 		if(full)
 		{
-			return tableName(re->_category, escape, full)+"."+n;
+			return schemaName(i->_category->_schema, escape, full)+"."+n;
 		}
 		return n;
 	}
@@ -270,6 +281,61 @@ namespace dbCreator
 
 		return true;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Cluster::sync_indexExistence(TSyncLog &log, dbMeta::IndexCPtr i, bool allowCreate)
+	{
+		if(i->_fields.empty())
+		{
+			return true;
+		}
+
+		pgc::Result pgr = _con.once("SELECT * FROM pg_catalog.pg_indexes WHERE schemaname=$1 AND tablename=$2 AND indexname=$3").exec(schemaName(i->_category->_schema, false, false), tableName(i->_category, false, false), indexName(i, false, false)).throwIfError();
+		if(!pgr.rows())
+		{
+			log.push_back(SyncLogLine("index absent", schemaName(i->_category->_schema, false, false), indexName(i, false, false)));
+			if(allowCreate)
+			{
+				std::string sql = "CREATE INDEX "+indexName(i, true, false)+" ON "+tableName(i->_category, true, true)+" USING ";
+				switch(i->_type)
+				{
+				default:
+					assert(!"unknown index type");
+				case dbMeta::eitTree:
+					sql += "btree";
+					break;
+				case dbMeta::eitHash:
+					sql += "hash";
+					break;
+				}
+
+				sql += "(";
+				bool isFirst = true;
+				BOOST_FOREACH(dbMeta::FieldCPtr f, i->_fields)
+				{
+					if(isFirst)
+					{
+						isFirst = false;
+					}
+					else
+					{
+						sql += ",";
+					}
+					sql += columnName(f, true, false);
+				}
+				sql += ")";
+				_con.once(sql).exec().throwIfError();
+				log.push_back(SyncLogLine("index created", schemaName(i->_category->_schema, false, false), indexName(i, false, false)));
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	bool Cluster::sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate)
@@ -528,6 +594,22 @@ namespace dbCreator
 				BOOST_FOREACH(dbMeta::FieldCPtr f, c->_fields)
 				{
 					res &= sync_columnExistence(log, f, allowCreate);
+				}
+			}
+		}
+		if(!res)
+		{
+			return res;
+		}
+
+		//наличие индексов
+		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		{
+			BOOST_FOREACH(dbMeta::CategoryCPtr c, s->_categories)
+			{
+				BOOST_FOREACH(dbMeta::IndexCPtr i, c->_indices)
+				{
+					res &= sync_indexExistence(log, i, allowCreate);
 				}
 			}
 		}

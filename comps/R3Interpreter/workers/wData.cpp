@@ -631,7 +631,15 @@ namespace workers
 							hpp<<"Hash";
 							break;
 						}
-						hpp<<";\n"
+						hpp<<";\n";
+
+
+					BOOST_FOREACH(Field fld, idx->getIndexOnCategoryFieldSrcs())
+					{
+						hpp<<"	i->_fields.push_back(c->_ownFields[\""+fld->getName()+"\"]);\n";
+					}
+
+					hpp<<
 						"	i->_category = c.get();\n";
 
 					hpp<<

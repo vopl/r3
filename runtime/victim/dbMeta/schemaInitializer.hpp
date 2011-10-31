@@ -151,6 +151,13 @@ namespace dbMeta
 			*adopted = *idx;
 			adopted->_category = c;
 
+			FieldPtrs::iterator iter = adopted->_fields.begin();
+			FieldPtrs::iterator end = adopted->_fields.end();
+			for(; iter!=end; iter++)
+			{
+				adopted->_fields.replace(c->_fields[(*iter)->_name]);
+			}
+
 			c->_indices.replace(adopted.get());
 			_storage->_indices_heap.push_back(adopted);
 		}

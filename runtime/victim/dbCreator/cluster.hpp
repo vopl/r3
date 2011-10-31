@@ -74,7 +74,7 @@ namespace dbCreator
 		std::string tableName	(dbMeta::CategoryCPtr c,		bool escape,	bool full);
 		std::string tableName	(dbMeta::RelationCPtr r,		bool escape,	bool full);
 		std::string columnName	(dbMeta::FieldCPtr f,			bool escape,	bool full);
-		std::string columnName	(dbMeta::RelationEndCPtr re,	bool escape,	bool full);
+		std::string indexName	(dbMeta::IndexCPtr i,			bool escape,	bool full);
 
 		std::string columnType	(dbMeta::FieldCPtr f);
 
@@ -88,6 +88,7 @@ namespace dbCreator
 		bool sync_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s, bool allowCreate);
 		bool sync_tableExistence(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
 		bool sync_columnExistence(TSyncLog &log, dbMeta::FieldCPtr f, bool allowCreate);
+		bool sync_indexExistence(TSyncLog &log, dbMeta::IndexCPtr i, bool allowCreate);
 		bool sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate);
 		bool sync_tableInherits(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
 
