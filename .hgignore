@@ -14,8 +14,12 @@ Release
 \.layout$
 \.pem$
 \.a$
+\.xme$
+\.mta$
+-backup.mga$
 
 ^runtime/client/GeneratedFiles
+^runtime/victim/dbMeta/schemas
 ^meta/R3Meta-{
 ^runtime/include/r3/data
 ^runtime/include/r3/protocol
