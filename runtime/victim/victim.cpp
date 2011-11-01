@@ -109,11 +109,13 @@ int _tmain(int argc, _TCHAR* argv[])
 // 	lt.servisePart[0].cost;
 
 	dbMeta::schemas::TestCategoriesCPtr testCats = mcl->get<dbMeta::schemas::TestCategories>();
-	dbWorker::Select mysel(testCats->Letter);
+	dbWorker::Select mysel;
 
 	mysel
+		.what(testCats->Client)
+		.what(testCats->Letter)
 		.link(testCats->Letter->servicePart)
-		.where(/*testCats->Letter->creation < 220*/)
+		.where(testCats->Letter->creation)
 		.limit(20);
 
 	//mysel.exec(con);

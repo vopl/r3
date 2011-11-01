@@ -3,6 +3,7 @@
 
 namespace dbWorker
 {
+	//////////////////////////////////////////////////////////////////////////
 	class CatOrFld
 	{
 	public:
@@ -11,19 +12,44 @@ namespace dbWorker
 	};
 
 	//////////////////////////////////////////////////////////////////////////
+	class RelEnd
+	{
+	public:
+		RelEnd(dbMeta::RelationEndCPtr re);
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	class Var
+	{
+	public:
+		Var(...);
+	};
+	//////////////////////////////////////////////////////////////////////////
+	class Expr
+	{
+	public:
+		Expr(...);
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	class Order
+	{
+	public:
+		Order(...);
+	};
+
+	//////////////////////////////////////////////////////////////////////////
 	class Select
 	{
 	public:
 		Select();
-		Select(CatOrFld cof);
-		Select(CatOrFld cof, CatOrFld cof2);
-		Select(CatOrFld cof, CatOrFld cof2, CatOrFld cof3);
 
-		Select &link(...);
-		Select &where(...);
-		Select &limit(...);
-		Select &offset(...);
-		Select &order(...);
+		Select &what(CatOrFld);
+		Select &link(RelEnd);
+		Select &where(Expr);
+		Select &limit(Var);
+		Select &offset(Var);
+		Select &order(Order);
 	};
 }
 
