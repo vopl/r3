@@ -19,6 +19,8 @@ using namespace std;
 #include "pgc/connection.hpp"
 
 #include "dbCreator/cluster.hpp"
+#include "dbWorker/select.hpp"
+
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -78,33 +80,43 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 
-	//////////////////////////////////////////////////////////////////////////
-	dbWorker::Cluster wcl(ccl);
+// 	//////////////////////////////////////////////////////////////////////////
+// 	dbWorker::Cluster wcl(ccl);
+// 
+// 	dbMeta::schemas::TestCategoriesCPtr testCats = mcl->get<dbMeta::schemas::TestCategories>();
+// 
+// 	dbMeta::Tuple<dbMeta::schemas::TestCategories> lt;
+// 	lt = wcl.select(testCats->Letter).where(testCats->Letter->comment < 220);
+// 
+// 	lt.comment = "380";
+// 	wcl.update(lt, lt.comment);
+// 	wcl.insert(lt);
+// 	wcl.delete(lt);
+// 
+// 	dbMeta::categories::TestCategories_LetterCPtr letter = testCats->Letter;
+// 
+// 	lt = wcl
+// 		.select(letter)
+// 		.distinct(letter->servisePart->cost)
+// 		.link(letter->servisePart)
+// 		
+// 		.where(letter->lastModified < 220 &&
+// 			letter->servisePart->cost < 380)
+// 		.limit(10)
+// 		.offset(3)
+// 		.order(letter->servisePart->cost, letter->lastModified);
+// 
+// 	lt.servisePart[0].cost;
 
 	dbMeta::schemas::TestCategoriesCPtr testCats = mcl->get<dbMeta::schemas::TestCategories>();
+	dbWorker::Select mysel(testCats->Letter);
 
-	dbMeta::Tuple<dbMeta::schemas::TestCategories> lt;
-	lt = wcl.select(testCats->Letter).where(testCats->Letter->comment < 220);
+	mysel
+		.link(testCats->Letter->servicePart)
+		.where(/*testCats->Letter->creation < 220*/)
+		.limit(20);
 
-	lt.comment = "380";
-	wcl.update(lt, lt.comment);
-	wcl.insert(lt);
-	wcl.delete(lt);
-
-	dbMeta::categories::TestCategories_LetterCPtr letter = testCats->Letter;
-
-	lt = wcl
-		.select(letter)
-		.distinct(letter->servisePart->cost)
-		.link(letter->servisePart)
-		
-		.where(letter->lastModified < 220 &&
-			letter->servisePart->cost < 380)
-		.limit(10)
-		.offset(3)
-		.order(letter->servisePart->cost, letter->lastModified);
-
-	lt.servisePart[0].cost;
+	//mysel.exec(con);
 
 	return 0;
 }

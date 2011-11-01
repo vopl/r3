@@ -314,6 +314,14 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="dbWorker"
+			>
+			<File
+				RelativePath=".\dbWorker\select.hpp"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>
