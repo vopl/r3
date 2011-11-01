@@ -8,7 +8,10 @@ namespace dbWorker
 	{
 		dbMeta::FieldCPtr _metaField;
 	public:
+		Field();
 		Field(dbMeta::FieldCPtr fld);
+
+		dbMeta::FieldCPtr meta() const;
 	};
 }
 

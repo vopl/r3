@@ -1,8 +1,23 @@
 #include "stdafx.h"
 #include "dbWorker/select.hpp"
+#include "dbMeta/cluster.hpp"
 
 namespace dbWorker
 {
+	//////////////////////////////////////////////////////////////////////////
+	Select::CategoryOrField::CategoryOrField(Category c)
+		: _isCategory(true)
+		, _category(c)
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Select::CategoryOrField::CategoryOrField(Field f)
+		: _isCategory(false)
+		, _field(f)
+	{
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	Select::Select()
 	{
@@ -12,20 +27,51 @@ namespace dbWorker
 	//////////////////////////////////////////////////////////////////////////
 	Select &Select::what(Category c)
 	{
-		_whatCategories.push_back(c);
+		_what.push_back(c);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Select &Select::what(Field f)
 	{
-		_whatFields.push_back(f);
+		_what.push_back(f);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Select &Select::link(Link l)
 	{
+		//проверить что исходная категория присутствует во what
+		bool present = false;
+		BOOST_FOREACH(CategoryOrField cof, _what)
+		{
+			if(cof._isCategory)
+			{
+				if(l.meta()->_category == cof._category.meta())
+				{
+					present = true;
+					break;
+				}
+			}
+			else
+			{
+				if(l.meta()->_category == cof._field.meta()->_category)
+				{
+					present = true;
+					break;
+				}
+			}
+		}
+
+		//_what.push_back(Category(l.meta()->_anotherEnd->_category));
+
+		if(!present)
+		{
+			assert(!"link source category absent in 'what'");
+			throw "link source category absent in 'what'";
+			return *this;
+		}
+
 		_links.push_back(l);
 		return *this;
 	}
@@ -33,6 +79,7 @@ namespace dbWorker
 	//////////////////////////////////////////////////////////////////////////
 	Select &Select::where(Expression e)
 	{
+		//перебрать дерево выражения, проверить наличие всех полей, собрать все переменные
 		_where = e;
 		return *this;
 	}

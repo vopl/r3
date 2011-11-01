@@ -8,7 +8,10 @@ namespace dbWorker
 	{
 		dbMeta::CategoryCPtr _metaCategory;
 	public:
+		Category();
 		Category(dbMeta::CategoryCPtr cat);
+
+		dbMeta::CategoryCPtr meta() const;
 	};
 }
 

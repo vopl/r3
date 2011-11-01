@@ -9,6 +9,8 @@ namespace dbWorker
 		dbMeta::RelationEndCPtr _metaRelatioEnd;
 	public:
 		Link(dbMeta::RelationEndCPtr re);
+
+		dbMeta::RelationEndCPtr meta() const;
 	};
 }
 

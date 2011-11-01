@@ -8,4 +8,11 @@ namespace dbWorker
 		: _metaRelatioEnd(re)
 	{
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	dbMeta::RelationEndCPtr Link::meta() const
+	{
+		return _metaRelatioEnd;
+	}
+
 }
