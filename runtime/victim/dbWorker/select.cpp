@@ -10,44 +10,51 @@ namespace dbWorker
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::what(Category)
+	Select &Select::what(Category c)
 	{
+		_whatCategories.push_back(c);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::what(Field)
+	Select &Select::what(Field f)
 	{
+		_whatFields.push_back(f);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::link(Link)
+	Select &Select::link(Link l)
 	{
+		_links.push_back(l);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::where(Expression)
+	Select &Select::where(Expression e)
 	{
+		_where = e;
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::limit(Variable)
+	Select &Select::limit(Variable v)
 	{
+		_limit = v;
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::offset(Variable)
+	Select &Select::offset(Variable v)
 	{
+		_offset = v;
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::order(Order)
+	Select &Select::order(Order o)
 	{
+		_orders.push_back(o);
 		return *this;
 	}
 }

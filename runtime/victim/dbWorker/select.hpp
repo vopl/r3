@@ -14,6 +14,16 @@ namespace dbWorker
 	//////////////////////////////////////////////////////////////////////////
 	class Select
 	{
+		std::deque<Category>	_whatCategories;
+		std::deque<Field>		_whatFields;
+		std::deque<Link>		_links;
+
+		Expression				_where;
+		Variable				_limit;
+		Variable				_offset;
+
+		std::deque<Order>		_orders;
+
 	public:
 		Select();
 
