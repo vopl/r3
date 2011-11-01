@@ -1,9 +1,9 @@
-#ifndef _PGS_SUGAR_HPP_
-#define _PGS_SUGAR_HPP_
+#ifndef _DBWORKER_EXPRESSIONSUGAR_HPP_
+#define _DBWORKER_EXPRESSIONSUGAR_HPP_
 
-#include "pgs/expr.hpp"
+#include "dbWorker/expression.hpp"
 
-namespace pgs
+namespace dbWorker
 {
 	Expression operator==(const Expression &v1, const Expression &v2);
 	Expression operator!=(const Expression &v1, const Expression &v2);

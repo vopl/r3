@@ -350,6 +350,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dbWorker\expressionSugar.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dbWorker\expressionSugar.hpp"
 				>
 			</File>

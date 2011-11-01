@@ -20,6 +20,7 @@ using namespace std;
 
 #include "dbCreator/cluster.hpp"
 #include "dbWorker/select.hpp"
+#include "dbWorker/expressionSugar.hpp"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -115,7 +116,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		.what(testCats->Client)
 		.what(testCats->Letter->file)
 		.link(testCats->Letter->servicePart)
-		.where(dbWorker::Expression(testCats->Letter->creation))
+		.where(dbWorker::Expression(testCats->Letter->creation) && dbWorker::Expression(testCats->Letter->creation))
 		.limit(20);
 
 	//mysel.exec(con);
