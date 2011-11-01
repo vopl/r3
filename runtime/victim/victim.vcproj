@@ -334,6 +334,26 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dbWorker\expressionAccess.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\expressionAccess.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\expressionImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\expressionImpl.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\expressionSugar.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dbWorker\field.cpp"
 				>
 			</File>
