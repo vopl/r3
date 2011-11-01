@@ -1,7 +1,6 @@
 #ifndef _DBWORKER_EXPRESSION_HPP_
 #define _DBWORKER_EXPRESSION_HPP_
 
-#include "dbWorker/field.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace dbWorker
@@ -15,9 +14,6 @@ namespace dbWorker
 	{
 	protected:
 		ExpressionImpl_ptr _impl;
-	public:
-		Expression();
-		Expression(Field f);
 	};
 
 
