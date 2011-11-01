@@ -6,6 +6,7 @@ namespace dbWorker
 	//////////////////////////////////////////////////////////////////////////
 	class Link
 	{
+		dbMeta::RelationEndCPtr _metaRelatioEnd;
 	public:
 		Link(dbMeta::RelationEndCPtr re);
 	};

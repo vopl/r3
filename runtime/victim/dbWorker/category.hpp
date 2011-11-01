@@ -6,6 +6,7 @@ namespace dbWorker
 	//////////////////////////////////////////////////////////////////////////
 	class Category
 	{
+		dbMeta::CategoryCPtr _metaCategory;
 	public:
 		Category(dbMeta::CategoryCPtr cat);
 	};

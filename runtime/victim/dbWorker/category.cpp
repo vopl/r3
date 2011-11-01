@@ -5,6 +5,7 @@ namespace dbWorker
 {
 	//////////////////////////////////////////////////////////////////////////
 	Category::Category(dbMeta::CategoryCPtr cat)
+		: _metaCategory(cat)
 	{
 	}
 }

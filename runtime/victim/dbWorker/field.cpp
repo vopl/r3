@@ -5,6 +5,7 @@ namespace dbWorker
 {
 	//////////////////////////////////////////////////////////////////////////
 	Field::Field(dbMeta::FieldCPtr fld)
+		: _metaField(fld)
 	{
 	}
 }

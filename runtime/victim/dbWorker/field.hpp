@@ -6,6 +6,7 @@ namespace dbWorker
 	//////////////////////////////////////////////////////////////////////////
 	class Field
 	{
+		dbMeta::FieldCPtr _metaField;
 	public:
 		Field(dbMeta::FieldCPtr fld);
 	};
