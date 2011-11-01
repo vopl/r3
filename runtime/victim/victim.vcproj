@@ -318,7 +318,59 @@
 			Name="dbWorker"
 			>
 			<File
+				RelativePath=".\dbWorker\category.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\category.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\expression.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\expression.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\field.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\field.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\link.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\link.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\order.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\order.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\select.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dbWorker\select.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\variable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbWorker\variable.hpp"
 				>
 			</File>
 		</Filter>

@@ -113,7 +113,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	mysel
 		.what(testCats->Client)
-		.what(testCats->Letter)
+		.what(testCats->Letter->file)
 		.link(testCats->Letter->servicePart)
 		.where(testCats->Letter->creation)
 		.limit(20);
