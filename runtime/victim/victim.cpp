@@ -68,7 +68,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//con.once("BEGIN").exec();
 
 	pgs::TSyncLog log;
-	bool bc = true;//ccl->sync(log, true);
+	bool bc = ccl->sync(log, true);
 	bool bd = true;//ccl->drop(log);
 
 	std::cout<<bc<<", "<<bd<<std::endl;

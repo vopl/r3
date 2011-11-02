@@ -110,6 +110,8 @@ namespace pgs
 			return "BYTEA";
 		case pgs::meta::eftFile:
 			return "OID";
+		case pgs::meta::eftId:
+			return "BIGINT";
 		case pgs::meta::eftImage:
 			return "OID";
 		case pgs::meta::eftInt16:
@@ -235,7 +237,7 @@ namespace pgs
 			log.push_back(SyncLogLine("table absent", schemaName(c->_schema, false, false), tableName(c, false, false)));
 			if(allowCreate)
 			{
-				_con.once("CREATE TABLE "+tableName(c, true, true)+"(id BIGINT DEFAULT nextval('"+idGenName(c->_schema, true, true)+"'::regclass) PRIMARY KEY )").exec().throwIfError();
+				_con.once("CREATE TABLE "+tableName(c, true, true)+"()").exec().throwIfError();
 				log.push_back(SyncLogLine("table created", schemaName(c->_schema, false, false), tableName(c, false, false)));
 			}
 			else
@@ -270,7 +272,13 @@ namespace pgs
 			log.push_back(SyncLogLine("column absent", schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)));
 			if(allowCreate)
 			{
-				_con.once("ALTER TABLE "+tableName(f->_category, true, true)+" ADD COLUMN "+columnName(f, true, false)+" "+columnType(f)).exec().throwIfError();
+				std::string sql = "ALTER TABLE "+tableName(f->_category, true, true)+" ADD COLUMN "+columnName(f, true, false)+" "+columnType(f);
+				if(meta::eftId == f->_type)
+				{
+					sql += " DEFAULT nextval('"+idGenName(f->_category->_schema, true, true)+"'::regclass) PRIMARY KEY";
+				}
+
+				_con.once(sql).exec().throwIfError();
 				log.push_back(SyncLogLine("column created", schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)));
 			}
 			else

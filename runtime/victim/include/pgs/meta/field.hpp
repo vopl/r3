@@ -16,6 +16,7 @@ namespace pgs
 			eftDateTimeInterval,
 			eftEnum,
 			eftFile,
+			eftId,
 			eftImage,
 			eftInt16,
 			eftInt32,
