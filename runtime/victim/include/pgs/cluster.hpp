@@ -1,14 +1,14 @@
 #ifndef _DBCREATOR_CLUSTER_HPP_
 #define _DBCREATOR_CLUSTER_HPP_
 
-#include "dbMeta/cluster.hpp"
+#include "pgs/meta/cluster.hpp"
 #include "pgc/connection.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/cstdint.hpp>
 
-namespace dbCreator
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	struct SyncLogLine
@@ -33,7 +33,7 @@ namespace dbCreator
 		: public boost::enable_shared_from_this<Cluster>
 	{
 		//мета данные этого экземпл€ра
-		boost::shared_ptr<dbMeta::Cluster> _metaCluster;
+		boost::shared_ptr<pgs::meta::Cluster> _metaCluster;
 
 		//уникаторы
 		std::string _prefix;
@@ -43,20 +43,20 @@ namespace dbCreator
 
 		//соответстви€ мета и схем базы
 		//schema oid -> schema
-		typedef std::map<TOid, dbMeta::SchemaCPtr> TMOid2Schema;
+		typedef std::map<TOid, pgs::meta::SchemaCPtr> TMOid2Schema;
 		TMOid2Schema _oid2schema;
 
 		//schema -> schema oid
-		typedef std::map<dbMeta::SchemaCPtr, TOid> TMSchema2Oid;
+		typedef std::map<pgs::meta::SchemaCPtr, TOid> TMSchema2Oid;
 		TMSchema2Oid _schema2oid;
 
 		//соответстви€ мета и таблиц базы
 		//table oid -> category
-		typedef std::map<TOid, dbMeta::CategoryCPtr> TMOid2Cat;
+		typedef std::map<TOid, pgs::meta::CategoryCPtr> TMOid2Cat;
 		TMOid2Cat _oid2cat;
 
 		//category -> table oid
-		typedef std::map<dbMeta::CategoryCPtr, TOid> TMCat2Oid;
+		typedef std::map<pgs::meta::CategoryCPtr, TOid> TMCat2Oid;
 		TMCat2Oid _cat2oid;
 
 
@@ -69,36 +69,36 @@ namespace dbCreator
 	private:
 		std::string escapeName	(const std::string &name, bool escape);
 
-		std::string schemaName	(dbMeta::SchemaCPtr s,			bool escape,	bool full);
-		std::string idGenName	(dbMeta::SchemaCPtr s,			bool escape,	bool full);
-		std::string tableName	(dbMeta::CategoryCPtr c,		bool escape,	bool full);
-		std::string tableName	(dbMeta::RelationCPtr r,		bool escape,	bool full);
-		std::string columnName	(dbMeta::FieldCPtr f,			bool escape,	bool full);
-		std::string indexName	(dbMeta::IndexCPtr i,			bool escape,	bool full);
+		std::string schemaName	(pgs::meta::SchemaCPtr s,			bool escape,	bool full);
+		std::string idGenName	(pgs::meta::SchemaCPtr s,			bool escape,	bool full);
+		std::string tableName	(pgs::meta::CategoryCPtr c,		bool escape,	bool full);
+		std::string tableName	(pgs::meta::RelationCPtr r,		bool escape,	bool full);
+		std::string columnName	(pgs::meta::FieldCPtr f,			bool escape,	bool full);
+		std::string indexName	(pgs::meta::IndexCPtr i,			bool escape,	bool full);
 
-		std::string columnType	(dbMeta::FieldCPtr f);
+		std::string columnType	(pgs::meta::FieldCPtr f);
 
-		std::string triggerFuncName	(dbMeta::CategoryCPtr c, const std::string &suffix);
-		std::string triggerFuncName	(dbMeta::RelationCPtr r, const std::string &suffix);
+		std::string triggerFuncName	(pgs::meta::CategoryCPtr c, const std::string &suffix);
+		std::string triggerFuncName	(pgs::meta::RelationCPtr r, const std::string &suffix);
 
-		std::string triggerName	(dbMeta::CategoryCPtr c, const std::string &suffix);
-		std::string triggerName	(dbMeta::RelationCPtr r, const std::string &suffix);
-
-	private:
-		bool sync_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s, bool allowCreate);
-		bool sync_tableExistence(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
-		bool sync_columnExistence(TSyncLog &log, dbMeta::FieldCPtr f, bool allowCreate);
-		bool sync_indexExistence(TSyncLog &log, dbMeta::IndexCPtr i, bool allowCreate);
-		bool sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate);
-		bool sync_tableInherits(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate);
-
-		bool createTable2CrossTrigger(TSyncLog &log, dbMeta::RelationEndCPtr re, const std::string &who);
+		std::string triggerName	(pgs::meta::CategoryCPtr c, const std::string &suffix);
+		std::string triggerName	(pgs::meta::RelationCPtr r, const std::string &suffix);
 
 	private:
-		bool drop_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s);
+		bool sync_schemaExistence(TSyncLog &log, pgs::meta::SchemaCPtr s, bool allowCreate);
+		bool sync_tableExistence(TSyncLog &log, pgs::meta::CategoryCPtr c, bool allowCreate);
+		bool sync_columnExistence(TSyncLog &log, pgs::meta::FieldCPtr f, bool allowCreate);
+		bool sync_indexExistence(TSyncLog &log, pgs::meta::IndexCPtr i, bool allowCreate);
+		bool sync_crossExistence(TSyncLog &log, pgs::meta::RelationCPtr r, bool allowCreate);
+		bool sync_tableInherits(TSyncLog &log, pgs::meta::CategoryCPtr c, bool allowCreate);
+
+		bool createTable2CrossTrigger(TSyncLog &log, pgs::meta::RelationEndCPtr re, const std::string &who);
+
+	private:
+		bool drop_schemaExistence(TSyncLog &log, pgs::meta::SchemaCPtr s);
 
 	public:
-		Cluster(boost::shared_ptr<dbMeta::Cluster> metaCluster);
+		Cluster(boost::shared_ptr<pgs::meta::Cluster> metaCluster);
 		void setUnicators(const std::string &prefix, const std::string &suffix);
 		void setConnection(pgc::Connection con);
 

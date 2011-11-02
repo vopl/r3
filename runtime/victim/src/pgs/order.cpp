@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "dbWorker/order.hpp"
+#include "pgs/order.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Order::Order(...)

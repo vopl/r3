@@ -1,34 +1,37 @@
-#ifndef _DBMETA_INDEX_HPP_
-#define _DBMETA_INDEX_HPP_
+#ifndef _PGS_META_INDEX_HPP_
+#define _PGS_META_INDEX_HPP_
 
-#include "dbMeta/common.hpp"
+#include "pgs/meta/common.hpp"
 
-namespace dbMeta
+namespace pgs
 {
-	//////////////////////////////////////////////////////////////////////////
-	enum EIndexType
+	namespace meta
 	{
-		eitTree,
-		eitHash,
-	};
+		//////////////////////////////////////////////////////////////////////////
+		enum EIndexType
+		{
+			eitTree,
+			eitHash,
+		};
 
-	//////////////////////////////////////////////////////////////////////////
-	class Index
-	{
-	public:
-		//наименование
-		std::string		_name;
+		//////////////////////////////////////////////////////////////////////////
+		class Index
+		{
+		public:
+			//наименование
+			std::string		_name;
 
-		//тип индекса
-		EIndexType		_type;
+			//тип индекса
+			EIndexType		_type;
 
-		//задействованные поля
-		FieldPtrs		_fields;
+			//задействованные поля
+			FieldPtrs		_fields;
 
-		//объемлющая категория
-		CategoryPtr		_category;
-		CategoryPtrs	_categories;
-	};
+			//объемлющая категория
+			CategoryPtr		_category;
+			CategoryPtrs	_categories;
+		};
+	}
 }
 
 #endif

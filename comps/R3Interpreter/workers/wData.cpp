@@ -181,16 +181,16 @@ namespace workers
 		{
 			out::File hpp(_path / "schemas" / (data->getName()+".hpp"));
 			hpp<<"// data: "<<data->getName()<<endl;
-			hpp<<"#ifndef _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
-			hpp<<"#define _DBMETA_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
+			hpp<<"#ifndef _PGS_META_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
+			hpp<<"#define _PGS_META_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
 			hpp<<endl;
-			hpp<<"#include \"dbMeta/schema.hpp\""<<endl;
-			hpp<<"#include \"dbMeta/category.hpp\""<<endl;
-			hpp<<"#include \"dbMeta/relation.hpp\""<<endl;
-			hpp<<"#include \"dbMeta/relationEnd.hpp\""<<endl;
-			hpp<<"#include \"dbMeta/field.hpp\""<<endl;
-			hpp<<"#include \"dbMeta/fieldScanty.hpp\""<<endl;
-			hpp<<"#include \"dbMeta/index.hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/schema.hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/category.hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/relation.hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/relationEnd.hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/field.hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/fieldScanty.hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/index.hpp\""<<endl;
 			hpp<<endl;
 
 			mkSchemaTypes(hpp, data);
@@ -204,11 +204,11 @@ namespace workers
 		{
 			out::File hpp(_path / "schemas" / (data->getName()+"_initializer.hpp"));
 			hpp<<"// data: "<<data->getName()<<endl;
-			hpp<<"#ifndef _DBMETA_SCHEMAS_"<<data->getName()<<"_INITIALIZER_hpp"<<endl;
-			hpp<<"#define _DBMETA_SCHEMAS_"<<data->getName()<<"_INITIALIZER_hpp"<<endl;
+			hpp<<"#ifndef _PGS_META_SCHEMAS_"<<data->getName()<<"_INITIALIZER_hpp"<<endl;
+			hpp<<"#define _PGS_META_SCHEMAS_"<<data->getName()<<"_INITIALIZER_hpp"<<endl;
 			hpp<<endl;
-			hpp<<"#include \"dbMeta/schemas/"<<data->getName()<<".hpp\""<<endl;
-			hpp<<"#include \"dbMeta/schemaInitializer.hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/schemas/"<<data->getName()<<".hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/schemaInitializer.hpp\""<<endl;
 			hpp<<endl;
 
 			mkSchemaInitializer(hpp, data);
@@ -225,7 +225,7 @@ namespace workers
 	void WData::mkSchemaTypes(out::File &hpp, const Data &data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		hpp<<"namespace dbMeta\n{"<<endl;
+		hpp<<"namespace pgs\n{\nnamespace meta\n{"<<endl;
 
 		//////////////////////////////////////////////////////////////////////////
 
@@ -312,7 +312,7 @@ namespace workers
 		//////////////////////////////////////////////////////////////////////////
 		//класс схемы
 		hpp<<"namespace schemas\n{"<<endl;
-		hpp<<"class "<<schemaClassName(data)<<"\n	: public ::dbMeta::Schema\n{"<<endl;
+		hpp<<"class "<<schemaClassName(data)<<"\n	: public ::pgs::meta::Schema\n{"<<endl;
 
 		hpp<<"public:"<<endl;
 		//категории
@@ -330,7 +330,7 @@ namespace workers
 
 
 		hpp<<"}"<<endl;
-		hpp<<"}"<<endl;
+		hpp<<"}\n}"<<endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -343,7 +343,7 @@ namespace workers
 			return;
 		}
 
-		hpp<<"\n : public ::dbMeta::Category\n{"<<endl;
+		hpp<<"\n : public ::pgs::meta::Category\n{"<<endl;
 		hpp<<"public:"<<endl;
 
 
@@ -376,7 +376,7 @@ namespace workers
 			return;
 		}
 
-		hpp<<"\n : public ::dbMeta::";
+		hpp<<"\n : public ::pgs::meta::";
 		if(Scanty(fld))
 		{
 			hpp<<"FieldScanty";
@@ -401,7 +401,7 @@ namespace workers
 			return;
 		}
 
-		hpp<<"\n : public ::dbMeta::Relation\n{"<<endl;
+		hpp<<"\n : public ::pgs::meta::Relation\n{"<<endl;
 		hpp<<"public:"<<endl;
 
 		hpp<<"};\n"<<endl;
@@ -489,7 +489,7 @@ namespace workers
 	void WData::mkSchemaInitializer(out::File &hpp, const Data &data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		hpp<<"namespace dbMeta\n{"<<endl;
+		hpp<<"namespace pgs\n{\nnamespace meta\n{"<<endl;
 
 		mkSchemaInitializerPre(hpp, data);
 		mkSchemaInitializerDeps(hpp, data);
@@ -497,7 +497,7 @@ namespace workers
 		mkSchemaInitializerLinks(hpp, data);
 		mkSchemaInitializerPost(hpp, data);
 
-		hpp<<"}"<<endl;
+		hpp<<"}\n}"<<endl;
 	}
 
 

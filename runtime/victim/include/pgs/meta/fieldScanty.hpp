@@ -1,32 +1,35 @@
-#ifndef _DBMETA_FIELDSCANTY_HPP_
-#define _DBMETA_FIELDSCANTY_HPP_
+#ifndef _PGS_META_FIELDSCANTY_HPP_
+#define _PGS_META_FIELDSCANTY_HPP_
 
-#include "dbMeta/field.hpp"
+#include "pgs/meta/field.hpp"
 
-namespace dbMeta
+namespace pgs
 {
-	//////////////////////////////////////////////////////////////////////////
-	//set, enum
-	class FieldScantyValue
+	namespace meta
 	{
-	public:
-		std::string		_name;
-		int				_key;
-		std::string		_shortDescription;
-		std::string		_longDescription;
-		FieldScantyPtr	_field;
-	};
+		//////////////////////////////////////////////////////////////////////////
+		//set, enum
+		class FieldScantyValue
+		{
+		public:
+			std::string		_name;
+			int				_key;
+			std::string		_shortDescription;
+			std::string		_longDescription;
+			FieldScantyPtr	_field;
+		};
 
-	//////////////////////////////////////////////////////////////////////////
-	//set, enum
-	class FieldScanty
-		: public Field
-	{
-	public:
-		//значения
-		FieldScantyValuePtrs _values;
-	};
+		//////////////////////////////////////////////////////////////////////////
+		//set, enum
+		class FieldScanty
+			: public Field
+		{
+		public:
+			//значения
+			FieldScantyValuePtrs _values;
+		};
 
+	}
 }
 
 #endif

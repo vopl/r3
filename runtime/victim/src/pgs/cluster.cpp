@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "dbCreator/cluster.hpp"
+#include "pgs/cluster.hpp"
 
-namespace dbCreator
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	std::string Cluster::escapeName(const std::string &name, bool escape)
@@ -15,7 +15,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::schemaName(dbMeta::SchemaCPtr s, bool escape, bool full)
+	std::string Cluster::schemaName(pgs::meta::SchemaCPtr s, bool escape, bool full)
 	{
 		std::string n = escapeName(_prefix + "_" + s->_name + "_" + _suffix, escape);
 		if(full)
@@ -26,7 +26,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::idGenName(dbMeta::SchemaCPtr s, bool escape, bool full)
+	std::string Cluster::idGenName(pgs::meta::SchemaCPtr s, bool escape, bool full)
 	{
 		std::string n = escapeName("idGen", escape);
 		if(full)
@@ -37,7 +37,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::tableName(dbMeta::CategoryCPtr c, bool escape, bool full)
+	std::string Cluster::tableName(pgs::meta::CategoryCPtr c, bool escape, bool full)
 	{
 		std::string n = escapeName(c->_name, escape);
 		if(full)
@@ -48,7 +48,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::tableName(dbMeta::RelationCPtr r, bool escape, bool full)
+	std::string Cluster::tableName(pgs::meta::RelationCPtr r, bool escape, bool full)
 	{
 		std::string n = escapeName(r->_name, escape);
 		if(full)
@@ -59,7 +59,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::columnName(dbMeta::FieldCPtr f, bool escape, bool full)
+	std::string Cluster::columnName(pgs::meta::FieldCPtr f, bool escape, bool full)
 	{
 		std::string n = escapeName(f->_name, escape);
 		if(full)
@@ -70,7 +70,7 @@ namespace dbCreator
 	}
 
 // 	//////////////////////////////////////////////////////////////////////////
-// 	std::string Cluster::columnName(dbMeta::RelationEndCPtr re, bool escape, bool full)
+// 	std::string Cluster::columnName(pgs::meta::RelationEndCPtr re, bool escape, bool full)
 // 	{
 // 		std::string n = escapeName(re->_name, escape);
 // 		if(full)
@@ -81,7 +81,7 @@ namespace dbCreator
 // 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::indexName	(dbMeta::IndexCPtr i,			bool escape,	bool full)
+	std::string Cluster::indexName	(pgs::meta::IndexCPtr i,			bool escape,	bool full)
 	{
 		std::string n = escapeName(i->_category->_name+"_"+i->_name, escape);
 		if(full)
@@ -92,49 +92,49 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::columnType(dbMeta::FieldCPtr f)
+	std::string Cluster::columnType(pgs::meta::FieldCPtr f)
 	{
 		switch(f->_type)
 		{
-		case dbMeta::eftAudio:
+		case pgs::meta::eftAudio:
 			return "OID";
-		case dbMeta::eftBinary:
+		case pgs::meta::eftBinary:
 			return "BYTEA";
-		case dbMeta::eftBool:
+		case pgs::meta::eftBool:
 			return "BOOLEAN";
-		case dbMeta::eftDate:
+		case pgs::meta::eftDate:
 			return "DATE";
-		case dbMeta::eftDateTimeInterval:
+		case pgs::meta::eftDateTimeInterval:
 			return "INTERVAL";
-		case dbMeta::eftEnum:
+		case pgs::meta::eftEnum:
 			return "BYTEA";
-		case dbMeta::eftFile:
+		case pgs::meta::eftFile:
 			return "OID";
-		case dbMeta::eftImage:
+		case pgs::meta::eftImage:
 			return "OID";
-		case dbMeta::eftInt16:
+		case pgs::meta::eftInt16:
 			return "SMALLINT";
-		case dbMeta::eftInt32:
+		case pgs::meta::eftInt32:
 			return "INTEGER";
-		case dbMeta::eftInt64:
+		case pgs::meta::eftInt64:
 			return "BIGINT";
-		case dbMeta::eftInt8:
+		case pgs::meta::eftInt8:
 			return "SMALLINT";
-		case dbMeta::eftMoney:
+		case pgs::meta::eftMoney:
 			return "MONEY";
-		case dbMeta::eftReal32:
+		case pgs::meta::eftReal32:
 			return "REAL";
-		case dbMeta::eftReal64:
+		case pgs::meta::eftReal64:
 			return "DOUBLE PRECISION";
-		case dbMeta::eftSet:
+		case pgs::meta::eftSet:
 			return "BYTEA";
-		case dbMeta::eftString:
+		case pgs::meta::eftString:
 			return "VARCHAR";
-		case dbMeta::eftTime:
+		case pgs::meta::eftTime:
 			return "TIME WITH TIME ZONE";
-		case dbMeta::eftTimestamp:
+		case pgs::meta::eftTimestamp:
 			return "TIMESTAMP WITH TIME ZONE";
-		case dbMeta::eftVideo:
+		case pgs::meta::eftVideo:
 			return "OID";
 		default:
 			assert(!"unknown field type");
@@ -144,32 +144,32 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::triggerFuncName	(dbMeta::CategoryCPtr c, const std::string &suffix)
+	std::string Cluster::triggerFuncName	(pgs::meta::CategoryCPtr c, const std::string &suffix)
 	{
 		return schemaName(c->_schema, true, true)+"."+escapeName(c->_name+"_"+suffix, true);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::triggerFuncName	(dbMeta::RelationCPtr r, const std::string &suffix)
+	std::string Cluster::triggerFuncName	(pgs::meta::RelationCPtr r, const std::string &suffix)
 	{
 		return schemaName(r->_schema, true, true)+"."+escapeName(r->_name+"_"+suffix, true);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::triggerName	(dbMeta::CategoryCPtr c, const std::string &suffix)
+	std::string Cluster::triggerName	(pgs::meta::CategoryCPtr c, const std::string &suffix)
 	{
 		return escapeName(c->_name+"_"+suffix, true);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	std::string Cluster::triggerName	(dbMeta::RelationCPtr r, const std::string &suffix)
+	std::string Cluster::triggerName	(pgs::meta::RelationCPtr r, const std::string &suffix)
 	{
 		return escapeName(r->_name+"_"+suffix, true);
 	}
 
 	
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::sync_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s, bool allowCreate)
+	bool Cluster::sync_schemaExistence(TSyncLog &log, pgs::meta::SchemaCPtr s, bool allowCreate)
 	{
 		pgc::Result pgr = _con
 			.once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1")
@@ -227,7 +227,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::sync_tableExistence(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate)
+	bool Cluster::sync_tableExistence(TSyncLog &log, pgs::meta::CategoryCPtr c, bool allowCreate)
 	{
 		pgc::Result pgr = _con.once("SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2").exec(schemaName(c->_schema, false, false), tableName(c, false, false)).throwIfError();
 		if(!pgr.rows())
@@ -262,7 +262,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::sync_columnExistence(TSyncLog &log, dbMeta::FieldCPtr f, bool allowCreate)
+	bool Cluster::sync_columnExistence(TSyncLog &log, pgs::meta::FieldCPtr f, bool allowCreate)
 	{
 		pgc::Result pgr = _con.once("SELECT * FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2 AND column_name=$3").exec(schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)).throwIfError();
 		if(!pgr.rows())
@@ -283,7 +283,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::sync_indexExistence(TSyncLog &log, dbMeta::IndexCPtr i, bool allowCreate)
+	bool Cluster::sync_indexExistence(TSyncLog &log, pgs::meta::IndexCPtr i, bool allowCreate)
 	{
 		if(i->_fields.empty())
 		{
@@ -301,17 +301,17 @@ namespace dbCreator
 				{
 				default:
 					assert(!"unknown index type");
-				case dbMeta::eitTree:
+				case pgs::meta::eitTree:
 					sql += "btree";
 					break;
-				case dbMeta::eitHash:
+				case pgs::meta::eitHash:
 					sql += "hash";
 					break;
 				}
 
 				sql += "(";
 				bool isFirst = true;
-				BOOST_FOREACH(dbMeta::FieldCPtr f, i->_fields)
+				BOOST_FOREACH(pgs::meta::FieldCPtr f, i->_fields)
 				{
 					if(isFirst)
 					{
@@ -338,7 +338,7 @@ namespace dbCreator
 
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::sync_crossExistence(TSyncLog &log, dbMeta::RelationCPtr r, bool allowCreate)
+	bool Cluster::sync_crossExistence(TSyncLog &log, pgs::meta::RelationCPtr r, bool allowCreate)
 	{
 		pgc::Result pgr = _con.once("SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2").exec(schemaName(r->_schema, false, false), tableName(r, false, false)).throwIfError();
 		if(!pgr.rows())
@@ -379,18 +379,18 @@ namespace dbCreator
 					).exec().throwIfError();
 
 
-				BOOST_FOREACH(dbMeta::CategoryCPtr c, r->_inputEnd->_categories)
+				BOOST_FOREACH(pgs::meta::CategoryCPtr c, r->_inputEnd->_categories)
 				{
-					dbMeta::RelationEndCPtr re = c->_relationEnds[r->_inputEnd->_name];
+					pgs::meta::RelationEndCPtr re = c->_relationEnds[r->_inputEnd->_name];
 					if(!createTable2CrossTrigger(log, re, "in"))
 					{
 						log.push_back(SyncLogLine("table triggers creation failed", schemaName(r->_schema, false, false), tableName(c, false, false)));
 						return false;
 					}
 				}
-				BOOST_FOREACH(dbMeta::CategoryCPtr c, r->_outputEnd->_categories)
+				BOOST_FOREACH(pgs::meta::CategoryCPtr c, r->_outputEnd->_categories)
 				{
-					dbMeta::RelationEndCPtr re = c->_relationEnds[r->_outputEnd->_name];
+					pgs::meta::RelationEndCPtr re = c->_relationEnds[r->_outputEnd->_name];
 					if(!createTable2CrossTrigger(log, re, "out"))
 					{
 						log.push_back(SyncLogLine("table triggers creation failed", schemaName(r->_schema, false, false), tableName(c, false, false)));
@@ -409,7 +409,7 @@ namespace dbCreator
 
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::sync_tableInherits(TSyncLog &log, dbMeta::CategoryCPtr c, bool allowCreate)
+	bool Cluster::sync_tableInherits(TSyncLog &log, pgs::meta::CategoryCPtr c, bool allowCreate)
 	{
 		pgc::Result pgr = _con
 			.once("SELECT inhparent FROM pg_catalog.pg_inherits WHERE inhrelid=$1")
@@ -423,7 +423,7 @@ namespace dbCreator
 		}
 
 
-		BOOST_FOREACH(dbMeta::CategoryCPtr b, c->_bases)
+		BOOST_FOREACH(pgs::meta::CategoryCPtr b, c->_bases)
 		{
 			if(baseOids.end() == baseOids.find(_cat2oid[b]))
 			{
@@ -444,7 +444,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::createTable2CrossTrigger(TSyncLog &log, dbMeta::RelationEndCPtr re, const std::string &who)
+	bool Cluster::createTable2CrossTrigger(TSyncLog &log, pgs::meta::RelationEndCPtr re, const std::string &who)
 	{
 		//////////////////////////////////////////////////////////////////////////
 		//тригер на удаление
@@ -496,7 +496,7 @@ namespace dbCreator
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Cluster::drop_schemaExistence(TSyncLog &log, dbMeta::SchemaCPtr s)
+	bool Cluster::drop_schemaExistence(TSyncLog &log, pgs::meta::SchemaCPtr s)
 	{
 		pgc::Result pgr = _con
 			.once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1")
@@ -516,7 +516,7 @@ namespace dbCreator
 
 
 	//////////////////////////////////////////////////////////////////////////
-	Cluster::Cluster(boost::shared_ptr<dbMeta::Cluster> metaCluster)
+	Cluster::Cluster(boost::shared_ptr<pgs::meta::Cluster> metaCluster)
 		: _metaCluster(metaCluster)
 		, _prefix()
 		, _suffix()
@@ -564,7 +564,7 @@ namespace dbCreator
 		bool res = true;
 
 		//наличие схем
-		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
 		{
 			res &= sync_schemaExistence(log, s, allowCreate);
 		}
@@ -574,9 +574,9 @@ namespace dbCreator
 		}
 
 		//наличие таблиц
-		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
 		{
-			BOOST_FOREACH(dbMeta::CategoryCPtr c, s->_categories)
+			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 			{
 				res &= sync_tableExistence(log, c, allowCreate);
 			}
@@ -587,11 +587,11 @@ namespace dbCreator
 		}
 
 		//наличие полей
-		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
 		{
-			BOOST_FOREACH(dbMeta::CategoryCPtr c, s->_categories)
+			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 			{
-				BOOST_FOREACH(dbMeta::FieldCPtr f, c->_fields)
+				BOOST_FOREACH(pgs::meta::FieldCPtr f, c->_fields)
 				{
 					res &= sync_columnExistence(log, f, allowCreate);
 				}
@@ -603,11 +603,11 @@ namespace dbCreator
 		}
 
 		//наличие индексов
-		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
 		{
-			BOOST_FOREACH(dbMeta::CategoryCPtr c, s->_categories)
+			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 			{
-				BOOST_FOREACH(dbMeta::IndexCPtr i, c->_indices)
+				BOOST_FOREACH(pgs::meta::IndexCPtr i, c->_indices)
 				{
 					res &= sync_indexExistence(log, i, allowCreate);
 				}
@@ -619,9 +619,9 @@ namespace dbCreator
 		}
 
 		//наличие таблиц связей
-		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
 		{
-			BOOST_FOREACH(dbMeta::RelationCPtr r, s->_relations)
+			BOOST_FOREACH(pgs::meta::RelationCPtr r, s->_relations)
 			{
 				res &= sync_crossExistence(log, r, allowCreate);
 			}
@@ -632,9 +632,9 @@ namespace dbCreator
 		}
 
 		//наследование
-		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
 		{
-			BOOST_FOREACH(dbMeta::CategoryCPtr c, s->_categories)
+			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 			{
 				res &= sync_tableInherits(log, c, allowCreate);
 			}
@@ -660,7 +660,7 @@ namespace dbCreator
 		bool res = true;
 
 		//схемы
-		BOOST_FOREACH(dbMeta::SchemaCPtr s, _metaCluster->getSchemas())
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
 		{
 			res &= drop_schemaExistence(log, s);
 		}

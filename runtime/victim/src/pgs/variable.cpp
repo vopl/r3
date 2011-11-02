@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "dbWorker/variable.hpp"
+#include "pgs/variable.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Variable::Variable(...)

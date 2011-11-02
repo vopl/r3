@@ -1,63 +1,66 @@
-#ifndef _DBMETA_COMMON_HPP_
-#define _DBMETA_COMMON_HPP_
+#ifndef _PGS_META_COMMON_HPP_
+#define _PGS_META_COMMON_HPP_
 
-#include "dbMeta/ptrContainer.hpp"
+#include "pgs/meta/ptrContainer.hpp"
 
-namespace dbMeta
+namespace pgs
 {
-	//////////////////////////////////////////////////////////////////////////
-	class ClusterStorage;
-	typedef ClusterStorage *ClusterStoragePtr;
-	typedef const ClusterStorage *ClusterStorageCPtr;
+	namespace meta
+	{
+		//////////////////////////////////////////////////////////////////////////
+		class ClusterStorage;
+		typedef ClusterStorage *ClusterStoragePtr;
+		typedef const ClusterStorage *ClusterStorageCPtr;
 
-	//////////////////////////////////////////////////////////////////////////
-	class Schema;
-	typedef Schema *SchemaPtr;
-	typedef const Schema *SchemaCPtr;
-	typedef PtrContainer<Schema> SchemaPtrs;
+		//////////////////////////////////////////////////////////////////////////
+		class Schema;
+		typedef Schema *SchemaPtr;
+		typedef const Schema *SchemaCPtr;
+		typedef PtrContainer<Schema> SchemaPtrs;
 
-	//////////////////////////////////////////////////////////////////////////
-	class Field;
-	typedef Field *FieldPtr;
-	typedef const Field *FieldCPtr;
-	typedef PtrContainer<Field> FieldPtrs;
+		//////////////////////////////////////////////////////////////////////////
+		class Field;
+		typedef Field *FieldPtr;
+		typedef const Field *FieldCPtr;
+		typedef PtrContainer<Field> FieldPtrs;
 
-	//////////////////////////////////////////////////////////////////////////
-	class FieldScanty;
-	typedef FieldScanty *FieldScantyPtr;
-	typedef const FieldScanty *FieldScantyCPtr;
-	typedef PtrContainer<FieldScanty> FieldScantyPtrs;
+		//////////////////////////////////////////////////////////////////////////
+		class FieldScanty;
+		typedef FieldScanty *FieldScantyPtr;
+		typedef const FieldScanty *FieldScantyCPtr;
+		typedef PtrContainer<FieldScanty> FieldScantyPtrs;
 
-	//////////////////////////////////////////////////////////////////////////
-	class FieldScantyValue;
-	typedef FieldScantyValue *FieldScantyValuePtr;
-	typedef const FieldScantyValue *FieldScantyValueCPtr;
-	typedef PtrContainer<FieldScantyValue> FieldScantyValuePtrs;
+		//////////////////////////////////////////////////////////////////////////
+		class FieldScantyValue;
+		typedef FieldScantyValue *FieldScantyValuePtr;
+		typedef const FieldScantyValue *FieldScantyValueCPtr;
+		typedef PtrContainer<FieldScantyValue> FieldScantyValuePtrs;
 
-	//////////////////////////////////////////////////////////////////////////
-	class Index;
-	typedef Index *IndexPtr;
-	typedef const Index *IndexCPtr;
-	typedef PtrContainer<Index> IndexPtrs;
+		//////////////////////////////////////////////////////////////////////////
+		class Index;
+		typedef Index *IndexPtr;
+		typedef const Index *IndexCPtr;
+		typedef PtrContainer<Index> IndexPtrs;
 
-	//////////////////////////////////////////////////////////////////////////
-	class Category;
-	typedef Category * CategoryPtr;
-	typedef const Category * CategoryCPtr;
-	typedef PtrContainer<Category> CategoryPtrs;
+		//////////////////////////////////////////////////////////////////////////
+		class Category;
+		typedef Category * CategoryPtr;
+		typedef const Category * CategoryCPtr;
+		typedef PtrContainer<Category> CategoryPtrs;
 
-	//////////////////////////////////////////////////////////////////////////
-	class Relation;
-	typedef Relation * RelationPtr;
-	typedef const Relation * RelationCPtr;
-	typedef PtrContainer<Relation> RelationPtrs;
+		//////////////////////////////////////////////////////////////////////////
+		class Relation;
+		typedef Relation * RelationPtr;
+		typedef const Relation * RelationCPtr;
+		typedef PtrContainer<Relation> RelationPtrs;
 
-	//////////////////////////////////////////////////////////////////////////
-	class RelationEnd;
-	typedef RelationEnd * RelationEndPtr;
-	typedef const RelationEnd * RelationEndCPtr;
-	typedef PtrContainer<RelationEnd> RelationEndPtrs;
+		//////////////////////////////////////////////////////////////////////////
+		class RelationEnd;
+		typedef RelationEnd * RelationEndPtr;
+		typedef const RelationEnd * RelationEndCPtr;
+		typedef PtrContainer<RelationEnd> RelationEndPtrs;
 
+	}
 }
 
 #endif

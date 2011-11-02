@@ -1,20 +1,20 @@
-#ifndef _DBWORKER_FIELD_HPP_
-#define _DBWORKER_FIELD_HPP_
+#ifndef _PGS_FIELD_HPP_
+#define _PGS_FIELD_HPP_
 
-#include "dbWorker/expression.hpp"
+#include "pgs/expression.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class Field
 		: public Expression
 	{
-		dbMeta::FieldCPtr _metaField;
+		pgs::meta::FieldCPtr _metaField;
 	public:
 		Field();
-		Field(dbMeta::FieldCPtr fld);
+		Field(pgs::meta::FieldCPtr fld);
 
-		dbMeta::FieldCPtr meta() const;
+		pgs::meta::FieldCPtr meta() const;
 	};
 }
 

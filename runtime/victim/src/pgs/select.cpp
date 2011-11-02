@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "dbWorker/select.hpp"
-#include "dbMeta/cluster.hpp"
+#include "pgs/select.hpp"
+#include "pgs/meta/cluster.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Select::CategoryOrField::CategoryOrField(Category c)

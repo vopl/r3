@@ -1,7 +1,7 @@
-#ifndef _DBWORKER_ORDER_HPP_
-#define _DBWORKER_ORDER_HPP_
+#ifndef _PGS_ORDER_HPP_
+#define _PGS_ORDER_HPP_
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class Order

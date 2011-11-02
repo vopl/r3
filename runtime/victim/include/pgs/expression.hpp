@@ -1,9 +1,9 @@
-#ifndef _DBWORKER_EXPRESSION_HPP_
-#define _DBWORKER_EXPRESSION_HPP_
+#ifndef _PGS_EXPRESSION_HPP_
+#define _PGS_EXPRESSION_HPP_
 
 #include <boost/shared_ptr.hpp>
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class ExpressionImpl;

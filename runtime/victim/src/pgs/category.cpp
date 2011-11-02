@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "dbWorker/category.hpp"
+#include "pgs/category.hpp"
 
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Category::Category()
@@ -11,13 +11,13 @@ namespace dbWorker
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Category::Category(dbMeta::CategoryCPtr cat)
+	Category::Category(pgs::meta::CategoryCPtr cat)
 		: _metaCategory(cat)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	dbMeta::CategoryCPtr Category::meta() const
+	pgs::meta::CategoryCPtr Category::meta() const
 	{
 		return _metaCategory;
 	}

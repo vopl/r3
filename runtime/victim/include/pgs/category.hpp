@@ -1,17 +1,17 @@
-#ifndef _DBWORKER_CATEGORY_HPP_
-#define _DBWORKER_CATEGORY_HPP_
+#ifndef _PGS_CATEGORY_HPP_
+#define _PGS_CATEGORY_HPP_
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class Category
 	{
-		dbMeta::CategoryCPtr _metaCategory;
+		pgs::meta::CategoryCPtr _metaCategory;
 	public:
 		Category();
-		Category(dbMeta::CategoryCPtr cat);
+		Category(pgs::meta::CategoryCPtr cat);
 
-		dbMeta::CategoryCPtr meta() const;
+		pgs::meta::CategoryCPtr meta() const;
 	};
 }
 

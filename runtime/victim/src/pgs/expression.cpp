@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "dbWorker/expression.hpp"
-#include "dbWorker/expressionImpl.hpp"
-#include "dbWorker/expressionAccess.hpp"
+#include "pgs/expression.hpp"
+#include "expressionImpl.hpp"
+#include "expressionAccess.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Expression op1_pre(const char *name, const Expression &a)

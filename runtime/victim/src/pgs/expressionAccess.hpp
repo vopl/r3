@@ -1,9 +1,9 @@
-#ifndef _DBWORKER_EXPRESSIONACCESS_HPP_
-#define _DBWORKER_EXPRESSIONACCESS_HPP_
+#ifndef _PGS_EXPRESSIONACCESS_HPP_
+#define _PGS_EXPRESSIONACCESS_HPP_
 
-#include "dbWorker/expression.hpp"
+#include "pgs/expression.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	class ExpressionAccess
 		: public Expression

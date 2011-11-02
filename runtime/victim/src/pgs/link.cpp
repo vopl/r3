@@ -1,16 +1,16 @@
 #include "stdafx.h"
-#include "dbWorker/link.hpp"
+#include "pgs/link.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Link::Link(dbMeta::RelationEndCPtr re)
+	Link::Link(pgs::meta::RelationEndCPtr re)
 		: _metaRelatioEnd(re)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	dbMeta::RelationEndCPtr Link::meta() const
+	pgs::meta::RelationEndCPtr Link::meta() const
 	{
 		return _metaRelatioEnd;
 	}

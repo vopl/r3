@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "dbWorker/expressionImpl.hpp"
-#include "dbWorker/expressionAccess.hpp"
+#include "expressionImpl.hpp"
+#include "expressionAccess.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	ExpressionImpl::ExpressionImpl()

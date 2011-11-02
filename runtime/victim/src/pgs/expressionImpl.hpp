@@ -1,11 +1,11 @@
-#ifndef _DBWORKER_EXPRESSIONIMPL_HPP_
-#define _DBWORKER_EXPRESSIONIMPL_HPP_
+#ifndef _PGS_EXPRESSIONIMPL_HPP_
+#define _PGS_EXPRESSIONIMPL_HPP_
 
-#include "dbWorker/expression.hpp"
+#include "pgs/expression.hpp"
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class ExpressionImpl;

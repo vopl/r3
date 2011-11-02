@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "dbWorker/field.hpp"
+#include "pgs/field.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Field::Field()
@@ -10,13 +10,13 @@ namespace dbWorker
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Field::Field(dbMeta::FieldCPtr fld)
+	Field::Field(pgs::meta::FieldCPtr fld)
 		: _metaField(fld)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	dbMeta::FieldCPtr Field::meta() const
+	pgs::meta::FieldCPtr Field::meta() const
 	{
 		return _metaField;
 	}

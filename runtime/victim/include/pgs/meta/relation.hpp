@@ -1,27 +1,30 @@
-#ifndef _DBMETA_RELATION_HPP_
-#define _DBMETA_RELATION_HPP_
+#ifndef _PGS_META_RELATION_HPP_
+#define _PGS_META_RELATION_HPP_
 
-#include "dbMeta/common.hpp"
-#include "dbMeta/relationEnd.hpp"
+#include "pgs/meta/common.hpp"
+#include "pgs/meta/relationEnd.hpp"
 
-namespace dbMeta
+namespace pgs
 {
-	//////////////////////////////////////////////////////////////////////////
-	class Relation
+	namespace meta
 	{
-	public:
-		//наименование
-		std::string		_name;
+		//////////////////////////////////////////////////////////////////////////
+		class Relation
+		{
+		public:
+			//наименование
+			std::string		_name;
 
-		//входящий край
-		RelationEndPtr	_inputEnd;
+			//входящий край
+			RelationEndPtr	_inputEnd;
 
-		//исходящий край
-		RelationEndPtr	_outputEnd;
+			//исходящий край
+			RelationEndPtr	_outputEnd;
 
-		//объемлющая схема
-		SchemaPtr		_schema;
-	};
+			//объемлющая схема
+			SchemaPtr		_schema;
+		};
+	}
 }
 
 #endif

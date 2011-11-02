@@ -1,14 +1,14 @@
-#ifndef _DBWORKER_SELECT_HPP_
-#define _DBWORKER_SELECT_HPP_
+#ifndef _PGS_SELECT_HPP_
+#define _PGS_SELECT_HPP_
 
-#include "dbWorker/category.hpp"
-#include "dbWorker/expression.hpp"
-#include "dbWorker/field.hpp"
-#include "dbWorker/link.hpp"
-#include "dbWorker/order.hpp"
-#include "dbWorker/variable.hpp"
+#include "pgs/category.hpp"
+#include "pgs/expression.hpp"
+#include "pgs/field.hpp"
+#include "pgs/link.hpp"
+#include "pgs/order.hpp"
+#include "pgs/variable.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 
 	//////////////////////////////////////////////////////////////////////////

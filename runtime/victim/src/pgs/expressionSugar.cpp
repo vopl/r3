@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "dbWorker/expressionSugar.hpp"
+#include "pgs/expressionSugar.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Expression operator==(const Expression &v1, const Expression &v2)

@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "dbWorker/expressionAccess.hpp"
+#include "expressionAccess.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	ExpressionAccess::ExpressionAccess(const Expression &expr)

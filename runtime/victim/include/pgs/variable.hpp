@@ -1,9 +1,9 @@
-#ifndef _DBWORKER_VARIABLE_HPP_
-#define _DBWORKER_VARIABLE_HPP_
+#ifndef _PGS_VARIABLE_HPP_
+#define _PGS_VARIABLE_HPP_
 
-#include "dbWorker/expression.hpp"
+#include "pgs/expression.hpp"
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class Variable

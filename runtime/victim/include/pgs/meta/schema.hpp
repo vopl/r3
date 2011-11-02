@@ -1,27 +1,30 @@
-#ifndef _DBMETA_SCHEMA_HPP_
-#define _DBMETA_SCHEMA_HPP_
+#ifndef _PGS_META_SCHEMA_HPP_
+#define _PGS_META_SCHEMA_HPP_
 
-#include "dbMeta/common.hpp"
+#include "pgs/meta/common.hpp"
 
-namespace dbMeta
+namespace pgs
 {
-	
-	//////////////////////////////////////////////////////////////////////////
-	class Schema
+	namespace meta
 	{
-	public:
-		//наименование
-		std::string			_name;
+		
+		//////////////////////////////////////////////////////////////////////////
+		class Schema
+		{
+		public:
+			//наименование
+			std::string			_name;
 
-		//все категории
-		CategoryPtrs		_categories;
+			//все категории
+			CategoryPtrs		_categories;
 
-		//все связи
-		RelationPtrs		_relations;
+			//все связи
+			RelationPtrs		_relations;
 
-		//объемлющий менеджер
-		ClusterStoragePtr	_storage;
-	};
+			//объемлющий менеджер
+			ClusterStoragePtr	_storage;
+		};
+	}
 }
 
 #endif

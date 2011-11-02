@@ -1,16 +1,16 @@
-#ifndef _DBWORKER_LINK_HPP_
-#define _DBWORKER_LINK_HPP_
+#ifndef _PGS_LINK_HPP_
+#define _PGS_LINK_HPP_
 
-namespace dbWorker
+namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class Link
 	{
-		dbMeta::RelationEndCPtr _metaRelatioEnd;
+		pgs::meta::RelationEndCPtr _metaRelatioEnd;
 	public:
-		Link(dbMeta::RelationEndCPtr re);
+		Link(pgs::meta::RelationEndCPtr re);
 
-		dbMeta::RelationEndCPtr meta() const;
+		pgs::meta::RelationEndCPtr meta() const;
 	};
 }
 
