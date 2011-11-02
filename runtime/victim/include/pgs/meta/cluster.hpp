@@ -14,18 +14,16 @@ namespace pgs
 {
 	namespace meta
 	{
+		//////////////////////////////////////////////////////////////////////////
+		class ClusterImpl;
+		typedef boost::shared_ptr<ClusterImpl> ClusterImpl_ptr;
 
 		//////////////////////////////////////////////////////////////////////////
 		class Cluster
-			: private ClusterStorage
 		{
-			//инициализаторы
-			typedef std::vector<boost::shared_ptr<SchemaInitializerBase> > TVSchemaInitializers;
-			TVSchemaInitializers _schemaInitializers;
-			bool _isInitialized;
-
-			bool doInheritance();
-			bool collectInheritance(CategoryPtrs &res, CategoryPtr c, bool bases);
+		protected:
+			ClusterImpl_ptr	_impl;
+			void add(boost::shared_ptr<Schema> schema, boost::shared_ptr<SchemaInitializerBase> schemaInitializer);
 
 		public:
 			Cluster();
@@ -46,31 +44,21 @@ namespace pgs
 			//void serialize();
 		};
 
-		///
+		//////////////////////////////////////////////////////////////////////////
 		template <class Schema>
 		void Cluster::add()
 		{
-			if(_isInitialized)
-			{
-				assert(!"already initialized");
-				throw "already initialized";
-				return;
-			}
-
 			boost::shared_ptr<Schema> schema(new Schema);
-			boost::shared_ptr<SchemaInitializerBase> schemaInitializer(new SchemaInitializer<Schema>(this, schema.get()));
+			boost::shared_ptr<SchemaInitializerBase> schemaInitializer(new SchemaInitializer<Schema>(schema.get()));
 
-			_schemaInitializers.push_back(schemaInitializer);
-			_schemas_heap.push_back(schema);
-
-			return;
+			return add(schema, schemaInitializer);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class Schema> 
 		const Schema* Cluster::get() const
 		{
-			return static_cast<const Schema*>(_schemas[SchemaInitializer<Schema>::getName()]);
+			return static_cast<const Schema*>(getByName(SchemaInitializer<Schema>::getName()));
 		}
 
 	}

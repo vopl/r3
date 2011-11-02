@@ -391,6 +391,14 @@
 							/>
 						</FileConfiguration>
 					</File>
+					<File
+						RelativePath=".\src\pgs\meta\clusterImpl.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\pgs\meta\clusterImpl.hpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 		</Filter>

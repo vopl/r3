@@ -10,6 +10,8 @@ namespace pgs
 		class SchemaInitializerBase
 		{
 		public:
+			virtual void setStorage(ClusterStorage *storage)=0;
+
 			virtual bool preInit()=0;
 			virtual bool checkDependencies()=0;
 			virtual bool createObjects()=0;
@@ -28,8 +30,9 @@ namespace pgs
 			static const std::string _sname;
 
 		public:
-			SchemaInitializer(ClusterStorage *storage, SchemaPtr schema);
+			SchemaInitializer(SchemaPtr schema);
 
+			void setStorage(ClusterStorage *storage);
 			bool preInit();
 			bool checkDependencies();
 			bool createObjects();
@@ -47,10 +50,18 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class Schema>
-		SchemaInitializer<Schema>::SchemaInitializer(ClusterStorage *storage, SchemaPtr schema)
-			: _storage(storage)
+		SchemaInitializer<Schema>::SchemaInitializer(SchemaPtr schema)
+			: _storage(NULL)
 			, _schema(schema)
 		{
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		template <class Schema>
+		void SchemaInitializer<Schema>::setStorage(ClusterStorage *storage)
+		{
+			_storage = storage;
+			return;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
