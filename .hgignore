@@ -19,7 +19,7 @@ Release
 -backup.mga$
 
 ^runtime/client/GeneratedFiles
-^runtime/victim/dbMeta/schemas
+^runtime/victim/include/pgs/meta/schemas
 ^meta/R3Meta-{
 ^runtime/include/r3/data
 ^runtime/include/r3/protocol

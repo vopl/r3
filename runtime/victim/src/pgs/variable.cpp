@@ -1,0 +1,10 @@
+#include "stdafx.h"
+#include "pgs/variable.hpp"
+
+namespace pgs
+{
+	//////////////////////////////////////////////////////////////////////////
+	Variable::Variable(...)
+	{
+	}
+}
