@@ -1,0 +1,10 @@
+#include "stdafx.h"
+#include "pgs/order.hpp"
+
+namespace pgs
+{
+	//////////////////////////////////////////////////////////////////////////
+	Order::Order(...)
+	{
+	}
+}

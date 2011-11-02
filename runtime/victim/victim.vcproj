@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../include"
+				AdditionalIncludeDirectories=".;include;../include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -178,10 +178,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\schemaSyncronizer.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -212,10 +208,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\schemaSyncronizer.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
@@ -231,88 +223,176 @@
 			>
 		</Filter>
 		<Filter
-			Name="dbMeta"
+			Name="include"
 			>
-			<File
-				RelativePath=".\dbMeta\category.hpp"
+			<Filter
+				Name="pgs"
 				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\cluster.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
+				<File
+					RelativePath=".\include\pgs\category.hpp"
 					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(SafeParentName)\"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\dbMeta\cluster.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\clusterStorage.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\common.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\field.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\fieldScanty.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\index.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\ptrContainer.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\relation.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\relationEnd.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\schema.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dbMeta\schemaInitializer.hpp"
-				>
-			</File>
+				</File>
+				<File
+					RelativePath=".\include\pgs\cluster.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\pgs\expression.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\pgs\expressionSugar.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\pgs\field.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\pgs\link.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\pgs\order.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\pgs\select.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\pgs\variable.hpp"
+					>
+				</File>
+				<Filter
+					Name="meta"
+					>
+					<File
+						RelativePath=".\include\pgs\meta\category.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\cluster.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\clusterStorage.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\common.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\field.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\fieldScanty.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\index.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\ptrContainer.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\relation.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\relationEnd.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\schema.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\pgs\meta\schemaInitializer.hpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
-			Name="dbCreator"
+			Name="src"
 			>
-			<File
-				RelativePath=".\dbCreator\cluster.cpp"
+			<Filter
+				Name="pgs"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
+				<File
+					RelativePath=".\src\pgs\category.cpp"
 					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(SafeParentName)\"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\dbCreator\cluster.hpp"
-				>
-			</File>
+				</File>
+				<File
+					RelativePath=".\src\pgs\cluster.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\expression.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\expressionAccess.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\expressionAccess.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\expressionImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\expressionImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\expressionSugar.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\field.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\link.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\order.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\select.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pgs\variable.cpp"
+					>
+				</File>
+				<Filter
+					Name="meta"
+					>
+					<File
+						RelativePath=".\src\pgs\meta\cluster.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\meta\"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
