@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <algorithm>
 
 
 namespace pgs
@@ -94,6 +95,7 @@ namespace pgs
 		class PtrContainer
 			: public std::vector<PWrapper<T> >
 		{
+		private:
 			typedef PWrapper<T> Ptr;
 			typedef std::vector<Ptr> Base;
 
@@ -105,6 +107,10 @@ namespace pgs
 			void eraseFromMap(const Ptr &c);
 
 
+		public:
+			typedef typename Base::size_type size_type;
+			typedef typename Base::iterator iterator;
+		
 		public:
 			PtrContainer();
 			PtrContainer(const PtrContainer &);
@@ -154,8 +160,8 @@ namespace pgs
 		template <class T>
 		void PtrContainer<T>::eraseFromMap(const Ptr &c)
 		{
-			TMMap::iterator iter = _map.find(c->_name);
-			TMMap::iterator end = _map.end();
+			typename TMMap::iterator iter = _map.find(c->_name);
+			typename TMMap::iterator end = _map.end();
 			for(; iter!=end; iter++)
 			{
 				if(iter->second == c)
@@ -165,7 +171,7 @@ namespace pgs
 				}
 			}
 
-			assert(!"ύλεμενς κ σδΰλενθώ νε νΰιδεν");
+			assert(!"Γ½Γ«Γ₯Γ¬Γ₯Γ­Γ² Γͺ Γ³Γ€Γ Γ«Γ₯Γ­Γ¨ΓΎ Γ­Γ₯ Γ­Γ Γ©Γ€Γ₯Γ­");
 			return;
 		}
 
@@ -193,8 +199,8 @@ namespace pgs
 			: Base(i)
 			, _map()
 		{
-			iterator iter = begin();
-			iterator end = end();
+			iterator iter = Base::begin();
+			iterator end = Base::end();
 			for(; iter!=end; iter++)
 			{
 				_map[(*iter)->_name] = *iter;
@@ -205,7 +211,7 @@ namespace pgs
 		template <class T>
 		typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](size_type idx)
 		{
-			if(idx < size())
+			if(idx < Base::size())
 			{
 				return Base::operator [](idx);
 			}
@@ -214,13 +220,13 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		typename const PtrContainer<T>::Ptr PtrContainer<T>::operator[](size_type idx) const
+		const typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](size_type idx) const
 		{
-			if(idx < size())
+			if(idx < Base::size())
 			{
 				return Base::operator [](idx);
 			}
-			return const Ptr();
+			return Ptr();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -228,7 +234,7 @@ namespace pgs
 		typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](const char *name)
 		{
 			const std::string key(name);
-			TMMap::iterator iter = _map.find(key);
+			typename TMMap::iterator iter = _map.find(key);
 			if(_map.end() != iter)
 			{
 				return iter->second;
@@ -238,10 +244,10 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		typename const PtrContainer<T>::Ptr PtrContainer<T>::operator[](const char *name) const
+		const typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](const char *name) const
 		{
 			const std::string key(name);
-			TMMap::const_iterator iter = _map.find(key);
+			typename TMMap::const_iterator iter = _map.find(key);
 			if(_map.end() != iter)
 			{
 				return iter->second;
@@ -253,7 +259,7 @@ namespace pgs
 		template <class T>
 		typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](const std::string &name)
 		{
-			TMMap::iterator iter = _map.find(name);
+			typename TMMap::iterator iter = _map.find(name);
 			if(_map.end() != iter)
 			{
 				return iter->second;
@@ -263,9 +269,9 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		typename const PtrContainer<T>::Ptr PtrContainer<T>::operator[](const std::string &name) const
+		const typename PtrContainer<T>::Ptr PtrContainer<T>::operator[](const std::string &name) const
 		{
-			TMMap::const_iterator iter = _map.find(name);
+			typename TMMap::const_iterator iter = _map.find(name);
 			if(_map.end() != iter)
 			{
 				return iter->second;
@@ -275,23 +281,24 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		void PtrContainer<T>::resize ( size_type sz, Ptr c = Ptr() )
+		void PtrContainer<T>::resize ( size_type sz, Ptr c)
 		{
-			if(sz < size())
+			size_type size = Base::size();
+			if(sz < size)
 			{
-				for(size_type i(sz); i<size(); i++)
+				for(size_type i(sz); i<size; i++)
 				{
 					eraseFromMap(Base::operator [](i));
 				}
 			}
 			else
 			{
-				for(size_type i(sz); i<size(); i++)
+				for(size_type i(sz); i<size; i++)
 				{
 					insertToMap(c);
 				}
 			}
-			Base::resize(cz, c);
+			Base::resize(sz, c);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -312,7 +319,7 @@ namespace pgs
 		template <class T>
 		void PtrContainer<T>::assign ( size_type n, const Ptr& u )
 		{
-			Base::assign(first, last);
+			Base::assign(n, u);
 
 			_map.clear();
 			for(size_type i(0); i<n; i++)
@@ -333,7 +340,7 @@ namespace pgs
 		template <class T>
 		void PtrContainer<T>::pop_back ( )
 		{
-			eraseFromMap(back());
+			eraseFromMap(Base::back());
 			Base::pop_back();
 		}
 
@@ -341,10 +348,10 @@ namespace pgs
 		template <class T>
 		void PtrContainer<T>::replace ( const Ptr& x )
 		{
-			TMMap::iterator iter = _map.find(x->_name);
+			typename TMMap::iterator iter = _map.find(x->_name);
 			if(_map.end() != iter)
 			{
-				*std::find(begin(), end(), iter->second) = x;
+				*std::find(Base::begin(), Base::end(), iter->second) = x;
 				iter->second = x;
 			}
 			else
@@ -397,7 +404,7 @@ namespace pgs
 		template <class T>
 		typename PtrContainer<T>::iterator PtrContainer<T>::erase ( iterator first, iterator last )
 		{
-			for(InputIterator iter=first; iter!=last; iter++)
+			for(iterator iter=first; iter!=last; iter++)
 			{
 				eraseFromMap(*iter);
 			}

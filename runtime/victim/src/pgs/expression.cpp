@@ -28,19 +28,19 @@ namespace pgs
 
 
 	//////////////////////////////////////////////////////////////////////////
-	Expression and(const Expression &a, const Expression &b)
+	Expression and_(const Expression &a, const Expression &b)
 	{
 		return op2(" AND ", a, b);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Expression or(const Expression &a, const Expression &b)
+	Expression or_(const Expression &a, const Expression &b)
 	{
 		return op2(" OR ", a, b);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Expression not(const Expression &a)
+	Expression not_(const Expression &a)
 	{
 		return op1_pre("NOT ", a);
 	}

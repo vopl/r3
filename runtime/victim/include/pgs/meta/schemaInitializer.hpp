@@ -2,6 +2,11 @@
 #define _PGS_META_SCHEMAINITIALIZER_HPP_
 
 #include "pgs/meta/common.hpp"
+#include "pgs/meta/category.hpp"
+#include "pgs/meta/relation.hpp"
+#include "pgs/meta/relationEnd.hpp"
+#include "pgs/meta/field.hpp"
+#include "pgs/meta/index.hpp"
 
 namespace pgs
 {

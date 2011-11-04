@@ -118,6 +118,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		.link(testCats->Letter->servicePart)
 		.where(pgs::Field(testCats->Letter->creation) && pgs::Field(testCats->Letter->creation))
 		.limit(20);
+		
+	//testCats->
 
 	//mysel.exec(con);
 

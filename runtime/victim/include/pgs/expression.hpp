@@ -21,9 +21,9 @@ namespace pgs
 	// 			AND 
 	// 			OR 
 	// 			NOT 
-	Expression and(const Expression &a, const Expression &b);
-	Expression or(const Expression &a, const Expression &b);
-	Expression not(const Expression &a);
+	Expression and_(const Expression &a, const Expression &b);
+	Expression or_(const Expression &a, const Expression &b);
+	Expression not_(const Expression &a);
 
 	// 
 	// 		Comparison Operators
