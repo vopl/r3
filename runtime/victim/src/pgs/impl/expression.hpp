@@ -23,10 +23,9 @@ namespace pgs
 		{
 		protected:
 			Expression();
+			virtual ~Expression();
 
 		public:
-			virtual void reg(Statement *s) =0;
-			virtual void mkSql(std::string &result) =0;
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -39,9 +38,6 @@ namespace pgs
 			~Expression_list();
 
 			void push(const pgs::Expression &a);
-
-			virtual void reg(Statement *s);
-			virtual void mkSql(std::string &result);
 		};
 		typedef boost::shared_ptr<Expression_list> Expression_list_ptr;
 
@@ -54,8 +50,6 @@ namespace pgs
 			Expression_op0(const char *name);
 			~Expression_op0();
 
-			virtual void reg(Statement *s);
-			virtual void mkSql(std::string &result);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -68,9 +62,6 @@ namespace pgs
 		public:
 			Expression_op1(const char *name, const pgs::Expression &a, bool isPre=true);
 			~Expression_op1();
-
-			virtual void reg(Statement *s);
-			virtual void mkSql(std::string &result);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -84,8 +75,6 @@ namespace pgs
 			Expression_op2(const char *name, const pgs::Expression &a, const pgs::Expression &b);
 			~Expression_op2();
 
-			virtual void reg(Statement *s);
-			virtual void mkSql(std::string &result);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -96,8 +85,6 @@ namespace pgs
 			Expression_op3(const char *name1, const char *name2, const pgs::Expression &a, const pgs::Expression &b, const pgs::Expression &c);
 			~Expression_op3();
 
-			virtual void reg(Statement *s);
-			virtual void mkSql(std::string &result);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -114,8 +101,6 @@ namespace pgs
 
 			void pushArg(const pgs::Expression &a);
 
-			virtual void reg(Statement *s);
-			virtual void mkSql(std::string &result);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -129,8 +114,6 @@ namespace pgs
 			void pushPair(const pgs::Expression &c, const pgs::Expression &r);
 			void pushElse(const pgs::Expression &e);
 
-			virtual void reg(Statement *s);
-			virtual void mkSql(std::string &result);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -144,8 +127,6 @@ namespace pgs
 			void pushPair(const pgs::Expression &v, const pgs::Expression &r);
 			void pushElse(const pgs::Expression &e);
 
-			virtual void reg(Statement *s);
-			virtual void mkSql(std::string &result);
 		};
 	}
 }

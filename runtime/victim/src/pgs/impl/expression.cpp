@@ -11,6 +11,11 @@ namespace pgs
 		{
 		}
 		//////////////////////////////////////////////////////////////////////////
+		Expression::~Expression()
+		{
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		Expression_list::Expression_list()
 		{
 
@@ -29,29 +34,6 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Expression_list::reg(Statement *s)
-		{
-			for(size_t i(0); i<_list.size(); i++)
-			{
-				_list[i]->reg(s);
-			}
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_list::mkSql(std::string &result)
-		{
-			for(size_t i(0); i<_list.size(); i++)
-			{
-				if(i)
-				{
-					result += ",";
-				}
-				_list[i]->mkSql(result);
-			}
-		}
-
-
-		//////////////////////////////////////////////////////////////////////////
 		Expression_op0::Expression_op0(const char *name)
 			: _name(name)
 		{
@@ -65,19 +47,6 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Expression_op0::reg(Statement *s)
-		{
-
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_op0::mkSql(std::string &result)
-		{
-			result += _name;
-		}
-
-
-		//////////////////////////////////////////////////////////////////////////
 		Expression_op1::Expression_op1(const char *name, const pgs::Expression &a, bool isPre)
 			: _name(name)
 			, _a(Access<pgs::Expression>(a))
@@ -88,18 +57,6 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		Expression_op1::~Expression_op1()
 		{
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_op1::reg(Statement *s)
-		{
-			_a->reg(s);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_op1::mkSql(std::string &result)
-		{
-			assert(!__FUNCTION__);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -116,23 +73,6 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Expression_op2::reg(Statement *s)
-		{
-			_a->reg(s);
-			_b->reg(s);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_op2::mkSql(std::string &result)
-		{
-			result += "(";
-			_a->mkSql(result);
-			result += _name;
-			_b->mkSql(result);
-			result += ")";
-		}
-
-		//////////////////////////////////////////////////////////////////////////
 		Expression_op3::Expression_op3(const char *name1, const char *name2, const pgs::Expression &a, const pgs::Expression &b, const pgs::Expression &c)
 		{
 			assert(0);
@@ -142,20 +82,6 @@ namespace pgs
 		Expression_op3::~Expression_op3()
 		{
 			assert(0);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_op3::reg(Statement *s)
-		{
-	// 		_a->reg(s);
-	// 		_b->reg(s);
-	// 		_c->reg(s);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_op3::mkSql(std::string &result)
-		{
-			assert(!__FUNCTION__);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -173,31 +99,6 @@ namespace pgs
 		void Expression_func::pushArg(const pgs::Expression &a)
 		{
 			_args.push_back(Access<pgs::Expression>(a));
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_func::reg(Statement *s)
-		{
-			for(size_t i(0); i<_args.size(); i++)
-			{
-				_args[i]->reg(s);
-			}
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_func::mkSql(std::string &result)
-		{
-			result += _name;
-			result += "(";
-			for(size_t i(0); i<_args.size(); i++)
-			{
-				if(i)
-				{
-					result += ",";
-				}
-				_args[i]->mkSql(result);
-			}
-			result += ")";
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -225,19 +126,6 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Expression_casec::reg(Statement *s)
-		{
-			assert(0);
-			//_args[i]->reg(s);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_casec::mkSql(std::string &result)
-		{
-			assert(!__FUNCTION__);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
 		Expression_casee::Expression_casee(const pgs::Expression &e)
 		{
 			assert(0);
@@ -259,19 +147,6 @@ namespace pgs
 		void Expression_casee::pushElse(const pgs::Expression &e)
 		{
 			assert(0);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_casee::reg(Statement *s)
-		{
-			//_args[i]->reg(s);
-			assert(0);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Expression_casee::mkSql(std::string &result)
-		{
-			assert(!__FUNCTION__);
 		}
 	}
 }
