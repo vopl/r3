@@ -22,6 +22,10 @@ using namespace std;
 #include "pgs/select.hpp"
 #include "pgs/expressionSugar.hpp"
 
+#include "pgs/field.hpp"
+#include "pgs/category.hpp"
+#include "pgs/link.hpp"
+
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -113,11 +117,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	pgs::Select mysel;
 
 	mysel
-		.what(testCats->Client)
-		.what(testCats->Letter->file)
-		.link(testCats->Letter->servicePart)
-		.where(pgs::Field(testCats->Letter->creation) && pgs::Field(testCats->Letter->creation))
-		.limit(20);
+		.whats(pgs::Category(testCats->Client))
+		.whats(pgs::Field(testCats->Letter->file))
+		.links(pgs::Link(testCats->Letter->servicePart))
+		//.where(pgs::Expression(testCats->Letter->creation) && pgs::Expression(testCats->Letter->creation))
+		.limit(pgs::Value(20));
 		
 	//testCats->
 

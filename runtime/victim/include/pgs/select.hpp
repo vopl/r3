@@ -6,7 +6,7 @@
 #include "pgs/field.hpp"
 #include "pgs/link.hpp"
 #include "pgs/order.hpp"
-#include "pgs/variable.hpp"
+#include "pgs/value.hpp"
 
 namespace pgs
 {
@@ -14,35 +14,29 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	class Select
 	{
-		//для what либо категория либо поле
-		struct CategoryOrField
-		{
-			bool		_isCategory;
-			Category	_category;
-			Field		_field;
-			CategoryOrField(Category c);
-			CategoryOrField(Field f);
-		};
+		std::deque<Expression>	_what;
 
-		std::deque<CategoryOrField>	_what;
-		std::deque<Link>			_links;
+		Category				_from;
+		std::deque<Link>		_links;
 
-		Expression					_where;
-		Variable					_limit;
-		Variable					_offset;
+		Expression				_where;
+		Expression				_limit;
+		Expression				_offset;
 
-		std::deque<Order>			_orders;
+		std::deque<Order>		_orders;
 
 	public:
 		Select();
 
-		Select &what(Category);
-		Select &what(Field);
-		Select &link(Link);
+		Select &whats(Expression);
+
+		Select &from(Category);
+		Select &links(Link);
 		Select &where(Expression);
-		Select &limit(Variable);
-		Select &offset(Variable);
-		Select &order(Order);
+
+		Select &limit(Expression);
+		Select &offset(Expression);
+		Select &orders(Order);
 	};
 }
 

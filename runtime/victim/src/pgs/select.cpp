@@ -5,73 +5,28 @@
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Select::CategoryOrField::CategoryOrField(Category c)
-		: _isCategory(true)
-		, _category(c)
-	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Select::CategoryOrField::CategoryOrField(Field f)
-		: _isCategory(false)
-		, _field(f)
-	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	Select::Select()
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::what(Category c)
+	Select &Select::whats(Expression e)
 	{
-		_what.push_back(c);
+		_what.push_back(e);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::what(Field f)
+	Select &Select::from(Category c)
 	{
-		_what.push_back(f);
+		_from = c;
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::link(Link l)
+	Select &Select::links(Link l)
 	{
-		//проверить что исходная категория присутствует во what
-		bool present = false;
-		BOOST_FOREACH(CategoryOrField cof, _what)
-		{
-			if(cof._isCategory)
-			{
-				if(l.meta()->_category == cof._category.meta())
-				{
-					present = true;
-					break;
-				}
-			}
-			else
-			{
-				if(l.meta()->_category == cof._field.meta()->_category)
-				{
-					present = true;
-					break;
-				}
-			}
-		}
-
-		//_what.push_back(Category(l.meta()->_anotherEnd->_category));
-
-		if(!present)
-		{
-			assert(!"link source category absent in 'what'");
-			throw "link source category absent in 'what'";
-			return *this;
-		}
-
 		_links.push_back(l);
 		return *this;
 	}
@@ -85,21 +40,21 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::limit(Variable v)
+	Select &Select::limit(Expression e)
 	{
-		_limit = v;
+		_limit = e;
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::offset(Variable v)
+	Select &Select::offset(Expression e)
 	{
-		_offset = v;
+		_offset = e;
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::order(Order o)
+	Select &Select::orders(Order o)
 	{
 		_orders.push_back(o);
 		return *this;

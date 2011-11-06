@@ -1,16 +1,16 @@
-#ifndef _PGS_VARIABLE_HPP_
-#define _PGS_VARIABLE_HPP_
+#ifndef _PGS_VALUE_HPP_
+#define _PGS_VALUE_HPP_
 
 #include "pgs/expression.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	class Variable
-		: Expression
+	class Value
+		: public Expression
 	{
 	public:
-		Variable(...);
+		Value(...);
 	};
 }
 

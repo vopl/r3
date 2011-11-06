@@ -261,7 +261,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\pgs\variable.hpp"
+					RelativePath=".\include\pgs\value.hpp"
 					>
 				</File>
 				<Filter
@@ -381,7 +381,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\pgs\variable.cpp"
+					RelativePath=".\src\pgs\value.cpp"
 					>
 				</File>
 				<Filter
