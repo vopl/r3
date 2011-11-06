@@ -58,6 +58,26 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		bool Select::compile(std::string &sql)
 		{
+			//выделить значения для bind
+			//выделить поля для fetch
+			//составить sql
+			
+			/*
+				SELECT
+					what
+				FROM
+					from
+				[LEFT JOIN ... links]
+				WHERE
+					where
+				ORDER BY
+					[orders]
+				LIMIT
+					limit
+				OFFSET
+					offset
+			*/
+
 			assert(0);
 			return false;
 		}
