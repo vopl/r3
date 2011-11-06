@@ -19,6 +19,7 @@ namespace pgs
 
 			pgs::meta::CategoryCPtr meta() const;
 		};
+		typedef boost::shared_ptr<Category> Category_ptr;
 	}
 }
 

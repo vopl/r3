@@ -11,19 +11,15 @@
 namespace pgs
 {
 
+	namespace impl
+	{
+		class Select;
+		typedef boost::shared_ptr<Select> Select_ptr;
+	}
 	//////////////////////////////////////////////////////////////////////////
 	class Select
 	{
-		std::deque<Expression>	_what;
-
-		Category				_from;
-		std::deque<Link>		_links;
-
-		Expression				_where;
-		Expression				_limit;
-		Expression				_offset;
-
-		std::deque<Order>		_orders;
+		impl::Select_ptr	_impl;
 
 	public:
 		Select();

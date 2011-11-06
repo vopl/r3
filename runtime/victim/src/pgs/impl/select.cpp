@@ -13,53 +13,46 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Select &Select::whats(Expression e)
+		void Select::whats(Expression_ptr e)
 		{
 			_what.push_back(e);
-			return *this;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Select &Select::from(Category c)
+		void Select::from(Category_ptr c)
 		{
 			_from = c;
-			return *this;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Select &Select::links(Link l)
+		void Select::links(Link_ptr l)
 		{
 			_links.push_back(l);
-			return *this;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Select &Select::where(Expression e)
+		void Select::where(Expression_ptr e)
 		{
 			//перебрать дерево выражения, проверить наличие всех полей, собрать все переменные
 			_where = e;
-			return *this;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Select &Select::limit(Expression e)
+		void Select::limit(Expression_ptr e)
 		{
 			_limit = e;
-			return *this;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Select &Select::offset(Expression e)
+		void Select::offset(Expression_ptr e)
 		{
 			_offset = e;
-			return *this;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Select &Select::orders(Order o)
+		void Select::orders(Order_ptr o)
 		{
 			_orders.push_back(o);
-			return *this;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

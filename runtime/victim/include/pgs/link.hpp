@@ -15,6 +15,8 @@ namespace pgs
 	class Link
 		: public Expression
 	{
+
+	public:
 		typedef impl::Link_ptr Impl_ptr;
 
 	public:

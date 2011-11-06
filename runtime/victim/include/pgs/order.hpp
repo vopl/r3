@@ -15,6 +15,7 @@ namespace pgs
 	class Order
 		: public Expression
 	{
+	public:
 		typedef impl::Order_ptr Impl_ptr;
 
 	public:

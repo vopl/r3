@@ -17,6 +17,7 @@ namespace pgs
 
 			pgs::meta::RelationEndCPtr meta() const;
 		};
+		typedef boost::shared_ptr<Link> Link_ptr;
 	}
 }
 

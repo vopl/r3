@@ -14,6 +14,7 @@ namespace pgs
 		public:
 			Order(...);
 		};
+		typedef boost::shared_ptr<Order> Order_ptr;
 	}
 }
 

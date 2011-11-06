@@ -15,29 +15,29 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		class Select
 		{
-			std::deque<Expression>	_what;
+			std::deque<Expression_ptr>	_what;
 
-			Category				_from;
-			std::deque<Link>		_links;
+			Category_ptr				_from;
+			std::deque<Link_ptr>		_links;
 
-			Expression				_where;
-			Expression				_limit;
-			Expression				_offset;
+			Expression_ptr				_where;
+			Expression_ptr				_limit;
+			Expression_ptr				_offset;
 
-			std::deque<Order>		_orders;
+			std::deque<Order_ptr>		_orders;
 
 		public:
 			Select();
 
-			Select &whats(Expression);
+			void whats(Expression_ptr);
 
-			Select &from(Category);
-			Select &links(Link);
-			Select &where(Expression);
+			void from(Category_ptr);
+			void links(Link_ptr);
+			void where(Expression_ptr);
 
-			Select &limit(Expression);
-			Select &offset(Expression);
-			Select &orders(Order);
+			void limit(Expression_ptr);
+			void offset(Expression_ptr);
+			void orders(Order_ptr);
 
 		public:
 			bool compile(std::string &sql);

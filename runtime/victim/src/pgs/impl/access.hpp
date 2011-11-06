@@ -16,8 +16,8 @@ namespace pgs
 			Access(const Base &base);
 			Access(const typename Base::Impl_ptr &impl);
 
-			typename Base::Impl_ptr &impl();
-			operator typename Base::Impl_ptr&();
+			typename Base::Impl_ptr impl();
+			operator typename Base::Impl_ptr();
 		};
 
 
@@ -37,16 +37,16 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class Base>
-		typename Base::Impl_ptr &Access<Base>::impl()
+		typename Base::Impl_ptr Access<Base>::impl()
 		{
-			return _impl;
+			return boost::static_pointer_cast<typename Base::Impl_ptr::element_type>(_impl);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class Base>
-		Access<Base>::operator typename Base::Impl_ptr&()
+		Access<Base>::operator typename Base::Impl_ptr()
 		{
-			return _impl;
+			return boost::static_pointer_cast<typename Base::Impl_ptr::element_type>(_impl);
 		}
 
 	}

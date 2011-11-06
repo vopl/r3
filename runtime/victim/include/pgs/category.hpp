@@ -15,6 +15,7 @@ namespace pgs
 	class Category
 		: public Expression
 	{
+	public:
 		typedef impl::Category_ptr Impl_ptr;
 
 	public:
