@@ -5,11 +5,18 @@
 
 namespace pgs
 {
+	namespace impl
+	{
+		class Category;
+		typedef boost::shared_ptr<Category> Category_ptr;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	class Category
 		: public Expression
 	{
-		pgs::meta::CategoryCPtr _metaCategory;
+		typedef impl::Category_ptr Impl_ptr;
+
 	public:
 		Category();
 		Category(pgs::meta::CategoryCPtr cat);

@@ -120,12 +120,15 @@ int _tmain(int argc, _TCHAR* argv[])
 		.whats(pgs::Category(testCats->Client))
 		.whats(pgs::Field(testCats->Letter->file))
 		.links(pgs::Link(testCats->Letter->servicePart))
-		//.where(pgs::Expression(testCats->Letter->creation) && pgs::Expression(testCats->Letter->creation))
+		.where(pgs::Field(testCats->Letter->creation) && pgs::Field(testCats->Letter->creation))
 		.limit(pgs::Value(20));
 		
 	//testCats->
 
 	//mysel.exec(con);
+
+	std::string sql;
+	mysel.compile(sql);
 
 	return 0;
 }

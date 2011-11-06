@@ -59,4 +59,12 @@ namespace pgs
 		_orders.push_back(o);
 		return *this;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Select::compile(std::string &sql)
+	{
+		assert(0);
+		return false;
+	}
+
 }

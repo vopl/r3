@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../Debug/libpgs.lib"
+				AdditionalDependencies="../Debug/libpgc.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -400,6 +400,22 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\pgs\impl\category.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\category.hpp"
+						>
+					</File>
+					<File
 						RelativePath=".\src\pgs\impl\cluster.cpp"
 						>
 						<FileConfiguration
@@ -429,6 +445,70 @@
 					</File>
 					<File
 						RelativePath=".\src\pgs\impl\expression.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\field.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\field.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\link.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\link.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\order.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\order.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\select.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\select.hpp"
 						>
 					</File>
 					<File

@@ -1,25 +1,26 @@
 #include "stdafx.h"
 #include "pgs/category.hpp"
-
+#include "impl/access.hpp"
+#include "impl/category.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Category::Category()
-		: _metaCategory()
+		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Category())))
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Category::Category(pgs::meta::CategoryCPtr cat)
-		: _metaCategory(cat)
+		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Category(cat))))
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	pgs::meta::CategoryCPtr Category::meta() const
 	{
-		return _metaCategory;
+		return static_cast<impl::Category *>(_impl.get())->meta();
 	}
 
 }

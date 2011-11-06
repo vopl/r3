@@ -37,6 +37,9 @@ namespace pgs
 		Select &limit(Expression);
 		Select &offset(Expression);
 		Select &orders(Order);
+
+	public:
+		bool compile(std::string &sql);
 	};
 }
 

@@ -9,7 +9,6 @@ namespace pgs
 	Value::Value()
 		: Expression(impl::Access<Expression>(impl::Expression_ptr(new impl::Value())))
 	{
-		assert(0);
 	}
 
 
@@ -19,14 +18,13 @@ namespace pgs
 	Value::Value(const CppType *v, EValueDataMode vdm)
 		: Expression(impl::Access<Expression>(impl::Expression_ptr(new impl::Value(v,vdm))))
 	{
-		assert(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
 	void Value::set(const CppType *v, EValueDataMode vdm)
 	{
-		assert(0);
+		static_cast<impl::Value *>(_impl.get())->set(v, vdm);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -34,14 +32,13 @@ namespace pgs
 	Value::Value(const CppType &v, EValueDataMode vdm)
 		: Expression(impl::Access<Expression>(impl::Expression_ptr(new impl::Value(v, vdm))))
 	{
-		assert(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
 	void Value::set(const CppType &v, EValueDataMode vdm)
 	{
-		assert(0);
+		static_cast<impl::Value *>(_impl.get())->set(v, vdm);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

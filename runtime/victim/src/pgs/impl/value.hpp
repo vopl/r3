@@ -73,25 +73,24 @@ namespace pgs
 		void Value::set(const CppType *v, EValueDataMode vdm)
 		{
 			reset();
-			assert(0);
-// 			_dataMode = dataMode;
-// 			if(dm_isCopy & _dataMode)
-// 			{
-// 				if(v)
-// 				{
-// 					_dataDeleter = &Value::dataDeleter<CppType>;
-// 					_data = new CppType(*v);
-// 				}
-// 			}
-// 			else
-// 			{
-// 				if(dm_doDeleteOnFree & _dataMode)
-// 				{
-// 					_dataDeleter = &Value::dataDeleter<CppType>;
-// 				}
-// 				_data = v;
-// 			}
-// 			_cdt = pgc::CppDataType<CppType>::cdt_index;
+			_vdm = vdm;
+			if(vdm_makeCopy == _vdm)
+			{
+				if(v)
+				{
+					_dataDeleter = &Value::dataDeleter<CppType>;
+					_data = new CppType(*v);
+				}
+			}
+			else
+			{
+				if(vdm_doDeleteOnFree == _vdm)
+				{
+					_dataDeleter = &Value::dataDeleter<CppType>;
+				}
+				_data = v;
+			}
+			_cdt = pgc::CppDataType<CppType>::cdt_index;
 		}
 
 		template <class CppType>
@@ -108,20 +107,19 @@ namespace pgs
 		void Value::set(const CppType &v, EValueDataMode vdm)
 		{
 			reset();
-			assert(0);
 
-// 			_dataMode = dataMode;
-// 			if(dm_isCopy & _dataMode)
-// 			{
-// 				_dataDeleter = &Value::dataDeleter<CppType>;
-// 				_data = new CppType(v);
-// 			}
-// 			else
-// 			{
-// 				assert(!(dm_doDeleteOnFree & _dataMode));
-// 				_data = &v;
-// 			}
-// 			_cdt = pgc::CppDataType<CppType>::cdt_index;
+			_vdm = vdm;
+			if(vdm_makeCopy == _vdm)
+			{
+				_dataDeleter = &Value::dataDeleter<CppType>;
+				_data = new CppType(v);
+			}
+			else
+			{
+				assert(vdm_doDeleteOnFree != _vdm);
+				_data = &v;
+			}
+			_cdt = pgc::CppDataType<CppType>::cdt_index;
 		}
 	}
 }
