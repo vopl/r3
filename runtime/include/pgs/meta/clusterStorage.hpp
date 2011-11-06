@@ -2,8 +2,8 @@
 #define _PGS_META_CLUSTERSTORAGE_HPP_
 
 #include "pgs/meta/common.hpp"
-
 #include <boost/shared_ptr.hpp>
+
 namespace pgs
 {
 	namespace meta

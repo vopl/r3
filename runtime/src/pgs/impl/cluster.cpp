@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "pgs/cluster.hpp"
 #include "cluster.hpp"
+#include <set>
 
 namespace pgs
 {

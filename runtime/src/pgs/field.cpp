@@ -1,21 +1,26 @@
+#include "stdafx.h"
 #include "pgs/field.hpp"
-#include "fieldImpl.hpp"
-#include "exprAccess.hpp"
+#include "impl/access.hpp"
+#include "impl/field.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Field::Field(const char *field, const char *table, const char *schema, const char *tableId)
-		: Expr(ExprAccess(ExprImpl_ptr(new FieldImpl(field, table, schema, tableId))))
+	Field::Field()
+		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Field())))
 	{
-
 	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	Field::~Field()
-	{
 
+	//////////////////////////////////////////////////////////////////////////
+	Field::Field(pgs::meta::FieldCPtr fld)
+		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Field(fld))))
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	pgs::meta::FieldCPtr Field::meta() const
+	{
+		return static_cast<impl::Field *>(_impl.get())->meta();
 	}
 
 }
-

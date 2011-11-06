@@ -2,6 +2,7 @@
 #define _PGS_IMPL_FIELD_HPP_
 
 #include "expression.hpp"
+#include "pgs/meta/field.hpp"
 
 namespace pgs
 {

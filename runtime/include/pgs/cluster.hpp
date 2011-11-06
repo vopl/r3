@@ -8,6 +8,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/cstdint.hpp>
 
+#include <deque>
+
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "clusterImpl.hpp"
+#include "pgs/meta/category.hpp"
 
 namespace pgs
 {

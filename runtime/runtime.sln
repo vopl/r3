@@ -31,6 +31,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmodel", "libmodel\libmodel.vcproj", "{604D43CE-9FC3-4BF1-A829-98EA0AC3DFAB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "victim", "victim\victim.vcproj", "{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{55B09566-11AA-42DD-A2AA-A359E9E8098E} = {55B09566-11AA-42DD-A2AA-A359E9E8098E}
+		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F} = {AA92C4B3-CC22-4D4B-AA50-803B09A9059F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpgs", "libpgs\libpgs.vcproj", "{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +85,12 @@ Global
 		{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}.Release|Win32.ActiveCfg = Release|Win32
 		{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}.Release|Win32.Build.0 = Release|Win32
 		{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}.Release|x64.ActiveCfg = Release|Win32
+		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Debug|Win32.Build.0 = Debug|Win32
+		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Debug|x64.ActiveCfg = Debug|Win32
+		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Release|Win32.ActiveCfg = Release|Win32
+		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Release|Win32.Build.0 = Release|Win32
+		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

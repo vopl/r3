@@ -8,6 +8,8 @@
 #include "order.hpp"
 #include "value.hpp"
 
+#include <deque>
+
 namespace pgs
 {
 	namespace impl

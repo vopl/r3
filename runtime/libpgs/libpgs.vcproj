@@ -46,7 +46,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -198,7 +198,19 @@
 				Name="pgs"
 				>
 				<File
-					RelativePath="..\include\pgs\expr.hpp"
+					RelativePath="..\include\pgs\category.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\pgs\cluster.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\pgs\expression.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\pgs\expressionSugar.hpp"
 					>
 				</File>
 				<File
@@ -210,17 +222,69 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\pgs\select.hpp"
+					RelativePath="..\include\pgs\order.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\pgs\sugar.hpp"
+					RelativePath="..\include\pgs\select.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\include\pgs\value.hpp"
 					>
 				</File>
+				<Filter
+					Name="meta"
+					>
+					<File
+						RelativePath="..\include\pgs\meta\category.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\cluster.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\clusterStorage.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\common.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\field.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\fieldScanty.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\index.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\ptrContainer.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\relation.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\relationEnd.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\schema.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\include\pgs\meta\schemaInitializer.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -230,193 +294,209 @@
 				Name="pgs"
 				>
 				<File
-					RelativePath="..\src\pgs\expr.cpp"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\exprAccess.cpp"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\exprAccess.hpp"
+					RelativePath="..\src\pgs\category.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\pgs\exprImpl.cpp"
+					RelativePath="..\src\pgs\cluster.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\pgs\exprImpl.hpp"
+					RelativePath="..\src\pgs\expression.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\expressionSugar.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\pgs\field.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\fieldImpl.cpp"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\fieldImpl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\pgs\instantiate4pgctypes.hpp"
-					>
 				</File>
 				<File
 					RelativePath="..\src\pgs\link.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\pgs\linkImpl.cpp"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\linkImpl.hpp"
+					RelativePath="..\src\pgs\order.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\pgs\select.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\selectImpl.cpp"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\selectImpl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\pgs\statementImpl.cpp"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\statementImpl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\pgs\sugar.cpp"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\src\pgs\value.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
 				</File>
-				<File
-					RelativePath="..\src\pgs\valueImpl.cpp"
+				<Filter
+					Name="meta"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
+					<File
+						RelativePath="..\src\pgs\meta\cluster.cpp"
 						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\src\pgs\valueImpl.hpp"
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\meta\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\meta\clusterImpl.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\meta\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\meta\clusterImpl.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="impl"
 					>
-				</File>
+					<File
+						RelativePath="..\src\pgs\impl\access.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\category.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\category.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\cluster.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\cluster.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\expression.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\expression.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\field.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\field.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\link.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\link.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\order.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\order.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\select.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\select.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\value.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\value.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 	</Files>

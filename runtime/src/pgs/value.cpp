@@ -1,46 +1,44 @@
+#include "stdafx.h"
 #include "pgs/value.hpp"
-#include "valueImpl.hpp"
-#include "exprAccess.hpp"
+#include "impl/value.hpp"
+#include "impl/access.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Value::Value(const char *name)
-		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(name))))
+	Value::Value()
+		: Expression(impl::Access<Expression>(impl::Expression_ptr(new impl::Value())))
 	{
-
 	}
 
 
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	Value::Value(const char *name, const CppType *v, int dataMode)
-		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(name, v, dataMode))))
+	Value::Value(const CppType *v, EValueDataMode vdm)
+		: Expression(impl::Access<Expression>(impl::Expression_ptr(new impl::Value(v,vdm))))
 	{
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	void Value::set(const CppType *v, int dataMode)
+	void Value::set(const CppType *v, EValueDataMode vdm)
 	{
-
+		static_cast<impl::Value *>(_impl.get())->set(v, vdm);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	Value::Value(const char *name, const CppType &v, int dataMode)
-		: Expr(ExprAccess(ExprImpl_ptr(new ValueImpl(name, v, dataMode))))
+	Value::Value(const CppType &v, EValueDataMode vdm)
+		: Expression(impl::Access<Expression>(impl::Expression_ptr(new impl::Value(v, vdm))))
 	{
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class CppType>
-	void Value::set(const CppType &v, int dataMode)
+	void Value::set(const CppType &v, EValueDataMode vdm)
 	{
-
+		static_cast<impl::Value *>(_impl.get())->set(v, vdm);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -48,49 +46,16 @@ namespace pgs
 	{
 
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	AValue::AValue()
-		: Value("")
-	{
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class CppType>
-	AValue::AValue(const CppType *v, int dataMode)
-		: Value("", v, dataMode)
-	{
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class CppType>
-	AValue::AValue(const CppType &v, int dataMode)
-		: Value("", v, dataMode)
-	{
-
-	}
-
 }
 
 #include "pgc/cppDataType.hpp"
 
-#define INST_METHOD template pgs::Value::Value(const char *name, const PGCTYPE *v, int dataMode);
+#define INST_METHOD template pgs::Value::Value(const PGCTYPE *v, EValueDataMode vdm);
 #include "instantiate4pgctypes.hpp"
-#define INST_METHOD template void pgs::Value::set(const PGCTYPE *v, int dataMode);
-#include "instantiate4pgctypes.hpp"
-
-#define INST_METHOD template pgs::Value::Value(const char *name, const PGCTYPE &v, int dataMode);
-#include "instantiate4pgctypes.hpp"
-#define INST_METHOD template void pgs::Value::set(const PGCTYPE &v, int dataMode);
+#define INST_METHOD template void pgs::Value::set(const PGCTYPE *v, EValueDataMode vdm);
 #include "instantiate4pgctypes.hpp"
 
-
-
-
-#define INST_METHOD template pgs::AValue::AValue(const PGCTYPE *v, int dataMode);
+#define INST_METHOD template pgs::Value::Value(const PGCTYPE &v, EValueDataMode vdm);
 #include "instantiate4pgctypes.hpp"
-
-#define INST_METHOD template pgs::AValue::AValue(const PGCTYPE &v, int dataMode);
+#define INST_METHOD template void pgs::Value::set(const PGCTYPE &v, EValueDataMode vdm);
 #include "instantiate4pgctypes.hpp"

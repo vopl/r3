@@ -2,6 +2,7 @@
 #define _PGS_CATEGORY_HPP_
 
 #include "pgs/expression.hpp"
+#include "meta/common.hpp"
 
 namespace pgs
 {

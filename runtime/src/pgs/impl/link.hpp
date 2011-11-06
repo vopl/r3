@@ -2,6 +2,7 @@
 #define _PGS_IMPL_LINK_HPP_
 
 #include "expression.hpp"
+#include "pgs/meta/relationEnd.hpp"
 
 namespace pgs
 {

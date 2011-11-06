@@ -1,61 +1,71 @@
+#include "stdafx.h"
 #include "pgs/select.hpp"
-#include "selectImpl.hpp"
-#include "exprAccess.hpp"
+#include "impl/select.hpp"
+#include "impl/access.hpp"
+
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Select::Select(Expr w)
-		: _impl(new SelectImpl())
-	{
-		what(w);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Select::~Select()
+	Select::Select()
+		: _impl(new impl::Select)
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::what(Expr e)
+	Select &Select::whats(Expression e)
 	{
-		_impl->setWhat(ExprAccess(e));
+		_impl->whats(impl::Access<Expression>(e));
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::where(Expr e)
+	Select &Select::from(Category c)
 	{
-		_impl->setWhere(ExprAccess(e));
+		_impl->from(impl::Access<Category>(c));
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::limit(Expr e)
+	Select &Select::links(Link l)
 	{
-		_impl->setLimit(ExprAccess(e));
+		_impl->links(impl::Access<Link>(l));
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::offset(Expr e)
+	Select &Select::where(Expression e)
 	{
-		_impl->setOffset(ExprAccess(e));
+		_impl->where(impl::Access<Expression>(e));
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Select &Select::orderBy(Expr e)
+	Select &Select::limit(Expression e)
 	{
-		_impl->setOrderBy(ExprAccess(e));
+		_impl->limit(impl::Access<Expression>(e));
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Select::compile()
+	Select &Select::offset(Expression e)
 	{
-		_impl->compile();
+		_impl->offset(impl::Access<Expression>(e));
+		return *this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Select &Select::orders(Order o)
+	{
+		_impl->orders(impl::Access<Order>(o));
+		return *this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Select::compile(std::string &sql)
+	{
+		return _impl->compile(sql);
 	}
 
 }
