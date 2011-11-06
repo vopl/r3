@@ -43,6 +43,15 @@ namespace pgs
 
 		public:
 			bool compile(std::string &sql);
+
+		private:
+			void mkWhats(std::deque<std::string> &);
+			void mkFrom(std::string &);
+			void mkLinks(std::deque<std::string> &);
+			void mkWhere(std::string &);
+			void mkOrders(std::deque<std::string> &);
+			void mkLimit(std::string &);
+			void mkOffset(std::string &);
 		};
 	}
 }
