@@ -333,31 +333,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\pgs\clusterImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\clusterImpl.hpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\pgs\expression.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionAccess.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionAccess.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionImpl.hpp"
 					>
 				</File>
 				<File
@@ -413,6 +389,58 @@
 					</File>
 					<File
 						RelativePath=".\src\pgs\meta\clusterImpl.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="impl"
+					>
+					<File
+						RelativePath=".\src\pgs\impl\access.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\access.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\cluster.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\cluster.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\expression.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\pgs\impl\expression.hpp"
 						>
 					</File>
 				</Filter>

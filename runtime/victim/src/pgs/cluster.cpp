@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "pgs/cluster.hpp"
-#include "clusterImpl.hpp"
+#include "impl/cluster.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Cluster::Cluster(boost::shared_ptr<pgs::meta::Cluster> metaCluster)
-		: _impl(new ClusterImpl(metaCluster))
+		: _impl(new impl::Cluster(metaCluster))
 	{
 	}
 
