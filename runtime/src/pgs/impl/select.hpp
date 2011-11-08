@@ -29,6 +29,15 @@ namespace pgs
 
 			std::deque<Order_ptr>		_orders;
 
+			//объект состояния компиляции
+			struct SCompileState
+			{
+				impl::Cluster_ptr		_cluster;
+				std::set<std::string>	_aliases;
+				size_t					_nextCrossIndex;
+				SCompileState();
+			};
+
 		public:
 			Select();
 
@@ -46,13 +55,13 @@ namespace pgs
 			bool compile(std::string &sql, const impl::Cluster_ptr &cluster);
 
 		private:
-			void mkWhats(std::deque<std::string> &res,	const impl::Cluster_ptr &cluster);
-			void mkFrom(std::string &res,				const impl::Cluster_ptr &cluster);
-			void mkLinks(std::deque<std::string> &res,	const impl::Cluster_ptr &cluster);
-			void mkWhere(std::string &res,				const impl::Cluster_ptr &cluster);
-			void mkOrders(std::deque<std::string> &res,	const impl::Cluster_ptr &cluster);
-			void mkLimit(std::string &res,				const impl::Cluster_ptr &cluster);
-			void mkOffset(std::string &res,				const impl::Cluster_ptr &cluster);
+			void mkWhats(std::deque<std::string> &res,	SCompileState &state);
+			void mkFrom(std::string &res,				SCompileState &state);
+			void mkLinks(std::deque<std::string> &res,	SCompileState &state);
+			void mkWhere(std::string &res,				SCompileState &state);
+			void mkOrders(std::deque<std::string> &res,	SCompileState &state);
+			void mkLimit(std::string &res,				SCompileState &state);
+			void mkOffset(std::string &res,				SCompileState &state);
 		};
 	}
 }

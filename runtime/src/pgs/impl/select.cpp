@@ -1,11 +1,19 @@
 #include "stdafx.h"
 #include "select.hpp"
 #include "pgs/meta/cluster.hpp"
+#include "utils/ntoa.hpp"
 
 namespace pgs
 {
 	namespace impl
 	{
+		//////////////////////////////////////////////////////////////////////////
+		Select::SCompileState::SCompileState()
+			: _nextCrossIndex(0)
+		{
+
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		Select::Select()
 		{
@@ -85,13 +93,22 @@ namespace pgs
 			std::string limit;
 			std::string offset;
 
-			mkWhats(whats, cluster);
-			mkFrom(from, cluster);
-			mkLinks(links, cluster);
-			mkWhere(where, cluster);
-			mkOrders(orders, cluster);
-			mkLimit(limit, cluster);
-			mkOffset(offset, cluster);
+			{
+				SCompileState state;
+				state._cluster = cluster;
+
+				mkFrom(from, state);
+				mkLinks(links, state);
+
+				mkWhats(whats, state);
+
+				mkWhere(where, state);
+
+				mkOrders(orders, state);
+
+				mkLimit(limit, state);
+				mkOffset(offset, state);
+			}
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -129,7 +146,7 @@ namespace pgs
 
 			BOOST_FOREACH(std::string &link, links)
 			{
-				sql += ", ";
+				sql += " ";
 				sql += link;
 			}
 
@@ -177,63 +194,116 @@ namespace pgs
 				sql += offset;
 			}
 
+			std::cout<<sql;
 			assert(0);
 			return false;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkWhats(std::deque<std::string> &res, const impl::Cluster_ptr &cluster)
+		void Select::mkWhats(std::deque<std::string> &res, SCompileState &state)
 		{
 			res.push_back(__FUNCTION__);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkFrom(std::string &res, const impl::Cluster_ptr &cluster)
+		void Select::mkFrom(std::string &res, SCompileState &state)
 		{
 			assert(_from);
 
-			res += cluster->tableName(_from->meta());
+			res += state._cluster->tableName(_from->meta());
 			res += " AS ";
-			res += cluster->escapeName(_from->alias());
+			res += state._cluster->escapeName(_from->alias());
+
+			state._aliases.insert(_from->alias());
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkLinks(std::deque<std::string> &res, const impl::Cluster_ptr &cluster)
+		void Select::mkLinks(std::deque<std::string> &res, SCompileState &state)
 		{
 			BOOST_FOREACH(Link_ptr &link, _links)
 			{
 				//проверить наличие srcAlias во from или уже реализованых link
+				if(state._aliases.end() == state._aliases.find(link->srcAlias()))
+				{
+					assert(!"srcAlias for link must be present");
+					throw "srcAlias for link must be present";
+					return;
+				}
+
 				//проверить отсутствие alias во from или уже реализованых link
-				assert(0);
-				//std::string srcAlias = 
-				//res += link->
-				/*
-					LEFT JOIN cross ON (srcAlias)
-					LEFT JOIN table AS alias
-				*/
+				if(state._aliases.end() != state._aliases.find(link->alias()))
+				{
+					assert(!"alias for link already present");
+					throw "alias for link already present";
+					return;
+				}
+
+				std::string srcAlias = state._cluster->escapeName(link->srcAlias());
+				std::string alias = state._cluster->escapeName(link->alias());
+				std::string crossTable = state._cluster->tableName(link->meta()->_relation);
+				char tmp[64];
+				std::string crossAlias = state._cluster->escapeName(std::string("___cross_")+utils::_ntoa(state._nextCrossIndex++, tmp));
+				std::string foreignTable = state._cluster->tableName(link->meta()->_anotherEnd->_category);
+				
+				std::string sql;
+				sql += "LEFT OUTER JOIN ";
+				sql += crossTable;
+				sql += " AS ";
+				sql += crossAlias;
+				sql += " ON (";
+
+				sql += srcAlias;
+				sql += ".id";
+				sql += "=";
+				sql += crossAlias;
+				sql += ".";
+				sql += link->meta()->_isInput?"output_id":"input_id";
+
+
+
+				sql += ") LEFT OUTER JOIN ";
+				sql += foreignTable;
+				sql += " AS ";
+				sql += alias;
+
+				sql += " ON(";
+
+				sql += crossAlias;
+				sql += ".";
+				sql += link->meta()->_isInput?"input_id":"output_id";
+				sql += "=";
+				sql += alias;
+				sql += ".id";
+
+
+				sql += ")";
+
+
+				res.push_back(sql);
+				state._aliases.insert(link->alias());
 			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkWhere(std::string &res, const impl::Cluster_ptr &cluster)
+		void Select::mkWhere(std::string &res, SCompileState &state)
 		{
 			res = __FUNCTION__;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkOrders(std::deque<std::string> &res, const impl::Cluster_ptr &cluster)
+		void Select::mkOrders(std::deque<std::string> &res, SCompileState &state)
 		{
 			res.push_back(__FUNCTION__);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkLimit(std::string &res, const impl::Cluster_ptr &cluster)
+		void Select::mkLimit(std::string &res, SCompileState &state)
 		{
 			res = __FUNCTION__;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkOffset(std::string &res, const impl::Cluster_ptr &cluster)
+		void Select::mkOffset(std::string &res, SCompileState &state)
 		{
 			res = __FUNCTION__;
 		}
