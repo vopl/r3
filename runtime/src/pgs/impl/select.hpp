@@ -7,6 +7,7 @@
 #include "link.hpp"
 #include "order.hpp"
 #include "value.hpp"
+#include "cluster.hpp"
 
 #include <deque>
 
@@ -42,16 +43,16 @@ namespace pgs
 			void orders(Order_ptr);
 
 		public:
-			bool compile(std::string &sql);
+			bool compile(std::string &sql, const impl::Cluster_ptr &cluster);
 
 		private:
-			void mkWhats(std::deque<std::string> &);
-			void mkFrom(std::string &);
-			void mkLinks(std::deque<std::string> &);
-			void mkWhere(std::string &);
-			void mkOrders(std::deque<std::string> &);
-			void mkLimit(std::string &);
-			void mkOffset(std::string &);
+			void mkWhats(std::deque<std::string> &res,	const impl::Cluster_ptr &cluster);
+			void mkFrom(std::string &res,				const impl::Cluster_ptr &cluster);
+			void mkLinks(std::deque<std::string> &res,	const impl::Cluster_ptr &cluster);
+			void mkWhere(std::string &res,				const impl::Cluster_ptr &cluster);
+			void mkOrders(std::deque<std::string> &res,	const impl::Cluster_ptr &cluster);
+			void mkLimit(std::string &res,				const impl::Cluster_ptr &cluster);
+			void mkOffset(std::string &res,				const impl::Cluster_ptr &cluster);
 		};
 	}
 }

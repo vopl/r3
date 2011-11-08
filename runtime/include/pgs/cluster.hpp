@@ -41,10 +41,12 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	class Cluster
 	{
-		impl::Cluster_ptr	_impl;
+	protected:
+		typedef impl::Cluster_ptr Impl_ptr;
+		Impl_ptr	_impl;
 
 	public:
-		Cluster(boost::shared_ptr<pgs::meta::Cluster> metaCluster);
+		Cluster(pgs::meta::Cluster metaCluster);
 
 		void setUnicators(const std::string &prefix, const std::string &suffix);
 		void setConnection(pgc::Connection con);

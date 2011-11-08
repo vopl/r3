@@ -528,7 +528,7 @@ namespace pgs
 
 
 		//////////////////////////////////////////////////////////////////////////
-		Cluster::Cluster(boost::shared_ptr<pgs::meta::Cluster> metaCluster)
+		Cluster::Cluster(pgs::meta::Cluster metaCluster)
 			: _metaCluster(metaCluster)
 			, _prefix()
 			, _suffix()
@@ -567,7 +567,7 @@ namespace pgs
 			_oid2cat.clear();
 			_cat2oid.clear();
 
-			if(!_metaCluster->isInitialized())
+			if(!_metaCluster.isInitialized())
 			{
 				log.push_back(SyncLogLine("meta cluster is not initialized"));
 				return false;
@@ -576,7 +576,7 @@ namespace pgs
 			bool res = true;
 
 			//наличие схем
-			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
+			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 			{
 				res &= sync_schemaExistence(log, s, allowCreate);
 			}
@@ -586,7 +586,7 @@ namespace pgs
 			}
 
 			//наличие таблиц
-			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
+			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 			{
 				BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 				{
@@ -599,7 +599,7 @@ namespace pgs
 			}
 
 			//наличие полей
-			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
+			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 			{
 				BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 				{
@@ -615,7 +615,7 @@ namespace pgs
 			}
 
 			//наличие индексов
-			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
+			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 			{
 				BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 				{
@@ -631,7 +631,7 @@ namespace pgs
 			}
 
 			//наличие таблиц связей
-			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
+			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 			{
 				BOOST_FOREACH(pgs::meta::RelationCPtr r, s->_relations)
 				{
@@ -644,7 +644,7 @@ namespace pgs
 			}
 
 			//наследование
-			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
+			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 			{
 				BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 				{
@@ -663,7 +663,7 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		bool Cluster::drop(TSyncLog &log)
 		{
-			if(!_metaCluster->isInitialized())
+			if(!_metaCluster.isInitialized())
 			{
 				log.push_back(SyncLogLine("meta cluster is not initialized"));
 				return false;
@@ -672,7 +672,7 @@ namespace pgs
 			bool res = true;
 
 			//схемы
-			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster->getSchemas())
+			BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 			{
 				res &= drop_schemaExistence(log, s);
 			}

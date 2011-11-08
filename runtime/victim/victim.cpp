@@ -32,21 +32,21 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
-	boost::shared_ptr<pgs::meta::Cluster> mcl(new pgs::meta::Cluster);
+	pgs::meta::Cluster mcl;
 
-	mcl->add<pgs::meta::schemas::TestCategories>();
-	mcl->add<pgs::meta::schemas::Mixed>();
-	mcl->add<pgs::meta::schemas::ForFields>();
-	mcl->initialize();
+	mcl.add<pgs::meta::schemas::TestCategories>();
+	mcl.add<pgs::meta::schemas::Mixed>();
+	mcl.add<pgs::meta::schemas::ForFields>();
+	mcl.initialize();
 
 	{
-		pgs::meta::SchemaCPtr s = mcl->getByName("TestCategories");
+		pgs::meta::SchemaCPtr s = mcl.getByName("TestCategories");
 		s->_categories["Document"]->_name;
 		s->_categories["Contract"]->_fields["file"]->_name;
 	}
 
 	{
-		pgs::meta::schemas::TestCategoriesCPtr s = mcl->get<pgs::meta::schemas::TestCategories>();
+		pgs::meta::schemas::TestCategoriesCPtr s = mcl.get<pgs::meta::schemas::TestCategories>();
 		s->Contract->file->_name;
 
 // 		BOOST_FOREACH(pgs::meta::CategoryPtr cat, s->_categories)
@@ -65,14 +65,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	//con.log(std::cout, pgc::lf_all);
 	con.open("dbname=test user=postgres password=postgres port=5432");
 
-	boost::shared_ptr<pgs::Cluster> ccl(new pgs::Cluster(mcl));
-	ccl->setUnicators("pref", "suff");
-	ccl->setConnection(con);
+	pgs::Cluster ccl(mcl);
+	ccl.setUnicators("pref", "suff");
+	ccl.setConnection(con);
 
 	//con.once("BEGIN").exec();
 
 	pgs::TSyncLog log;
-	bool bc = ccl->sync(log, true);
+	bool bc = ccl.sync(log, true);
 	bool bd = true;//ccl->drop(log);
 
 	std::cout<<bc<<", "<<bd<<std::endl;
@@ -88,7 +88,7 @@ int _tmain(int argc, _TCHAR* argv[])
 // 	//////////////////////////////////////////////////////////////////////////
 // 	pgs::Cluster wcl(ccl);
 // 
-// 	pgs::meta::schemas::TestCategoriesCPtr testCats = mcl->get<pgs::meta::schemas::TestCategories>();
+// 	pgs::meta::schemas::TestCategoriesCPtr testCats = mcl.get<pgs::meta::schemas::TestCategories>();
 // 
 // 	pgs::meta::Tuple<pgs::meta::schemas::TestCategories> lt;
 // 	lt = wcl.select(testCats->Letter).where(testCats->Letter->comment < 220);
@@ -113,12 +113,13 @@ int _tmain(int argc, _TCHAR* argv[])
 // 
 // 	lt.servisePart[0].cost;
 
-	pgs::meta::schemas::TestCategoriesCPtr testCats = mcl->get<pgs::meta::schemas::TestCategories>();
+	pgs::meta::schemas::TestCategoriesCPtr testCats = mcl.get<pgs::meta::schemas::TestCategories>();
 	pgs::Select mysel;
 
 	mysel
 		.whats(pgs::Category(testCats->Client))
 		.whats(pgs::Field(testCats->Letter->file))
+		.from(pgs::Category(testCats->Client, "clientAlias"))
 		.links(pgs::Link(testCats->Letter->servicePart))
 		.where(pgs::Field(testCats->Letter->creation) && pgs::Field(testCats->Letter->creation))
 		.limit(pgs::Value(20));
@@ -128,7 +129,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//mysel.exec(con);
 
 	std::string sql;
-	mysel.compile(sql);
+	mysel.compile(sql, ccl);
 
 	return 0;
 }

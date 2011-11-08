@@ -9,12 +9,14 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		Category::Category()
 			: _metaCategory()
+			, _alias()
 		{
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Category::Category(pgs::meta::CategoryCPtr cat)
+		Category::Category(pgs::meta::CategoryCPtr cat, const std::string &alias)
 			: _metaCategory(cat)
+			, _alias(alias)
 		{
 		}
 
@@ -23,6 +25,13 @@ namespace pgs
 		{
 			return _metaCategory;
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		const std::string &Category::alias() const
+		{
+			return _alias;
+		}
+
 	}
 }
 

@@ -21,9 +21,10 @@ namespace pgs
 
 	public:
 		Category();
-		Category(pgs::meta::CategoryCPtr cat);
+		Category(pgs::meta::CategoryCPtr cat, const std::string &alias="");
 
 		pgs::meta::CategoryCPtr meta() const;
+		const std::string &alias() const;
 	};
 }
 

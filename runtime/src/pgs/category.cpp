@@ -12,8 +12,8 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Category::Category(pgs::meta::CategoryCPtr cat)
-		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Category(cat))))
+	Category::Category(pgs::meta::CategoryCPtr cat, const std::string &alias)
+		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Category(cat, alias))))
 	{
 	}
 
@@ -22,6 +22,13 @@ namespace pgs
 	{
 		return static_cast<impl::Category *>(_impl.get())->meta();
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const std::string &Category::alias() const
+	{
+		return static_cast<impl::Category *>(_impl.get())->alias();
+	}
+
 
 }
 

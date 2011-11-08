@@ -15,14 +15,18 @@ namespace pgs
 	namespace meta
 	{
 		//////////////////////////////////////////////////////////////////////////
-		class ClusterImpl;
-		typedef boost::shared_ptr<ClusterImpl> ClusterImpl_ptr;
+		namespace impl
+		{
+			class Cluster;
+			typedef boost::shared_ptr<Cluster> Cluster_ptr;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		class Cluster
 		{
 		protected:
-			ClusterImpl_ptr	_impl;
+			typedef impl::Cluster_ptr Impl_ptr;
+			Impl_ptr	_impl;
 			void add(boost::shared_ptr<Schema> schema, boost::shared_ptr<SchemaInitializerBase> schemaInitializer);
 
 		public:

@@ -5,7 +5,7 @@
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Cluster::Cluster(boost::shared_ptr<pgs::meta::Cluster> metaCluster)
+	Cluster::Cluster(pgs::meta::Cluster metaCluster)
 		: _impl(new impl::Cluster(metaCluster))
 	{
 	}

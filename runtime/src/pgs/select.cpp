@@ -63,9 +63,9 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Select::compile(std::string &sql)
+	bool Select::compile(std::string &sql, Cluster cluster)
 	{
-		return _impl->compile(sql);
+		return _impl->compile(sql, impl::Access<Cluster>(cluster).impl());
 	}
 
 }

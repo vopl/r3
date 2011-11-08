@@ -2,6 +2,7 @@
 #define _PGS_IMPL_CLUSTER_HPP_
 
 #include "pgs/meta/cluster.hpp"
+#include "pgs/cluster.hpp"
 #include "pgc/connection.hpp"
 
 #include <boost/shared_ptr.hpp>
@@ -17,7 +18,7 @@ namespace pgs
 			: public boost::enable_shared_from_this<Cluster>
 		{
 			//мета данные этого экземпл€ра
-			boost::shared_ptr<pgs::meta::Cluster> _metaCluster;
+			pgs::meta::Cluster _metaCluster;
 
 			//уникаторы
 			std::string _prefix;
@@ -50,15 +51,15 @@ namespace pgs
 			//соединение с базой 
 			pgc::Connection _con;
 
-		private:
-			std::string escapeName	(const std::string &name, bool escape);
+		public:
+			std::string escapeName	(const std::string &name, bool escape=true);
 
-			std::string schemaName	(pgs::meta::SchemaCPtr s,			bool escape,	bool full);
-			std::string idGenName	(pgs::meta::SchemaCPtr s,			bool escape,	bool full);
-			std::string tableName	(pgs::meta::CategoryCPtr c,		bool escape,	bool full);
-			std::string tableName	(pgs::meta::RelationCPtr r,		bool escape,	bool full);
-			std::string columnName	(pgs::meta::FieldCPtr f,			bool escape,	bool full);
-			std::string indexName	(pgs::meta::IndexCPtr i,			bool escape,	bool full);
+			std::string schemaName	(pgs::meta::SchemaCPtr s,		bool escape=true,	bool full=true);
+			std::string idGenName	(pgs::meta::SchemaCPtr s,		bool escape=true,	bool full=true);
+			std::string tableName	(pgs::meta::CategoryCPtr c,		bool escape=true,	bool full=true);
+			std::string tableName	(pgs::meta::RelationCPtr r,		bool escape=true,	bool full=true);
+			std::string columnName	(pgs::meta::FieldCPtr f,		bool escape=true,	bool full=true);
+			std::string indexName	(pgs::meta::IndexCPtr i,		bool escape=true,	bool full=true);
 
 			std::string columnType	(pgs::meta::FieldCPtr f);
 
@@ -82,7 +83,7 @@ namespace pgs
 			bool drop_schemaExistence(TSyncLog &log, pgs::meta::SchemaCPtr s);
 
 		public:
-			Cluster(boost::shared_ptr<pgs::meta::Cluster> metaCluster);
+			Cluster(pgs::meta::Cluster metaCluster);
 
 			void setUnicators(const std::string &prefix, const std::string &suffix);
 			void setConnection(pgc::Connection con);
@@ -95,6 +96,7 @@ namespace pgs
 			// 	update
 			// 	delete
 		};
+		typedef boost::shared_ptr<Cluster> Cluster_ptr;
 	}
 }
 #endif

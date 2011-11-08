@@ -56,7 +56,7 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		bool Select::compile(std::string &sql)
+		bool Select::compile(std::string &sql, const impl::Cluster_ptr &cluster)
 		{
 			//выделить значения для bind
 			//выделить поля для fetch
@@ -85,13 +85,13 @@ namespace pgs
 			std::string limit;
 			std::string offset;
 
-			mkWhats(whats);
-			mkFrom(from);
-			mkLinks(links);
-			mkWhere(where);
-			mkOrders(orders);
-			mkLimit(limit);
-			mkOffset(offset);
+			mkWhats(whats, cluster);
+			mkFrom(from, cluster);
+			mkLinks(links, cluster);
+			mkWhere(where, cluster);
+			mkOrders(orders, cluster);
+			mkLimit(limit, cluster);
+			mkOffset(offset, cluster);
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -182,43 +182,49 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkWhats(std::deque<std::string> &res)
+		void Select::mkWhats(std::deque<std::string> &res, const impl::Cluster_ptr &cluster)
 		{
 			res.push_back(__FUNCTION__);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkFrom(std::string &res)
+		void Select::mkFrom(std::string &res, const impl::Cluster_ptr &cluster)
 		{
-			res = __FUNCTION__;
+			res += cluster->tableName(_from->meta());
+			if(!_from->alias().empty())
+			{
+				res += " AS ";
+				res += cluster->escapeName(_from->alias());
+
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkLinks(std::deque<std::string> &res)
-		{
-			res.push_back(__FUNCTION__);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Select::mkWhere(std::string &res)
-		{
-			res = __FUNCTION__;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Select::mkOrders(std::deque<std::string> &res)
+		void Select::mkLinks(std::deque<std::string> &res, const impl::Cluster_ptr &cluster)
 		{
 			res.push_back(__FUNCTION__);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkLimit(std::string &res)
+		void Select::mkWhere(std::string &res, const impl::Cluster_ptr &cluster)
 		{
 			res = __FUNCTION__;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkOffset(std::string &res)
+		void Select::mkOrders(std::deque<std::string> &res, const impl::Cluster_ptr &cluster)
+		{
+			res.push_back(__FUNCTION__);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Select::mkLimit(std::string &res, const impl::Cluster_ptr &cluster)
+		{
+			res = __FUNCTION__;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Select::mkOffset(std::string &res, const impl::Cluster_ptr &cluster)
 		{
 			res = __FUNCTION__;
 		}
