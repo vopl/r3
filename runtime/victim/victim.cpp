@@ -120,7 +120,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		.whats(pgs::Category(testCats->Client))
 		.whats(pgs::Field(testCats->Letter->file))
 		.from(pgs::Category(testCats->Client, "clientAlias"))
-		.links(pgs::Link(testCats->Letter->servicePart))
+		.links(pgs::Link("clientAlias", testCats->Client->observableServices, "observableServicesAlias"))
+		.links(pgs::Link(testCats->Client->services, "servicesAlias"))
 		.where(pgs::Field(testCats->Letter->creation) && pgs::Field(testCats->Letter->creation))
 		.limit(pgs::Value(20));
 		

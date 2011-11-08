@@ -21,9 +21,12 @@ namespace pgs
 		typedef impl::Link_ptr Impl_ptr;
 
 	public:
-		Link(pgs::meta::RelationEndCPtr re);
+		Link(pgs::meta::RelationEndCPtr re, const std::string &alias="");
+		Link(const std::string &srcAlias, pgs::meta::RelationEndCPtr re, const std::string &alias="");
 
 		pgs::meta::RelationEndCPtr meta() const;
+		const std::string &srcAlias() const;
+		const std::string &alias() const;
 	};
 }
 

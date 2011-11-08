@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "category.hpp"
-
+#include "pgs/meta/category.hpp"
 
 namespace pgs
 {
@@ -16,7 +16,7 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		Category::Category(pgs::meta::CategoryCPtr cat, const std::string &alias)
 			: _metaCategory(cat)
-			, _alias(alias)
+			, _alias(alias.empty()?cat->_name:alias)
 		{
 		}
 

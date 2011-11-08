@@ -190,19 +190,28 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Select::mkFrom(std::string &res, const impl::Cluster_ptr &cluster)
 		{
-			res += cluster->tableName(_from->meta());
-			if(!_from->alias().empty())
-			{
-				res += " AS ";
-				res += cluster->escapeName(_from->alias());
+			assert(_from);
 
-			}
+			res += cluster->tableName(_from->meta());
+			res += " AS ";
+			res += cluster->escapeName(_from->alias());
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Select::mkLinks(std::deque<std::string> &res, const impl::Cluster_ptr &cluster)
 		{
-			res.push_back(__FUNCTION__);
+			BOOST_FOREACH(Link_ptr &link, _links)
+			{
+				//проверить наличие srcAlias во from или уже реализованых link
+				//проверить отсутствие alias во from или уже реализованых link
+				assert(0);
+				//std::string srcAlias = 
+				//res += link->
+				/*
+					LEFT JOIN cross ON (srcAlias)
+					LEFT JOIN table AS alias
+				*/
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
