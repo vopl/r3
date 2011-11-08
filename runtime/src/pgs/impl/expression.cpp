@@ -63,7 +63,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Expression_list::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -82,7 +86,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Expression_op0::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -101,7 +109,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Expression_op1::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -120,7 +132,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Expression_op2::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -138,7 +154,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Expression_op3::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -161,7 +181,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Expression_func::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -191,7 +215,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Expression_casec::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -221,7 +249,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Expression_casee::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 	}

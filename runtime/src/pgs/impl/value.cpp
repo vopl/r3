@@ -37,7 +37,11 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Value::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			assert(0);
+			switch(ecm)
+			{
+			default:
+				assert(0);
+			}
 		}
 
 	}

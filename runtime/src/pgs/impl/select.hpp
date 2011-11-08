@@ -49,10 +49,10 @@ namespace pgs
 			void mkWhats(std::deque<std::string> &res,	SCompileState &state);
 			void mkFrom(std::string &res,				SCompileState &state);
 			void mkLinks(std::deque<std::string> &res,	SCompileState &state);
-			void mkWhere(std::string &res,				SCompileState &state);
+			void mkWhere(std::deque<std::string> &res,	SCompileState &state);
 			void mkOrders(std::deque<std::string> &res,	SCompileState &state);
-			void mkLimit(std::string &res,				SCompileState &state);
-			void mkOffset(std::string &res,				SCompileState &state);
+			void mkLimit(std::deque<std::string> &res,	SCompileState &state);
+			void mkOffset(std::deque<std::string> &res,	SCompileState &state);
 		};
 	}
 }

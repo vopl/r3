@@ -78,13 +78,13 @@ namespace pgs
 				OFFSET
 					offset
 			*/
-			std::deque<std::string> whats;
-			std::string from;
-			std::deque<std::string> links;
-			std::string where;
-			std::deque<std::string> orders;
-			std::string limit;
-			std::string offset;
+			std::deque<std::string>	whats;
+			std::string				from;
+			std::deque<std::string>	links;
+			std::deque<std::string>	where;
+			std::deque<std::string>	orders;
+			std::deque<std::string>	limit;
+			std::deque<std::string>	offset;
 
 			{
 				SCompileState state;
@@ -150,7 +150,11 @@ namespace pgs
 			else
 			{
 				sql += " WHERE ";
-				sql += where;
+				BOOST_FOREACH(std::string &s, where)
+				{
+					sql += " ";
+					sql += s;
+				}
 			}
 
 			if(orders.empty())
@@ -178,13 +182,21 @@ namespace pgs
 			if(!limit.empty())
 			{
 				sql += " LIMIT ";
-				sql += limit;
+				BOOST_FOREACH(std::string &s, limit)
+				{
+					sql += " ";
+					sql += s;
+				}
 			}
 
 			if(!offset.empty())
 			{
 				sql += " OFFSET ";
-				sql += offset;
+				BOOST_FOREACH(std::string &s, offset)
+				{
+					sql += " ";
+					sql += s;
+				}
 			}
 
 			std::cout<<sql;
@@ -271,27 +283,30 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkWhere(std::string &res, SCompileState &state)
+		void Select::mkWhere(std::deque<std::string> &res, SCompileState &state)
 		{
-			res = __FUNCTION__;
+			_where->compile(res, state, ecmSelectWhere);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Select::mkOrders(std::deque<std::string> &res, SCompileState &state)
 		{
-			res.push_back(__FUNCTION__);
+			BOOST_FOREACH(Order_ptr &order, _orders)
+			{
+				order->compile(res, state, ecmSelectOrder);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkLimit(std::string &res, SCompileState &state)
+		void Select::mkLimit(std::deque<std::string> &res, SCompileState &state)
 		{
-			res = __FUNCTION__;
+			_limit->compile(res, state, ecmSelectLimit);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkOffset(std::string &res, SCompileState &state)
+		void Select::mkOffset(std::deque<std::string> &res, SCompileState &state)
 		{
-			res = __FUNCTION__;
+			_limit->compile(res, state, ecmSelectOffset);
 		}
 	}
 }

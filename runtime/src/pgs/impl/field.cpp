@@ -43,16 +43,25 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Field::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
-			state.checkAliasExistence(_srcAlias, true);
-			std::string categoryAlias = state._cluster->escapeName(_srcAlias);
+			switch(ecm)
+			{
+			case ecmSelectWhat:
+				{
+					state.checkAliasExistence(_srcAlias, true);
+					std::string categoryAlias = state._cluster->escapeName(_srcAlias);
 
-			std::string sql;
+					std::string sql;
 
-			sql += categoryAlias;
-			sql += ".";
-			sql += state._cluster->escapeName(_metaField->_name);
+					sql += categoryAlias;
+					sql += ".";
+					sql += state._cluster->escapeName(_metaField->_name);
 
-			res.push_back(sql);
+					res.push_back(sql);
+				}
+				break;
+			default:
+				assert(0);
+			}
 		}
 
 	}
