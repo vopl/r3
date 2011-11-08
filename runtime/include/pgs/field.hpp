@@ -21,8 +21,10 @@ namespace pgs
 	public:
 		Field();
 		Field(pgs::meta::FieldCPtr fld);
+		Field(const std::string &srcAlias, pgs::meta::FieldCPtr fld);
 
 		pgs::meta::FieldCPtr meta() const;
+		const std::string &srcAlias() const; 
 	};
 }
 

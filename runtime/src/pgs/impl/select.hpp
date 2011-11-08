@@ -18,7 +18,7 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		class Select
 		{
-			std::deque<Expression_ptr>	_what;
+			std::deque<Expression_ptr>	_whats;
 
 			Category_ptr				_from;
 			std::deque<Link_ptr>		_links;
@@ -62,6 +62,9 @@ namespace pgs
 			void mkOrders(std::deque<std::string> &res,	SCompileState &state);
 			void mkLimit(std::string &res,				SCompileState &state);
 			void mkOffset(std::string &res,				SCompileState &state);
+
+		private:
+			bool checkAliasExistence(SCompileState &state, const std::string &alias, bool mustExists);
 		};
 	}
 }

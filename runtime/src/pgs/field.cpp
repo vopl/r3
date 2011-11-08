@@ -18,9 +18,24 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	Field::Field(const std::string &srcAlias, pgs::meta::FieldCPtr fld)
+		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Field(srcAlias, fld))))
+	{
+
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	pgs::meta::FieldCPtr Field::meta() const
 	{
 		return static_cast<impl::Field *>(_impl.get())->meta();
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const std::string &Field::srcAlias() const
+	{
+		return static_cast<impl::Field *>(_impl.get())->srcAlias();
+	}
+
 
 }

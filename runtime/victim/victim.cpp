@@ -117,11 +117,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	pgs::Select mysel;
 
 	mysel
-		.whats(pgs::Category(testCats->Client))
-		.whats(pgs::Field(testCats->Letter->file))
 		.from(pgs::Category(testCats->Client, "clientAlias"))
 		.links(pgs::Link("clientAlias", testCats->Client->observableServices, "observableServicesAlias"))
 		.links(pgs::Link("clientAlias", testCats->Client->services, "servicesAlias"))
+
+		.whats(pgs::Category(testCats->Client, "clientAlias"))
+		.whats(pgs::Field("clientAlias", testCats->Client->name))
+
 		.where(pgs::Field(testCats->Letter->creation) && pgs::Field(testCats->Letter->creation))
 		.limit(pgs::Value(20));
 		

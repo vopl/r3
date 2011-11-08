@@ -608,16 +608,19 @@ namespace workers
 
 
 
-				//поле id
-				hpp<<
-					"{\n"
-					"	boost::shared_ptr<fields::"<<fieldClassName(cat, "id")<<"> f(new fields::"<<fieldClassName(cat, "id")<<");\n"
-					"	f->_name = \"id\";\n"
-					"	f->_type = eftId;\n"
-					"	f->_category = c.get();\n"
-					"	_storage->_fields_heap.push_back(f);\n"
-					"	c->_ownFields.push_back(f.get());\n"
-					"}\n";
+				//поле id, только для самых базовый
+				if(cat->getCategoryInheritanceDsts().empty())
+				{
+					hpp<<
+						"{\n"
+						"	boost::shared_ptr<fields::"<<fieldClassName(cat, "id")<<"> f(new fields::"<<fieldClassName(cat, "id")<<");\n"
+						"	f->_name = \"id\";\n"
+						"	f->_type = eftId;\n"
+						"	f->_category = c.get();\n"
+						"	_storage->_fields_heap.push_back(f);\n"
+						"	c->_ownFields.push_back(f.get());\n"
+						"}\n";
+				}
 
 				//остальные поля из модели
 				BOOST_FOREACH(Field fld, cat->getChildFCOs())
