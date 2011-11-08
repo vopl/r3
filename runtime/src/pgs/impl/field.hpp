@@ -21,6 +21,8 @@ namespace pgs
 
 			pgs::meta::FieldCPtr meta() const;
 			const std::string &srcAlias() const;
+
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 		typedef boost::shared_ptr<Field> Field_ptr;
 	}

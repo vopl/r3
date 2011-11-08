@@ -29,15 +29,6 @@ namespace pgs
 
 			std::deque<Order_ptr>		_orders;
 
-			//объект состояния компиляции
-			struct SCompileState
-			{
-				impl::Cluster_ptr		_cluster;
-				std::set<std::string>	_aliases;
-				size_t					_nextCrossIndex;
-				SCompileState();
-			};
-
 		public:
 			Select();
 
@@ -62,9 +53,6 @@ namespace pgs
 			void mkOrders(std::deque<std::string> &res,	SCompileState &state);
 			void mkLimit(std::string &res,				SCompileState &state);
 			void mkOffset(std::string &res,				SCompileState &state);
-
-		private:
-			bool checkAliasExistence(SCompileState &state, const std::string &alias, bool mustExists);
 		};
 	}
 }

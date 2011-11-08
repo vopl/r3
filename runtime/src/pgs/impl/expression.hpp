@@ -2,6 +2,7 @@
 #define _PGS_IMPL_EXPRESSION_HPP_
 
 #include "pgs/expression.hpp"
+#include "cluster.hpp"
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
 
@@ -9,6 +10,24 @@ namespace pgs
 {
 	namespace impl
 	{
+		//////////////////////////////////////////////////////////////////////////
+		enum ECompileMode
+		{
+			ecmSelectWhat,
+			ecmSelectWhere,
+		};
+
+		//////////////////////////////////////////////////////////////////////////
+		//объект состояния компиляции
+		struct SCompileState
+		{
+			impl::Cluster_ptr		_cluster;
+			std::set<std::string>	_aliases;
+			size_t					_nextCrossIndex;
+			SCompileState();
+			bool checkAliasExistence(const std::string &alias, bool mustExists);
+		};
+
 		//////////////////////////////////////////////////////////////////////////
 		class Expression
 			: public boost::enable_shared_from_this<Expression>
@@ -18,6 +37,7 @@ namespace pgs
 			virtual ~Expression();
 
 		public:
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)=0;
 		};
 		typedef boost::shared_ptr<Expression> Expression_ptr;
 
@@ -31,6 +51,8 @@ namespace pgs
 			~Expression_list();
 
 			void push(const pgs::Expression &a);
+
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 		typedef boost::shared_ptr<Expression_list> Expression_list_ptr;
 
@@ -43,6 +65,7 @@ namespace pgs
 			Expression_op0(const char *name);
 			~Expression_op0();
 
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -55,6 +78,8 @@ namespace pgs
 		public:
 			Expression_op1(const char *name, const pgs::Expression &a, bool isPre=true);
 			~Expression_op1();
+
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -68,6 +93,7 @@ namespace pgs
 			Expression_op2(const char *name, const pgs::Expression &a, const pgs::Expression &b);
 			~Expression_op2();
 
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -78,6 +104,7 @@ namespace pgs
 			Expression_op3(const char *name1, const char *name2, const pgs::Expression &a, const pgs::Expression &b, const pgs::Expression &c);
 			~Expression_op3();
 
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -94,6 +121,7 @@ namespace pgs
 
 			void pushArg(const pgs::Expression &a);
 
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -107,6 +135,7 @@ namespace pgs
 			void pushPair(const pgs::Expression &c, const pgs::Expression &r);
 			void pushElse(const pgs::Expression &e);
 
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 
 		//////////////////////////////////////////////////////////////////////////
@@ -120,6 +149,7 @@ namespace pgs
 			void pushPair(const pgs::Expression &v, const pgs::Expression &r);
 			void pushElse(const pgs::Expression &e);
 
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 	}
 }

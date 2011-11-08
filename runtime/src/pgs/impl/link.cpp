@@ -40,5 +40,11 @@ namespace pgs
 			return _alias;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		void Link::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+		{
+			assert(0);
+		}
+
 	}
 }

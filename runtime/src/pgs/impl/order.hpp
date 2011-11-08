@@ -13,6 +13,8 @@ namespace pgs
 		{
 		public:
 			Order(...);
+
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 		typedef boost::shared_ptr<Order> Order_ptr;
 	}

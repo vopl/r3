@@ -23,6 +23,7 @@ namespace pgs
 			const std::string &srcAlias() const;
 			const std::string &alias() const;
 
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 		typedef boost::shared_ptr<Link> Link_ptr;
 	}

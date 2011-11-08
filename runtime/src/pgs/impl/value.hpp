@@ -46,6 +46,8 @@ namespace pgs
 			void set(const CppType &v, EValueDataMode vdm);
 
 			~Value();
+
+			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 		typedef boost::shared_ptr<Value> Value_ptr;
 

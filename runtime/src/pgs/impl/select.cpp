@@ -8,13 +8,6 @@ namespace pgs
 	namespace impl
 	{
 		//////////////////////////////////////////////////////////////////////////
-		Select::SCompileState::SCompileState()
-			: _nextCrossIndex(0)
-		{
-
-		}
-
-		//////////////////////////////////////////////////////////////////////////
 		Select::Select()
 		{
 
@@ -204,57 +197,7 @@ namespace pgs
 		{
 			BOOST_FOREACH(Expression_ptr &expr, _whats)
 			{
-				//НЕ ТАК
-				/*
-					перебрать выражение, в нем пораскрывать категории в наборы полей
-				*/
-				Category_ptr cat = boost::dynamic_pointer_cast<Category>(expr);
-
-				if(cat)
-				{
-					//проверить наличие alias во from или links
-					checkAliasExistence(state, cat->alias(), true);
-
-					std::string categoryAlias = state._cluster->escapeName(cat->alias());
-
-					std::string sql;
-					//tableoid
-					sql += categoryAlias;
-					sql += ".tableoid";
-					// TRATATA тут фиксировать информацию для феча
-
-					//перебрать все поля
-					BOOST_FOREACH(meta::FieldCPtr mf, cat->meta()->_fields)
-					{
-						sql += ", ";
-						sql += categoryAlias;
-						sql += ".";
-						sql += state._cluster->escapeName(mf->_name);
-						// TRATATA тут фиксировать информацию для феча
-					}
-
-					res.push_back(sql);
-					continue;
-				}
-
-				Field_ptr fld = boost::dynamic_pointer_cast<Field>(expr);
-				if(fld)
-				{
-					checkAliasExistence(state, fld->srcAlias(), true);
-					std::string categoryAlias = state._cluster->escapeName(fld->srcAlias());
-
-					std::string sql;
-
-					sql += categoryAlias;
-					sql += ".";
-					sql += state._cluster->escapeName(fld->meta()->_name);
-
-					res.push_back(sql);
-					continue;
-				}
-
-				assert(!"'what' must be category or field");
-				throw "'what' must be category or field";
+				expr->compile(res, state, ecmSelectWhat);
 			}
 		}
 
@@ -276,10 +219,10 @@ namespace pgs
 			BOOST_FOREACH(Link_ptr &link, _links)
 			{
 				//проверить наличие srcAlias во from или уже реализованых link
-				checkAliasExistence(state, link->srcAlias(), true);
+				state.checkAliasExistence(link->srcAlias(), true);
 
 				//проверить отсутствие alias во from или уже реализованых link
-				checkAliasExistence(state, link->alias(), false);
+				state.checkAliasExistence(link->alias(), false);
 
 				std::string srcAlias = state._cluster->escapeName(link->srcAlias());
 				std::string alias = state._cluster->escapeName(link->alias());
@@ -350,27 +293,5 @@ namespace pgs
 		{
 			res = __FUNCTION__;
 		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool Select::checkAliasExistence(SCompileState &state, const std::string &alias, bool mustExists)
-		{
-			bool exists = state._aliases.end() != state._aliases.find(alias);
-			if(mustExists && !exists)
-			{
-				assert(!"alias must be present");
-				throw "alias must be present";
-				return false;
-			}
-			if(!mustExists && exists)
-			{
-				assert(!"alias must be absent");
-				throw "alias must be absent";
-				return false;
-			}
-
-			return true;
-		}
-
-
 	}
 }

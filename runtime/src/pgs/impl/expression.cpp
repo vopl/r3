@@ -7,6 +7,33 @@ namespace pgs
 	namespace impl
 	{
 		//////////////////////////////////////////////////////////////////////////
+		SCompileState::SCompileState()
+			: _nextCrossIndex(0)
+		{
+
+		}
+		//////////////////////////////////////////////////////////////////////////
+		bool SCompileState::checkAliasExistence(const std::string &alias, bool mustExists)
+		{
+			bool exists = _aliases.end() != _aliases.find(alias);
+			if(mustExists && !exists)
+			{
+				assert(!"alias must be present");
+				throw "alias must be present";
+				return false;
+			}
+			if(!mustExists && exists)
+			{
+				assert(!"alias must be absent");
+				throw "alias must be absent";
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//////////////////////////////////////////////////////////////////////////
 		Expression::Expression()
 		{
 		}
@@ -34,6 +61,12 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Expression_list::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+		{
+			assert(0);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		Expression_op0::Expression_op0(const char *name)
 			: _name(name)
 		{
@@ -44,6 +77,12 @@ namespace pgs
 		Expression_op0::~Expression_op0()
 		{
 
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Expression_op0::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+		{
+			assert(0);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -60,6 +99,12 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Expression_op1::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+		{
+			assert(0);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		Expression_op2::Expression_op2(const char *name, const pgs::Expression &a, const pgs::Expression &b)
 			: _name(name)
 			, _a(Access<pgs::Expression>(a))
@@ -73,6 +118,12 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Expression_op2::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+		{
+			assert(0);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		Expression_op3::Expression_op3(const char *name1, const char *name2, const pgs::Expression &a, const pgs::Expression &b, const pgs::Expression &c)
 		{
 			assert(0);
@@ -80,6 +131,12 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		Expression_op3::~Expression_op3()
+		{
+			assert(0);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Expression_op3::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
 			assert(0);
 		}
@@ -99,6 +156,12 @@ namespace pgs
 		void Expression_func::pushArg(const pgs::Expression &a)
 		{
 			_args.push_back(Access<pgs::Expression>(a));
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Expression_func::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+		{
+			assert(0);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -126,6 +189,12 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Expression_casec::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+		{
+			assert(0);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		Expression_casee::Expression_casee(const pgs::Expression &e)
 		{
 			assert(0);
@@ -148,5 +217,12 @@ namespace pgs
 		{
 			assert(0);
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Expression_casee::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+		{
+			assert(0);
+		}
+
 	}
 }
