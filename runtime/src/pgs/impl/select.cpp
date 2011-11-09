@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "select.hpp"
 #include "pgs/meta/cluster.hpp"
-#include "utils/ntoa.hpp"
 
 namespace pgs
 {
@@ -57,6 +56,25 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		namespace
+		{
+			inline std::string &operator += (std::string &s, const std::deque<std::string> &d)
+			{
+				BOOST_FOREACH(const std::string &ds, d)
+				{
+					s += ds;
+				}
+				return s;
+			}
+
+			std::deque<std::string> &operator += (std::deque<std::string> &d, const std::string &s)
+			{
+				d.push_back(s);
+				return d;
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		bool Select::compile(std::string &sql, const impl::Cluster_ptr &cluster)
 		{
 			//выделить значения для bind
@@ -79,7 +97,7 @@ namespace pgs
 					offset
 			*/
 			std::deque<std::string>	whats;
-			std::string				from;
+			std::deque<std::string>	from;
 			std::deque<std::string>	links;
 			std::deque<std::string>	where;
 			std::deque<std::string>	orders;
@@ -105,43 +123,13 @@ namespace pgs
 
 
 			//////////////////////////////////////////////////////////////////////////
-			if(whats.empty())
-			{
-				sql += "SELECT *";
-			}
-			else
-			{
-				sql += "SELECT ";
-				bool first = true;
-				BOOST_FOREACH(std::string &what, whats)
-				{
-					if(first)
-					{
-						first = false;
-					}
-					else
-					{
-						sql += ", ";
-					}
-					sql += what;
-				}
-			}
+			sql += "SELECT ";
+			sql += whats;
 
-			if(from.empty())
-			{
+			sql += " FROM ";
+			sql += from;
 
-			}
-			else
-			{
-				sql += " FROM ";
-				sql += from;
-			}
-
-			BOOST_FOREACH(std::string &link, links)
-			{
-				sql += " ";
-				sql += link;
-			}
+			sql += links;
 
 			if(where.empty())
 			{
@@ -150,11 +138,7 @@ namespace pgs
 			else
 			{
 				sql += " WHERE ";
-				BOOST_FOREACH(std::string &s, where)
-				{
-					sql += " ";
-					sql += s;
-				}
+				sql += where;
 			}
 
 			if(orders.empty())
@@ -164,42 +148,22 @@ namespace pgs
 			else
 			{
 				sql += " ORDER BY ";
-				bool first = true;
-				BOOST_FOREACH(std::string &order, orders)
-				{
-					if(first)
-					{
-						first = false;
-					}
-					else
-					{
-						sql += ", ";
-					}
-					sql += order;
-				}
+				sql += orders;
 			}
 
 			if(!limit.empty())
 			{
 				sql += " LIMIT ";
-				BOOST_FOREACH(std::string &s, limit)
-				{
-					sql += " ";
-					sql += s;
-				}
+				sql += limit;
 			}
 
 			if(!offset.empty())
 			{
 				sql += " OFFSET ";
-				BOOST_FOREACH(std::string &s, offset)
-				{
-					sql += " ";
-					sql += s;
-				}
+				sql += offset;
 			}
 
-			std::cout<<sql;
+			std::cout<<sql<<std::endl;
 			assert(0);
 			return false;
 		}
@@ -207,22 +171,35 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Select::mkWhats(std::deque<std::string> &res, SCompileState &state)
 		{
+			bool first = true;
 			BOOST_FOREACH(Expression_ptr &expr, _whats)
 			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					res += ", ";
+				}
+
 				expr->compile(res, state, ecmSelectWhat);
+			}
+
+			if(first)
+			{
+				res += "*";
 			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Select::mkFrom(std::string &res, SCompileState &state)
+		void Select::mkFrom(std::deque<std::string> &res, SCompileState &state)
 		{
 			assert(_from);
-
-			res += state._cluster->tableName(_from->meta());
-			res += " AS ";
-			res += state._cluster->escapeName(_from->alias());
-
-			state._aliases.insert(_from->alias());
+			if(_from)
+			{
+				_from->compile(res, state, ecmSelectFrom);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -230,69 +207,34 @@ namespace pgs
 		{
 			BOOST_FOREACH(Link_ptr &link, _links)
 			{
-				//проверить наличие srcAlias во from или уже реализованых link
-				state.checkAliasExistence(link->srcAlias(), true);
-
-				//проверить отсутствие alias во from или уже реализованых link
-				state.checkAliasExistence(link->alias(), false);
-
-				std::string srcAlias = state._cluster->escapeName(link->srcAlias());
-				std::string alias = state._cluster->escapeName(link->alias());
-				std::string crossTable = state._cluster->tableName(link->meta()->_relation);
-				char tmp[64];
-				std::string crossAlias = state._cluster->escapeName(std::string("___cross_")+utils::_ntoa(state._nextCrossIndex++, tmp));
-				std::string foreignTable = state._cluster->tableName(link->meta()->_anotherEnd->_category);
-				
-				std::string sql;
-				sql += "LEFT OUTER JOIN ";
-				sql += crossTable;
-				sql += " AS ";
-				sql += crossAlias;
-				sql += " ON (";
-
-				sql += srcAlias;
-				sql += ".id";
-				sql += "=";
-				sql += crossAlias;
-				sql += ".";
-				sql += link->meta()->_isInput?"output_id":"input_id";
-
-
-
-				sql += ") LEFT OUTER JOIN ";
-				sql += foreignTable;
-				sql += " AS ";
-				sql += alias;
-
-				sql += " ON(";
-
-				sql += crossAlias;
-				sql += ".";
-				sql += link->meta()->_isInput?"input_id":"output_id";
-				sql += "=";
-				sql += alias;
-				sql += ".id";
-
-
-				sql += ")";
-
-
-				res.push_back(sql);
-				state._aliases.insert(link->alias());
+				res += " ";
+				link->compile(res, state, ecmSelectLink);
 			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Select::mkWhere(std::deque<std::string> &res, SCompileState &state)
 		{
-			_where->compile(res, state, ecmSelectWhere);
+			if(_where)
+			{
+				_where->compile(res, state, ecmSelectWhere);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Select::mkOrders(std::deque<std::string> &res, SCompileState &state)
 		{
+			bool first = true;
 			BOOST_FOREACH(Order_ptr &order, _orders)
 			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					res += ", ";
+				}
 				order->compile(res, state, ecmSelectOrder);
 			}
 		}
@@ -300,13 +242,19 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		void Select::mkLimit(std::deque<std::string> &res, SCompileState &state)
 		{
-			_limit->compile(res, state, ecmSelectLimit);
+			if(_limit)
+			{
+				_limit->compile(res, state, ecmSelectLimit);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Select::mkOffset(std::deque<std::string> &res, SCompileState &state)
 		{
-			_limit->compile(res, state, ecmSelectOffset);
+			if(_offset)
+			{
+				_offset->compile(res, state, ecmSelectOffset);
+			}
 		}
 	}
 }

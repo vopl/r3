@@ -47,7 +47,7 @@ namespace pgs
 
 		private:
 			void mkWhats(std::deque<std::string> &res,	SCompileState &state);
-			void mkFrom(std::string &res,				SCompileState &state);
+			void mkFrom(std::deque<std::string> &res,	SCompileState &state);
 			void mkLinks(std::deque<std::string> &res,	SCompileState &state);
 			void mkWhere(std::deque<std::string> &res,	SCompileState &state);
 			void mkOrders(std::deque<std::string> &res,	SCompileState &state);

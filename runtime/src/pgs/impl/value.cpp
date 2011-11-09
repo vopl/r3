@@ -39,6 +39,21 @@ namespace pgs
 		{
 			switch(ecm)
 			{
+			case ecmSelectWhat:
+			case ecmSelectWhere:
+			case ecmSelectLimit:
+			case ecmSelectOffset:
+				{
+					std::map<void *, size_t>::iterator iter = state._valueNumbers.find(this);
+					if(state._valueNumbers.end() == iter)
+					{
+						iter = state._valueNumbers.insert(std::make_pair(this, state._valueNumbers.size()+1)).first;
+					}
+
+					char tmp[64];
+					res.push_back(std::string("$")+utils::_ntoa(iter->second, tmp));
+				}
+				break;
 			default:
 				assert(0);
 			}

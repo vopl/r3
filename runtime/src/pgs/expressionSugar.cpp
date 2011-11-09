@@ -15,6 +15,32 @@ namespace pgs
 		return ne(v1, v2);
 	}
 
+
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator>(const Expression &v1, const Expression &v2)
+	{
+		return gt(v1,v2);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator>=(const Expression &v1, const Expression &v2)
+	{
+		return ge(v1,v2);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator<(const Expression &v1, const Expression &v2)
+	{
+		return lt(v1,v2);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator<=(const Expression &v1, const Expression &v2)
+	{
+		return le(v1,v2);
+	}
+
+
 	//////////////////////////////////////////////////////////////////////////
 	Expression operator||(const Expression &v1, const Expression &v2)
 	{
@@ -39,4 +65,35 @@ namespace pgs
 		return list(v1, v2);
 	}
 
+
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator+(const Expression &v1, const Expression &v2)
+	{
+		return plus(v1, v2);
+	}
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator-(const Expression &v1, const Expression &v2)
+	{
+		return minus(v1, v2);
+	}
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator*(const Expression &v1, const Expression &v2)
+	{
+		return mul(v1, v2);
+	}
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator/(const Expression &v1, const Expression &v2)
+	{
+		return div(v1, v2);
+	}
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator%(const Expression &v1, const Expression &v2)
+	{
+		return mod(v1, v2);
+	}
+	//////////////////////////////////////////////////////////////////////////
+	Expression operator^(const Expression &v1, const Expression &v2)
+	{
+		return exp(v1, v2);
+	}
 }

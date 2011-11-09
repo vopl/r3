@@ -135,6 +135,7 @@ namespace pgs
 
 				c->_fields.replace(adopted.get());
 				_storage->_fields_heap.push_back(adopted);
+				fld = adopted.get();
 			}
 
 			return fld;
@@ -153,6 +154,7 @@ namespace pgs
 
 				c->_relationEnds.replace(adopted.get());
 				_storage->_relationEnds_heap.push_back(adopted);
+				re = adopted.get();
 			}
 
 			return re;
@@ -178,6 +180,7 @@ namespace pgs
 
 				c->_indices.replace(adopted.get());
 				_storage->_indices_heap.push_back(adopted);
+				idx = adopted.get();
 			}
 
 			return idx;

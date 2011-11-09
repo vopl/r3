@@ -134,6 +134,17 @@ namespace pgs
 		{
 			switch(ecm)
 			{
+			case ecmSelectWhere:
+				{
+					res.push_back("(");
+					_a->compile(res, state, ecm);
+					//res.push_back(")");
+					res.push_back(_name);
+					//res.push_back("(");
+					_b->compile(res, state, ecm);
+					res.push_back(")");
+				}
+				break;
 			default:
 				assert(0);
 			}

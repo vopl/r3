@@ -46,6 +46,7 @@ namespace pgs
 			switch(ecm)
 			{
 			case ecmSelectWhat:
+			case ecmSelectWhere:
 				{
 					state.checkAliasExistence(_srcAlias, true);
 					std::string categoryAlias = state._cluster->escapeName(_srcAlias);

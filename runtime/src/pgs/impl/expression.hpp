@@ -13,6 +13,8 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		enum ECompileMode
 		{
+			ecmSelectFrom,
+			ecmSelectLink,
 			ecmSelectWhat,
 			ecmSelectWhere,
 			ecmSelectOrder,
@@ -27,6 +29,9 @@ namespace pgs
 			impl::Cluster_ptr		_cluster;
 			std::set<std::string>	_aliases;
 			size_t					_nextCrossIndex;
+
+			std::map<void *, size_t>	_valueNumbers;
+
 			SCompileState();
 			bool checkAliasExistence(const std::string &alias, bool mustExists);
 		};

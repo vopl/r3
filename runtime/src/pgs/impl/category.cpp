@@ -37,6 +37,17 @@ namespace pgs
 		{
 			switch(ecm)
 			{
+			case ecmSelectFrom:
+				{
+					std::string sql;
+					sql += state._cluster->tableName(_metaCategory);
+					sql += " AS ";
+					sql += state._cluster->escapeName(_alias);
+
+					res.push_back(sql);
+					state._aliases.insert(_alias);
+				}
+				break;
 			case ecmSelectWhat:
 				{
 					//проверить наличие alias во from или links
@@ -61,7 +72,6 @@ namespace pgs
 					}
 
 					res.push_back(sql);
-
 				}
 				break;
 			default:

@@ -124,8 +124,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		.whats(pgs::Category(testCats->Client, "clientAlias"))
 		.whats(pgs::Field("clientAlias", testCats->Client->name))
 
-		.where(pgs::Field(testCats->Letter->creation) && pgs::Field(testCats->Letter->creation))
-		.limit(pgs::Value(20));
+		.where(
+			pgs::Field("observableServicesAlias", testCats->Service->description) > pgs::Value(21) && 
+			pgs::Field("servicesAlias", testCats->ServicePart->id) <= pgs::Value(22)
+		)
+		.limit(pgs::Value(23))
+		.offset(pgs::Value(24));
 		
 	//testCats->
 
