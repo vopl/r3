@@ -469,6 +469,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\pgs\impl\sdHelpers.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\pgs\impl\select.cpp"
 						>
 						<FileConfiguration

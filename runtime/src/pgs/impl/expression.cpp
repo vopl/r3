@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "expression.hpp"
 #include "access.hpp"
+#include "sdHelpers.hpp"
 
 namespace pgs
 {
@@ -136,13 +137,13 @@ namespace pgs
 			{
 			case ecmSelectWhere:
 				{
-					res.push_back("(");
+					res += "(";
 					_a->compile(res, state, ecm);
-					//res.push_back(")");
-					res.push_back(_name);
-					//res.push_back("(");
+					//res += ")";
+					res += _name;
+					//res += "(";
 					_b->compile(res, state, ecm);
-					res.push_back(")");
+					res += ")";
 				}
 				break;
 			default:

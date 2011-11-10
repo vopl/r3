@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "field.hpp"
 #include "pgs/meta/category.hpp"
+#include "sdHelpers.hpp"
 
 namespace pgs
 {
@@ -21,9 +22,10 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Field::Field(const std::string srcAlias, pgs::meta::FieldCPtr fld)
-			: _srcAlias(srcAlias)
+		Field::Field(const std::string srcAlias, pgs::meta::FieldCPtr fld, const std::string alias)
+			: _srcAlias(srcAlias.empty()?fld->_category->_name:srcAlias)
 			, _metaField(fld)
+			, _alias(alias.empty()?fld->_name:alias)
 		{
 
 		}
@@ -41,6 +43,12 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		const std::string &Field::alias() const
+		{
+			return _alias;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		void Field::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
 		{
 			switch(ecm)
@@ -49,15 +57,16 @@ namespace pgs
 			case ecmSelectWhere:
 				{
 					state.checkAliasExistence(_srcAlias, true);
-					std::string categoryAlias = state._cluster->escapeName(_srcAlias);
 
-					std::string sql;
+					res += state._cluster->escapeName(_srcAlias);
+					res += ".";
+					res += state._cluster->escapeName(_metaField->_name);
 
-					sql += categoryAlias;
-					sql += ".";
-					sql += state._cluster->escapeName(_metaField->_name);
-
-					res.push_back(sql);
+					if(ecmSelectWhat == ecm && !_alias.empty() && _alias != _metaField->_name)
+					{
+						res += " AS ";
+						res += state._cluster->escapeName(_alias);
+					}
 				}
 				break;
 			default:

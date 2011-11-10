@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "category.hpp"
 #include "pgs/meta/category.hpp"
+#include "sdHelpers.hpp"
 
 namespace pgs
 {
@@ -39,12 +40,10 @@ namespace pgs
 			{
 			case ecmSelectFrom:
 				{
-					std::string sql;
-					sql += state._cluster->tableName(_metaCategory);
-					sql += " AS ";
-					sql += state._cluster->escapeName(_alias);
+					res += state._cluster->tableName(_metaCategory);
+					res += " AS ";
+					res += state._cluster->escapeName(_alias);
 
-					res.push_back(sql);
 					state._aliases.insert(_alias);
 				}
 				break;
@@ -55,23 +54,21 @@ namespace pgs
 
 					std::string categoryAlias = state._cluster->escapeName(_alias);
 
-					std::string sql;
 					//tableoid
-					sql += categoryAlias;
-					sql += ".tableoid";
+					res += categoryAlias;
+					res += ".tableoid";
 					// TRATATA тут фиксировать информацию дл€ феча
 
 					//перебрать все пол€
 					BOOST_FOREACH(meta::FieldCPtr mf, _metaCategory->_fields)
 					{
-						sql += ", ";
-						sql += categoryAlias;
-						sql += ".";
-						sql += state._cluster->escapeName(mf->_name);
+						res += ", ";
+						res += categoryAlias;
+						res += ".";
+						res += state._cluster->escapeName(mf->_name);
+
 						// TRATATA тут фиксировать информацию дл€ феча
 					}
-
-					res.push_back(sql);
 				}
 				break;
 			default:

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "value.hpp"
 #include "utils/ntoa.hpp"
+#include "sdHelpers.hpp"
 
 namespace pgs
 {
@@ -50,8 +51,9 @@ namespace pgs
 						iter = state._valueNumbers.insert(std::make_pair(this, state._valueNumbers.size()+1)).first;
 					}
 
+					res += "$";
 					char tmp[64];
-					res.push_back(std::string("$")+utils::_ntoa(iter->second, tmp));
+					res += utils::_ntoa(iter->second, tmp);
 				}
 				break;
 			default:

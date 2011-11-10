@@ -2,6 +2,7 @@
 #include "link.hpp"
 #include "pgs/meta/category.hpp"
 #include "utils/ntoa.hpp"
+#include "sdHelpers.hpp"
 
 namespace pgs
 {
@@ -61,41 +62,39 @@ namespace pgs
 					std::string crossAlias = state._cluster->escapeName(std::string("___cross_")+utils::_ntoa(state._nextCrossIndex++, tmp));
 					std::string foreignTable = state._cluster->tableName(_metaRelatioEnd->_anotherEnd->_category);
 
-					std::string sql;
-					sql += "LEFT OUTER JOIN ";
-					sql += crossTable;
-					sql += " AS ";
-					sql += crossAlias;
-					sql += " ON (";
+					res += "LEFT OUTER JOIN ";
+					res += crossTable;
+					res += " AS ";
+					res += crossAlias;
+					res += " ON(";
 
-					sql += srcAlias;
-					sql += ".id";
-					sql += "=";
-					sql += crossAlias;
-					sql += ".";
-					sql += _metaRelatioEnd->_isInput?"output_id":"input_id";
-
+					res += srcAlias;
+					res += ".id";
+					res += "=";
+					res += crossAlias;
+					res += ".";
+					res += _metaRelatioEnd->_isInput?"output_id":"input_id";
 
 
-					sql += ") LEFT OUTER JOIN ";
-					sql += foreignTable;
-					sql += " AS ";
-					sql += alias;
 
-					sql += " ON(";
+					res += ") LEFT OUTER JOIN ";
+					res += foreignTable;
+					res += " AS ";
+					res += alias;
 
-					sql += crossAlias;
-					sql += ".";
-					sql += _metaRelatioEnd->_isInput?"input_id":"output_id";
-					sql += "=";
-					sql += alias;
-					sql += ".id";
+					res += " ON(";
 
-
-					sql += ")";
+					res += crossAlias;
+					res += ".";
+					res += _metaRelatioEnd->_isInput?"input_id":"output_id";
+					res += "=";
+					res += alias;
+					res += ".id";
 
 
-					res.push_back(sql);
+					res += ")";
+
+
 					state._aliases.insert(_alias);
 				}
 				break;
