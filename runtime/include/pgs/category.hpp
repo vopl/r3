@@ -20,7 +20,6 @@ namespace pgs
 		typedef impl::Category_ptr Impl_ptr;
 
 	public:
-		Category();
 		Category(pgs::meta::CategoryCPtr cat, const std::string &alias="");
 
 		pgs::meta::CategoryCPtr meta() const;

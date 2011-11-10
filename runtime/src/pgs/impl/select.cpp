@@ -57,8 +57,9 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		bool Select::compile(std::string &sql, const impl::Cluster_ptr &cluster)
+		Statement_ptr Select::compile(const impl::Cluster_ptr &cluster)
 		{
+			std::string sql;
 			//выделить значения для bind
 			//выделить поля для fetch
 			//составить sql
@@ -147,7 +148,7 @@ namespace pgs
 
 			std::cout<<sql<<std::endl;
 			assert(0);
-			return false;
+			return Statement_ptr();
 		}
 
 		//////////////////////////////////////////////////////////////////////////

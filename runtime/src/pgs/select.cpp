@@ -2,6 +2,7 @@
 #include "pgs/select.hpp"
 #include "impl/select.hpp"
 #include "impl/access.hpp"
+#include "impl/statement.hpp"
 
 
 namespace pgs
@@ -63,9 +64,9 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Select::compile(std::string &sql, Cluster cluster)
+	Statement Select::compile(Cluster cluster)
 	{
-		return _impl->compile(sql, impl::Access<Cluster>(cluster).impl());
+		return Statement(_impl->compile(impl::Access<Cluster>(cluster).impl()));
 	}
 
 }

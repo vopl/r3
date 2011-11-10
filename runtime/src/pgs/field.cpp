@@ -6,14 +6,8 @@
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Field::Field()
-		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Field())))
-	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Field::Field(pgs::meta::FieldCPtr fld)
-		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Field(fld))))
+	Field::Field(pgs::meta::FieldCPtr fld, const std::string &alias)
+		: Expression(impl::Access<Expression>(Impl_ptr(new impl::Field(fld, alias))))
 	{
 	}
 

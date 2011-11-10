@@ -9,6 +9,8 @@
 #include "value.hpp"
 #include "cluster.hpp"
 
+#include "statement.hpp"
+
 #include <deque>
 
 namespace pgs
@@ -43,7 +45,7 @@ namespace pgs
 			void orders(Order_ptr);
 
 		public:
-			bool compile(std::string &sql, const impl::Cluster_ptr &cluster);
+			Statement_ptr compile(const impl::Cluster_ptr &cluster);
 
 		private:
 			void mkWhats(std::deque<std::string> &res,	SCompileState &state);

@@ -16,7 +16,6 @@ namespace pgs
 			std::string _alias;
 
 		public:
-			Category();
 			Category(pgs::meta::CategoryCPtr cat, const std::string &alias="");
 
 			pgs::meta::CategoryCPtr meta() const;

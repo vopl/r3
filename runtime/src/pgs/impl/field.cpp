@@ -8,16 +8,10 @@ namespace pgs
 	namespace impl
 	{
 		//////////////////////////////////////////////////////////////////////////
-		Field::Field()
-			: _srcAlias()
-			, _metaField()
-		{
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		Field::Field(pgs::meta::FieldCPtr fld)
+		Field::Field(pgs::meta::FieldCPtr fld, const std::string alias)
 			: _srcAlias(fld->_category->_name)
 			, _metaField(fld)
+			, _alias(alias)
 		{
 		}
 

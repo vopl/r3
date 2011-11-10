@@ -8,31 +8,23 @@ namespace pgs
 	namespace impl
 	{
 		//////////////////////////////////////////////////////////////////////////
-		void Value::reset()
+		Value::Value(const std::string &alias, const std::string &srcAlias)
+			: _alias(alias)
+			, _srcAlias(srcAlias)
 		{
-			if(_dataDeleter)
-			{
-				(this->*_dataDeleter)();
-				_dataDeleter = NULL;
-			}
-			_data = NULL;
-			_cdt = 0;
-			_vdm = vdm_null;
+
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Value::Value()
-			: _vdm(vdm_null)
-			, _data(NULL)
-			, _cdt(0)
-			, _dataDeleter(NULL)
+		const std::string &Value::srcAlias() const
 		{
+			return _srcAlias;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Value::~Value()
+		const std::string &Value::alias() const
 		{
-			reset();
+			return _alias;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

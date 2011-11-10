@@ -226,7 +226,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\pgs\result.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\pgs\select.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\pgs\statement.hpp"
 					>
 				</File>
 				<File
@@ -322,7 +330,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\result.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\select.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\statement.cpp"
 					>
 				</File>
 				<File
@@ -469,6 +485,22 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\pgs\impl\result.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\result.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\pgs\impl\sdHelpers.hpp"
 						>
 					</File>
@@ -486,6 +518,22 @@
 					</File>
 					<File
 						RelativePath="..\src\pgs\impl\select.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\statement.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\impl\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\pgs\impl\statement.hpp"
 						>
 					</File>
 					<File

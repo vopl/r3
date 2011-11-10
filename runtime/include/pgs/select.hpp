@@ -8,6 +8,7 @@
 #include "pgs/order.hpp"
 #include "pgs/value.hpp"
 #include "pgs/cluster.hpp"
+#include "pgs/statement.hpp"
 
 namespace pgs
 {
@@ -36,7 +37,7 @@ namespace pgs
 		Select &orders(Order);
 
 	public:
-		bool compile(std::string &sql, Cluster cluster);
+		Statement compile(Cluster cluster);
 	};
 }
 

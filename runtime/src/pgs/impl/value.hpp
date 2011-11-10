@@ -13,116 +13,21 @@ namespace pgs
 		class Value
 			: public impl::Expression
 		{
-			EValueDataMode	_vdm;
-			const void		*_data;
-			int				_cdt;
-
-			typedef void (Value:: *TDataDeleter)();
-
-			TDataDeleter _dataDeleter;
-
+			std::string				_srcAlias;
+			std::string				_alias;
 
 			Value(const Value &);
 			void operator=(const Value &);
 
-			template <class CppType>
-			void dataDeleter();
-
-			void reset();
-
 		public:
-			Value();
+			Value(const std::string &alias, const std::string &srcAlias);
 
-			template <class CppType>
-			Value(const CppType *v, EValueDataMode vdm);
-
-			template <class CppType>
-			Value(const CppType &v, EValueDataMode vdm);
-
-			template <class CppType>
-			void set(const CppType *v, EValueDataMode vdm);
-
-			template <class CppType>
-			void set(const CppType &v, EValueDataMode vdm);
-
-			~Value();
+			const std::string &srcAlias() const;
+			const std::string &alias() const;
 
 			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 		};
 		typedef boost::shared_ptr<Value> Value_ptr;
-
-
-		//////////////////////////////////////////////////////////////////////////
-		template <class CppType>
-		void Value::dataDeleter()
-		{
-			delete (CppType *)_data;
-		}
-
-
-		//////////////////////////////////////////////////////////////////////////
-		template <class CppType>
-		Value::Value(const CppType *v, EValueDataMode vdm)
-			: _vdm(vdm_null)
-			, _data(NULL)
-			, _cdt(0)
-			, _dataDeleter(NULL)
-		{
-			set(v, vdm);
-		}
-
-		template <class CppType>
-		void Value::set(const CppType *v, EValueDataMode vdm)
-		{
-			reset();
-			_vdm = vdm;
-			if(vdm_makeCopy == _vdm)
-			{
-				if(v)
-				{
-					_dataDeleter = &Value::dataDeleter<CppType>;
-					_data = new CppType(*v);
-				}
-			}
-			else
-			{
-				if(vdm_doDeleteOnFree == _vdm)
-				{
-					_dataDeleter = &Value::dataDeleter<CppType>;
-				}
-				_data = v;
-			}
-			_cdt = pgc::CppDataType<CppType>::cdt_index;
-		}
-
-		template <class CppType>
-		Value::Value(const CppType &v, EValueDataMode vdm)
-			: _vdm(vdm_null)
-			, _data(NULL)
-			, _cdt(0)
-			, _dataDeleter(NULL)
-		{
-			set(v, vdm);
-		}
-
-		template <class CppType>
-		void Value::set(const CppType &v, EValueDataMode vdm)
-		{
-			reset();
-
-			_vdm = vdm;
-			if(vdm_makeCopy == _vdm)
-			{
-				_dataDeleter = &Value::dataDeleter<CppType>;
-				_data = new CppType(v);
-			}
-			else
-			{
-				assert(vdm_doDeleteOnFree != _vdm);
-				_data = &v;
-			}
-			_cdt = pgc::CppDataType<CppType>::cdt_index;
-		}
 	}
 }
 #endif

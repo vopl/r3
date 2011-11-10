@@ -123,20 +123,23 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		.whats(pgs::Category(testCats->Client, "clientAlias"))
 		.whats(pgs::Field("clientAlias", testCats->Client->name))
+		//.whats(pgs::Field(testCats->Client->name))
 
 		.where(
-			pgs::Field("observableServicesAlias", testCats->Service->description) > pgs::Value(21) && 
-			pgs::Field("servicesAlias", testCats->ServicePart->id) <= pgs::Value(22)
+			pgs::Field("observableServicesAlias", testCats->Service->description) > pgs::Value("v1") && 
+			pgs::Field("servicesAlias", testCats->ServicePart->id) <= pgs::Value("v2")
 		)
-		.limit(pgs::Value(23))
-		.offset(pgs::Value(24));
+		.limit(pgs::Value("v3"))
+		.offset(pgs::Value("v4"));
 		
 	//testCats->
 
 	//mysel.exec(con);
 
-	std::string sql;
-	mysel.compile(sql, ccl);
+	mysel.compile(ccl);
+
+	//mysel.bind("v3", 20);
+	//mysel.exec(con);
 
 	return 0;
 }
