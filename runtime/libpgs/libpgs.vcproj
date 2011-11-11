@@ -306,11 +306,35 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\categoryImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\categoryImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\cluster.cpp"
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\clusterImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\clusterImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\expression.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\expressionImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\expressionImpl.hpp"
 					>
 				</File>
 				<File
@@ -322,7 +346,31 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\fieldImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\fieldImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\implAccess.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\instantiate4pgctypes.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\link.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\linkImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\linkImpl.hpp"
 					>
 				</File>
 				<File
@@ -330,7 +378,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\orderImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\orderImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\result.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\resultImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\resultImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\sdHelpers.hpp"
 					>
 				</File>
 				<File
@@ -338,11 +406,35 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\selectImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\selectImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\statement.cpp"
 					>
 				</File>
 				<File
+					RelativePath="..\src\pgs\statementImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\statementImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\pgs\value.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\valueImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\pgs\valueImpl.hpp"
 					>
 				</File>
 				<Filter
@@ -360,196 +452,20 @@
 							/>
 						</FileConfiguration>
 					</File>
-					<Filter
-						Name="impl"
-						>
-						<File
-							RelativePath="..\src\pgs\meta\impl\cluster.cpp"
-							>
-							<FileConfiguration
-								Name="Debug|Win32"
-								>
-								<Tool
-									Name="VCCLCompilerTool"
-									ObjectFile="$(IntDir)\meta\impl\"
-								/>
-							</FileConfiguration>
-						</File>
-						<File
-							RelativePath="..\src\pgs\meta\impl\cluster.hpp"
-							>
-						</File>
-					</Filter>
-				</Filter>
-				<Filter
-					Name="impl"
-					>
 					<File
-						RelativePath="..\src\pgs\impl\access.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\category.cpp"
+						RelativePath="..\src\pgs\meta\clusterImpl.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
+								ObjectFile="$(IntDir)\meta\"
 							/>
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\src\pgs\impl\category.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\cluster.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\cluster.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\expression.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\expression.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\field.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\field.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\link.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\link.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\order.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\order.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\result.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\result.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\sdHelpers.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\select.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\select.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\statement.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\statement.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\value.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\impl\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\src\pgs\impl\value.hpp"
+						RelativePath="..\src\pgs\meta\clusterImpl.hpp"
 						>
 					</File>
 				</Filter>

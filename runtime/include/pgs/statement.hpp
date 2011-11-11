@@ -8,18 +8,15 @@
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	namespace impl
-	{
-		class Statement;
-		typedef boost::shared_ptr<Statement> Statement_ptr;
-	}
+	class StatementImpl;
+	typedef boost::shared_ptr<StatementImpl> StatementImpl_ptr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Statement
 		: public pgc::Statement
 	{
 	protected:
-		typedef impl::Statement_ptr Impl_ptr;
+		typedef StatementImpl_ptr Impl_ptr;
 
 		friend class Select;
 		Statement(Impl_ptr impl);

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "pgs/statement.hpp"
-#include "impl/statement.hpp"
-#include "impl/result.hpp"
+#include "statementImpl.hpp"
+#include "resultImpl.hpp"
 
 namespace pgs
 {
@@ -16,20 +16,20 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	void Statement::bindNative(int typCpp, void const *valCpp, const char *name)
 	{
-		boost::static_pointer_cast<impl::Statement>(_impl)->bind(typCpp, valCpp, name);
+		boost::static_pointer_cast<StatementImpl>(_impl)->bind(typCpp, valCpp, name);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Statement &Statement::unbind(const char *name)
 	{
-		boost::static_pointer_cast<impl::Statement>(_impl)->unbind(name);
+		boost::static_pointer_cast<StatementImpl>(_impl)->unbind(name);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Result Statement::exec()
 	{
-		impl::Result_ptr res(new impl::Result(_impl->con(), _impl->exec()));
+		ResultImpl_ptr res(new ResultImpl(_impl->con(), _impl->exec()));
 		return Result(res);
 	}
 

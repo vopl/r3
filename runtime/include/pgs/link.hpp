@@ -6,11 +6,8 @@
 
 namespace pgs
 {
-	namespace impl
-	{
-		class Link;
-		typedef boost::shared_ptr<Link> Link_ptr;
-	}
+	class LinkImpl;
+	typedef boost::shared_ptr<LinkImpl> LinkImpl_ptr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Link
@@ -18,7 +15,7 @@ namespace pgs
 	{
 
 	public:
-		typedef impl::Link_ptr Impl_ptr;
+		typedef LinkImpl_ptr Impl_ptr;
 
 	public:
 		Link(pgs::meta::RelationEndCPtr re, const std::string &alias="");

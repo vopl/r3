@@ -5,18 +5,15 @@
 
 namespace pgs
 {
-	namespace impl
-	{
-		class Order;
-		typedef boost::shared_ptr<Order> Order_ptr;
-	}
+	class OrderImpl;
+	typedef boost::shared_ptr<OrderImpl> OrderImpl_ptr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Order
 		: public Expression
 	{
 	public:
-		typedef impl::Order_ptr Impl_ptr;
+		typedef OrderImpl_ptr Impl_ptr;
 
 	public:
 		Order(...);

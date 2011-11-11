@@ -6,17 +6,14 @@
 
 namespace pgs
 {
-	namespace impl
-	{
-		class Field;
-		typedef boost::shared_ptr<Field> Field_ptr;
-	}
+	class FieldImpl;
+	typedef boost::shared_ptr<FieldImpl> FieldImpl_ptr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Field
 		: public Expression
 	{
-		typedef impl::Field_ptr Impl_ptr;
+		typedef FieldImpl_ptr Impl_ptr;
 
 	public:
 		Field(pgs::meta::FieldCPtr fld, const std::string &alias="");

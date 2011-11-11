@@ -31,18 +31,14 @@ namespace pgs
 	typedef std::deque<SyncLogLine> TSyncLog;
 
 	//////////////////////////////////////////////////////////////////////////
-	namespace impl
-	{
-		class Cluster;
-		typedef boost::shared_ptr<Cluster> Cluster_ptr;
-	}
-
+	class ClusterImpl;
+	typedef boost::shared_ptr<ClusterImpl> ClusterImpl_ptr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Cluster
 	{
 	protected:
-		typedef impl::Cluster_ptr Impl_ptr;
+		typedef ClusterImpl_ptr Impl_ptr;
 		Impl_ptr	_impl;
 
 	public:

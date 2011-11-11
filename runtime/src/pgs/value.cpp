@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "pgs/value.hpp"
-#include "impl/value.hpp"
-#include "impl/access.hpp"
+#include "valueImpl.hpp"
+#include "implAccess.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Value::Value(const std::string &alias)
-		: Expression(impl::Access<Expression>(impl::Expression_ptr(new impl::Value(alias))))
+		: Expression(ImplAccess<Expression>(ExpressionImpl_ptr(new ValueImpl(alias))))
 	{
 
 	}
@@ -15,7 +15,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	const std::string &Value::alias() const
 	{
-		return static_cast<impl::Value *>(_impl.get())->alias();
+		return static_cast<ValueImpl *>(_impl.get())->alias();
 	}
 
 }

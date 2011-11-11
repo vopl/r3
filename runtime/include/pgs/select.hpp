@@ -13,15 +13,14 @@
 namespace pgs
 {
 
-	namespace impl
-	{
-		class Select;
-		typedef boost::shared_ptr<Select> Select_ptr;
-	}
+	class SelectImpl;
+	typedef boost::shared_ptr<SelectImpl> SelectImpl_ptr;
+
 	//////////////////////////////////////////////////////////////////////////
 	class Select
 	{
-		impl::Select_ptr	_impl;
+		typedef SelectImpl_ptr Impl_ptr;
+		Impl_ptr	_impl;
 
 	public:
 		Select();

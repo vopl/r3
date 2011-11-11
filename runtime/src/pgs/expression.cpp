@@ -1,29 +1,29 @@
 #include "stdafx.h"
 #include "pgs/expression.hpp"
-#include "impl/expression.hpp"
-#include "impl/access.hpp"
+#include "expressionImpl.hpp"
+#include "implAccess.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Expression op1_pre(const char *name, const Expression &a)
 	{
-		return impl::Access<Expression>(impl::Expression_ptr(new impl::Expression_op1(name, a, true)));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(new ExpressionImpl_op1(name, a, true)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expression op1_post(const char *name, const Expression &a)
 	{
-		return impl::Access<Expression>(impl::Expression_ptr(new impl::Expression_op1(name, a, false)));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(new ExpressionImpl_op1(name, a, false)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expression op2(const char *name, const Expression &a, const Expression &b)
 	{
-		return impl::Access<Expression>(impl::Expression_ptr(new impl::Expression_op2(name, a, b)));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(new ExpressionImpl_op2(name, a, b)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expression op3(const char *name1, const char *name2, const Expression &a, const Expression &b, const Expression &c)
 	{
-		return impl::Access<Expression>(impl::Expression_ptr(new impl::Expression_op3(name1, name2, a, b, c)));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(new ExpressionImpl_op3(name1, name2, a, b, c)));
 	}
 
 
@@ -192,46 +192,46 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	Expression func(const char *name)
 	{
-		impl::Expression_func *p = new impl::Expression_func(name);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		ExpressionImpl_func *p = new ExpressionImpl_func(name);
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression func(const char *name, const Expression &a)
 	{
-		impl::Expression_func *p = new impl::Expression_func(name);
+		ExpressionImpl_func *p = new ExpressionImpl_func(name);
 		p->pushArg(a);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression func(const char *name, const Expression &a, const Expression &b)
 	{
-		impl::Expression_func *p = new impl::Expression_func(name);
+		ExpressionImpl_func *p = new ExpressionImpl_func(name);
 		p->pushArg(a);
 		p->pushArg(b);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression func(const char *name, const Expression &a, const Expression &b, const Expression &c)
 	{
-		impl::Expression_func *p = new impl::Expression_func(name);
+		ExpressionImpl_func *p = new ExpressionImpl_func(name);
 		p->pushArg(a);
 		p->pushArg(b);
 		p->pushArg(c);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression func(const char *name, const Expression &a, const Expression &b, const Expression &c, const Expression &d)
 	{
-		impl::Expression_func *p = new impl::Expression_func(name);
+		ExpressionImpl_func *p = new ExpressionImpl_func(name);
 		p->pushArg(a);
 		p->pushArg(b);
 		p->pushArg(c);
 		p->pushArg(d);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -261,224 +261,224 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	Expression casec(const Expression &c1, const Expression &r1)
 	{
-		impl::Expression_casec *p = new impl::Expression_casec();
+		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casec(const Expression &c1, const Expression &r1, const Expression &el)
 	{
-		impl::Expression_casec *p = new impl::Expression_casec();
+		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushElse(el);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casec(const Expression &c1, const Expression &r1, const Expression &c2, const Expression &r2)
 	{
-		impl::Expression_casec *p = new impl::Expression_casec();
+		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casec(const Expression &c1, const Expression &r1, const Expression &c2, const Expression &r2, const Expression &el)
 	{
-		impl::Expression_casec *p = new impl::Expression_casec();
+		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushElse(el);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casec(const Expression &c1, const Expression &r1, const Expression &c2, const Expression &r2, const Expression &c3, const Expression &r3)
 	{
-		impl::Expression_casec *p = new impl::Expression_casec();
+		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casec(const Expression &c1, const Expression &r1, const Expression &c2, const Expression &r2, const Expression &c3, const Expression &r3, const Expression &el)
 	{
-		impl::Expression_casec *p = new impl::Expression_casec();
+		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
 		p->pushElse(el);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casec(const Expression &c1, const Expression &r1, const Expression &c2, const Expression &r2, const Expression &c3, const Expression &r3, const Expression &c4, const Expression &r4)
 	{
-		impl::Expression_casec *p = new impl::Expression_casec();
+		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
 		p->pushPair(c4, r4);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casec(const Expression &c1, const Expression &r1, const Expression &c2, const Expression &r2, const Expression &c3, const Expression &r3, const Expression &c4, const Expression &r4, const Expression &el)
 	{
-		impl::Expression_casec *p = new impl::Expression_casec();
+		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
 		p->pushPair(c4, r4);
 		p->pushElse(el);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casee(const Expression &e, const Expression &v1, const Expression &r1)
 	{
-		impl::Expression_casee *p = new impl::Expression_casee(e);
+		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casee(const Expression &e, const Expression &v1, const Expression &r1, const Expression &el)
 	{
-		impl::Expression_casee *p = new impl::Expression_casee(e);
+		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushElse(el);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casee(const Expression &e, const Expression &v1, const Expression &r1, const Expression &v2, const Expression &r2)
 	{
-		impl::Expression_casee *p = new impl::Expression_casee(e);
+		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casee(const Expression &e, const Expression &v1, const Expression &r1, const Expression &v2, const Expression &r2, const Expression &el)
 	{
-		impl::Expression_casee *p = new impl::Expression_casee(e);
+		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushElse(el);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casee(const Expression &e, const Expression &v1, const Expression &r1, const Expression &v2, const Expression &r2, const Expression &v3, const Expression &r3)
 	{
-		impl::Expression_casee *p = new impl::Expression_casee(e);
+		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casee(const Expression &e, const Expression &v1, const Expression &r1, const Expression &v2, const Expression &r2, const Expression &v3, const Expression &r3, const Expression &el)
 	{
-		impl::Expression_casee *p = new impl::Expression_casee(e);
+		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
 		p->pushElse(el);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casee(const Expression &e, const Expression &v1, const Expression &r1, const Expression &v2, const Expression &r2, const Expression &v3, const Expression &r3, const Expression &v4, const Expression &r4)
 	{
-		impl::Expression_casee *p = new impl::Expression_casee(e);
+		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
 		p->pushPair(v4, r4);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression casee(const Expression &e, const Expression &v1, const Expression &r1, const Expression &v2, const Expression &r2, const Expression &v3, const Expression &r3, const Expression &v4, const Expression &r4, const Expression &el)
 	{
-		impl::Expression_casee *p = new impl::Expression_casee(e);
+		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
 		p->pushPair(v4, r4);
 		p->pushElse(el);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression in(const Expression &a, const Expression &v1)
 	{
-		impl::Expression_func *p = new impl::Expression_func("IN");
+		ExpressionImpl_func *p = new ExpressionImpl_func("IN");
 		p->pushArg(v1);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression in(const Expression &a, const Expression &v1, const Expression &v2)
 	{
-		impl::Expression_func *p = new impl::Expression_func("IN");
+		ExpressionImpl_func *p = new ExpressionImpl_func("IN");
 		p->pushArg(v1);
 		p->pushArg(v2);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression in(const Expression &a, const Expression &v1, const Expression &v2, const Expression &v3)
 	{
-		impl::Expression_func *p = new impl::Expression_func("IN");
+		ExpressionImpl_func *p = new ExpressionImpl_func("IN");
 		p->pushArg(v1);
 		p->pushArg(v2);
 		p->pushArg(v3);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression in(const Expression &a, const Expression &v1, const Expression &v2, const Expression &v3, const Expression &v4)
 	{
-		impl::Expression_func *p = new impl::Expression_func("IN");
+		ExpressionImpl_func *p = new ExpressionImpl_func("IN");
 		p->pushArg(v1);
 		p->pushArg(v2);
 		p->pushArg(v3);
 		p->pushArg(v4);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression any(const Expression &a)
 	{
-		impl::Expression_func *p = new impl::Expression_func("ANY");
+		ExpressionImpl_func *p = new ExpressionImpl_func("ANY");
 		p->pushArg(a);
-		return impl::Access<Expression>(impl::Expression_ptr(p));
+		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression list(const Expression &v1, const Expression &v2)
 	{
-		impl::Expression_list_ptr l1 = boost::shared_dynamic_cast<impl::Expression_list>(impl::Access<Expression>(v1).impl());
+		ExpressionImpl_list_ptr l1 = boost::shared_dynamic_cast<ExpressionImpl_list>(ImplAccess<Expression>(v1).impl());
 		if(l1)
 		{
 			l1->push(v2);
 			return v1;
 		}
 
-		impl::Expression_list_ptr l(new impl::Expression_list);
+		ExpressionImpl_list_ptr l(new ExpressionImpl_list);
 		l->push(v1);
 		l->push(v2);
 
-		return impl::Access<Expression>(l);
+		return ImplAccess<Expression>(l);
 	}
 
 }

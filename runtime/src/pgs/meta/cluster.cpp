@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "pgs/meta/cluster.hpp"
-#include "impl/cluster.hpp"
+#include "clusterImpl.hpp"
 
 namespace pgs
 {
@@ -16,7 +16,7 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		Cluster::Cluster()
-			: _impl(new impl::Cluster)
+			: _impl(new ClusterImpl)
 		{
 
 		}
