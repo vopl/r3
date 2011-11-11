@@ -95,8 +95,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		.links(pgs::Link("clientAlias", testCats->Client->services, "servicesAlias"))
 
 		.whats(pgs::Category(testCats->Client, "clientAlias"))
-		.whats(pgs::Field("clientAlias", testCats->Client->name))
-		//.whats(pgs::Field(testCats->Client->name))
+		//.whats(pgs::Field("clientAlias", testCats->Client->name))
+		.whats(pgs::Category(testCats->Service, "servicesAlias"))
 
 		.where(
 			pgs::Field("observableServicesAlias", testCats->Service->description) > pgs::Value("v1") && 
@@ -118,7 +118,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	stmt.bind(std::string("a"));
 	stmt.bind(20, "v2");
 	stmt.bind(20, "v3");
-	stmt.bind(0, "v4");
+	stmt.bind(1, "v4");
 
 	pgs::Result r = stmt.exec();
 
