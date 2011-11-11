@@ -13,9 +13,9 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	class Statement
 	{
-		StatementImplPtr _impl;
 	protected:
 		friend class Connection;
+		StatementImplPtr _impl;
 		Statement(StatementImplPtr impl);
 
 	public:

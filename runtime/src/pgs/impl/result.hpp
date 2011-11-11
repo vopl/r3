@@ -1,7 +1,7 @@
 #ifndef _PGS_IMPL_RESULT_HPP_
 #define _PGS_IMPL_RESULT_HPP_
 
-#include "pgc/result.hpp"
+#include "../../pgc/resultImpl.hpp"
 
 namespace pgs
 {
@@ -9,23 +9,10 @@ namespace pgs
 	{
 		//////////////////////////////////////////////////////////////////////////
 		class Result
+			: public pgc::ResultImpl
 		{
-			pgc::Result _pg;
 		public:
-			Result(pgc::Result pg);
-
-			pgc::EExecStatus status();
-
-			size_t cmdRows();
-			size_t rows();
-
-			bool fetch(size_t rowIdx, size_t colIdx, int typCpp, void *valCpp);
-			bool fetch(size_t rowIdx, const std::string &colName, int typCpp, void *valCpp);
-
-			bool isNull(size_t rowIdx, size_t colIdx);
-			bool isNull(size_t rowIdx, const std::string &colName);
-
-
+			Result(...);
 		};
 		typedef boost::shared_ptr<Result> Result_ptr;
 	}

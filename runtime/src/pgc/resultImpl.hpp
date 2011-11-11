@@ -50,7 +50,7 @@ namespace pgc
 
 	public:
 		ResultImpl(ConnectionImplPtr con, PGresult *pgres);
-		~ResultImpl();
+		virtual ~ResultImpl();
 
 		EExecStatus status();
 		const char *errorMsg();

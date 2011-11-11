@@ -27,7 +27,7 @@ namespace pgc
 		std::vector<bool>	_bindOwn;
 	public:
 		StatementImpl(ConnectionImplPtr con);
-		~StatementImpl();
+		virtual ~StatementImpl();
 
 		void sql(const char *sql);
 		void sql(const std::string &sql);

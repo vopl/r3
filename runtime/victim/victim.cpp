@@ -111,14 +111,14 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	pgs::Statement stmt = mysel.compile(ccl);
 
-	stmt.bind(std::string("dgh"), "v1");
-	stmt.bind(20, "v2");
-	stmt.bind(20, "v3");
-	stmt.bind(20, "v4");
-// 	stmt.bind(std::string("dgh"));
-// 	stmt.bind(20);
-// 	stmt.bind(20);
-// 	stmt.bind(20);
+// 	stmt.bind(std::string("dgh"), "v1");
+// 	stmt.bind(20, "v2");
+// 	stmt.bind(20, "v3");
+// 	stmt.bind(20, "v4");
+	stmt.bind(std::string("dgh"));
+	stmt.bind(20);
+	stmt.bind(20);
+	stmt.bind(20);
 
 	pgs::Result r = stmt.exec();
 
