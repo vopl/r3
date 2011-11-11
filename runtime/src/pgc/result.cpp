@@ -9,12 +9,12 @@ namespace pgc
 	{
 	}
 
-	bool Result::fetchHelper(int rowIdx, int colIdx, int typCpp, void *valCpp)
+	bool Result::fetchNative(int rowIdx, int colIdx, int typCpp, void *valCpp)
 	{
 		return _impl->fetch(rowIdx, colIdx, typCpp, valCpp);
 	}
 	
-	bool Result::fetchHelper(int rowIdx, const char *colName, int typCpp, void *valCpp)
+	bool Result::fetchNative(int rowIdx, const char *colName, int typCpp, void *valCpp)
 	{
 		return _impl->fetch(rowIdx, colName, typCpp, valCpp);
 	}
@@ -50,6 +50,11 @@ namespace pgc
 			throw Exception(_impl);
 		}
 		return *this;
+	}
+
+	size_t Result::cmdRows()
+	{
+		return _impl->cmdRows();
 	}
 
 	int Result::rows()

@@ -24,8 +24,9 @@ namespace pgc
 		friend class Statement;
 		Result(ResultImplPtr impl);
 
-		bool fetchHelper(int rowIdx, int colIdx, int typCpp, void *valCpp);
-		bool fetchHelper(int rowIdx, const char *colName, int typCpp, void *valCpp);
+	public:
+		bool fetchNative(int rowIdx, int colIdx, int typCpp, void *valCpp);
+		bool fetchNative(int rowIdx, const char *colName, int typCpp, void *valCpp);
 
 	public:
 		Result();
@@ -36,6 +37,7 @@ namespace pgc
 		const char *errorCode();
 		Result &throwIfError();
 
+		size_t cmdRows();
 		int rows();
 		template <class T> bool fetch(int rowIdx, int colIdx, T &v);
 		template <class T> bool fetch(int rowIdx, const char *colName, T &v);
@@ -57,13 +59,13 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> bool Result::fetch(int rowIdx, int colIdx, T &v)
 	{
-		return fetchHelper(rowIdx, colIdx, CppDataType<T>::cdt_index, &v);
+		return fetchNative(rowIdx, colIdx, CppDataType<T>::cdt_index, &v);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> bool Result::fetch(int rowIdx, const char *colName, T &v)
 	{
-		return fetchHelper(rowIdx, colName, CppDataType<T>::cdt_index, &v);
+		return fetchNative(rowIdx, colName, CppDataType<T>::cdt_index, &v);
 	}
 
 }

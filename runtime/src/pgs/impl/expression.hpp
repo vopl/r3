@@ -13,7 +13,6 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		enum ECompileMode
 		{
-			ecmSelectPushValues,
 			ecmSelectFrom,
 			ecmSelectLink,
 			ecmSelectWhat,

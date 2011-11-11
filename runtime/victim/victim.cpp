@@ -86,34 +86,6 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 
-// 	//////////////////////////////////////////////////////////////////////////
-// 	pgs::Cluster wcl(ccl);
-// 
-// 	pgs::meta::schemas::TestCategoriesCPtr testCats = mcl.get<pgs::meta::schemas::TestCategories>();
-// 
-// 	pgs::meta::Tuple<pgs::meta::schemas::TestCategories> lt;
-// 	lt = wcl.select(testCats->Letter).where(testCats->Letter->comment < 220);
-// 
-// 	lt.comment = "380";
-// 	wcl.update(lt, lt.comment);
-// 	wcl.insert(lt);
-// 	wcl.delete(lt);
-// 
-// 	pgs::meta::categories::TestCategories_LetterCPtr letter = testCats->Letter;
-// 
-// 	lt = wcl
-// 		.select(letter)
-// 		.distinct(letter->servisePart->cost)
-// 		.link(letter->servisePart)
-// 		
-// 		.where(letter->lastModified < 220 &&
-// 			letter->servisePart->cost < 380)
-// 		.limit(10)
-// 		.offset(3)
-// 		.order(letter->servisePart->cost, letter->lastModified);
-// 
-// 	lt.servisePart[0].cost;
-
 	pgs::meta::schemas::TestCategoriesCPtr testCats = mcl.get<pgs::meta::schemas::TestCategories>();
 	pgs::Select mysel;
 
@@ -148,7 +120,9 @@ int _tmain(int argc, _TCHAR* argv[])
 // 	stmt.bind(20);
 // 	stmt.bind(20);
 
-	stmt.exec();
+	pgs::Result r = stmt.exec();
+
+	std::cout<<r.rows()<<std::endl;
 
 	return 0;
 }

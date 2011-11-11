@@ -52,10 +52,7 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		Result_ptr Statement::exec()
 		{
-			pgc::Result r = _pg.exec();
-			r.throwIfError();
-			assert(0);
-			return Result_ptr();
+			return Result_ptr(new Result(_pg.exec()));
 		}
 
 	}
