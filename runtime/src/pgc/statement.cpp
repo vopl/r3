@@ -12,9 +12,6 @@ namespace pgc
 		: _impl(impl)
 	{
 	}
-	Statement::Statement()
-	{
-	}
 	Statement::~Statement()
 	{
 		_impl.reset();
@@ -43,7 +40,7 @@ namespace pgc
 	}
 	Result Statement::exec()
 	{
-		return Result(_impl->exec());
+		return Result(ResultImplPtr(new ResultImpl(_impl->con(), _impl->exec())));
 	}
 
 }

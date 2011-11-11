@@ -17,10 +17,10 @@ namespace pgc
 
 		void bind(int typCpp, void const *valCpp, size_t idx);
 		void unbind(size_t idx);
-		ResultImplPtr exec();
+		PGresult *exec();
 
 	private:
-		ResultImplPtr prepare();
+		PGresult *prepare();
 		void unprepare();
 	};
 

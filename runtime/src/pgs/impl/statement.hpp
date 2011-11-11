@@ -19,7 +19,7 @@ namespace pgs
 			size_t name2idx(const std::string &name);
 
 		public:
-			Statement(...);
+			Statement(pgc::ConnectionImplPtr con, const TMName2idx &name2idx);
 		};
 		typedef boost::shared_ptr<Statement> Statement_ptr;
 	}

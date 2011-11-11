@@ -19,8 +19,9 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		Statement::Statement(...)
-			: pgc::StatementPrepImpl(pgc::ConnectionImplPtr())
+		Statement::Statement(pgc::ConnectionImplPtr con, const TMName2idx &name2idx)
+			: pgc::StatementPrepImpl(con)
+			, _name2idx(name2idx)
 		{
 		}
 

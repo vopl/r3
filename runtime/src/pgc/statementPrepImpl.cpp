@@ -121,11 +121,11 @@ namespace pgc
 			}
 		}
 	}
-	ResultImplPtr StatementPrepImpl::exec()
+	PGresult *StatementPrepImpl::exec()
 	{
 		_con->doLogExec(_sql);
 
-		ResultImplPtr res;
+		PGresult *res;
 		if(_id.empty())
 		{
 			res = prepare();
@@ -138,30 +138,31 @@ namespace pgc
 
 		if(_bindTyp.size())
 		{
-			res.reset(new ResultImpl(_con, PQexecPrepared(
+			res = PQexecPrepared(
 				_con->pgcon(),
 				_id.c_str(),
 				_bindVal.size(),
 				&_bindVal[0],
 				&_bindLen[0],
 				&_bindFmt[0],
-				1)));
+				1);
 		}
 		else
 		{
-			res.reset(new ResultImpl(_con, PQexecPrepared(
+			res = PQexecPrepared(
 				_con->pgcon(),
 				_id.c_str(),
 				0,
 				NULL,
 				NULL,
 				NULL,
-				1)));
+				1);
 		}
 
-		if(ees_error == res->status())
+		ExecStatusType est = PQresultStatus(res);
+		if(est!=PGRES_COMMAND_OK && est!=PGRES_TUPLES_OK)
 		{
-			if(!strcmp(res->errorCode(), "26000"))//26000 INVALID SQL STATEMENT NAME
+			if(!strcmp(PQresultErrorField(res, PG_DIAG_SQLSTATE), "26000"))//26000 INVALID SQL STATEMENT NAME
 			{
 				_id.clear();
 				return exec();
@@ -172,7 +173,7 @@ namespace pgc
 		return res;
 	}
 
-	ResultImplPtr StatementPrepImpl::prepare()
+	PGresult *StatementPrepImpl::prepare()
 	{
 		bool inTrans = false;
 		PGconn *_conn = _con->pgcon();
@@ -229,7 +230,7 @@ namespace pgc
 			}
 			if(PGRES_COMMAND_OK != est)
 			{
-				return ResultImplPtr(new ResultImpl(_con, res));
+				return res;
 			}
 
 			//ok
@@ -238,7 +239,7 @@ namespace pgc
 		};
 
 		_id = id;
-		return ResultImplPtr();
+		return NULL;
 	}
 
 	void StatementPrepImpl::unprepare()

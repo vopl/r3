@@ -2,6 +2,7 @@
 #include "select.hpp"
 #include "pgs/meta/cluster.hpp"
 #include "sdHelpers.hpp"
+#include "access.hpp"
 
 namespace pgs
 {
@@ -144,10 +145,9 @@ namespace pgs
 			}
 
 			//////////////////////////////////////////////////////////////////////////
-			pgc::Statement pg = cluster->con().prep(sql);
-
-			assert(0);
-			return Statement_ptr();
+			Statement_ptr stm(new Statement(Access<pgc::Connection>(cluster->con()).impl(), state._name2idx));
+			stm->sql(sql);
+			return stm;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

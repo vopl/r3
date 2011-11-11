@@ -6,10 +6,9 @@ namespace pgs
 	namespace impl
 	{
 		//////////////////////////////////////////////////////////////////////////
-		Result::Result(...)
-			: pgc::ResultImpl(pgc::ConnectionImplPtr(), NULL)
+		Result::Result(pgc::ConnectionImplPtr con, PGresult *pgres)
+			: pgc::ResultImpl(con, pgres)
 		{
-			assert(0);
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace pgs
 			: public pgc::ResultImpl
 		{
 		public:
-			Result(...);
+			Result(pgc::ConnectionImplPtr con, PGresult *pgres);
 		};
 		typedef boost::shared_ptr<Result> Result_ptr;
 	}

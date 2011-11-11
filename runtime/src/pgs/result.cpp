@@ -5,8 +5,8 @@
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Result::Result(...)
+	Result::Result(Impl_ptr impl)
+		: pgc::Result(impl)
 	{
-		assert(0);
 	}
 }

@@ -20,8 +20,8 @@ namespace pgs
 	protected:
 		typedef impl::Result_ptr Impl_ptr;
 
-	public:
-		Result(...);
+		friend class Statement;
+		Result(Impl_ptr impl);
 	};
 }
 #endif

@@ -20,8 +20,9 @@ namespace pgs
 	protected:
 		typedef impl::Statement_ptr Impl_ptr;
 
+		friend class Select;
+		Statement(Impl_ptr impl);
 	public:
-		Statement(...);
 
 // 		template <class T> Statement &bind(T const &v, const std::string &name);
 // 		template <class T> Statement &bind(T const *pv, const std::string &name);

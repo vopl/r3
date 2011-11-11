@@ -21,6 +21,11 @@ namespace pgc
 		_con.reset();
 	}
 
+	ConnectionImplPtr StatementImpl::con()
+	{
+		return _con;
+	}
+
 	void StatementImpl::sql(const char *sql)
 	{
 		_sql = sql;
@@ -164,14 +169,14 @@ namespace pgc
 		}
 	}
 
-	ResultImplPtr StatementImpl::exec()
+	PGresult *StatementImpl::exec()
 	{
 		_con->doLogExec(_sql);
 
-		ResultImplPtr res;
+		PGresult *res = NULL;
 		if(_bindTyp.empty())
 		{
-			res.reset(new ResultImpl(_con, PQexecParams(
+			res = PQexecParams(
 				_con->_pgcon,
 				_sql.c_str(),
 				0,
@@ -179,7 +184,7 @@ namespace pgc
 				0,
 				0,
 				0,
-				1)));
+				1);
 		}
 		else
 		{
@@ -190,7 +195,7 @@ namespace pgc
 				_bindTyp.size() == _bindFmt.size() &&
 				_bindTyp.size() == _bindOwn.size());
 
-			res.reset(new ResultImpl(_con, PQexecParams(
+			res = PQexecParams(
 				_con->_pgcon,
 				_sql.c_str(),
 				_bindTyp.size(),
@@ -198,7 +203,7 @@ namespace pgc
 				&_bindVal[0],
 				&_bindLen[0],
 				&_bindFmt[0],
-				1)));
+				1);
 		}
 		_con->doLogError(_sql, res);
 

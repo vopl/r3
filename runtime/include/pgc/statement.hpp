@@ -19,7 +19,6 @@ namespace pgc
 		Statement(StatementImplPtr impl);
 
 	public:
-		Statement();
 		~Statement();
 
 		Statement &sql(const char *csz);

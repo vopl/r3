@@ -29,6 +29,8 @@ namespace pgc
 		StatementImpl(ConnectionImplPtr con);
 		virtual ~StatementImpl();
 
+		ConnectionImplPtr con();
+
 		void sql(const char *sql);
 		void sql(const std::string &sql);
 
@@ -36,7 +38,7 @@ namespace pgc
 
 		virtual void bind(int typCpp, void const *valCpp, size_t idx);
 		virtual void unbind(size_t idx);
-		virtual ResultImplPtr exec();
+		virtual PGresult *exec();
 
 	protected:
 		bool bindFiller(
