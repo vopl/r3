@@ -13,16 +13,14 @@ namespace pgs
 		class Value
 			: public impl::Expression
 		{
-			std::string				_srcAlias;
 			std::string				_alias;
 
 			Value(const Value &);
 			void operator=(const Value &);
 
 		public:
-			Value(const std::string &alias, const std::string &srcAlias);
+			Value(const std::string &alias);
 
-			const std::string &srcAlias() const;
 			const std::string &alias() const;
 
 			virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);

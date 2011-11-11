@@ -17,11 +17,16 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Cluster::setConnection(pgc::Connection con)
+	pgc::Connection Cluster::con(pgc::Connection con)
 	{
-		return _impl->setConnection(con);
+		return _impl->con(con);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	pgc::Connection Cluster::con()
+	{
+		return _impl->con();
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	bool Cluster::sync(TSyncLog &log, bool allowCreate)

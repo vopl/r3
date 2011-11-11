@@ -11,9 +11,7 @@ namespace pgs
 	{
 	public:
 
-		Value(const std::string &alias, const std::string &srcAlias="");
-
-		const std::string &srcAlias() const;
+		Value(const std::string &alias);
 		const std::string &alias() const;
 	};
 }

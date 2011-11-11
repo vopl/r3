@@ -1,27 +1,47 @@
 #include "stdafx.h"
 #include "pgs/statement.hpp"
+#include "impl/statement.hpp"
 
 namespace pgs
 {
+	//////////////////////////////////////////////////////////////////////////
+	void Statement::bindNative(int typCpp, void const *valCpp, size_t idx)
+	{
+		return _impl->bind(typCpp, valCpp, idx);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void Statement::bindNative(int typCpp, void const *valCpp, const std::string &name)
+	{
+		return _impl->bind(typCpp, valCpp, name);
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	Statement::Statement(const Impl_ptr &impl)
+		: _impl(impl)
 	{
-		assert(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Statement::bind(const std::string vname, ...)
+	Statement &Statement::unbind(size_t idx)
 	{
-		assert(0);
-		return false;
+		_impl->unbind(idx);
+		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result Statement::exec(pgc::Connection con)
+	Statement &Statement::unbind(const std::string &name)
 	{
-		assert(0);
-		return Result(impl::Result_ptr());
+		_impl->unbind(name);
+		return *this;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	Result Statement::exec()
+	{
+		return Result(_impl->exec());
 	}
 
 }

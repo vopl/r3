@@ -3,7 +3,7 @@
 
 namespace pgc
 {
-	void Statement::bindHelper(int typCpp, void const *valCpp, size_t idx)
+	void Statement::bindNative(int typCpp, void const *valCpp, size_t idx)
 	{
 		_impl->bind(typCpp, valCpp, idx);
 	}

@@ -551,9 +551,16 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Cluster::setConnection(pgc::Connection con)
+		pgc::Connection  Cluster::con(pgc::Connection con)
 		{
 			_con = con;
+			return _con;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		pgc::Connection  Cluster::con()
+		{
+			return _con;
 		}
 
 

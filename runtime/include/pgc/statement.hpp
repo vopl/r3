@@ -18,8 +18,6 @@ namespace pgc
 		friend class Connection;
 		Statement(StatementImplPtr impl);
 
-		void bindHelper(int typCpp, void const *valCpp, size_t idx);
-
 	public:
 		Statement();
 		~Statement();
@@ -28,6 +26,8 @@ namespace pgc
 		Statement &sql(const std::string &sql);
 
 		bool empty() const;
+
+		void bindNative(int typCpp, void const *valCpp, size_t idx);
 
 		template <class T> Statement &bind(T const &v, size_t idx=0);
 		template <class T> Statement &bind(T const *pv, size_t idx=0);
@@ -80,28 +80,28 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T const &v, size_t idx)
 	{
-		bindHelper(CppDataType<T>::cdt_index, &v, idx);
+		bindNative(CppDataType<T>::cdt_index, &v, idx);
 		return *this;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T const *pv, size_t idx)
 	{
-		bindHelper(CppDataType<T>::cdt_index, pv, idx);
+		bindNative(CppDataType<T>::cdt_index, pv, idx);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T &v, size_t idx)
 	{
-		bindHelper(CppDataType<T>::cdt_index, &v, idx);
+		bindNative(CppDataType<T>::cdt_index, &v, idx);
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T *pv, size_t idx)
 	{
-		bindHelper(CppDataType<T>::cdt_index, pv, idx);
+		bindNative(CppDataType<T>::cdt_index, pv, idx);
 		return *this;
 	}
 

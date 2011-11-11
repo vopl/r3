@@ -8,17 +8,10 @@ namespace pgs
 	namespace impl
 	{
 		//////////////////////////////////////////////////////////////////////////
-		Value::Value(const std::string &alias, const std::string &srcAlias)
+		Value::Value(const std::string &alias)
 			: _alias(alias)
-			, _srcAlias(srcAlias)
 		{
 
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		const std::string &Value::srcAlias() const
-		{
-			return _srcAlias;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -46,6 +39,8 @@ namespace pgs
 					res += "$";
 					char tmp[64];
 					res += utils::_ntoa(iter->second, tmp);
+
+					state._name2idx[_alias] = iter->second;
 				}
 				break;
 			default:

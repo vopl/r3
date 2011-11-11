@@ -29,6 +29,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////
 
 
+
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -67,7 +68,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	pgs::Cluster ccl(mcl);
 	ccl.setUnicators("pref", "suff");
-	ccl.setConnection(con);
+	ccl.con(con);
 
 	//con.once("BEGIN").exec();
 
@@ -136,10 +137,18 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//mysel.exec(con);
 
-	mysel.compile(ccl);
+	pgs::Statement stmt = mysel.compile(ccl);
 
-	//mysel.bind("v3", 20);
-	//mysel.exec(con);
+	stmt.bind(std::string("dgh"), "v1");
+	stmt.bind(20, "v2");
+	stmt.bind(20, "v3");
+	stmt.bind(20, "v4");
+// 	stmt.bind(std::string("dgh"));
+// 	stmt.bind(20);
+// 	stmt.bind(20);
+// 	stmt.bind(20);
+
+	stmt.exec();
 
 	return 0;
 }

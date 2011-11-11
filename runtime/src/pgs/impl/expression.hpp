@@ -13,6 +13,7 @@ namespace pgs
 		//////////////////////////////////////////////////////////////////////////
 		enum ECompileMode
 		{
+			ecmSelectPushValues,
 			ecmSelectFrom,
 			ecmSelectLink,
 			ecmSelectWhat,
@@ -26,11 +27,15 @@ namespace pgs
 		//объект состояния компиляции
 		struct SCompileState
 		{
-			impl::Cluster_ptr		_cluster;
-			std::set<std::string>	_aliases;
-			size_t					_nextCrossIndex;
+			impl::Cluster_ptr			_cluster;
+			std::set<std::string>		_aliases;
+			size_t						_nextCrossIndex;
 
 			std::map<void *, size_t>	_valueNumbers;
+
+			typedef std::map<std::string, size_t>	TMValueName2idx;
+			TMValueName2idx				_name2idx;
+
 
 			SCompileState();
 			bool checkAliasExistence(const std::string &alias, bool mustExists);

@@ -87,23 +87,20 @@ namespace pgs
 			std::deque<std::string>	limit;
 			std::deque<std::string>	offset;
 
-			{
-				SCompileState state;
-				state._cluster = cluster;
+			SCompileState state;
+			state._cluster = cluster;
 
-				mkFrom(from, state);
-				mkLinks(links, state);
+			mkFrom(from, state);
+			mkLinks(links, state);
 
-				mkWhats(whats, state);
+			mkWhats(whats, state);
 
-				mkWhere(where, state);
+			mkWhere(where, state);
 
-				mkOrders(orders, state);
+			mkOrders(orders, state);
 
-				mkLimit(limit, state);
-				mkOffset(offset, state);
-			}
-
+			mkLimit(limit, state);
+			mkOffset(offset, state);
 
 			//////////////////////////////////////////////////////////////////////////
 			sql += "SELECT ";
@@ -146,9 +143,9 @@ namespace pgs
 				sql += offset;
 			}
 
-			std::cout<<sql<<std::endl;
-			assert(0);
-			return Statement_ptr();
+			//////////////////////////////////////////////////////////////////////////
+			pgc::Statement pg = cluster->con().prep(sql);
+			return Statement_ptr(new Statement(pg, state._name2idx));
 		}
 
 		//////////////////////////////////////////////////////////////////////////
