@@ -9,19 +9,14 @@ namespace pgc
 	{
 	}
 
-	bool Result::fetchNative(int rowIdx, int colIdx, int typCpp, void *valCpp)
+	bool Result::fetchNative(int typCpp, void *valCpp, size_t rowIdx, size_t colIdx)
 	{
-		return _impl->fetch(rowIdx, colIdx, typCpp, valCpp);
+		return _impl->fetch(typCpp, valCpp, rowIdx, colIdx);
 	}
 	
-	bool Result::fetchNative(int rowIdx, const char *colName, int typCpp, void *valCpp)
+	bool Result::fetchNative(int typCpp, void *valCpp, size_t rowIdx, const char *colName)
 	{
-		return _impl->fetch(rowIdx, colName, typCpp, valCpp);
-	}
-
-	Result::Result()
-	{
-
+		return _impl->fetch(typCpp, valCpp, rowIdx, colName);
 	}
 
 	Result::~Result()
@@ -57,15 +52,15 @@ namespace pgc
 		return _impl->cmdRows();
 	}
 
-	int Result::rows()
+	size_t Result::rows()
 	{
 		return _impl->rows();
 	}
 
-	boost::int32_t Result::fetchInt32(int rowIdx, int colIdx)
+	boost::int32_t Result::fetchInt32(size_t rowIdx, size_t colIdx)
 	{
 		boost::int32_t res;
-		if(!fetch(rowIdx, colIdx, res))
+		if(!fetch(res, rowIdx, colIdx))
 		{
 			throw std::runtime_error("fetchInt failed");
 			return res;
@@ -73,10 +68,10 @@ namespace pgc
 		return res;
 	}
 
-	boost::int32_t Result::fetchInt32(int rowIdx, const char *colName)
+	boost::int32_t Result::fetchInt32(size_t rowIdx, const char *colName)
 	{
 		boost::int32_t res;
-		if(!fetch(rowIdx, colName, res))
+		if(!fetch(res, rowIdx, colName))
 		{
 			throw std::runtime_error("fetchInt failed");
 			return res;
@@ -84,10 +79,10 @@ namespace pgc
 		return res;
 	}
 
-	boost::uint32_t Result::fetchUInt32(int rowIdx, int colIdx)
+	boost::uint32_t Result::fetchUInt32(size_t rowIdx, size_t colIdx)
 	{
 		boost::uint32_t res;
-		if(!fetch(rowIdx, colIdx, res))
+		if(!fetch(res, rowIdx, colIdx))
 		{
 			throw std::runtime_error("fetchInt failed");
 			return res;
@@ -95,10 +90,10 @@ namespace pgc
 		return res;
 	}
 
-	boost::uint32_t Result::fetchUInt32(int rowIdx, const char *colName)
+	boost::uint32_t Result::fetchUInt32(size_t rowIdx, const char *colName)
 	{
 		boost::uint32_t res;
-		if(!fetch(rowIdx, colName, res))
+		if(!fetch(res, rowIdx, colName))
 		{
 			throw std::runtime_error("fetchInt failed");
 			return res;
@@ -106,10 +101,10 @@ namespace pgc
 		return res;
 	}
 
-	std::string Result::fetchString(int rowIdx, int colIdx)
+	std::string Result::fetchString(size_t rowIdx, size_t colIdx)
 	{
 		std::string res;
-		if(!fetch(rowIdx, colIdx, res))
+		if(!fetch(res, rowIdx, colIdx))
 		{
 			throw std::runtime_error("fetchString failed");
 			return res;
@@ -117,10 +112,10 @@ namespace pgc
 		return res;
 	}
 
-	std::string Result::fetchString(int rowIdx, const char *colName)
+	std::string Result::fetchString(size_t rowIdx, const char *colName)
 	{
 		std::string res;
-		if(!fetch(rowIdx, colName, res))
+		if(!fetch(res, rowIdx, colName))
 		{
 			throw std::runtime_error("fetchString failed");
 			return res;
@@ -128,12 +123,12 @@ namespace pgc
 		return res;
 	}
 
-	bool Result::isNull(int rowIdx, int colIdx)
+	bool Result::isNull(size_t rowIdx, size_t colIdx)
 	{
 		return _impl->isNull(rowIdx, colIdx);
 	}
 
-	bool Result::isNull(int rowIdx, const char *colName)
+	bool Result::isNull(size_t rowIdx, const char *colName)
 	{
 		return _impl->isNull(rowIdx, colName);
 	}

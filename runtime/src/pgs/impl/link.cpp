@@ -73,7 +73,7 @@ namespace pgs
 					res += "=";
 					res += crossAlias;
 					res += ".";
-					res += _metaRelatioEnd->_isInput?"output_id":"input_id";
+					res += _metaRelatioEnd->_isInput?"input_id":"output_id";
 
 
 
@@ -86,7 +86,7 @@ namespace pgs
 
 					res += crossAlias;
 					res += ".";
-					res += _metaRelatioEnd->_isInput?"input_id":"output_id";
+					res += _metaRelatioEnd->_isInput?"output_id":"input_id";
 					res += "=";
 					res += alias;
 					res += ".id";

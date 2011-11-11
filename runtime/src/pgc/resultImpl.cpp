@@ -147,16 +147,16 @@ namespace pgc
 		}
 		return 0;
 	}
-	int ResultImpl::rows()
+	size_t ResultImpl::rows()
 	{
 		if(_pgres)
 		{
-			return PQntuples(_pgres);
+			return (size_t)PQntuples(_pgres);
 		}
 		return 0;
 	}
 
-	bool ResultImpl::fetch(int rowIdx, int colIdx, int typCpp, void *valCpp)
+	bool ResultImpl::fetch(int typCpp, void *valCpp, size_t rowIdx, size_t colIdx)
 	{
 		if(!_pgres)
 		{
@@ -172,7 +172,7 @@ namespace pgc
 
 		return (this->*_extractors[colIdx]._meth)(rowIdx, colIdx, typCpp, valCpp);
 	}
-	bool ResultImpl::fetch(int rowIdx, const char *colName, int typCpp, void *valCpp)
+	bool ResultImpl::fetch(int typCpp, void *valCpp, size_t rowIdx, const char *colName)
 	{
 		if(_pgres)
 		{
@@ -182,13 +182,13 @@ namespace pgc
 				return false;
 			}
 
-			return fetch(rowIdx, (size_t)cn, typCpp, valCpp);
+			return fetch(typCpp, valCpp, rowIdx, (size_t)cn);
 		}
 		return false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ResultImpl::isNull(int rowIdx, int colIdx)
+	bool ResultImpl::isNull(size_t rowIdx, size_t colIdx)
 	{
 		if(!_pgres)
 		{
@@ -199,7 +199,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ResultImpl::isNull(int rowIdx, const char *colName)
+	bool ResultImpl::isNull(size_t rowIdx, const char *colName)
 	{
 		if(_pgres)
 		{

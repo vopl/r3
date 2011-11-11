@@ -25,8 +25,8 @@ namespace pgc
 		Result(ResultImplPtr impl);
 
 	public:
-		bool fetchNative(int rowIdx, int colIdx, int typCpp, void *valCpp);
-		bool fetchNative(int rowIdx, const char *colName, int typCpp, void *valCpp);
+		bool fetchNative(int typCpp, void *valCpp, size_t rowIdx, size_t colIdx);
+		bool fetchNative(int typCpp, void *valCpp, size_t rowIdx, const char *colName);
 
 	public:
 		~Result();
@@ -37,34 +37,34 @@ namespace pgc
 		Result &throwIfError();
 
 		size_t cmdRows();
-		int rows();
-		template <class T> bool fetch(int rowIdx, int colIdx, T &v);
-		template <class T> bool fetch(int rowIdx, const char *colName, T &v);
+		size_t rows();
+		template <class T> bool fetch(T &v, size_t rowIdx=0, size_t colIdx=0);
+		template <class T> bool fetch(T &v, size_t rowIdx, const char *colName);
 
-		boost::int32_t fetchInt32(int rowIdx, int colIdx);
-		boost::int32_t fetchInt32(int rowIdx, const char *colName);
+		boost::int32_t fetchInt32(size_t rowIdx=0, size_t colIdx=0);
+		boost::int32_t fetchInt32(size_t rowIdx, const char *colName);
 
-		boost::uint32_t fetchUInt32(int rowIdx, int colIdx);
-		boost::uint32_t fetchUInt32(int rowIdx, const char *colName);
+		boost::uint32_t fetchUInt32(size_t rowIdx=0, size_t colIdx=0);
+		boost::uint32_t fetchUInt32(size_t rowIdx, const char *colName);
 
-		std::string fetchString(int rowIdx, int colIdx);
-		std::string fetchString(int rowIdx, const char *colName);
+		std::string fetchString(size_t rowIdx=0, size_t colIdx=0);
+		std::string fetchString(size_t rowIdx, const char *colName);
 
-		bool isNull(int rowIdx, int colIdx);
-		bool isNull(int rowIdx, const char *colName);
+		bool isNull(size_t rowIdx=0, size_t colIdx=0);
+		bool isNull(size_t rowIdx, const char *colName);
 	};
 	typedef boost::shared_ptr<Result> ResultPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class T> bool Result::fetch(int rowIdx, int colIdx, T &v)
+	template <class T> bool Result::fetch(T &v, size_t rowIdx, size_t colIdx)
 	{
-		return fetchNative(rowIdx, colIdx, CppDataType<T>::cdt_index, &v);
+		return fetchNative(CppDataType<T>::cdt_index, &v, rowIdx, colIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class T> bool Result::fetch(int rowIdx, const char *colName, T &v)
+	template <class T> bool Result::fetch(T &v, size_t rowIdx, const char *colName)
 	{
-		return fetchNative(rowIdx, colName, CppDataType<T>::cdt_index, &v);
+		return fetchNative(CppDataType<T>::cdt_index, &v, rowIdx, colName);
 	}
 
 }

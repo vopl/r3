@@ -63,7 +63,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//////////////////////////////////////////////////////////////////////////
 	pgc::Connection con;
-	//con.log(std::cout, pgc::lf_all);
+	con.log(std::cout, pgc::lf_all);
 	con.open("dbname=test user=postgres password=postgres port=5432");
 
 	pgs::Cluster ccl(mcl);
@@ -73,7 +73,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//con.once("BEGIN").exec();
 
 	pgs::TSyncLog log;
-	bool bc = ccl.sync(log, true);
+	bool bc = true;//ccl.sync(log, true);
 	bool bd = true;//ccl->drop(log);
 
 	std::cout<<bc<<", "<<bd<<std::endl;
@@ -115,14 +115,34 @@ int _tmain(int argc, _TCHAR* argv[])
 // 	stmt.bind(20, "v2");
 // 	stmt.bind(20, "v3");
 // 	stmt.bind(20, "v4");
-	stmt.bind(std::string("dgh"));
-	stmt.bind(20);
-	stmt.bind(20);
-	stmt.bind(20);
+	stmt.bind(std::string("a"));
+	stmt.bind(20, "v2");
+	stmt.bind(20, "v3");
+	stmt.bind(0, "v4");
 
 	pgs::Result r = stmt.exec();
 
 	std::cout<<r.rows()<<std::endl;
+
+// 	std::cout<<r.fetchString(0)<<std::endl;
+// 	std::cout<<r.fetchString(0,1)<<std::endl;
+// 	std::cout<<r.fetchString(0,2)<<std::endl;
+// 	std::cout<<r.fetchString(0,3)<<std::endl;
+// 	std::cout<<r.fetchString(0,4)<<std::endl;
+// 	std::cout<<r.fetchString(0,5)<<std::endl;
+// 	std::cout<<r.fetchString(0,6)<<std::endl;
+// 	std::cout<<r.fetchString(0,7)<<std::endl;
+// 	std::cout<<r.fetchString(0,8)<<std::endl;
+
+	std::cout<<r.fetchString(0, "tableoid")<<std::endl;
+	std::cout<<r.fetchString(0, "id")<<std::endl;
+	std::cout<<r.fetchString(0, "sex")<<std::endl;
+	std::cout<<r.fetchString(0, "birth")<<std::endl;
+	std::cout<<r.fetchString(0, "photo")<<std::endl;
+	std::cout<<r.fetchString(0, "name")<<std::endl;
+	std::cout<<r.fetchString(0, "middlename")<<std::endl;
+	std::cout<<r.fetchString(0, "surname")<<std::endl;
+	std::cout<<r.fetchString(0, "name")<<std::endl;
 
 	return 0;
 }

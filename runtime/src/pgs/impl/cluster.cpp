@@ -182,7 +182,7 @@ namespace pgs
 				.exec(schemaName(s, false, false))
 				.throwIfError();
 
-			if(!pgr.fetchInt32(0,0))
+			if(!pgr.fetchInt32())
 			{
 				log.push_back(SyncLogLine("schema absent", schemaName(s, false, false)));
 
@@ -208,13 +208,13 @@ namespace pgs
 				log.push_back(SyncLogLine("obtain schema oid failed", schemaName(s, false, false)));
 				return false;
 			}
-			TOid oid = pgr.fetchUInt32(0, 0);
+			TOid oid = pgr.fetchUInt32();
 			_schema2oid[s] = oid;
 			_oid2schema[oid] = s;
 
 			//генератор идентификаторов объектов
 			pgr = _con.once("SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2").exec(schemaName(s, false, false), idGenName(s, false, false)).throwIfError();
-			if(!pgr.fetchInt32(0, 0))
+			if(!pgr.fetchInt32())
 			{
 				log.push_back(SyncLogLine("idGen absent", schemaName(s, false, false), idGenName(s, false, false)));
 
@@ -260,7 +260,7 @@ namespace pgs
 				log.push_back(SyncLogLine("obtain table oid failed", schemaName(c->_schema, false, false), tableName(c, false, false)));
 				return false;
 			}
-			TOid oid = pgr.fetchUInt32(0, 0);
+			TOid oid = pgr.fetchUInt32();
 			_cat2oid[c] = oid;
 			_oid2cat[oid] = c;
 
@@ -429,9 +429,9 @@ namespace pgs
 				.throwIfError();
 
 			std::set<TOid> baseOids;
-			for(int i(0); i<pgr.rows(); i++)
+			for(size_t i(0); i<pgr.rows(); i++)
 			{
-				baseOids.insert(pgr.fetchUInt32(i, 0));
+				baseOids.insert(pgr.fetchUInt32(i));
 			}
 
 
@@ -515,7 +515,7 @@ namespace pgs
 				.exec(schemaName(s, false, false))
 				.throwIfError();
 
-			if(pgr.fetchInt32(0,0))
+			if(pgr.fetchInt32())
 			{
 				log.push_back(SyncLogLine("schema present", schemaName(s, false, false)));
 
