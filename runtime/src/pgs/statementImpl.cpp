@@ -11,7 +11,7 @@ namespace pgs
 		{
 			assert(!"bad name");
 			throw "bad name";
-			return -1;
+			return (size_t)-1;
 		}
 		return iter->second;
 	}

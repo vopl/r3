@@ -111,10 +111,10 @@ namespace pgc
 			*(double *)valCpp = VAL;
 			return true;
 		case CppDataType<boost::int8_t>::cdt_index:
-			*(boost::int8_t *)valCpp = VAL;
+			*(boost::int8_t *)valCpp = (boost::int8_t)VAL;
 			return true;
 		case CppDataType<boost::int16_t>::cdt_index:
-			*(boost::int16_t *)valCpp = VAL;
+			*(boost::int16_t *)valCpp = (boost::int16_t)VAL;
 			return true;
 		case CppDataType<boost::int32_t>::cdt_index:
 			*(boost::int32_t *)valCpp = VAL;
@@ -123,10 +123,10 @@ namespace pgc
 			*(boost::int64_t *)valCpp = VAL;
 			return true;
 		case CppDataType<boost::uint8_t>::cdt_index:
-			*(boost::uint8_t *)valCpp = VAL;
+			*(boost::uint8_t *)valCpp = (boost::uint8_t)VAL;
 			return true;
 		case CppDataType<boost::uint16_t>::cdt_index:
-			*(boost::uint16_t *)valCpp = VAL;
+			*(boost::uint16_t *)valCpp = (boost::uint16_t)VAL;
 			return true;
 		case CppDataType<boost::uint32_t>::cdt_index:
 			*(boost::uint32_t *)valCpp = VAL;
@@ -1683,50 +1683,41 @@ namespace pgc
 			return true;
 		case CppDataType<std::bitset<8> >::cdt_index:
 			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 				impl::bits2Bitset(*(std::bitset<8>*)valCpp, v.amount, v.bits);
 			}
 			return true;
 		case CppDataType<std::bitset<16> >::cdt_index:
 			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 				impl::bits2Bitset(*(std::bitset<16>*)valCpp, v.amount, v.bits);
 			}
 			return true;
 		case CppDataType<std::bitset<32> >::cdt_index:
 			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 				impl::bits2Bitset(*(std::bitset<32>*)valCpp, v.amount, v.bits);
 			}
 			return true;
 		case CppDataType<std::bitset<64> >::cdt_index:
 			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 				impl::bits2Bitset(*(std::bitset<64>*)valCpp, v.amount, v.bits);
 			}
 			return true;
 		case CppDataType<std::bitset<128> >::cdt_index:
 			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 				impl::bits2Bitset(*(std::bitset<128>*)valCpp, v.amount, v.bits);
 			}
 			return true;
 		case CppDataType<std::bitset<256> >::cdt_index:
 			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 				impl::bits2Bitset(*(std::bitset<256>*)valCpp, v.amount, v.bits);
 			}
 			return true;
 		case CppDataType<std::bitset<512> >::cdt_index:
 			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
 				impl::bits2Bitset(*(std::bitset<512>*)valCpp, v.amount, v.bits);
 			}
 			return true;
 		case CppDataType<std::vector<unsigned char> >::cdt_index:
 			{
-				int lenDb = PQgetlength(_pgres, rowIdx, colIdx);
-
 				std::vector<unsigned char> &vec = (*(std::vector<unsigned char> *)valCpp);
 				vec.assign((unsigned char *)v.bits, (unsigned char *)v.bits + ((v.amount%8)?(v.amount/8+1):(v.amount/8)));
 
@@ -1776,10 +1767,10 @@ namespace pgc
 			*(double *)valCpp = VAL;
 			return true;
 		case CppDataType<boost::int8_t>::cdt_index:
-			*(boost::int8_t *)valCpp = VAL;
+			*(boost::int8_t *)valCpp = (boost::int8_t)VAL;
 			return true;
 		case CppDataType<boost::int16_t>::cdt_index:
-			*(boost::int16_t *)valCpp = VAL;
+			*(boost::int16_t *)valCpp = (boost::int16_t)VAL;
 			return true;
 		case CppDataType<boost::int32_t>::cdt_index:
 			*(boost::int32_t *)valCpp = VAL;
@@ -1788,10 +1779,10 @@ namespace pgc
 			*(boost::int64_t *)valCpp = VAL;
 			return true;
 		case CppDataType<boost::uint8_t>::cdt_index:
-			*(boost::uint8_t *)valCpp = VAL;
+			*(boost::uint8_t *)valCpp = (boost::uint8_t)VAL;
 			return true;
 		case CppDataType<boost::uint16_t>::cdt_index:
-			*(boost::uint16_t *)valCpp = VAL;
+			*(boost::uint16_t *)valCpp = (boost::uint16_t)VAL;
 			return true;
 		case CppDataType<boost::uint32_t>::cdt_index:
 			*(boost::uint32_t *)valCpp = VAL;
@@ -1815,7 +1806,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ResultImpl::extractor_null			(int rowIdx, int colIdx, int typCpp, void *valCpp)
+	bool ResultImpl::extractor_null			(int /*rowIdx*/, int /*colIdx*/, int /*typCpp*/, void * /*valCpp*/)
 	{
 		return false;
 	}

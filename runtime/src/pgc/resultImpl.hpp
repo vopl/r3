@@ -59,11 +59,11 @@ namespace pgc
 		size_t cmdRows();
 
 		size_t rows();
-		bool fetch(int typCpp, void *valCpp, size_t rowIdx, size_t colIdx);
-		bool fetch(int typCpp, void *valCpp, size_t rowIdx, const char *colName);
+		bool fetch(int typCpp, void *valCpp, size_t colIdx, size_t rowIdx);
+		bool fetch(int typCpp, void *valCpp, const char *colName, size_t rowIdx);
 
-		bool isNull(size_t rowIdx, size_t colIdx);
-		bool isNull(size_t rowIdx, const char *colName);
+		bool isNull(size_t colIdx, size_t rowIdx);
+		bool isNull(const char *colName, size_t rowIdx);
 
 	};
 

@@ -134,15 +134,15 @@ int _tmain(int argc, _TCHAR* argv[])
 // 	std::cout<<r.fetchString(0,7)<<std::endl;
 // 	std::cout<<r.fetchString(0,8)<<std::endl;
 
-	std::cout<<r.fetchString(0, "tableoid")<<std::endl;
-	std::cout<<r.fetchString(0, "id")<<std::endl;
-	std::cout<<r.fetchString(0, "sex")<<std::endl;
-	std::cout<<r.fetchString(0, "birth")<<std::endl;
-	std::cout<<r.fetchString(0, "photo")<<std::endl;
-	std::cout<<r.fetchString(0, "name")<<std::endl;
-	std::cout<<r.fetchString(0, "middlename")<<std::endl;
-	std::cout<<r.fetchString(0, "surname")<<std::endl;
-	std::cout<<r.fetchString(0, "name")<<std::endl;
+	std::cout<<r.fetchString(0)<<std::endl;
+	std::cout<<r.fetchString("id")<<std::endl;
+	std::cout<<r.fetchString("sex")<<std::endl;
+	std::cout<<r.fetchString("birth")<<std::endl;
+	std::cout<<r.fetchString("photo")<<std::endl;
+	std::cout<<r.fetchString("name")<<std::endl;
+	std::cout<<r.fetchString("middlename")<<std::endl;
+	std::cout<<r.fetchString("surname")<<std::endl;
+	std::cout<<r.fetchString("name")<<std::endl;
 
 	return 0;
 }

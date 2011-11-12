@@ -71,7 +71,7 @@ protected:
 	{
 		std::string val;
 
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 #define STR_EQUAL(x,y) CPPUNIT_ASSERT_EQUAL( std::string(x), y );
 
 		CPPUNIT_ASSERT( SQL("-123::int2") );
@@ -160,7 +160,7 @@ protected:
 	{
 		bool val;
 
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( SQL("-123::int2") );
 		CPPUNIT_ASSERT_EQUAL( true, val );
@@ -271,7 +271,7 @@ protected:
 	{
 		float val;
 
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( SQL("-123::int2") );
 		CPPUNIT_ASSERT_DOUBLES_EQUAL( -123.0f, val, 1e-5 );
@@ -359,7 +359,7 @@ protected:
 	{
 		double val;
 
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( SQL("-123::int2") );
 		CPPUNIT_ASSERT_DOUBLES_EQUAL( -123.0, val, 1e-5 );
@@ -439,7 +439,7 @@ protected:
 	{
 		T val;
 
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( SQL("123::int2") );
 		CPPUNIT_ASSERT_EQUAL( (T)123, val );
@@ -527,7 +527,7 @@ protected:
 	{
 		std::tm val;
 
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( !SQL("-123::int2") );
 
@@ -645,7 +645,7 @@ protected:
 		std::bitset<512> val512;
 
 #undef SQL
-#define SQL(x, v) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,v)
+#define SQL(x, v) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(v,0,0)
 
 		CPPUNIT_ASSERT( !SQL("-123::int2", val8) );
 		CPPUNIT_ASSERT( !SQL("0::int4", val8) );
@@ -775,7 +775,7 @@ protected:
 		std::vector<char> val;
 
 #undef SQL
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( !SQL("-123::int2") );
 		CPPUNIT_ASSERT( !SQL("0::int4") );
@@ -860,7 +860,7 @@ protected:
 		boost::gregorian::date val;
 
 #undef SQL
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( !SQL("-123::int2") );
 		CPPUNIT_ASSERT( !SQL("0::int4") );
@@ -929,7 +929,7 @@ protected:
 		boost::posix_time::ptime val;
 
 #undef SQL
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( !SQL("-123::int2") );
 		CPPUNIT_ASSERT( !SQL("0::int4") );
@@ -1014,7 +1014,7 @@ protected:
 		boost::gregorian::date_duration val;
 
 #undef SQL
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( !SQL("-123::int2") );
 		CPPUNIT_ASSERT( !SQL("0::int4") );
@@ -1080,7 +1080,7 @@ protected:
 		boost::posix_time::time_duration val;
 
 #undef SQL
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( !SQL("-123::int2") );
 		CPPUNIT_ASSERT( !SQL("0::int4") );
@@ -1173,7 +1173,7 @@ protected:
 		pgc::DateTimeDuration val;
 
 #undef SQL
-#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(0,0,val)
+#define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)
 
 		CPPUNIT_ASSERT( !SQL("-123::int2") );
 		CPPUNIT_ASSERT( !SQL("0::int4") );

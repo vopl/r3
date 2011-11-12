@@ -60,7 +60,7 @@ protected:
 		std::string res;
 
 #undef SQL
-#define SQL(x, val) _con.once().sql("SELECT " x).bind(val).exec().throwIfError().fetch(0,0,res)
+#define SQL(x, val) _con.once().sql("SELECT " x).bind(val).exec().throwIfError().fetch(res,0,0)
 
 		CPPUNIT_ASSERT( SQL("$1::varchar", std::string("sdflgjkwer")) );
 		CPPUNIT_ASSERT_EQUAL( std::string("sdflgjkwer"), res );
