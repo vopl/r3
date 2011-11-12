@@ -26,58 +26,12 @@ using namespace std;
 #include "pgs/category.hpp"
 #include "pgs/link.hpp"
 
-#include <boost/variant.hpp>
 //////////////////////////////////////////////////////////////////////////
-#include <map>
 
-class VarClass
-	: public boost::make_recursive_variant <
-
-		  std::string
-		, float
-		, double
-		, boost::int8_t
-		, boost::int16_t
-		, boost::int32_t
-		, boost::int64_t
-		, boost::uint8_t
-		, boost::uint16_t
-		, boost::uint32_t
-		, boost::uint64_t
-		, std::vector<char>
-		, boost::gregorian::date
-		, boost::posix_time::ptime
-		, std::vector<VarClass>
-		, std::map<std::string, VarClass>
-
-	> ::type
-{
-public:
-	VarClass();
-	VarClass(const VarClass &);
-	template<typename T> VarClass(const T &);
-
-
-	void swap(variant &);
-	VarClass & operator=(const VarClass &);
-	template<typename T> variant & operator=(const T &);
-
-// 	// queries
-// 	int which() const;
-// 	bool empty() const;
-// 	const std::type_info & type() const;
-
-	template<typename T> T &as();
-	template<typename T> bool is();
-
-};
-
-VarClass v;
 
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
-	VarClass v2;
 	return 0;
 
 

@@ -225,10 +225,22 @@
 			Name="includes"
 			>
 			<Filter
-				Name="pgs"
+				Name="utils"
 				>
 				<File
-					RelativePath=".\include\pgs\recordset.hpp"
+					RelativePath="..\include\utils\data.hpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="src"
+			>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\src\utils\data.cpp"
 					>
 				</File>
 			</Filter>
