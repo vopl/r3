@@ -49,10 +49,17 @@ namespace pgc
 
 		bool fetch(utils::Variant &v, int colIdx=0, size_t rowIdx=0);
 		bool fetch(utils::Variant &v, const char *colName, size_t rowIdx=0);
-		bool fetchArray(utils::Variant::VectorVariant &v, size_t rowIdx=0);
+
+		template <class SequenceVariant>
+		bool fetchList(SequenceVariant &v, size_t rowIdx=0);
+
 		bool fetchMap(utils::Variant::MapStringVariant &v, size_t rowIdx=0);
-		bool fetchArrays(utils::Variant::VectorVariant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
-		bool fetchMaps(utils::Variant::VectorVariant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+
+		template <class SequenceVariant>
+		bool fetchLists(SequenceVariant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+
+		template <class SequenceVariant>
+		bool fetchMaps(SequenceVariant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 
 		boost::int32_t fetchInt32(int colIdx=0, size_t rowIdx=0);
 		boost::int32_t fetchInt32(const char *colName, size_t rowIdx=0);
@@ -80,5 +87,94 @@ namespace pgc
 		return fetchNative(CppDataType<T>::cdt_index, &v, colName, rowIdx);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	template <class SequenceVariant>
+	bool Result::fetchList(SequenceVariant &v, size_t rowIdx)
+	{
+		size_t columns = this->columns();
+		v.resize(columns);
+
+		SequenceVariant::const_iterator iter = v.begin();
+		for(size_t colIdx(0); colIdx<columns; colIdx++)
+		{
+			utils::Variant &rv = *iter;
+			if(isNull(colIdx, rowIdx))
+			{
+				rv.clear();
+			}
+			else
+			{
+				if(!fetch(rv, colIdx, rowIdx))
+				{
+					return false;
+				}
+			}
+			iter++;
+		}
+
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class SequenceVariant>
+	bool Result::fetchLists(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		size_t columns = this->columns();
+		if(rowEndIdx > columns) 
+		{
+			rowEndIdx = columns;
+		}
+
+		if(rowBeginIdx>=rowEndIdx)
+		{
+			v.clear();
+			return true;
+		}
+
+		v.resize(rowEndIdx - rowBeginIdx);
+		SequenceVariant::const_iterator iter = v.begin();
+		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
+		{
+			utils::Variant &rv = *iter;
+			rv.forceType(utils::Variant::etVectorVariant);
+			if(!fetchList(rv.as<SequenceVariant>(), rowIdx))
+			{
+				return false;
+			}
+			iter++;
+		}
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class SequenceVariant>
+	bool Result::fetchMaps(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		size_t columns = this->columns();
+		if(rowEndIdx > columns) 
+		{
+			rowEndIdx = columns;
+		}
+
+		if(rowBeginIdx>=rowEndIdx)
+		{
+			v.clear();
+			return true;
+		}
+
+		v.resize(rowEndIdx - rowBeginIdx);
+		SequenceVariant::const_iterator iter = v.begin();
+		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
+		{
+			utils::Variant &rv = v[rowIdx];
+			rv.forceType(utils::Variant::etMapStringVariant);
+			if(!fetchMap(rv.as<utils::Variant::MapStringVariant>(), rowIdx))
+			{
+				return false;
+			}
+			iter++;
+		}
+		return true;
+	}
 }
 #endif

@@ -518,31 +518,31 @@ ENUMTYPES
 
 }
 
-
-
-#include <boost/variant.hpp>
-
-#include <iostream>
-int f()
-{
-
-
-#define ENUMTYPES_ONE(T) std::cout<< # T <<":\t"<<sizeof(utils::Variant::T)<<std::endl;
-	ENUMTYPES
-#undef ENUMTYPES_ONE
-
-	std::cout<< "Variant" <<":\t"<<sizeof(utils::Variant)<<std::endl;
-
-	typedef boost::variant<char, std::string, std::bitset<512> > BV;
-
-	std::cout<< "BV" <<":\t"<<sizeof(BV)<<std::endl;
-
-
-	//////////////////////////////////////////////////////////////////////////
-	utils::Variant::SetVariant sv;
-	sv.insert(utils::Variant());
-
-	return 220;
-}
-static int i = f();
-
+// 
+// 
+// #include <boost/variant.hpp>
+// 
+// #include <iostream>
+// int f()
+// {
+// 
+// 
+// #define ENUMTYPES_ONE(T) std::cout<< # T <<":\t"<<sizeof(utils::Variant::T)<<std::endl;
+// 	ENUMTYPES
+// #undef ENUMTYPES_ONE
+// 
+// 	std::cout<< "Variant" <<":\t"<<sizeof(utils::Variant)<<std::endl;
+// 
+// 	typedef boost::variant<char, std::string, std::bitset<512> > BV;
+// 
+// 	std::cout<< "BV" <<":\t"<<sizeof(BV)<<std::endl;
+// 
+// 
+// 	//////////////////////////////////////////////////////////////////////////
+// 	utils::Variant::SetVariant sv;
+// 	sv.insert(utils::Variant());
+// 
+// 	return 220;
+// }
+// static int i = f();
+// 

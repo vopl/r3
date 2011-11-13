@@ -32,7 +32,9 @@ namespace pgc
 		template <class T> Statement &bind(T const &v, size_t idx=0);
 		template <class T> Statement &bind(T const *pv, size_t idx=0);
 		Statement &bind(const utils::Variant &v, size_t idx=0);
-		Statement &bindMany(const utils::Variant::VectorVariant &v, size_t idx=0);
+
+		template <class SequenceVariant> 
+		Statement &bindList(const SequenceVariant &v, size_t idx=0);
 
 		Statement &unbind(size_t idx=0);
 
@@ -99,5 +101,27 @@ namespace pgc
 
 		return *this;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class SequenceVariant> 
+	Statement &Statement::bindList(const SequenceVariant &v, size_t idx)
+	{
+		SequenceVariant::const_iterator iter = v.begin();
+		SequenceVariant::const_iterator end = v.end();
+
+		for(; iter!=end; iter++)
+		{
+			if(!bindNative(iter->type(), iter->data(), idx))
+			{
+				throw std::invalid_argument("for Statement::bindList");
+			}
+			if(idx)
+			{
+				idx++;
+			}
+		}
+		return *this;
+	}
+
 }
 #endif

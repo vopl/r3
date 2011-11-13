@@ -52,26 +52,6 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement &Statement::bindMany(const utils::Variant::VectorVariant &v, size_t idx)
-	{
-		utils::Variant::VectorVariant::const_iterator iter = v.begin();
-		utils::Variant::VectorVariant::const_iterator end = v.end();
-
-		for(; iter!=end; iter++)
-		{
-			if(!bindNative(iter->type(), iter->data(), idx))
-			{
-				throw std::invalid_argument("for Statement::bindMany");
-			}
-			if(idx)
-			{
-				idx++;
-			}
-		}
-		return *this;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	Statement &Statement::unbind(size_t idx)
 	{
 		_impl->unbind(idx);

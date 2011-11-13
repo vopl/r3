@@ -129,30 +129,6 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchArray(utils::Variant::VectorVariant &v, size_t rowIdx)
-	{
-		size_t columns = this->columns();
-		v.resize(columns);
-
-		for(size_t colIdx(0); colIdx<columns; colIdx++)
-		{
-			if(isNull(colIdx, rowIdx))
-			{
-				v[colIdx].clear();
-			}
-			else
-			{
-				if(!fetch(v[colIdx], colIdx, rowIdx))
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	bool Result::fetchMap(utils::Variant::MapStringVariant &v, size_t rowIdx)
 	{
 		size_t columns = this->columns();
@@ -173,62 +149,6 @@ namespace pgc
 			}
 		}
 
-		return true;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchArrays(utils::Variant::VectorVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
-	{
-		size_t columns = this->columns();
-		if(rowEndIdx > columns) 
-		{
-			rowEndIdx = columns;
-		}
-
-		if(rowBeginIdx>=rowEndIdx)
-		{
-			v.clear();
-			return true;
-		}
-
-		v.resize(rowEndIdx - rowBeginIdx);
-		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
-		{
-			utils::Variant &rv = v[rowIdx];
-			rv.forceType(utils::Variant::etVectorVariant);
-			if(!fetchArray(rv.as<utils::Variant::VectorVariant>(), rowIdx))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchMaps(utils::Variant::VectorVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
-	{
-		size_t columns = this->columns();
-		if(rowEndIdx > columns) 
-		{
-			rowEndIdx = columns;
-		}
-
-		if(rowBeginIdx>=rowEndIdx)
-		{
-			v.clear();
-			return true;
-		}
-
-		v.resize(rowEndIdx - rowBeginIdx);
-		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
-		{
-			utils::Variant &rv = v[rowIdx];
-			rv.forceType(utils::Variant::etMapStringVariant);
-			if(!fetchMap(rv.as<utils::Variant::MapStringVariant>(), rowIdx))
-			{
-				return false;
-			}
-		}
 		return true;
 	}
 
