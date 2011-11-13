@@ -4,9 +4,9 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	void Statement::bindNative(int typCpp, void const *valCpp, size_t idx)
+	bool Statement::bindNative(int typCpp, void const *valCpp, size_t idx)
 	{
-		_impl->bind(typCpp, valCpp, idx);
+		return _impl->bind(typCpp, valCpp, idx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,10 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	Statement &Statement::bind(const utils::Variant &v, size_t idx)
 	{
-		bindNative(v.type(), v.data(), idx);
+		if(!bindNative(v.type(), v.data(), idx))
+		{
+			throw std::invalid_argument("for Statement::bind");
+		}
 		return *this;
 	}
 
@@ -56,7 +59,10 @@ namespace pgc
 
 		for(; iter!=end; iter++)
 		{
-			bindNative(iter->type(), iter->data(), idx);
+			if(!bindNative(iter->type(), iter->data(), idx))
+			{
+				throw std::invalid_argument("for Statement::bindMany");
+			}
 			if(idx)
 			{
 				idx++;

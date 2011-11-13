@@ -27,7 +27,7 @@ namespace pgc
 
 		bool empty() const;
 
-		void bindNative(int typCpp, void const *valCpp, size_t idx);
+		bool bindNative(int typCpp, void const *valCpp, size_t idx);
 
 		template <class T> Statement &bind(T const &v, size_t idx=0);
 		template <class T> Statement &bind(T const *pv, size_t idx=0);
@@ -81,14 +81,22 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T const &v, size_t idx)
 	{
-		bindNative(CppDataType<T>::cdt_index, &v, idx);
+		if(!bindNative(CppDataType<T>::cdt_index, &v, idx))
+		{
+			assert(!"bad variant type");
+			throw "bad type";
+		}
 		return *this;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T const *pv, size_t idx)
 	{
-		bindNative(CppDataType<T>::cdt_index, pv, idx);
+		if(!bindNative(CppDataType<T>::cdt_index, pv, idx))
+		{
+			throw std::invalid_argument("for Statement::bind");
+		}
+
 		return *this;
 	}
 }

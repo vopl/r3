@@ -182,6 +182,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\utils\dateTimeDuration.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\utils\fixEndian.hpp"
 					>
 				</File>
@@ -191,6 +195,10 @@
 				</File>
 				<File
 					RelativePath="..\include\utils\ntoa.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\utils\serialization.hpp"
 					>
 				</File>
 				<File

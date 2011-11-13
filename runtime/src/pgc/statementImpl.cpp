@@ -62,7 +62,7 @@ namespace pgc
 			}
 		}
 	}
-	void StatementImpl::bind(int typCpp, void const *valCpp, size_t idx)
+	bool StatementImpl::bind(int typCpp, void const *valCpp, size_t idx)
 	{
 		assert(
 			_bindTyp.size() == _bindVal.size() &&
@@ -70,29 +70,6 @@ namespace pgc
 			_bindTyp.size() == _bindLen.size() &&
 			_bindTyp.size() == _bindFmt.size() &&
 			_bindTyp.size() == _bindOwn.size());
-
-		if(!idx)
-		{
-			idx = _bindTyp.size();
-		}
-		else
-		{
-			//начинается с единички, надо с нуля
-			idx--;
-		}
-
-		if(idx >= _bindTyp.size())
-		{
-			_bindTyp.resize(idx+1, InvalidOid);
-			_bindVal.resize(idx+1, NULL);
-			_bindLen.resize(idx+1, 0);
-			_bindFmt.resize(idx+1, 0);
-			_bindOwn.resize(idx+1, false);
-		}
-		else
-		{
-			unbind(idx+1);
-		}
 
 		Oid	bindTyp;
 		char *bindVal;
@@ -110,12 +87,40 @@ namespace pgc
 
 		if(bf)
 		{
+
+			if(!idx)
+			{
+				idx = _bindTyp.size();
+			}
+			else
+			{
+				//начинается с единички, надо с нуля
+				idx--;
+			}
+
+			if(idx >= _bindTyp.size())
+			{
+				_bindTyp.resize(idx+1, InvalidOid);
+				_bindVal.resize(idx+1, NULL);
+				_bindLen.resize(idx+1, 0);
+				_bindFmt.resize(idx+1, 0);
+				_bindOwn.resize(idx+1, false);
+			}
+			else
+			{
+				unbind(idx+1);
+			}
+
 			_bindTyp[idx] = bindTyp;
 			_bindVal[idx] = bindVal;
 			_bindLen[idx] = bindLen;
 			_bindFmt[idx] = bindFmt;
 			_bindOwn[idx] = bindOwn;
+
+			return true;
 		}
+
+		return false;
 	}
 
 	void StatementImpl::unbind(size_t idx)

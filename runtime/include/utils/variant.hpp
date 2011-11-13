@@ -7,6 +7,10 @@
 
 #include <vector>
 #include <map>
+#include <set>
+#include <deque>
+#include <deque>
+#include <list>
 #include <bitset>
 
 namespace utils
@@ -47,6 +51,15 @@ namespace utils
 			etDateDuration,
 			etTimeDuration,
 			etDateTimeDuration,
+
+
+			etMapVariantVariant,
+			etMultimapVariantVariant,
+			etMultimapStringVariant,
+			etSetVariant,
+			etMultisetVariant,
+			etDequeVariant,
+			etListVariant,
 		};
 
 	public:
@@ -79,26 +92,35 @@ namespace utils
 		typedef boost::posix_time::time_duration	TimeDuration;
 		typedef ::utils::DateTimeDuration			DateTimeDuration;
 
+		typedef std::map<Variant, Variant>			MapVariantVariant;
+		typedef std::multimap<std::string, Variant>	MultimapStringVariant;
+		typedef std::multimap<Variant, Variant>		MultimapVariantVariant;
+		typedef std::set<Variant>					SetVariant;
+		typedef std::multiset<Variant>				MultisetVariant;
+		typedef std::deque<Variant>					DequeVariant;
+		typedef std::list<Variant>					ListVariant;
+
+
 	public:
 		template <class T> struct Type2Enum				{ static const EType et = etNull;	};
-		template <> struct Type2Enum<String>				{ static const EType et = etString;	};
+		template <> struct Type2Enum<String>			{ static const EType et = etString;	};
 		template <> struct Type2Enum<Float>				{ static const EType et = etFloat;	};
-		template <> struct Type2Enum<Double>				{ static const EType et = etDouble;	};
+		template <> struct Type2Enum<Double>			{ static const EType et = etDouble;	};
 		template <> struct Type2Enum<Int8>				{ static const EType et = etInt8;	};
 		template <> struct Type2Enum<Int16>				{ static const EType et = etInt16;	};
 		template <> struct Type2Enum<Int32>				{ static const EType et = etInt32;	};
 		template <> struct Type2Enum<Int64>				{ static const EType et = etInt64;	};
 		template <> struct Type2Enum<UInt8>				{ static const EType et = etUInt8;	};
-		template <> struct Type2Enum<UInt16>				{ static const EType et = etUInt16;	};
-		template <> struct Type2Enum<UInt32>				{ static const EType et = etUInt32;	};
-		template <> struct Type2Enum<UInt64>				{ static const EType et = etUInt64;	};
-		template <> struct Type2Enum<VectorChar>			{ static const EType et = etVectorChar;	};
+		template <> struct Type2Enum<UInt16>			{ static const EType et = etUInt16;	};
+		template <> struct Type2Enum<UInt32>			{ static const EType et = etUInt32;	};
+		template <> struct Type2Enum<UInt64>			{ static const EType et = etUInt64;	};
+		template <> struct Type2Enum<VectorChar>		{ static const EType et = etVectorChar;	};
 		template <> struct Type2Enum<Date>				{ static const EType et = etDate;	};
 		template <> struct Type2Enum<Time>				{ static const EType et = etTime;	};
 		template <> struct Type2Enum<VectorVariant>		{ static const EType et = etVectorVariant;	};
 		template <> struct Type2Enum<MapStringVariant>	{ static const EType et = etMapStringVariant;	};
 		template <> struct Type2Enum<Bool>				{ static const EType et = etBool;	};
-		template <> struct Type2Enum<Tm>					{ static const EType et = etTm;	};
+		template <> struct Type2Enum<Tm>				{ static const EType et = etTm;	};
 		template <> struct Type2Enum<Bitset8>			{ static const EType et = etBitset8;	};
 		template <> struct Type2Enum<Bitset16>			{ static const EType et = etBitset16;	};
 		template <> struct Type2Enum<Bitset32>			{ static const EType et = etBitset32;	};
@@ -109,6 +131,14 @@ namespace utils
 		template <> struct Type2Enum<DateDuration>		{ static const EType et = etDateDuration;	};
 		template <> struct Type2Enum<TimeDuration>		{ static const EType et = etTimeDuration;	};
 		template <> struct Type2Enum<DateTimeDuration>	{ static const EType et = etDateTimeDuration;	};
+
+		template <> struct Type2Enum<MapVariantVariant>	{ static const EType et = etMapVariantVariant;	};
+		template <> struct Type2Enum<MultimapStringVariant>		{ static const EType et = etMultimapStringVariant;	};
+		template <> struct Type2Enum<MultimapVariantVariant>	{ static const EType et = etMultimapVariantVariant;	};
+		template <> struct Type2Enum<SetVariant>		{ static const EType et = etSetVariant;	};
+		template <> struct Type2Enum<MultisetVariant>	{ static const EType et = etMultisetVariant;	};
+		template <> struct Type2Enum<DequeVariant>		{ static const EType et = etDequeVariant;	};
+		template <> struct Type2Enum<ListVariant>		{ static const EType et = etListVariant;	};
 
 	public:
 		~Variant();
@@ -143,6 +173,13 @@ namespace utils
 		Variant(const DateDuration &v);
 		Variant(const TimeDuration &v);
 		Variant(const DateTimeDuration &v);
+		Variant(const MapVariantVariant &v);
+		Variant(const MultimapVariantVariant &v);
+		Variant(const MultimapStringVariant &v);
+		Variant(const SetVariant &v);
+		Variant(const MultisetVariant &v);
+		Variant(const DequeVariant &v);
+		Variant(const ListVariant &v);
 
 		Variant &operator=(const Variant &v);
 		Variant &operator=(const String &v);
@@ -173,6 +210,13 @@ namespace utils
 		Variant &operator=(const DateDuration &v);
 		Variant &operator=(const TimeDuration &v);
 		Variant &operator=(const DateTimeDuration &v);
+		Variant &operator=(const MapVariantVariant &v);
+		Variant &operator=(const MultimapVariantVariant &v);
+		Variant &operator=(const MultimapStringVariant &v);
+		Variant &operator=(const SetVariant &v);
+		Variant &operator=(const MultisetVariant &v);
+		Variant &operator=(const DequeVariant &v);
+		Variant &operator=(const ListVariant &v);
 
 		// queries
 		operator String &();
@@ -203,6 +247,13 @@ namespace utils
 		operator DateDuration &();
 		operator TimeDuration &();
 		operator DateTimeDuration &();
+		operator MapVariantVariant &();
+		operator MultimapVariantVariant &();
+		operator MultimapStringVariant &();
+		operator SetVariant &();
+		operator MultisetVariant &();
+		operator DequeVariant &();
+		operator ListVariant &();
 
 
 		operator String const &() const;
@@ -233,6 +284,13 @@ namespace utils
 		operator DateDuration const &() const;
 		operator TimeDuration const &() const;
 		operator DateTimeDuration const &() const;
+		operator MapVariantVariant const &() const;
+		operator MultimapVariantVariant const &() const;
+		operator MultimapStringVariant const &() const;
+		operator SetVariant const &() const;
+		operator MultisetVariant const &() const;
+		operator DequeVariant const &() const;
+		operator ListVariant const &() const;
 
 		void swap(Variant &);
 		bool empty() const;
@@ -247,6 +305,9 @@ namespace utils
 		template<typename T> bool is() const;
 		template<typename T> void forceType();
 		void forceType(EType et);
+
+	public:
+		bool operator <(const Variant &v) const;
 
 	protected:
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);

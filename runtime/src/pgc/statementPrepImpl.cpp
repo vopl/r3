@@ -16,7 +16,7 @@ namespace pgc
 		unprepare();
 	}
 
-	void StatementPrepImpl::bind(int typCpp, void const *valCpp, size_t idx)
+	bool StatementPrepImpl::bind(int typCpp, void const *valCpp, size_t idx)
 	{
 		if(_id.empty())
 		{
@@ -32,7 +32,7 @@ namespace pgc
 			if(idx >= _bindTyp.size())
 			{
 				throw std::range_error("bind index out of range");
-				return;
+				return false;
 			}
 
 			if(_bindOwn[idx])
@@ -61,15 +61,16 @@ namespace pgc
 				if(bindTyp != _bindTyp[idx])
 				{
 					throw std::invalid_argument("bind type is differ");
-					return;
+					return false;
 				}
 
 				_bindVal[idx] = bindVal;
 				_bindLen[idx] = bindLen;
 				_bindFmt[idx] = bindFmt;
 				_bindOwn[idx] = bindOwn;
+				return true;
 			}
-			return;
+			return false;
 		}
 
 		//throw std::exception("unable bind to compiled statement");

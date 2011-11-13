@@ -21,6 +21,15 @@ namespace utils
 			, _td(td)
 		{}
 
+
+		bool operator <(const DateTimeDuration &v) const
+		{
+			if(_dd < v._dd) return true;
+			if(_dd > v._dd) return false;
+
+			return _td < v._td;
+		}
+
 	};
 }
 

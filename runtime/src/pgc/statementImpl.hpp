@@ -36,7 +36,7 @@ namespace pgc
 
 		bool empty() const;
 
-		virtual void bind(int typCpp, void const *valCpp, size_t idx);
+		virtual bool bind(int typCpp, void const *valCpp, size_t idx);
 		virtual void unbind(size_t idx);
 		virtual PGresult *exec();
 

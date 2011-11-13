@@ -4,6 +4,31 @@
 
 namespace utils
 {
+	//////////////////////////////////////////////////////////////////////////
+	inline bool operator <(const std::tm &v1,const std::tm &v2)
+	{
+		std::tm cv1(v1),cv2(v2);
+		return mktime(&cv1) < mktime(&cv2);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <size_t N>
+	bool operator <(const std::bitset<N> &v1,const std::bitset<N> &v2)
+	{
+		if(N < sizeof(unsigned long))
+		{
+			return v1.to_ulong() < v2.to_ulong();
+		}
+		else
+		{
+			for(size_t i(N-1); i<N; i--)
+			{
+				if(!v1[i] && v2[i]) return true;
+				if(v1[i] && !v2[i]) return false;
+			}
+			return false;
+		}
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 #define ENUMTYPES					\
@@ -34,9 +59,14 @@ namespace utils
 	ENUMTYPES_ONE(Bitset512)		\
 	ENUMTYPES_ONE(DateDuration)		\
 	ENUMTYPES_ONE(TimeDuration)		\
-	ENUMTYPES_ONE(DateTimeDuration)	//\
-
-
+	ENUMTYPES_ONE(DateTimeDuration)	\
+	ENUMTYPES_ONE(MapVariantVariant)		\
+	ENUMTYPES_ONE(MultimapVariantVariant)	\
+	ENUMTYPES_ONE(MultimapStringVariant)	\
+	ENUMTYPES_ONE(SetVariant)				\
+	ENUMTYPES_ONE(MultisetVariant)			\
+	ENUMTYPES_ONE(DequeVariant)				\
+	ENUMTYPES_ONE(ListVariant)				//\
 
 
 
@@ -280,6 +310,33 @@ ENUMTYPES
 				throw "bad et for destruct";
 			}
 		}
+
+		bool less(const Variant &v) const
+		{
+			if(v.type() < _et)
+			{
+				return true;
+			}
+			if(v.type() > _et)
+			{
+				return false;
+			}
+
+			switch(_et)
+			{
+			case etNull: break;
+#define ENUMTYPES_ONE(T) case et ## T: return as<T>() < v.as<T>();
+	ENUMTYPES
+#undef ENUMTYPES_ONE
+			default:
+				assert(!"bad et for destruct");
+				throw "bad et for destruct";
+			}
+
+			//never here
+			return false;
+		}
+
 	};
 #define IMPL ((VariantImpl *)this)
 
@@ -453,25 +510,39 @@ ENUMTYPES
 		return IMPL->forceType(et);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool Variant::operator <(const Variant &v) const
+	{
+		return IMPL->less(v);
+	}
+
 }
 
 
 
-// #include <boost/variant.hpp>
-// 
-// #include <iostream>
-// int f()
-// {
-// #define ENUMTYPES_ONE(T) std::cout<< # T <<":\t"<<sizeof(utils::Variant::T)<<std::endl;
-// 	ENUMTYPES
-// #undef ENUMTYPES_ONE
-// 
-// 	std::cout<< "Variant" <<":\t"<<sizeof(utils::Variant)<<std::endl;
-// 
-// 	typedef boost::variant<char, std::string, std::bitset<512> > BV;
-// 
-// 	std::cout<< "BV" <<":\t"<<sizeof(BV)<<std::endl;
-// 
-// 	return 220;
-// }
-// static int i = f();
+#include <boost/variant.hpp>
+
+#include <iostream>
+int f()
+{
+
+
+#define ENUMTYPES_ONE(T) std::cout<< # T <<":\t"<<sizeof(utils::Variant::T)<<std::endl;
+	ENUMTYPES
+#undef ENUMTYPES_ONE
+
+	std::cout<< "Variant" <<":\t"<<sizeof(utils::Variant)<<std::endl;
+
+	typedef boost::variant<char, std::string, std::bitset<512> > BV;
+
+	std::cout<< "BV" <<":\t"<<sizeof(BV)<<std::endl;
+
+
+	//////////////////////////////////////////////////////////////////////////
+	utils::Variant::SetVariant sv;
+	sv.insert(utils::Variant());
+
+	return 220;
+}
+static int i = f();
+
