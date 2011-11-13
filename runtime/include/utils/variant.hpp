@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <map>
+#include <bitset>
 
 namespace utils
 {
@@ -49,9 +50,45 @@ namespace utils
 
 		// std::map<std::string, Variant>
 		evtMapStringVariant,
+
+
+		// bool
+		evtBool,
+
+		// std::tm
+		evtTm,
+
+		// std::bitset<8>
+		evtBitset8,
+
+		// std::bitset<16>
+		evtBitset16,
+
+		// std::bitset<32>
+		evtBitset32,
+
+		// std::bitset<64>
+		evtBitset64,
+
+		// std::bitset<128>
+		evtBitset128,
+
+		// std::bitset<256>
+		evtBitset256,
+
+		// std::bitset<512>
+		evtBitset512,
+
+		// boost::gregorian::date_duration
+		evtDateDuration,
+
+		// boost::posix_time::time_duration
+		evtTimeDuration,
+
 	};
 
-
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 	class Variant
 	{
 	public:
@@ -71,6 +108,18 @@ namespace utils
 		typedef boost::posix_time::ptime		Time;
 		typedef std::vector<Variant>			VectorVariant;
 		typedef std::map<std::string, Variant>	MapStringVariant;
+		
+		typedef bool							Bool;
+		typedef std::tm							Tm;
+		typedef std::bitset<8>					Bitset8;
+		typedef std::bitset<16>					Bitset16;
+		typedef std::bitset<32>					Bitset32;
+		typedef std::bitset<64>					Bitset64;
+		typedef std::bitset<128>				Bitset128;
+		typedef std::bitset<256>				Bitset256;
+		typedef std::bitset<512>				Bitset512;
+		typedef boost::gregorian::date_duration		DateDuration;
+		typedef boost::posix_time::time_duration	TimeDuration;
 
 
 	public:
@@ -94,6 +143,17 @@ namespace utils
 		Variant(const Time &v);
 		Variant(const VectorVariant &v);
 		Variant(const MapStringVariant &v);
+		Variant(const Bool &v);
+		Variant(const Tm &v);
+		Variant(const Bitset8 &v);
+		Variant(const Bitset16 &v);
+		Variant(const Bitset32 &v);
+		Variant(const Bitset64 &v);
+		Variant(const Bitset128 &v);
+		Variant(const Bitset256 &v);
+		Variant(const Bitset512 &v);
+		Variant(const DateDuration &v);
+		Variant(const TimeDuration &v);
 
 		Variant &operator=(const Variant &v);
 		Variant &operator=(const String &v);
@@ -112,6 +172,17 @@ namespace utils
 		Variant &operator=(const Time &v);
 		Variant &operator=(const VectorVariant &v);
 		Variant &operator=(const MapStringVariant &v);
+		Variant &operator=(const Bool &v);
+		Variant &operator=(const Tm &v);
+		Variant &operator=(const Bitset8 &v);
+		Variant &operator=(const Bitset16 &v);
+		Variant &operator=(const Bitset32 &v);
+		Variant &operator=(const Bitset64 &v);
+		Variant &operator=(const Bitset128 &v);
+		Variant &operator=(const Bitset256 &v);
+		Variant &operator=(const Bitset512 &v);
+		Variant &operator=(const DateDuration &v);
+		Variant &operator=(const TimeDuration &v);
 
 		// queries
 		operator String &();
@@ -130,6 +201,17 @@ namespace utils
 		operator Time &();
 		operator VectorVariant &();
 		operator MapStringVariant &();
+		operator Bool &();
+		operator Tm &();
+		operator Bitset8 &();
+		operator Bitset16 &();
+		operator Bitset32 &();
+		operator Bitset64 &();
+		operator Bitset128 &();
+		operator Bitset256 &();
+		operator Bitset512 &();
+		operator DateDuration &();
+		operator TimeDuration &();
 
 
 		operator String const &() const;
@@ -148,6 +230,17 @@ namespace utils
 		operator Time const &() const;
 		operator VectorVariant const &() const;
 		operator MapStringVariant const &() const;
+		operator Bool const &() const;
+		operator Tm const &() const;
+		operator Bitset8 const &() const;
+		operator Bitset16 const &() const;
+		operator Bitset32 const &() const;
+		operator Bitset64 const &() const;
+		operator Bitset128 const &() const;
+		operator Bitset256 const &() const;
+		operator Bitset512 const &() const;
+		operator DateDuration const &() const;
+		operator TimeDuration const &() const;
 
 		void swap(Variant &);
 		bool empty() const;
@@ -157,12 +250,13 @@ namespace utils
 		template<typename T> const T &as() const;
 		template<typename T> bool is() const;
 		template<typename T> void forceType();
+		void forceType(EVariantType evt);
 
 	protected:
-		static const size_t _dataSize = 8;
+		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);
 		char _data[_dataSize];
-		EVariantType _evt;
 
+		boost::uint16_t _evt;
 	};
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="victim"
 	ProjectGUID="{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}"
 	RootNamespace="victim"
@@ -228,7 +228,7 @@
 				Name="utils"
 				>
 				<File
-					RelativePath="..\include\utils\data.hpp"
+					RelativePath="..\include\utils\variant.hpp"
 					>
 				</File>
 			</Filter>
@@ -240,7 +240,7 @@
 				Name="utils"
 				>
 				<File
-					RelativePath="..\src\utils\data.cpp"
+					RelativePath="..\src\utils\variant.cpp"
 					>
 				</File>
 			</Filter>

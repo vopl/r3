@@ -26,16 +26,24 @@ using namespace std;
 #include "pgs/category.hpp"
 #include "pgs/link.hpp"
 
+
 //////////////////////////////////////////////////////////////////////////
+#include "utils/variant.hpp"
 
 
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
-	typedef std::vector<std::string> TV;
-	TV v;
-	std::cout<<sizeof(TV)<<endl;
-	std::cout<<sizeof(std::_Vector_val<std::string, TV::allocator_type>)<<endl;
+	utils::Variant v(10);
+	v = utils::Variant::MapStringVariant();
+	v.as<utils::Variant::MapStringVariant>()["220"] = 220;
+	//std::cout<<v.as<int>()<<endl;
+
+	utils::Variant v2(v);
+	std::cout<<v2.as<utils::Variant::MapStringVariant>()["220"].as<int>()<<endl;
+
+	std::cout<<sizeof(utils::Variant)<<endl;
+
 	return 0;
 
 // 
