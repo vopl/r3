@@ -4,6 +4,7 @@
 
 namespace pgc
 {
+	//////////////////////////////////////////////////////////////////////////
 	ResultImpl::ResultImpl(ConnectionImplPtr con, PGresult *pgres)
 		: _con(con)
 		, _pgres(pgres)
@@ -95,6 +96,8 @@ namespace pgc
 			}
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
 	ResultImpl::~ResultImpl()
 	{
 		if(_pgres)
@@ -104,6 +107,7 @@ namespace pgc
 		}
 	}
 
+	//////////////////////////////////////////////////////////////////////////
 	EExecStatus ResultImpl::status()
 	{
 		if(_pgres)
@@ -119,6 +123,7 @@ namespace pgc
 		return ees_error;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
 	const char *ResultImpl::errorMsg()
 	{
 		if(_pgres)
@@ -128,6 +133,7 @@ namespace pgc
 		return "null result";
 	}
 
+	//////////////////////////////////////////////////////////////////////////
 	const char *ResultImpl::errorCode()
 	{
 		if(_pgres)
@@ -137,8 +143,59 @@ namespace pgc
 		return "null";
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	int ResultImpl::bestType(int colIdx)
+	{
+		if(!_pgres)
+		{
+			return 0;
+		}
+
+		if(colIdx >= (int)_extractors.size())
+		{
+			return 0;
+		}
+
+		assert(1 == PQfformat(_pgres, colIdx));
+
+		return _extractors[colIdx]._favorCppType;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	int ResultImpl::bestType(const char *colName)
+	{
+		if(_pgres)
+		{
+			int cn = PQfnumber(_pgres, colName);
+			if(0 > cn)
+			{
+				return 0;
+			}
+
+			return bestType(cn);
+		}
+
+		return 0;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const char *ResultImpl::name(size_t colIdx)
+	{
+		if(!_pgres)
+		{
+			return NULL;
+		}
+
+		if(colIdx >= (int)_extractors.size())
+		{
+			return NULL;
+		}
+
+		return PQfname(_pgres, colIdx);
+	}
 
 
+	//////////////////////////////////////////////////////////////////////////
 	size_t ResultImpl::cmdRows()
 	{
 		if(_pgres)
@@ -147,6 +204,8 @@ namespace pgc
 		}
 		return 0;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
 	size_t ResultImpl::rows()
 	{
 		if(_pgres)
@@ -156,6 +215,18 @@ namespace pgc
 		return 0;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	size_t ResultImpl::columns()
+	{
+		if(_pgres)
+		{
+			return _extractors.size();
+		}
+		return 0;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	bool ResultImpl::fetch(int typCpp, void *valCpp, size_t colIdx, size_t rowIdx)
 	{
 		if(!_pgres)
@@ -172,6 +243,8 @@ namespace pgc
 
 		return (this->*_extractors[colIdx]._meth)(rowIdx, colIdx, typCpp, valCpp);
 	}
+
+	//////////////////////////////////////////////////////////////////////////
 	bool ResultImpl::fetch(int typCpp, void *valCpp, const char *colName, size_t rowIdx)
 	{
 		if(_pgres)

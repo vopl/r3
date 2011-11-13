@@ -1170,7 +1170,7 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	void _boost_date_time_datetimedur()
 	{
-		pgc::DateTimeDuration val;
+		utils::DateTimeDuration val;
 
 #undef SQL
 #define SQL(x) _con.once().sql("SELECT " x "").exec().throwIfError().fetch(val,0,0)

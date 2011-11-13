@@ -56,9 +56,15 @@ namespace pgc
 		const char *errorMsg();
 		const char *errorCode();
 
+		int bestType(int colIdx);
+		int bestType(const char *colName);
+		const char *name(size_t colIdx);
+
 		size_t cmdRows();
 
 		size_t rows();
+		size_t columns();
+
 		bool fetch(int typCpp, void *valCpp, size_t colIdx, size_t rowIdx);
 		bool fetch(int typCpp, void *valCpp, const char *colName, size_t rowIdx);
 

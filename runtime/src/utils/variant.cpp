@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "utils/variant.hpp"
 #include <new>
 #include <typeinfo>
@@ -34,7 +33,8 @@ namespace utils
 	ENUMTYPES_ONE(Bitset256)		\
 	ENUMTYPES_ONE(Bitset512)		\
 	ENUMTYPES_ONE(DateDuration)		\
-	ENUMTYPES_ONE(TimeDuration)		//\
+	ENUMTYPES_ONE(TimeDuration)		\
+	ENUMTYPES_ONE(DateTimeDuration)	//\
 
 
 
@@ -49,12 +49,6 @@ namespace utils
 	class VariantImpl
 		: private Variant
 	{
-		//тип в енум типа
-		template <class T> struct Type2Evt	{ static const EVariantType evt = evtNull;	};
-#define ENUMTYPES_ONE(T) template <> struct Type2Evt<T>	{ static const EVariantType evt = evt ## T;	};
-ENUMTYPES
-#undef ENUMTYPES_ONE
-
 		//выделение блока памяти под данные
 		template <class T> void alloc()
 		{
@@ -78,7 +72,7 @@ ENUMTYPES
 		template <class T>
 		void validateType()
 		{
-			if(evtNull == Type2Evt<T>::evt)
+			if(etNull == Type2Enum<T>::et)
 			{
 				throw std::bad_cast();
 			}
@@ -88,7 +82,7 @@ ENUMTYPES
 		template <class T>
 		void validateValue()
 		{
-			if(_evt != Type2Evt<T>::evt)
+			if(_et != Type2Enum<T>::et)
 			{
 				throw std::bad_cast();
 			}
@@ -97,14 +91,14 @@ ENUMTYPES
 		//////////////////////////////////////////////////////////////////////////
 		void construct()
 		{
-			_evt = evtNull;
+			_et = etNull;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
 		void construct()
 		{
-			_evt = Type2Evt<T>::evt;
+			_et = Type2Enum<T>::et;
 			alloc<T>();
 			new (&as<T>()) T;
 		}
@@ -113,7 +107,7 @@ ENUMTYPES
 		template <class T>
 		void construct(const T &v)
 		{
-			_evt = Type2Evt<T>::evt;
+			_et = Type2Enum<T>::et;
 			alloc<T>();
 			new (&as<T>()) T(v);
 		}
@@ -121,33 +115,33 @@ ENUMTYPES
 		template <>
 		void construct(const Variant &v)
 		{
-			_evt = v.type();
+			_et = v.type();
 
-			switch(_evt)
+			switch(_et)
 			{
-			case evtNull: break;
+			case etNull: break;
 
-#define ENUMTYPES_ONE(T) case evt ## T: alloc<T>(); new (&as<T>()) T(v.as<T>()); break;
+#define ENUMTYPES_ONE(T) case et ## T: alloc<T>(); new (&as<T>()) T(v.as<T>()); break;
 				ENUMTYPES
 #undef ENUMTYPES_ONE
 			default:
-				assert(!"bad evt for destruct");
-				throw "bad evt for destruct";
+				assert(!"bad et for destruct");
+				throw "bad et for destruct";
 			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void destruct()
 		{
-			switch(_evt)
+			switch(_et)
 			{
-			case evtNull: break;
-#define ENUMTYPES_ONE(T) case evt ## T: destruct<T>(); break;
+			case etNull: break;
+#define ENUMTYPES_ONE(T) case et ## T: destruct<T>(); break;
 ENUMTYPES
 #undef ENUMTYPES_ONE
 			default:
-				assert(!"bad evt for destruct");
-				throw "bad evt for destruct";
+				assert(!"bad et for destruct");
+				throw "bad et for destruct";
 			}
 		}
 
@@ -157,7 +151,7 @@ ENUMTYPES
 		{
 			(&as<T>())->~T();
 			free<T>();
-			_evt = evtNull;
+			_et = etNull;
 		}
 
 
@@ -177,22 +171,55 @@ ENUMTYPES
 		template <>
 		void assign(const Variant &v)
 		{
-			if(v.type() == _evt)
+			if(v.type() == _et)
 			{
-				switch(_evt)
+				switch(_et)
 				{
-#define ENUMTYPES_ONE(T) case evt ## T: assign<T>(v.as<T>()); break;
+#define ENUMTYPES_ONE(T) case et ## T: assign<T>(v.as<T>()); break;
 					ENUMTYPES
 #undef ENUMTYPES_ONE
 				default:
-					assert(!"bad evt for destruct");
-					throw "bad evt for destruct";
+					assert(!"bad et for destruct");
+					throw "bad et for destruct";
 				}
 				return;
 			}
 
 			destruct();
 			construct<Variant>(v);
+		}
+
+		void *data()
+		{
+			switch(_et)
+			{
+#define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
+				ENUMTYPES
+#undef ENUMTYPES_ONE
+				default:
+					assert(!"bad et for destruct");
+					throw "bad et for destruct";
+			}
+			return NULL;
+		}
+
+		void clear()
+		{
+			destruct();
+		}
+
+		const void *data() const
+		{
+			switch(_et)
+			{
+#define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
+				ENUMTYPES
+#undef ENUMTYPES_ONE
+				default:
+					assert(!"bad et for destruct");
+					throw "bad et for destruct";
+			}
+			return NULL;
 		}
 
 		template <class T>
@@ -218,7 +245,7 @@ ENUMTYPES
 		template<typename T> 
 		bool is() const
 		{
-			return _evt == Type2Evt<T>::evt;
+			return _et == Type2Enum<T>::et;
 		}
 
 		template<typename T> 
@@ -233,24 +260,24 @@ ENUMTYPES
 			construct<T>();
 		}
 
-		void forceType(EVariantType evt)
+		void forceType(EType et)
 		{
-			if(evt == _evt)
+			if(et == _et)
 			{
 				return;
 			}
 
 			destruct();
-			switch(_evt)
+			switch(_et)
 			{
-			case evtNull: break;
+			case etNull: break;
 
-#define ENUMTYPES_ONE(T) case evt ## T: construct<T>(); break;
+#define ENUMTYPES_ONE(T) case et ## T: construct<T>(); break;
 				ENUMTYPES
 #undef ENUMTYPES_ONE
 			default:
-				assert(!"bad evt for destruct");
-				throw "bad evt for destruct";
+				assert(!"bad et for destruct");
+				throw "bad et for destruct";
 			}
 		}
 	};
@@ -342,7 +369,7 @@ ENUMTYPES
 	//////////////////////////////////////////////////////////////////////////
 	void Variant::swap(Variant & v)
 	{
-		std::swap(_evt, v._evt);
+		std::swap(_et, v._et);
 		//std::swap(_data, v._data);
 		assert(0);
 	}
@@ -350,13 +377,31 @@ ENUMTYPES
 	//////////////////////////////////////////////////////////////////////////
 	bool Variant::empty() const
 	{
-		return evtNull == _evt;
+		return etNull == _et;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	EVariantType Variant::type() const
+	Variant::EType Variant::type() const
 	{
-		return (EVariantType)_evt;
+		return (EType)_et;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Variant::clear()
+	{
+		return IMPL->clear();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void *Variant::data()
+	{
+		return IMPL->data();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void const *Variant::data() const
+	{
+		return IMPL->data();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -403,9 +448,9 @@ ENUMTYPES
 #undef ENUMTYPES_ONE
 
 	//////////////////////////////////////////////////////////////////////////
-	void Variant::forceType(EVariantType evt)
+	void Variant::forceType(EType et)
 	{
-		return IMPL->forceType(evt);
+		return IMPL->forceType(et);
 	}
 
 }

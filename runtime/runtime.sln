@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpgc", "libpgc\libpgc.vcproj", "{55B09566-11AA-42DD-A2AA-A359E9E8098E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F} = {8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testpgc", "testpgc\testpgc.vcproj", "{35C20092-C46E-4F39-926B-D53F227C6F85}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -37,6 +40,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "victim", "victim\victim.vcp
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpgs", "libpgs\libpgs.vcproj", "{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{55B09566-11AA-42DD-A2AA-A359E9E8098E} = {55B09566-11AA-42DD-A2AA-A359E9E8098E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libutils", "libutils\libutils.vcproj", "{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +101,12 @@ Global
 		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Release|Win32.ActiveCfg = Release|Win32
 		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Release|Win32.Build.0 = Release|Win32
 		{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}.Release|x64.ActiveCfg = Release|Win32
+		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Debug|Win32.Build.0 = Debug|Win32
+		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Debug|x64.ActiveCfg = Debug|Win32
+		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Release|Win32.ActiveCfg = Release|Win32
+		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Release|Win32.Build.0 = Release|Win32
+		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

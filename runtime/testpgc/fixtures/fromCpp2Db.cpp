@@ -148,7 +148,7 @@ protected:
 		CPPUNIT_ASSERT_EQUAL( std::string("0 month 0 day 23:59:59.999999"), res );
 
 
-		pgc::DateTimeDuration dtd(
+		utils::DateTimeDuration dtd(
 			boost::gregorian::date_duration(65),
 			boost::posix_time::time_duration(23, 51, 29, 999999));
 

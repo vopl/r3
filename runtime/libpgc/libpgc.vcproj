@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libpgc"
 	ProjectGUID="{55B09566-11AA-42DD-A2AA-A359E9E8098E}"
 	RootNamespace="libpgc"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libpq.lib"
+				AdditionalDependencies="libpq.lib ../Debug/libutils.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -194,7 +194,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libpq.lib"
+				AdditionalDependencies="libpq.lib ../Release/libutils.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -312,26 +312,6 @@
 				</File>
 				<File
 					RelativePath="..\include\pgc\statement.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="utils"
-				>
-				<File
-					RelativePath="..\include\utils\aton.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\include\utils\fixEndian.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\include\utils\julian.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\utils\ntoa.hpp"
 					>
 				</File>
 			</Filter>

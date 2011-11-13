@@ -3,6 +3,7 @@
 
 #include "pgc/cppDataType.hpp"
 #include "pgc/result.hpp"
+#include "utils/variant.hpp"
 
 namespace pgc
 {
@@ -30,8 +31,9 @@ namespace pgc
 
 		template <class T> Statement &bind(T const &v, size_t idx=0);
 		template <class T> Statement &bind(T const *pv, size_t idx=0);
-// 		template <class T> Statement &bind(T &v, size_t idx=0);
-// 		template <class T> Statement &bind(T *pv, size_t idx=0);
+		Statement &bind(const utils::Variant &v, size_t idx=0);
+		Statement &bindMany(const utils::Variant::VectorVariant &v, size_t idx=0);
+
 		Statement &unbind(size_t idx=0);
 
 		Result exec();
@@ -89,20 +91,5 @@ namespace pgc
 		bindNative(CppDataType<T>::cdt_index, pv, idx);
 		return *this;
 	}
-
-// 	//////////////////////////////////////////////////////////////////////////
-// 	template <class T> Statement &Statement::bind(T &v, size_t idx)
-// 	{
-// 		bindNative(CppDataType<T>::cdt_index, &v, idx);
-// 		return *this;
-// 	}
-// 
-// 	//////////////////////////////////////////////////////////////////////////
-// 	template <class T> Statement &Statement::bind(T *pv, size_t idx)
-// 	{
-// 		bindNative(CppDataType<T>::cdt_index, pv, idx);
-// 		return *this;
-// 	}
-
 }
 #endif

@@ -1148,9 +1148,9 @@ namespace pgc
 					boost::gregorian::date_duration(v.day + v.month*utils::DAYS_PER_MONTH);
 			}
 			return true;
-		case CppDataType<DateTimeDuration>::cdt_index:
+		case CppDataType<utils::DateTimeDuration>::cdt_index:
 			{
-				DateTimeDuration &dtd = *(DateTimeDuration *)valCpp;
+				utils::DateTimeDuration &dtd = *(utils::DateTimeDuration *)valCpp;
 
 				dtd._dd = boost::gregorian::date_duration(v.day + v.month*utils::DAYS_PER_MONTH);
 
@@ -1405,14 +1405,14 @@ namespace pgc
 					boost::posix_time::time_duration(hour, min, sec, fsecl);
 			}
 			return true;
-		case CppDataType<DateTimeDuration>::cdt_index:
+		case CppDataType<utils::DateTimeDuration>::cdt_index:
 			{
 				int hour, min, sec, fsec;
 				utils::dt2time(VAL, &hour, &min, &sec, &fsec);
 
 				boost::int64_t fsecl = (boost::int64_t)fsec * utils::USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
 
-				DateTimeDuration &dtd = *(DateTimeDuration*)valCpp;
+				utils::DateTimeDuration &dtd = *(utils::DateTimeDuration*)valCpp;
 				dtd._td = 
 					boost::posix_time::time_duration(hour, min, sec, fsecl);
 				dtd._dd = boost::gregorian::date_duration();

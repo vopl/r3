@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libpgs"
 	ProjectGUID="{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}"
 	RootNamespace="libpgs"
@@ -60,6 +60,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="../Debug/libpgc.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -123,6 +124,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="../Release/libpgc.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

@@ -501,13 +501,13 @@ namespace pgc
 				}
 			}
 			break;
-		case CppDataType<DateTimeDuration>::cdt_index:
+		case CppDataType<utils::DateTimeDuration>::cdt_index:
 			{
 				bindTyp = 1186;//interval
 				bindFmt = 1;
 				if(valCpp)
 				{
-					const DateTimeDuration &dtd = *(const DateTimeDuration *)valCpp;
+					const utils::DateTimeDuration &dtd = *(const utils::DateTimeDuration *)valCpp;
 
 					bindVal = new char[sizeof(PG_Interval)];
 					PG_Interval &pgi = *(PG_Interval *)bindVal;

@@ -36,10 +36,23 @@ namespace pgc
 		const char *errorCode();
 		Result &throwIfError();
 
+		int bestType(size_t colIdx) const;
+		int bestType(const char *colName) const;
+		const char *name(size_t colIdx) const;
+
 		size_t cmdRows();
 		size_t rows();
+		size_t columns();
+
 		template <class T> bool fetch(T &v, int colIdx=0, size_t rowIdx=0);
 		template <class T> bool fetch(T &v, const char *colName, size_t rowIdx=0);
+
+		bool fetch(utils::Variant &v, int colIdx=0, size_t rowIdx=0);
+		bool fetch(utils::Variant &v, const char *colName, size_t rowIdx=0);
+		bool fetchArray(utils::Variant::VectorVariant &v, size_t rowIdx=0);
+		bool fetchMap(utils::Variant::MapStringVariant &v, size_t rowIdx=0);
+		bool fetchArrays(utils::Variant::VectorVariant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchMaps(utils::Variant::VectorVariant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 
 		boost::int32_t fetchInt32(int colIdx=0, size_t rowIdx=0);
 		boost::int32_t fetchInt32(const char *colName, size_t rowIdx=0);
