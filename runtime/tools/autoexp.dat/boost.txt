@@ -1,0 +1,1015 @@
+;----------------------------------------
+; BOOST_VISUALIZER_START boost::date_time
+;
+; Copyright Bruno Durin 2010. Use, modification and distribution are subject
+; to the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt
+; or copy at http://www.boost.org/LICENSE_1_0.txt)
+;
+; @guid     2421DB60-44CC-11DF-9879-0800200C9A66
+; @platform msvc-8, msvc-9
+; @version  1.0
+; @author   Bruno Durin
+; @email    bruno dot durin at gmail dot com
+;
+; Usage
+; =====
+;
+; Unlike the other visualizer for date_time, this visualizer does not need a header
+; file to work. Note that the displayed time is in UTC.
+;
+
+;------------------------------------------------------------------------------
+;  boost::gregorian::date visualizer
+;------------------------------------------------------------------------------
+
+boost::gregorian::date{
+	preview
+	( 
+		#( 
+			100*((4*($e.days_+32044)+3)/146097)+((4*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4))+3)/1461)-4800+(((5*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4)-(1461*((4*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4))+3)/1461))/4)+2)/153)/10),
+			"-",
+			((5*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4)-(1461*((4*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4))+3)/1461))/4)+2)/153)+3-12*(((5*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4)-(1461*((4*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4))+3)/1461))/4)+2)/153)/10),
+			"-",
+			($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4)-(1461*((4*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4))+3)/1461))/4)-((153*((5*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4)-(1461*((4*($e.days_+32044-((146097*((4*($e.days_+32044)+3)/146097))/4))+3)/1461))/4)+2)/153)+2)/5)+1
+		 )
+	)		
+}
+
+;------------------------------------------------------------------------------
+;  boost::gregorian::date_duration visualizer
+;------------------------------------------------------------------------------
+
+boost::gregorian::date_duration{
+	preview
+	( 
+		#( 
+			$e.days_.value_,
+			" days"
+		 )
+	)		
+}
+
+;------------------------------------------------------------------------------
+;  boost::posix_time::time_duration visualizer
+;  only works with microseconds resolution
+;------------------------------------------------------------------------------
+
+boost::posix_time::time_duration{
+	preview
+	( 
+		#( 
+			$e.ticks_.value_/86400000000,
+			"d ",
+			($e.ticks_.value_-86400000000*($e.ticks_.value_/86400000000))/3600000000,
+			"h ",
+			($e.ticks_.value_-86400000000*($e.ticks_.value_/86400000000)-3600000000*(($e.ticks_.value_-86400000000*($e.ticks_.value_/86400000000))/3600000000))/60000000,
+			"m ",
+			(($e.ticks_.value_-86400000000*($e.ticks_.value_/86400000000)-3600000000*(($e.ticks_.value_-86400000000*($e.ticks_.value_/86400000000))/3600000000))-60000000*(($e.ticks_.value_-86400000000*($e.ticks_.value_/86400000000) - 3600000000*(($e.ticks_.value_-86400000000*($e.ticks_.value_/86400000000))/3600000000))/60000000))/1000000,
+			"s ",
+			($e.ticks_.value_%1000000)/1000,
+			"ms ",
+			$e.ticks_.value_%1000,
+			"us"
+		 )
+	)		
+}
+
+;------------------------------------------------------------------------------
+;  boost::posix_time::ptime visualizer
+;  only works with microseconds resolution
+;------------------------------------------------------------------------------
+
+boost::posix_time::ptime{
+	preview
+	( 
+		#( 
+			100*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097)+((4*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4))+3)/1461)-4800+(((5*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4)-(1461*((4*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4))+3)/1461))/4)+2)/153)/10),
+			"-",
+			((5*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4)-(1461*((4*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4))+3)/1461))/4)+2)/153)+3-12*(((5*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4)-(1461*((4*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4))+3)/1461))/4)+2)/153)/10),
+			"-",
+			(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4)-(1461*((4*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4))+3)/1461))/4)-((153*((5*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4)-(1461*((4*(($e.time_.time_count_.value_/86400000000)+32044-((146097*((4*(($e.time_.time_count_.value_/86400000000)+32044)+3)/146097))/4))+3)/1461))/4)+2)/153)+2)/5)+1,
+			"  ",
+			($e.time_.time_count_.value_-86400000000*($e.time_.time_count_.value_/86400000000))/3600000000,
+			"h",
+			($e.time_.time_count_.value_-86400000000*($e.time_.time_count_.value_/86400000000)-3600000000*(($e.time_.time_count_.value_-86400000000*($e.time_.time_count_.value_/86400000000))/3600000000))/60000000,
+			"m",
+			(($e.time_.time_count_.value_-86400000000*($e.time_.time_count_.value_/86400000000)-3600000000*(($e.time_.time_count_.value_-86400000000*($e.time_.time_count_.value_/86400000000))/3600000000))-60000000*(($e.time_.time_count_.value_-86400000000*($e.time_.time_count_.value_/86400000000) - 3600000000*(($e.time_.time_count_.value_-86400000000*($e.time_.time_count_.value_/86400000000))/3600000000))/60000000))/1000000,
+			"s (",
+			$e.time_.time_count_.value_%1000000,
+			"us)"
+		 )
+	)		
+}
+
+;
+; BOOST_VISUALIZER_END boost::date_time
+;--------------------------------------
+
+;-------------------------------------------
+; BOOST_VISUALIZER_START boost::interprocess
+;
+; Copyright Filip Konvi?ka 2008. Use, modification and distribution are subject to
+; the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt
+; or copy at http://www.boost.org/LICENSE_1_0.txt)
+;
+; @guid     bed732a0-daf1-11dc-95ff-0800200c9a66
+; @platform msvc-8, msvc-9
+; @version  1.0
+; @author   Filip Konvi?ka
+; @email    filip dot konvicka at logis dot cz
+;
+; Usage
+; =====
+;
+; Just append this to autoexp.dat.
+; Currently this just handles offset_ptr.
+;
+;
+;------------------------------------
+; boost::interprocess::offset_ptr
+boost::interprocess::offset_ptr<*> {
+  preview( #if($e.m_offset==1) (#("null")) #else (#("non-null")) )
+  children(
+    #(
+      #array(
+        expr: (($T1*)(((char*)(void*)&$c)+$c.m_offset)),
+        size: #if($c.m_offset==1) (0) #else (1)
+      ) : $e
+    )
+  )
+}
+;
+; BOOST_VISUALIZER_END boost::interprocess
+;-----------------------------------------
+
+
+;----------------------------------------------------
+; BOOST_VISUALIZER_START boost::multi_index_container
+;
+; Copyright Filip Konvi?ka 2007 - 2009. Use, modification and distribution are subject
+; to the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt
+; or copy at http://www.boost.org/LICENSE_1_0.txt)
+;
+; @guid     CA3A7EDA-43F3-11DC-9D06-4B5856D89593
+; @platform msvc-8, msvc-9
+; @version  1.1
+; @header   mic_visualizer.hpp
+; @author   Filip Konvi?ka
+; @email    filip dot konvicka at logis dot cz
+;
+; Usage
+; =====
+;
+; NOTE: This version is known to work with Boost MultiIndex v. 1.34.1. For newer versions, use the other file.
+;
+; Visualization must be explicitly enabled in the code for each type.
+; For each multi_index_container type, you need to call
+;
+;   VISUALIZE_MULTI_INDEX_CONTAINER(TypeName);
+;
+; at global namespace level. The macro is defined in the accompanying header file mic_visualizer.hpp.
+;
+;
+;------------------------------------
+; boost::multi_index_container - base
+;
+; This passes control to the header_holder decoders :-)
+boost::multi_index::multi_index_container<*,*,*>{
+  preview(#($c.node_count, " items (multi_index_container)"))
+  children(
+    #(
+      data:((msvc_helpers::multi_index_helper_2<boost::multi_index::multi_index_container<$T1,$T2,$T3> >*)&$c)->header,
+      original members: [$c,!]
+    )
+  )
+}
+;-----------------------------------------------
+; boost::multi_index_container - sequenced index
+boost::multi_index::detail::header_holder<boost::multi_index::detail::sequenced_index_node<*>,*>{
+  preview(#("sequenced index"))
+  children(
+    #(
+      #list(
+            head : *(((boost::multi_index::detail::sequenced_index_node_impl*)(boost::multi_index::detail::sequenced_index_node_trampoline<$T1>*)($c.member))->next_),
+            size : (($T2*)&$c)->node_count,
+            next : next_
+      ) : ((msvc_helpers::multi_index_helper<boost::multi_index::detail::sequenced_index_node<$T1> >*)(boost::multi_index::detail::sequenced_index_node<$T1>*)(boost::multi_index::detail::sequenced_index_node_trampoline<$T1>*)(&$e))->value
+    )
+  )
+}
+;---------------------------------------------------
+; boost::multi_index_container - random access index
+boost::multi_index::detail::header_holder<boost::multi_index::detail::random_access_index_node<*>,*>{
+  preview(#("random access index"))
+  children(
+    #(
+      #array(
+          expr:  (($T2*)&$c)->ptrs.spc.data_[$i],
+          size:  (($T2*)&$c)->node_count
+      ) : ((msvc_helpers::multi_index_helper<boost::multi_index::detail::random_access_index_node<$T1> >*)(boost::multi_index::detail::random_access_index_node<$T1>*)(boost::multi_index::detail::random_access_index_node_trampoline<$T1>*)&$e)->value
+    )
+  )
+}
+;--------------------------------------------
+; boost::multi_index_container - hashed index
+boost::multi_index::detail::header_holder<boost::multi_index::detail::hashed_index_node<*>,*>{
+  preview(#("hashed index - ", (($T2*)&$c)->node_count, " in ", (($T2*)&$c)->buckets.size_, " buckets"))
+  children(
+    #(
+      #array(
+            expr : (($T2*)&$c)->buckets.spc.data_[$i],
+            size : (($T2*)&$c)->buckets.size_
+      ) : (msvc_helpers::multi_index_helper_3<boost::multi_index::detail::hashed_index_node<$T1> >*)(void*)&$e
+    )
+  )
+}
+msvc_helpers::multi_index_helper_3<boost::multi_index::detail::hashed_index_node<*> >{
+  preview(#if ( ((boost::multi_index::detail::hashed_index_node_impl*)&$c)->next_==((boost::multi_index::detail::hashed_index_node_impl*)&$c) )
+             ; no data at all
+             (#("---"))
+          #else (
+             #if ( ((boost::multi_index::detail::hashed_index_node_impl*)&$c)->next_->next_==((boost::multi_index::detail::hashed_index_node_impl*)&$c) ) (
+               ; 1 item: preview as _value_
+               #( ((msvc_helpers::multi_index_helper<boost::multi_index::detail::hashed_index_node<$T1> >*)(boost::multi_index::detail::hashed_index_node<$T1>*)(boost::multi_index::detail::hashed_index_node_trampoline<$T1>*)(((boost::multi_index::detail::hashed_index_node_impl*)&$c)->next_))->value)
+             ) #else (
+               ; multiple items: preview as [_value_ ...]
+               #("[", ((msvc_helpers::multi_index_helper<boost::multi_index::detail::hashed_index_node<$T1> >*)(boost::multi_index::detail::hashed_index_node<$T1>*)(boost::multi_index::detail::hashed_index_node_trampoline<$T1>*)(((boost::multi_index::detail::hashed_index_node_impl*)&$c)->next_))->value, " ...]")
+             )
+          )
+         )
+  children(
+    #(
+      ; multiple items: view as list
+      #list(
+        head: ((boost::multi_index::detail::hashed_index_node_impl*)&$c)->next_,
+        next: next_,
+        skip: ((boost::multi_index::detail::hashed_index_node_impl*)&$c)
+      ) : ((msvc_helpers::multi_index_helper<boost::multi_index::detail::hashed_index_node<$T1> >*)(boost::multi_index::detail::hashed_index_node<$T1>*)(boost::multi_index::detail::hashed_index_node_trampoline<$T1>*)(&$e))->value
+    )
+  )
+}
+;---------------------------------------------
+; boost::multi_index_container - ordered index
+boost::multi_index::detail::header_holder<boost::multi_index::detail::ordered_index_node<*>,*>{
+  preview(#("ordered index"))
+  children(
+    #(
+      #tree(
+            head : *(boost::multi_index::detail::ordered_index_node_compressed_base*)(boost::multi_index::detail::ordered_index_node_impl*)(void*)(((boost::multi_index::detail::ordered_index_node_trampoline<$T1>*)($c.member))->parentcolor_&~1U),
+            size : (($T2*)&$c)->node_count,
+            left : left_,
+            right : right_,
+            skip : 0
+      ) : ((msvc_helpers::multi_index_helper<boost::multi_index::detail::ordered_index_node<$T1> >*)(boost::multi_index::detail::ordered_index_node<$T1>*)(boost::multi_index::detail::ordered_index_node_trampoline<$T1>*)(&$e))->value
+    )
+  )
+}
+;
+; BOOST_VISUALIZER_END boost::multi_index_container
+;--------------------------------------------------
+
+;----------------------------------------------------
+; BOOST_VISUALIZER_START boost::multi_index_container
+;
+; Copyright Filip Konvi?ka 2007 - 2009. Use, modification and distribution are subject
+; to the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt
+; or copy at http://www.boost.org/LICENSE_1_0.txt)
+;
+; @guid     CA3A7EDA-43F3-11DC-9D06-4B5856D89593
+; @platform msvc-8, msvc-9
+; @version  2.0
+; @header   mic_visualizer.hpp
+; @author   Filip Konvi?ka
+; @email    filip dot konvicka at logis dot cz
+;
+; Usage
+; =====
+;
+; This version is for Boost.MultiIndex versions 1.35 and above.
+; The other version of this file is known to work for Boost.MultiIndex 1.34.1.
+;
+; Visualization must be explicitly enabled in the code for each type.
+; For each multi_index_container type, you need to call
+;
+;   VISUALIZE_MULTI_INDEX_CONTAINER(TypeName);
+;
+; at global namespace level. The macro is defined in the accompanying header file mic_visualizer.hpp.
+;
+;
+;------------------------------------
+; boost::multi_index_container - base
+;
+; This passes control to the header_holder decoders :-)
+boost::multi_index::multi_index_container<*,*,*>{
+  preview(#($c.node_count, " items (multi_index_container)"))
+  children(
+    #(
+      data:((msvc_helpers::multi_index_helper_2<boost::multi_index::multi_index_container<$T1,$T2,$T3> >*)&$c)->header,
+      original members: [$c,!]
+    )
+  )
+}
+;-----------------------------------------------
+; boost::multi_index_container - sequenced index
+boost::multi_index::detail::header_holder<boost::multi_index::detail::sequenced_index_node<*>*,*>{
+  preview(#("sequenced index"))
+  children(
+    #(
+      #list(
+            head : *(((boost::multi_index::detail::sequenced_index_node_trampoline<$T1>*)($c.member))->next_),
+            size : (($T3*)&$c)->node_count,
+            next : next_
+      ) : ((msvc_helpers::multi_index_helper<boost::multi_index::detail::sequenced_index_node<$T1> >*)(boost::multi_index::detail::sequenced_index_node<$T1>*)(boost::multi_index::detail::sequenced_index_node_trampoline<$T1>*)(&$e))->value
+    )
+  )
+}
+;---------------------------------------------------
+; boost::multi_index_container - random access index
+boost::multi_index::detail::header_holder<boost::multi_index::detail::random_access_index_node<*>*,*>{
+  preview(#("random access index"))
+  children(
+    #(
+      #array(
+          expr:  (($T3*)&$c)->ptrs.spc.data_[$i],
+          size:  (($T3*)&$c)->node_count
+      ) : ((msvc_helpers::multi_index_helper<boost::multi_index::detail::random_access_index_node<$T1> >*)(boost::multi_index::detail::random_access_index_node<$T1>*)(boost::multi_index::detail::random_access_index_node_trampoline<$T1>*)(&$e))->value
+    )
+  )
+}
+;--------------------------------------------
+; boost::multi_index_container - hashed index
+; NOTE: it seems that we don't need to retrieve the actual allocator used, std::allocator will suffice...
+boost::multi_index::detail::header_holder<boost::multi_index::detail::hashed_index_node<*>*,*>{
+  preview(#("hashed index - ", (($T3*)&$c)->node_count, " in ", (($T3*)&$c)->buckets.size_, " buckets"))
+  children(
+    #(
+      #array(
+            expr : (($T3*)&$c)->buckets.spc.data_[$i],
+            size : (($T3*)&$c)->buckets.size_
+      ) : *(msvc_helpers::multi_index_helper_3<boost::multi_index::detail::hashed_index_node<$T1> >*)(void*)&$e
+    )
+  )
+}
+msvc_helpers::multi_index_helper_3<boost::multi_index::detail::hashed_index_node<*> >{
+  preview(#if ( ((boost::multi_index::detail::hashed_index_node_impl<std::allocator<char> >*)&$c)->next_==((boost::multi_index::detail::hashed_index_node_impl<std::allocator<char> >*)&$c) )
+             ; no data at all
+             (#("---"))
+          #else (
+             #if ( ((boost::multi_index::detail::hashed_index_node_impl<std::allocator<char> >*)&$c)->next_->next_==((boost::multi_index::detail::hashed_index_node_impl<std::allocator<char> >*)&$c) ) (
+               ; 1 item: preview as _value_
+               #( ((msvc_helpers::multi_index_helper<boost::multi_index::detail::hashed_index_node<$T1> >*)(boost::multi_index::detail::hashed_index_node<$T1>*)(boost::multi_index::detail::hashed_index_node_trampoline<$T1>*)(((boost::multi_index::detail::hashed_index_node_impl<std::allocator<char> >*)&$c)->next_))->value)
+             ) #else (
+               ; multiple items: preview as [_value_ ...]
+               #("[", ((msvc_helpers::multi_index_helper<boost::multi_index::detail::hashed_index_node<$T1> >*)(boost::multi_index::detail::hashed_index_node<$T1>*)(boost::multi_index::detail::hashed_index_node_trampoline<$T1>*)(((boost::multi_index::detail::hashed_index_node_impl<std::allocator<char> >*)&$c)->next_))->value, " ...]")
+             )
+          )
+         )
+  children(
+    #(
+      ; multiple items: view as list
+      #list(
+        head: ((boost::multi_index::detail::hashed_index_node_impl<std::allocator<char> >*)&$c)->next_,
+        next: next_,
+        skip: ((boost::multi_index::detail::hashed_index_node_impl<std::allocator<char> >*)&$c)
+      ) : ((msvc_helpers::multi_index_helper<boost::multi_index::detail::hashed_index_node<$T1> >*)(boost::multi_index::detail::hashed_index_node<$T1>*)(boost::multi_index::detail::hashed_index_node_trampoline<$T1>*)(&$e))->value
+    )
+  )
+}
+;---------------------------------------------
+; boost::multi_index_container - ordered index
+; NOTE: it seems that we don't need to retrieve the actual allocator used, std::allocator will suffice...
+boost::multi_index::detail::header_holder<boost::multi_index::detail::ordered_index_node<*>*,*>{
+  preview(#("ordered index"))
+  children(
+      #tree(
+            head : *(boost::multi_index::detail::ordered_index_node_compressed_base<std::allocator<char> >*)(boost::multi_index::detail::ordered_index_node_impl<std::allocator<char> >*)(void*)(((boost::multi_index::detail::ordered_index_node_trampoline<$T1>*)($c.member))->parentcolor_&~1U),
+            size : (($T3*)&$c)->node_count,
+            left : left_,
+            right : right_,
+            skip : 0
+      ) : ((msvc_helpers::multi_index_helper<boost::multi_index::detail::ordered_index_node<$T1> >*)(boost::multi_index::detail::ordered_index_node<$T1>*)(boost::multi_index::detail::ordered_index_node_trampoline<$T1>*)(&$e))->value
+  )
+}
+;
+; BOOST_VISUALIZER_END boost::multi_index_container
+;--------------------------------------------------
+
+
+
+;-------------------------------------------------------------
+; BOOST_VISUALIZER_START boost::optional
+;
+; Copyright Daniel Kruegler 2008. Use, modification and distribution are subject to
+; the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt
+; or copy at http://www.boost.org/LICENSE_1_0.txt)
+;
+; @guid     D02681E0-021B-11DD-95FF-0800200C9A66
+; @platform msvc-8, msvc-9
+; @version  1.0
+; @author   Daniel Kruegler
+; @email    daniel dot kruegler at bdal dot de
+;
+; Usage
+; =====
+;
+; All of the following text must be placed in the autoexp.dat file.
+; Usage is automatic. No extra code is required.
+;
+
+boost::optional<*>|boost::optional_detail::optional_base<*> {
+  preview
+  (
+    #if($e.m_initialized)
+    (
+      *(($T1 *) (&$e.m_storage.dummy_.data[0]))
+    )
+    #else
+    (
+      "?"
+    )
+  )
+  
+  children
+  (
+    #if($e.m_initialized)
+    (
+      #(value:
+        *(($T1 *) (&$e.m_storage.dummy_.data[0]))
+      )
+    )
+    #else
+    (
+      "?"
+    )
+  )
+}
+
+; BOOST_VISUALIZER_END boost::optional
+;-----------------------------------------------------------
+
+
+;-------------------------------------------------------------
+; BOOST_VISUALIZER_START boost::ptr_container and boost::array
+;
+; Copyright William Buklis 2007. Use, modification and distribution are subject to
+; the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt
+; or copy at http://www.boost.org/LICENSE_1_0.txt)
+;
+; @guid     CDC4F187-4AE8-40f2-A1CA-4F5913BC2778
+; @platform msvc-8, msvc-9
+; @version  1.1
+; @author   Bill Buklis
+; @email    bill at pbjzone dot com
+;
+; Usage
+; =====
+;
+; All of the following text must be placed in the autoexp.dat file.
+; Usage is automatic. No extra code is required.
+;
+; The following containers are supported with these visualizers:
+;	array
+;	ptr_array
+;	ptr_deque
+;	ptr_list
+;	ptr_map
+;	ptr_multimap
+;	ptr_set
+;	ptr_multiset
+;	ptr_vector
+;
+; All of these visualizers attempt to emulate their corresponding STL containers using
+;	a pointer type. i.e. ptr_vector<T> displays equivalently to vector<T*>.
+;
+
+
+;------------------------------------------------------------------------------
+;  boost::array
+;------------------------------------------------------------------------------
+
+boost::array<*,*>{
+	preview( $c.elems )
+	children
+	(
+	    #array
+	    (
+			expr:	$c.elems[$i],
+			size :	$T2
+		)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_array
+;------------------------------------------------------------------------------
+
+boost::ptr_array<*,*>{
+	preview( ($T1**)$c.c_.elems )
+	children
+	(
+	    #array
+	    (
+			expr:	($T1*)$c.c_.elems[$i],
+			size :	$T2
+		)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_vector
+;------------------------------------------------------------------------------
+boost::ptr_vector<*,*>{
+	children
+	(
+	    #array
+	    (
+			expr: (($T1**)($c.c_._Myfirst))[$i],
+			size :	$c.c_._Mylast-$c.c_._Myfirst
+		)
+	)
+	
+    preview
+    ( 
+        #( 
+			"[", 
+            $e.c_._Mylast - $e.c_._Myfirst, 
+            "](", 
+            
+            #array
+            (
+				expr : 	(($T1**)($c.c_._Myfirst))[$i],  
+				size : 	$c.c_._Mylast-$c.c_._Myfirst
+			), 
+			")"
+		)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_map
+;------------------------------------------------------------------------------
+
+boost::ptr_map<*,*,*>{
+	preview
+	(
+		#(
+			"[", 
+			$e.c_._Mysize, 
+			"](", 
+
+			#tree
+			(
+				head : $c.c_._Myhead->_Parent, 
+				skip : $c.c_._Myhead, 
+				size : $c.c_._Mysize, 
+				left : _Left, 
+				right : _Right
+			) : *(std::pair<$T1,$T2 *> *)&($e._Myval),
+			
+			")"
+		)
+	)		     
+	children
+	(
+		#tree
+		(
+			head : $c.c_._Myhead->_Parent,
+		    skip : $c.c_._Myhead, 
+		    size : $c.c_._Mysize, 
+		    left : _Left, 
+		    right : _Right
+		) : *(std::pair<$T1,$T2 *> *)&($e._Myval)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_multimap
+;------------------------------------------------------------------------------
+
+boost::ptr_multimap<*,*,*>{
+	preview
+	(
+		#(
+			"[", 
+			$e.c_._Mysize, 
+			"](", 
+
+			#tree
+			(
+				head : $c.c_._Myhead->_Parent, 
+				skip : $c.c_._Myhead, 
+				size : $c.c_._Mysize, 
+				left : _Left, 
+				right : _Right
+			) : *(std::pair<$T1,$T2 *> *)&($e._Myval),
+			
+			")"
+		)
+	)		     
+	children
+	(
+		#tree
+		(
+			head : $c.c_._Myhead->_Parent,
+		    skip : $c.c_._Myhead, 
+		    size : $c.c_._Mysize, 
+		    left : _Left, 
+		    right : _Right
+		) : *(std::pair<$T1,$T2 *> *)&($e._Myval)
+	)
+}
+
+boost::ptr_map_iterator<*,*,*>{
+	preview
+	( 
+		#( "(", $c.m_iterator._Ptr->_Myval.first, ",", ($T3) $c.m_iterator._Ptr->_Myval.second, ")"
+		)
+	)
+	children
+	(
+		#(
+			_ptr: $c.m_iterator._Ptr,
+			first: $c.m_iterator._Ptr->_Myval.first,
+			second: ($T3) $c.m_iterator._Ptr->_Myval.second
+		)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_set
+;------------------------------------------------------------------------------
+
+boost::ptr_set<*,*,*>{
+    preview
+    ( 
+		#( 
+			"[", 
+            $e.c_._Mysize , 
+            "](", 
+            
+            #tree
+            (
+				head : $c.c_._Myhead->_Parent, 
+				skip : $c.c_._Myhead, 
+				left : _Left, 
+				right : _Right,
+				size  : $c.c_._Mysize
+			) : ($T1*)$e._Myval, 
+			
+			")"
+		)
+	)
+			   
+	children
+	(
+		#tree
+		(
+			head : $c.c_._Myhead->_Parent, 
+			skip : $c.c_._Myhead, 
+			left : _Left, 
+			right : _Right,
+			size  : $c.c_._Mysize
+		) : ($T1*)$e._Myval
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_multiset
+;------------------------------------------------------------------------------
+
+boost::ptr_multiset<*,*,*>{
+    preview
+    ( 
+		#( 
+			"[", 
+            $e.c_._Mysize , 
+            "](", 
+            
+            #tree
+            (
+				head : $c.c_._Myhead->_Parent, 
+				skip : $c.c_._Myhead, 
+				left : _Left, 
+				right : _Right,
+				size  : $c.c_._Mysize
+			) : ($T1*)$e._Myval, 
+			
+			")"
+		)
+	)
+			   
+	children
+	(
+		#tree
+		(
+			head : $c.c_._Myhead->_Parent, 
+			skip : $c.c_._Myhead, 
+			left : _Left, 
+			right : _Right,
+			size  : $c.c_._Mysize
+		) : ($T1*)$e._Myval
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_list
+;------------------------------------------------------------------------------
+
+boost::ptr_list<*,*>{
+
+	children
+	(
+		#list
+		(
+			head : ($c.c_._Myhead->_Next),
+			size : $c.c_._Mysize, 
+			next : _Next
+		) : ($T1*)$e._Myval
+	)
+		          
+	preview
+	(
+		#(
+			"[", 
+			$e._Mysize, 
+			"](", 
+		  
+			#list
+			(
+				head : $c.c_._Myhead->_Next,
+				size : $c.c_._Mysize, 
+				next : _Next
+			) : ($T1*)$e._Myval,
+		 
+			")"
+		)
+	)			      
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_deque
+;------------------------------------------------------------------------------
+
+boost::ptr_deque<*,*>{
+	children
+	(
+		#array
+		(
+			expr : ($T1*)($c.c_._Map[ (($i + $c.c_._Myoff) / $c.c_._EEN_DS) % $c.c_._Mapsize][($i + $c.c_._Myoff) % $c.c_._EEN_DS]),
+			size : $c.c_._Mysize
+		)
+	)
+
+	preview
+	(
+		#(
+			"[", 
+			$e.c_._Mysize, 
+			"](", 
+		  
+			#array
+			(
+				expr : ($T1*)($c.c_._Map[ (($i + $c.c_._Myoff) / $c.c_._EEN_DS) % $c.c_._Mapsize][($i + $c.c_._Myoff) % $c.c_._EEN_DS]),
+				size : $c.c_._Mysize
+			),
+		 
+			")"
+		)
+	)		       
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_vector::iterator (specialization of void_ptr_iterator)
+;------------------------------------------------------------------------------
+boost::void_ptr_iterator<std::_Vector_iterator<*>,*>|boost::void_ptr_iterator<std::_Vector_const_iterator<*>,*>{
+	preview
+	(
+		#(
+			($T2*)(*$c.iter_._Myptr)
+		)
+	)
+	children
+	(
+		#(
+			ptr: ($T2*)(*$c.iter_._Myptr)
+		)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_deque::iterator (specialization of void_ptr_iterator)
+;------------------------------------------------------------------------------
+boost::void_ptr_iterator<std::_Deque_iterator<*,*,*>,*>|boost::void_ptr_iterator<std::_Deque_const_iterator<*,*,*>,*>{
+   preview
+   (
+	   #if( $e.iter_._Myoff >= ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Myoff + ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Mysize)
+	   (
+	   		#("<end>")
+	   )
+	   #else(
+			#(
+				"deque[", 
+				$e.iter_._Myoff - ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Myoff, 
+				"] = ",
+				($T4*)((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Map[ (($c.iter_._Myoff) / ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_EEN_DS) % ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Mapsize][$c.iter_._Myoff % ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_EEN_DS] 
+			)
+		)
+	)
+	children
+	(
+	   #if( ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Myoff + ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Mysize > $e.iter_._Myoff) 
+	   (
+			#(
+				ptr: ($T4*)((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Map[ ($c.iter_._Myoff / ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_EEN_DS) % ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_Mapsize][$c.iter_._Myoff % ((std::deque<$T1,$T2 > *)$c.iter_._Mycont)->_EEN_DS] 
+			)
+		)
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::ptr_array::iterator (specialization of void_ptr_iterator)
+;------------------------------------------------------------------------------
+boost::void_ptr_iterator<void**,*>{
+	preview
+	(
+		#( ($T3**) $e.iter_ )
+	)
+	
+	children
+	(
+		#( ptr: *($T3**) $e.iter_ )
+	)
+}
+
+;------------------------------------------------------------------------------
+;  boost::void_ptr_iterator - used by ptr_set, ptr_multiset, ptr_list
+;------------------------------------------------------------------------------
+boost::void_ptr_iterator<*,*>{
+	preview
+	(
+		#( ($T2*) $e.iter_._Ptr->_Myval)
+	)
+	
+	children
+	(
+		#(ptr: ($T2*) $e.iter_._Ptr->_Myval)
+	)
+}
+
+; BOOST_VISUALIZER_END boost::ptr_container and boost::array
+;-----------------------------------------------------------
+
+
+
+
+
+
+;------------------------------------------------------------------------------
+;  boost::basic_regex
+;------------------------------------------------------------------------------
+
+boost::basic_regex<*,*>{
+	preview
+	( 
+		#(	"regex ",
+			$c.m_pimpl.px->m_expression
+		 )
+	)
+	children
+	( 
+		#( 
+			internals: $c.m_pimpl.px
+		)
+	)
+}
+
+
+
+
+
+
+
+;------------------------------------------------------------------------------
+;  boost::shared_ptr
+;------------------------------------------------------------------------------
+
+boost::shared_ptr<*>{
+	preview
+	( 
+		#(	"shared_ptr ",
+			(*(($T1 *)$c.px) )
+			, " count = ", $c.pn.pi_->use_count_
+		 )
+	)
+	children
+	( 
+		#( 
+			ptr: (*(($T1 *)$c.px)) ,
+			count: $c.pn.pi_->use_count_ ,
+			weak_count: $c.pn.pi_->weak_count_
+		)
+	)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+;------------------------------------------------------------------------------
+;  boost::variant
+;
+;  Copyright (c) 2009 Dmitry Vinogradov
+;  Copyright (c) 2009 Steven Watanabe
+;
+;  Distributed under the Boost Software License, Version 1.0. (See
+;  accomapnying file LICENSE_1_0.txt or copy at
+;  http://www.boost.org/LICENSE_1_0.txt)
+;------------------------------------------------------------------------------
+
+boost::variant<boost::detail::variant::over_sequence<*>,*> {
+    preview ([$e,!])
+    children (
+        #(
+            which_ : $e.which_,
+            #(storage_ : $e.storage_)
+        )
+    )
+}
+
+boost::variant<boost::detail::variant::recursive_flag<boost::detail::variant::over_sequence<*> >,*> {
+    preview ([$e,!])
+    children (
+        #(
+            which_ : $e.which_,
+            #(storage_ : $e.storage_)
+        )
+    )
+}
+
+boost::variant<boost::detail::variant::recursive_flag<*>,*,*,*,*,*,*,*,*,*>|boost::variant<*,*,*,*,*,*,*,*,*,*> {
+    preview (
+        #(
+            #switch($e.which_)
+            #case 0 ( *($T1 *)&($e.storage_.data_) )
+            #case 1 ( *($T2 *)&($e.storage_.data_) )
+            #case 2 ( *($T3 *)&($e.storage_.data_) )
+            #case 3 ( *($T4 *)&($e.storage_.data_) )
+            #case 4 ( *($T5 *)&($e.storage_.data_) )
+            #case 5 ( *($T6 *)&($e.storage_.data_) )
+            #case 6 ( *($T7 *)&($e.storage_.data_) )
+            #case 7 ( *($T8 *)&($e.storage_.data_) )
+            #case 8 ( *($T9 *)&($e.storage_.data_) )
+            #case -1 ( **($T1 **)&($e.storage_.data_) )
+            #case -2 ( **($T2 **)&($e.storage_.data_) )
+            #case -3 ( **($T3 **)&($e.storage_.data_) )
+            #case -4 ( **($T4 **)&($e.storage_.data_) )
+            #case -5 ( **($T5 **)&($e.storage_.data_) )
+            #case -6 ( **($T6 **)&($e.storage_.data_) )
+            #case -7 ( **($T7 **)&($e.storage_.data_) )
+            #case -8 ( **($T8 **)&($e.storage_.data_) )
+            #case -9 ( **($T9 **)&($e.storage_.data_) )
+            #default (#([actual members] : [$e,!]))
+            #except (#([actual members] : [$e,!]))
+        )
+    )
+    children
+    (
+        #(
+        value :
+            #switch($e.which_)
+            #case 0 ( *($T1 *)&($e.storage_.data_) )
+            #case 1 ( *($T2 *)&($e.storage_.data_) )
+            #case 2 ( *($T3 *)&($e.storage_.data_) )
+            #case 3 ( *($T4 *)&($e.storage_.data_) )
+            #case 4 ( *($T5 *)&($e.storage_.data_) )
+            #case 5 ( *($T6 *)&($e.storage_.data_) )
+            #case 6 ( *($T7 *)&($e.storage_.data_) )
+            #case 7 ( *($T8 *)&($e.storage_.data_) )
+            #case 8 ( *($T9 *)&($e.storage_.data_) )
+            #case -1 ( **($T1 **)&($e.storage_.data_) )
+            #case -2 ( **($T2 **)&($e.storage_.data_) )
+            #case -3 ( **($T3 **)&($e.storage_.data_) )
+            #case -4 ( **($T4 **)&($e.storage_.data_) )
+            #case -5 ( **($T5 **)&($e.storage_.data_) )
+            #case -6 ( **($T6 **)&($e.storage_.data_) )
+            #case -7 ( **($T7 **)&($e.storage_.data_) )
+            #case -8 ( **($T8 **)&($e.storage_.data_) )
+            #case -9 ( **($T9 **)&($e.storage_.data_) )
+            #default ( *(void*)0 )
+            #except ( *(void*)0 ),
+            #([actual members] : [$e,!])
+        )
+    )
+}
+
+boost::recursive_wrapper<*> {
+    preview ([*$e.p_])
+}

@@ -49,37 +49,102 @@ int _tmain(int argc, _TCHAR* argv[])
 	v = boost::uint32_t(29);
 	v = boost::uint64_t(30);
 
-	{
-		utils::Variant::VectorChar vc;
-		vc.push_back(10);
-		vc.push_back(20);
-		v = vc;
-	}
+	utils::Variant::VectorChar vc;
+	vc.push_back(10);
+	vc.push_back(20);
+	v = vc;
 
-	{
-		utils::Variant::Date d(2003, 1,2);
-		v = d;
-	}
+	utils::Variant::Date d(2003, 1,2);
+	v = d;
 
-	{
-		utils::Variant::Date d(2003, 1,2);
-		utils::Variant::Time t(d);
-		v = t;
-	}
+	utils::Variant::Time t(d, utils::Variant::TimeDuration(1,2,3));
+	v = t;
 
-	{
-		utils::Variant::VectorVariant vv;
-		vv.push_back(v);
-		vv.push_back(utils::Variant(10));
-		v = vv;
-	}
+	utils::Variant::VectorVariant vv;
+	vv.push_back(v);
+	vv.push_back(utils::Variant(10));
+	v = vv;
 
-	v = utils::Variant::MapStringVariant();
-	v.as<utils::Variant::MapStringVariant>()["220"] = 220;
-	//std::cout<<v.as<int>()<<endl;
+	utils::Variant::MapStringVariant msv;
+	msv["one"] = v;
+	msv["two"] = vc;
+	msv["three"] = t;
+	msv["four"] = vv;
+	v = msv;
 
-	utils::Variant v2(v);
-	std::cout<<v2.as<utils::Variant::MapStringVariant>()["220"].as<int>()<<endl;
+
+	v = true;
+
+	std::tm tm = {};
+	tm.tm_year = 111;
+	tm.tm_mon = 3;
+	tm.tm_mday = 4;
+	tm.tm_hour = 5;
+	tm.tm_min = 6;
+	tm.tm_sec = 7;
+	tm.tm_isdst = 1;
+	v = tm;
+
+
+	utils::Variant::Bitset8 bs8(std::string("010111"));
+	v = bs8;
+	utils::Variant::Bitset16 bs16(std::string("010111"));
+	v = bs16;
+	utils::Variant::Bitset32 bs32(std::string("010111"));
+	v = bs32;
+	utils::Variant::Bitset64 bs64(std::string("010111"));
+	v = bs64;
+	utils::Variant::Bitset128 bs128(std::string("010111"));
+	v = bs128;
+	utils::Variant::Bitset256 bs256(std::string("010111"));
+	v = bs256;
+	utils::Variant::Bitset512 bs512(std::string("010111"));
+	v = bs512;
+
+	utils::Variant::DateDuration dd(23);
+	v = dd;
+
+	utils::Variant::TimeDuration td(23,14,32);
+	v = td;
+
+	utils::Variant::DateTimeDuration dtd(dd, td);
+	v = dtd;
+
+	utils::Variant::MapVariantVariant mvv;
+	mvv["v"]="v";
+	mvv[dd]=mvv;
+	v = mvv;
+
+	utils::Variant::MultimapVariantVariant mmvv;
+	mmvv.insert(std::make_pair("v", "v"));
+	mmvv.insert(std::make_pair(dd, mmvv));
+	v = mmvv;
+
+	utils::Variant::MultimapStringVariant mmsv;
+	mmsv.insert(std::make_pair("v", "v"));
+	mmsv.insert(std::make_pair("dd", mmvv));
+	v = mmsv;
+
+	utils::Variant::SetVariant sv;
+	sv.insert("v");
+	sv.insert("mmsv");
+	v = sv;
+
+	utils::Variant::MultisetVariant msetv;
+	msetv.insert("v");
+	msetv.insert("v");
+	msetv.insert("msetv");
+	v = msetv;
+
+	utils::Variant::DequeVariant dv;
+	dv.push_back("v");
+	dv.push_back(dd);
+	v = dv;
+
+	utils::Variant::ListVariant lv;
+	lv.push_back("v");
+	lv.push_back(dd);
+	v = lv;
 
 	std::cout<<sizeof(utils::Variant)<<endl;
 
