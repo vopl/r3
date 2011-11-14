@@ -423,9 +423,14 @@ ENUMTYPES
 	//////////////////////////////////////////////////////////////////////////
 	void Variant::swap(Variant & v)
 	{
-		std::swap(_et, v._et);
-		//std::swap(_data, v._data);
-		assert(0);
+		if(this != &v)
+		{
+			static const size_t s = sizeof(*this);
+			char tmp[s];
+			memcpy(tmp, this, s);
+			memcpy(this, &v, s);
+			memcpy(&v, tmp, s);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

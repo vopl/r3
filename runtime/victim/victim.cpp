@@ -148,6 +148,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	std::cout<<sizeof(utils::Variant)<<endl;
 
+	utils::Variant v2;
+	v2.swap(v);
+	v2.swap(v2);
+
 	return 0;
 
 // 
