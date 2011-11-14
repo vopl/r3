@@ -1,6 +1,13 @@
 #ifndef _UTILS_DATA_HPP_
 #define _UTILS_DATA_HPP_
 
+
+//для autoexp.dat
+#if !defined NDEBUG && defined _MSC_VER
+#	define UTILS_VARIANT_DBGDATA
+#endif
+
+
 #include "utils/dateTimeDuration.hpp"
 #include <string>
 #include <boost/cstdint.hpp>
@@ -22,44 +29,44 @@ namespace utils
 	public:
 		enum EType
 		{
-			etNull,
-			etString,
-			etFloat,
-			etDouble,
-			etInt8,
-			etInt16,
-			etInt32,
-			etInt64,
-			etUInt8,
-			etUInt16,
-			etUInt32,
-			etUInt64,
-			etVectorChar,
-			etDate,
-			etTime,
-			etVectorVariant,
-			etMapStringVariant,
-			etBool,
-			etTm,
-			etBitset8,
-			etBitset16,
-			etBitset32,
-			etBitset64,
-			etBitset128,
-			etBitset256,
-			etBitset512,
-			etDateDuration,
-			etTimeDuration,
-			etDateTimeDuration,
+			etNull						=0,
+			etString					=1,
+			etFloat						=2,
+			etDouble					=3,
+			etInt8						=4,
+			etInt16						=5,
+			etInt32						=6,
+			etInt64						=7,
+			etUInt8						=8,
+			etUInt16					=9,
+			etUInt32					=10,
+			etUInt64					=11,
+			etVectorChar				=12,
+			etDate						=13,
+			etTime						=14,
+			etVectorVariant				=15,
+			etMapStringVariant			=16,
+			etBool						=17,
+			etTm						=18,
+			etBitset8					=19,
+			etBitset16					=20,
+			etBitset32					=21,
+			etBitset64					=22,
+			etBitset128					=23,
+			etBitset256					=24,
+			etBitset512					=25,
+			etDateDuration				=26,
+			etTimeDuration				=27,
+			etDateTimeDuration			=28,
 
 
-			etMapVariantVariant,
-			etMultimapVariantVariant,
-			etMultimapStringVariant,
-			etSetVariant,
-			etMultisetVariant,
-			etDequeVariant,
-			etListVariant,
+			etMapVariantVariant			=29,
+			etMultimapVariantVariant	=30,
+			etMultimapStringVariant		=31,
+			etSetVariant				=32,
+			etMultisetVariant			=33,
+			etDequeVariant				=34,
+			etListVariant				=35,
 		};
 
 	public:
@@ -312,8 +319,12 @@ namespace utils
 	protected:
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);
 		char _data[_dataSize];
-
 		boost::uint16_t _et;
+
+#ifdef UTILS_VARIANT_DBGDATA
+		void *_dbgData;
+#endif
+
 	};
 }
 

@@ -34,7 +34,46 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
-	utils::Variant v(10);
+	utils::Variant v;
+
+	v = std::string("220");
+	v = 1.234f;
+	v = 1.234;
+
+	v = boost::int8_t(23);
+	v = boost::int16_t(24);
+	v = boost::int32_t(25);
+	v = boost::int64_t(26);
+	v = boost::uint8_t(27);
+	v = boost::uint16_t(28);
+	v = boost::uint32_t(29);
+	v = boost::uint64_t(30);
+
+	{
+		utils::Variant::VectorChar vc;
+		vc.push_back(10);
+		vc.push_back(20);
+		v = vc;
+	}
+
+	{
+		utils::Variant::Date d(2003, 1,2);
+		v = d;
+	}
+
+	{
+		utils::Variant::Date d(2003, 1,2);
+		utils::Variant::Time t(d);
+		v = t;
+	}
+
+	{
+		utils::Variant::VectorVariant vv;
+		vv.push_back(v);
+		vv.push_back(utils::Variant(10));
+		v = vv;
+	}
+
 	v = utils::Variant::MapStringVariant();
 	v.as<utils::Variant::MapStringVariant>()["220"] = 220;
 	//std::cout<<v.as<int>()<<endl;

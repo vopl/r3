@@ -84,12 +84,24 @@ namespace utils
 		{
 			if(sizeof(T) <= sizeof(_data))
 			{
+				//для autoexp.dat
+#ifdef UTILS_VARIANT_DBGDATA
+				_dbgData = &as<T>();
+#endif
 				return;
 			}
 			as<T*>() = (T*)new char[sizeof(T)];
+			//для autoexp.dat
+#ifdef UTILS_VARIANT_DBGDATA
+			_dbgData = &as<T>();
+#endif
 		}
 		template <class T> void free()
 		{
+			//для autoexp.dat
+#ifdef UTILS_VARIANT_DBGDATA
+			_dbgData = NULL;
+#endif
 			if(sizeof(T) <= sizeof(_data))
 			{
 				return;
@@ -142,6 +154,7 @@ namespace utils
 			new (&as<T>()) T(v);
 		}
 
+		//////////////////////////////////////////////////////////////////////////
 		template <>
 		void construct(const Variant &v)
 		{
@@ -184,7 +197,7 @@ ENUMTYPES
 			_et = etNull;
 		}
 
-
+		//////////////////////////////////////////////////////////////////////////
 		template <class T>
 		void assign(const T &v)
 		{
@@ -198,6 +211,7 @@ ENUMTYPES
 			construct<T>(v);
 		}
 
+		//////////////////////////////////////////////////////////////////////////
 		template <>
 		void assign(const Variant &v)
 		{
@@ -219,6 +233,7 @@ ENUMTYPES
 			construct<Variant>(v);
 		}
 
+		//////////////////////////////////////////////////////////////////////////
 		void *data()
 		{
 			switch(_et)
@@ -233,25 +248,13 @@ ENUMTYPES
 			return NULL;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
 		void clear()
 		{
 			destruct();
 		}
 
-		const void *data() const
-		{
-			switch(_et)
-			{
-#define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
-				ENUMTYPES
-#undef ENUMTYPES_ONE
-				default:
-					assert(!"bad et for destruct");
-					throw "bad et for destruct";
-			}
-			return NULL;
-		}
-
+		//////////////////////////////////////////////////////////////////////////
 		template <class T>
 		T &as()
 		{
@@ -262,22 +265,14 @@ ENUMTYPES
 			return **(T**)(void *)_data;
 		}
 
-		template <class T>
-		const T &as() const
-		{
-			if(sizeof(T) <= sizeof(_data))
-			{
-				return *(T*)_data;
-			}
-			return **(T**)(void *)_data;
-		}
-
+		//////////////////////////////////////////////////////////////////////////
 		template<typename T> 
-		bool is() const
+		bool is()
 		{
 			return _et == Type2Enum<T>::et;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
 		template<typename T> 
 		void forceType()
 		{
@@ -290,6 +285,7 @@ ENUMTYPES
 			construct<T>();
 		}
 
+		//////////////////////////////////////////////////////////////////////////
 		void forceType(EType et)
 		{
 			if(et == _et)
@@ -311,7 +307,8 @@ ENUMTYPES
 			}
 		}
 
-		bool less(const Variant &v) const
+		//////////////////////////////////////////////////////////////////////////
+		bool less(const Variant &v)
 		{
 			if(v.type() < _et)
 			{
