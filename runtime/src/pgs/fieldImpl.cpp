@@ -45,19 +45,27 @@ namespace pgs
 	{
 		switch(ecm)
 		{
-		case ecmSelectWhat:
 		case ecmSelectWhere:
+		case ecmSelectWhat:
 			{
 				state.checkAliasExistence(_srcAlias, true);
 
-				res += state._cluster->escapeName(_srcAlias);
-				res += ".";
-				res += state._cluster->escapeName(_metaField->_name);
+				std::string fldName;
+
+				fldName += state._cluster->escapeName(_srcAlias);
+				fldName += ".";
+				fldName += state._cluster->escapeName(_metaField->_name);
 
 				if(ecmSelectWhat == ecm && !_alias.empty() && _alias != _metaField->_name)
 				{
-					res += " AS ";
-					res += state._cluster->escapeName(_alias);
+					fldName += " AS ";
+					fldName += state._cluster->escapeName(_alias);
+				}
+				res += fldName;
+
+				if(ecmSelectWhat == ecm)
+				{
+					state._fetchName2idx[fldName] = state._nextWhatColumnIndex++;
 				}
 			}
 			break;

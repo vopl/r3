@@ -188,6 +188,9 @@ namespace utils
 		Variant(const DequeVariant &v);
 		Variant(const ListVariant &v);
 
+		//helper
+		Variant(const char *v);
+
 		Variant &operator=(const Variant &v);
 		Variant &operator=(const String &v);
 		Variant &operator=(const Float &v);
@@ -225,6 +228,9 @@ namespace utils
 		Variant &operator=(const DequeVariant &v);
 		Variant &operator=(const ListVariant &v);
 
+		//helper
+		Variant &operator=(const char *v);
+
 		// queries
 		operator String &();
 		operator Float &();
@@ -261,6 +267,9 @@ namespace utils
 		operator MultisetVariant &();
 		operator DequeVariant &();
 		operator ListVariant &();
+
+		//helper
+		operator const char *();
 
 
 		operator String const &() const;
@@ -307,7 +316,7 @@ namespace utils
 
 		void *data();
 		void const *data() const;
-		template<typename T> T &as();
+		template<typename T> T &as(bool forceType = false);
 		template<typename T> T const &as() const;
 		template<typename T> bool is() const;
 		template<typename T> void forceType();

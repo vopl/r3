@@ -13,6 +13,7 @@ namespace pgs
 	class Field
 		: public Expression
 	{
+	protected:
 		typedef FieldImpl_ptr Impl_ptr;
 
 	public:

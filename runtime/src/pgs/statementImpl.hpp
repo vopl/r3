@@ -11,15 +11,25 @@ namespace pgs
 		: public pgc::StatementPrepImpl
 	{
 		typedef std::map<std::string, size_t>	TMName2idx;
-		TMName2idx _name2idx;
+		TMName2idx _bindName2idx;
+		TMName2idx _fetchName2idx;
 
-	private:
-		size_t name2idx(const char *name);
+		pgs::ClusterImpl_ptr _cluster;
 
 	public:
-		StatementImpl(pgc::ConnectionImplPtr con, const TMName2idx &name2idx);
+		size_t bindName2idx(const char *name);
+		bool fldIndex(size_t &res, const std::string &name);
+		bool fldIndex(size_t &res, const FieldImpl_ptr &fld);
+		bool fldIndices(std::deque<size_t> &res, const CategoryImpl_ptr &cat);
 
-		void bind(int typCpp, void const *valCpp, const char *name);
+	public:
+		StatementImpl(
+			pgs::ClusterImpl_ptr cluster, 
+			const TMName2idx &bindName2idx,
+			const TMName2idx &fetchName2idx);
+
+		bool bind(int typCpp, void const *valCpp, const char *name);
+
 		void unbind(const char *name);
 
 	};

@@ -1,6 +1,7 @@
 #include "pgc/result.hpp"
 #include "pgc/exception.hpp"
 #include "resultImpl.hpp"
+#include <cassert>
 
 namespace pgc
 {
@@ -129,9 +130,9 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchMap(utils::Variant::MapStringVariant &v, size_t rowIdx)
+	bool Result::fetchRowMap(utils::Variant::MapStringVariant &v, size_t rowIdx)
 	{
-		size_t columns = this->columns();
+		size_t columns = Result::columns();
 		v.clear();
 
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
@@ -143,6 +144,31 @@ namespace pgc
 			else
 			{
 				if(!fetch(v[name(colIdx)], colIdx, rowIdx))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowMap(utils::Variant::MapStringVariant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	{
+		size_t columns = colIndices.size();
+		v.clear();
+
+		for(size_t colIdx(0); colIdx<columns; colIdx++)
+		{
+			assert(colIndices[colIdx] < Result::columns());
+			if(isNull(colIndices[colIdx], rowIdx))
+			{
+				v[name(colIndices[colIdx])];
+			}
+			else
+			{
+				if(!fetch(v[name(colIndices[colIdx])], colIndices[colIdx], rowIdx))
 				{
 					return false;
 				}

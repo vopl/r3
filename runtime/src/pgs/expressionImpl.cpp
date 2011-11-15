@@ -8,6 +8,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	SCompileState::SCompileState()
 		: _nextCrossIndex(0)
+		, _nextWhatColumnIndex(0)
 	{
 
 	}

@@ -46,19 +46,19 @@ namespace pgs
 				std::string categoryAlias = state._cluster->escapeName(_alias);
 
 				//tableoid
-				res += categoryAlias;
-				res += ".tableoid";
-				// TRATATA тут фиксировать информацию дл€ феча
+				std::string fldName = categoryAlias + ".tableoid";
+				state._fetchName2idx[fldName] = state._nextWhatColumnIndex++;
+
+				res += fldName;
 
 				//перебрать все пол€
 				BOOST_FOREACH(meta::FieldCPtr mf, _metaCategory->_fields)
 				{
-					res += ", ";
-					res += categoryAlias;
-					res += ".";
-					res += state._cluster->escapeName(mf->_name);
+					fldName = categoryAlias + "." + state._cluster->escapeName(mf->_name);
+					state._fetchName2idx[fldName] = state._nextWhatColumnIndex++;
 
-					// TRATATA тут фиксировать информацию дл€ феча
+					res += ", ";
+					res += fldName;
 				}
 			}
 			break;

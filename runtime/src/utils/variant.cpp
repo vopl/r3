@@ -174,6 +174,14 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void construct(const char *v)
+		{
+			_et = Type2Enum<String>::et;
+			alloc<String>();
+			new (&as<String>()) String(v);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		void destruct()
 		{
 			switch(_et)
@@ -208,7 +216,7 @@ ENUMTYPES
 			}
 
 			destruct();
-			construct<T>(v);
+			construct(v);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -234,10 +242,24 @@ ENUMTYPES
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void assign(const char *v)
+		{
+			if(is<String>())
+			{
+				as<String>() = v;
+				return;
+			}
+
+			destruct();
+			construct(v);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		void *data()
 		{
 			switch(_et)
 			{
+				case etNull: return NULL;
 #define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
 				ENUMTYPES
 #undef ENUMTYPES_ONE
@@ -294,7 +316,7 @@ ENUMTYPES
 			}
 
 			destruct();
-			switch(_et)
+			switch(et)
 			{
 			case etNull: break;
 
@@ -376,6 +398,10 @@ ENUMTYPES
 	{
 		IMPL->construct(v);
 	}
+	Variant::Variant(const char *v)
+	{
+		IMPL->construct(v);
+	}
 
 //////////////////////////////////////////////////////////////////////////
 #define ENUMTYPES_ONE(T)					\
@@ -394,6 +420,12 @@ ENUMTYPES
 		return *this;
 	}
 
+Variant &Variant::operator=(const char * v)
+{
+	IMPL->assign(v);
+	return *this;
+}
+
 //////////////////////////////////////////////////////////////////////////
 #define ENUMTYPES_ONE(T)			\
 	Variant::operator T &()			\
@@ -405,6 +437,13 @@ ENUMTYPES
 
 ENUMTYPES
 #undef ENUMTYPES_ONE
+
+	Variant::operator const char *()
+	{
+		IMPL->validateType<String>();
+		IMPL->validateValue<String>();
+		return IMPL->as<String>().data();
+	}
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -464,13 +503,22 @@ ENUMTYPES
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template<typename T> T &Variant::as()
+	template<typename T> T &Variant::as(bool forceType)
 	{
 		IMPL->validateType<T>();
-		IMPL->validateValue<T>();
+		
+		if(forceType)
+		{
+			IMPL->forceType<T>();
+		}
+		else
+		{
+			IMPL->validateValue<T>();
+		}
+
 		return IMPL->as<T>();
 	}
-#define ENUMTYPES_ONE(T) template Variant::T &Variant::as<Variant::T>();
+#define ENUMTYPES_ONE(T) template Variant::T &Variant::as<Variant::T>(bool forceType);
 ENUMTYPES
 #undef ENUMTYPES_ONE
 

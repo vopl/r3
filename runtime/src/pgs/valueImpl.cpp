@@ -38,7 +38,7 @@ namespace pgs
 				char tmp[64];
 				res += utils::_ntoa(iter->second, tmp);
 
-				state._name2idx[_alias] = iter->second;
+				state._bindName2idx[_alias] = iter->second;
 			}
 			break;
 		default:

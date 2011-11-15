@@ -14,9 +14,19 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Statement::bindNative(int typCpp, void const *valCpp, const char *name)
+	bool Statement::bindNative(int typCpp, void const *valCpp, const char *name)
 	{
-		boost::static_pointer_cast<StatementImpl>(_impl)->bind(typCpp, valCpp, name);
+		return boost::static_pointer_cast<StatementImpl>(_impl)->bind(typCpp, valCpp, name);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Statement &Statement::bind(const utils::Variant &v, const char *name)
+	{
+		if(!boost::static_pointer_cast<StatementImpl>(_impl)->bind(v.type(), v.data(), name))
+		{
+			throw std::invalid_argument("for Statement::bind");
+		}
+		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -29,7 +39,9 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	Result Statement::exec()
 	{
-		ResultImpl_ptr res(new ResultImpl(_impl->con(), _impl->exec()));
+		ResultImpl_ptr res(new ResultImpl(
+			boost::static_pointer_cast<StatementImpl>(_impl), 
+			_impl->exec()));
 		return Result(res);
 	}
 

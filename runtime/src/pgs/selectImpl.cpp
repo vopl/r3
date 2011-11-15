@@ -143,7 +143,11 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		StatementImpl_ptr stm(new StatementImpl(ImplAccess<pgc::Connection>(cluster->con()).impl(), state._name2idx));
+		StatementImpl_ptr stm(new StatementImpl(
+			cluster, 
+			state._bindName2idx,
+			state._fetchName2idx));
+
 		stm->sql(sql);
 		return stm;
 	}

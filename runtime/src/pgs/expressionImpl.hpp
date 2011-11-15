@@ -27,11 +27,13 @@ namespace pgs
 		ClusterImpl_ptr				_cluster;
 		std::set<std::string>		_aliases;
 		size_t						_nextCrossIndex;
+		size_t						_nextWhatColumnIndex;
 
 		std::map<void *, size_t>	_valueNumbers;
 
-		typedef std::map<std::string, size_t>	TMValueName2idx;
-		TMValueName2idx				_name2idx;
+		typedef std::map<std::string, size_t>	TMName2idx;
+		TMName2idx					_bindName2idx;
+		TMName2idx					_fetchName2idx;
 
 
 		SCompileState();
