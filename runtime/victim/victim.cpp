@@ -204,6 +204,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::cout<<msv<<std::endl;
 	}
 
+	std::cout<<(v==dv[0]);
+	v = 220;
+	std::cout<<(v==dv[0]);
+
 	return 0;
 }
 

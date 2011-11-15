@@ -30,6 +30,16 @@ namespace utils
 			return _td < v._td;
 		}
 
+		bool operator ==(const DateTimeDuration &v) const
+		{
+			return _dd == v._dd && _td == v._td;
+		}
+
+		bool operator !=(const DateTimeDuration &v) const
+		{
+			return !operator==(v);
+		}
+
 	};
 }
 

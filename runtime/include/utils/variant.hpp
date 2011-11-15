@@ -324,6 +324,8 @@ namespace utils
 
 	public:
 		bool operator <(const Variant &v) const;
+		bool operator ==(const Variant &v) const;
+		bool operator !=(const Variant &v) const;
 
 	protected:
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);

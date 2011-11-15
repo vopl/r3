@@ -28,6 +28,13 @@ namespace utils
 				return false;
 			}
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		inline bool operator ==(const std::tm &v1,const std::tm &v2)
+		{
+			return 0 == memcmp(&v1, &v2, sizeof(std::tm));
+		}
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -168,8 +175,8 @@ namespace utils
 				ENUMTYPES
 #undef ENUMTYPES_ONE
 			default:
-				assert(!"bad et for destruct");
-				throw "bad et for destruct";
+				assert(!"bad et");
+				throw "bad et";
 			}
 		}
 
@@ -191,8 +198,8 @@ namespace utils
 				ENUMTYPES
 #undef ENUMTYPES_ONE
 			default:
-				assert(!"bad et for destruct");
-				throw "bad et for destruct";
+				assert(!"bad et");
+				throw "bad et";
 			}
 		}
 
@@ -231,8 +238,8 @@ namespace utils
 					ENUMTYPES
 #undef ENUMTYPES_ONE
 	default:
-		assert(!"bad et for destruct");
-		throw "bad et for destruct";
+		assert(!"bad et");
+		throw "bad et";
 				}
 				return;
 			}
@@ -264,8 +271,8 @@ namespace utils
 				ENUMTYPES
 #undef ENUMTYPES_ONE
 			default:
-				assert(!"bad et for destruct");
-				throw "bad et for destruct";
+				assert(!"bad et");
+				throw "bad et";
 			}
 			return NULL;
 		}
@@ -324,8 +331,8 @@ namespace utils
 				ENUMTYPES
 #undef ENUMTYPES_ONE
 			default:
-				assert(!"bad et for destruct");
-				throw "bad et for destruct";
+				assert(!"bad et");
+				throw "bad et";
 			}
 		}
 
@@ -348,14 +355,36 @@ namespace utils
 				ENUMTYPES
 #undef ENUMTYPES_ONE
 			default:
-				assert(!"bad et for destruct");
-				throw "bad et for destruct";
+				assert(!"bad et");
+				throw "bad et";
 			}
 
 			//never here
 			return false;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		bool equal(const Variant &v)
+		{
+			if(v.type() != _et)
+			{
+				return false;
+			}
+
+			switch(_et)
+			{
+			case etNull: break;
+#define ENUMTYPES_ONE(T) case et ## T: return as<T>() == v.as<T>();
+				ENUMTYPES
+#undef ENUMTYPES_ONE
+			default:
+				assert(!"bad et");
+				throw "bad et";
+			}
+
+			//never here
+			return false;
+		}
 	};
 #define IMPL ((VariantImpl *)this)
 

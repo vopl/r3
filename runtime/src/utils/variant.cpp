@@ -212,7 +212,17 @@ ENUMTYPES
 		return IMPL->less(v);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool Variant::operator ==(const Variant &v) const
+	{
+		return IMPL->equal(v);
+	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool Variant::operator !=(const Variant &v) const
+	{
+		return !IMPL->equal(v);
+	}
 
 
 
