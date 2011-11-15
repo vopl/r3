@@ -140,7 +140,7 @@ namespace utils
 		{
 		case Variant::etNull: ostr<<"Null"; break;
 
-#define ENUMTYPES_ONE(T) case Variant::et ## T: ostr<< #T<<"="; dumpOstr(ostr, v.as<Variant::T>(), level, levelApplyed); break;
+#define ENUMTYPES_ONE(T) case Variant::et ## T: ostr<< #T<<"# "; dumpOstr(ostr, v.as<Variant::T>(), level, levelApplyed); break;
 			ENUMTYPES
 #undef ENUMTYPES_ONE
 		default:

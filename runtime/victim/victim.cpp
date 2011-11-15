@@ -196,6 +196,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	r.fetchColumn(dv, pgs::Field("clientAlias", testCats->Client->middlename));
 	std::cout<<dv<<std::endl;
 
+	{
+		utils::Variant::MultisetVariant msv;
+		msv.insert(v);
+		msv.insert("220");
+		msv.insert("220");
+		std::cout<<msv<<std::endl;
+	}
+
 	return 0;
 }
 

@@ -11,11 +11,11 @@
 #include "utils/dateTimeDuration.hpp"
 #include <string>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <vector>
 #include <map>
 #include <set>
-#include <deque>
 #include <deque>
 #include <list>
 #include <bitset>
@@ -334,6 +334,8 @@ namespace utils
 		void *_dbgData;
 #endif
 	};
+
+	typedef boost::shared_ptr<Variant> VariantPtr;
 
 
 	std::ostream &operator <<(std::ostream &ostr, const Variant &v);
