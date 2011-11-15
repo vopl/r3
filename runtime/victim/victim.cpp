@@ -167,24 +167,34 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	utils::Variant::DequeVariant dv;
 	r.fetchRowList(dv);
+	std::cout<<dv<<std::endl;
 	r.fetchRowsList(dv);
+	std::cout<<dv<<std::endl;
 
 	msv;
 	r.fetchRowMap(msv);
+	std::cout<<msv<<std::endl;
 	r.fetchRowsMap(dv);
+	std::cout<<dv<<std::endl;
 
 
 	dv;
 	r.fetchRowList(dv, pgs::Category(testCats->Client, "clientAlias"));
+	std::cout<<dv<<std::endl;
 	r.fetchRowsList(dv, pgs::Category(testCats->Client, "clientAlias"));
+	std::cout<<dv<<std::endl;
 
 	msv;
 	r.fetchRowMap(msv, pgs::Category(testCats->Client, "clientAlias"));
+	std::cout<<msv<<std::endl;
 	r.fetchRowsMap(dv, pgs::Category(testCats->Client, "clientAlias"));
+	std::cout<<dv<<std::endl;
 
 	utils::Variant v;
 	r.fetch(v, pgs::Field("clientAlias", testCats->Client->middlename));
+	std::cout<<v<<std::endl;
 	r.fetchColumn(dv, pgs::Field("clientAlias", testCats->Client->middlename));
+	std::cout<<dv<<std::endl;
 
 	return 0;
 }

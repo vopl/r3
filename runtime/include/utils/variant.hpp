@@ -333,8 +333,26 @@ namespace utils
 #ifdef UTILS_VARIANT_DBGDATA
 		void *_dbgData;
 #endif
-
 	};
+
+
+	std::ostream &operator <<(std::ostream &ostr, const Variant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::VectorVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::MapStringVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::MapVariantVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::MultimapStringVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::MultimapVariantVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::SetVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::MultisetVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::DequeVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::ListVariant &v);
+
+
+
+
+
+
+
 }
 
 #endif

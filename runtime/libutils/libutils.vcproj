@@ -263,6 +263,14 @@
 					RelativePath="..\src\utils\variant.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\utils\variantDumper.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\utils\variantImpl.hpp"
+					>
+				</File>
 				<Filter
 					Name="serialization"
 					>
