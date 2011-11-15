@@ -165,48 +165,66 @@ int _tmain(int argc, _TCHAR* argv[])
 // 	std::cout<<r.fetchString("surname")<<std::endl;
 // 	std::cout<<r.fetchString("name")<<std::endl;
 
+	utils::Variant::VectorVariant sum;
+
 	utils::Variant::DequeVariant dv;
-	r.fetchRowList(dv);
+	r.fetchRowList(dv); sum.push_back(dv);
 	std::cout<<dv<<std::endl;
-	r.fetchRowsList(dv);
+	r.fetchRowsList(dv); sum.push_back(dv);
 	std::cout<<dv<<std::endl;
 
 	msv;
-	r.fetchRowMap(msv);
+	r.fetchRowMap(msv); sum.push_back(msv);
 	std::cout<<msv<<std::endl;
-	r.fetchRowsMap(dv);
+	r.fetchRowsMap(dv); sum.push_back(dv);
 	std::cout<<dv<<std::endl;
 
 
 	dv;
-	r.fetchRowList(dv, pgs::Category(testCats->Client, "clientAlias"));
+	r.fetchRowList(dv, pgs::Category(testCats->Client, "clientAlias")); sum.push_back(dv);
 	std::cout<<dv<<std::endl;
-	r.fetchRowsList(dv, pgs::Category(testCats->Client, "clientAlias"));
+	r.fetchRowsList(dv, pgs::Category(testCats->Client, "clientAlias")); sum.push_back(dv);
 	std::cout<<dv<<std::endl;
 
 	msv;
-	r.fetchRowMap(msv, pgs::Category(testCats->Client, "clientAlias"));
+	r.fetchRowMap(msv, pgs::Category(testCats->Client, "clientAlias")); sum.push_back(msv);
 	std::cout<<msv<<std::endl;
-	r.fetchRowsMap(dv, pgs::Category(testCats->Client, "clientAlias"));
+	r.fetchRowsMap(dv, pgs::Category(testCats->Client, "clientAlias")); sum.push_back(msv);
 	std::cout<<dv<<std::endl;
 
 	utils::Variant v;
-	r.fetch(v, pgs::Field("clientAlias", testCats->Client->middlename));
+	r.fetch(v, pgs::Field("clientAlias", testCats->Client->middlename)); sum.push_back(v);
 	std::cout<<v<<std::endl;
-	r.fetchColumn(dv, pgs::Field("clientAlias", testCats->Client->middlename));
+	r.fetchColumn(dv, pgs::Field("clientAlias", testCats->Client->middlename)); sum.push_back(dv);
 	std::cout<<dv<<std::endl;
 
 	{
 		utils::Variant::MultisetVariant msv;
 		msv.insert(v);
 		msv.insert("220");
-		msv.insert("220");
+		msv.insert("220"); sum.push_back(msv);
 		std::cout<<msv<<std::endl;
 	}
 
 	std::cout<<(v==dv[0]);
 	v = 220;
 	std::cout<<(v==dv[0]);
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	v = sum;
+
+	size_t size;
+	boost::shared_array<char> data = v.save(size);
+
+	utils::Variant v2;
+	v2.load(data, size);
+
+	std::cout<<(v==v2);
 
 	return 0;
 }

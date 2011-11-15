@@ -12,6 +12,7 @@
 #include <string>
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
 
 #include <vector>
 #include <map>
@@ -326,6 +327,10 @@ namespace utils
 		bool operator <(const Variant &v) const;
 		bool operator ==(const Variant &v) const;
 		bool operator !=(const Variant &v) const;
+
+	public:
+		boost::shared_array<char> save(size_t &size) const;
+		bool load(boost::shared_array<char> data, size_t size);
 
 	protected:
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);

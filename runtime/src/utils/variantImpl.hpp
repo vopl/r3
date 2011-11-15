@@ -1,3 +1,5 @@
+#include "utils/streambufOnArray.hpp"
+#include "utils/serialization.hpp"
 
 namespace utils
 {
@@ -14,7 +16,7 @@ namespace utils
 		template <size_t N>
 		bool operator <(const std::bitset<N> &v1,const std::bitset<N> &v2)
 		{
-			if(N < sizeof(unsigned long))
+			if(N <= sizeof(unsigned long))
 			{
 				return v1.to_ulong() < v2.to_ulong();
 			}
@@ -119,7 +121,7 @@ namespace utils
 	public:
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		void validateType()
+		void validateType() const
 		{
 			if(etNull == Type2Enum<T>::et)
 			{
@@ -129,7 +131,7 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		void validateValue()
+		void validateValue() const
 		{
 			if(_et != Type2Enum<T>::et)
 			{
@@ -262,6 +264,22 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		const void *data() const
+		{
+			switch(_et)
+			{
+			case etNull: return NULL;
+#define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
+				ENUMTYPES
+#undef ENUMTYPES_ONE
+			default:
+				assert(!"bad et");
+				throw "bad et";
+			}
+			return NULL;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		void *data()
 		{
 			switch(_et)
@@ -295,8 +313,19 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		template <class T>
+		const T &as() const
+		{
+			if(sizeof(T) <= sizeof(_data))
+			{
+				return *(T*)_data;
+			}
+			return **(T**)(void *)_data;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		template<typename T> 
-		bool is()
+		bool is() const
 		{
 			return _et == Type2Enum<T>::et;
 		}
@@ -337,7 +366,7 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		bool less(const Variant &v)
+		bool less(const Variant &v) const
 		{
 			if(v.type() < _et)
 			{
@@ -350,7 +379,7 @@ namespace utils
 
 			switch(_et)
 			{
-			case etNull: break;
+			case etNull: return false;
 #define ENUMTYPES_ONE(T) case et ## T: return as<T>() < v.as<T>();
 				ENUMTYPES
 #undef ENUMTYPES_ONE
@@ -364,7 +393,7 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		bool equal(const Variant &v)
+		bool equal(const Variant &v) const
 		{
 			if(v.type() != _et)
 			{
@@ -373,7 +402,7 @@ namespace utils
 
 			switch(_et)
 			{
-			case etNull: break;
+			case etNull: return true;
 #define ENUMTYPES_ONE(T) case et ## T: return as<T>() == v.as<T>();
 				ENUMTYPES
 #undef ENUMTYPES_ONE
@@ -385,7 +414,112 @@ namespace utils
 			//never here
 			return false;
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		boost::shared_array<char> save(size_t &size) const;
+		bool load(boost::shared_array<char> data, size_t size);
+
+	private:
+		friend class boost::serialization::access;
+
+		template<class Archive> void save(Archive & ar, const unsigned int version) const;
+		template<class Archive> void load(Archive & ar, const unsigned int version);
+		BOOST_SERIALIZATION_SPLIT_MEMBER()
 	};
-#define IMPL ((VariantImpl *)this)
+}
+
+//BOOST_CLASS_TRACKING(utils::VariantImpl, boost::serialization::track_always)
+
+//////////////////////////////////////////////////////////////////////////
+//utils::Variant 
+namespace boost 
+{
+	namespace serialization 
+	{
+		//////////////////////////////////////////////////////////////////////////
+		template<class Archive>
+		void serialize(Archive & ar, utils::Variant &x, const unsigned int version)
+		{
+			ar & static_cast<utils::VariantImpl &>(x);
+		}
+	} // namespace serialization
+} // namespace boost
+
+
+namespace utils
+{
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	boost::shared_array<char> VariantImpl::save(size_t &size) const
+	{
+		utils::StreambufOnArray sbuf;
+		{
+			std::ostream os(&sbuf);
+			utils::serialization::polymorphic_binary_portable_oarchive oa(os, boost::archive::no_header|boost::archive::no_codecvt);
+
+			oa << *this;
+		}
+
+		size = sbuf.size();
+		return sbuf.data();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool VariantImpl::load(boost::shared_array<char> data, size_t size)
+	{
+		try
+		{
+			utils::StreambufOnArray sbuf(data, size);
+			{
+				std::istream is(&sbuf);
+				utils::serialization::polymorphic_binary_portable_iarchive ia(is, boost::archive::no_header|boost::archive::no_codecvt);
+
+				ia >> *this;
+			}
+			return true;
+		}
+		catch(...)
+		{
+			std::cerr<<"exception in "<<__FUNCTION__<<std::endl;
+		}
+
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive>
+	void VariantImpl::save(Archive & ar, const unsigned int version) const
+	{
+		ar & _et;
+		switch(_et)
+		{
+		case etNull: break;
+#define ENUMTYPES_ONE(T) case et ## T: ar & as<T>(); break;
+			ENUMTYPES
+#undef ENUMTYPES_ONE
+		default:
+			assert(!"bad et");
+			throw "bad et";
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template<class Archive>
+	void VariantImpl::load(Archive & ar, const unsigned int version)
+	{
+		boost::uint16_t et;
+		ar & et;
+
+		switch(et)
+		{
+		case etNull: break;
+#define ENUMTYPES_ONE(T) case et ## T: forceType<T>(); ar & as<T>(); break;
+			ENUMTYPES
+#undef ENUMTYPES_ONE
+		default:
+			assert(!"bad et");
+			throw "bad et";
+		}
+	}
 
 }

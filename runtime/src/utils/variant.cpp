@@ -3,6 +3,9 @@
 
 #include "variantImpl.hpp"
 
+#define IMPL (static_cast<VariantImpl *>(this))
+#define CIMPL (static_cast<const VariantImpl *>(this))
+
 namespace utils
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -96,9 +99,9 @@ ENUMTYPES
 #define ENUMTYPES_ONE(T)					\
 	Variant::operator T const &() const		\
 	{										\
-		IMPL->validateType<T>();			\
-		IMPL->validateValue<T>();			\
-		return IMPL->as<T>();				\
+		CIMPL->validateType<T>();			\
+		CIMPL->validateValue<T>();			\
+		return CIMPL->as<T>();				\
 	}										//\
 
 ENUMTYPES
@@ -145,7 +148,7 @@ ENUMTYPES
 	//////////////////////////////////////////////////////////////////////////
 	void const *Variant::data() const
 	{
-		return IMPL->data();
+		return CIMPL->data();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -172,9 +175,9 @@ ENUMTYPES
 	//////////////////////////////////////////////////////////////////////////
 	template<typename T> T const &Variant::as() const
 	{
-		IMPL->validateType<T>();
-		IMPL->validateValue<T>();
-		return IMPL->as<T>();
+		CIMPL->validateType<T>();
+		CIMPL->validateValue<T>();
+		return CIMPL->as<T>();
 	}
 #define ENUMTYPES_ONE(T) template Variant::T const &Variant::as<Variant::T>() const;
 ENUMTYPES
@@ -183,8 +186,8 @@ ENUMTYPES
 	//////////////////////////////////////////////////////////////////////////
 	template<typename T> bool Variant::is() const
 	{
-		IMPL->validateType<T>();
-		return IMPL->is<T>();
+		CIMPL->validateType<T>();
+		return CIMPL->is<T>();
 	}
 #define ENUMTYPES_ONE(T) template bool Variant::is<Variant::T>() const;
 ENUMTYPES
@@ -209,19 +212,31 @@ ENUMTYPES
 	//////////////////////////////////////////////////////////////////////////
 	bool Variant::operator <(const Variant &v) const
 	{
-		return IMPL->less(v);
+		return CIMPL->less(v);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	bool Variant::operator ==(const Variant &v) const
 	{
-		return IMPL->equal(v);
+		return CIMPL->equal(v);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	bool Variant::operator !=(const Variant &v) const
 	{
-		return !IMPL->equal(v);
+		return !CIMPL->equal(v);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	boost::shared_array<char> Variant::save(size_t &size) const
+	{
+		return CIMPL->save(size);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	bool Variant::load(boost::shared_array<char> data, size_t size)
+	{
+		return IMPL->load(data, size);
 	}
 
 
