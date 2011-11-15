@@ -19,7 +19,7 @@ namespace utils
 		{
 			for(size_t i(0); i<level; i++)
 			{
-				ostr<<' ';
+				ostr<<"\t";
 			}
 		}
 	}

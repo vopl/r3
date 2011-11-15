@@ -61,20 +61,20 @@ namespace pgc
 				case 1114://timestamp
 				case 1184://timestamptz
 					_extractors[colIdx]._meth = &ResultImpl::extractor_timestamp;
-					_extractors[colIdx]._favorCppType = CppDataType<std::tm>::cdt_index;
+					_extractors[colIdx]._favorCppType = CppDataType<boost::posix_time::ptime>::cdt_index;
 					break;
 				case 1186://interval
 					_extractors[colIdx]._meth = &ResultImpl::extractor_interval;
-					_extractors[colIdx]._favorCppType = CppDataType<std::string>::cdt_index;
+					_extractors[colIdx]._favorCppType = CppDataType<boost::posix_time::time_duration>::cdt_index;
 					break;
 				case 1082://date
 					_extractors[colIdx]._meth = &ResultImpl::extractor_date;
-					_extractors[colIdx]._favorCppType = CppDataType<std::tm>::cdt_index;
+					_extractors[colIdx]._favorCppType = CppDataType<boost::gregorian::date>::cdt_index;
 					break;
 				case 1083://time
 				case 1266://timetz
 					_extractors[colIdx]._meth = &ResultImpl::extractor_time;
-					_extractors[colIdx]._favorCppType = CppDataType<std::tm>::cdt_index;
+					_extractors[colIdx]._favorCppType = CppDataType<boost::posix_time::time_duration>::cdt_index;
 					break;
 				case 16://bool
 					_extractors[colIdx]._meth = &ResultImpl::extractor_bool;
