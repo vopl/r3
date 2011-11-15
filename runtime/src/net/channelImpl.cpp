@@ -40,12 +40,12 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::send(boost::shared_array<char> data, size_t size)
+	void ChannelImpl::sendImpl(boost::shared_array<char> data, size_t size, EPacketKind kind)
 	{
 		OutPacketWrapper_ptr packet(new OutPacketWrapper);
 		packet->_totalSended = 0;
 		packet->_size = size;
-		packet->_sizeNetOrder = utils::fixEndian(packet->_size);
+		packet->_sizeNetOrder = utils::fixEndian(packet->_size | (((boost::uint32_t)kind)<<28));
 		packet->_crc32NetOrder = utils::fixEndian(utils::crc32(data.get(), size));
 		packet->_data = data;
 
@@ -57,6 +57,20 @@ namespace net
 			Allocator_ptr alloc = boost::make_shared<Allocator>();
 			handleSend(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
 		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelImpl::send(boost::shared_array<char> data, size_t size)
+	{
+		sendImpl(data, size, epkRaw);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelImpl::send(const utils::Variant &v)
+	{
+		size_t size;
+		boost::shared_array<char> data = v.save(size);
+		sendImpl(data, size, epkVariant);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -178,6 +192,8 @@ namespace net
 		else if(packet->_totalReceived == 4)
 		{
 			packet->_size = utils::fixEndian(packet->_size);
+			packet->_kind = (EPacketKind)(packet->_size>>28);
+			packet->_size &= 0x0fffffff;
 			packet->_data.reset(new char [packet->_size]);
 
 			boost::array<boost::asio::mutable_buffer, 2> packedData = 
@@ -228,7 +244,14 @@ namespace net
 			if(crc32 == packet->_crc32)
 			{
 				_socket->get_io_service().post(
-					makeCmaHandler(*alloc, boost::bind(&ChannelImpl::handleReceiveComplete, this, shared_from_this(), packet->_data, packet->_size, alloc))
+					makeCmaHandler(*alloc, boost::bind(
+						&ChannelImpl::handleReceiveComplete, 
+						this, 
+						shared_from_this(), 
+						packet->_data, 
+						packet->_size, 
+						packet->_kind, 
+						alloc))
 					);
 				makeReceive();
 			}
@@ -247,11 +270,38 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size, Allocator_ptr alloc)
+	void ChannelImpl::handleReceiveComplete(
+		ChannelImpl_ptr selfKeeper, boost
+		::shared_array<char> data, 
+		size_t size, 
+		EPacketKind kind,
+		Allocator_ptr alloc)
 	{
 		if(_handler)
 		{
-			_handler->onReceive(selfKeeper, data, size);
+			switch(kind)
+			{
+			case epkRaw:
+				_handler->onReceive(selfKeeper, data, size);
+				break;
+			case epkVariant:
+				{
+					utils::VariantPtr pv(new utils::Variant);
+					if(pv->load(data, size))
+					{
+						_handler->onReceive(selfKeeper, pv);
+					}
+					else
+					{
+						//corrupted data?
+						_handler->onError(selfKeeper);
+					}
+				}
+				break;
+			default:
+				assert(!"unknown packet kind");
+				throw "unknown packet kind";
+			}
 		}
 	}
 

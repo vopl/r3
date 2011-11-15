@@ -1,6 +1,8 @@
 #ifndef _NET_CHANNEL_HPP_
 #define _NET_CHANNEL_HPP_
 
+#include "utils/variant.hpp"
+
 namespace net
 {
 	struct Channel;
@@ -9,6 +11,7 @@ namespace net
 	struct IChannelHandler
 	{
 		virtual void onReceive(Channel_ptr channel, boost::shared_array<char> data, size_t size) =0;
+		virtual void onReceive(Channel_ptr channel, const utils::VariantPtr vptr) =0;
 		virtual void onError(Channel_ptr channel) =0;
 		virtual void onClose(Channel_ptr channel) =0;
 	};
@@ -17,6 +20,7 @@ namespace net
 	{
 		virtual void setHandler(IChannelHandler *) =0;
 		virtual void send(boost::shared_array<char> data, size_t size) =0;
+		virtual void send(const utils::Variant &v) =0;
 		virtual void close() =0;
 	};
 }
