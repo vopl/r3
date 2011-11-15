@@ -25,7 +25,7 @@ namespace boost
 	{
 		//////////////////////////////////////////////////////////////////////////
 		template<class Archive>
-		void save(Archive & ar, const std::tm &x, const unsigned int version)
+		void save(Archive & ar, const std::tm &x, const unsigned int /*version*/)
 		{
 			ar & x.tm_hour;
 			ar & x.tm_sec;
@@ -41,7 +41,7 @@ namespace boost
 
 		//////////////////////////////////////////////////////////////////////////
 		template<class Archive>
-		void load(Archive & ar, std::tm & x, const unsigned int version)
+		void load(Archive & ar, std::tm & x, const unsigned int /*version*/)
 		{
 			ar & x.tm_hour;
 			ar & x.tm_sec;
@@ -73,7 +73,7 @@ namespace boost
 	{
 		//////////////////////////////////////////////////////////////////////////
 		template<class Archive>
-		void serialize(Archive & ar, utils::DateTimeDuration &x, const unsigned int version)
+		void serialize(Archive & ar, utils::DateTimeDuration &x, const unsigned int /*version*/)
 		{
 			ar & x._dd;
 			ar & x._td;

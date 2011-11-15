@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libpgs"
 	ProjectGUID="{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}"
 	RootNamespace="libpgs"
@@ -47,6 +47,7 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
+				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
 			<Tool

@@ -1,6 +1,10 @@
 #include "utils/streambufOnArray.hpp"
 #include "utils/serialization.hpp"
 
+//warning C4127: conditional expression is constant
+#pragma warning (push)
+#pragma warning (disable: 4127)
+
 namespace utils
 {
 	namespace
@@ -76,8 +80,6 @@ namespace utils
 	ENUMTYPES_ONE(MultisetVariant)			\
 	ENUMTYPES_ONE(DequeVariant)				\
 	ENUMTYPES_ONE(ListVariant)				//\
-
-
 
 
 
@@ -167,7 +169,7 @@ namespace utils
 		template <>
 		void construct(const Variant &v)
 		{
-			_et = v.type();
+			_et = (ETypeStorage)v.type();
 
 			switch(_et)
 			{
@@ -276,6 +278,8 @@ namespace utils
 				assert(!"bad et");
 				throw "bad et";
 			}
+
+			//never here
 			return NULL;
 		}
 
@@ -292,6 +296,8 @@ namespace utils
 				assert(!"bad et");
 				throw "bad et";
 			}
+
+			//never here
 			return NULL;
 		}
 
@@ -438,7 +444,7 @@ namespace boost
 	{
 		//////////////////////////////////////////////////////////////////////////
 		template<class Archive>
-		void serialize(Archive & ar, utils::Variant &x, const unsigned int version)
+		void serialize(Archive & ar, utils::Variant &x, const unsigned int /*version*/)
 		{
 			ar & static_cast<utils::VariantImpl &>(x);
 		}
@@ -488,7 +494,7 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	template<class Archive>
-	void VariantImpl::save(Archive & ar, const unsigned int version) const
+	void VariantImpl::save(Archive & ar, const unsigned int /*version*/) const
 	{
 		ar & _et;
 		switch(_et)
@@ -505,7 +511,7 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	template<class Archive>
-	void VariantImpl::load(Archive & ar, const unsigned int version)
+	void VariantImpl::load(Archive & ar, const unsigned int /*version*/)
 	{
 		boost::uint16_t et;
 		ar & et;
@@ -523,3 +529,5 @@ namespace utils
 	}
 
 }
+
+#pragma warning (pop)

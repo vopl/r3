@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libpgc"
 	ProjectGUID="{55B09566-11AA-42DD-A2AA-A359E9E8098E}"
 	RootNamespace="libpgc"
@@ -49,6 +49,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
 			<Tool

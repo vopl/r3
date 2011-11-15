@@ -26,7 +26,7 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
-	std::ostream &dumpOstr(std::ostream &ostr, const T &v, size_t level, bool levelApplyed)
+	std::ostream &dumpOstr(std::ostream &ostr, const T &v, size_t /*level*/, bool /*levelApplyed*/)
 	{
 		ostr<<v;
 		return ostr;
@@ -34,7 +34,7 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	template <>
-	std::ostream &dumpOstr<tm>(std::ostream &ostr, const tm &v, size_t level, bool levelApplyed)
+	std::ostream &dumpOstr<tm>(std::ostream &ostr, const tm &v, size_t /*level*/, bool /*levelApplyed*/)
 	{
 		ostr
 			<<v.tm_year+1900<<"-"<<v.tm_mon+1<<"-"<<v.tm_mday

@@ -335,7 +335,9 @@ namespace utils
 	protected:
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);
 		char _data[_dataSize];
-		boost::uint16_t _et;
+
+		typedef boost::uint16_t ETypeStorage;
+		ETypeStorage _et;
 
 #ifdef UTILS_VARIANT_DBGDATA
 		void *_dbgData;
