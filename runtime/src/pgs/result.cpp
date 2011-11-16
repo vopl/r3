@@ -18,7 +18,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result::Result(Impl_ptr impl)
+	Result::Result(ImplPtr impl)
 		: pgc::Result(impl)
 	{
 	}

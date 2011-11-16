@@ -14,17 +14,17 @@ namespace pgs
 		TMName2idx _bindName2idx;
 		TMName2idx _fetchName2idx;
 
-		pgs::ClusterImpl_ptr _cluster;
+		pgs::ClusterImplPtr _cluster;
 
 	public:
 		size_t bindName2idx(const char *name);
 		bool fldIndex(size_t &res, const std::string &name);
-		bool fldIndex(size_t &res, const FieldImpl_ptr &fld);
-		bool fldIndices(std::deque<size_t> &res, const CategoryImpl_ptr &cat);
+		bool fldIndex(size_t &res, const FieldImplPtr &fld);
+		bool fldIndices(std::deque<size_t> &res, const CategoryImplPtr &cat);
 
 	public:
 		StatementImpl(
-			pgs::ClusterImpl_ptr cluster, 
+			pgs::ClusterImplPtr cluster, 
 			const TMName2idx &bindName2idx,
 			const TMName2idx &fetchName2idx);
 
@@ -33,7 +33,7 @@ namespace pgs
 		void unbind(const char *name);
 
 	};
-	typedef boost::shared_ptr<StatementImpl> StatementImpl_ptr;
+	typedef boost::shared_ptr<StatementImpl> StatementImplPtr;
 }
 
 #endif

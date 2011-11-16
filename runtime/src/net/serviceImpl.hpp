@@ -39,7 +39,7 @@ namespace net
 
 
 		boost::asio::io_service::strand	_socksPoolStrand;
-		std::set<TSocket_ptr>			_socks;
+		std::set<TSocketPtr>			_socks;
 
 	private:
 		void workerProc(ServiceWorkerPtr swp);
@@ -48,19 +48,19 @@ namespace net
 		const std::string &handleGetPassword();
 
 		void makeAccept();
-		void handleAccept(TSocket_ptr socket, const boost::system::error_code& e, Allocator_ptr alloc);
-		void handleServerHandshake(TSocket_ptr socket, const boost::system::error_code& e, Allocator_ptr alloc);
+		void handleAccept(TSocketPtr socket, const boost::system::error_code& e, AllocatorPtr alloc);
+		void handleServerHandshake(TSocketPtr socket, const boost::system::error_code& e, AllocatorPtr alloc);
 
-		void handleConnect(TSocket_ptr socket, const boost::system::error_code& e, Allocator_ptr alloc);
-		void handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& e, Allocator_ptr alloc);
+		void handleConnect(TSocketPtr socket, const boost::system::error_code& e, AllocatorPtr alloc);
+		void handleClientHandshake(TSocketPtr socket, const boost::system::error_code& e, AllocatorPtr alloc);
 
 	public:
-		void addSock(TSocket_ptr socket, Allocator_ptr alloc);
-		void delSock(TSocket_ptr socket);
+		void addSock(TSocketPtr socket, AllocatorPtr alloc);
+		void delSock(TSocketPtr socket);
 	private:
 		void closeSocks();
-		void handleAddSock(TSocket_ptr socket, Allocator_ptr alloc);
-		void handleDelSock(TSocket_ptr socket);
+		void handleAddSock(TSocketPtr socket, AllocatorPtr alloc);
+		void handleDelSock(TSocketPtr socket);
 		void handleCloseSocks();
 	public:
 		ServiceImpl(Service *iface, IServiceHandler *);

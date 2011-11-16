@@ -7,14 +7,14 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class ExpressionImpl;
-	typedef boost::shared_ptr<ExpressionImpl> ExpressionImpl_ptr;
+	typedef boost::shared_ptr<ExpressionImpl> ExpressionImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Expression
 	{
 	protected:
-		typedef ExpressionImpl_ptr Impl_ptr;
-		Impl_ptr _impl;
+		typedef ExpressionImplPtr ImplPtr;
+		ImplPtr _impl;
 	};
 
 

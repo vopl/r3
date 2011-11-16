@@ -7,7 +7,7 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Value::Value(const std::string &alias)
-		: Expression(ImplAccess<Expression>(ExpressionImpl_ptr(new ValueImpl(alias))))
+		: Expression(ImplAccess<Expression>(ExpressionImplPtr(new ValueImpl(alias))))
 	{
 
 	}

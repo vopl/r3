@@ -175,7 +175,7 @@ namespace net
 	}
 
 	typedef CmaAllocator<512> Allocator;
-	typedef boost::shared_ptr<Allocator> Allocator_ptr;
+	typedef boost::shared_ptr<Allocator> AllocatorPtr;
 
 }
 

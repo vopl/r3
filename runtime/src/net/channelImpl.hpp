@@ -7,11 +7,11 @@ namespace net
 {
  	//typedef boost::asio::ip::tcp::socket TSocket;
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> TSocket;
-	typedef boost::shared_ptr<TSocket> TSocket_ptr;
+	typedef boost::shared_ptr<TSocket> TSocketPtr;
 
 
 	class ChannelImpl;
-	typedef boost::shared_ptr<ChannelImpl> ChannelImpl_ptr;
+	typedef boost::shared_ptr<ChannelImpl> ChannelImplPtr;
 
 	class ServiceImpl;
 
@@ -33,7 +33,7 @@ namespace net
 			boost::shared_array<char> _data;
 			boost::uint32_t	_size;
 		};
-		typedef boost::shared_ptr<OutPacketWrapper> OutPacketWrapper_ptr;
+		typedef boost::shared_ptr<OutPacketWrapper> OutPacketWrapperPtr;
 
 		struct InPacketWrapper
 		{
@@ -42,20 +42,20 @@ namespace net
 			boost::uint32_t		_flags;
 			boost::shared_array<char> _data;
 		};
-		typedef boost::shared_ptr<InPacketWrapper> InPacketWrapper_ptr;
+		typedef boost::shared_ptr<InPacketWrapper> InPacketWrapperPtr;
 
 
 		ServiceImpl *_serviceImpl;
-		TSocket_ptr _socket;
+		TSocketPtr _socket;
 		IChannelHandler *_handler;
 
 		boost::mutex _sendQueueMtx;
-		std::queue<OutPacketWrapper_ptr> _sendQueue;
+		std::queue<OutPacketWrapperPtr> _sendQueue;
 
 		void sendImpl(boost::shared_array<char> data, size_t size, EPacketKind kind);
 
 	public:
-		ChannelImpl(ServiceImpl *serviceImpl, TSocket_ptr socket);
+		ChannelImpl(ServiceImpl *serviceImpl, TSocketPtr socket);
 		~ChannelImpl();
 		virtual void setHandler(IChannelHandler *);
 		virtual void send(boost::shared_array<char> data, size_t size);
@@ -63,12 +63,12 @@ namespace net
 		virtual void close();
 
 	private:
-		void handleSend(ChannelImpl_ptr selfKeeper, OutPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t sended, Allocator_ptr alloc);
+		void handleSend(ChannelImplPtr selfKeeper, OutPacketWrapperPtr packet, const boost::system::error_code& ec, const size_t sended, AllocatorPtr alloc);
 
 	private:
 		void makeReceive();
-		void handleReceive(ChannelImpl_ptr selfKeeper, InPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t received, Allocator_ptr alloc);
-		void handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size, EPacketKind kind, Allocator_ptr alloc);
+		void handleReceive(ChannelImplPtr selfKeeper, InPacketWrapperPtr packet, const boost::system::error_code& ec, const size_t received, AllocatorPtr alloc);
+		void handleReceiveComplete(ChannelImplPtr selfKeeper, boost::shared_array<char> data, size_t size, EPacketKind kind, AllocatorPtr alloc);
 	};
 
 

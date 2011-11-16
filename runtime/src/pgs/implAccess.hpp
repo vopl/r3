@@ -12,10 +12,10 @@ namespace pgs
 	{
 	public:
 		ImplAccess(const Base &base);
-		ImplAccess(const typename Base::Impl_ptr &impl);
+		ImplAccess(const typename Base::ImplPtr &impl);
 
-		typename Base::Impl_ptr impl();
-		operator typename Base::Impl_ptr();
+		typename Base::ImplPtr impl();
+		operator typename Base::ImplPtr();
 	};
 
 
@@ -28,23 +28,23 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	ImplAccess<Base>::ImplAccess(const typename Base::Impl_ptr &impl)
+	ImplAccess<Base>::ImplAccess(const typename Base::ImplPtr &impl)
 	{
 		_impl = impl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	typename Base::Impl_ptr ImplAccess<Base>::impl()
+	typename Base::ImplPtr ImplAccess<Base>::impl()
 	{
-		return boost::static_pointer_cast<typename Base::Impl_ptr::element_type>(_impl);
+		return boost::static_pointer_cast<typename Base::ImplPtr::element_type>(_impl);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	ImplAccess<Base>::operator typename Base::Impl_ptr()
+	ImplAccess<Base>::operator typename Base::ImplPtr()
 	{
-		return boost::static_pointer_cast<typename Base::Impl_ptr::element_type>(_impl);
+		return boost::static_pointer_cast<typename Base::ImplPtr::element_type>(_impl);
 	}
 }
 

@@ -12,7 +12,7 @@ namespace net
 	using namespace boost::asio;
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::ChannelImpl(ServiceImpl *serviceImpl, TSocket_ptr socket)
+	ChannelImpl::ChannelImpl(ServiceImpl *serviceImpl, TSocketPtr socket)
 		: _serviceImpl(serviceImpl)
 		, _socket(socket)
 		, _handler(NULL)
@@ -42,7 +42,7 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::sendImpl(boost::shared_array<char> data, size_t size, EPacketKind kind)
 	{
-		OutPacketWrapper_ptr packet(new OutPacketWrapper);
+		OutPacketWrapperPtr packet(new OutPacketWrapper);
 		packet->_totalSended = 0;
 		packet->_size = size;
 		packet->_sizeNetOrder = utils::fixEndian(packet->_size);
@@ -54,7 +54,7 @@ namespace net
 
 		if(1 == _sendQueue.size())
 		{
-			Allocator_ptr alloc = boost::make_shared<Allocator>();
+			AllocatorPtr alloc = boost::make_shared<Allocator>();
 			handleSend(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
 		}
 	}
@@ -75,10 +75,10 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::handleSend(
-		ChannelImpl_ptr selfKeeper,
-		OutPacketWrapper_ptr packet, 
+		ChannelImplPtr selfKeeper,
+		OutPacketWrapperPtr packet, 
 		const boost::system::error_code& ec, const size_t sended,
-		Allocator_ptr alloc)
+		AllocatorPtr alloc)
 	{
 		packet->_totalSended += sended;
 		if(ec)
@@ -160,17 +160,17 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::makeReceive()
 	{
-		InPacketWrapper_ptr packet(new InPacketWrapper);
+		InPacketWrapperPtr packet(new InPacketWrapper);
 		packet->_totalReceived = 0;
 		packet->_size = 0;
 		packet->_flags = 0;
 
-		Allocator_ptr alloc = boost::make_shared<Allocator>();
+		AllocatorPtr alloc = boost::make_shared<Allocator>();
 		handleReceive(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleReceive(ChannelImpl_ptr selfKeeper, InPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t received, Allocator_ptr alloc)
+	void ChannelImpl::handleReceive(ChannelImplPtr selfKeeper, InPacketWrapperPtr packet, const boost::system::error_code& ec, const size_t received, AllocatorPtr alloc)
 	{
 		if(ec)
 		{
@@ -259,11 +259,11 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::handleReceiveComplete(
-		ChannelImpl_ptr selfKeeper, boost
+		ChannelImplPtr selfKeeper, boost
 		::shared_array<char> data, 
 		size_t size, 
 		EPacketKind kind,
-		Allocator_ptr alloc)
+		AllocatorPtr alloc)
 	{
 		if(_handler)
 		{

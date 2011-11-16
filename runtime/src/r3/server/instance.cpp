@@ -81,7 +81,7 @@ namespace r3
 		void Instance::reset()
 		{
 			boost::mutex::scoped_lock l(_mtx);
-			BOOST_FOREACH(Connection_ptr c, _connections)
+			BOOST_FOREACH(ConnectionPtr c, _connections)
 			{
 				c->close();
 			}
@@ -111,14 +111,14 @@ namespace r3
 
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onConnectionClose(Connection_ptr con)
+		void Instance::onConnectionClose(ConnectionPtr con)
 		{
 			boost::mutex::scoped_lock l(_mtx);
 			_connections.erase(con);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onConnectionError(Connection_ptr con)
+		void Instance::onConnectionError(ConnectionPtr con)
 		{
 			boost::mutex::scoped_lock l(_mtx);
 			_connections.erase(con);
@@ -140,14 +140,14 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onAccept(net::Channel_ptr channel)
+		void Instance::onAccept(net::ChannelPtr channel)
 		{
 			boost::mutex::scoped_lock l(_mtx);
-			_connections.insert(Connection_ptr(new r3::logic::server::Connection(channel)));
+			_connections.insert(ConnectionPtr(new r3::logic::server::Connection(channel)));
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onConnect(net::Channel_ptr channel)
+		void Instance::onConnect(net::ChannelPtr channel)
 		{
 			assert(!"never here");
 		}

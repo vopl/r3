@@ -95,6 +95,6 @@ namespace pgs
 		// 	update
 		// 	delete
 	};
-	typedef boost::shared_ptr<ClusterImpl> ClusterImpl_ptr;
+	typedef boost::shared_ptr<ClusterImpl> ClusterImplPtr;
 }
 #endif

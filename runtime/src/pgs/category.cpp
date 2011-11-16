@@ -7,7 +7,7 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Category::Category(pgs::meta::CategoryCPtr cat, const std::string &alias)
-		: Expression(ImplAccess<Expression>(Impl_ptr(new CategoryImpl(cat, alias))))
+		: Expression(ImplAccess<Expression>(ImplPtr(new CategoryImpl(cat, alias))))
 	{
 	}
 

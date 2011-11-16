@@ -7,13 +7,13 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Field::Field(pgs::meta::FieldCPtr fld, const std::string &alias)
-		: Expression(ImplAccess<Expression>(Impl_ptr(new FieldImpl(fld, alias))))
+		: Expression(ImplAccess<Expression>(ImplPtr(new FieldImpl(fld, alias))))
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Field::Field(const std::string &srcAlias, pgs::meta::FieldCPtr fld, const std::string &alias)
-		: Expression(ImplAccess<Expression>(Impl_ptr(new FieldImpl(srcAlias, fld, alias))))
+		: Expression(ImplAccess<Expression>(ImplPtr(new FieldImpl(srcAlias, fld, alias))))
 	{
 
 	}

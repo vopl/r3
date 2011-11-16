@@ -32,7 +32,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool StatementImpl::fldIndex(size_t &res, const FieldImpl_ptr &fld)
+	bool StatementImpl::fldIndex(size_t &res, const FieldImplPtr &fld)
 	{
 		std::string fldName;
 
@@ -50,7 +50,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool StatementImpl::fldIndices(std::deque<size_t> &res, const CategoryImpl_ptr &cat)
+	bool StatementImpl::fldIndices(std::deque<size_t> &res, const CategoryImplPtr &cat)
 	{
 		std::string categoryAlias = _cluster->escapeName(cat->alias());
 
@@ -79,7 +79,7 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	StatementImpl::StatementImpl(
-									pgs::ClusterImpl_ptr cluster, 
+									pgs::ClusterImplPtr cluster, 
 									const TMName2idx &bindName2idx,
 									const TMName2idx &fetchName2idx)
 		: pgc::StatementPrepImpl(ImplAccess<pgc::Connection>(cluster->con()).impl())

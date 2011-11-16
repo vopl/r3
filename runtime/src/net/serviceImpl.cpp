@@ -45,10 +45,10 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::makeAccept()
 	{
-		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
-		//TSocket_ptr socket(new TSocket(_io_service));
+		TSocketPtr socket(new TSocket(_io_service, _ssl_context));
+		//TSocketPtr socket(new TSocket(_io_service));
 
-		Allocator_ptr alloc = boost::make_shared<Allocator>();
+		AllocatorPtr alloc = boost::make_shared<Allocator>();
 
 		_acceptor.async_accept(socket->lowest_layer(),
 			makeCmaHandler(*alloc, boost::bind(&ServiceImpl::handleAccept, this,
@@ -57,7 +57,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleAccept(TSocket_ptr socket, const boost::system::error_code& ec, Allocator_ptr alloc)
+	void ServiceImpl::handleAccept(TSocketPtr socket, const boost::system::error_code& ec, AllocatorPtr alloc)
 	{
 		if(ec)
 		{
@@ -75,7 +75,7 @@ namespace net
 		makeAccept();
 
 // 		addSock(socket);
-// 		_handler->onAccept(Channel_ptr(new ChannelImpl(this, socket)));
+// 		_handler->onAccept(ChannelPtr(new ChannelImpl(this, socket)));
 		socket->async_handshake(
 			ssl::stream_base::server,
 			makeCmaHandler(*alloc, boost::bind(
@@ -85,7 +85,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleServerHandshake(TSocket_ptr socket, const boost::system::error_code& ec, Allocator_ptr alloc)
+	void ServiceImpl::handleServerHandshake(TSocketPtr socket, const boost::system::error_code& ec, AllocatorPtr alloc)
 	{
 		if(ec)
 		{
@@ -101,11 +101,11 @@ namespace net
 		}
 
 		addSock(socket, alloc);
-		_handler->onAccept(Channel_ptr(new ChannelImpl(this, socket)));
+		_handler->onAccept(ChannelPtr(new ChannelImpl(this, socket)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleConnect(TSocket_ptr socket, const boost::system::error_code& ec, Allocator_ptr alloc)
+	void ServiceImpl::handleConnect(TSocketPtr socket, const boost::system::error_code& ec, AllocatorPtr alloc)
 	{
 		if(ec)
 		{
@@ -120,7 +120,7 @@ namespace net
 			return;
 		}
 // 		addSock(socket);
-// 		_handler->onConnect(Channel_ptr(new ChannelImpl(this, socket)));
+// 		_handler->onConnect(ChannelPtr(new ChannelImpl(this, socket)));
 		socket->async_handshake(
 			ssl::stream_base::client,
 			makeCmaHandler(*alloc, boost::bind(
@@ -130,7 +130,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleClientHandshake(TSocket_ptr socket, const boost::system::error_code& ec, Allocator_ptr alloc)
+	void ServiceImpl::handleClientHandshake(TSocketPtr socket, const boost::system::error_code& ec, AllocatorPtr alloc)
 	{
 		if(ec)
 		{
@@ -146,12 +146,12 @@ namespace net
 		}
 
 		addSock(socket, alloc);
-		_handler->onConnect(Channel_ptr(new ChannelImpl(this, socket)));
+		_handler->onConnect(ChannelPtr(new ChannelImpl(this, socket)));
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::addSock(TSocket_ptr socket, Allocator_ptr alloc)
+	void ServiceImpl::addSock(TSocketPtr socket, AllocatorPtr alloc)
 	{
 		_io_service.post(_socksPoolStrand.wrap(
 			makeCmaHandler(*alloc, boost::bind(&ServiceImpl::handleAddSock, this, socket, alloc))
@@ -159,7 +159,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::delSock(TSocket_ptr socket)
+	void ServiceImpl::delSock(TSocketPtr socket)
 	{
 		_io_service.post(_socksPoolStrand.wrap(
 			boost::bind(&ServiceImpl::handleDelSock, this, socket)
@@ -175,13 +175,13 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleAddSock(TSocket_ptr socket, Allocator_ptr alloc)
+	void ServiceImpl::handleAddSock(TSocketPtr socket, AllocatorPtr alloc)
 	{
 		_socks.insert(socket);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::handleDelSock(TSocket_ptr socket)
+	void ServiceImpl::handleDelSock(TSocketPtr socket)
 	{
 		_socks.erase(socket);
 	}
@@ -190,7 +190,7 @@ namespace net
 	void ServiceImpl::handleCloseSocks()
 	{
 		boost::system::error_code ec;
-		BOOST_FOREACH(TSocket_ptr socket, _socks)
+		BOOST_FOREACH(TSocketPtr socket, _socks)
 		{
 			socket->shutdown(ec);
 			socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
@@ -340,10 +340,10 @@ namespace net
 		ip::tcp::resolver::query query(host, utils::_ntoa(port, sport));
 		ip::tcp::endpoint endpoint = *resolver.resolve(query);
 
-		TSocket_ptr socket(new TSocket(_io_service, _ssl_context));
-		//TSocket_ptr socket(new TSocket(_io_service));
+		TSocketPtr socket(new TSocket(_io_service, _ssl_context));
+		//TSocketPtr socket(new TSocket(_io_service));
 
-		Allocator_ptr alloc = boost::make_shared<Allocator>();
+		AllocatorPtr alloc = boost::make_shared<Allocator>();
 		socket->lowest_layer().async_connect(endpoint,
 			makeCmaHandler(*alloc, boost::bind(
 				&ServiceImpl::handleConnect, this,

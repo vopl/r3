@@ -15,8 +15,8 @@ namespace net
 
 		virtual void onError(Service *) {};
 
-		virtual void onAccept(Channel_ptr channel) {};
-		virtual void onConnect(Channel_ptr channel) {};
+		virtual void onAccept(ChannelPtr channel) {};
+		virtual void onConnect(ChannelPtr channel) {};
 
 		virtual void onStopInThread() {};
 	};

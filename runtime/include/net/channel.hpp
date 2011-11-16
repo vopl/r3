@@ -6,14 +6,14 @@
 namespace net
 {
 	struct Channel;
-	typedef boost::shared_ptr<Channel> Channel_ptr;
+	typedef boost::shared_ptr<Channel> ChannelPtr;
 
 	struct IChannelHandler
 	{
-		virtual void onReceive(Channel_ptr channel, boost::shared_array<char> data, size_t size) =0;
-		virtual void onReceive(Channel_ptr channel, const utils::VariantPtr vptr) =0;
-		virtual void onError(Channel_ptr channel) =0;
-		virtual void onClose(Channel_ptr channel) =0;
+		virtual void onReceive(ChannelPtr channel, boost::shared_array<char> data, size_t size) =0;
+		virtual void onReceive(ChannelPtr channel, const utils::VariantPtr vptr) =0;
+		virtual void onError(ChannelPtr channel) =0;
+		virtual void onClose(ChannelPtr channel) =0;
 	};
 
 	struct Channel

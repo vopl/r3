@@ -7,13 +7,13 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Link::Link(pgs::meta::RelationEndCPtr re, const std::string &alias)
-		: Expression(ImplAccess<Expression>(Impl_ptr(new LinkImpl(re, alias))))
+		: Expression(ImplAccess<Expression>(ImplPtr(new LinkImpl(re, alias))))
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Link::Link(const std::string &srcAlias, pgs::meta::RelationEndCPtr re, const std::string &alias)
-		: Expression(ImplAccess<Expression>(Impl_ptr(new LinkImpl(srcAlias, re, alias))))
+		: Expression(ImplAccess<Expression>(ImplPtr(new LinkImpl(srcAlias, re, alias))))
 	{
 	}
 

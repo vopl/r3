@@ -6,14 +6,14 @@
 namespace pgs
 {
 	class OrderImpl;
-	typedef boost::shared_ptr<OrderImpl> OrderImpl_ptr;
+	typedef boost::shared_ptr<OrderImpl> OrderImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Order
 		: public Expression
 	{
 	public:
-		typedef OrderImpl_ptr Impl_ptr;
+		typedef OrderImplPtr ImplPtr;
 
 	public:
 		Order(...);
