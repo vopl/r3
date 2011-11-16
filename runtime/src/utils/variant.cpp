@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "utils/variant.hpp"
 #include <new>
 
@@ -122,21 +123,21 @@ ENUMTYPES
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Variant::empty() const
+	bool Variant::isNull() const
 	{
-		return etNull == _et;
+		return CIMPL->isNull();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Variant::setNull(bool n)
+	{
+		return IMPL->setNull(n);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Variant::EType Variant::type() const
 	{
-		return (EType)_et;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Variant::clear()
-	{
-		return IMPL->clear();
+		return CIMPL->type();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -159,6 +160,7 @@ ENUMTYPES
 		if(forceType)
 		{
 			IMPL->forceType<T>();
+			IMPL->setNull(false);
 		}
 		else
 		{
@@ -192,6 +194,7 @@ ENUMTYPES
 #define ENUMTYPES_ONE(T) template bool Variant::is<Variant::T>() const;
 ENUMTYPES
 #undef ENUMTYPES_ONE
+template bool Variant::is<Variant::Void>() const;
 
 	//////////////////////////////////////////////////////////////////////////
 	template<typename T> void Variant::forceType()
@@ -202,6 +205,7 @@ ENUMTYPES
 #define ENUMTYPES_ONE(T) template void Variant::forceType<Variant::T>();
 ENUMTYPES
 #undef ENUMTYPES_ONE
+template void Variant::forceType<Variant::Void>();
 
 	//////////////////////////////////////////////////////////////////////////
 	void Variant::forceType(EType et)

@@ -136,16 +136,33 @@ namespace utils
 	//////////////////////////////////////////////////////////////////////////
 	std::ostream &dumpOstr_variant(std::ostream &ostr, const Variant &v, size_t level, bool levelApplyed)
 	{
-		switch(v.type())
+		if(v.isNull())
 		{
-		case Variant::etNull: ostr<<"Null"; break;
+			switch(v.type())
+			{
+			case Variant::etVoid: ostr<<"Void# Null"; break;
+
+#define ENUMTYPES_ONE(T) case Variant::et ## T: ostr<< #T<<"# Null"; break;
+				ENUMTYPES
+#undef ENUMTYPES_ONE
+			default:
+				assert(!"bad et for dumpOstr_variant");
+				throw "bad et for dumpOstr_variant";
+			}
+		}
+		else
+		{
+			switch(v.type())
+			{
+			case Variant::etVoid: ostr<<"Void# <void>"; break;
 
 #define ENUMTYPES_ONE(T) case Variant::et ## T: ostr<< #T<<"# "; dumpOstr(ostr, v.as<Variant::T>(), level, levelApplyed); break;
-			ENUMTYPES
+				ENUMTYPES
 #undef ENUMTYPES_ONE
-		default:
-			assert(!"bad et for dumpOstr_variant");
-			throw "bad et for dumpOstr_variant";
+			default:
+				assert(!"bad et for dumpOstr_variant");
+				throw "bad et for dumpOstr_variant";
+			}
 		}
 
 		return ostr;

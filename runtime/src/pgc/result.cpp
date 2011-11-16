@@ -109,6 +109,13 @@ namespace pgc
 			break;
 		}
 		v.forceType((utils::Variant::EType)bestType);
+		if(isNull(colIdx, rowIdx))
+		{
+			v.setNull();
+			return true;
+		}
+
+		v.setNull(false);
 		return fetchNative(v.type(), v.data(), colIdx, rowIdx);
 	}
 
@@ -126,6 +133,11 @@ namespace pgc
 			break;
 		}
 		v.forceType((utils::Variant::EType)bestType);
+		if(isNull(colName, rowIdx))
+		{
+			v.setNull();
+			return true;
+		}
 		return fetchNative(v.type(), v.data(), colName, rowIdx);
 	}
 
@@ -137,16 +149,9 @@ namespace pgc
 
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
-			if(isNull(colIdx, rowIdx))
+			if(!fetch(v[name(colIdx)], colIdx, rowIdx))
 			{
-				v[name(colIdx)];
-			}
-			else
-			{
-				if(!fetch(v[name(colIdx)], colIdx, rowIdx))
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 
@@ -162,16 +167,9 @@ namespace pgc
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
 			assert(colIndices[colIdx] < Result::columns());
-			if(isNull(colIndices[colIdx], rowIdx))
+			if(!fetch(v[name(colIndices[colIdx])], colIndices[colIdx], rowIdx))
 			{
-				v[name(colIndices[colIdx])];
-			}
-			else
-			{
-				if(!fetch(v[name(colIndices[colIdx])], colIndices[colIdx], rowIdx))
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 

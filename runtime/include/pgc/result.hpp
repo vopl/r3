@@ -119,16 +119,9 @@ namespace pgc
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
 			utils::Variant &rv = *iter;
-			if(isNull(colIdx, rowIdx))
+			if(!fetch(rv, colIdx, rowIdx))
 			{
-				rv.clear();
-			}
-			else
-			{
-				if(!fetch(rv, colIdx, rowIdx))
-				{
-					return false;
-				}
+				return false;
 			}
 			iter++;
 		}
@@ -220,16 +213,9 @@ namespace pgc
 		{
 			assert(colIndices[colIdx] < Result::columns());
 			utils::Variant &rv = *iter;
-			if(isNull(colIndices[colIdx], rowIdx))
+			if(!fetch(rv, colIndices[colIdx], rowIdx))
 			{
-				rv.clear();
-			}
-			else
-			{
-				if(!fetch(rv, colIndices[colIdx], rowIdx))
-				{
-					return false;
-				}
+				return false;
 			}
 			iter++;
 		}

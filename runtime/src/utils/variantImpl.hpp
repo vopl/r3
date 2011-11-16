@@ -90,6 +90,7 @@ namespace utils
 	class VariantImpl
 		: private Variant
 	{
+		//////////////////////////////////////////////////////////////////////////
 		//выделение блока памяти под данные
 		template <class T> void alloc()
 		{
@@ -107,6 +108,8 @@ namespace utils
 			_dbgData = &as<T>();
 #endif
 		}
+		
+		//////////////////////////////////////////////////////////////////////////
 		template <class T> void free()
 		{
 			//для autoexp.dat
@@ -125,7 +128,7 @@ namespace utils
 		template <class T>
 		void validateType() const
 		{
-			if(etNull == Type2Enum<T>::et)
+			if(etUnknown == Type2Enum<T>::et)
 			{
 				throw std::bad_cast();
 			}
@@ -135,7 +138,7 @@ namespace utils
 		template <class T>
 		void validateValue() const
 		{
-			if(_et != Type2Enum<T>::et)
+			if(type() != Type2Enum<T>::et || isNull())
 			{
 				throw std::bad_cast();
 			}
@@ -144,7 +147,7 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		void construct()
 		{
-			_et = etNull;
+			_et = -(ETypeStorage)etVoid;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -153,7 +156,16 @@ namespace utils
 		{
 			_et = Type2Enum<T>::et;
 			alloc<T>();
-			new (&as<T>()) T;
+			new (&as<T>()) T();
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		template <>
+		void construct<Tm>()
+		{
+			_et = Type2Enum<Tm>::et;
+			alloc<Tm>();
+			new (&as<Tm>()) Tm;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -169,11 +181,19 @@ namespace utils
 		template <>
 		void construct(const Variant &v)
 		{
-			_et = (ETypeStorage)v.type();
-
-			switch(_et)
+			if(v.isNull())
 			{
-			case etNull: break;
+				_et = -(ETypeStorage)v.type();
+				return;
+			}
+			else
+			{
+				_et = (ETypeStorage)v.type();
+			}
+
+			switch(type())
+			{
+			case etVoid: break;
 
 #define ENUMTYPES_ONE(T) case et ## T: alloc<T>(); new (&as<T>()) T(v.as<T>()); break;
 				ENUMTYPES
@@ -195,9 +215,9 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		void destruct()
 		{
-			switch(_et)
+			switch(type())
 			{
-			case etNull: break;
+			case etVoid: break;
 #define ENUMTYPES_ONE(T) case et ## T: destruct<T>(); break;
 				ENUMTYPES
 #undef ENUMTYPES_ONE
@@ -211,9 +231,16 @@ namespace utils
 		template <class T>
 		void destruct()
 		{
+			assert(type() == (ETypeStorage)Type2Enum<T>::et);
+
+			if(isNull())
+			{
+				return;
+			}
+
 			(&as<T>())->~T();
 			free<T>();
-			_et = etNull;
+			_et = -(ETypeStorage)Type2Enum<T>::et;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -222,6 +249,7 @@ namespace utils
 		{
 			if(is<T>())
 			{
+				setNull(false);
 				as<T>() = v;
 				return;
 			}
@@ -234,16 +262,24 @@ namespace utils
 		template <>
 		void assign(const Variant &v)
 		{
-			if(v.type() == _et)
+			if(v.type() == type())
 			{
-				switch(_et)
+				if(v.isNull())
 				{
+					setNull(true);
+				}
+				else
+				{
+					switch(type())
+					{
+					case etVoid: destruct(); break;
 #define ENUMTYPES_ONE(T) case et ## T: assign<T>(v.as<T>()); break;
-					ENUMTYPES
+						ENUMTYPES
 #undef ENUMTYPES_ONE
-	default:
-		assert(!"bad et");
-		throw "bad et";
+					default:
+						assert(!"bad et");
+						throw "bad et";
+					}
 				}
 				return;
 			}
@@ -257,6 +293,7 @@ namespace utils
 		{
 			if(is<String>())
 			{
+				setNull(false);
 				as<String>() = v;
 				return;
 			}
@@ -266,11 +303,57 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		bool isNull() const
+		{
+			return _et < 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void setNull(bool n)
+		{
+			if(n)
+			{
+				if(!isNull())
+				{
+					destruct();
+				}
+			}
+			else
+			{
+				if(isNull())
+				{
+					switch(type())
+					{
+					case etVoid: break;
+
+#define ENUMTYPES_ONE(T) case et ## T: construct<T>(); break;
+						ENUMTYPES
+#undef ENUMTYPES_ONE
+					default:
+						assert(!"bad et");
+						throw "bad et";
+					}
+				}
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		EType type() const
+		{
+			return (EType)(_et<0?-_et:_et);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		const void *data() const
 		{
-			switch(_et)
+			if(isNull())
 			{
-			case etNull: return NULL;
+				return NULL;
+			}
+
+			switch(type())
+			{
+			case etVoid: return NULL;
 #define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
 				ENUMTYPES
 #undef ENUMTYPES_ONE
@@ -286,9 +369,14 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		void *data()
 		{
-			switch(_et)
+			if(isNull())
 			{
-			case etNull: return NULL;
+				return NULL;
+			}
+
+			switch(type())
+			{
+			case etVoid: return NULL;
 #define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
 				ENUMTYPES
 #undef ENUMTYPES_ONE
@@ -299,12 +387,6 @@ namespace utils
 
 			//never here
 			return NULL;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void clear()
-		{
-			destruct();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -333,7 +415,7 @@ namespace utils
 		template<typename T> 
 		bool is() const
 		{
-			return _et == Type2Enum<T>::et;
+			return type() == Type2Enum<T>::et;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -346,53 +428,73 @@ namespace utils
 			}
 
 			destruct();
-			construct<T>();
+			_et = -(ETypeStorage)Type2Enum<T>::et;
 		}
-
 		//////////////////////////////////////////////////////////////////////////
-		void forceType(EType et)
+		template<> 
+		void forceType<Void>()
 		{
-			if(et == _et)
+			if(is<Void>())
 			{
 				return;
 			}
 
 			destruct();
-			switch(et)
-			{
-			case etNull: break;
+			_et = -(ETypeStorage)Type2Enum<Void>::et;
+		}
 
-#define ENUMTYPES_ONE(T) case et ## T: construct<T>(); break;
-				ENUMTYPES
-#undef ENUMTYPES_ONE
-			default:
-				assert(!"bad et");
-				throw "bad et";
+		//////////////////////////////////////////////////////////////////////////
+		void forceType(EType et)
+		{
+			if(et == type())
+			{
+				return;
 			}
+
+			destruct();
+			_et = -(ETypeStorage)et;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		bool less(const Variant &v) const
 		{
-			if(v.type() < _et)
+			if(type() < v.type())
 			{
 				return true;
 			}
-			if(v.type() > _et)
+			if(type() > v.type())
 			{
 				return false;
 			}
 
-			switch(_et)
+			if(isNull())
 			{
-			case etNull: return false;
-#define ENUMTYPES_ONE(T) case et ## T: return as<T>() < v.as<T>();
-				ENUMTYPES
-#undef ENUMTYPES_ONE
-			default:
-				assert(!"bad et");
-				throw "bad et";
+				if(!v.isNull())
+				{
+					return true;
+				}
+				return false;
 			}
+			else
+			{
+				if(v.isNull())
+				{
+					return false;
+				}
+
+				switch(type())
+				{
+				case etVoid: return false;
+#define ENUMTYPES_ONE(T) case et ## T: return as<T>() < v.as<T>();
+					ENUMTYPES
+#undef ENUMTYPES_ONE
+				default:
+					assert(!"bad et");
+					throw "bad et";
+				}
+
+			}
+
 
 			//never here
 			return false;
@@ -401,20 +503,35 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		bool equal(const Variant &v) const
 		{
-			if(v.type() != _et)
+			if(type() != v.type() || isNull() != v.isNull())
 			{
 				return false;
 			}
 
-			switch(_et)
+			if(isNull())
 			{
-			case etNull: return true;
+				if(v.isNull())
+				{
+					return true;
+				}
+				return false;
+			}
+			else
+			{
+				if(v.isNull())
+				{
+					return false;
+				}
+				switch(type())
+				{
+				case etVoid: return true;
 #define ENUMTYPES_ONE(T) case et ## T: return as<T>() == v.as<T>();
-				ENUMTYPES
+					ENUMTYPES
 #undef ENUMTYPES_ONE
-			default:
-				assert(!"bad et");
-				throw "bad et";
+				default:
+					assert(!"bad et");
+					throw "bad et";
+				}
 			}
 
 			//never here
@@ -497,15 +614,19 @@ namespace utils
 	void VariantImpl::save(Archive & ar, const unsigned int /*version*/) const
 	{
 		ar & _et;
-		switch(_et)
+
+		if(!isNull())
 		{
-		case etNull: break;
+			switch(_et)
+			{
+			case etVoid: break;
 #define ENUMTYPES_ONE(T) case et ## T: ar & as<T>(); break;
-			ENUMTYPES
+				ENUMTYPES
 #undef ENUMTYPES_ONE
-		default:
-			assert(!"bad et");
-			throw "bad et";
+			default:
+				assert(!"bad et");
+				throw "bad et";
+			}
 		}
 	}
 
@@ -513,21 +634,28 @@ namespace utils
 	template<class Archive>
 	void VariantImpl::load(Archive & ar, const unsigned int /*version*/)
 	{
-		boost::uint16_t et;
+		boost::int16_t et;
 		ar & et;
 
-		switch(et)
+		if(et < 0)
 		{
-		case etNull: break;
-#define ENUMTYPES_ONE(T) case et ## T: forceType<T>(); ar & as<T>(); break;
-			ENUMTYPES
+			destruct();
+			forceType((EType)-et);
+		}
+		else
+		{
+			switch(et)
+			{
+			case etVoid: destruct(); break;
+#define ENUMTYPES_ONE(T) case et ## T: forceType<T>(); setNull(false); ar & as<T>(); break;
+				ENUMTYPES
 #undef ENUMTYPES_ONE
-		default:
-			assert(!"bad et");
-			throw "bad et";
+			default:
+				assert(!"bad et");
+				throw "bad et";
+			}
 		}
 	}
-
 }
 
 #pragma warning (pop)

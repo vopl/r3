@@ -30,47 +30,50 @@ namespace utils
 	public:
 		enum EType
 		{
-			etNull						=0,
-			etString					=1,
-			etFloat						=2,
-			etDouble					=3,
-			etInt8						=4,
-			etInt16						=5,
-			etInt32						=6,
-			etInt64						=7,
-			etUInt8						=8,
-			etUInt16					=9,
-			etUInt32					=10,
-			etUInt64					=11,
-			etVectorChar				=12,
-			etDate						=13,
-			etTime						=14,
-			etVectorVariant				=15,
-			etMapStringVariant			=16,
-			etBool						=17,
-			etTm						=18,
-			etBitset8					=19,
-			etBitset16					=20,
-			etBitset32					=21,
-			etBitset64					=22,
-			etBitset128					=23,
-			etBitset256					=24,
-			etBitset512					=25,
-			etDateDuration				=26,
-			etTimeDuration				=27,
-			etDateTimeDuration			=28,
+			etUnknown					=0,//ub
+
+			etVoid						=1,
+			etString					=2,
+			etFloat						=3,
+			etDouble					=4,
+			etInt8						=5,
+			etInt16						=6,
+			etInt32						=7,
+			etInt64						=8,
+			etUInt8						=9,
+			etUInt16					=10,
+			etUInt32					=11,
+			etUInt64					=12,
+			etVectorChar				=13,
+			etDate						=14,
+			etTime						=15,
+			etVectorVariant				=16,
+			etMapStringVariant			=17,
+			etBool						=18,
+			etTm						=19,
+			etBitset8					=20,
+			etBitset16					=21,
+			etBitset32					=22,
+			etBitset64					=23,
+			etBitset128					=24,
+			etBitset256					=25,
+			etBitset512					=26,
+			etDateDuration				=27,
+			etTimeDuration				=28,
+			etDateTimeDuration			=29,
 
 
-			etMapVariantVariant			=29,
-			etMultimapVariantVariant	=30,
-			etMultimapStringVariant		=31,
-			etSetVariant				=32,
-			etMultisetVariant			=33,
-			etDequeVariant				=34,
-			etListVariant				=35,
+			etMapVariantVariant			=30,
+			etMultimapVariantVariant	=31,
+			etMultimapStringVariant		=32,
+			etSetVariant				=33,
+			etMultisetVariant			=34,
+			etDequeVariant				=35,
+			etListVariant				=36,
 		};
 
 	public:
+		typedef void		 						Void;
 		typedef std::string 						String;
 		typedef float								Float;
 		typedef double								Double;
@@ -110,7 +113,8 @@ namespace utils
 
 
 	public:
-		template <class T> struct Type2Enum				{ static const EType et = etNull;	};
+		template <class T> struct Type2Enum				{ static const EType et = etUnknown;	};
+		template <> struct Type2Enum<Void>				{ static const EType et = etVoid;	};
 		template <> struct Type2Enum<String>			{ static const EType et = etString;	};
 		template <> struct Type2Enum<Float>				{ static const EType et = etFloat;	};
 		template <> struct Type2Enum<Double>			{ static const EType et = etDouble;	};
@@ -310,13 +314,14 @@ namespace utils
 		operator ListVariant const &() const;
 
 		void swap(Variant &);
-		bool empty() const;
+
+		bool isNull() const;
+		void setNull(bool n=true);
+
 		EType type() const;
-
-		void clear();
-
 		void *data();
 		void const *data() const;
+
 		template<typename T> T &as(bool forceType = false);
 		template<typename T> T const &as() const;
 		template<typename T> bool is() const;
@@ -336,7 +341,7 @@ namespace utils
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);
 		char _data[_dataSize];
 
-		typedef boost::uint16_t ETypeStorage;
+		typedef boost::int16_t ETypeStorage;//негативный null
 		ETypeStorage _et;
 
 #ifdef UTILS_VARIANT_DBGDATA

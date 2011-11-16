@@ -224,6 +224,15 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	std::cout<<(v==v2);
 
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	v2.forceType(utils::Variant::etVoid);
+	v2.forceType<void>();
+
 	return 0;
 }
 
