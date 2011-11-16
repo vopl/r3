@@ -281,8 +281,9 @@ namespace net
 		}
 		else
 		{
+			//выкачать оставшиеся сообщения этим потоком
 			_io_service.reset();
-			_io_service.poll();
+			_io_service.run();
 		}
 	}
 
@@ -293,6 +294,10 @@ namespace net
 		{
 			swp->_thread.join();
 		}
+
+		//выкачать оставшиеся сообщения этим потоком
+		_io_service.reset();
+		_io_service.run();
 	}
 
 
