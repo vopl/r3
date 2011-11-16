@@ -38,6 +38,7 @@ utils::Variant{
 		#case -34 ( #("MultisetVariant=Null") )
 		#case -35 ( #("DequeVariant=Null") )
 		#case -36 ( #("ListVariant=Null") )
+		#case -37 ( #("Char=Null") )
 		#case 0 ( #("Unknown=", [$e,!]) )		
 		#case 1 ( #("Void=<void>") )
 		#case 2 ( #("String=", *(std::basic_string<char,std::char_traits<char>,std::allocator<char> > *)$e._dbgData) )
@@ -75,6 +76,7 @@ utils::Variant{
 		#case 34 ( #("MultisetVariant") )
 		#case 35 ( #("DequeVariant") )
 		#case 36 ( #("ListVariant") )
+		#case 37 ( #("Char=", *(char *)$e._dbgData) )
 		#default ( #("UNKNOWN=", [$e,!]) )		
 	)
 
@@ -117,6 +119,7 @@ utils::Variant{
 		#case -34 ( #(MultisetVariant : *((void*)0)) )
 		#case -35 ( #(DequeVariant : *((void*)0)) )
 		#case -36 ( #(ListVariant : *((void*)0)) )
+		#case -37 ( #(Char : *((void*)0)) )
 		#case 0 (#( Unknown: [$e,!]) )
 		#case 1 (#( Void : *((void*)0)))
 		#case 2 (#( String : *(std::basic_string<char,std::char_traits<char>,std::allocator<char> > *)$e._dbgData))
@@ -154,6 +157,7 @@ utils::Variant{
 		#case 34 (#( MultisetVariant : *(std::multiset<utils::Variant,std::less<utils::Variant>,std::allocator<utils::Variant> >*)$e._dbgData) )
 		#case 35 (#( DequeVariant : *(std::deque<utils::Variant,std::allocator<utils::Variant> >*)$e._dbgData) )
 		#case 36 (#( ListVariant : *(std::list<utils::Variant,std::allocator<utils::Variant> >*)$e._dbgData) )
+		#case 37 (#( Char : *(char *)$e._dbgData) )
 		#default (#( UNKNOWN: [$e,!]) )
 	)
 	
