@@ -1,7 +1,12 @@
+#ifndef _UTILS_SERIALIZATION_HPP_
+#define _UTILS_SERIALIZATION_HPP_
+
 #include <boost/serialization/export.hpp>
 
 #include "utils/serialization/polymorphic_binary_portable_iarchive.hpp"
 #include "utils/serialization/polymorphic_binary_portable_oarchive.hpp"
+#include "utils/dateTimeDuration.hpp"
+#include <time.h>
 
 
 #include "utils/serialization/collection_size_type.hpp"
@@ -81,3 +86,4 @@ namespace boost
 	} // namespace serialization
 } // namespace boost
 
+#endif

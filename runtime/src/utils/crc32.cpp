@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "utils/crc32.hpp"
 
 namespace utils

@@ -7,6 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org for updates, documentation, and revision history.
+#include "stdafx.h"
 #include <istream>
 
 #define BOOST_ARCHIVE_SOURCE
