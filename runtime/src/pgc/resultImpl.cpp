@@ -191,7 +191,7 @@ namespace pgc
 			return NULL;
 		}
 
-		return PQfname(_pgres, colIdx);
+		return PQfname(_pgres, (int)colIdx);
 	}
 
 
@@ -241,7 +241,7 @@ namespace pgc
 
 		assert(1 == PQfformat(_pgres, colIdx));
 
-		return (this->*_extractors[colIdx]._meth)(rowIdx, colIdx, typCpp, valCpp);
+		return (this->*_extractors[colIdx]._meth)((int)rowIdx, (int)colIdx, typCpp, valCpp);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -268,7 +268,7 @@ namespace pgc
 			return true;
 		}
 
-		return PQgetisnull(_pgres, rowIdx, colIdx)?true:false;
+		return PQgetisnull(_pgres, (int)rowIdx, (int)colIdx)?true:false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
