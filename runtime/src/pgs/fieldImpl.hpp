@@ -1,28 +1,29 @@
-#ifndef _PGS_FIELDIMPL_HPP_
-#define _PGS_FIELDIMPL_HPP_
+#ifndef _PGS_IMPL_FIELD_HPP_
+#define _PGS_IMPL_FIELD_HPP_
 
-#include "exprImpl.hpp"
+#include "expressionImpl.hpp"
+#include "pgs/meta/field.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class FieldImpl
-		: public ExprImpl
+		: public ExpressionImpl
 	{
-
-		std::string _field;
-		std::string _table;
-		std::string _schema;
-		std::string _tableId;
+		pgs::meta::FieldCPtr	_metaField;
+		std::string				_srcAlias;
+		std::string				_alias;
 	public:
-		FieldImpl(const char *field, const char *table, const char *schema, const char *tableId=NULL);
-		~FieldImpl();
+		FieldImpl(pgs::meta::FieldCPtr fld, const std::string alias);
+		FieldImpl(const std::string srcAlias, pgs::meta::FieldCPtr fld, const std::string alias);
 
-		virtual void reg(StatementImpl *s);
-		virtual void mkSql(std::string &result);
+		pgs::meta::FieldCPtr meta() const;
+		const std::string &srcAlias() const;
+		const std::string &alias() const;
+
+		virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 	};
-
 	typedef boost::shared_ptr<FieldImpl> FieldImpl_ptr;
-
 }
+
 #endif

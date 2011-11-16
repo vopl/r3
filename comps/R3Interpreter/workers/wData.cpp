@@ -247,6 +247,10 @@ namespace workers
 		//предварительные объявления
 		//типы полей
 		hpp<<"namespace fields\n{"<<endl;
+		BOOST_FOREACH(const Category &cat, data->getCategory())
+		{
+			mkFieldClass(hpp, cat, "id", true);
+		}
 		BOOST_FOREACH(const Field &fld, allFields)
 		{
 			mkFieldClass(hpp, fld, true);
@@ -283,6 +287,10 @@ namespace workers
 		//////////////////////////////////////////////////////////////////////////
 		//типы полей
 		hpp<<"namespace fields\n{"<<endl;
+		BOOST_FOREACH(const Category &cat, data->getCategory())
+		{
+			mkFieldClass(hpp, cat, "id", false);
+		}
 		BOOST_FOREACH(const Field &fld, allFields)
 		{
 			mkFieldClass(hpp, fld);
@@ -348,6 +356,7 @@ namespace workers
 
 
 		//поля
+		hpp<<"fields::"<<fieldClassName(cat, "id")<<" *id;"<<endl;
 		BOOST_FOREACH(const Field &fld, collectFields(cat))
 		{
 			hpp<<"fields::"<<fieldClassName(fld)<<" *"<<fld->getName()<<";"<<endl;
@@ -392,6 +401,24 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	
+	void WData::mkFieldClass(out::File &hpp, const Category &cat, const std::string &name, bool fwd)
+	{
+		hpp<<"class "<<fieldClassName(cat, name);
+		if(fwd)
+		{
+			hpp<<";"<<endl;
+			return;
+		}
+
+		hpp<<"\n : public ::pgs::meta::Field";
+		hpp<<"\n{"<<endl;
+		hpp<<"public:"<<endl;
+
+		hpp<<"};\n"<<endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void WData::mkRelationClass(out::File &hpp, const CategoryRelation &rel, bool fwd)
 	{
 		hpp<<"class "<<relationClassName(rel);
@@ -422,11 +449,18 @@ namespace workers
 	//////////////////////////////////////////////////////////////////////////
 	std::string WData::fieldClassName(const Field &obj)
 	{
-		return 
-			obj->getParent()->getParent()->getName()+"_"+
-			obj->getParent()->getName()+"_"+
-			obj->getName();
+		return fieldClassName(Category(obj->getParent()), obj->getName());
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::string WData::fieldClassName(const Category &obj, const std::string &name)
+	{
+		return 
+			obj->getParent()->getName()+"_"+
+			obj->getName()+"_"+
+			name;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	std::string WData::relationClassName(const CategoryRelation &obj)
@@ -572,6 +606,23 @@ namespace workers
 				"	_storage->_categories_heap.push_back(c);\n"
 				"	_schema->_categories.push_back(c.get());\n";
 
+
+
+				//поле id, только для самых базовый
+				if(cat->getCategoryInheritanceDsts().empty())
+				{
+					hpp<<
+						"{\n"
+						"	boost::shared_ptr<fields::"<<fieldClassName(cat, "id")<<"> f(new fields::"<<fieldClassName(cat, "id")<<");\n"
+						"	f->_name = \"id\";\n"
+						"	f->_type = eftId;\n"
+						"	f->_category = c.get();\n"
+						"	_storage->_fields_heap.push_back(f);\n"
+						"	c->_ownFields.push_back(f.get());\n"
+						"}\n";
+				}
+
+				//остальные поля из модели
 				BOOST_FOREACH(Field fld, cat->getChildFCOs())
 				{
 					if(fld)
@@ -795,6 +846,7 @@ namespace workers
 			hpp<<"s->"<<cat->getName()<<" = c;\n";
 
 			//поля
+			hpp<<"c->id = adoptField<fields::"<<fieldClassName(cat, "id")<<">(c, \"id\");\n";
 			BOOST_FOREACH(const Field &fld, collectFields(cat))
 			{
 				hpp<<"c->"<<fld->getName()<<" = adoptField<fields::"<<fieldClassName(fld)<<">(c, \""<<fld->getName()<<"\");\n";

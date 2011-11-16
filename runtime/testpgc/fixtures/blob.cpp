@@ -81,7 +81,7 @@ protected:
 		CPPUNIT_ASSERT_EQUAL(6, bIn.read(buf, 8));
 		CPPUNIT_ASSERT(!strncmp(buf, "0123456", 6));
 
-		CPPUNIT_ASSERT(_con.once("SELECT $1::oid").exec(bIn).throwIfError().fetch(0,0,bOut));
+		CPPUNIT_ASSERT(_con.once("SELECT $1::oid").exec(bIn).throwIfError().fetch(bOut,0,0));
 
 		CPPUNIT_ASSERT_EQUAL(6, bOut.read(buf, 8));
 		CPPUNIT_ASSERT(!strncmp(buf, "0123456", 6));

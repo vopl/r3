@@ -50,20 +50,26 @@ namespace pgc
 
 	public:
 		ResultImpl(ConnectionImplPtr con, PGresult *pgres);
-		~ResultImpl();
+		virtual ~ResultImpl();
 
 		EExecStatus status();
 		const char *errorMsg();
 		const char *errorCode();
 
+		int bestType(int colIdx);
+		int bestType(const char *colName);
+		const char *name(size_t colIdx);
+
 		size_t cmdRows();
 
-		int rows();
-		bool fetch(int rowIdx, int colIdx, int typCpp, void *valCpp);
-		bool fetch(int rowIdx, const char *colName, int typCpp, void *valCpp);
+		size_t rows();
+		size_t columns();
 
-		bool isNull(int rowIdx, int colIdx);
-		bool isNull(int rowIdx, const char *colName);
+		bool fetch(int typCpp, void *valCpp, size_t colIdx, size_t rowIdx);
+		bool fetch(int typCpp, void *valCpp, const char *colName, size_t rowIdx);
+
+		bool isNull(size_t colIdx, size_t rowIdx);
+		bool isNull(const char *colName, size_t rowIdx);
 
 	};
 

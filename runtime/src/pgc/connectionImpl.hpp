@@ -35,7 +35,7 @@ namespace pgc
 		StatementImplPtr prep();
 
 		void doLogExec(const std::string &stmt);
-		void doLogError(const std::string &stmt, ResultImplPtr &res);
+		void doLogError(const std::string &stmt, PGresult *res);
 	private:
 		static void noticeReceiver(void *arg, const PGresult *res);
 		void updateLog();

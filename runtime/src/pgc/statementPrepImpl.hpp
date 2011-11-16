@@ -15,12 +15,12 @@ namespace pgc
 		StatementPrepImpl(ConnectionImplPtr con);
 		~StatementPrepImpl();
 
-		void bind(int typCpp, void const *valCpp, size_t idx);
+		bool bind(int typCpp, void const *valCpp, size_t idx);
 		void unbind(size_t idx);
-		ResultImplPtr exec();
+		PGresult *exec();
 
 	private:
-		ResultImplPtr prepare();
+		PGresult *prepare();
 		void unprepare();
 	};
 

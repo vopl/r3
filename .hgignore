@@ -1,8 +1,8 @@
 syntax: regexp
-Debug
-Release
+(/|\\)Debug
+(/|\\)Release
 \.user$
-\.ncb
+\.ncb$
 \.opt$
 \.suo$
 \.aps$
@@ -19,7 +19,7 @@ Release
 -backup.mga$
 
 ^runtime/client/GeneratedFiles
-^runtime/victim/include/pgs/meta/schemas
+^runtime/include/pgs/meta/schemas
 ^meta/R3Meta-{
 ^runtime/include/r3/data
 ^runtime/include/r3/protocol

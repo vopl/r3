@@ -1,0 +1,11 @@
+tm{
+	preview
+	(
+		#($e.tm_year+1900, "-", $e.tm_mon+1, "-", $e.tm_mday, " ", $e.tm_hour, "h", $e.tm_min, "m", $e.tm_sec, "s",
+		
+			" {isdst=", $e.tm_isdst,
+			", wday=", $e.tm_wday,
+			", yday=", $e.tm_yday,"}"
+		)
+	)
+}

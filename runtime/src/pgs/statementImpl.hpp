@@ -1,28 +1,39 @@
-#ifndef _PGS_STATEMENTIMPL_HPP_
-#define _PGS_STATEMENTIMPL_HPP_
+#ifndef _PGS_IMPL_STATEMENT_HPP_
+#define _PGS_IMPL_STATEMENT_HPP_
 
-#include "valueImpl.hpp"
-#include "fieldImpl.hpp"
-#include <set>
+#include "../pgc/statementPrepImpl.hpp"
+#include "resultImpl.hpp"
 
 namespace pgs
 {
+	//////////////////////////////////////////////////////////////////////////
 	class StatementImpl
+		: public pgc::StatementPrepImpl
 	{
-		std::set<ExprImpl_ptr>		_exprs;
-		std::set<ValueImpl_ptr>		_values;
-		std::set<FieldImpl_ptr>		_fields;
+		typedef std::map<std::string, size_t>	TMName2idx;
+		TMName2idx _bindName2idx;
+		TMName2idx _fetchName2idx;
+
+		pgs::ClusterImpl_ptr _cluster;
 
 	public:
-		StatementImpl();
-		~StatementImpl();
+		size_t bindName2idx(const char *name);
+		bool fldIndex(size_t &res, const std::string &name);
+		bool fldIndex(size_t &res, const FieldImpl_ptr &fld);
+		bool fldIndices(std::deque<size_t> &res, const CategoryImpl_ptr &cat);
 
-		void addExpr(const ExprImpl_ptr &e);
+	public:
+		StatementImpl(
+			pgs::ClusterImpl_ptr cluster, 
+			const TMName2idx &bindName2idx,
+			const TMName2idx &fetchName2idx);
 
-		void compile();
+		bool bind(int typCpp, void const *valCpp, const char *name);
 
-		virtual void regValue(const ValueImpl_ptr &v);
-		virtual void regField(const FieldImpl_ptr &f);
+		void unbind(const char *name);
+
 	};
+	typedef boost::shared_ptr<StatementImpl> StatementImpl_ptr;
 }
+
 #endif

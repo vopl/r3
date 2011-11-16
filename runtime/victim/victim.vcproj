@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="victim"
 	ProjectGUID="{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}"
 	RootNamespace="victim"
@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../Debug/libpgs.lib"
+				AdditionalDependencies="../Debug/libpgc.lib ../Debug/libpgs.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -118,12 +118,18 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="3"
+				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -223,176 +229,8 @@
 			>
 		</Filter>
 		<Filter
-			Name="include"
-			>
-			<Filter
-				Name="pgs"
-				>
-				<File
-					RelativePath=".\include\pgs\category.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\pgs\cluster.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\pgs\expression.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\pgs\expressionSugar.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\pgs\field.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\pgs\link.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\pgs\order.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\pgs\select.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\pgs\variable.hpp"
-					>
-				</File>
-				<Filter
-					Name="meta"
-					>
-					<File
-						RelativePath=".\include\pgs\meta\category.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\cluster.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\clusterStorage.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\common.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\field.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\fieldScanty.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\index.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\ptrContainer.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\relation.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\relationEnd.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\schema.hpp"
-						>
-					</File>
-					<File
-						RelativePath=".\include\pgs\meta\schemaInitializer.hpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-		</Filter>
-		<Filter
 			Name="src"
 			>
-			<Filter
-				Name="pgs"
-				>
-				<File
-					RelativePath=".\src\pgs\category.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\cluster.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expression.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionAccess.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionAccess.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionImpl.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\expressionSugar.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\field.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\link.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\order.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\select.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pgs\variable.cpp"
-					>
-				</File>
-				<Filter
-					Name="meta"
-					>
-					<File
-						RelativePath=".\src\pgs\meta\cluster.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								ObjectFile="$(IntDir)\meta\"
-							/>
-						</FileConfiguration>
-					</File>
-				</Filter>
-			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"

@@ -755,30 +755,6 @@
 						</Filter>
 					</Filter>
 				</Filter>
-				<Filter
-					Name="utils"
-					>
-					<File
-						RelativePath="..\src\utils\crc32.cpp"
-						>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-					</File>
-				</Filter>
 			</Filter>
 		</Filter>
 		<File

@@ -27,16 +27,18 @@ namespace pgc
 		std::vector<bool>	_bindOwn;
 	public:
 		StatementImpl(ConnectionImplPtr con);
-		~StatementImpl();
+		virtual ~StatementImpl();
+
+		ConnectionImplPtr con();
 
 		void sql(const char *sql);
 		void sql(const std::string &sql);
 
 		bool empty() const;
 
-		virtual void bind(int typCpp, void const *valCpp, size_t idx);
+		virtual bool bind(int typCpp, void const *valCpp, size_t idx);
 		virtual void unbind(size_t idx);
-		virtual ResultImplPtr exec();
+		virtual PGresult *exec();
 
 	protected:
 		bool bindFiller(

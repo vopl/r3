@@ -3,6 +3,7 @@
 
 #include "pgc/cppDataType.hpp"
 #include "pgc/result.hpp"
+#include "utils/variant.hpp"
 
 namespace pgc
 {
@@ -13,15 +14,12 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	class Statement
 	{
-		StatementImplPtr _impl;
 	protected:
 		friend class Connection;
+		StatementImplPtr _impl;
 		Statement(StatementImplPtr impl);
 
-		void bindHelper(int typCpp, void const *valCpp, size_t idx);
-
 	public:
-		Statement();
 		~Statement();
 
 		Statement &sql(const char *csz);
@@ -29,10 +27,15 @@ namespace pgc
 
 		bool empty() const;
 
+		bool bindNative(int typCpp, void const *valCpp, size_t idx);
+
 		template <class T> Statement &bind(T const &v, size_t idx=0);
 		template <class T> Statement &bind(T const *pv, size_t idx=0);
-		template <class T> Statement &bind(T &v, size_t idx=0);
-		template <class T> Statement &bind(T *pv, size_t idx=0);
+		Statement &bind(const utils::Variant &v, size_t idx=0);
+
+		template <class SequenceVariant> 
+		Statement &bindList(const SequenceVariant &v, size_t idx=0);
+
 		Statement &unbind(size_t idx=0);
 
 		Result exec();
@@ -80,28 +83,43 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T const &v, size_t idx)
 	{
-		bindHelper(CppDataType<T>::cdt_index, &v, idx);
+		if(!bindNative(CppDataType<T>::cdt_index, &v, idx))
+		{
+			assert(!"bad variant type");
+			throw "bad type";
+		}
 		return *this;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <class T> Statement &Statement::bind(T const *pv, size_t idx)
 	{
-		bindHelper(CppDataType<T>::cdt_index, pv, idx);
+		if(!bindNative(CppDataType<T>::cdt_index, pv, idx))
+		{
+			throw std::invalid_argument("for Statement::bind");
+		}
+
 		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template <class T> Statement &Statement::bind(T &v, size_t idx)
+	template <class SequenceVariant> 
+	Statement &Statement::bindList(const SequenceVariant &v, size_t idx)
 	{
-		bindHelper(CppDataType<T>::cdt_index, &v, idx);
-		return *this;
-	}
+		SequenceVariant::const_iterator iter = v.begin();
+		SequenceVariant::const_iterator end = v.end();
 
-	//////////////////////////////////////////////////////////////////////////
-	template <class T> Statement &Statement::bind(T *pv, size_t idx)
-	{
-		bindHelper(CppDataType<T>::cdt_index, pv, idx);
+		for(; iter!=end; iter++)
+		{
+			if(!bindNative(iter->type(), iter->data(), idx))
+			{
+				throw std::invalid_argument("for Statement::bindList");
+			}
+			if(idx)
+			{
+				idx++;
+			}
+		}
 		return *this;
 	}
 

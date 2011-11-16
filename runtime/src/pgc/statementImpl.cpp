@@ -21,6 +21,11 @@ namespace pgc
 		_con.reset();
 	}
 
+	ConnectionImplPtr StatementImpl::con()
+	{
+		return _con;
+	}
+
 	void StatementImpl::sql(const char *sql)
 	{
 		_sql = sql;
@@ -57,7 +62,7 @@ namespace pgc
 			}
 		}
 	}
-	void StatementImpl::bind(int typCpp, void const *valCpp, size_t idx)
+	bool StatementImpl::bind(int typCpp, void const *valCpp, size_t idx)
 	{
 		assert(
 			_bindTyp.size() == _bindVal.size() &&
@@ -65,29 +70,6 @@ namespace pgc
 			_bindTyp.size() == _bindLen.size() &&
 			_bindTyp.size() == _bindFmt.size() &&
 			_bindTyp.size() == _bindOwn.size());
-
-		if(!idx)
-		{
-			idx = _bindTyp.size();
-		}
-		else
-		{
-			//начинается с единички, надо с нуля
-			idx--;
-		}
-
-		if(idx >= _bindTyp.size())
-		{
-			_bindTyp.resize(idx+1, InvalidOid);
-			_bindVal.resize(idx+1, NULL);
-			_bindLen.resize(idx+1, 0);
-			_bindFmt.resize(idx+1, 0);
-			_bindOwn.resize(idx+1, false);
-		}
-		else
-		{
-			unbind(idx+1);
-		}
 
 		Oid	bindTyp;
 		char *bindVal;
@@ -105,12 +87,40 @@ namespace pgc
 
 		if(bf)
 		{
+
+			if(!idx)
+			{
+				idx = _bindTyp.size();
+			}
+			else
+			{
+				//начинается с единички, надо с нуля
+				idx--;
+			}
+
+			if(idx >= _bindTyp.size())
+			{
+				_bindTyp.resize(idx+1, InvalidOid);
+				_bindVal.resize(idx+1, NULL);
+				_bindLen.resize(idx+1, 0);
+				_bindFmt.resize(idx+1, 0);
+				_bindOwn.resize(idx+1, false);
+			}
+			else
+			{
+				unbind(idx+1);
+			}
+
 			_bindTyp[idx] = bindTyp;
 			_bindVal[idx] = bindVal;
 			_bindLen[idx] = bindLen;
 			_bindFmt[idx] = bindFmt;
 			_bindOwn[idx] = bindOwn;
+
+			return true;
 		}
+
+		return false;
 	}
 
 	void StatementImpl::unbind(size_t idx)
@@ -164,14 +174,14 @@ namespace pgc
 		}
 	}
 
-	ResultImplPtr StatementImpl::exec()
+	PGresult *StatementImpl::exec()
 	{
 		_con->doLogExec(_sql);
 
-		ResultImplPtr res;
+		PGresult *res = NULL;
 		if(_bindTyp.empty())
 		{
-			res.reset(new ResultImpl(_con, PQexecParams(
+			res = PQexecParams(
 				_con->_pgcon,
 				_sql.c_str(),
 				0,
@@ -179,7 +189,7 @@ namespace pgc
 				0,
 				0,
 				0,
-				1)));
+				1);
 		}
 		else
 		{
@@ -190,7 +200,7 @@ namespace pgc
 				_bindTyp.size() == _bindFmt.size() &&
 				_bindTyp.size() == _bindOwn.size());
 
-			res.reset(new ResultImpl(_con, PQexecParams(
+			res = PQexecParams(
 				_con->_pgcon,
 				_sql.c_str(),
 				_bindTyp.size(),
@@ -198,7 +208,7 @@ namespace pgc
 				&_bindVal[0],
 				&_bindLen[0],
 				&_bindFmt[0],
-				1)));
+				1);
 		}
 		_con->doLogError(_sql, res);
 
@@ -496,13 +506,13 @@ namespace pgc
 				}
 			}
 			break;
-		case CppDataType<DateTimeDuration>::cdt_index:
+		case CppDataType<utils::DateTimeDuration>::cdt_index:
 			{
 				bindTyp = 1186;//interval
 				bindFmt = 1;
 				if(valCpp)
 				{
-					const DateTimeDuration &dtd = *(const DateTimeDuration *)valCpp;
+					const utils::DateTimeDuration &dtd = *(const utils::DateTimeDuration *)valCpp;
 
 					bindVal = new char[sizeof(PG_Interval)];
 					PG_Interval &pgi = *(PG_Interval *)bindVal;

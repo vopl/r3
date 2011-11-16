@@ -129,9 +129,10 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionImpl::doLogError(const std::string &stmt, ResultImplPtr &res)
+	void ConnectionImpl::doLogError(const std::string &stmt, PGresult *res)
 	{
-		if(res->status() == ees_error)
+		ExecStatusType est = PQresultStatus(res);
+		if(est!=PGRES_COMMAND_OK && est!=PGRES_TUPLES_OK)
 		{
 
 			if(_log)
@@ -140,11 +141,11 @@ namespace pgc
 				{
 					(*_log)<<stmt<<std::endl;
 				}
-				(*_log)<<res->errorMsg()<<std::endl;
+				(*_log)<<PQresultErrorMessage(res)<<std::endl;
 			}
 			else
 			{
-				std::cerr<<res->errorMsg()<<std::endl;
+				std::cerr<<PQresultErrorMessage(res)<<std::endl;
 			}
 		}
 	}

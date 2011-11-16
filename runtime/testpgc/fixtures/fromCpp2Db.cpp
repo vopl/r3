@@ -60,7 +60,7 @@ protected:
 		std::string res;
 
 #undef SQL
-#define SQL(x, val) _con.once().sql("SELECT " x).bind(val).exec().throwIfError().fetch(0,0,res)
+#define SQL(x, val) _con.once().sql("SELECT " x).bind(val).exec().throwIfError().fetch(res,0,0)
 
 		CPPUNIT_ASSERT( SQL("$1::varchar", std::string("sdflgjkwer")) );
 		CPPUNIT_ASSERT_EQUAL( std::string("sdflgjkwer"), res );
@@ -148,7 +148,7 @@ protected:
 		CPPUNIT_ASSERT_EQUAL( std::string("0 month 0 day 23:59:59.999999"), res );
 
 
-		pgc::DateTimeDuration dtd(
+		utils::DateTimeDuration dtd(
 			boost::gregorian::date_duration(65),
 			boost::posix_time::time_duration(23, 51, 29, 999999));
 

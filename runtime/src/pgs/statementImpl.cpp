@@ -1,61 +1,103 @@
+#include "stdafx.h"
 #include "statementImpl.hpp"
-#include <boost/foreach.hpp>
+#include "implAccess.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	StatementImpl::StatementImpl()
+	size_t StatementImpl::bindName2idx(const char *name)
 	{
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	StatementImpl::~StatementImpl()
-	{
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void StatementImpl::addExpr(const ExprImpl_ptr &e)
-	{
-		_exprs.insert(e);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void StatementImpl::compile()
-	{
-		_values.clear();
-		_fields.clear();
-
-		BOOST_FOREACH(const ExprImpl_ptr &e, _exprs)
+		TMName2idx::iterator iter = _bindName2idx.find(name);
+		if(_bindName2idx.end() == iter)
 		{
-			e->reg(this);
+			assert(!"bad name");
+			throw "bad name";
+			return (size_t)-1;
+		}
+		return iter->second;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool StatementImpl::fldIndex(size_t &res, const std::string &name)
+	{
+		TMName2idx::iterator iter = _fetchName2idx.find(name);
+		if(_fetchName2idx.end() == iter)
+		{
+			assert(!"bad name");
+			throw "bad name";
+			return false;
+		}
+		res = iter->second;
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool StatementImpl::fldIndex(size_t &res, const FieldImpl_ptr &fld)
+	{
+		std::string fldName;
+
+		fldName += _cluster->escapeName(fld->srcAlias());
+		fldName += ".";
+		fldName += _cluster->escapeName(fld->meta()->_name);
+
+		if(fld->alias().empty() && fld->alias() != fld->meta()->_name)
+		{
+			fldName += " AS ";
+			fldName += _cluster->escapeName(fld->alias());
 		}
 
-		BOOST_FOREACH(const ExprImpl_ptr &e, _exprs)
-		{
-			std::string sql;
-			e->mkSql(sql);
-			//std::cout<<sql<<std::endl;
-		}
+		return fldIndex(res, fldName);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void StatementImpl::regValue(const ValueImpl_ptr &v)
+	bool StatementImpl::fldIndices(std::deque<size_t> &res, const CategoryImpl_ptr &cat)
 	{
-		if(_values.end() == _values.find(v))
+		std::string categoryAlias = _cluster->escapeName(cat->alias());
+
+		//tableoid
+		std::string fldName = categoryAlias + ".tableoid";
+		size_t idx;
+		if(!fldIndex(idx, fldName))
 		{
-			_values.insert(v);
-			v->setNumber(_values.size());
+			return false;
 		}
+		res.push_back(idx);
+
+		//перебрать все поля
+		BOOST_FOREACH(meta::FieldCPtr mf, cat->meta()->_fields)
+		{
+			fldName = categoryAlias + "." + _cluster->escapeName(mf->_name);
+			if(!fldIndex(idx, fldName))
+			{
+				return false;
+			}
+			res.push_back(idx);
+		}
+
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void StatementImpl::regField(const FieldImpl_ptr &f)
+	StatementImpl::StatementImpl(
+									pgs::ClusterImpl_ptr cluster, 
+									const TMName2idx &bindName2idx,
+									const TMName2idx &fetchName2idx)
+		: pgc::StatementPrepImpl(ImplAccess<pgc::Connection>(cluster->con()).impl())
+		, _bindName2idx(bindName2idx)
+		, _fetchName2idx(fetchName2idx)
+		, _cluster(cluster)
 	{
-		if(_fields.end() == _fields.find(f))
-		{
-			_fields.insert(f);
-		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool StatementImpl::bind(int typCpp, void const *valCpp, const char *name)
+	{
+		return pgc::StatementPrepImpl::bind(typCpp, valCpp, bindName2idx(name));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void StatementImpl::unbind(const char *name)
+	{
+		pgc::StatementPrepImpl::unbind(bindName2idx(name));
 	}
 }

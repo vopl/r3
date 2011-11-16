@@ -24,7 +24,6 @@ misrepresented as being the original source code.
 Rene Nyffenegger rene.nyffenegger@adp-gmbh.ch
 
 */
-#include "stdafx.h"
 #include "utils/base64.h"
 #include <iostream>
 
@@ -37,6 +36,18 @@ namespace utils
 			"abcdefghijklmnopqrstuvwxyz"
 			"0123456789+/";
 
+		std::string mkbase64_charsrev(const std::string &base64_chars)
+		{
+			std::string res(256, '\0');
+
+			for(size_t i(0); i<base64_chars.size(); i++)
+			{
+				res[base64_chars[i]] = (unsigned char)i;
+			}
+
+			return res;
+		}
+		static const std::string base64_charsrev = mkbase64_charsrev(base64_chars);
 
 		static inline bool is_base64(unsigned char c)
 		{
@@ -144,7 +155,7 @@ namespace utils
 			{
 				for (i = 0; i <4; i++)
 				{
-					char_array_4[i] = impl::base64_chars.find(char_array_4[i]);
+					char_array_4[i] = impl::base64_charsrev[char_array_4[i]];
 				}
 
 				char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
@@ -167,7 +178,7 @@ namespace utils
 
 			for (j = 0; j <4; j++)
 			{
-				char_array_4[j] = impl::base64_chars.find(char_array_4[j]);
+				char_array_4[j] = impl::base64_charsrev[char_array_4[j]];
 			}
 
 			char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);

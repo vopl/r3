@@ -1,21 +1,40 @@
+#include "stdafx.h"
 #include "pgs/field.hpp"
+#include "implAccess.hpp"
 #include "fieldImpl.hpp"
-#include "exprAccess.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	Field::Field(const char *field, const char *table, const char *schema, const char *tableId)
-		: Expr(ExprAccess(ExprImpl_ptr(new FieldImpl(field, table, schema, tableId))))
+	Field::Field(pgs::meta::FieldCPtr fld, const std::string &alias)
+		: Expression(ImplAccess<Expression>(Impl_ptr(new FieldImpl(fld, alias))))
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Field::Field(const std::string &srcAlias, pgs::meta::FieldCPtr fld, const std::string &alias)
+		: Expression(ImplAccess<Expression>(Impl_ptr(new FieldImpl(srcAlias, fld, alias))))
 	{
 
 	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	Field::~Field()
-	{
 
+
+	//////////////////////////////////////////////////////////////////////////
+	pgs::meta::FieldCPtr Field::meta() const
+	{
+		return static_cast<FieldImpl *>(_impl.get())->meta();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const std::string &Field::srcAlias() const
+	{
+		return static_cast<FieldImpl *>(_impl.get())->srcAlias();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const std::string &Field::alias() const
+	{
+		return static_cast<FieldImpl *>(_impl.get())->alias();
 	}
 
 }
-

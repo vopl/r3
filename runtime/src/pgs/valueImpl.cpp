@@ -1,58 +1,48 @@
+#include "stdafx.h"
 #include "valueImpl.hpp"
-#include "statementImpl.hpp"
 #include "utils/ntoa.hpp"
+#include "sdHelpers.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ValueImpl::reset()
+	ValueImpl::ValueImpl(const std::string &alias)
+		: _alias(alias)
 	{
-		if(_dataDeleter)
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const std::string &ValueImpl::alias() const
+	{
+		return _alias;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ValueImpl::compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)
+	{
+		switch(ecm)
 		{
-			(this->*_dataDeleter)();
-			_dataDeleter = NULL;
+		case ecmSelectWhat:
+		case ecmSelectWhere:
+		case ecmSelectLimit:
+		case ecmSelectOffset:
+			{
+				std::map<void *, size_t>::iterator iter = state._valueNumbers.find(this);
+				if(state._valueNumbers.end() == iter)
+				{
+					iter = state._valueNumbers.insert(std::make_pair(this, state._valueNumbers.size()+1)).first;
+				}
+
+				res += "$";
+				char tmp[64];
+				res += utils::_ntoa(iter->second, tmp);
+
+				state._bindName2idx[_alias] = iter->second;
+			}
+			break;
+		default:
+			assert(0);
 		}
-		_data = NULL;
-		_cdt = 0;
-		_dataMode = 0;
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	ValueImpl::ValueImpl(const char *name)
-		: _name(name)
-		, _dataMode(0)
-		, _data(NULL)
-		, _cdt(0)
-		, _dataDeleter(NULL)
-		, _number(0)
-	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	ValueImpl::~ValueImpl()
-	{
-		reset();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ValueImpl::setNumber(size_t num)
-	{
-		_number = num;
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	void ValueImpl::reg(StatementImpl *s)
-	{
-		s->regValue(boost::shared_static_cast<ValueImpl>(shared_from_this()));
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ValueImpl::mkSql(std::string &result)
-	{
-		result += "$";
-		char buf[32];
-		result += utils::_ntoa(_number, buf);
-	}
-
 }

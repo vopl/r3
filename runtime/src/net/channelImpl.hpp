@@ -20,11 +20,16 @@ namespace net
 		: public Channel
 		, public boost::enable_shared_from_this<ChannelImpl>
 	{
+		enum EPacketKind
+		{
+			epkRaw,
+			epkVariant,
+		};
 		struct OutPacketWrapper
 		{
 			size_t			_totalSended;
 			boost::uint32_t	_sizeNetOrder;
-			boost::uint32_t	_crc32NetOrder;
+			boost::uint32_t	_crc32NetOrder;//4 старших бита - вид
 			boost::shared_array<char> _data;
 			boost::uint32_t	_size;
 		};
@@ -34,6 +39,7 @@ namespace net
 		{
 			size_t				_totalReceived;
 			boost::uint32_t		_size;
+			EPacketKind			_kind;
 			boost::uint32_t		_crc32;
 			boost::shared_array<char> _data;
 		};
@@ -46,11 +52,15 @@ namespace net
 
 		boost::mutex _sendQueueMtx;
 		std::queue<OutPacketWrapper_ptr> _sendQueue;
+
+		void sendImpl(boost::shared_array<char> data, size_t size, EPacketKind kind);
+
 	public:
 		ChannelImpl(ServiceImpl *serviceImpl, TSocket_ptr socket);
 		~ChannelImpl();
 		virtual void setHandler(IChannelHandler *);
 		virtual void send(boost::shared_array<char> data, size_t size);
+		virtual void send(const utils::Variant &v);
 		virtual void close();
 
 	private:
@@ -59,7 +69,7 @@ namespace net
 	private:
 		void makeReceive();
 		void handleReceive(ChannelImpl_ptr selfKeeper, InPacketWrapper_ptr packet, const boost::system::error_code& ec, const size_t received, Allocator_ptr alloc);
-		void handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size, Allocator_ptr alloc);
+		void handleReceiveComplete(ChannelImpl_ptr selfKeeper, boost::shared_array<char> data, size_t size, EPacketKind kind, Allocator_ptr alloc);
 	};
 
 
