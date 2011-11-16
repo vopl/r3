@@ -29,7 +29,7 @@ namespace net
 		{
 			size_t			_totalSended;
 			boost::uint32_t	_sizeNetOrder;
-			boost::uint32_t	_crc32NetOrder;//4 старших бита - вид
+			boost::uint32_t	_flagsNetOrder;
 			boost::shared_array<char> _data;
 			boost::uint32_t	_size;
 		};
@@ -39,8 +39,7 @@ namespace net
 		{
 			size_t				_totalReceived;
 			boost::uint32_t		_size;
-			EPacketKind			_kind;
-			boost::uint32_t		_crc32;
+			boost::uint32_t		_flags;
 			boost::shared_array<char> _data;
 		};
 		typedef boost::shared_ptr<InPacketWrapper> InPacketWrapper_ptr;

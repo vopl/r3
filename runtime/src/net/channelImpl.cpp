@@ -45,8 +45,8 @@ namespace net
 		OutPacketWrapper_ptr packet(new OutPacketWrapper);
 		packet->_totalSended = 0;
 		packet->_size = size;
-		packet->_sizeNetOrder = utils::fixEndian(packet->_size | (((boost::uint32_t)kind)<<28));
-		packet->_crc32NetOrder = utils::fixEndian(utils::crc32(data.get(), size));
+		packet->_sizeNetOrder = utils::fixEndian(packet->_size);
+		packet->_flagsNetOrder = utils::fixEndian((boost::uint32_t)kind);
 		packet->_data = data;
 
 		boost::mutex::scoped_lock l(_sendQueueMtx);
@@ -95,7 +95,7 @@ namespace net
 			{
 				const_buffers_1((const char *)&packet->_sizeNetOrder+lsended, 4-lsended), 
 				const_buffers_1(packet->_data.get(), packet->_size), 
-				const_buffers_1(&packet->_crc32NetOrder, 4), 
+				const_buffers_1(&packet->_flagsNetOrder, 4), 
 			};
 
 			_socket->async_write_some(packedData, 
@@ -110,7 +110,7 @@ namespace net
 			boost::array<boost::asio::const_buffers_1, 2> packedData = 
 			{
 				const_buffers_1(packet->_data.get()+lsended, packet->_size-lsended), 
-				const_buffers_1(&packet->_crc32NetOrder, 4), 
+				const_buffers_1(&packet->_flagsNetOrder, 4), 
 			};
 
 			_socket->async_write_some(packedData, 
@@ -122,7 +122,7 @@ namespace net
 		else if(packet->_totalSended < 4+packet->_size+4)
 		{
 			size_t lsended = packet->_totalSended - 4 - packet->_size;
-			_socket->async_write_some(buffer((const char *)&packet->_crc32NetOrder+lsended, 4-lsended), 
+			_socket->async_write_some(buffer((const char *)&packet->_flagsNetOrder+lsended, 4-lsended), 
 				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleSend, this, selfKeeper,
 					packet, 
@@ -163,7 +163,7 @@ namespace net
 		InPacketWrapper_ptr packet(new InPacketWrapper);
 		packet->_totalReceived = 0;
 		packet->_size = 0;
-		packet->_crc32 = 0;
+		packet->_flags = 0;
 
 		Allocator_ptr alloc = boost::make_shared<Allocator>();
 		handleReceive(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
@@ -192,14 +192,12 @@ namespace net
 		else if(packet->_totalReceived == 4)
 		{
 			packet->_size = utils::fixEndian(packet->_size);
-			packet->_kind = (EPacketKind)(packet->_size>>28);
-			packet->_size &= 0x0fffffff;
 			packet->_data.reset(new char [packet->_size]);
 
 			boost::array<boost::asio::mutable_buffer, 2> packedData = 
 			{
 				buffer(&packet->_data[0], packet->_size), 
-				buffer(&packet->_crc32, 4), 
+				buffer(&packet->_flags, 4), 
 			};
 
 			_socket->async_read_some(packedData, 
@@ -215,7 +213,7 @@ namespace net
 			boost::array<boost::asio::mutable_buffer, 2> packedData = 
 			{
 				buffer(&packet->_data[lreceived], packet->_size-lreceived), 
-				buffer(&packet->_crc32, 4), 
+				buffer(&packet->_flags, 4), 
 			};
 
 			_socket->async_read_some(packedData, 
@@ -229,7 +227,7 @@ namespace net
 		{
 			size_t lreceived = packet->_totalReceived-4-packet->_size;
 
-			_socket->async_read_some(buffer((char *)&packet->_crc32+lreceived, 4-lreceived),
+			_socket->async_read_some(buffer((char *)&packet->_flags+lreceived, 4-lreceived),
 				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleReceive, this, selfKeeper,
 					packet, 
@@ -238,28 +236,18 @@ namespace net
 		}
 		else if(packet->_totalReceived == 4+packet->_size+4)
 		{
-			packet->_crc32 = utils::fixEndian(packet->_crc32);
-			boost::uint32_t crc32 = utils::crc32(&packet->_data[0], packet->_size);
-
-			if(crc32 == packet->_crc32)
-			{
-				_socket->get_io_service().post(
-					makeCmaHandler(*alloc, boost::bind(
-						&ChannelImpl::handleReceiveComplete, 
-						this, 
-						shared_from_this(), 
-						packet->_data, 
-						packet->_size, 
-						packet->_kind, 
-						alloc))
-					);
+			packet->_flags = utils::fixEndian(packet->_flags);
+			_socket->get_io_service().post(
+				makeCmaHandler(*alloc, boost::bind(
+					&ChannelImpl::handleReceiveComplete, 
+					this, 
+					shared_from_this(), 
+					packet->_data, 
+					packet->_size, 
+					(EPacketKind)packet->_flags, 
+					alloc))
+				);
 				makeReceive();
-			}
-			else
-			{
-				//assert(0);
-				std::cerr<<"bad crc"<<std::endl;
-			}
 		}
 		else
 		{
