@@ -27,11 +27,11 @@ int main(int argc, char* argv[])
 	{
 		r3::server::Instance instance;
 
-		if(!instance.setDBInfo("dbname=test user=postgres password=postgres port=5432"))
-		{
-			std::cerr<<"instance.setDBInfo failed"<<std::endl;
-			return EXIT_FAILURE;
-		}
+// 		if(!instance.setDBInfo("dbname=test user=postgres password=postgres port=5432"))
+// 		{
+// 			std::cerr<<"instance.setDBInfo failed"<<std::endl;
+// 			return EXIT_FAILURE;
+// 		}
 		net::Service ns(&instance);
 
 		ns.listen("127.0.0.1", 1234);
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 		} while(!bStop);
 
 		ns.balance(0);
-		instance.reset();
+		//instance.reset();
 	}
 	catch(const std::exception &e)
 	{

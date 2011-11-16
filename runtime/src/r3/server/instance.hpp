@@ -2,8 +2,8 @@
 #define _R3_SERVER_INSTANCE_HPP_
 
 #include "net/service.hpp"
-#include "r3/server/sessionManager.hpp"
-#include "r3/server/threadLocalStorage.hpp"
+#include "r3/server/channel.hpp"
+#include "r3/server/session.hpp"
 
 namespace r3
 {
@@ -33,8 +33,6 @@ namespace r3
 			virtual void onConnect(net::ChannelPtr channel);
 			virtual void onStopInThread();
 		};
-
-		Instance *instance();
 	}
 }
 #endif
