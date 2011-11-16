@@ -27,17 +27,12 @@ int main(int argc, char* argv[])
 	{
 		r3::server::Instance instance;
 
-// 		if(!instance.setDBInfo("dbname=test user=postgres password=postgres port=5432"))
-// 		{
-// 			std::cerr<<"instance.setDBInfo failed"<<std::endl;
-// 			return EXIT_FAILURE;
-// 		}
+// 		instance.setDBInfo("dbname=test user=postgres password=postgres port=5432")
+
 		net::Service ns(&instance);
+		ns.balance(1);
 
-		ns.listen("127.0.0.1", 1234);
-
-		ns.balance(4);
-
+		instance.setAddress("213.59.105.7", 29431);
 		do
 		{
 
@@ -60,6 +55,8 @@ int main(int argc, char* argv[])
 				boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
 			}
 		} while(!bStop);
+
+		instance.setAddress("", 0);
 
 		ns.balance(0);
 		//instance.reset();

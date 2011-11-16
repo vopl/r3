@@ -3,7 +3,8 @@
 #include "utils/ntoa.hpp"
 #include "channelImpl.hpp"
 
-#define LOG(e) if(e){std::cerr<<__FUNCTION__<<": "<<e.message()<<"("<<e.value()<<")"<<std::endl;}
+//#define LOG(e) if(e){std::cerr<<__FUNCTION__<<": "<<e.message()<<"("<<e.value()<<")"<<std::endl;}
+#define LOG(e) 
 
 namespace net
 {
@@ -62,7 +63,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
-			if(_handler) _handler->onError(_iface);
+			if(_handler) _handler->onError(_iface, esAccept, ec);
 			{
 				boost::system::error_code ec;
 				socket->shutdown(ec);
@@ -90,7 +91,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
-			if(_handler) _handler->onError(_iface);
+			if(_handler) _handler->onError(_iface, esAcceptHandshake, ec);
 			{
 				boost::system::error_code ec;
 				socket->shutdown(ec);
@@ -110,7 +111,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
-			if(_handler) _handler->onError(_iface);
+			if(_handler) _handler->onError(_iface, esConnect, ec);
 			{
 				boost::system::error_code ec;
 				socket->shutdown(ec);
@@ -135,7 +136,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
-			if(_handler) _handler->onError(_iface);
+			if(_handler) _handler->onError(_iface, esConnectHandshake, ec);
 			{
 				boost::system::error_code ec;
 				socket->shutdown(ec);
@@ -288,16 +289,24 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::listen(const char *host, short port)
 	{
+		if(!host)
+		{
+			boost::system::error_code ec;
+			_acceptor.cancel(ec);
+			_acceptor.close(ec);
+			return;
+		}
+
 		_ssl_context.set_options(
 			ssl::context::default_workarounds
 			| ssl::context::no_sslv2
 			| ssl::context::single_dh_use);
 		_ssl_context.set_password_callback(boost::bind(&ServiceImpl::handleGetPassword, this));
 
-		_ssl_password = "test";
-		_ssl_certificate = "server.pem";
-		_ssl_privateKey = "server.pem";
-		_ssl_tmpdh = "dh512.pem";
+// 		_ssl_password = "test";
+// 		_ssl_certificate = "server.pem";
+// 		_ssl_privateKey = "server.pem";
+// 		_ssl_tmpdh = "dh512.pem";
 
 
 		if(!_ssl_certificate.empty())

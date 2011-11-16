@@ -5,7 +5,8 @@
 #include "utils/fixEndian.hpp"
 #include "utils/crc32.hpp"
 
-#define LOG(e) if(e){std::cerr<<__FUNCTION__<<": "<<e.message()<<"("<<e.value()<<")"<<std::endl;}
+//#define LOG(e) if(e){std::cerr<<__FUNCTION__<<": "<<e.message()<<"("<<e.value()<<")"<<std::endl;}
+#define LOG(e)
 
 namespace net
 {
@@ -84,7 +85,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
-			if(_handler) _handler->onError(shared_from_this());
+			if(_handler) _handler->onError(shared_from_this(), esSend, ec);
 			close();
 			return;
 		}
@@ -175,7 +176,7 @@ namespace net
 		if(ec)
 		{
 			LOG(ec);
-			if(_handler) _handler->onError(shared_from_this());
+			if(_handler) _handler->onError(shared_from_this(), esReceive, ec);
 			close();
 			return;
 		}
@@ -282,7 +283,8 @@ namespace net
 					else
 					{
 						//corrupted data?
-						_handler->onError(selfKeeper);
+						boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::bad_message);
+						_handler->onError(selfKeeper, esReceive, ec);
 					}
 				}
 				break;

@@ -13,7 +13,7 @@ namespace net
 	{
 		virtual void onStartInThread(Service *) {};
 
-		virtual void onError(Service *) {};
+		virtual void onError(Service *srv, EStage es, const boost::system::error_code& ec) {};
 
 		virtual void onAccept(ChannelPtr channel) {};
 		virtual void onConnect(ChannelPtr channel) {};

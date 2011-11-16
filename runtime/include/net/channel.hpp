@@ -2,18 +2,30 @@
 #define _NET_CHANNEL_HPP_
 
 #include "utils/variant.hpp"
+#include "boost/system/error_code.hpp"
 
 namespace net
 {
+	enum EStage
+	{
+		esListen,
+		esAccept,
+		esAcceptHandshake,
+		esConnect,
+		esConnectHandshake,
+		esSend,
+		esReceive,
+	};
+
 	struct Channel;
 	typedef boost::shared_ptr<Channel> ChannelPtr;
 
 	struct IChannelHandler
 	{
-		virtual void onReceive(ChannelPtr channel, boost::shared_array<char> data, size_t size) =0;
-		virtual void onReceive(ChannelPtr channel, const utils::VariantPtr vptr) =0;
-		virtual void onError(ChannelPtr channel) =0;
-		virtual void onClose(ChannelPtr channel) =0;
+		virtual void onReceive(const ChannelPtr &channel, boost::shared_array<char> data, size_t size) =0;
+		virtual void onReceive(const ChannelPtr &channel, const utils::VariantPtr vptr) =0;
+		virtual void onError(const ChannelPtr &channel, EStage es, const boost::system::error_code& ec) =0;
+		virtual void onClose(const ChannelPtr &channel) =0;
 	};
 
 	struct Channel
