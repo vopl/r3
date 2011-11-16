@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 		net::Service ns(&instance);
 		ns.balance(1);
 
-		instance.setAddress("213.59.105.7", 29431);
+		instance.setAddress("localhost", 29431);
 		do
 		{
 

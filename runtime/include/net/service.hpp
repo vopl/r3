@@ -31,6 +31,7 @@ namespace net
 		~Service();
 
 		void balance(size_t numThreads);
+		void join();
 
 		void listen(const char *host, short port);
 		void connect(const char *host, short port);

@@ -22,7 +22,7 @@ namespace r3
 			bool		_hasListener;
 			size_t		_threads;
 
-			std::set<ChannelPtr> _channels;
+			std::set<net::ChannelPtr> _channels;
 			net::Service *_netsrv;
 		public:
 			Instance();
@@ -31,8 +31,8 @@ namespace r3
 			void setAddress(const std::string &host, short port);
 
 		private:
-			void onChannelClose(ChannelPtr ch);
-			void onChannelError(ChannelPtr ch);
+			void onChannelClose(net::ChannelPtr channel);
+			void onChannelError(net::ChannelPtr channel);
 
 
 		private:

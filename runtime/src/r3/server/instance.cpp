@@ -33,15 +33,15 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onChannelClose(ChannelPtr ch)
+		void Instance::onChannelClose(net::ChannelPtr channel)
 		{
-			assert(0);
+			_channels.erase(channel);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onChannelError(ChannelPtr ch)
+		void Instance::onChannelError(net::ChannelPtr channel)
 		{
-			assert(0);
+			_channels.erase(channel);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -91,13 +91,13 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onAccept(net::ChannelPtr channel)
 		{
-			assert(0);
+			_channels.insert(channel);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onConnect(net::ChannelPtr channel)
 		{
-			assert(0);
+			_channels.insert(channel);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -108,6 +108,7 @@ namespace r3
 				_threads--;
 				if(!_threads)
 				{
+					_channels.clear();
 					if(_netsrv)
 					{
 						if(_hasListener)
@@ -115,7 +116,7 @@ namespace r3
 							_netsrv->listen(NULL, 0);
 							_hasListener = false;
 						}
-						_netsrv = false;
+						_netsrv = NULL;
 					}
 				}
 			}

@@ -5,7 +5,11 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	Client w;
-	w.show();
-	return a.exec();
+	int res;
+	{
+		Client w;
+		w.show();
+		res = a.exec();
+	}
+	return res;
 }

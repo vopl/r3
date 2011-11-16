@@ -193,7 +193,7 @@ namespace net
 		boost::system::error_code ec;
 		BOOST_FOREACH(TSocketPtr socket, _socks)
 		{
-			socket->shutdown(ec);
+			//socket->shutdown(ec);
 			socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
 			socket->lowest_layer().close(ec);
 		}
@@ -287,6 +287,16 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::join()
+	{
+		BOOST_FOREACH(ServiceWorkerPtr &swp, _workers)
+		{
+			swp->_thread.join();
+		}
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::listen(const char *host, short port)
 	{
 		if(!host)
@@ -303,10 +313,10 @@ namespace net
 			| ssl::context::single_dh_use);
 		_ssl_context.set_password_callback(boost::bind(&ServiceImpl::handleGetPassword, this));
 
-// 		_ssl_password = "test";
-// 		_ssl_certificate = "server.pem";
-// 		_ssl_privateKey = "server.pem";
-// 		_ssl_tmpdh = "dh512.pem";
+		_ssl_password = "test";
+		_ssl_certificate = "server.pem";
+		_ssl_privateKey = "server.pem";
+		_ssl_tmpdh = "dh512.pem";
 
 
 		if(!_ssl_certificate.empty())
