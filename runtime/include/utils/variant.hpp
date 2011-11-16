@@ -70,6 +70,8 @@ namespace utils
 			etMultisetVariant			=34,
 			etDequeVariant				=35,
 			etListVariant				=36,
+
+			etChar						=37,
 		};
 
 	public:
@@ -110,6 +112,7 @@ namespace utils
 		typedef std::multiset<Variant>				MultisetVariant;
 		typedef std::deque<Variant>					DequeVariant;
 		typedef std::list<Variant>					ListVariant;
+		typedef char								Char;
 
 
 	public:
@@ -151,6 +154,7 @@ namespace utils
 		template <> struct Type2Enum<MultisetVariant>	{ static const EType et = etMultisetVariant;	};
 		template <> struct Type2Enum<DequeVariant>		{ static const EType et = etDequeVariant;	};
 		template <> struct Type2Enum<ListVariant>		{ static const EType et = etListVariant;	};
+		template <> struct Type2Enum<Char>				{ static const EType et = etChar;	};
 
 	public:
 		~Variant();
@@ -192,6 +196,7 @@ namespace utils
 		Variant(const MultisetVariant &v);
 		Variant(const DequeVariant &v);
 		Variant(const ListVariant &v);
+		Variant(const Char &v);
 
 		//helper
 		Variant(const char *v);
@@ -232,6 +237,7 @@ namespace utils
 		Variant &operator=(const MultisetVariant &v);
 		Variant &operator=(const DequeVariant &v);
 		Variant &operator=(const ListVariant &v);
+		Variant &operator=(const Char &v);
 
 		//helper
 		Variant &operator=(const char *v);
@@ -272,6 +278,7 @@ namespace utils
 		operator MultisetVariant &();
 		operator DequeVariant &();
 		operator ListVariant &();
+		operator Char &();
 
 		//helper
 		operator const char *();
@@ -312,6 +319,7 @@ namespace utils
 		operator MultisetVariant const &() const;
 		operator DequeVariant const &() const;
 		operator ListVariant const &() const;
+		operator Char const &() const;
 
 		void swap(Variant &);
 

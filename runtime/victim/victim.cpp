@@ -211,11 +211,27 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 
+	std::cout<<typeid((char)'c').name()<<std::endl;
+	std::cout<<typeid((signed char)'c').name()<<std::endl;
+	std::cout<<typeid((unsigned char)'c').name()<<std::endl;
+	std::cout<<typeid((boost::int8_t)'c').name()<<std::endl;
+	std::cout<<typeid((boost::uint8_t)'c').name()<<std::endl;
 
+	std::cout<<typeid((short)20).name()<<std::endl;
+	std::cout<<typeid((signed short)20).name()<<std::endl;
+	std::cout<<typeid((unsigned short)20).name()<<std::endl;
+	std::cout<<typeid((boost::int16_t)20).name()<<std::endl;
+	std::cout<<typeid((boost::uint16_t)20).name()<<std::endl;
+
+	std::cout<<typeid((int)20).name()<<std::endl;
+	std::cout<<typeid((signed int)20).name()<<std::endl;
+	std::cout<<typeid((unsigned int)20).name()<<std::endl;
+	std::cout<<typeid((boost::int32_t)20).name()<<std::endl;
+	std::cout<<typeid((boost::uint32_t)20).name()<<std::endl;
 
 	//////////////////////////////////////////////////////////////////////////
 	v = sum;
-
+	v = 'c';
 	size_t size;
 	boost::shared_array<char> data = v.save(size);
 

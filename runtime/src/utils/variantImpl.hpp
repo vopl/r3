@@ -79,7 +79,8 @@ namespace utils
 	ENUMTYPES_ONE(SetVariant)				\
 	ENUMTYPES_ONE(MultisetVariant)			\
 	ENUMTYPES_ONE(DequeVariant)				\
-	ENUMTYPES_ONE(ListVariant)				//\
+	ENUMTYPES_ONE(ListVariant)				\
+	ENUMTYPES_ONE(Char)						//\
 
 
 
