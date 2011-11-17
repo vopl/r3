@@ -122,7 +122,6 @@ namespace r3
 			else
 			{
 				_netsrv.balance(0);
-				_netsrv.join();
 			}
 		}
 

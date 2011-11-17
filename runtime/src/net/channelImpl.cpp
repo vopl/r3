@@ -18,7 +18,6 @@ namespace net
 		, _socket(socket)
 		, _handler(NULL)
 	{
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -27,17 +26,23 @@ namespace net
 		_serviceImpl->delSock(_socket);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelImpl::listen()
+	{
+		makeReceive(boost::make_shared<Allocator>());
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::setHandler(IChannelHandler *handler)
 	{
-		bool handlerWas = _handler?true:false;
+		//bool handlerWas = _handler?true:false;
 		_handler = handler;
 
-		if(!handlerWas && _handler)
-		{
-			makeReceive(boost::make_shared<Allocator>());
-		}
+// 		if(!handlerWas && _handler)
+// 		{
+// 			makeReceive(boost::make_shared<Allocator>());
+// 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

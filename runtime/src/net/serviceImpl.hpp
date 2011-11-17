@@ -14,7 +14,6 @@ namespace net
 	{
 		boost::thread		_thread;
 		bool				_stop;
-
 	};
 	typedef boost::shared_ptr<ServiceWorker> ServiceWorkerPtr;
 
@@ -67,7 +66,6 @@ namespace net
 		~ServiceImpl();
 
 		void balance(size_t numThreads);
-		void join();
 
 		void listen(const char *host, short port);
 		void connect(const char *host, short port);

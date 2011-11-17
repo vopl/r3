@@ -24,6 +24,8 @@ namespace net
 			_io_service.run(ec);
 			if(swp->_stop)
 			{
+				//выкачать остаток сообщений
+				_io_service.run(ec);
 				break;
 			}
 // 			std::cout<<"workerProc sleep\n";
@@ -102,7 +104,10 @@ namespace net
 		}
 
 		addSock(socket, alloc);
-		_handler->onAccept(ChannelPtr(new ChannelImpl(this, socket)));
+
+		ChannelImplPtr channel(new ChannelImpl(this, socket));
+		_handler->onAccept(channel);
+		channel->listen();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -257,7 +262,6 @@ namespace net
 		}
 
 		_work.reset();
-		_io_service.stop();
 
 		while(count<numThreads)
 		{
@@ -279,27 +283,7 @@ namespace net
 			_io_service.reset();
 			_work.reset(new boost::asio::io_service::work(_io_service));
 		}
-		else
-		{
-			//выкачать оставшиеся сообщения этим потоком
-			_io_service.reset();
-			_io_service.run();
-		}
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::join()
-	{
-		BOOST_FOREACH(ServiceWorkerPtr &swp, _workers)
-		{
-			swp->_thread.join();
-		}
-
-		//выкачать оставшиеся сообщения этим потоком
-		_io_service.reset();
-		_io_service.run();
-	}
-
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::listen(const char *host, short port)

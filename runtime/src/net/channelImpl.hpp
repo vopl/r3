@@ -61,6 +61,7 @@ namespace net
 	public:
 		ChannelImpl(ServiceImpl *serviceImpl, TSocketPtr socket);
 		~ChannelImpl();
+		void listen();
 		virtual void setHandler(IChannelHandler *);
 		virtual void send(boost::shared_array<char> data, size_t size);
 		virtual void send(utils::VariantPtr v);
