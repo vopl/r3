@@ -4,6 +4,9 @@
 
 Client::Client(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
+	, _sended(0)
+	, _received(0)
+
 {
 	qRegisterMetaType<boost::shared_array<char> >("boost::shared_array<char>");
 	qRegisterMetaType<utils::VariantPtr>("utils::VariantPtr");
@@ -15,9 +18,23 @@ Client::Client(QWidget *parent, Qt::WFlags flags)
 	connect(ui.actionFullScreen, SIGNAL(changed()),
 		this, SLOT(onFullScreen()));
 
+	connect(ui.doPing, SIGNAL(clicked()),
+		this, SLOT(onBtn()));
+
+
 	connect(
 		&_inst, SIGNAL(connected(size_t)),
 		this, SLOT(connected(size_t)),
+		Qt::QueuedConnection);
+
+	connect(
+		&_inst, SIGNAL(sendComplete(boost::shared_array<char>, size_t)),
+		this, SLOT(sendComplete(boost::shared_array<char>, size_t)),
+		Qt::QueuedConnection);
+
+	connect(
+		&_inst, SIGNAL(sendComplete(utils::VariantPtr)),
+		this, SLOT(sendComplete(utils::VariantPtr)),
 		Qt::QueuedConnection);
 
 	connect(
@@ -26,8 +43,8 @@ Client::Client(QWidget *parent, Qt::WFlags flags)
 		Qt::QueuedConnection);
 
 	connect(
-		&_inst, SIGNAL(receive(const utils::VariantPtr &)),
-		this, SLOT(receive(const utils::VariantPtr &)),
+		&_inst, SIGNAL(receive(utils::VariantPtr)),
+		this, SLOT(receive(utils::VariantPtr)),
 		Qt::QueuedConnection);
 
 	_inst.setAddress("localhost", 29431);
@@ -39,6 +56,14 @@ Client::~Client()
 	disconnect(
 		&_inst, SIGNAL(connected(size_t)),
 		this, SLOT(connected(size_t)));
+
+	disconnect(
+		&_inst, SIGNAL(sendComplete(boost::shared_array<char>, size_t)),
+		this, SLOT(sendComplete(boost::shared_array<char>, size_t)));
+
+	disconnect(
+		&_inst, SIGNAL(sendComplete(const utils::VariantPtr &)),
+		this, SLOT(sendComplete(const utils::VariantPtr &)));
 
 	disconnect(
 		&_inst, SIGNAL(receive(boost::shared_array<char>, size_t)),
@@ -73,21 +98,49 @@ void Client::onFullScreen()
 
 
 
+void Client::onBtn()
+{
+	utils::VariantPtr v(new utils::Variant("tratata"));
+	_inst.send(v);
+}
 
 
 void Client::connected(size_t channels)
 {
 	QString s;
 	s.sprintf("%d", (int)channels);
-	ui.label_2->setText(s);
+	ui.connected_->setText(s);
+}
+
+
+void Client::sendComplete(boost::shared_array<char> data, size_t size)
+{
+	_sended++;
+	QString s;
+	s.sprintf("%d", _sended);
+	ui.send_->setText(s);
+}
+
+void Client::sendComplete(utils::VariantPtr v)
+{
+	_sended++;
+	QString s;
+	s.sprintf("%d", _sended);
+	ui.send_->setText(s);
 }
 
 void Client::receive(boost::shared_array<char> data, size_t size)
 {
-	assert(0);
+	_received++;
+	QString s;
+	s.sprintf("%d", _received);
+	ui.receive_->setText(s);
 }
 
-void Client::receive(const utils::VariantPtr &v)
+void Client::receive(utils::VariantPtr v)
 {
-	assert(0);
+	_received++;
+	QString s;
+	s.sprintf("%d", _received);
+	ui.receive_->setText(s);
 }

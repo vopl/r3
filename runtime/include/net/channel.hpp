@@ -22,8 +22,10 @@ namespace net
 
 	struct IChannelHandler
 	{
+		virtual void onSendComplete(const ChannelPtr &channel, boost::shared_array<char> data, size_t size) =0;
+		virtual void onSendComplete(const ChannelPtr &channel, utils::VariantPtr v) =0;
 		virtual void onReceive(const ChannelPtr &channel, boost::shared_array<char> data, size_t size) =0;
-		virtual void onReceive(const ChannelPtr &channel, const utils::VariantPtr vptr) =0;
+		virtual void onReceive(const ChannelPtr &channel, utils::VariantPtr v) =0;
 		virtual void onError(const ChannelPtr &channel, EStage es, const boost::system::error_code& ec) =0;
 		virtual void onClose(const ChannelPtr &channel) =0;
 	};
@@ -32,7 +34,7 @@ namespace net
 	{
 		virtual void setHandler(IChannelHandler *) =0;
 		virtual void send(boost::shared_array<char> data, size_t size) =0;
-		virtual void send(const utils::Variant &v) =0;
+		virtual void send(utils::VariantPtr v) =0;
 		virtual void close() =0;
 	};
 }

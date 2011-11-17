@@ -38,21 +38,24 @@ namespace r3
 
 		public slots:
 			bool send(boost::shared_array<char> data, size_t size);
-			bool send(const utils::Variant &v);
-			bool send(const utils::VariantPtr &v);
+			bool send(utils::VariantPtr v);
 
 		private slots:
 			void tconnected(size_t channels);
+			void tsendComplete(boost::shared_array<char> data, size_t size);
+			void tsendComplete(utils::VariantPtr v);
 			void treceive(boost::shared_array<char> data, size_t size);
-			void treceive(const utils::VariantPtr &v);
+			void treceive(utils::VariantPtr v);
 
 		signals:
 			void connected(size_t channels);
+			void sendComplete(boost::shared_array<char> data, size_t size);
+			void sendComplete(utils::VariantPtr v);
 			void receive(boost::shared_array<char> data, size_t size);
-			void receive(const utils::VariantPtr &v);
+			void receive(utils::VariantPtr v);
 
 		private:
-			//for servece
+			//for service
 			virtual void onStartInThread(net::Service *netsrv);
 			virtual void onError(net::Service *netsrv, net::EStage es, const boost::system::error_code& ec);
 			virtual void onAccept(net::ChannelPtr channel);
@@ -61,8 +64,10 @@ namespace r3
 
 		private:
 			//for channel
+			virtual void onSendComplete(const net::ChannelPtr &channel, boost::shared_array<char> data, size_t size);
+			virtual void onSendComplete(const net::ChannelPtr &channel, utils::VariantPtr vptr);
 			virtual void onReceive(const net::ChannelPtr &channel, boost::shared_array<char> data, size_t size);
-			virtual void onReceive(const net::ChannelPtr &channel, const utils::VariantPtr vptr);
+			virtual void onReceive(const net::ChannelPtr &channel, utils::VariantPtr vptr);
 			virtual void onError(const net::ChannelPtr &channel, net::EStage es, const boost::system::error_code& ec);
 			virtual void onClose(const net::ChannelPtr &channel);
 

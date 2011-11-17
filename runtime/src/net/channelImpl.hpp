@@ -27,11 +27,15 @@ namespace net
 		};
 		struct OutPacketWrapper
 		{
-			size_t			_totalSended;
-			boost::uint32_t	_sizeNetOrder;
-			boost::uint32_t	_flagsNetOrder;
+			boost::uint32_t		_sizeNetOrder;
+			boost::uint32_t		_flagsNetOrder;
+
+			size_t				_totalSended;
+			boost::uint32_t		_flags;
+
 			boost::shared_array<char> _data;
-			boost::uint32_t	_size;
+			boost::uint32_t		_size;
+			utils::VariantPtr	_variant;
 		};
 		typedef boost::shared_ptr<OutPacketWrapper> OutPacketWrapperPtr;
 
@@ -52,23 +56,24 @@ namespace net
 		boost::mutex _sendQueueMtx;
 		std::queue<OutPacketWrapperPtr> _sendQueue;
 
-		void sendImpl(boost::shared_array<char> data, size_t size, EPacketKind kind);
+		void sendImpl(OutPacketWrapperPtr packet);
 
 	public:
 		ChannelImpl(ServiceImpl *serviceImpl, TSocketPtr socket);
 		~ChannelImpl();
 		virtual void setHandler(IChannelHandler *);
 		virtual void send(boost::shared_array<char> data, size_t size);
-		virtual void send(const utils::Variant &v);
+		virtual void send(utils::VariantPtr v);
 		virtual void close();
 
 	private:
 		void handleSend(ChannelImplPtr selfKeeper, OutPacketWrapperPtr packet, const boost::system::error_code& ec, const size_t sended, AllocatorPtr alloc);
+		void handleSendComplete(ChannelImplPtr selfKeeper, OutPacketWrapperPtr packet);
 
 	private:
-		void makeReceive();
+		void makeReceive(AllocatorPtr alloc);
 		void handleReceive(ChannelImplPtr selfKeeper, InPacketWrapperPtr packet, const boost::system::error_code& ec, const size_t received, AllocatorPtr alloc);
-		void handleReceiveComplete(ChannelImplPtr selfKeeper, boost::shared_array<char> data, size_t size, EPacketKind kind, AllocatorPtr alloc);
+		void handleReceiveComplete(ChannelImplPtr selfKeeper, InPacketWrapperPtr packet);
 	};
 
 

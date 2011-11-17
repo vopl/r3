@@ -36,19 +36,25 @@ namespace net
 
 		if(!handlerWas && _handler)
 		{
-			makeReceive();
+			makeReceive(boost::make_shared<Allocator>());
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::sendImpl(boost::shared_array<char> data, size_t size, EPacketKind kind)
+	void ChannelImpl::sendImpl(OutPacketWrapperPtr packet)
 	{
-		OutPacketWrapperPtr packet(new OutPacketWrapper);
+		EPacketKind kind = epkRaw;
+		if(packet->_variant)
+		{
+			packet->_data = packet->_variant->save(packet->_size);
+			kind = epkVariant;
+		}
+
 		packet->_totalSended = 0;
-		packet->_size = size;
+
+		packet->_flags = kind;
 		packet->_sizeNetOrder = utils::fixEndian(packet->_size);
-		packet->_flagsNetOrder = utils::fixEndian((boost::uint32_t)kind);
-		packet->_data = data;
+		packet->_flagsNetOrder = utils::fixEndian(packet->_flags);
 
 		boost::mutex::scoped_lock l(_sendQueueMtx);
 		_sendQueue.push(packet);
@@ -63,15 +69,20 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::send(boost::shared_array<char> data, size_t size)
 	{
-		sendImpl(data, size, epkRaw);
+		OutPacketWrapperPtr packet(new OutPacketWrapper);
+		packet->_size = size;
+		packet->_data = data;
+
+		sendImpl(packet);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::send(const utils::Variant &v)
+	void ChannelImpl::send(utils::VariantPtr v)
 	{
-		size_t size;
-		boost::shared_array<char> data = v.save(size);
-		sendImpl(data, size, epkVariant);
+		OutPacketWrapperPtr packet(new OutPacketWrapper);
+		packet->_variant = v;
+
+		sendImpl(packet);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -133,6 +144,8 @@ namespace net
 		{
 			assert(packet->_totalSended == 4+packet->_size+4);
 
+			handleSendComplete(selfKeeper, packet);
+
 			boost::mutex::scoped_lock l(_sendQueueMtx);
 			assert(_sendQueue.size());
 			assert(packet == _sendQueue.front());
@@ -147,6 +160,30 @@ namespace net
 		}
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelImpl::handleSendComplete(ChannelImplPtr selfKeeper, OutPacketWrapperPtr packet)
+	{
+		if(_handler)
+		{
+			EPacketKind kind = (EPacketKind)packet->_flags;
+			switch(kind)
+			{
+			case epkRaw:
+				_handler->onSendComplete(selfKeeper, packet->_data, packet->_size);
+				break;
+			case epkVariant:
+				{
+					_handler->onSendComplete(selfKeeper, packet->_variant);
+				}
+				break;
+			default:
+				assert(!"unknown packet kind");
+				throw "unknown packet kind";
+			}
+		}
+	}
+
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::close()
@@ -159,14 +196,13 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::makeReceive()
+	void ChannelImpl::makeReceive(AllocatorPtr alloc)
 	{
 		InPacketWrapperPtr packet(new InPacketWrapper);
 		packet->_totalReceived = 0;
 		packet->_size = 0;
 		packet->_flags = 0;
 
-		AllocatorPtr alloc = boost::make_shared<Allocator>();
 		handleReceive(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
 	}
 
@@ -243,12 +279,9 @@ namespace net
 					&ChannelImpl::handleReceiveComplete, 
 					this, 
 					shared_from_this(), 
-					packet->_data, 
-					packet->_size, 
-					(EPacketKind)packet->_flags, 
-					alloc))
+					packet))
 				);
-				makeReceive();
+				makeReceive(alloc);
 		}
 		else
 		{
@@ -259,24 +292,20 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleReceiveComplete(
-		ChannelImplPtr selfKeeper, boost
-		::shared_array<char> data, 
-		size_t size, 
-		EPacketKind kind,
-		AllocatorPtr alloc)
+	void ChannelImpl::handleReceiveComplete(ChannelImplPtr selfKeeper, InPacketWrapperPtr packet)
 	{
 		if(_handler)
 		{
+			EPacketKind kind = (EPacketKind)packet->_flags;
 			switch(kind)
 			{
 			case epkRaw:
-				_handler->onReceive(selfKeeper, data, size);
+				_handler->onReceive(selfKeeper, packet->_data, packet->_size);
 				break;
 			case epkVariant:
 				{
 					utils::VariantPtr pv(new utils::Variant);
-					if(pv->load(data, size))
+					if(pv->load(packet->_data, packet->_size))
 					{
 						_handler->onReceive(selfKeeper, pv);
 					}

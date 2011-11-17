@@ -43,7 +43,7 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		bool Instance::send(const utils::Variant &v)
+		bool Instance::send(utils::VariantPtr v)
 		{
 			net::ChannelPtr channel;
 			{
@@ -65,12 +65,6 @@ namespace r3
 
 
 		//////////////////////////////////////////////////////////////////////////
-		bool Instance::send(const utils::VariantPtr &v)
-		{
-			return send(*v);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
 		void Instance::tconnected(size_t channels)
 		{
 			//return;
@@ -78,16 +72,26 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Instance::tsendComplete(boost::shared_array<char> data, size_t size)
+		{
+			emit sendComplete(data, size);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Instance::tsendComplete(utils::VariantPtr v)
+		{
+			emit sendComplete(v);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		void Instance::treceive(boost::shared_array<char> data, size_t size)
 		{
-			//return;
 			emit receive(data, size);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::treceive(const utils::VariantPtr &v)
+		void Instance::treceive(utils::VariantPtr v)
 		{
-			//return;
 			emit receive(v);
 		}
 
@@ -196,7 +200,20 @@ namespace r3
 			tconnected(channels);
 		}
 
+
+		//////////////////////////////////////////////////////////////////////////
+		void Instance::onSendComplete(const net::ChannelPtr &channel, boost::shared_array<char> data, size_t size)
+		{
+			tsendComplete(data, size);
+		}
 		
+		//////////////////////////////////////////////////////////////////////////
+		void Instance::onSendComplete(const net::ChannelPtr &channel, utils::VariantPtr v)
+		{
+			tsendComplete(v);
+		}
+
+
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onReceive(const net::ChannelPtr &channel, boost::shared_array<char> data, size_t size)
 		{
