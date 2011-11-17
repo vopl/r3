@@ -11,8 +11,8 @@ namespace r3
 			: _host("localhost")
 			, _port(29431)
 			, _netsrv(this)
-			, _threads(0)
 			, _favorNumChannels(0)
+			, _connectNumChannels(0)
 		{
 		}
 
@@ -137,11 +137,16 @@ namespace r3
 			//логировать
 			switch(es)
 			{
+			case net::esConnect:
+			case net::esConnectHandshake:
+				{
+					boost::mutex::scoped_lock sl(_mtx);
+					_connectNumChannels--;
+				}
+				break;
 			case net::esListen:
 			case net::esAccept:
 			case net::esAcceptHandshake:
-			case net::esConnect:
-			case net::esConnectHandshake:
 			case net::esSend:
 			case net::esReceive:
 				std::cerr<<es<<": "<<ec.message()<<"("<<ec.value()<<")"<<std::endl;
@@ -175,6 +180,8 @@ namespace r3
 			size_t channels;
 			{
 				boost::mutex::scoped_lock sl(_mtx);
+				assert(_connectNumChannels);
+				_connectNumChannels--;
 				_channels.insert(channel);
 				channels = _channels.size();
 			}
@@ -186,17 +193,17 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onStopInThread()
 		{
-			size_t channels;
-			{
-				boost::mutex::scoped_lock sl(_mtx);
-				if(!_threads)
-				{
-					_channels.clear();
-				}
-				channels = _channels.size();
-			}
-
-			tconnected(channels);
+// 			size_t channels;
+// 			{
+// 				boost::mutex::scoped_lock sl(_mtx);
+// 				if(!_threads)
+// 				{
+// 					_channels.clear();
+// 				}
+// 				channels = _channels.size();
+// 			}
+// 
+// 			tconnected(channels);
 		}
 
 
@@ -263,14 +270,10 @@ namespace r3
 				boost::mutex::scoped_lock sl(_mtx);
 				if(_favorNumChannels)
 				{
-					if(!_threads)
-					{
-						_threads = 1;
-					}
-
-					if(_favorNumChannels > _channels.size())
+					if(_favorNumChannels > _channels.size() && !_connectNumChannels)
 					{
 						_netsrv.connect(_host.c_str(), _port);
+						_connectNumChannels++;
 					}
 					else if(_favorNumChannels < _channels.size())
 					{
@@ -283,17 +286,8 @@ namespace r3
 					{
 						(*_channels.begin())->close();
 					}
-					else
-					{
-						if(_threads)
-						{
-							_threads = 0;
-						}
-					}
 				}
 			}
 		}
-
-
 	}
 }

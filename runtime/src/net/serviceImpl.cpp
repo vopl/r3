@@ -152,7 +152,10 @@ namespace net
 		}
 
 		addSock(socket, alloc);
-		_handler->onConnect(ChannelPtr(new ChannelImpl(this, socket)));
+
+		ChannelImplPtr channel(new ChannelImpl(this, socket));
+		_handler->onConnect(channel);
+		channel->listen();
 	}
 
 

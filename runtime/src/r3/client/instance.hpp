@@ -23,10 +23,10 @@ namespace r3
 
 			std::string _host;
 			short		_port;
-			size_t		_threads;
 
 			net::Service _netsrv;
 
+			size_t		_connectNumChannels;
 			size_t		_favorNumChannels;
 			std::set<net::ChannelPtr> _channels;
 		public:

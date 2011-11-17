@@ -35,13 +35,15 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onChannelClose(net::ChannelPtr channel)
 		{
-			_channels.erase(channel);
+// 			boost::mutex::scoped_lock sl(_mtx);
+// 			_channels.erase(channel);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onChannelError(net::ChannelPtr channel)
 		{
-			_channels.erase(channel);
+// 			boost::mutex::scoped_lock sl(_mtx);
+// 			_channels.erase(channel);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -91,13 +93,15 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onAccept(net::ChannelPtr channel)
 		{
-			_channels.insert(channel);
+// 			boost::mutex::scoped_lock sl(_mtx);
+// 			_channels.insert(channel);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onConnect(net::ChannelPtr channel)
 		{
-			_channels.insert(channel);
+// 			boost::mutex::scoped_lock sl(_mtx);
+// 			_channels.insert(channel);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -108,7 +112,7 @@ namespace r3
 				_threads--;
 				if(!_threads)
 				{
-					_channels.clear();
+// 					_channels.clear();
 					if(_netsrv)
 					{
 						if(_hasListener)
