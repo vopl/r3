@@ -26,15 +26,15 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Service::listen(const char *host, short port)
+	bool Service::listen(const char *host, short port)
 	{
-		_impl->listen(host, port);
+		return _impl->listen(host, port);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Service::connect(const char *host, short port)
+	bool Service::connect(const char *host, short port)
 	{
-		_impl->connect(host, port);
+		return _impl->connect(host, port);
 	}
 
 

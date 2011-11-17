@@ -13,7 +13,7 @@ namespace net
 	struct ServiceWorker
 	{
 		boost::thread		_thread;
-		bool				_stop;
+		volatile bool		_stop;
 	};
 	typedef boost::shared_ptr<ServiceWorker> ServiceWorkerPtr;
 
@@ -39,6 +39,7 @@ namespace net
 
 		boost::asio::io_service::strand	_socksPoolStrand;
 		std::set<TSocketPtr>			_socks;
+		volatile bool					_stop;
 
 	private:
 		void workerProc(ServiceWorkerPtr swp);
@@ -67,8 +68,8 @@ namespace net
 
 		void balance(size_t numThreads);
 
-		void listen(const char *host, short port);
-		void connect(const char *host, short port);
+		bool listen(const char *host, short port);
+		bool connect(const char *host, short port);
 	};
 }
 #endif

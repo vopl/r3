@@ -186,7 +186,17 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::handleAddSock(TSocketPtr socket, AllocatorPtr alloc)
 	{
-		_socks.insert(socket);
+		if(_stop)
+		{
+			boost::system::error_code ec;
+			socket->shutdown(ec);
+			socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+			socket->lowest_layer().close(ec);
+		}
+		else
+		{
+			_socks.insert(socket);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -217,6 +227,7 @@ namespace net
 		, _ssl_context(_io_service, ssl::context::sslv23)
 		, _acceptor(_io_service)
 		, _socksPoolStrand(_io_service)
+		, _stop(false)
 	{
 	}
 
@@ -232,10 +243,15 @@ namespace net
 	{
 		if(!numThreads)
 		{
+			_stop = true;
 			boost::system::error_code ec;
 			_acceptor.cancel(ec);
 			_acceptor.close(ec);
 			closeSocks();
+		}
+		else
+		{
+			_stop = false;
 		}
 
 		size_t count = 0;
@@ -265,6 +281,7 @@ namespace net
 		}
 
 		_work.reset();
+		_io_service.stop();
 
 		while(count<numThreads)
 		{
@@ -286,17 +303,31 @@ namespace net
 			_io_service.reset();
 			_work.reset(new boost::asio::io_service::work(_io_service));
 		}
+		else
+		{
+			assert(_workers.empty());
+			boost::system::error_code ec;
+			
+			closeSocks();
+			_io_service.reset();
+			_io_service.run(ec);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::listen(const char *host, short port)
+	bool ServiceImpl::listen(const char *host, short port)
 	{
 		if(!host)
 		{
 			boost::system::error_code ec;
 			_acceptor.cancel(ec);
 			_acceptor.close(ec);
-			return;
+			return true;
+		}
+
+		if(_workers.empty())
+		{
+			return false;
 		}
 
 		_ssl_context.set_options(
@@ -340,12 +371,17 @@ namespace net
 
 		makeAccept();
 
-
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::connect(const char *host, short port)
+	bool ServiceImpl::connect(const char *host, short port)
 	{
+		if(_workers.empty())
+		{
+			return false;
+		}
+
 		ip::tcp::resolver resolver(_io_service);
 		char sport[32];
 		ip::tcp::resolver::query query(host, utils::_ntoa(port, sport));
@@ -360,6 +396,8 @@ namespace net
 				&ServiceImpl::handleConnect, this,
 				socket,
 				placeholders::error, alloc)));
+
+		return true;
 	}
 
 }

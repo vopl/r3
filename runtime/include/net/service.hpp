@@ -32,8 +32,8 @@ namespace net
 
 		void balance(size_t numThreads);
 
-		void listen(const char *host, short port);
-		void connect(const char *host, short port);
+		bool listen(const char *host, short port);
+		bool connect(const char *host, short port);
 	};
 }
 #endif

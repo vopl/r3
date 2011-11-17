@@ -113,13 +113,14 @@ namespace r3
 				_favorNumChannels = numChannels;
 			}
 
-			balance();
-
 			if(numChannels)
 			{
 				_netsrv.balance(1);
 			}
-			else
+
+			balance();
+
+			if(!numChannels)
 			{
 				_netsrv.balance(0);
 			}
@@ -272,6 +273,16 @@ namespace r3
 				{
 					if(_favorNumChannels > _channels.size() && !_connectNumChannels)
 					{
+						_netsrv.connect(_host.c_str(), _port);
+						_connectNumChannels++;
+						_netsrv.connect(_host.c_str(), _port);
+						_connectNumChannels++;
+						_netsrv.connect(_host.c_str(), _port);
+						_connectNumChannels++;
+						_netsrv.connect(_host.c_str(), _port);
+						_connectNumChannels++;
+						_netsrv.connect(_host.c_str(), _port);
+						_connectNumChannels++;
 						_netsrv.connect(_host.c_str(), _port);
 						_connectNumChannels++;
 					}
