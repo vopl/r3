@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 // 		instance.setDBInfo("dbname=test user=postgres password=postgres port=5432")
 
 		net::Service ns(&instance);
-		ns.balance(1);
+		ns.balance(4);
 
 		instance.setAddress("localhost", 29431);
 		do

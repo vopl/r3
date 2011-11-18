@@ -275,16 +275,6 @@ namespace r3
 					{
 						_netsrv.connect(_host.c_str(), _port);
 						_connectNumChannels++;
-						_netsrv.connect(_host.c_str(), _port);
-						_connectNumChannels++;
-						_netsrv.connect(_host.c_str(), _port);
-						_connectNumChannels++;
-						_netsrv.connect(_host.c_str(), _port);
-						_connectNumChannels++;
-						_netsrv.connect(_host.c_str(), _port);
-						_connectNumChannels++;
-						_netsrv.connect(_host.c_str(), _port);
-						_connectNumChannels++;
 					}
 					else if(_favorNumChannels < _channels.size())
 					{
