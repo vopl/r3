@@ -204,7 +204,7 @@ namespace net
 						packet, 
 						placeholders::error, placeholders::bytes_transferred, alloc)));
 			}
-			else if(received == sizeof(packet->_headerNetOrder))
+			else
 			{
 				packet->_id = utils::fixEndian(packet->_headerNetOrder[0]);
 				packet->_kind = utils::fixEndian(packet->_headerNetOrder[1]);
