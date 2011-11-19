@@ -6,35 +6,35 @@
 
 namespace net
 {
-	enum EStage
+	//////////////////////////////////////////////////////////////////////////
+	struct SPacket
 	{
-		esListen,
-		esAccept,
-		esAcceptHandshake,
-		esConnect,
-		esConnectHandshake,
-		esSend,
-		esReceive,
+		boost::uint32_t	_id;
+		boost::uint32_t	_kind;
+		boost::uint32_t _size;
+		boost::shared_array<char> _data;
+
+		SPacket();
 	};
 
+	//////////////////////////////////////////////////////////////////////////
 	struct Channel;
 	typedef boost::shared_ptr<Channel> ChannelPtr;
 
 	struct IChannelHandler
 	{
-		virtual void onSendComplete(const ChannelPtr &channel, boost::shared_array<char> data, size_t size) =0;
-		virtual void onSendComplete(const ChannelPtr &channel, utils::VariantPtr v) =0;
-		virtual void onReceive(const ChannelPtr &channel, boost::shared_array<char> data, size_t size) =0;
-		virtual void onReceive(const ChannelPtr &channel, utils::VariantPtr v) =0;
-		virtual void onError(const ChannelPtr &channel, EStage es, const boost::system::error_code& ec) =0;
+		virtual void onSendFailed(const ChannelPtr &channel, const SPacket &p) =0;
+		virtual void onSendComplete(const ChannelPtr &channel, const SPacket &p) =0;
+
+		virtual void onReceive(const ChannelPtr &channel, const SPacket &p) =0;
+
 		virtual void onClose(const ChannelPtr &channel) =0;
 	};
 
 	struct Channel
 	{
-		virtual void setHandler(IChannelHandler *) =0;
-		virtual void send(boost::shared_array<char> data, size_t size) =0;
-		virtual void send(utils::VariantPtr v) =0;
+		virtual void setHandler(IChannelHandler *handler) =0;
+		virtual void send(const SPacket &p) =0;
 		virtual void close() =0;
 	};
 }

@@ -38,7 +38,6 @@ namespace r3
 
 		public slots:
 			bool send(boost::shared_array<char> data, size_t size);
-			bool send(utils::VariantPtr v);
 
 		private slots:
 			void tconnected(size_t channels);
@@ -64,11 +63,9 @@ namespace r3
 
 		private:
 			//for channel
-			virtual void onSendComplete(const net::ChannelPtr &channel, boost::shared_array<char> data, size_t size);
-			virtual void onSendComplete(const net::ChannelPtr &channel, utils::VariantPtr vptr);
-			virtual void onReceive(const net::ChannelPtr &channel, boost::shared_array<char> data, size_t size);
-			virtual void onReceive(const net::ChannelPtr &channel, utils::VariantPtr vptr);
-			virtual void onError(const net::ChannelPtr &channel, net::EStage es, const boost::system::error_code& ec);
+			virtual void onSendFailed(const net::ChannelPtr &channel, const net::SPacket &p);
+			virtual void onSendComplete(const net::ChannelPtr &channel, const net::SPacket &p);
+			virtual void onReceive(const net::ChannelPtr &channel, const net::SPacket &p);
 			virtual void onClose(const net::ChannelPtr &channel);
 
 		private:

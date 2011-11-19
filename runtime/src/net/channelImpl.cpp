@@ -13,6 +13,30 @@ namespace net
 	using namespace boost::asio;
 
 	//////////////////////////////////////////////////////////////////////////
+	SPacket::SPacket()
+		: _id(0)
+		, _kind(0)
+		, _size(0)
+		, _data()
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelImpl::PacketWrapper::PacketWrapper(const SPacket &p)
+		: SPacket(p)
+	{
+		_headerNetOrder[0] = utils::fixEndian(p._id);
+		_headerNetOrder[1] = utils::fixEndian(p._kind);
+		_headerNetOrder[2] = utils::fixEndian(p._size);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelImpl::PacketWrapper::PacketWrapper()
+	{
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	ChannelImpl::ChannelImpl(ServiceImpl *serviceImpl, TSocketPtr socket)
 		: _serviceImpl(serviceImpl)
 		, _socket(socket)
@@ -27,13 +51,6 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::listen()
-	{
-		makeReceive(boost::make_shared<Allocator>());
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::setHandler(IChannelHandler *handler)
 	{
 		//bool handlerWas = _handler?true:false;
@@ -46,20 +63,9 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::sendImpl(OutPacketWrapperPtr packet)
+	void ChannelImpl::send(const SPacket &p)
 	{
-		EPacketKind kind = epkRaw;
-		if(packet->_variant)
-		{
-			packet->_data = packet->_variant->save(packet->_size);
-			kind = epkVariant;
-		}
-
-		packet->_totalSended = 0;
-
-		packet->_flags = kind;
-		packet->_sizeNetOrder = utils::fixEndian(packet->_size);
-		packet->_flagsNetOrder = utils::fixEndian(packet->_flags);
+		PacketWrapperPtr packet(new PacketWrapper(p));
 
 		boost::mutex::scoped_lock l(_sendQueueMtx);
 		_sendQueue.push(packet);
@@ -72,74 +78,39 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::send(boost::shared_array<char> data, size_t size)
-	{
-		OutPacketWrapperPtr packet(new OutPacketWrapper);
-		packet->_size = size;
-		packet->_data = data;
-
-		sendImpl(packet);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::send(utils::VariantPtr v)
-	{
-		OutPacketWrapperPtr packet(new OutPacketWrapper);
-		packet->_variant = v;
-
-		sendImpl(packet);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::handleSend(
 		ChannelImplPtr selfKeeper,
-		OutPacketWrapperPtr packet, 
+		PacketWrapperPtr packet, 
 		const boost::system::error_code& ec, const size_t sended,
 		AllocatorPtr alloc)
 	{
-		packet->_totalSended += sended;
 		if(ec)
 		{
 			LOG(ec);
-			if(_handler) _handler->onError(shared_from_this(), esSend, ec);
+			if(_handler)
+			{
+				_handler->onSendFailed(selfKeeper, *packet);
+				_handler->onClose(selfKeeper);
+			}
 			close();
 			return;
 		}
-		if(packet->_totalSended < 4)
-		{
-			size_t lsended = packet->_totalSended;
-			boost::array<boost::asio::const_buffers_1, 3> packedData = 
-			{
-				const_buffers_1((const char *)&packet->_sizeNetOrder+lsended, 4-lsended), 
-				const_buffers_1(packet->_data.get(), packet->_size), 
-				const_buffers_1(&packet->_flagsNetOrder, 4), 
-			};
 
-			_socket->async_write_some(packedData, 
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleSend, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
-		}
-		else if(packet->_totalSended < 4+packet->_size)
+		assert(
+			sended == 0 || 
+			sended == sizeof(packet->_headerNetOrder) + packet->_size);
+
+		if(!sended)
 		{
-			size_t lsended = packet->_totalSended - 4;
 			boost::array<boost::asio::const_buffers_1, 2> packedData = 
 			{
-				const_buffers_1(packet->_data.get()+lsended, packet->_size-lsended), 
-				const_buffers_1(&packet->_flagsNetOrder, 4), 
+				const_buffers_1((const char *)&packet->_headerNetOrder, sizeof(packet->_headerNetOrder)), 
+				const_buffers_1(packet->_data.get(), packet->_size)
 			};
 
-			_socket->async_write_some(packedData, 
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleSend, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
-		}
-		else if(packet->_totalSended < 4+packet->_size+4)
-		{
-			size_t lsended = packet->_totalSended - 4 - packet->_size;
-			_socket->async_write_some(buffer((const char *)&packet->_flagsNetOrder+lsended, 4-lsended), 
+			async_write(
+				*_socket,
+				packedData, 
 				makeCmaHandler(*alloc, boost::bind(
 					&ChannelImpl::handleSend, this, selfKeeper,
 					packet, 
@@ -147,9 +118,12 @@ namespace net
 		}
 		else
 		{
-			assert(packet->_totalSended == 4+packet->_size+4);
+			assert(sended == sizeof(packet->_headerNetOrder)+packet->_size);
 
-			handleSendComplete(selfKeeper, packet);
+			if(_handler)
+			{
+				_handler->onSendComplete(selfKeeper, *packet);
+			}
 
 			boost::mutex::scoped_lock l(_sendQueueMtx);
 			assert(_sendQueue.size());
@@ -166,31 +140,6 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleSendComplete(ChannelImplPtr selfKeeper, OutPacketWrapperPtr packet)
-	{
-		if(_handler)
-		{
-			EPacketKind kind = (EPacketKind)packet->_flags;
-			switch(kind)
-			{
-			case epkRaw:
-				_handler->onSendComplete(selfKeeper, packet->_data, packet->_size);
-				break;
-			case epkVariant:
-				{
-					_handler->onSendComplete(selfKeeper, packet->_variant);
-				}
-				break;
-			default:
-				assert(!"unknown packet kind");
-				throw "unknown packet kind";
-			}
-		}
-	}
-
-
-
-	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::close()
 	{
 		boost::system::error_code ec;
@@ -201,132 +150,76 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ChannelImpl::makeReceive()
+	{
+		return makeReceive(AllocatorPtr(new Allocator));
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::makeReceive(AllocatorPtr alloc)
 	{
-		InPacketWrapperPtr packet(new InPacketWrapper);
-		packet->_totalReceived = 0;
-		packet->_size = 0;
-		packet->_flags = 0;
-
+		PacketWrapperPtr packet(new PacketWrapper);
 		handleReceive(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleReceive(ChannelImplPtr selfKeeper, InPacketWrapperPtr packet, const boost::system::error_code& ec, const size_t received, AllocatorPtr alloc)
+	void ChannelImpl::handleReceive(ChannelImplPtr selfKeeper, PacketWrapperPtr packet, const boost::system::error_code& ec, const size_t received, AllocatorPtr alloc)
 	{
 		if(ec)
 		{
 			LOG(ec);
-			if(_handler) _handler->onError(shared_from_this(), esReceive, ec);
+			if(_handler)
+			{
+				_handler->onClose(selfKeeper);
+			}
 			close();
 			return;
 		}
-		packet->_totalReceived += received;
-		if(packet->_totalReceived < 4)
-		{
-			size_t lreceived = packet->_totalReceived;
-			_socket->async_read_some(buffer((char *)&packet->_size + lreceived, 4-lreceived), 
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleReceive, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
-		}
-		else if(packet->_totalReceived == 4)
-		{
-			packet->_size = utils::fixEndian(packet->_size);
-			packet->_data.reset(new char [packet->_size]);
 
-			boost::array<boost::asio::mutable_buffer, 2> packedData = 
+		if(packet->_data)
+		{
+			assert(received == packet->_size);
+
+			if(_handler)
 			{
-				buffer(&packet->_data[0], packet->_size), 
-				buffer(&packet->_flags, 4), 
-			};
+				_handler->onReceive(selfKeeper, *packet);
+			}
 
-			_socket->async_read_some(packedData, 
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleReceive, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
-
-		}
-		else if(packet->_totalReceived < 4+packet->_size)
-		{
-			size_t lreceived = packet->_totalReceived-4;
-			boost::array<boost::asio::mutable_buffer, 2> packedData = 
-			{
-				buffer(&packet->_data[lreceived], packet->_size-lreceived), 
-				buffer(&packet->_flags, 4), 
-			};
-
-			_socket->async_read_some(packedData, 
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleReceive, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
-
-		}
-		else if(packet->_totalReceived < 4+packet->_size+4)
-		{
-			size_t lreceived = packet->_totalReceived-4-packet->_size;
-
-			_socket->async_read_some(buffer((char *)&packet->_flags+lreceived, 4-lreceived),
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleReceive, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
-
-		}
-		else if(packet->_totalReceived == 4+packet->_size+4)
-		{
-			packet->_flags = utils::fixEndian(packet->_flags);
-			_socket->get_io_service().post(
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleReceiveComplete, 
-					this, 
-					shared_from_this(), 
-					packet))
-				);
-				makeReceive(alloc);
+			makeReceive(alloc);
 		}
 		else
 		{
-			assert(0);
-		}
+			assert(
+				received == 0 || 
+				received == sizeof(packet->_headerNetOrder));
 
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleReceiveComplete(ChannelImplPtr selfKeeper, InPacketWrapperPtr packet)
-	{
-		if(_handler)
-		{
-			EPacketKind kind = (EPacketKind)packet->_flags;
-			switch(kind)
+			if(!received)
 			{
-			case epkRaw:
-				_handler->onReceive(selfKeeper, packet->_data, packet->_size);
-				break;
-			case epkVariant:
-				{
-					utils::VariantPtr pv(new utils::Variant);
-					if(pv->load(packet->_data, packet->_size))
-					{
-						_handler->onReceive(selfKeeper, pv);
-					}
-					else
-					{
-						//corrupted data?
-						boost::system::error_code ec = boost::system::errc::make_error_code(boost::system::errc::bad_message);
-						_handler->onError(selfKeeper, esReceive, ec);
-					}
-				}
-				break;
-			default:
-				assert(!"unknown packet kind");
-				throw "unknown packet kind";
+				async_read(
+					*_socket,
+					buffer((char *)&packet->_headerNetOrder, sizeof(packet->_headerNetOrder)), 
+					makeCmaHandler(*alloc, boost::bind(
+						&ChannelImpl::handleReceive, this, selfKeeper,
+						packet, 
+						placeholders::error, placeholders::bytes_transferred, alloc)));
+			}
+			else if(received == sizeof(packet->_headerNetOrder))
+			{
+				packet->_id = utils::fixEndian(packet->_headerNetOrder[0]);
+				packet->_kind = utils::fixEndian(packet->_headerNetOrder[1]);
+				packet->_size = utils::fixEndian(packet->_headerNetOrder[2]);
+				packet->_data.reset(new char [packet->_size]);
+
+				async_read(
+					*_socket,
+					buffer(&packet->_data[0], packet->_size), 
+					makeCmaHandler(*alloc, boost::bind(
+						&ChannelImpl::handleReceive, this, selfKeeper,
+						packet, 
+						placeholders::error, placeholders::bytes_transferred, alloc)));
+
 			}
 		}
 	}
-
 }

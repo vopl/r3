@@ -24,16 +24,16 @@ namespace r3
 
 			std::set<net::ChannelPtr> _channels;
 			net::Service *_netsrv;
+
+		private:
+			typedef std::map<std::string, SessionPtr> TMSessions;
+			TMSessions _sessions;
+
 		public:
 			Instance();
 			~Instance();
 
 			void setAddress(const std::string &host, short port);
-
-		private:
-			void onChannelClose(net::ChannelPtr channel);
-			void onChannelError(net::ChannelPtr channel);
-
 
 		private:
 			virtual void onStartInThread(net::Service *netsrv);

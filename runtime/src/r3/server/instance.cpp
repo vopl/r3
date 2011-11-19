@@ -33,20 +33,6 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onChannelClose(net::ChannelPtr channel)
-		{
-// 			boost::mutex::scoped_lock sl(_mtx);
-// 			_channels.erase(channel);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onChannelError(net::ChannelPtr channel)
-		{
-// 			boost::mutex::scoped_lock sl(_mtx);
-// 			_channels.erase(channel);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
 		void Instance::onStartInThread(net::Service *netsrv)
 		{
 			bool needUpdateListener = false;
@@ -82,8 +68,6 @@ namespace r3
 				break;
 			case net::esConnect:
 			case net::esConnectHandshake:
-			case net::esSend:
-			case net::esReceive:
 				std::cerr<<es<<": "<<ec.message()<<"("<<ec.value()<<")"<<std::endl;
 				break;
 			}
@@ -93,6 +77,8 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onAccept(net::ChannelPtr channel)
 		{
+			//поставить на распределение в сессию
+			//channel->setHandler(this);
 // 			boost::mutex::scoped_lock sl(_mtx);
 // 			_channels.insert(channel);
 		}
@@ -100,6 +86,7 @@ namespace r3
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::onConnect(net::ChannelPtr channel)
 		{
+			channel->close();
 // 			boost::mutex::scoped_lock sl(_mtx);
 // 			_channels.insert(channel);
 		}

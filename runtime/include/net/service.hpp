@@ -6,19 +6,28 @@
 
 namespace net
 {
+	enum EStage
+	{
+		esListen,
+		esAccept,
+		esAcceptHandshake,
+		esConnect,
+		esConnectHandshake,
+	};
+
 	class Service;
 
 	//////////////////////////////////////////////////////////////////////////
 	struct IServiceHandler
 	{
-		virtual void onStartInThread(Service *) {};
+		virtual void onStartInThread(Service *) =0;
 
-		virtual void onError(Service *srv, EStage es, const boost::system::error_code& ec) {};
+		virtual void onError(Service *srv, EStage es, const boost::system::error_code& ec) =0;
 
-		virtual void onAccept(ChannelPtr channel) {};
-		virtual void onConnect(ChannelPtr channel) {};
+		virtual void onAccept(ChannelPtr channel) =0;
+		virtual void onConnect(ChannelPtr channel) =0;
 
-		virtual void onStopInThread() {};
+		virtual void onStopInThread() =0;
 	};
 
 	//////////////////////////////////////////////////////////////////////////

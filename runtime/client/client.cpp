@@ -100,8 +100,7 @@ void Client::onFullScreen()
 
 void Client::onBtn()
 {
-	utils::VariantPtr v(new utils::Variant("tratata"));
-	_inst.send(v);
+	_inst.send(boost::shared_array<char>(new char[10]), 10);
 }
 
 

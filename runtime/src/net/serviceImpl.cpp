@@ -107,7 +107,7 @@ namespace net
 
 		ChannelImplPtr channel(new ChannelImpl(this, socket));
 		_handler->onAccept(channel);
-		channel->listen();
+		channel->makeReceive();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ namespace net
 
 		ChannelImplPtr channel(new ChannelImpl(this, socket));
 		_handler->onConnect(channel);
-		channel->listen();
+		channel->makeReceive();
 	}
 
 

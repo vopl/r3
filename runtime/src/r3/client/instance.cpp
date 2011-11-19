@@ -35,34 +35,15 @@ namespace r3
 
 			if(channel)
 			{
-				channel->send(data, size);
+				net::SPacket pack;
+				pack._data = data;
+				pack._size = size;
+				channel->send(pack);
 				return true;
 			}
 
 			return false;
 		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool Instance::send(utils::VariantPtr v)
-		{
-			net::ChannelPtr channel;
-			{
-				boost::mutex::scoped_lock sl(_mtx);
-				if(_channels.size())
-				{
-					channel = *_channels.begin();
-				}
-			}
-
-			if(channel)
-			{
-				channel->send(v);
-				return true;
-			}
-
-			return false;
-		}
-
 
 		//////////////////////////////////////////////////////////////////////////
 		void Instance::tconnected(size_t channels)
@@ -148,8 +129,6 @@ namespace r3
 			case net::esListen:
 			case net::esAccept:
 			case net::esAcceptHandshake:
-			case net::esSend:
-			case net::esReceive:
 				std::cerr<<es<<": "<<ec.message()<<"("<<ec.value()<<")"<<std::endl;
 				break;
 			}
@@ -209,44 +188,21 @@ namespace r3
 
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onSendComplete(const net::ChannelPtr &channel, boost::shared_array<char> data, size_t size)
+		void Instance::onSendComplete(const net::ChannelPtr &channel, const net::SPacket &p)
 		{
-			tsendComplete(data, size);
+			tsendComplete(p._data, p._size);
 		}
 		
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onSendComplete(const net::ChannelPtr &channel, utils::VariantPtr v)
+		void Instance::onReceive(const net::ChannelPtr &channel, const net::SPacket &p)
 		{
-			tsendComplete(v);
-		}
-
-
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onReceive(const net::ChannelPtr &channel, boost::shared_array<char> data, size_t size)
-		{
-			treceive(data, size);
+			treceive(p._data, p._size);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::onReceive(const net::ChannelPtr &channel, const utils::VariantPtr vptr)
+		void Instance::onSendFailed(const net::ChannelPtr &channel, const net::SPacket &p)
 		{
-			treceive(vptr);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onError(const net::ChannelPtr &channel, net::EStage es, const boost::system::error_code& ec)
-		{
-			size_t channels;
-
-			{
-				boost::mutex::scoped_lock sl(_mtx);
-				_channels.erase(channel);
-				channels = _channels.size();
-			}
-
-			balance();
-			tconnected(channels);
-
+			//tsendFailed(p._data, p._size);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
