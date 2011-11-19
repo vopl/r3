@@ -23,7 +23,9 @@ namespace net
 		struct PacketWrapper
 			: SPacket
 		{
-			boost::uint32_t _headerNetOrder[3];
+			boost::uint32_t	_headerNetOrder[3];
+
+			size_t			_totalTransmitted;
 
 			PacketWrapper();
 			PacketWrapper(const SPacket &p);
