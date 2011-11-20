@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libpgc"
 	ProjectGUID="{55B09566-11AA-42DD-A2AA-A359E9E8098E}"
 	RootNamespace="libpgc"
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libpq.lib ../Debug/libutils.lib"
+				AdditionalDependencies="libpq.lib ../Win32/Debug/libutils.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -146,8 +146,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -195,7 +195,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libpq.lib ../Release/libutils.lib"
+				AdditionalDependencies="libpq.lib ../Win32/Release/libutils.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

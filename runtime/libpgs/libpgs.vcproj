@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libpgs"
 	ProjectGUID="{AA92C4B3-CC22-4D4B-AA50-803B09A9059F}"
 	RootNamespace="libpgs"
@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="../Debug/libpgc.lib"
+				AdditionalDependencies="../Win32/Debug/libpgc.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -148,8 +148,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -192,7 +192,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="../Release/libpgc.lib"
+				AdditionalDependencies="../Win32/Release/libpgc.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
