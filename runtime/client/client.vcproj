@@ -43,8 +43,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;../src&quot;;&quot;../include&quot;;&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;.\&quot;;&quot;..\src\r3\logic\client&quot;;&quot;..\include\r3\logic\client&quot;;&quot;..\src\r3\logic\client\connection&quot;"
-				PreprocessorDefinitions=",UNICODE,WIN32,QT_LARGEFILE_SUPPORT;QT_NO_DEBUG,NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_NETWORK_LIB"
+				AdditionalIncludeDirectories="&quot;../src&quot;;&quot;../include&quot;;&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;.\&quot;;&quot;..\src\r3\logic\client&quot;;&quot;..\include\r3\logic\client&quot;;&quot;..\src\r3\logic\client\connection&quot;"
+				PreprocessorDefinitions="UNICODE;WIN32;QT_LARGEFILE_SUPPORT;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_DLL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtNetwork4.lib ../Release/libnet.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib ../Release/libnet.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="$(QTDIR)\lib"
 				GenerateDebugInformation="false"
@@ -115,9 +115,18 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;../src&quot;;&quot;../include&quot;;&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;.\&quot;;&quot;..\src\r3\logic\client&quot;;&quot;..\include\r3\logic\client&quot;;&quot;..\src\r3\logic\client\connection&quot;"
-				PreprocessorDefinitions=",UNICODE,WIN32,QT_LARGEFILE_SUPPORT;QT_NO_DEBUG,NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_NETWORK_LIB"
+				Optimization="3"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories="&quot;../src&quot;;&quot;../include&quot;;&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;.\&quot;;&quot;..\src\r3\logic\client&quot;;&quot;..\include\r3\logic\client&quot;;&quot;..\src\r3\logic\client\connection&quot;"
+				PreprocessorDefinitions="UNICODE;WIN32;QT_LARGEFILE_SUPPORT;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_DLL"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="false"
+				EnableEnhancedInstructionSet="0"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
 				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
@@ -134,7 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtNetwork4.lib ../Release/libnet.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib ../x64/Release/libnet.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="$(QTDIR)\lib"
 				GenerateDebugInformation="false"
@@ -189,8 +198,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm512"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;../src&quot;;&quot;../include&quot;;&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;.\&quot;;&quot;..\src\r3\logic\client&quot;;&quot;..\include\r3\logic\client&quot;;&quot;..\src\r3\logic\client\connection&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;QT_LARGEFILE_SUPPORT;QT_CORE_LIB;QT_GUI_LIB;QT_NETWORK_LIB;BOOST_NO_STD_WSTRING___"
+				AdditionalIncludeDirectories="&quot;../src&quot;;&quot;../include&quot;;&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;.\&quot;;&quot;..\src\r3\logic\client&quot;;&quot;..\include\r3\logic\client&quot;;&quot;..\src\r3\logic\client\connection&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;QT_LARGEFILE_SUPPORT;QT_CORE_LIB;QT_GUI_LIB;BOOST_NO_STD_WSTRING___;QT_DLL"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
@@ -208,7 +217,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmaind.lib QtCored4.lib QtGuid4.lib QtNetworkd4.lib ../Debug/libnet.lib"
+				AdditionalDependencies="qtmaind.lib QtCored4.lib QtGuid4.lib ../Debug/libnet.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="$(QTDIR)\lib"
 				GenerateDebugInformation="true"
@@ -263,8 +272,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm512"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;../src&quot;;&quot;../include&quot;;&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtNetwork&quot;;&quot;.\&quot;;&quot;..\src\r3\logic\client&quot;;&quot;..\include\r3\logic\client&quot;;&quot;..\src\r3\logic\client\connection&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;QT_LARGEFILE_SUPPORT;QT_CORE_LIB;QT_GUI_LIB;QT_NETWORK_LIB;BOOST_NO_STD_WSTRING___"
+				AdditionalIncludeDirectories="&quot;../src&quot;;&quot;../include&quot;;&quot;.\GeneratedFiles&quot;;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;.\&quot;;&quot;..\src\r3\logic\client&quot;;&quot;..\include\r3\logic\client&quot;;&quot;..\src\r3\logic\client\connection&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;QT_LARGEFILE_SUPPORT;QT_CORE_LIB;QT_GUI_LIB;BOOST_NO_STD_WSTRING___;QT_DLL"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
@@ -282,7 +291,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmaind.lib QtCored4.lib QtGuid4.lib QtNetworkd4.lib ../x64/Debug/libnet.lib"
+				AdditionalDependencies="qtmaind.lib QtCored4.lib QtGuid4.lib ../x64/Debug/libnet.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="$(QTDIR)\lib"
 				GenerateDebugInformation="true"
@@ -379,7 +388,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing $(InputFileName)..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;.\client.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\client.h&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_DLL  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;.\client.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\client.h&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -390,7 +399,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing $(InputFileName)..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;.\client.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\client.h&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_DLL  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;.\client.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\client.h&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -401,7 +410,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing $(InputFileName)..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DBOOST_NO_STD_WSTRING___  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;.\client.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\client.h&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DBOOST_NO_STD_WSTRING___ -DQT_DLL  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;.\client.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\client.h&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -412,7 +421,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing $(InputFileName)..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DBOOST_NO_STD_WSTRING___  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;.\client.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\client.h&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DBOOST_NO_STD_WSTRING___ -DQT_DLL  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;.\client.h&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\client.h&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -909,7 +918,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Moc&apos;ing $(InputFileName)..."
-								CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\client\instance.hpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot;&#x0D;&#x0A;"
+								CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_DLL  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;..\src\r3\client\instance.hpp&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\client\instance.hpp&quot;&#x0D;&#x0A;"
 								AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 								Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 							/>
@@ -920,7 +929,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Moc&apos;ing $(InputFileName)..."
-								CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\client\instance.hpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot;&#x0D;&#x0A;"
+								CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_DLL  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;..\src\r3\client\instance.hpp&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\client\instance.hpp&quot;&#x0D;&#x0A;"
 								AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 								Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 							/>
@@ -931,7 +940,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Moc&apos;ing $(InputFileName)..."
-								CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\client\instance.hpp&quot;  -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DBOOST_NO_STD_WSTRING___ &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot;&#x0D;&#x0A;"
+								CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DBOOST_NO_STD_WSTRING___ -DQT_DLL  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;..\src\r3\client\instance.hpp&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\client\instance.hpp&quot;&#x0D;&#x0A;"
 								AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 								Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 							/>
@@ -942,7 +951,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Moc&apos;ing $(InputFileName)..."
-								CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\client\instance.hpp&quot;  -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DBOOST_NO_STD_WSTRING___ &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtNetwork&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot;&#x0D;&#x0A;"
+								CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DWIN32 -D_DEBUG -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DBOOST_NO_STD_WSTRING___ -DQT_DLL  &quot;-I.\..\src&quot; &quot;-I.\..\include&quot; &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I.&quot; &quot;-I.\..\src\r3\logic\client&quot; &quot;-I.\..\include\r3\logic\client&quot; &quot;-I.\..\src\r3\logic\client\connection&quot; &quot;..\src\r3\client\instance.hpp&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot; &quot;-fStdAfx.h&quot; &quot;-f..\..\..\src\r3\client\instance.hpp&quot;&#x0D;&#x0A;"
 								AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 								Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 							/>
@@ -980,6 +989,10 @@
 		<Global
 			Name="QtVersion Win32"
 			Value="msvc2008"
+		/>
+		<Global
+			Name="QtVersion x64"
+			Value="msvc2008_x64"
 		/>
 		<Global
 			Name="RccDir"

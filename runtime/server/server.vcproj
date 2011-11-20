@@ -266,12 +266,18 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="3"
+				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
 				AdditionalIncludeDirectories="../include;../src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
+				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="false"
+				EnableEnhancedInstructionSet="0"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -287,7 +293,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../Release/libnet.lib ../Release/libutils.lib ../Release/libpgs.lib"
+				AdditionalDependencies="../x64/Release/libnet.lib ../x64/Release/libutils.lib ../x64/Release/libpgs.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"

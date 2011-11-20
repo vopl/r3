@@ -121,7 +121,7 @@ namespace net
 					packet, 
 					placeholders::error, placeholders::bytes_transferred, alloc)));
 		}
-		else if(sizeof(packet->_headerNetOrder) == packet->_totalTransmitted && !packet->_size)
+		else if(sizeof(packet->_headerNetOrder) == packet->_totalTransmitted && packet->_size)
 		{
 			async_write(
 				*_socket,
