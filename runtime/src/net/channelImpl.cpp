@@ -1,251 +1,175 @@
 #include "stdafx.h"
-#include "net/channel.hpp"
 #include "channelImpl.hpp"
-#include "serviceImpl.hpp"
 #include "utils/fixEndian.hpp"
-#include "utils/crc32.hpp"
-
-//#define LOG(e) if(e){std::cerr<<__FUNCTION__<<": "<<e.message()<<"("<<e.value()<<")"<<std::endl;}
-#define LOG(e)
 
 namespace net
 {
-	using namespace boost::asio;
-
 	//////////////////////////////////////////////////////////////////////////
-	SPacket::SPacket()
-		: _id(0)
-		, _kind(0)
-		, _size(0)
-		, _data()
+	ChannelImpl::STransferStateSend::STransferStateSend(
+		const SPacket &packet, 
+		ChannelImplPtr ch, 
+		function<void ()> ok,
+		function<void (system::error_code)> fail)
+		: _ok(ok)
 	{
+		_packet = packet;
+		_header[0] = 0;
+		_ch = ch;
+		_transferedSize = 0;
+		_fail = fail;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::PacketWrapper::PacketWrapper(const SPacket &p)
-		: SPacket(p)
-		, _totalTransmitted(0)
+	ChannelImpl::STransferStateReceive::STransferStateReceive(
+		ChannelImplPtr ch, 
+		function<void (const SPacket &)> ok,
+		function<void (system::error_code)> fail)
+		: _ok(ok)
 	{
-		_headerNetOrder[0] = utils::fixEndian(p._id);
-		_headerNetOrder[1] = utils::fixEndian(p._kind);
-		_headerNetOrder[2] = utils::fixEndian(p._size);
+		_header[0] = 0;
+		_ch = ch;
+		_transferedSize = 0;
+		_fail = fail;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::PacketWrapper::PacketWrapper()
-		: _totalTransmitted(0)
-	{
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::ChannelImpl(ServiceImpl *serviceImpl, TSocketPtr socket)
-		: _serviceImpl(serviceImpl)
-		, _socket(socket)
-		, _handler(NULL)
+	ChannelImpl::ChannelImpl(TSocketPtr socket)
+		: _socket(socket)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ChannelImpl::~ChannelImpl()
 	{
-		_serviceImpl->delSock(_socket);
+		close();
 	}
 
+
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::setHandler(IChannelHandler *handler)
+	void ChannelImpl::receive(
+		function<void (const SPacket &)> ok,
+		function<void (system::error_code)> fail)
 	{
-		//bool handlerWas = _handler?true:false;
-		_handler = handler;
-
-// 		if(!handlerWas && _handler)
-// 		{
-// 			makeReceive(boost::make_shared<Allocator>());
-// 		}
+		STransferStateReceivePtr ts(new STransferStateReceive(shared_from_this(), ok, fail));
+		onReceive(ts, system::error_code(), 0);
 	}
 
+
+
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::send(const SPacket &p)
+	void ChannelImpl::send(
+		const SPacket &p,
+		function<void ()> ok,
+		function<void (system::error_code)> fail)
 	{
-		PacketWrapperPtr packet(new PacketWrapper(p));
-
-		boost::mutex::scoped_lock l(_sendQueueMtx);
-		_sendQueue.push(packet);
-
-		if(1 == _sendQueue.size())
-		{
-			AllocatorPtr alloc = boost::make_shared<Allocator>();
-			handleSend(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
-		}
+		STransferStateSendPtr ts(new STransferStateSend(p, shared_from_this(), ok, fail));
+		ts->_header[0] = utils::fixEndian(ts->_packet._size);
+		onSend(ts, system::error_code(), 0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleSend(
-		ChannelImplPtr selfKeeper,
-		PacketWrapperPtr packet, 
-		const boost::system::error_code& ec, const size_t sended,
-		AllocatorPtr alloc)
+	void ChannelImpl::onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size)
 	{
 		if(ec)
 		{
-			LOG(ec);
-			if(_handler)
-			{
-				_handler->onSendFailed(selfKeeper, *packet);
-				_handler->onClose(selfKeeper);
-			}
-			close();
+			ts->_fail(ec);
 			return;
 		}
 
-		packet->_totalTransmitted += sended;
-
-		assert(
-			packet->_totalTransmitted == 0 || 
-			packet->_totalTransmitted == sizeof(packet->_headerNetOrder) ||
-			packet->_totalTransmitted == sizeof(packet->_headerNetOrder) + packet->_size);
-
-
-		if(!packet->_totalTransmitted)
+		ts->_transferedSize += size;
+		if(ts->_transferedSize < sizeof(ts->_header))
 		{
-			boost::array<const_buffer, 2> buffers = {
-				buffer((const void *)&packet->_headerNetOrder, sizeof(packet->_headerNetOrder)),
-				buffer(packet->_data.get(), packet->_size),
-			};
-			async_write(
-				*_socket,
-				buffers, 
-				//transfer_all(),
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleSend, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
+			ts->_ch->_socket->async_read_some(
+				buffer((char *)&ts->_header, sizeof(ts->_header)-ts->_transferedSize), 
+				bind(
+					&ChannelImpl::onReceive,
+					ts, 
+					_1, _2));
 		}
-		else if(sizeof(packet->_headerNetOrder) == packet->_totalTransmitted && packet->_size)
+		else if(ts->_transferedSize == sizeof(ts->_header))
 		{
-			async_write(
-				*_socket,
-				const_buffers_1(packet->_data.get(), packet->_size), 
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleSend, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
+			ts->_packet._size = utils::fixEndian(ts->_header[0]);
+			ts->_packet._data.reset(new char[ts->_packet._size]);
+
+			ts->_ch->_socket->async_read_some(
+				buffer(ts->_packet._data.get(), ts->_packet._size), 
+				bind(
+					&ChannelImpl::onReceive,
+					ts, 
+					_1, _2));
 		}
-		else if(packet->_totalTransmitted == sizeof(packet->_headerNetOrder)+packet->_size)
+		else if(ts->_transferedSize < sizeof(ts->_header)+ ts->_packet._size)
 		{
-			if(_handler)
-			{
-				_handler->onSendComplete(selfKeeper, *packet);
-			}
-
-			boost::mutex::scoped_lock l(_sendQueueMtx);
-			assert(_sendQueue.size());
-			assert(packet == _sendQueue.front());
-			_sendQueue.pop();
-
-			if(!_sendQueue.empty())
-			{
-				packet = _sendQueue.front();
-				handleSend(selfKeeper, packet, boost::system::error_code(), 0, alloc);
-			}
+			size_t dataTransferedSize = ts->_transferedSize-sizeof(ts->_header);
+			ts->_ch->_socket->async_read_some(
+				buffer(
+					ts->_packet._data.get()+dataTransferedSize, 
+					ts->_packet._size-dataTransferedSize), 
+				bind(
+					&ChannelImpl::onReceive,
+					ts, 
+					_1, _2));
 		}
 		else
 		{
-			assert(0);
-			close();
+			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
+			ts->_ok(ts->_packet);
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelImpl::onSend(STransferStateSendPtr ts, system::error_code ec, size_t size)
+	{
+		if(ec)
+		{
+			ts->_fail(ec);
+			return;
+		}
+
+		ts->_transferedSize += size;
+		if(ts->_transferedSize < sizeof(ts->_header))
+		{
+			boost::array<boost::asio::const_buffers_1, 2> packedData = 
+			{
+				const_buffers_1((char *)&ts->_header+ts->_transferedSize, sizeof(ts->_header)-ts->_transferedSize), 
+				const_buffers_1(ts->_packet._data.get(), ts->_packet._size), 
+			};
+
+			ts->_ch->_socket->async_write_some(
+				packedData, 
+				bind(
+					&ChannelImpl::onSend,
+					ts, 
+					_1, _2));
+
+		}
+		else if(ts->_transferedSize < sizeof(ts->_header)+ts->_packet._size)
+		{
+			size_t dataTransferedSize = ts->_transferedSize-sizeof(ts->_header);
+			boost::asio::const_buffers_1 packedData(
+				ts->_packet._data.get()+dataTransferedSize, 
+				ts->_packet._size-dataTransferedSize);
+
+			ts->_ch->_socket->async_write_some(
+				packedData, 
+				bind(
+					&ChannelImpl::onSend,
+					ts, 
+					_1, _2));
+		}
+		else
+		{
+			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
+			ts->_ok();
+		}
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelImpl::close()
 	{
 		boost::system::error_code ec;
-		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both,ec);
+		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
 		_socket->lowest_layer().close(ec);
-		
-		_serviceImpl->delSock(_socket);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::makeReceive()
-	{
-		return makeReceive(AllocatorPtr(new Allocator));
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::makeReceive(AllocatorPtr alloc)
-	{
-		PacketWrapperPtr packet(new PacketWrapper);
-		handleReceive(shared_from_this(), packet, boost::system::error_code(), 0, alloc);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::handleReceive(ChannelImplPtr selfKeeper, PacketWrapperPtr packet, const boost::system::error_code& ec, const size_t received, AllocatorPtr alloc)
-	{
-		if(ec)
-		{
-			LOG(ec);
-			if(_handler)
-			{
-				_handler->onClose(selfKeeper);
-			}
-			close();
-			return;
-		}
-		packet->_totalTransmitted += received;
-
-		assert(
-			received == 0 || 
-			received == sizeof(packet->_headerNetOrder) ||
-			received == packet->_size);
-
-		if(!packet->_totalTransmitted)
-		{
-			async_read(
-				*_socket,
-				buffer((char *)&packet->_headerNetOrder, sizeof(packet->_headerNetOrder)), 
-				makeCmaHandler(*alloc, boost::bind(
-					&ChannelImpl::handleReceive, this, selfKeeper,
-					packet, 
-					placeholders::error, placeholders::bytes_transferred, alloc)));
-			return;
-		}
-		
-		if(sizeof(packet->_headerNetOrder) == packet->_totalTransmitted)
-		{
-			packet->_id = utils::fixEndian(packet->_headerNetOrder[0]);
-			packet->_kind = utils::fixEndian(packet->_headerNetOrder[1]);
-			packet->_size = utils::fixEndian(packet->_headerNetOrder[2]);
-			packet->_data.reset(new char [packet->_size]);
-
-			if(packet->_size)
-			{
-				async_read(
-					*_socket,
-					buffer(&packet->_data[0], packet->_size), 
-					makeCmaHandler(*alloc, boost::bind(
-						&ChannelImpl::handleReceive, this, selfKeeper,
-						packet, 
-						placeholders::error, placeholders::bytes_transferred, alloc)));
-				return;
-			}
-
-		}
-				
-		if(packet->_totalTransmitted == sizeof(packet->_headerNetOrder) + packet->_size)
-		{
-			if(_handler)
-			{
-				_handler->onReceive(selfKeeper, *packet);
-			}
-
-			makeReceive(alloc);
-		}
-		else
-		{
-			assert(0);
-			close();
-		}
 	}
 }

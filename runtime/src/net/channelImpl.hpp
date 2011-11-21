@@ -1,65 +1,77 @@
 #ifndef _NET_CHANNELIMPL_HPP_
 #define _NET_CHANNELIMPL_HPP_
-
-#include "cmaHandler.hpp"
+#include "net/channel.hpp"
 
 namespace net
 {
- 	//typedef boost::asio::ip::tcp::socket TSocket;
-	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> TSocket;
-	typedef boost::shared_ptr<TSocket> TSocketPtr;
+	using namespace boost;
+	using namespace boost::asio;
 
+	typedef ssl::stream<ip::tcp::socket> TSocket;
+	typedef shared_ptr<TSocket> TSocketPtr;
 
+	//////////////////////////////////////////////////////////////////////////
 	class ChannelImpl;
 	typedef boost::shared_ptr<ChannelImpl> ChannelImplPtr;
 
-	class ServiceImpl;
-
-	//////////////////////////////////////////////////////////////////////////
 	class ChannelImpl
-		: public Channel
-		, public boost::enable_shared_from_this<ChannelImpl>
+		: public enable_shared_from_this<ChannelImpl>
 	{
-		struct PacketWrapper
-			: SPacket
+		TSocketPtr _socket;
+
+		//////////////////////////////////////////////////////////////////////////
+		struct STransferState
 		{
-			boost::uint32_t	_headerNetOrder[3];
-
-			size_t			_totalTransmitted;
-
-			PacketWrapper();
-			PacketWrapper(const SPacket &p);
+			SPacket									_packet;
+			boost::uint32_t							_header[1];
+			ChannelImplPtr							_ch;
+			size_t									_transferedSize;
+			function<void (system::error_code)>		_fail;
 		};
 
-		typedef boost::shared_ptr<PacketWrapper> PacketWrapperPtr;
+		//////////////////////////////////////////////////////////////////////////
+		struct STransferStateSend
+			: STransferState
+		{
+			function<void ()>						_ok;
+			STransferStateSend(
+				const SPacket &packet, 
+				ChannelImplPtr ch, 
+				function<void ()> ok,
+				function<void (system::error_code)> fail);
+		};
+		typedef shared_ptr<STransferStateSend> STransferStateSendPtr;
 
+		//////////////////////////////////////////////////////////////////////////
+		struct STransferStateReceive
+			: STransferState
+		{
+			function<void (const SPacket &)>		_ok;
+			STransferStateReceive(
+				ChannelImplPtr ch, 
+				function<void (const SPacket &)> ok,
+				function<void (system::error_code)> fail);
+		};
+		typedef shared_ptr<STransferStateReceive> STransferStateReceivePtr;
 
-		ServiceImpl *_serviceImpl;
-		TSocketPtr _socket;
-		IChannelHandler *_handler;
-
-		boost::mutex _sendQueueMtx;
-		std::queue<PacketWrapperPtr> _sendQueue;
+	private:
+		static void onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size);
+		static void onSend(STransferStateSendPtr ts, system::error_code ec, size_t size);
 
 	public:
-		ChannelImpl(ServiceImpl *serviceImpl, TSocketPtr socket);
+		ChannelImpl(TSocketPtr socket);
 		~ChannelImpl();
-		virtual void setHandler(IChannelHandler *handler);
-		virtual void send(const SPacket &p);
-		virtual void close();
-		void makeReceive();
+		void receive(
+			function<void (const SPacket &)> ok,
+			function<void (system::error_code)> fail);
 
-	private:
-		void handleSend(ChannelImplPtr selfKeeper, PacketWrapperPtr packet, const boost::system::error_code& ec, const size_t sended, AllocatorPtr alloc);
+		void send(
+			const SPacket &p,
+			function<void ()> ok,
+			function<void (system::error_code)> fail);
 
-	private:
-		void makeReceive(AllocatorPtr alloc);
-		void handleReceive(ChannelImplPtr selfKeeper, PacketWrapperPtr packet, const boost::system::error_code& ec, const size_t received, AllocatorPtr alloc);
+		void close();
 	};
-
-
-	//////////////////////////////////////////////////////////////////////////
-
 }
 
 #endif

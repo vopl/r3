@@ -5,96 +5,111 @@
 #include <iostream>
 using namespace std;
 
-//////////////////////////////////////////////////////////////////////////
-class StateMachineCaller
-{
-public:
-	void operator()(...)
-	{
-		//...
-	}
-};
+#include "net/asyncService.hpp"
+#include "net/connector.hpp"
 
 //////////////////////////////////////////////////////////////////////////
-class StateMachine
-	: public boost::enable_shared_from_this<StateMachine>
+void onThreadStart()
 {
-public:
-	template <class SM>
-	StateMachineCaller mkCaller(void (SM:: *m)());
-
-	template <class SM, class A1>
-	StateMachineCaller mkCaller(void (SM:: *m)(A1 a1), A1 a1);
-
-};
-typedef boost::shared_ptr<StateMachine> StateMachinePtr;
+	std::cout<<"onThreadStart()"<<std::endl;
+}
 
 //////////////////////////////////////////////////////////////////////////
-typedef int TConnection;
-class SessionSM
-	: public StateMachine
+void onThreadStop()
 {
-public:
-	void onNewConnection(TConnection c)
-	{
-		std::cout<<"void onNewConnection(TConnection c)"<<std::endl;
-		(new Authorizer(c))
-			->onError(mkCaller(&onAuthError))
-			->onOk(mkCaller(&onAuthOk))
-			->start(c);
-	}
+	std::cout<<"onThreadStop()"<<std::endl;
+}
 
-	void onAuthError(TConnection c)
-	{
-		c->close();
-	}
+//////////////////////////////////////////////////////////////////////////
+void onAcceptSendOk()
+{
+	std::cout<<"void onAcceptSendOk()"<<std::endl;
+}
+void onAcceptSendFail(boost::system::error_code ec)
+{
+	std::cout<<"void onAcceptSendFail(boost::system::error_code ec)"<<ec<<std::endl;
+}
+//////////////////////////////////////////////////////////////////////////
+void onAcceptReceiveOk(const net::SPacket &p)
+{
+	std::cout<<"void onAcceptReceiveOk(const net::SPacket &p)"<<std::endl;
+}
+void onAcceptReceiveFail(boost::system::error_code ec)
+{
+	std::cout<<"void onAcceptReceiveFail(boost::system::error_code ec)"<<ec<<std::endl;
+}
+void onAccept(net::Channel &ch)
+{
+	net::SPacket p;
+	p._size = 10;
+	p._data = boost::shared_array<char>(new char[p._size]);
+	ch.send(p, onAcceptSendOk, onAcceptSendFail);
+	ch.receive(onAcceptReceiveOk, onAcceptReceiveFail);
+	std::cout<<"void onAccept(net::Channel &ch)"<<std::endl;
+}
 
-	void onAuthOk(TConnection c)
-	{
-		c->onSend(mkCaller(&onSend));
-		c->onSendError(mkCaller(&onSendError));
+void onConnectSendOk()
+{
+	std::cout<<"void onConnectSendOk()"<<std::endl;
+}
+void onConnectSendFail(boost::system::error_code ec)
+{
+	std::cout<<"void onConnectSendFail(boost::system::error_code ec)"<<ec<<std::endl;
+}
+//////////////////////////////////////////////////////////////////////////
+void onConnectReceiveOk(const net::SPacket &p)
+{
+	std::cout<<"void onConnectReceiveOk(const net::SPacket &p)"<<std::endl;
+}
+void onConnectReceiveFail(boost::system::error_code ec)
+{
+	std::cout<<"void onConnectReceiveFail(boost::system::error_code ec)"<<ec<<std::endl;
+}
+void onConnect(net::Channel &ch)
+{
+	net::SPacket p;
+	p._size = 10;
+	p._data = boost::shared_array<char>(new char[p._size]);
+	ch.send(p, onConnectSendOk, onConnectSendFail);
+	ch.receive(onConnectReceiveOk, onConnectReceiveFail);
+	std::cout<<"void onConnect(net::Channel &ch)"<<std::endl;
+}
 
-		c->onReceive(mkCaller(&onReceive));
-		c->onReceiveError(mkCaller(&onReceiveError));
-		c->receive();
-	}
-
-	void onReceive(TConnection c, Variant data)
-	{
-		TChild child = getChild(data.destination);
-		child->onReceive(data.data)
-	}
-	void onReceiveError(TConnection c)
-	{
-		c->close();
-	}
-
-	void onSend(TConnection c, Variant data)
-	{
-		TChild child = getChild(data.destination);
-		child->onSend(data.data)
-	}
-	void onReceiveError(TConnection c)
-	{
-		c->close();
-	}
-
-};
-typedef boost::shared_ptr<SessionSM> SessionSMPtr;
+//////////////////////////////////////////////////////////////////////////
+void onAcceptError(boost::system::error_code ec)
+{
+	std::cout<<"void onAcceptError(boost::system::error_code ec)"<<ec<<std::endl;
+}
+//////////////////////////////////////////////////////////////////////////
+void onConnectError(boost::system::error_code ec)
+{
+	std::cout<<"void onConnectError(boost::system::error_code ec)"<<ec<<std::endl;
+}
 
 //////////////////////////////////////////////////////////////////////////
 int _tmain(int argc, _TCHAR* argv[])
 {
-	StateMachinePtr sm1(new StateMachine);
+	net::AsyncService nas;
 
-	//sm1->method1();
+	nas.start(1, onThreadStart, onThreadStop);
 
-	SessionSMPtr ssm(new SessionSM);
 
-	TConnection c=220;
-	ssm->onNewConnection(c);
+	net::Connector nc(nas);
+	nc.listen("localhost", "3000", 
+		onAccept,
+		onAcceptError);
 
-	//loop
+	nc.connect("localhost", "3000",
+		onConnect,
+		onConnectError);
+
+	char c;
+	std::cin>>c;
+
+	nc.unlisten("localhost", "3000");
+
+	nas.stop();
+
 	return 0;
 }
 

@@ -360,6 +360,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\utils\implAccess.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\utils\julian.h"
 					>
 				</File>

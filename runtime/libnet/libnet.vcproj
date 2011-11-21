@@ -359,11 +359,15 @@
 				Name="net"
 				>
 				<File
+					RelativePath="..\include\net\asyncService.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\net\channel.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\net\service.hpp"
+					RelativePath="..\include\net\connector.hpp"
 					>
 				</File>
 			</Filter>
@@ -374,6 +378,22 @@
 			<Filter
 				Name="net"
 				>
+				<File
+					RelativePath="..\src\net\asyncService.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\asyncServiceImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\asyncServiceImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\channel.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\src\net\channelImpl.cpp"
 					>
@@ -387,15 +407,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\net\service.cpp"
+					RelativePath="..\src\net\connector.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\net\serviceImpl.cpp"
+					RelativePath="..\src\net\connectorImpl.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\net\serviceImpl.hpp"
+					RelativePath="..\src\net\connectorImpl.hpp"
 					>
 				</File>
 			</Filter>

@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../Win32/Debug/libpgc.lib ../Win32/Debug/libpgs.lib"
+				AdditionalDependencies="../Win32/Debug/libnet.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"

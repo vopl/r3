@@ -1,41 +1,44 @@
 #ifndef _NET_CHANNEL_HPP_
 #define _NET_CHANNEL_HPP_
 
-#include "utils/variant.hpp"
-#include "boost/system/error_code.hpp"
+#include <boost/cstdint.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/function.hpp>
+#include <boost/system/error_code.hpp>
 
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
 	struct SPacket
 	{
-		boost::uint32_t	_id;
-		boost::uint32_t	_kind;
-		boost::uint32_t _size;
 		boost::shared_array<char> _data;
+		boost::uint32_t _size;
 
 		SPacket();
+		SPacket(boost::shared_array<char> data, boost::uint32_t size);
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	struct Channel;
-	typedef boost::shared_ptr<Channel> ChannelPtr;
-
-	struct IChannelHandler
+	class ChannelImpl;
+	class Channel
 	{
-		virtual void onSendFailed(const ChannelPtr &channel, const SPacket &p) =0;
-		virtual void onSendComplete(const ChannelPtr &channel, const SPacket &p) =0;
+	protected:
+		typedef boost::shared_ptr<ChannelImpl> ImplPtr;
+		ImplPtr _impl;
 
-		virtual void onReceive(const ChannelPtr &channel, const SPacket &p) =0;
+	public:
+		Channel(ImplPtr impl);
 
-		virtual void onClose(const ChannelPtr &channel) =0;
-	};
+		void receive(
+			boost::function<void (const SPacket &)> ok,
+			boost::function<void (boost::system::error_code)> fail);
 
-	struct Channel
-	{
-		virtual void setHandler(IChannelHandler *handler) =0;
-		virtual void send(const SPacket &p) =0;
-		virtual void close() =0;
+		void send(
+			const SPacket &p,
+			boost::function<void ()> ok,
+			boost::function<void (boost::system::error_code)> fail);
+
+		void close();
 	};
 }
 #endif
