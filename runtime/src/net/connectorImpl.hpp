@@ -22,7 +22,7 @@ namespace net
 	class ConnectorImpl
 		: public enable_shared_from_this<ConnectorImpl>
 	{
-		AsyncServiceImplPtr _srv;
+		AsyncServiceImplPtr _asrv;
 
 	private:
 		typedef shared_ptr<ip::tcp::resolver> TResolverPtr;
@@ -99,7 +99,7 @@ namespace net
 
 
 	public:
-		ConnectorImpl(const AsyncServiceImplPtr &srv);
+		ConnectorImpl(const AsyncServiceImplPtr &asrv);
 		~ConnectorImpl();
 
 		void listen(

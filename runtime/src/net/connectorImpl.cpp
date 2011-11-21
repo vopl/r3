@@ -26,14 +26,14 @@ namespace net
 
 		mutex::scoped_lock sl(ls->_self->_mtx);
 		ls->_resolver.reset();
-		ls->_acceptor.reset(new ip::tcp::acceptor(ls->_self->_srv->io_service()));
+		ls->_acceptor.reset(new ip::tcp::acceptor(ls->_self->_asrv->io_service()));
 		ls->_acceptor->open(iterator->endpoint().protocol());
 		ls->_acceptor->set_option(ip::tcp::acceptor::reuse_address(true));
 		ls->_acceptor->set_option(socket_base::enable_connection_aborted(true));
 		ls->_acceptor->bind(*iterator);
 		ls->_acceptor->listen();
 
-		TSocketPtr socket(new TSocket(ls->_self->_srv->io_service(), ls->_self->_sslContext));
+		TSocketPtr socket(new TSocket(ls->_self->_asrv->io_service(), ls->_self->_sslContext));
 		ls->_acceptor->async_accept(
 			socket->lowest_layer(),
 			bind(&ConnectorImpl::onListenAccept, 
@@ -57,7 +57,7 @@ namespace net
 		}
 
 		{
-			TSocketPtr socket(new TSocket(ls->_self->_srv->io_service(), ls->_self->_sslContext));
+			TSocketPtr socket(new TSocket(ls->_self->_asrv->io_service(), ls->_self->_sslContext));
 			ls->_acceptor->async_accept(
 				socket->lowest_layer(),
 				bind(&ConnectorImpl::onListenAccept, 
@@ -113,7 +113,7 @@ namespace net
 			cs->_fail(ec);
 			return;
 		}
-		TSocketPtr socket(new TSocket(cs->_self->_srv->io_service(), cs->_self->_sslContext));
+		TSocketPtr socket(new TSocket(cs->_self->_asrv->io_service(), cs->_self->_sslContext));
 		socket->lowest_layer().async_connect(
 			*iterator,
 			bind(&ConnectorImpl::onConnect, 
@@ -227,9 +227,9 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	ConnectorImpl::ConnectorImpl(const AsyncServiceImplPtr &srv)
-		: _srv(srv)
-		, _sslContext(_srv->io_service(), ssl::context::sslv23)
+	ConnectorImpl::ConnectorImpl(const AsyncServiceImplPtr &asrv)
+		: _asrv(asrv)
+		, _sslContext(_asrv->io_service(), ssl::context::sslv23)
 	{
 		_sslContext.set_options(
 			ssl::context::default_workarounds
@@ -259,7 +259,7 @@ namespace net
 		SListenStatePtr ls(new SListenState);
 		ls->_self = shared_from_this();
 		ls->_addr = std::make_pair(host, service);
-		ls->_resolver.reset(new ip::tcp::resolver(_srv->io_service()));
+		ls->_resolver.reset(new ip::tcp::resolver(_asrv->io_service()));
 		ls->_ok = ok;
 		ls->_fail = fail;
 
@@ -287,7 +287,7 @@ namespace net
 	{
 		SConnectStatePtr cs(new SConnectState);
 		cs->_self = shared_from_this();
-		cs->_resolver.reset(new ip::tcp::resolver(_srv->io_service()));
+		cs->_resolver.reset(new ip::tcp::resolver(_asrv->io_service()));
 		cs->_ok = ok;
 		cs->_fail = fail;
 

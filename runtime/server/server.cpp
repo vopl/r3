@@ -25,14 +25,14 @@ int main(int argc, char* argv[])
 
 	try
 	{
-		r3::server::Instance instance;
 
 // 		instance.setDBInfo("dbname=test user=postgres password=postgres port=5432")
 
-		net::Service ns(&instance);
-		ns.balance(4);
+		net::AsyncService asrv;
+		asrv.balance(4);
+		r3::server::Instance instance(asrv);
 
-		instance.setAddress("localhost", 29431);
+		instance.setAddress("localhost", "29431");
 		do
 		{
 
@@ -55,10 +55,9 @@ int main(int argc, char* argv[])
 				boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
 			}
 		} while(!bStop);
+		instance.setAddress("", "");
 
-		instance.setAddress("", 0);
-
-		ns.balance(0);
+		asrv.stop();
 		//instance.reset();
 	}
 	catch(const std::exception &e)

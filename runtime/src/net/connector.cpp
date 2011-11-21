@@ -6,8 +6,8 @@
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
-	Connector::Connector(AsyncService &srv)
-		: _impl(new ConnectorImpl(utils::ImplAccess<AsyncService>(srv)))
+	Connector::Connector(AsyncService &asrv)
+		: _impl(new ConnectorImpl(utils::ImplAccess<AsyncService>(asrv)))
 	{
 	}
 

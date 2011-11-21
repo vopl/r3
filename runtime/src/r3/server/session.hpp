@@ -23,7 +23,7 @@ namespace r3
 			~Session();
 
 			const std::string &sid() const;
-			void addChannel(net::ChannelPtr channel);
+			void addChannel(net::Channel channel);
 
 			void touch();
 			void close();

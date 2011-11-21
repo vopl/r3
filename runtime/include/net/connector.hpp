@@ -17,7 +17,7 @@ namespace net
 		ImplPtr _impl;
 
 	public:
-		Connector(AsyncService &srv);
+		Connector(AsyncService &asrv);
 
 		void listen(
 			const char *host, const char *service,
