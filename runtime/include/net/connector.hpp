@@ -3,9 +3,6 @@
 
 #include "net/channel.hpp"
 #include "net/asyncService.hpp"
-#include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
-#include <boost/system/error_code.hpp>
 
 namespace net
 {

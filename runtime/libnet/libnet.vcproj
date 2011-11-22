@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libnet"
 	ProjectGUID="{4922BEF9-5FC3-4357-BFC0-460C101CEFA3}"
 	RootNamespace="libnet"
@@ -367,7 +367,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\net\clientSession.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\net\connector.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\net\serverSession.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\net\serverSessionManager.hpp"
 					>
 				</File>
 			</Filter>
@@ -403,6 +415,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\net\clientSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\clientSessionImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\clientSessionImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\net\cmaHandler.hpp"
 					>
 				</File>
@@ -416,6 +440,30 @@
 				</File>
 				<File
 					RelativePath="..\src\net\connectorImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionManagerImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionManagerImpl.hpp"
 					>
 				</File>
 			</Filter>
