@@ -5,6 +5,7 @@
 #include "serverSessionImpl.hpp"
 #include "net/connector.hpp"
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/uuid/random_generator.hpp>
 
 namespace net
 {
@@ -25,14 +26,20 @@ namespace net
 		bool										_isStarted;
 		boost::function<void (ServerSession)>		_ready;
 		boost::function<void (system::error_code)>	_fail;
-		std::deque<ServerSessionImplPtr>			_sessions;
+		boost::uuids::random_generator				_sidGen;
+
+		typedef std::map<TServerSid, ServerSessionImplPtr> TMSessions;
+		TMSessions			_sessions;
 
 	private:
 		void onAcceptOk(Channel channel);
-		void onAcceptError(system::error_code ec);
+		void onAcceptFail(system::error_code ec);
 
 		void onReceiveSidOk(Channel channel, const SPacket &packet);
 		void onReceiveSidFail(Channel channel, system::error_code ec);
+
+		void attach2Session(ServerSessionImplPtr session, Channel channel);
+		void attach2SessionFail(Channel channel);
 
 	public:
 		ServerSessionManagerImpl(

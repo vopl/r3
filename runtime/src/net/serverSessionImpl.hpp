@@ -2,7 +2,7 @@
 #define _NET_SERVERSESSIONIMPL_HPP_
 
 #include "net/serverSession.hpp"
-#include "channelImplBase.hpp"
+#include "channelHubImpl.hpp"
 
 namespace net
 {
@@ -10,24 +10,13 @@ namespace net
 	typedef boost::shared_ptr<ServerSessionImpl> ServerSessionImplPtr;
 
 	class ServerSessionImpl
-		: public ChannelImplBase
+		: public ChannelHubImpl
 	{
+		TServerSid		_sid;
 	public:
-		//ServerSessionImpl(Connector con);
-
-		virtual void receive(
-			function<void (const SPacket &)> ok,
-			function<void (system::error_code)> fail);
-
-		virtual void send(
-			const SPacket &p,
-			function<void ()> ok,
-			function<void (system::error_code)> fail);
-
-		virtual void close();
+		ServerSessionImpl(TServerSid sid);
 
 		TServerSid sid();
-
 	};
 }
 #endif

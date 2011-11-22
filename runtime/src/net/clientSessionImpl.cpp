@@ -8,9 +8,10 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ClientSessionImpl::checkbalance()
 	{
+		//уже заблокировано
 		//mutex::scoped_lock sl(_mtx);
 
-		if(_needNumChannels > _channels.size() && !_waitConnections)
+		if(_needNumChannels > getChannelsAmount() && !_waitConnections)
 		{
 			ClientSessionImplPtr self = shared_from_this();
 			_connector.connect(
@@ -20,7 +21,7 @@ namespace net
 			_waitConnections++;
 		}
 
-		if(_needNumChannels < _channels.size())
+		if(_needNumChannels < getChannelsAmount())
 		{
 			//закрыть один когда не будет трафика
 			assert(0);
@@ -92,7 +93,7 @@ namespace net
 
 		utils::Variant::MapStringVariant &msv = v.as<utils::Variant::MapStringVariant>();
 
-		if(msv["badSid"])
+		if(msv.end() != msv.find("badSid"))
 		{
 			//сессия утеряня, поднять новую
 			assert(!"sid lost!");
@@ -101,15 +102,17 @@ namespace net
 			onConnectOk(channel);
 			return;
 		}
-		else if(msv["sid"])
+		else if(msv.end() != msv.find("sid") && msv["sid"].is<TClientSid>())
 		{
 			size_t channels;
 			{
 				mutex::scoped_lock sl(_mtx);
 				_sid = msv["sid"];
 				_needSid = msv["sid"];
-				_channels.push_back(channel);
-				channels = _channels.size();
+
+				attachChannel(channel);
+				channels = getChannelsAmount();
+
 				_waitConnections--;
 				checkbalance();
 			}
@@ -170,8 +173,7 @@ namespace net
 			close();
 		}
 
-		assert(_channels.empty());
-		_channels.clear();
+		assert(!getChannelsAmount());
 
 		assert(nullClientSid == _needSid);
 		_needSid = sid;
@@ -214,28 +216,4 @@ namespace net
 		mutex::scoped_lock sl(_mtx);
 		return _sid;
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ClientSessionImpl::receive(
-		function<void (const SPacket &)> ok,
-		function<void (system::error_code)> fail)
-	{
-		assert(0);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ClientSessionImpl::send(
-		const SPacket &p,
-		function<void ()> ok,
-		function<void (system::error_code)> fail)
-	{
-		assert(0);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ClientSessionImpl::close()
-	{
-		assert(0);
-	}
-
 }

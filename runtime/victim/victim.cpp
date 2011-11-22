@@ -104,7 +104,8 @@ void onServerSessionManagerError(boost::system::error_code ec)
 //////////////////////////////////////////////////////////////////////////
 void onClientSessionReady(net::ClientSession cs, size_t numChannels)
 {
-	std::cout<<__FUNCTION__<<std::endl;
+	static int k(0);
+	std::cout<<__FUNCTION__<<", "<<k++<<std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -114,11 +115,11 @@ void onClientSessionError(size_t numChannels, boost::system::error_code ec)
 }
 
 //////////////////////////////////////////////////////////////////////////
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	net::AsyncService nas;
 
-	nas.start(1, onThreadStart, onThreadStop);
+	nas.start(10, onThreadStart, onThreadStop);
 
 	net::Connector c(nas);
 
@@ -128,7 +129,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		onServerSessionManagerError);
 
 	net::ClientSession cs(c, "localhost", "3000");
-	cs.start(net::nullClientSid, 2,
+	cs.start(net::nullClientSid, 200000000,
 		boost::bind(onClientSessionReady, cs, _1),
 		onClientSessionError);
 

@@ -2,7 +2,7 @@
 #define _NET_CLIENTSESSIONIMPL_HPP_
 
 #include "net/clientSession.hpp"
-#include "channelImplBase.hpp"
+#include "channelHubImpl.hpp"
 
 namespace net
 {
@@ -10,7 +10,7 @@ namespace net
 	typedef boost::shared_ptr<ClientSessionImpl> ClientSessionImplPtr;
 
 	class ClientSessionImpl
-		: public ChannelImplBase
+		: public ChannelHubImpl
 	{
 		Connector		_connector;
 		std::string		_host;
@@ -22,7 +22,7 @@ namespace net
 		TClientSid			_needSid;
 		size_t				_needNumChannels;
 		size_t				_waitConnections;
-		std::deque<Channel>	_channels;
+
 		boost::function<void (size_t)>						_ready;
 		boost::function<void (size_t, system::error_code)>	_fail;
 
@@ -54,18 +54,6 @@ namespace net
 		void balance(size_t numChannels);
 
 		TClientSid sid();
-
-	public:
-		virtual void receive(
-			function<void (const SPacket &)> ok,
-			function<void (system::error_code)> fail);
-
-		virtual void send(
-			const SPacket &p,
-			function<void ()> ok,
-			function<void (system::error_code)> fail);
-
-		virtual void close();
 
 	};
 }

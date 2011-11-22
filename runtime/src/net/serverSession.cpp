@@ -4,26 +4,10 @@
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionImpl::receive(
-		function<void (const SPacket &)> ok,
-		function<void (system::error_code)> fail)
+	ServerSessionImpl::ServerSessionImpl(TServerSid sid)
+		: _sid(sid)
 	{
-		assert(0);
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionImpl::send(
-		const SPacket &p,
-		function<void ()> ok,
-		function<void (system::error_code)> fail)
-	{
-		assert(0);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionImpl::close()
-	{
-		assert(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

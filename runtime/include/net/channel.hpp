@@ -31,12 +31,12 @@ namespace net
 
 		void receive(
 			boost::function<void (const SPacket &)> ok,
-			boost::function<void (boost::system::error_code)> fail);
+			boost::function<void (boost::system::error_code)> fail = boost::function<void (boost::system::error_code)>());
 
 		void send(
 			const SPacket &p,
 			boost::function<void ()> ok,
-			boost::function<void (boost::system::error_code)> fail);
+			boost::function<void (boost::system::error_code)> fail = boost::function<void (boost::system::error_code)>());
 
 		void close();
 	};

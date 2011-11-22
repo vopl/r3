@@ -1,0 +1,46 @@
+#include "stdafx.h"
+#include "channelHubImpl.hpp"
+
+namespace net
+{
+	//////////////////////////////////////////////////////////////////////////
+	ChannelHubImpl::ChannelHubImpl()
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelHubImpl::receive(
+		function<void (const SPacket &)> ok,
+		function<void (system::error_code)> fail)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelHubImpl::send(
+		const SPacket &p,
+		function<void ()> ok,
+		function<void (system::error_code)> fail)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelHubImpl::close()
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelHubImpl::attachChannel(Channel channel)
+	{
+		_channels.push_back(channel);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	size_t ChannelHubImpl::getChannelsAmount()
+	{
+		return _channels.size();
+	}
+
+}

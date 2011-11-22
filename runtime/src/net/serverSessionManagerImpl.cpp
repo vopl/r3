@@ -38,7 +38,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManagerImpl::onAcceptError(system::error_code ec)
+	void ServerSessionManagerImpl::onAcceptFail(system::error_code ec)
 	{
 		assert(!"log error?");
 
@@ -51,8 +51,7 @@ namespace net
 		_connector.listen(
 			_host.c_str(), _service.c_str(), 
 			bind(&ServerSessionManagerImpl::onAcceptOk, shared_from_this(), _1),
-			bind(&ServerSessionManagerImpl::onAcceptError, shared_from_this(), _1));
-
+			bind(&ServerSessionManagerImpl::onAcceptFail, shared_from_this(), _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -67,7 +66,61 @@ namespace net
 			channel.close();
 			return;
 		}
-		assert(0);
+		v = utils::Variant(v.as<utils::Variant::MapStringVariant>()["sid"]);
+		if(	!v.is<TServerSid>())
+		{
+			//bad packet
+			assert(!"log error?");
+			channel.close();
+			return;
+		}
+		TServerSid sid = v.as<TServerSid>();
+
+		if(nullServerSid != sid)
+		{
+			mutex::scoped_lock sl(_mtx);
+			TMSessions::iterator iter = _sessions.find(sid);
+			if(_sessions.end() == iter)
+			{
+				//запрошенная сессия НЕ существует
+				v.as<utils::Variant::MapStringVariant>(true)["badSid"] = true;
+
+				SPacket packet;
+				packet._data = v.save(packet._size);
+				channel.send(packet, 
+					bind(&ServerSessionManagerImpl::onAcceptOk, shared_from_this(), channel));
+			}
+			else
+			{
+				//запрошенная сессия существует, привязать к ней
+				v.as<utils::Variant::MapStringVariant>(true)["sid"] = sid;
+
+				SPacket packet;
+				packet._data = v.save(packet._size);
+				channel.send(packet, 
+					bind(&ServerSessionManagerImpl::attach2Session, shared_from_this(), iter->second, channel));
+			}
+		}
+		else
+		{
+			//сид был нулевой, создать новую сессию
+			mutex::scoped_lock sl(_mtx);
+
+			TServerSid newSid = _sidGen();
+			while(_sessions.end() != _sessions.find(newSid))
+			{
+				newSid = _sidGen();
+			}
+			ServerSessionImplPtr session(new ServerSessionImpl(newSid));
+			_sessions[newSid] = session;
+
+			v.as<utils::Variant::MapStringVariant>(true)["sid"] = newSid;
+
+			SPacket packet;
+			packet._data = v.save(packet._size);
+			channel.send(packet, 
+				bind(&ServerSessionManagerImpl::attach2Session, shared_from_this(), session, channel));
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -82,6 +135,18 @@ namespace net
 				return;
 			}
 		}
+		channel.close();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServerSessionManagerImpl::attach2Session(ServerSessionImplPtr session, Channel channel)
+	{
+		session->attachChannel(channel);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServerSessionManagerImpl::attach2SessionFail(Channel channel)
+	{
 		channel.close();
 	}
 
@@ -119,7 +184,7 @@ namespace net
 		_connector.listen(
 			_host.c_str(), _service.c_str(), 
 			bind(&ServerSessionManagerImpl::onAcceptOk, shared_from_this(), _1),
-			bind(&ServerSessionManagerImpl::onAcceptError, shared_from_this(), _1));
+			bind(&ServerSessionManagerImpl::onAcceptFail, shared_from_this(), _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -132,10 +197,10 @@ namespace net
 		}
 		_connector.unlisten(_host.c_str(), _service.c_str());
 
-		BOOST_FOREACH(ServerSessionImplPtr &s, _sessions)
+		BOOST_FOREACH(TMSessions::value_type &p, _sessions)
 		{
-			s->close();
-			s.reset();
+			p.second->close();
+			p.second.reset();
 		}
 		_sessions.clear();
 

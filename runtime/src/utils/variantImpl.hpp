@@ -295,8 +295,8 @@ namespace utils
 				return;
 			}
 
-			destruct();
-			construct<Variant>(v);
+			Variant stub(v);
+			swap(stub);
 		}
 
 		//////////////////////////////////////////////////////////////////////////

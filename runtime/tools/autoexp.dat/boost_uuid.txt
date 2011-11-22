@@ -1,0 +1,15 @@
+boost::uuids::uuid{
+	preview
+	(
+		*(GUID *)$e.data
+	)
+	children
+	(
+		#(
+			Data1: ((GUID *)$e.data)->Data1,
+			Data2: ((GUID *)$e.data)->Data2,
+			Data3: ((GUID *)$e.data)->Data3,
+			Data4: ((GUID *)$e.data)->Data4
+		)
+	)
+}
