@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "net/channel.hpp"
-#include "channelImpl.hpp"
+#include "channelImplBase.hpp"
 
 namespace net
 {

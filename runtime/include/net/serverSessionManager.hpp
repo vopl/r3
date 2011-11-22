@@ -2,10 +2,10 @@
 #define _NET_SERVERSESSIONMANAGER_HPP_
 
 #include "net/serverSession.hpp"
+#include "net/connector.hpp"
 
 namespace net
 {
-	typedef int TSid;
 	class ServerSessionManagerImpl;
 	class ServerSessionManager
 	{
@@ -14,12 +14,11 @@ namespace net
 		ImplPtr _impl;
 
 	public:
-		ServerSessionManager(Connector con);
+		ServerSessionManager(Connector connector, const char *host, const char *service);
 
 		void start(
-			const char *host, const char *service,
 			boost::function<void (ServerSession)> ready,
-			boost::function<void (system::error_code)> fail);
+			boost::function<void (boost::system::error_code)> fail);
 
 		void stop();
 	};

@@ -1,22 +1,27 @@
 #ifndef _NET_SERVERSESSION_HPP_
 #define _NET_SERVERSESSION_HPP_
 
-#include "net/serverSession.hpp"
+#include "net/channel.hpp"
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/nil_generator.hpp>
 
 namespace net
 {
-	typedef int TSid;
+	typedef boost::uuids::uuid TServerSid;
+	static const TServerSid nullServerSid = boost::uuids::nil_uuid();
+	
+	//////////////////////////////////////////////////////////////////////////
 	class ServerSessionImpl;
 	class ServerSession
 		: public Channel
 	{
 	protected:
-		typedef boost::shared_ptr<ServerSessionManagerImpl> ImplPtr;
+		typedef boost::shared_ptr<ServerSessionImpl> ImplPtr;
 
 	public:
-		ServerSession(Connector con);
+		ServerSession(ImplPtr impl);
 
-		TSid sid();
+		TServerSid sid();
 	};
 }
 #endif

@@ -39,6 +39,7 @@ utils::Variant{
 		#case -35 ( #("DequeVariant=Null") )
 		#case -36 ( #("ListVariant=Null") )
 		#case -37 ( #("Char=Null") )
+		#case -38 ( #("Uuid=Null") )
 		#case 0 ( #("Unknown=", [$e,!]) )		
 		#case 1 ( #("Void=<void>") )
 		#case 2 ( #("String=", *(std::basic_string<char,std::char_traits<char>,std::allocator<char> > *)$e._dbgData) )
@@ -77,6 +78,15 @@ utils::Variant{
 		#case 35 ( #("DequeVariant") )
 		#case 36 ( #("ListVariant") )
 		#case 37 ( #("Char=", *(char *)$e._dbgData) )
+		#case 38 ( #("Uuid={", 
+			[*(int *)((char *)$e._dbgData+0),hx],
+			"-",
+			[*(int *)((char *)$e._dbgData+4),hx],
+			"-",
+			[*(int *)((char *)$e._dbgData+8),hx],
+			"-",
+			[*(int *)((char *)$e._dbgData+12),hx],
+			"}") )
 		#default ( #("UNKNOWN=", [$e,!]) )		
 	)
 
@@ -120,6 +130,7 @@ utils::Variant{
 		#case -35 ( #(DequeVariant : *((void*)0)) )
 		#case -36 ( #(ListVariant : *((void*)0)) )
 		#case -37 ( #(Char : *((void*)0)) )
+		#case -38 ( #(Uuid : *((void*)0)) )
 		#case 0 (#( Unknown: [$e,!]) )
 		#case 1 (#( Void : *((void*)0)))
 		#case 2 (#( String : *(std::basic_string<char,std::char_traits<char>,std::allocator<char> > *)$e._dbgData))
@@ -158,6 +169,8 @@ utils::Variant{
 		#case 35 (#( DequeVariant : *(std::deque<utils::Variant,std::allocator<utils::Variant> >*)$e._dbgData) )
 		#case 36 (#( ListVariant : *(std::list<utils::Variant,std::allocator<utils::Variant> >*)$e._dbgData) )
 		#case 37 (#( Char : *(char *)$e._dbgData) )
+		#case 38 (#( Uuid : [(int *)$e._dbgData,4x]) )
+
 		#default (#( UNKNOWN: [$e,!]) )
 	)
 	

@@ -19,6 +19,7 @@
 #include <boost/serialization/bitset.hpp>
 #include <boost/date_time/gregorian/greg_serialize.hpp>
 #include <boost/date_time/posix_time/time_serialize.hpp>
+#include <boost/uuid/uuid.hpp>
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -82,6 +83,22 @@ namespace boost
 		{
 			ar & x._dd;
 			ar & x._td;
+		}
+	} // namespace serialization
+} // namespace boost
+
+
+//////////////////////////////////////////////////////////////////////////
+//uuid
+namespace boost 
+{
+	namespace serialization 
+	{
+		//////////////////////////////////////////////////////////////////////////
+		template<class Archive>
+		void serialize(Archive & ar, boost::uuids::uuid &x, const unsigned int /*version*/)
+		{
+			ar & x.data;
 		}
 	} // namespace serialization
 } // namespace boost

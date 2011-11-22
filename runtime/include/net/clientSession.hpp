@@ -2,10 +2,15 @@
 #define _NET_CLIENTSESSION_HPP_
 
 #include "net/connector.hpp"
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/nil_generator.hpp>
 
 namespace net
 {
-	typedef int TSid;
+	typedef boost::uuids::uuid TClientSid;
+	static const TClientSid nullClientSid = boost::uuids::nil_uuid();
+
+	//////////////////////////////////////////////////////////////////////////
 	class ClientSessionImpl;
 	class ClientSession
 		: public Channel
@@ -14,18 +19,19 @@ namespace net
 		typedef boost::shared_ptr<ClientSessionImpl> ImplPtr;
 
 	public:
-		ClientSession(Connector con);
+		ClientSession(
+			Connector connector,
+			const char *host, const char *service);
 
 		void start(
-			TSid sid, 
+			TClientSid sid, 
 			size_t numChannels,
-			const char *host, const char *service,
-			boost::function<void ()> ready,
-			boost::function<void (system::error_code)> fail);
+			boost::function<void (size_t)> ready,
+			boost::function<void (size_t, boost::system::error_code)> fail);
 
-		TSid sid();
+		void balance(size_t numChannels);
 
-		void stop();
+		TClientSid sid();
 	};
 }
 #endif

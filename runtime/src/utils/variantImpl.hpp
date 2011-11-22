@@ -80,7 +80,8 @@ namespace utils
 	ENUMTYPES_ONE(MultisetVariant)			\
 	ENUMTYPES_ONE(DequeVariant)				\
 	ENUMTYPES_ONE(ListVariant)				\
-	ENUMTYPES_ONE(Char)						//\
+	ENUMTYPES_ONE(Char)						\
+	ENUMTYPES_ONE(Uuid)						//\
 
 
 
@@ -167,6 +168,15 @@ namespace utils
 			_et = Type2Enum<Tm>::et;
 			alloc<Tm>();
 			new (&as<Tm>()) Tm;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		template <>
+		void construct<Uuid>()
+		{
+			_et = Type2Enum<Uuid>::et;
+			alloc<Uuid>();
+			new (&as<Uuid>()) Uuid;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

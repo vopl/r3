@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "channelImpl.hpp"
+#include "channelImplSocket.hpp"
 #include "utils/fixEndian.hpp"
 
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::STransferStateSend::STransferStateSend(
+	ChannelImplSocket::STransferStateSend::STransferStateSend(
 		const SPacket &packet, 
-		ChannelImplPtr ch, 
+		ChannelImplSocketPtr ch, 
 		function<void ()> ok,
 		function<void (system::error_code)> fail)
 		: _ok(ok)
@@ -20,8 +20,8 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::STransferStateReceive::STransferStateReceive(
-		ChannelImplPtr ch, 
+	ChannelImplSocket::STransferStateReceive::STransferStateReceive(
+		ChannelImplSocketPtr ch, 
 		function<void (const SPacket &)> ok,
 		function<void (system::error_code)> fail)
 		: _ok(ok)
@@ -33,42 +33,42 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::ChannelImpl(TSocketPtr socket)
+	ChannelImplSocket::ChannelImplSocket(TSocketPtr socket)
 		: _socket(socket)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImpl::~ChannelImpl()
+	ChannelImplSocket::~ChannelImplSocket()
 	{
 		close();
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::receive(
+	void ChannelImplSocket::receive(
 		function<void (const SPacket &)> ok,
 		function<void (system::error_code)> fail)
 	{
-		STransferStateReceivePtr ts(new STransferStateReceive(shared_from_this(), ok, fail));
+		STransferStateReceivePtr ts(new STransferStateReceive(static_pointer_cast<ChannelImplSocket>(shared_from_this()), ok, fail));
 		onReceive(ts, system::error_code(), 0);
 	}
 
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::send(
+	void ChannelImplSocket::send(
 		const SPacket &p,
 		function<void ()> ok,
 		function<void (system::error_code)> fail)
 	{
-		STransferStateSendPtr ts(new STransferStateSend(p, shared_from_this(), ok, fail));
+		STransferStateSendPtr ts(new STransferStateSend(p, static_pointer_cast<ChannelImplSocket>(shared_from_this()), ok, fail));
 		ts->_header[0] = utils::fixEndian(ts->_packet._size);
 		onSend(ts, system::error_code(), 0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size)
+	void ChannelImplSocket::onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size)
 	{
 		if(ec)
 		{
@@ -82,7 +82,7 @@ namespace net
 			ts->_ch->_socket->async_read_some(
 				buffer((char *)&ts->_header, sizeof(ts->_header)-ts->_transferedSize), 
 				bind(
-					&ChannelImpl::onReceive,
+					&ChannelImplSocket::onReceive,
 					ts, 
 					_1, _2));
 		}
@@ -94,7 +94,7 @@ namespace net
 			ts->_ch->_socket->async_read_some(
 				buffer(ts->_packet._data.get(), ts->_packet._size), 
 				bind(
-					&ChannelImpl::onReceive,
+					&ChannelImplSocket::onReceive,
 					ts, 
 					_1, _2));
 		}
@@ -106,7 +106,7 @@ namespace net
 					ts->_packet._data.get()+dataTransferedSize, 
 					ts->_packet._size-dataTransferedSize), 
 				bind(
-					&ChannelImpl::onReceive,
+					&ChannelImplSocket::onReceive,
 					ts, 
 					_1, _2));
 		}
@@ -118,7 +118,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::onSend(STransferStateSendPtr ts, system::error_code ec, size_t size)
+	void ChannelImplSocket::onSend(STransferStateSendPtr ts, system::error_code ec, size_t size)
 	{
 		if(ec)
 		{
@@ -138,7 +138,7 @@ namespace net
 			ts->_ch->_socket->async_write_some(
 				packedData, 
 				bind(
-					&ChannelImpl::onSend,
+					&ChannelImplSocket::onSend,
 					ts, 
 					_1, _2));
 
@@ -153,7 +153,7 @@ namespace net
 			ts->_ch->_socket->async_write_some(
 				packedData, 
 				bind(
-					&ChannelImpl::onSend,
+					&ChannelImplSocket::onSend,
 					ts, 
 					_1, _2));
 		}
@@ -166,7 +166,7 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImpl::close()
+	void ChannelImplSocket::close()
 	{
 		boost::system::error_code ec;
 		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);

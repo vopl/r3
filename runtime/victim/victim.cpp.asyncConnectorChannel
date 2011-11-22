@@ -4,42 +4,39 @@
 #include "stdafx.h"
 #include <iostream>
 using namespace std;
-#include <boost/bind.hpp>
 
 #include "net/asyncService.hpp"
-
-#include "net/serverSessionManager.hpp"
-#include "net/clientSession.hpp"
+#include "net/connector.hpp"
 
 //////////////////////////////////////////////////////////////////////////
 void onThreadStart()
 {
-	std::cout<<__FUNCTION__<<std::endl;
+	std::cout<<"onThreadStart()"<<std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////
 void onThreadStop()
 {
-	std::cout<<__FUNCTION__<<std::endl;
+	std::cout<<"onThreadStop()"<<std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////
 void onAcceptSendOk()
 {
-	std::cout<<__FUNCTION__<<std::endl;
+	std::cout<<"void onAcceptSendOk()"<<std::endl;
 }
 void onAcceptSendFail(boost::system::error_code ec)
 {
-	std::cout<<__FUNCTION__<<ec<<std::endl;
+	std::cout<<"void onAcceptSendFail(boost::system::error_code ec)"<<ec<<std::endl;
 }
 //////////////////////////////////////////////////////////////////////////
 void onAcceptReceiveOk(const net::SPacket &p)
 {
-	std::cout<<__FUNCTION__<<std::endl;
+	std::cout<<"void onAcceptReceiveOk(const net::SPacket &p)"<<std::endl;
 }
 void onAcceptReceiveFail(boost::system::error_code ec)
 {
-	std::cout<<__FUNCTION__<<ec<<std::endl;
+	std::cout<<"void onAcceptReceiveFail(boost::system::error_code ec)"<<ec<<std::endl;
 }
 void onAccept(net::Channel &ch)
 {
@@ -48,25 +45,25 @@ void onAccept(net::Channel &ch)
 	p._data = boost::shared_array<char>(new char[p._size]);
 	ch.send(p, onAcceptSendOk, onAcceptSendFail);
 	ch.receive(onAcceptReceiveOk, onAcceptReceiveFail);
-	std::cout<<__FUNCTION__<<std::endl;
+	std::cout<<"void onAccept(net::Channel &ch)"<<std::endl;
 }
 
 void onConnectSendOk()
 {
-	std::cout<<__FUNCTION__<<std::endl;
+	std::cout<<"void onConnectSendOk()"<<std::endl;
 }
 void onConnectSendFail(boost::system::error_code ec)
 {
-	std::cout<<__FUNCTION__<<ec<<std::endl;
+	std::cout<<"void onConnectSendFail(boost::system::error_code ec)"<<ec<<std::endl;
 }
 //////////////////////////////////////////////////////////////////////////
 void onConnectReceiveOk(const net::SPacket &p)
 {
-	std::cout<<__FUNCTION__<<std::endl;
+	std::cout<<"void onConnectReceiveOk(const net::SPacket &p)"<<std::endl;
 }
 void onConnectReceiveFail(boost::system::error_code ec)
 {
-	std::cout<<__FUNCTION__<<ec<<std::endl;
+	std::cout<<"void onConnectReceiveFail(boost::system::error_code ec)"<<ec<<std::endl;
 }
 void onConnect(net::Channel &ch)
 {
@@ -75,42 +72,18 @@ void onConnect(net::Channel &ch)
 	p._data = boost::shared_array<char>(new char[p._size]);
 	ch.send(p, onConnectSendOk, onConnectSendFail);
 	ch.receive(onConnectReceiveOk, onConnectReceiveFail);
-	std::cout<<__FUNCTION__<<std::endl;
+	std::cout<<"void onConnect(net::Channel &ch)"<<std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////
 void onAcceptError(boost::system::error_code ec)
 {
-	std::cout<<__FUNCTION__<<ec<<std::endl;
+	std::cout<<"void onAcceptError(boost::system::error_code ec)"<<ec<<std::endl;
 }
 //////////////////////////////////////////////////////////////////////////
 void onConnectError(boost::system::error_code ec)
 {
-	std::cout<<__FUNCTION__<<ec<<std::endl;
-}
-
-//////////////////////////////////////////////////////////////////////////
-void onServerSessionManagerReady(net::ServerSession ss)
-{
-	std::cout<<__FUNCTION__<<std::endl;
-}
-
-//////////////////////////////////////////////////////////////////////////
-void onServerSessionManagerError(boost::system::error_code ec)
-{
-	std::cout<<__FUNCTION__<<ec<<std::endl;
-}
-
-//////////////////////////////////////////////////////////////////////////
-void onClientSessionReady(net::ClientSession cs, size_t numChannels)
-{
-	std::cout<<__FUNCTION__<<std::endl;
-}
-
-//////////////////////////////////////////////////////////////////////////
-void onClientSessionError(size_t numChannels, boost::system::error_code ec)
-{
-	std::cout<<__FUNCTION__<<ec<<std::endl;
+	std::cout<<"void onConnectError(boost::system::error_code ec)"<<ec<<std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -120,23 +93,20 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	nas.start(1, onThreadStart, onThreadStop);
 
-	net::Connector c(nas);
 
-	net::ServerSessionManager ssm(c, "localhost", "3000");
-	ssm.start(
-		onServerSessionManagerReady,
-		onServerSessionManagerError);
+	net::Connector nc(nas);
+	nc.listen("localhost", "3000", 
+		onAccept,
+		onAcceptError);
 
-	net::ClientSession cs(c, "localhost", "3000");
-	cs.start(net::nullClientSid, 2,
-		boost::bind(onClientSessionReady, cs, _1),
-		onClientSessionError);
+	nc.connect("localhost", "3000",
+		onConnect,
+		onConnectError);
 
-	char ch;
-	std::cin>>ch;
+	char c;
+	std::cin>>c;
 
-	ssm.stop();
-	cs.close();
+	nc.unlisten("localhost", "3000");
 
 	nas.stop();
 

@@ -1,26 +1,72 @@
-#ifndef _NET_CLIENTSESSION_HPP_
-#define _NET_CLIENTSESSION_HPP_
+#ifndef _NET_CLIENTSESSIONIMPL_HPP_
+#define _NET_CLIENTSESSIONIMPL_HPP_
 
-#include "net/connector.hpp"
+#include "net/clientSession.hpp"
+#include "channelImplBase.hpp"
 
 namespace net
 {
+	class ClientSessionImpl;
+	typedef boost::shared_ptr<ClientSessionImpl> ClientSessionImplPtr;
+
 	class ClientSessionImpl
-		: public ChannelImpl
+		: public ChannelImplBase
 	{
+		Connector		_connector;
+		std::string		_host;
+		std::string		_service;
+
+		mutex				_mtx;
+		bool				_isStarted;
+		TClientSid			_sid;
+		TClientSid			_needSid;
+		size_t				_needNumChannels;
+		size_t				_waitConnections;
+		std::deque<Channel>	_channels;
+		boost::function<void (size_t)>						_ready;
+		boost::function<void (size_t, system::error_code)>	_fail;
+
+	private:
+		void checkbalance();
+		void onConnectOk(Channel channel);
+		void onConnectError(system::error_code ec);
+
+		void onSendSidOk(Channel channel);
+		void onSendSidFail(Channel channel, system::error_code ec);
+
+		void onReceiveSidOk(Channel channel, const SPacket &packet);
+		void onReceiveSidFail(Channel channel, system::error_code ec);
+
+
 	public:
-		ClientSessionImpl(ConnectorImplPtr con);
+		ClientSessionImplPtr shared_from_this();
+
+		ClientSessionImpl(
+			Connector connector,
+			const char *host, const char *service);
 
 		void start(
-			TSid sid, 
+			TClientSid sid, 
 			size_t numChannels,
-			const char *host, const char *service,
-			boost::function<void ()> ready,
-			boost::function<void (system::error_code)> fail);
+			boost::function<void (size_t)> ready,
+			boost::function<void (size_t, system::error_code)> fail);
 
-		TSid sid();
+		void balance(size_t numChannels);
 
-		void stop();
+		TClientSid sid();
+
+	public:
+		virtual void receive(
+			function<void (const SPacket &)> ok,
+			function<void (system::error_code)> fail);
+
+		virtual void send(
+			const SPacket &p,
+			function<void ()> ok,
+			function<void (system::error_code)> fail);
+
+		virtual void close();
+
 	};
 }
 #endif

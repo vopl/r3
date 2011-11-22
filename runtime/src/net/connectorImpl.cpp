@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "connectorImpl.hpp"
 #include "asyncServiceImpl.hpp"
-#include "channelImpl.hpp"
+#include "channelImplSocket.hpp"
 
 namespace net
 {
@@ -89,7 +89,7 @@ namespace net
 
 		//addSock(socket, alloc);
 
-		ChannelImplPtr channel(new ChannelImpl(socket));
+		ChannelImplBasePtr channel(new ChannelImplSocket(socket));
 		ls->_ok(Channel(channel));
 	}
 
@@ -159,7 +159,7 @@ namespace net
 
 		//addSock(socket, alloc);
 
-		ChannelImplPtr channel(new ChannelImpl(socket));
+		ChannelImplBasePtr channel(new ChannelImplSocket(socket));
 		cs->_ok(Channel(channel));
 	}
 
