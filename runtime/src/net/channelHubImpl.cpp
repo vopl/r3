@@ -102,27 +102,29 @@ namespace net
 		channel.close();
 
 		bool isWork = false;
-		mutex::scoped_lock sl(_mtxChannels);
-		TChannels::iterator iter = _channels.find(channel);
-		if(_channels.end() != iter)
 		{
-			assert(!"log error?");
+			mutex::scoped_lock sl(_mtxChannels);
+			TChannels::iterator iter = _channels.find(channel);
+			if(_channels.end() != iter)
+			{
+				assert(!"log error?");
 
-			_channels.erase(iter);
+				_channels.erase(iter);
 
-			mutex::scoped_lock sl2(_mtxSend);
-			_channelsSend.erase(channel);
-			_channelsSendNot.erase(channel);
+				mutex::scoped_lock sl2(_mtxSend);
+				_channelsSend.erase(channel);
+				_channelsSendNot.erase(channel);
 
-			//пакет переложить обратно в очередь (в начало, он обиженый)
-			_sendWaiters.push_front(sw);
+				//пакет переложить обратно в очередь (в начало, он обиженый)
+				_sendWaiters.push_front(sw);
 
-			balanceSends();
-			isWork = true;
-		}
-		else
-		{
-			//хаб закрыт?
+				balanceSends();
+				isWork = true;
+			}
+			else
+			{
+				//хаб закрыт?
+			}
 		}
 
 		if(!isWork)
