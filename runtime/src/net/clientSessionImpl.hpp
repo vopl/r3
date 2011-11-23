@@ -21,7 +21,9 @@ namespace net
 		TClientSid			_sid;
 		TClientSid			_needSid;
 		size_t				_needNumChannels;
+
 		size_t				_waitConnections;
+		std::set<Channel>	_waitConnectionsChannels;
 
 		boost::function<void (size_t)>						_ready;
 		boost::function<void (size_t, system::error_code)>	_fail;
@@ -50,6 +52,9 @@ namespace net
 			size_t numChannels,
 			boost::function<void (size_t)> ready,
 			boost::function<void (size_t, system::error_code)> fail);
+
+		void stop();
+		void close();
 
 		void balance(size_t numChannels);
 

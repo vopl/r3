@@ -28,18 +28,26 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::close()
 	{
-		assert(0);
+		//mutex::scoped_lock sl(_mtx);
+
+		BOOST_FOREACH(Channel &ch, _channels)
+		{
+			ch.close();
+		}
+		_channels.clear();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::attachChannel(Channel channel)
 	{
+		//mutex::scoped_lock sl(_mtx);
 		_channels.push_back(channel);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	size_t ChannelHubImpl::getChannelsAmount()
 	{
+		//mutex::scoped_lock sl(_mtx);
 		return _channels.size();
 	}
 

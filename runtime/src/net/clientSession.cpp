@@ -24,6 +24,13 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ClientSession::stop()
+	{
+		return static_pointer_cast<ClientSessionImpl>(_impl)
+			->stop();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void ClientSession::balance(size_t numChannels)
 	{
 		return static_pointer_cast<ClientSessionImpl>(_impl)

@@ -15,6 +15,8 @@ namespace net
 		typedef std::deque<Channel> TChannels;
 		TChannels _channels;
 
+		//mutex _mtx;
+
 	public:
 		ChannelHubImpl();
 

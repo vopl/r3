@@ -72,7 +72,10 @@ namespace net
 	{
 		if(ec)
 		{
-			ts->_fail(ec);
+			if(ts->_fail)
+			{
+				ts->_fail(ec);
+			}
 			return;
 		}
 
@@ -122,7 +125,10 @@ namespace net
 	{
 		if(ec)
 		{
-			ts->_fail(ec);
+			if(ts->_fail)
+			{
+				ts->_fail(ec);
+			}
 			return;
 		}
 

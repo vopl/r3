@@ -121,14 +121,14 @@ int main(int argc, char* argv[])
 
 	nas.start(10, onThreadStart, onThreadStop);
 
-	net::Connector c(nas);
-
-	net::ServerSessionManager ssm(c, "localhost", "3000");
+	net::Connector c1(nas);
+	net::ServerSessionManager ssm(c1, "localhost", "3000");
 	ssm.start(
 		onServerSessionManagerReady,
 		onServerSessionManagerError);
 
-	net::ClientSession cs(c, "localhost", "3000");
+	net::Connector c2(nas);
+	net::ClientSession cs(c2, "localhost", "3000");
 	cs.start(net::nullClientSid, 200000000,
 		boost::bind(onClientSessionReady, cs, _1),
 		onClientSessionError);
@@ -140,6 +140,9 @@ int main(int argc, char* argv[])
 	cs.close();
 
 	nas.stop();
+
+	std::cout<<"\n\nall stopped"<<std::endl;
+	std::cin>>ch;
 
 	return 0;
 }

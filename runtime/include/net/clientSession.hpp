@@ -29,6 +29,7 @@ namespace net
 			boost::function<void (size_t)> ready,
 			boost::function<void (size_t, boost::system::error_code)> fail);
 
+		void stop();
 		void balance(size_t numChannels);
 
 		TClientSid sid();

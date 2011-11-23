@@ -47,4 +47,10 @@ namespace net
 		return _impl->close();
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool Channel::operator<(const Channel &with) const
+	{
+		return _impl < with._impl;
+	}
+
 }

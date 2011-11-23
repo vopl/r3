@@ -39,6 +39,8 @@ namespace net
 			boost::function<void (boost::system::error_code)> fail = boost::function<void (boost::system::error_code)>());
 
 		void close();
+
+		bool operator<(const Channel &with) const;
 	};
 }
 #endif

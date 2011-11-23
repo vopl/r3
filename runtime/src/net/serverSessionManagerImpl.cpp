@@ -3,34 +3,22 @@
 #include <boost/bind.hpp>
 #include "utils/variant.hpp"
 
+//#define LF 		std::cerr<<__FUNCTION__ "\n";std::cerr.flush();
+#define LF
+
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
 	void ServerSessionManagerImpl::onAcceptOk(Channel channel)
 	{
-		{
-			mutex::scoped_lock sl(_mtx);
-			if(!_isStarted)
-			{
-				channel.close();
-				return;
-			}
-		}
+		LF;
 
-		//канал провести в сессию
-// 		channel.receive(getMeASid)
-// 		if(sid null)
-// 		{
-// 			create new session, attach channel to session, call ok
-// 		}
-// 		else if(sid known)
-// 		{
-// 			attach channel to session, call ok
-// 		}
-// 		else //sid unknown
-// 		{
-// 			send "no session"
-// 		}
+		mutex::scoped_lock sl(_mtx);
+		if(!_isStarted)
+		{
+			channel.close();
+			return;
+		}
 
 		channel.receive(
 			bind(&ServerSessionManagerImpl::onReceiveSidOk, shared_from_this(), channel, _1),
@@ -40,13 +28,16 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServerSessionManagerImpl::onAcceptFail(system::error_code ec)
 	{
-		assert(!"log error?");
-
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
+		LF;
 		{
-			return;
+			mutex::scoped_lock sl(_mtx);
+			if(!_isStarted)
+			{
+				return;
+			}
 		}
+
+		assert(!"log error?");
 
 		_connector.listen(
 			_host.c_str(), _service.c_str(), 
@@ -57,6 +48,14 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ServerSessionManagerImpl::onReceiveSidOk(Channel channel, const SPacket &packet)
 	{
+		LF;
+		mutex::scoped_lock sl(_mtx);
+		if(!_isStarted)
+		{
+			channel.close();
+			return;
+		}
+
 		utils::Variant v;
 		if(	!v.load(packet._data, packet._size) || 
 			!v.is<utils::Variant::MapStringVariant>())
@@ -78,7 +77,6 @@ namespace net
 
 		if(nullServerSid != sid)
 		{
-			mutex::scoped_lock sl(_mtx);
 			TMSessions::iterator iter = _sessions.find(sid);
 			if(_sessions.end() == iter)
 			{
@@ -88,7 +86,8 @@ namespace net
 				SPacket packet;
 				packet._data = v.save(packet._size);
 				channel.send(packet, 
-					bind(&ServerSessionManagerImpl::onAcceptOk, shared_from_this(), channel));
+					bind(&ServerSessionManagerImpl::onAcceptOk, shared_from_this(), channel),
+					bind(&ServerSessionManagerImpl::onAcceptFail, shared_from_this(), _1));
 			}
 			else
 			{
@@ -98,14 +97,13 @@ namespace net
 				SPacket packet;
 				packet._data = v.save(packet._size);
 				channel.send(packet, 
-					bind(&ServerSessionManagerImpl::attach2Session, shared_from_this(), iter->second, channel));
+					bind(&ServerSessionManagerImpl::attach2Session, shared_from_this(), iter->second, channel),
+					bind(&ServerSessionManagerImpl::attach2SessionFail, shared_from_this(), channel));
 			}
 		}
 		else
 		{
 			//сид был нулевой, создать новую сессию
-			mutex::scoped_lock sl(_mtx);
-
 			TServerSid newSid = _sidGen();
 			while(_sessions.end() != _sessions.find(newSid))
 			{
@@ -119,13 +117,17 @@ namespace net
 			SPacket packet;
 			packet._data = v.save(packet._size);
 			channel.send(packet, 
-				bind(&ServerSessionManagerImpl::attach2Session, shared_from_this(), session, channel));
+				bind(&ServerSessionManagerImpl::attach2Session, shared_from_this(), session, channel),
+				bind(&ServerSessionManagerImpl::attach2SessionFail, shared_from_this(), channel));
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServerSessionManagerImpl::onReceiveSidFail(Channel channel, system::error_code ec)
 	{
+		LF;
+		channel.close();
+
 		assert(!"log error?");
 
 		{
@@ -135,18 +137,20 @@ namespace net
 				return;
 			}
 		}
-		channel.close();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServerSessionManagerImpl::attach2Session(ServerSessionImplPtr session, Channel channel)
 	{
+		LF;
+		mutex::scoped_lock sl(_mtx);
 		session->attachChannel(channel);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServerSessionManagerImpl::attach2SessionFail(Channel channel)
 	{
+		LF;
 		channel.close();
 	}
 

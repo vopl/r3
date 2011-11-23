@@ -3,21 +3,25 @@
 #include <boost/bind.hpp>
 #include "utils/variant.hpp"
 
+//#define LF 		std::cerr<<__FUNCTION__ "\n";std::cerr.flush();
+#define LF
+
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
 	void ClientSessionImpl::checkbalance()
 	{
+		LF;
 		//уже заблокировано
 		//mutex::scoped_lock sl(_mtx);
+		assert(_isStarted);
 
 		if(_needNumChannels > getChannelsAmount() && !_waitConnections)
 		{
-			ClientSessionImplPtr self = shared_from_this();
 			_connector.connect(
 				_host.c_str(), _service.c_str(), 
-				bind(&ClientSessionImpl::onConnectOk, self, _1),
-				bind(&ClientSessionImpl::onConnectError, self, _1));
+				bind(&ClientSessionImpl::onConnectOk, shared_from_this(), _1),
+				bind(&ClientSessionImpl::onConnectError, shared_from_this(), _1));
 			_waitConnections++;
 		}
 
@@ -31,6 +35,14 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ClientSessionImpl::onConnectOk(Channel channel)
 	{
+		LF;
+		mutex::scoped_lock sl(_mtx);
+		if(!_isStarted)
+		{
+			channel.close();
+			return;
+		}
+
 		utils::Variant v;
 		v.as<utils::Variant::MapStringVariant>(true)["sid"] = _needSid;
 
@@ -42,13 +54,20 @@ namespace net
 			packet, 
 			bind(&ClientSessionImpl::onSendSidOk, shared_from_this(), channel),
 			bind(&ClientSessionImpl::onSendSidFail, shared_from_this(), channel, _1));
+		
+		_waitConnectionsChannels.insert(channel);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ClientSessionImpl::onConnectError(system::error_code ec)
 	{
-		assert(!"log error?");
+		LF;
 		mutex::scoped_lock sl(_mtx);
+		if(!_isStarted)
+		{
+			return;
+		}
+		//assert(!"log error?");
 		_waitConnections--;
 		checkbalance();
 	}
@@ -56,6 +75,13 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ClientSessionImpl::onSendSidOk(Channel channel)
 	{
+		LF;
+		mutex::scoped_lock sl(_mtx);
+		if(!_isStarted)
+		{
+			channel.close();
+			return;
+		}
 		//принять сид
 		channel.receive(
 			bind(&ClientSessionImpl::onReceiveSidOk, shared_from_this(), channel, _1),
@@ -65,17 +91,35 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ClientSessionImpl::onSendSidFail(Channel channel, system::error_code ec)
 	{
-		assert(!"log error?");
+		LF;
 		channel.close();
 
-		mutex::scoped_lock sl(_mtx);
-		_waitConnections--;
-		checkbalance();
+		{
+			mutex::scoped_lock sl(_mtx);
+			if(!_isStarted)
+			{
+				return;
+			}
+
+			assert(!"log error?");
+			_waitConnections--;
+			_waitConnectionsChannels.erase(channel);
+			channel.close();
+			checkbalance();
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ClientSessionImpl::onReceiveSidOk(Channel channel, const SPacket &packet)
 	{
+		LF;
+		mutex::scoped_lock sl(_mtx);
+		if(!_isStarted)
+		{
+			channel.close();
+			return;
+		}
+
 		utils::Variant v;
 		if(	!v.load(packet._data, packet._size) || 
 			!v.is<utils::Variant::MapStringVariant>())
@@ -85,7 +129,6 @@ namespace net
 			assert(!"log error?");
 			channel.close();
 
-			mutex::scoped_lock sl(_mtx);
 			_waitConnections--;
 			checkbalance();
 			return;
@@ -97,8 +140,8 @@ namespace net
 		{
 			//сессия утеряня, поднять новую
 			assert(!"sid lost!");
-			mutex::scoped_lock sl(_mtx);
 			_needSid = nullClientSid;
+			_waitConnectionsChannels.erase(channel);
 			onConnectOk(channel);
 			return;
 		}
@@ -106,13 +149,13 @@ namespace net
 		{
 			size_t channels;
 			{
-				mutex::scoped_lock sl(_mtx);
 				_sid = msv["sid"];
 				_needSid = msv["sid"];
 
 				attachChannel(channel);
 				channels = getChannelsAmount();
 
+				_waitConnectionsChannels.erase(channel);
 				_waitConnections--;
 				checkbalance();
 			}
@@ -121,7 +164,8 @@ namespace net
 		else
 		{
 			assert(!"packet out of format");
-			mutex::scoped_lock sl(_mtx);
+			_waitConnectionsChannels.erase(channel);
+			channel.close();
 			_waitConnections--;
 			checkbalance();
 			return;
@@ -131,12 +175,22 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ClientSessionImpl::onReceiveSidFail(Channel channel, system::error_code ec)
 	{
-		assert(!"log error?");
+		LF;
 		channel.close();
 
-		mutex::scoped_lock sl(_mtx);
-		_waitConnections--;
-		checkbalance();
+		{
+			mutex::scoped_lock sl(_mtx);
+			if(!_isStarted)
+			{
+				return;
+			}
+
+			//assert(!"log error?");
+			_waitConnectionsChannels.erase(channel);
+			channel.close();
+			_waitConnections--;
+			checkbalance();
+		}
 	}
 
 
@@ -193,8 +247,46 @@ namespace net
 
 		assert(!_waitConnections);
 		_waitConnections = 0;
+		assert(_waitConnectionsChannels.empty());
+		_waitConnectionsChannels.clear();
 
 		checkbalance();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ClientSessionImpl::close()
+	{
+		mutex::scoped_lock sl(_mtx);
+		if(!_isStarted)
+		{
+			return;
+		}
+
+
+		_needSid = nullClientSid;
+		_sid = nullClientSid;
+
+		_needNumChannels = 0;
+
+		_ready = function<void (size_t)>();
+
+		_fail = function<void (size_t, system::error_code)>();
+
+		_isStarted = false;
+
+		_waitConnections = 0;
+		BOOST_FOREACH(Channel &c, _waitConnectionsChannels)
+		{
+			c.close();
+		}
+		_waitConnectionsChannels.clear();
+		ChannelHubImpl::close();
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void ClientSessionImpl::stop()
+	{
+		return close();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
