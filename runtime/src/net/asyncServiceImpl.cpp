@@ -126,7 +126,6 @@ namespace net
 	void AsyncServiceImpl::stop()
 	{
 		balance(0);
-		_io_service.stop();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
