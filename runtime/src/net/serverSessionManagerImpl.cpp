@@ -143,8 +143,11 @@ namespace net
 	void ServerSessionManagerImpl::attach2Session(ServerSessionImplPtr session, Channel channel)
 	{
 		LF;
-		mutex::scoped_lock sl(_mtx);
-		session->attachChannel(channel);
+		{
+			mutex::scoped_lock sl(_mtx);
+			session->attachChannel(channel);
+		}
+		_ready(ServerSession(session));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

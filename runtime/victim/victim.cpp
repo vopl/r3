@@ -24,67 +24,13 @@ void onThreadStop()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void onAcceptSendOk()
+void onServerSendOk(net::ServerSession ss)
 {
-	std::cout<<__FUNCTION__<<std::endl;
-}
-void onAcceptSendFail(boost::system::error_code ec)
-{
-	std::cout<<__FUNCTION__<<ec<<std::endl;
-}
-//////////////////////////////////////////////////////////////////////////
-void onAcceptReceiveOk(const net::SPacket &p)
-{
-	std::cout<<__FUNCTION__<<std::endl;
-}
-void onAcceptReceiveFail(boost::system::error_code ec)
-{
-	std::cout<<__FUNCTION__<<ec<<std::endl;
-}
-void onAccept(net::Channel &ch)
-{
-	net::SPacket p;
-	p._size = 10;
-	p._data = boost::shared_array<char>(new char[p._size]);
-	ch.send(p, onAcceptSendOk, onAcceptSendFail);
-	ch.receive(onAcceptReceiveOk, onAcceptReceiveFail);
-	std::cout<<__FUNCTION__<<std::endl;
-}
-
-void onConnectSendOk()
-{
-	std::cout<<__FUNCTION__<<std::endl;
-}
-void onConnectSendFail(boost::system::error_code ec)
-{
-	std::cout<<__FUNCTION__<<ec<<std::endl;
-}
-//////////////////////////////////////////////////////////////////////////
-void onConnectReceiveOk(const net::SPacket &p)
-{
-	std::cout<<__FUNCTION__<<std::endl;
-}
-void onConnectReceiveFail(boost::system::error_code ec)
-{
-	std::cout<<__FUNCTION__<<ec<<std::endl;
-}
-void onConnect(net::Channel &ch)
-{
-	net::SPacket p;
-	p._size = 10;
-	p._data = boost::shared_array<char>(new char[p._size]);
-	ch.send(p, onConnectSendOk, onConnectSendFail);
-	ch.receive(onConnectReceiveOk, onConnectReceiveFail);
 	std::cout<<__FUNCTION__<<std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////
-void onAcceptError(boost::system::error_code ec)
-{
-	std::cout<<__FUNCTION__<<ec<<std::endl;
-}
-//////////////////////////////////////////////////////////////////////////
-void onConnectError(boost::system::error_code ec)
+void onServerSendFail(boost::system::error_code ec)
 {
 	std::cout<<__FUNCTION__<<ec<<std::endl;
 }
@@ -92,6 +38,12 @@ void onConnectError(boost::system::error_code ec)
 //////////////////////////////////////////////////////////////////////////
 void onServerSessionManagerReady(net::ServerSession ss)
 {
+	net::SPacket p;
+	p._size = 10;
+	p._data = boost::shared_array<char>(new char[p._size]);
+	ss.send(p, 
+		boost::bind(onServerSendOk, ss),
+		onServerSendFail);
 	std::cout<<__FUNCTION__<<std::endl;
 }
 
@@ -102,8 +54,28 @@ void onServerSessionManagerError(boost::system::error_code ec)
 }
 
 //////////////////////////////////////////////////////////////////////////
+void onClientSendOk(net::ClientSession cs)
+{
+	std::cout<<__FUNCTION__<<std::endl;
+}
+
+//////////////////////////////////////////////////////////////////////////
+void onClientSendFail(boost::system::error_code ec)
+{
+	std::cout<<__FUNCTION__<<ec<<std::endl;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 void onClientSessionReady(net::ClientSession cs, size_t numChannels)
 {
+	net::SPacket p;
+	p._size = 10;
+	p._data = boost::shared_array<char>(new char[p._size]);
+	cs.send(p, 
+		boost::bind(onClientSendOk, cs),
+		onClientSendFail);
+
 	static int k(0);
 	std::cout<<__FUNCTION__<<", "<<k++<<std::endl;
 }
@@ -119,7 +91,7 @@ int main(int argc, char* argv[])
 {
 	net::AsyncService nas;
 
-	nas.start(10, onThreadStart, onThreadStop);
+	nas.start(1, onThreadStart, onThreadStop);
 
 	net::Connector c1(nas);
 	net::ServerSessionManager ssm(c1, "localhost", "3000");
@@ -129,7 +101,7 @@ int main(int argc, char* argv[])
 
 	net::Connector c2(nas);
 	net::ClientSession cs(c2, "localhost", "3000");
-	cs.start(net::nullClientSid, 200000000,
+	cs.start(net::nullClientSid, 2,
 		boost::bind(onClientSessionReady, cs, _1),
 		onClientSessionError);
 
