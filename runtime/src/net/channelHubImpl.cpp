@@ -67,34 +67,68 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::onSendOk(Channel channel, SendWaiterPtr sw)
 	{
+		bool isWork = false;
 		{
 			mutex::scoped_lock sl(_mtxSend);
-			_channelsSend.erase(channel);
-			_channelsSendNot.insert(channel);
-			balanceSends();
+			TChannels::iterator iter = _channelsSend.find(channel);
+			if(_channelsSend.end() != iter)
+			{
+				_channelsSend.erase(iter);
+				_channelsSendNot.insert(channel);
+				isWork = true;
+				balanceSends();
+			}
+			else
+			{
+				//хаб закрыт?
+			}
 		}
-		sw->_ok();
+
+		if(isWork)
+		{
+			sw->_ok();
+		}
+		else
+		{
+			sw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
+		}
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::onSendFail(Channel channel, SendWaiterPtr sw, system::error_code ec)
 	{
-		assert(!"log error?");
-
 		//закрыть канал и избавится от него
 		channel.close();
+
+		bool isWork = false;
 		mutex::scoped_lock sl(_mtxChannels);
-		_channels.erase(channel);
+		TChannels::iterator iter = _channels.find(channel);
+		if(_channels.end() != iter)
+		{
+			assert(!"log error?");
 
-		mutex::scoped_lock sl2(_mtxSend);
-		_channelsSend.erase(channel);
-		_channelsSendNot.erase(channel);
+			_channels.erase(iter);
 
-		//пакет переложить обратно в очередь (в начало, он обиженый)
-		_sendWaiters.push_front(sw);
+			mutex::scoped_lock sl2(_mtxSend);
+			_channelsSend.erase(channel);
+			_channelsSendNot.erase(channel);
 
-		balanceSends();
+			//пакет переложить обратно в очередь (в начало, он обиженый)
+			_sendWaiters.push_front(sw);
+
+			balanceSends();
+			isWork = true;
+		}
+		else
+		{
+			//хаб закрыт?
+		}
+
+		if(!isWork)
+		{
+			sw->_fail(ec);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -139,18 +173,28 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::onRecvFail(Channel channel, system::error_code ec)
 	{
-		std::cout<<ec<<std::endl;
-		assert(!"log error?");
 		//закрыть канал и избавится от него
 		channel.close();
+
+		bool isWork = false;
 		mutex::scoped_lock sl(_mtxChannels);
-		_channels.erase(channel);
+		TChannels::iterator iter = _channels.find(channel);
+		if(_channels.end() != iter)
+		{
+			assert(!"log error?");
 
-		mutex::scoped_lock sl2(_mtxSend);
-		_channelsSend.erase(channel);
-		_channelsSendNot.erase(channel);
+			_channels.erase(iter);
 
-		balanceSends();
+			mutex::scoped_lock sl2(_mtxSend);
+			_channelsSend.erase(channel);
+			_channelsSendNot.erase(channel);
+
+			balanceSends();
+		}
+		else
+		{
+			//хаб закрыт?
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -206,18 +250,38 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::close()
 	{
-		mutex::scoped_lock sl(_mtxChannels);
-
-		BOOST_FOREACH(Channel &ch, _channels)
+		RecvCallbacks rcs;
+		TRecvWaiters rws;
 		{
-			ch.close();
+			mutex::scoped_lock sl(_mtxChannels);
+			mutex::scoped_lock sl2(_mtxSend);
+			mutex::scoped_lock sl3(_mtxRecv);
+
+			BOOST_FOREACH(Channel &ch, _channels)
+			{
+				ch.close();
+			}
+			_channels.clear();
+
+			{
+				_channelsSend.clear();
+				_channelsSendNot.clear();
+			}
+
+			{
+				balanceRecvs(rcs);
+				rws.swap(_recvWaiters);
+				_recvPackets.clear();
+			}
 		}
-		_channels.clear();
 
+		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
 		{
-			mutex::scoped_lock sl(_mtxSend);
-			_channelsSend.clear();
-			_channelsSendNot.clear();
+			rc->_ok(rc->_packet);
+		}
+		BOOST_FOREACH(RecvWaiterPtr &rw, rws)
+		{
+			rw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
 		}
 	}
 

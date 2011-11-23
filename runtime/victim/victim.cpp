@@ -14,7 +14,7 @@ using namespace std;
 //#define LF std::cout<<__FUNCTION__<<std::endl;
 #define LF 
 
-#define PACKETSIZE 1024*1024*4
+#define PACKETSIZE 1024*64
 
 //////////////////////////////////////////////////////////////////////////
 void onThreadStart()
@@ -167,9 +167,9 @@ int main(int argc, char* argv[])
 		onServerSessionManagerReady,
 		onServerSessionManagerError);
 
-	net::Connector c2(nas);
-	net::ClientSession cs(c2, "localhost", "3000");
-	cs.start(net::nullClientSid, 100,
+	//net::Connector c2(nas);
+	net::ClientSession cs(c1, "localhost", "3000");
+	cs.start(net::nullClientSid, 10,
 		boost::bind(onClientSessionReady, cs, _1),
 		onClientSessionError);
 
