@@ -4,7 +4,7 @@
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
-	ChannelHubImpl::SendPacket::SendPacket(
+	ChannelHubImpl::SendWaiter::SendWaiter(
 		const SPacket &packet,
 		function<void ()> ok,
 		function<void (system::error_code)>	fail)
@@ -15,51 +15,136 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	ChannelHubImpl::RecvWaiter::RecvWaiter(
+		function<void (const SPacket &)> ok,
+		function<void (system::error_code)>	fail)
+		: _ok(ok)
+		, _fail(fail)
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelHubImpl::RecvPacket::RecvPacket(
+		const SPacket &packet, 
+		Channel	channel)
+		: _packet(packet) 
+		, _channel(channel)
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelHubImpl::RecvCallback::RecvCallback(
+		const SPacket &packet,
+		function<void (const SPacket &)> ok)
+		: _packet(packet)
+		, _ok(ok)
+	{
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::balanceSends()
 	{
 		//уже заблокировано
 
-		if(!_sendPackets.empty() && !_channelsSendNot.empty())
+		if(!_sendWaiters.empty() && !_channelsSendNot.empty())
 		{
 			//есть пакет к отправке и свободный канал
 			Channel channel = *_channelsSendNot.begin();
 			_channelsSendNot.erase(_channelsSendNot.begin());
 
-			SendPacketPtr sp = _sendPackets.front();
-			_sendPackets.pop_front();
+			SendWaiterPtr sw = _sendWaiters.front();
+			_sendWaiters.pop_front();
 			
 			channel.send(
-				sp->_packet, 
-				bind(&ChannelHubImpl::onSendOk, shared_from_this(), channel, sp),
-				bind(&ChannelHubImpl::onSendFail, shared_from_this(), channel, sp, _1));
+				sw->_packet, 
+				bind(&ChannelHubImpl::onSendOk, shared_from_this(), channel, sw),
+				bind(&ChannelHubImpl::onSendFail, shared_from_this(), channel, sw, _1));
 			_channelsSend.insert(channel);
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelHubImpl::onSendOk(Channel channel, SendPacketPtr sp)
+	void ChannelHubImpl::onSendOk(Channel channel, SendWaiterPtr sw)
 	{
-		mutex::scoped_lock sl(_mtxSends);
-		sp->_ok();
-		_channelsSend.erase(channel);
-		_channelsSendNot.insert(channel);
-		balanceSends();
+		{
+			mutex::scoped_lock sl(_mtxSend);
+			_channelsSend.erase(channel);
+			_channelsSendNot.insert(channel);
+			balanceSends();
+		}
+		sw->_ok();
+
 	}
 
-	void ChannelHubImpl::onSendFail(Channel channel, SendPacketPtr sp, system::error_code ec)
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelHubImpl::onSendFail(Channel channel, SendWaiterPtr sw, system::error_code ec)
 	{
 		//закрыть канал и избавится от него
 		channel.close();
 		mutex::scoped_lock sl(_mtxChannels);
 		_channels.erase(channel);
 
-		mutex::scoped_lock sl2(_mtxSends);
-		assert(_channelsSend.end() != _channelsSend.find(channel));
+		mutex::scoped_lock sl2(_mtxSend);
 		_channelsSend.erase(channel);
 		_channelsSendNot.erase(channel);
 
 		//пакет переложить обратно в очередь (в начало, он обиженый)
-		_sendPackets.push_front(sp);
+		_sendWaiters.push_front(sw);
+
+		balanceSends();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelHubImpl::balanceRecvs(RecvCallbacks &rcs)
+	{
+		//уже заблокировано
+
+		while(!_recvPackets.empty() && !_recvWaiters.empty())
+		{
+			RecvPacketPtr rp = _recvPackets.front();
+			_recvPackets.pop_front();
+			RecvWaiterPtr rw = _recvWaiters.front();
+			_recvWaiters.pop_front();
+
+			RecvCallbackPtr rc(new RecvCallback(rp->_packet, rw->_ok));
+			rcs.push_back(rc);
+
+			rp->_channel.receive(
+				bind(&ChannelHubImpl::onRecvOk, shared_from_this(), rp->_channel, _1),
+				bind(&ChannelHubImpl::onRecvFail, shared_from_this(), rp->_channel, _1));
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelHubImpl::onRecvOk(Channel channel, const SPacket &p)
+	{
+		RecvCallbacks rcs;
+		{
+			mutex::scoped_lock sl(_mtxRecv);
+
+			RecvPacketPtr rp(new RecvPacket(p, channel));
+			_recvPackets.push_back(rp);
+			balanceRecvs(rcs);
+		}
+
+		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
+		{
+			rc->_ok(rc->_packet);
+		}
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelHubImpl::onRecvFail(Channel channel, system::error_code ec)
+	{
+		//закрыть канал и избавится от него
+		channel.close();
+		mutex::scoped_lock sl(_mtxChannels);
+		_channels.erase(channel);
+
+		mutex::scoped_lock sl2(_mtxSend);
+		_channelsSend.erase(channel);
+		_channelsSendNot.erase(channel);
 
 		balanceSends();
 	}
@@ -80,7 +165,23 @@ namespace net
 		function<void (const SPacket &)> ok,
 		function<void (system::error_code)> fail)
 	{
-		assert(0);
+		RecvCallbacks rcs;
+
+		{
+			mutex::scoped_lock sl(_mtxRecv);
+
+			//положить в очередь на отправку
+			RecvWaiterPtr rp(new RecvWaiter(ok,fail));
+			_recvWaiters.push_back(rp);
+
+			balanceRecvs(rcs);
+		}
+
+		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
+		{
+			rc->_ok(rc->_packet);
+		}
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -89,11 +190,11 @@ namespace net
 		function<void ()> ok,
 		function<void (system::error_code)> fail)
 	{
-		mutex::scoped_lock sl(_mtxSends);
+		mutex::scoped_lock sl(_mtxSend);
 
 		//положить в очередь на отправку
-		SendPacketPtr sp(new SendPacket(p,ok,fail));
-		_sendPackets.push_back(sp);
+		SendWaiterPtr sw(new SendWaiter(p,ok,fail));
+		_sendWaiters.push_back(sw);
 
 		balanceSends();
 	}
@@ -110,7 +211,7 @@ namespace net
 		_channels.clear();
 
 		{
-			mutex::scoped_lock sl(_mtxSends);
+			mutex::scoped_lock sl(_mtxSend);
 			_channelsSend.clear();
 			_channelsSendNot.clear();
 		}
@@ -123,9 +224,12 @@ namespace net
 		_channels.insert(channel);
 
 		{
-			mutex::scoped_lock sl(_mtxSends);
+			mutex::scoped_lock sl(_mtxSend);
 			_channelsSendNot.insert(channel);
 		}
+		channel.receive(
+			bind(&ChannelHubImpl::onRecvOk, shared_from_this(), channel, _1),
+			bind(&ChannelHubImpl::onRecvFail, shared_from_this(), channel, _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
