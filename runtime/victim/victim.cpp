@@ -14,6 +14,8 @@ using namespace std;
 //#define LF std::cout<<__FUNCTION__<<std::endl;
 #define LF 
 
+#define PACKETSIZE 1024*1024*4
+
 //////////////////////////////////////////////////////////////////////////
 void onThreadStart()
 {
@@ -31,7 +33,17 @@ void onThreadStop()
 
 
 
-
+net::SPacket randomPacket(size_t size)
+{
+	net::SPacket p;
+	p._size = size;
+	p._data = boost::shared_array<char>(new char[p._size]);
+	for(size_t i(0); i<p._size; i++)
+	{
+		p._data[i] = (char)rand();
+	}
+	return p;
+}
 
 
 
@@ -42,10 +54,7 @@ void onServerSendFail(boost::system::error_code ec);
 //////////////////////////////////////////////////////////////////////////
 void onServerReceiveOk(net::ServerSession ss)
 {
-	net::SPacket p;
-	p._size = 10;
-	p._data = boost::shared_array<char>(new char[p._size]);
-	ss.send(p, 
+	ss.send(randomPacket(PACKETSIZE), 
 		boost::bind(onServerSendOk, ss),
 		onServerSendFail);
 
@@ -76,10 +85,7 @@ void onServerSendFail(boost::system::error_code ec)
 //////////////////////////////////////////////////////////////////////////
 void onServerSessionManagerReady(net::ServerSession ss)
 {
-	net::SPacket p;
-	p._size = 10;
-	p._data = boost::shared_array<char>(new char[p._size]);
-	ss.send(p, 
+	ss.send(randomPacket(PACKETSIZE), 
 		boost::bind(onServerSendOk, ss),
 		onServerSendFail);
 	LF;
@@ -101,10 +107,7 @@ void onClientSendFail(boost::system::error_code ec);
 //////////////////////////////////////////////////////////////////////////
 void onClientReceiveOk(net::ClientSession cs)
 {
-	net::SPacket p;
-	p._size = 10;
-	p._data = boost::shared_array<char>(new char[p._size]);
-	cs.send(p, 
+	cs.send(randomPacket(PACKETSIZE), 
 		boost::bind(onClientSendOk, cs),
 		onClientSendFail);
 
@@ -136,10 +139,7 @@ void onClientSendFail(boost::system::error_code ec)
 //////////////////////////////////////////////////////////////////////////
 void onClientSessionReady(net::ClientSession cs, size_t numChannels)
 {
-	net::SPacket p;
-	p._size = 10;
-	p._data = boost::shared_array<char>(new char[p._size]);
-	cs.send(p, 
+	cs.send(randomPacket(PACKETSIZE), 
 		boost::bind(onClientSendOk, cs),
 		onClientSendFail);
 
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 {
 	net::AsyncService nas;
 
-	nas.start(10, onThreadStart, onThreadStop);
+	nas.start(20, onThreadStart, onThreadStop);
 
 	net::Connector c1(nas);
 	net::ServerSessionManager ssm(c1, "localhost", "3000");
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 
 	net::Connector c2(nas);
 	net::ClientSession cs(c2, "localhost", "3000");
-	cs.start(net::nullClientSid, 200,
+	cs.start(net::nullClientSid, 100,
 		boost::bind(onClientSessionReady, cs, _1),
 		onClientSessionError);
 

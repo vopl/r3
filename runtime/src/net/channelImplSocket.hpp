@@ -19,6 +19,7 @@ namespace net
 		: public ChannelImplBase
 	{
 		TSocketPtr _socket;
+		io_service::strand _strand;
 
 		//////////////////////////////////////////////////////////////////////////
 		struct STransferState

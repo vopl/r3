@@ -35,6 +35,7 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	ChannelImplSocket::ChannelImplSocket(TSocketPtr socket)
 		: _socket(socket)
+		, _strand(socket->get_io_service())
 	{
 	}
 
@@ -84,10 +85,14 @@ namespace net
 		{
 			ts->_ch->_socket->async_read_some(
 				buffer((char *)&ts->_header, sizeof(ts->_header)-ts->_transferedSize), 
-				bind(
-					&ChannelImplSocket::onReceive,
-					ts, 
-					_1, _2));
+				ts->_ch->_strand.wrap(
+					bind(
+						&ChannelImplSocket::onReceive,
+						ts, 
+						_1, _2
+					)
+				)
+			);
 		}
 		else if(ts->_transferedSize == sizeof(ts->_header))
 		{
@@ -96,10 +101,14 @@ namespace net
 
 			ts->_ch->_socket->async_read_some(
 				buffer(ts->_packet._data.get(), ts->_packet._size), 
-				bind(
-					&ChannelImplSocket::onReceive,
-					ts, 
-					_1, _2));
+				ts->_ch->_strand.wrap(
+					bind(
+						&ChannelImplSocket::onReceive,
+						ts, 
+						_1, _2
+					)
+				)
+			);
 		}
 		else if(ts->_transferedSize < sizeof(ts->_header)+ ts->_packet._size)
 		{
@@ -108,10 +117,14 @@ namespace net
 				buffer(
 					ts->_packet._data.get()+dataTransferedSize, 
 					ts->_packet._size-dataTransferedSize), 
-				bind(
-					&ChannelImplSocket::onReceive,
-					ts, 
-					_1, _2));
+				ts->_ch->_strand.wrap(
+					bind(
+						&ChannelImplSocket::onReceive,
+						ts, 
+						_1, _2
+					)
+				)
+			);
 		}
 		else
 		{
@@ -143,10 +156,14 @@ namespace net
 
 			ts->_ch->_socket->async_write_some(
 				packedData, 
-				bind(
-					&ChannelImplSocket::onSend,
-					ts, 
-					_1, _2));
+				ts->_ch->_strand.wrap(
+					bind(
+						&ChannelImplSocket::onSend,
+						ts, 
+						_1, _2
+					)
+				)
+			);
 
 		}
 		else if(ts->_transferedSize < sizeof(ts->_header)+ts->_packet._size)
@@ -158,10 +175,14 @@ namespace net
 
 			ts->_ch->_socket->async_write_some(
 				packedData, 
-				bind(
-					&ChannelImplSocket::onSend,
-					ts, 
-					_1, _2));
+				ts->_ch->_strand.wrap(
+					bind(
+						&ChannelImplSocket::onSend,
+						ts, 
+						_1, _2
+					)
+				)
+			);
 		}
 		else
 		{

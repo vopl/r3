@@ -80,6 +80,8 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::onSendFail(Channel channel, SendWaiterPtr sw, system::error_code ec)
 	{
+		assert(!"log error?");
+
 		//закрыть канал и избавится от него
 		channel.close();
 		mutex::scoped_lock sl(_mtxChannels);
@@ -137,6 +139,8 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelHubImpl::onRecvFail(Channel channel, system::error_code ec)
 	{
+		std::cout<<ec<<std::endl;
+		assert(!"log error?");
 		//закрыть канал и избавится от него
 		channel.close();
 		mutex::scoped_lock sl(_mtxChannels);

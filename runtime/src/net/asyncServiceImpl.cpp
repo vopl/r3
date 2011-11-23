@@ -129,7 +129,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::asio::io_service &AsyncServiceImpl::io_service()
+	boost::asio::io_service &AsyncServiceImpl::get_io_service()
 	{
 		return _io_service;
 	}

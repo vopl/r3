@@ -42,7 +42,7 @@ namespace net
 		void stop();
 
 	public:
-		boost::asio::io_service &io_service();
+		boost::asio::io_service &get_io_service();
 	};
 	typedef boost::shared_ptr<AsyncServiceImpl> AsyncServiceImplPtr;
 }
