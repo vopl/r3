@@ -1,17 +1,34 @@
 #include "stdafx.h"
 #include "instance.hpp"
+#include <boost/bind.hpp>
 
 namespace r3
 {
 	namespace server
 	{
 		//////////////////////////////////////////////////////////////////////////
-		Instance::Instance()
+		void Instance::onListenOk(net::Channel channel)
+		{
+			//
+		}
+
+		void Instance::onListenFail(system::error_code ec)
+		{
+			mutex::scoped_lock sl(_mtx);
+			if(!_host.empty())
+			{
+				_connector.listen(
+					_host.c_str(), _service.c_str(), 
+					bind(&Instance::onListenOk, this, _1), 
+					bind(&Instance::onListenFail, this, _1));
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		Instance::Instance(net::AsyncService &asrv)
 			: _host("localhost")
-			, _port(29431)
-			, _hasListener(false)
-			, _netsrv(NULL)
-			, _threads(0)
+			, _service("29431")
+			, _connector(asrv)
 		{
 		}
 
@@ -21,125 +38,30 @@ namespace r3
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Instance::setAddress(const std::string &host, short port)
+		void Instance::setAddress(const std::string &host, const std::string &service)
 		{
 			{
 				boost::mutex::scoped_lock sl(_mtx);
+
+				if(!_host.empty())
+				{
+					_connector.unlisten(_host.c_str(), _service.c_str());
+				}
+
 				_host = host;
-				_port = port;
-			}
+				_service = service;
 
-			updateListener();
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onStartInThread(net::Service *netsrv)
-		{
-			bool needUpdateListener = false;
-			{
-				boost::mutex::scoped_lock sl(_mtx);
-				assert(!_netsrv || _netsrv == netsrv);
-				_netsrv = netsrv;
-				_threads++;
-				needUpdateListener = !_hasListener;
-			}
-
-			if(needUpdateListener)
-			{
-				updateListener();
-			}
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onError(net::Service *netsrv, net::EStage es, const boost::system::error_code& ec)
-		{
-			boost::mutex::scoped_lock sl(_mtx);
-
-			//логировать
-			switch(es)
-			{
-			case net::esListen:
-			case net::esAccept:
-			case net::esAcceptHandshake:
-				if(_hasListener)
+				if(!_host.empty())
 				{
-					std::cerr<<es<<": "<<ec.message()<<"("<<ec.value()<<")"<<std::endl;
+					_connector.listen(
+						_host.c_str(), _service.c_str(), 
+						bind(&Instance::onListenOk, this, _1), 
+						bind(&Instance::onListenFail, this, _1));
 				}
-				break;
-			case net::esConnect:
-			case net::esConnectHandshake:
-				std::cerr<<es<<": "<<ec.message()<<"("<<ec.value()<<")"<<std::endl;
-				break;
-			}
-			//assert(0);
-		}
 
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onAccept(net::ChannelPtr channel)
-		{
-			//поставить на распределение в сессию
-			//channel->setHandler(this);
-// 			boost::mutex::scoped_lock sl(_mtx);
-// 			_channels.insert(channel);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onConnect(net::ChannelPtr channel)
-		{
-			channel->close();
-// 			boost::mutex::scoped_lock sl(_mtx);
-// 			_channels.insert(channel);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::onStopInThread()
-		{
-			{
-				boost::mutex::scoped_lock sl(_mtx);
-				_threads--;
-				if(!_threads)
-				{
-// 					_channels.clear();
-					if(_netsrv)
-					{
-						if(_hasListener)
-						{
-							_netsrv->listen(NULL, 0);
-							_hasListener = false;
-						}
-						_netsrv = NULL;
-					}
-				}
 			}
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		void Instance::updateListener()
-		{
-			boost::mutex::scoped_lock sl(_mtx);
-
-			if(!_netsrv)
-			{
-				return;
-			}
-
-			if(_host.empty())
-			{
-				if(_hasListener)
-				{
-					_netsrv->listen(NULL, 0);
-					_hasListener = false;
-				}
-			}
-			else
-			{
-				if(!_hasListener)
-				{
-					_netsrv->listen(_host.c_str(), _port);
-					_hasListener = true;
-				}
-			}
-		}
 
 	}
 }

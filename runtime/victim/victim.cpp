@@ -4,250 +4,191 @@
 #include "stdafx.h"
 #include <iostream>
 using namespace std;
+#include <boost/bind.hpp>
 
-#include "pgs/meta/cluster.hpp"
+#include "net/asyncService.hpp"
 
-#include "pgs/meta/schemas/TestCategories.hpp"
-#include "pgs/meta/schemas/Mixed.hpp"
-#include "pgs/meta/schemas/ForFields.hpp"
+#include "net/serverSessionManager.hpp"
+#include "net/clientSession.hpp"
 
-#include "pgs/meta/schemas/TestCategories_initializer.hpp"
-#include "pgs/meta/schemas/Mixed_initializer.hpp"
-#include "pgs/meta/schemas/ForFields_initializer.hpp"
+//#define LF std::cout<<__FUNCTION__<<std::endl;
+#define LF 
 
-
-#include "pgc/connection.hpp"
-
-#include "pgs/cluster.hpp"
-#include "pgs/select.hpp"
-#include "pgs/expressionSugar.hpp"
-
-#include "pgs/field.hpp"
-#include "pgs/category.hpp"
-#include "pgs/link.hpp"
+#define PACKETSIZE (rand()%(1024*10))
 
 //////////////////////////////////////////////////////////////////////////
-int _tmain(int argc, _TCHAR* argv[])
+void onThreadStart()
 {
-	//////////////////////////////////////////////////////////////////////////
-	pgs::meta::Cluster mcl;
+	LF;
+}
 
-	mcl.add<pgs::meta::schemas::TestCategories>();
-	mcl.add<pgs::meta::schemas::Mixed>();
-	mcl.add<pgs::meta::schemas::ForFields>();
-	mcl.initialize();
+//////////////////////////////////////////////////////////////////////////
+void onThreadStop()
+{
+	LF;
+}
 
+
+
+
+
+
+net::SPacket randomPacket(size_t size)
+{
+	net::SPacket p;
+	p._size = size;
+	p._data = boost::shared_array<char>(new char[p._size]);
+	for(size_t i(0); i<p._size; i++)
 	{
-		pgs::meta::SchemaCPtr s = mcl.getByName("TestCategories");
-		s->_categories["Document"]->_name;
-		s->_categories["Contract"]->_fields["file"]->_name;
+		p._data[i] = (char)rand();
 	}
+	return p;
+}
 
+
+
+
+void onServerSendOk(net::ServerSession ss);
+void onServerSendFail(boost::system::error_code ec);
+
+//////////////////////////////////////////////////////////////////////////
+void onServerReceiveOk(net::ServerSession ss)
+{
+	ss.send(randomPacket(PACKETSIZE), 
+		boost::bind(onServerSendOk, ss),
+		onServerSendFail);
+
+	static size_t k=0;
+	k++;
+	if(!(k %1000))
 	{
-		pgs::meta::schemas::TestCategoriesCPtr s = mcl.get<pgs::meta::schemas::TestCategories>();
-		s->Contract->file->_name;
-
-// 		BOOST_FOREACH(pgs::meta::CategoryPtr cat, s->_categories)
-// 		{
-// 			cat->_name = "sdfg";
-// 		}
-		int k=220;
+		std::cout<<k<<std::endl;
 	}
+	LF;
+}
+
+//////////////////////////////////////////////////////////////////////////
+void onServerReceiveFail(boost::system::error_code ec)
+{
+	LF;
+}
+
+//////////////////////////////////////////////////////////////////////////
+void onServerSendOk(net::ServerSession ss)
+{
+	ss.receive( 
+		boost::bind(onServerReceiveOk, ss),
+		onServerReceiveFail);
+	LF;
+}
+
+//////////////////////////////////////////////////////////////////////////
+void onServerSendFail(boost::system::error_code ec)
+{
+	LF;
+}
+
+//////////////////////////////////////////////////////////////////////////
+void onServerSessionManagerReady(net::ServerSession ss)
+{
+	ss.send(randomPacket(PACKETSIZE), 
+		boost::bind(onServerSendOk, ss),
+		onServerSendFail);
+	LF;
+}
+
+//////////////////////////////////////////////////////////////////////////
+void onServerSessionManagerError(boost::system::error_code ec)
+{
+	LF;
+}
 
 
 
 
 
-	//////////////////////////////////////////////////////////////////////////
-	pgc::Connection con;
-	con.log(std::cout, pgc::lf_all);
-	con.open("dbname=test user=postgres password=postgres port=5432");
+void onClientSendOk(net::ClientSession cs);
+void onClientSendFail(boost::system::error_code ec);
 
-	pgs::Cluster ccl(mcl);
-	ccl.setUnicators("pref", "suff");
-	ccl.con(con);
+//////////////////////////////////////////////////////////////////////////
+void onClientReceiveOk(net::ClientSession cs)
+{
+	cs.send(randomPacket(PACKETSIZE), 
+		boost::bind(onClientSendOk, cs),
+		onClientSendFail);
 
-	//con.once("BEGIN").exec();
+	LF;
+}
 
-	pgs::TSyncLog log;
-	bool bc = true;//ccl.sync(log, true);
-	bool bd = true;//ccl->drop(log);
+//////////////////////////////////////////////////////////////////////////
+void onClientReceiveFail(boost::system::error_code ec)
+{
+	LF;
+}
 
-	std::cout<<bc<<", "<<bd<<std::endl;
+//////////////////////////////////////////////////////////////////////////
+void onClientSendOk(net::ClientSession cs)
+{
+	cs.receive( 
+		boost::bind(onClientReceiveOk, cs),
+		onClientReceiveFail);
+	LF;
+}
 
-	BOOST_FOREACH(const pgs::SyncLogLine &l, log)
-	{
-		std::cout<<l._msg<<", "<<l._data1<<", "<<l._data2<<", "<<l._data3<<std::endl;
-	}
-
-
-
-
-	pgs::meta::schemas::TestCategoriesCPtr testCats = mcl.get<pgs::meta::schemas::TestCategories>();
-	pgs::Select mysel;
-
-	mysel
-		.from(pgs::Category(testCats->Client, "clientAlias"))
-		.links(pgs::Link("clientAlias", testCats->Client->observableServices, "observableServicesAlias"))
-		.links(pgs::Link("clientAlias", testCats->Client->services, "servicesAlias"))
-
-		.whats(pgs::Category(testCats->Client, "clientAlias"))
-		//.whats(pgs::Field("clientAlias", testCats->Client->name))
-		.whats(pgs::Category(testCats->Service, "servicesAlias"))
-
-		.where(
-			pgs::Field("observableServicesAlias", testCats->Service->description) > pgs::Value("v1") && 
-			pgs::Field("servicesAlias", testCats->ServicePart->id) <= pgs::Value("v2")
-		)
-		.limit(pgs::Value("v3"))
-		.offset(pgs::Value("v4"));
-		
-	//testCats->
-
-	//mysel.exec(con);
-
-	pgs::Statement stmt = mysel.compile(ccl);
-
-// 	stmt.bind(std::string("dgh"), "v1");
-// 	stmt.bind(20, "v2");
-// 	stmt.bind(20, "v3");
-// 	stmt.bind(20, "v4");
-
-// 	std::string s("a");
-// 	stmt.bind(s);
-// 	stmt.bind(20, "v2");
-// 	stmt.bind(20, "v3");
-// 	stmt.bind(1, "v4");
-
-// 	utils::Variant vs("a");
-// 	stmt.bind(vs);
-// 	stmt.bind(utils::Variant(20), "v2");
-// 	stmt.bind(utils::Variant(20), "v3");
-// 	stmt.bind(utils::Variant(1), "v4");
-
-// 	utils::Variant::VectorVariant vv;
-// 	vv.push_back("a");
-// 	vv.push_back(20);
-// 	vv.push_back(20);
-// 	vv.push_back(0);
-// 	stmt.bindList(vv);
-
-	utils::Variant::MapStringVariant msv;
-	msv["v1"] = "a";
-	msv["v2"] = 20;
-	msv["v3"] = 20;
-	msv["v4"] = 0;
-	stmt.bindMap(msv);
-
-	pgs::Result r = stmt.exec();
-
-	std::cout<<r.rows()<<std::endl;
-
-// 	std::cout<<r.fetchString(0)<<std::endl;
-// 	std::cout<<r.fetchString(0,1)<<std::endl;
-// 	std::cout<<r.fetchString(0,2)<<std::endl;
-// 	std::cout<<r.fetchString(0,3)<<std::endl;
-// 	std::cout<<r.fetchString(0,4)<<std::endl;
-// 	std::cout<<r.fetchString(0,5)<<std::endl;
-// 	std::cout<<r.fetchString(0,6)<<std::endl;
-// 	std::cout<<r.fetchString(0,7)<<std::endl;
-// 	std::cout<<r.fetchString(0,8)<<std::endl;
-
-// 	std::cout<<r.fetchString(0)<<std::endl;
-// 	std::cout<<r.fetchString("id")<<std::endl;
-// 	std::cout<<r.fetchString("sex")<<std::endl;
-// 	std::cout<<r.fetchString("birth")<<std::endl;
-// 	std::cout<<r.fetchString("photo")<<std::endl;
-// 	std::cout<<r.fetchString("name")<<std::endl;
-// 	std::cout<<r.fetchString("middlename")<<std::endl;
-// 	std::cout<<r.fetchString("surname")<<std::endl;
-// 	std::cout<<r.fetchString("name")<<std::endl;
-
-	utils::Variant::VectorVariant sum;
-
-	utils::Variant::DequeVariant dv;
-	r.fetchRowList(dv); sum.push_back(dv);
-	std::cout<<dv<<std::endl;
-	r.fetchRowsList(dv); sum.push_back(dv);
-	std::cout<<dv<<std::endl;
-
-	msv;
-	r.fetchRowMap(msv); sum.push_back(msv);
-	std::cout<<msv<<std::endl;
-	r.fetchRowsMap(dv); sum.push_back(dv);
-	std::cout<<dv<<std::endl;
+//////////////////////////////////////////////////////////////////////////
+void onClientSendFail(boost::system::error_code ec)
+{
+	LF;
+}
 
 
-	dv;
-	r.fetchRowList(dv, pgs::Category(testCats->Client, "clientAlias")); sum.push_back(dv);
-	std::cout<<dv<<std::endl;
-	r.fetchRowsList(dv, pgs::Category(testCats->Client, "clientAlias")); sum.push_back(dv);
-	std::cout<<dv<<std::endl;
+//////////////////////////////////////////////////////////////////////////
+void onClientSessionReady(net::ClientSession cs, size_t numChannels)
+{
+	cs.send(randomPacket(PACKETSIZE), 
+		boost::bind(onClientSendOk, cs),
+		onClientSendFail);
 
-	msv;
-	r.fetchRowMap(msv, pgs::Category(testCats->Client, "clientAlias")); sum.push_back(msv);
-	std::cout<<msv<<std::endl;
-	r.fetchRowsMap(dv, pgs::Category(testCats->Client, "clientAlias")); sum.push_back(msv);
-	std::cout<<dv<<std::endl;
+	static int k(0);
+	std::cout<<__FUNCTION__ ": "<<k++<<std::endl;
+	LF;
+}
 
-	utils::Variant v;
-	r.fetch(v, pgs::Field("clientAlias", testCats->Client->middlename)); sum.push_back(v);
-	std::cout<<v<<std::endl;
-	r.fetchColumn(dv, pgs::Field("clientAlias", testCats->Client->middlename)); sum.push_back(dv);
-	std::cout<<dv<<std::endl;
+//////////////////////////////////////////////////////////////////////////
+void onClientSessionError(size_t numChannels, boost::system::error_code ec)
+{
+	LF;
+}
 
-	{
-		utils::Variant::MultisetVariant msv;
-		msv.insert(v);
-		msv.insert("220");
-		msv.insert("220"); sum.push_back(msv);
-		std::cout<<msv<<std::endl;
-	}
+//////////////////////////////////////////////////////////////////////////
+int main(int argc, char* argv[])
+{
+	net::AsyncService nas;
 
-	std::cout<<(v==dv[0]);
-	v = 220;
-	std::cout<<(v==dv[0]);
+	nas.start(10, onThreadStart, onThreadStop);
 
+	net::Connector c1(nas);
+	net::ServerSessionManager ssm(c1, "localhost", "3000");
+	ssm.start(
+		onServerSessionManagerReady,
+		onServerSessionManagerError);
 
+	net::Connector c2(nas);
+	net::ClientSession cs(c2, "localhost", "3000");
+	cs.start(net::nullClientSid, 5,
+		boost::bind(onClientSessionReady, cs, _1),
+		onClientSessionError);
 
+	char ch;
+	std::cin>>ch;
 
-	std::cout<<typeid((char)'c').name()<<std::endl;
-	std::cout<<typeid((signed char)'c').name()<<std::endl;
-	std::cout<<typeid((unsigned char)'c').name()<<std::endl;
-	std::cout<<typeid((boost::int8_t)'c').name()<<std::endl;
-	std::cout<<typeid((boost::uint8_t)'c').name()<<std::endl;
+	ssm.stop();
+	cs.close();
 
-	std::cout<<typeid((short)20).name()<<std::endl;
-	std::cout<<typeid((signed short)20).name()<<std::endl;
-	std::cout<<typeid((unsigned short)20).name()<<std::endl;
-	std::cout<<typeid((boost::int16_t)20).name()<<std::endl;
-	std::cout<<typeid((boost::uint16_t)20).name()<<std::endl;
+	nas.stop();
 
-	std::cout<<typeid((int)20).name()<<std::endl;
-	std::cout<<typeid((signed int)20).name()<<std::endl;
-	std::cout<<typeid((unsigned int)20).name()<<std::endl;
-	std::cout<<typeid((boost::int32_t)20).name()<<std::endl;
-	std::cout<<typeid((boost::uint32_t)20).name()<<std::endl;
-
-	//////////////////////////////////////////////////////////////////////////
-	v = sum;
-	v = 'c';
-	size_t size;
-	boost::shared_array<char> data = v.save(size);
-
-	utils::Variant v2;
-	v2.load(data, size);
-
-	std::cout<<(v==v2);
-
-
-
-
-
-
-	//////////////////////////////////////////////////////////////////////////
-	v2.forceType(utils::Variant::etVoid);
-	v2.forceType<void>();
+	std::cout<<"\n\nall stopped"<<std::endl;
+	std::cin>>ch;
 
 	return 0;
 }

@@ -1,9 +1,7 @@
-#ifndef _PGS_IMPL_ACCESS_HPP_
-#define _PGS_IMPL_ACCESS_HPP_
+#ifndef _UTILS_IMPLACCESS_HPP_
+#define _UTILS_IMPLACCESS_HPP_
 
-#include "pgs/expression.hpp"
-
-namespace pgs
+namespace utils
 {
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
@@ -14,8 +12,8 @@ namespace pgs
 		ImplAccess(const Base &base);
 		ImplAccess(const typename Base::ImplPtr &impl);
 
-		typename Base::ImplPtr impl();
-		operator typename Base::ImplPtr();
+		typename Base::ImplPtr &impl();
+		operator typename Base::ImplPtr &();
 	};
 
 
@@ -35,16 +33,16 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	typename Base::ImplPtr ImplAccess<Base>::impl()
+	typename Base::ImplPtr &ImplAccess<Base>::impl()
 	{
-		return boost::static_pointer_cast<typename Base::ImplPtr::element_type>(_impl);
+		return _impl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	ImplAccess<Base>::operator typename Base::ImplPtr()
+	ImplAccess<Base>::operator typename Base::ImplPtr&()
 	{
-		return boost::static_pointer_cast<typename Base::ImplPtr::element_type>(_impl);
+		return _impl;
 	}
 }
 

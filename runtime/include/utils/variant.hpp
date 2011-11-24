@@ -13,6 +13,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/uuid/uuid.hpp>
 
 #include <vector>
 #include <map>
@@ -72,6 +73,7 @@ namespace utils
 			etListVariant				=36,
 
 			etChar						=37,
+			etUuid						=38,
 		};
 
 	public:
@@ -113,6 +115,7 @@ namespace utils
 		typedef std::deque<Variant>					DequeVariant;
 		typedef std::list<Variant>					ListVariant;
 		typedef char								Char;
+		typedef boost::uuids::uuid					Uuid;
 
 
 	public:
@@ -155,6 +158,7 @@ namespace utils
 		template <> struct Type2Enum<DequeVariant>		{ static const EType et = etDequeVariant;	};
 		template <> struct Type2Enum<ListVariant>		{ static const EType et = etListVariant;	};
 		template <> struct Type2Enum<Char>				{ static const EType et = etChar;	};
+		template <> struct Type2Enum<Uuid>				{ static const EType et = etUuid;	};
 
 	public:
 		~Variant();
@@ -197,6 +201,7 @@ namespace utils
 		Variant(const DequeVariant &v);
 		Variant(const ListVariant &v);
 		Variant(const Char &v);
+		Variant(const Uuid &v);
 
 		//helper
 		Variant(const char *v);
@@ -238,6 +243,7 @@ namespace utils
 		Variant &operator=(const DequeVariant &v);
 		Variant &operator=(const ListVariant &v);
 		Variant &operator=(const Char &v);
+		Variant &operator=(const Uuid &v);
 
 		//helper
 		Variant &operator=(const char *v);
@@ -279,6 +285,7 @@ namespace utils
 		operator DequeVariant &();
 		operator ListVariant &();
 		operator Char &();
+		operator Uuid &();
 
 		//helper
 		operator const char *();
@@ -320,6 +327,7 @@ namespace utils
 		operator DequeVariant const &() const;
 		operator ListVariant const &() const;
 		operator Char const &() const;
+		operator Uuid const &() const;
 
 		void swap(Variant &);
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="victim"
 	ProjectGUID="{9B3DD512-9241-4476-8E36-D0FBDF2EF15F}"
 	RootNamespace="victim"
@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../Win32/Debug/libpgc.lib ../Win32/Debug/libpgs.lib"
+				AdditionalDependencies="../Win32/Debug/libnet.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -202,7 +202,7 @@
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
 				EnableEnhancedInstructionSet="2"
@@ -222,7 +222,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../Win32/Release/libpgs.lib"
+				AdditionalDependencies="../Win32/Release/libnet.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"

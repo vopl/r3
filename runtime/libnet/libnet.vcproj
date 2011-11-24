@@ -178,7 +178,7 @@
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
 				EnableEnhancedInstructionSet="2"
@@ -359,11 +359,27 @@
 				Name="net"
 				>
 				<File
+					RelativePath="..\include\net\asyncService.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\net\channel.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\net\service.hpp"
+					RelativePath="..\include\net\clientSession.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\net\connector.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\net\serverSession.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\net\serverSessionManager.hpp"
 					>
 				</File>
 			</Filter>
@@ -375,7 +391,27 @@
 				Name="net"
 				>
 				<File
-					RelativePath="..\src\net\channelImpl.cpp"
+					RelativePath="..\src\net\asyncService.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\asyncServiceImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\asyncServiceImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\channel.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\channelHubImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\channelHubImpl.hpp"
 					>
 				</File>
 				<File
@@ -383,19 +419,63 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\net\channelSocketImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\channelSocketImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\clientSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\clientSessionImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\clientSessionImpl.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\net\cmaHandler.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\net\service.cpp"
+					RelativePath="..\src\net\connector.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\net\serviceImpl.cpp"
+					RelativePath="..\src\net\connectorImpl.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\net\serviceImpl.hpp"
+					RelativePath="..\src\net\connectorImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionImpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionManagerImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\net\serverSessionManagerImpl.hpp"
 					>
 				</File>
 			</Filter>
