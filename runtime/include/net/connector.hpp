@@ -2,7 +2,7 @@
 #define _NET_CONNECTOR_HPP_
 
 #include "net/channel.hpp"
-#include "net/asyncService.hpp"
+#include "async/service.hpp"
 
 namespace net
 {
@@ -14,7 +14,7 @@ namespace net
 		ImplPtr _impl;
 
 	public:
-		Connector(AsyncService &asrv);
+		Connector(async::Service asrv);
 
 		void listen(
 			const char *host, const char *service,

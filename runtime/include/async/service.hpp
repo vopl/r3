@@ -1,20 +1,21 @@
-#ifndef _NET_ASYNCSERVICE_HPP_
-#define _NET_ASYNCSERVICE_HPP_
+#ifndef _ASYNC_SERVICE_HPP_
+#define _ASYNC_SERVICE_HPP_
 
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+#include <boost/asio/io_service.hpp>
 
-namespace net
+namespace async
 {
-	class AsyncServiceImpl;
-	class AsyncService
+	class ServiceImpl;
+	class Service
 	{
 	protected:
-		typedef boost::shared_ptr<AsyncServiceImpl> ImplPtr;
+		typedef boost::shared_ptr<ServiceImpl> ImplPtr;
 		ImplPtr _impl;
 
 	public:
-		AsyncService();
+		Service();
 
 		void start(
 			size_t numThreads,
@@ -23,6 +24,8 @@ namespace net
 
 		void balance(size_t numThreads);
 		void stop();
+
+		boost::asio::io_service &get_io_service();
 	};
 }
 #endif
