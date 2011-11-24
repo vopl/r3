@@ -129,7 +129,7 @@ namespace net
 
 		if(!isWork)
 		{
-			sw->_fail(ec);
+			sw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
 		}
 	}
 
