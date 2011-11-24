@@ -6,7 +6,7 @@
 using namespace std;
 #include <boost/bind.hpp>
 
-#include "net/asyncService.hpp"
+#include "async/service.hpp"
 
 #include "net/serverSessionManager.hpp"
 #include "net/clientSession.hpp"
@@ -163,7 +163,7 @@ void onClientSessionError(size_t numChannels, boost::system::error_code ec)
 //////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-	net::AsyncService nas;
+	async::Service nas;
 
 	nas.start(10, onThreadStart, onThreadStop);
 

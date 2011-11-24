@@ -1,8 +1,8 @@
-#ifndef _NET_CMAHANDLER_HPP_
-#define _NET_CMAHANDLER_HPP_
+#ifndef _ASYNC_CMAHANDLER_HPP_
+#define _ASYNC_CMAHANDLER_HPP_
 
 
-namespace net
+namespace async
 {
 	template <std::size_t alloc_size>
 	class CmaAllocator

@@ -4,6 +4,7 @@
 #include "net/connector.hpp"
 #include <boost/enable_shared_from_this.hpp>
 #include "channelSocketImpl.hpp"
+#include "async/service.hpp"
 #include <set>
 #include <map>
 
@@ -12,9 +13,6 @@ namespace net
 	using namespace boost;
 	using namespace boost::asio;
 
-	class AsyncServiceImpl;
-	typedef shared_ptr<AsyncServiceImpl> AsyncServiceImplPtr;
-
 	//////////////////////////////////////////////////////////////////////////
 	class ConnectorImpl;
 	typedef shared_ptr<ConnectorImpl> ConnectorImplPtr;
@@ -22,7 +20,7 @@ namespace net
 	class ConnectorImpl
 		: public enable_shared_from_this<ConnectorImpl>
 	{
-		AsyncServiceImplPtr _asrv;
+		async::Service _asrv;
 
 	private:
 		typedef shared_ptr<ip::tcp::resolver> TResolverPtr;
@@ -99,7 +97,7 @@ namespace net
 
 
 	public:
-		ConnectorImpl(const AsyncServiceImplPtr &asrv);
+		ConnectorImpl(async::Service asrv);
 		~ConnectorImpl();
 
 		void listen(

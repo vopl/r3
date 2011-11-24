@@ -13,6 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testpgc", "testpgc\testpgc.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libnet", "libnet\libnet.vcproj", "{4922BEF9-5FC3-4357-BFC0-460C101CEFA3}"
 	ProjectSection(ProjectDependencies) = postProject
+		{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A} = {7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}
 		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F} = {8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}
 	EndProjectSection
 EndProject
@@ -40,6 +41,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpgs", "libpgs\libpgs.vcp
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libutils", "libutils\libutils.vcproj", "{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libasync", "libasync\libasync.vcproj", "{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +98,12 @@ Global
 		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Release|Win32.Build.0 = Release|Win32
 		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Release|x64.ActiveCfg = Release|x64
 		{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}.Release|x64.Build.0 = Release|x64
+		{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}.Debug|Win32.Build.0 = Debug|Win32
+		{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}.Debug|x64.ActiveCfg = Debug|Win32
+		{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}.Release|Win32.ActiveCfg = Release|Win32
+		{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}.Release|Win32.Build.0 = Release|Win32
+		{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

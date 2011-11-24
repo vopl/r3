@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "asyncServiceImpl.hpp"
+#include "serviceImpl.hpp"
 
-namespace net
+namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	void AsyncServiceImpl::workerProc(ServiceWorkerPtr swp)
+	void ServiceImpl::workerProc(ServiceWorkerPtr swp)
 	{
 		boost::function<void ()> func0;
 		{
@@ -40,7 +40,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	AsyncServiceImpl::AsyncServiceImpl()
+	ServiceImpl::ServiceImpl()
 		: _io_service()
 		, _work()
 		, _threadStart()
@@ -49,13 +49,13 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	AsyncServiceImpl::~AsyncServiceImpl()
+	ServiceImpl::~ServiceImpl()
 	{
 		stop();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void AsyncServiceImpl::start(
+	void ServiceImpl::start(
 		size_t numThreads,
 		boost::function<void ()> threadStart,
 		boost::function<void ()> threadStop)
@@ -70,7 +70,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void AsyncServiceImpl::balance(size_t numThreads)
+	void ServiceImpl::balance(size_t numThreads)
 	{
 		std::vector<ServiceWorkerPtr> stopped;
 
@@ -88,7 +88,7 @@ namespace net
 			{
 				ServiceWorkerPtr swp(new ServiceWorker);
 				swp->_stop = false;
-				swp->_thread = boost::thread(boost::bind(&AsyncServiceImpl::workerProc, shared_from_this(), swp));
+				swp->_thread = boost::thread(boost::bind(&ServiceImpl::workerProc, shared_from_this(), swp));
 				_workers.push_back(swp);
 			}
 			_work.reset();
@@ -123,13 +123,13 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void AsyncServiceImpl::stop()
+	void ServiceImpl::stop()
 	{
 		balance(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::asio::io_service &AsyncServiceImpl::get_io_service()
+	boost::asio::io_service &ServiceImpl::get_io_service()
 	{
 		return _io_service;
 	}

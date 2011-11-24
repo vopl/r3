@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libnet"
 	ProjectGUID="{4922BEF9-5FC3-4357-BFC0-460C101CEFA3}"
 	RootNamespace="libnet"
@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libeay32MDd.lib ssleay32MDd.lib ../Win32/Debug/libutils.lib"
+				AdditionalDependencies="libeay32MDd.lib ssleay32MDd.lib ../Win32/Debug/libutils.lib ../Win32/Debug/libasync.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -198,7 +198,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libeay32MD.lib ssleay32MD.lib ../Win32/Release/libutils.lib"
+				AdditionalDependencies="libeay32MD.lib ssleay32MD.lib ../Win32/Release/libutils.lib ../Win32/Release/libasync.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -359,10 +359,6 @@
 				Name="net"
 				>
 				<File
-					RelativePath="..\include\net\asyncService.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\include\net\channel.hpp"
 					>
 				</File>
@@ -390,18 +386,6 @@
 			<Filter
 				Name="net"
 				>
-				<File
-					RelativePath="..\src\net\asyncService.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\net\asyncServiceImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\net\asyncServiceImpl.hpp"
-					>
-				</File>
 				<File
 					RelativePath="..\src\net\channel.cpp"
 					>
@@ -436,10 +420,6 @@
 				</File>
 				<File
 					RelativePath="..\src\net\clientSessionImpl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\net\cmaHandler.hpp"
 					>
 				</File>
 				<File

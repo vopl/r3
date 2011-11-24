@@ -1,19 +1,19 @@
 #include "stdafx.h"
-#include "net/asyncService.hpp"
-#include "asyncServiceImpl.hpp"
+#include "async/service.hpp"
+#include "serviceImpl.hpp"
 #include "utils/implAccess.hpp"
 
-namespace net
+namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	AsyncService::AsyncService()
-		: _impl(new AsyncServiceImpl)
+	Service::Service()
+		: _impl(new ServiceImpl)
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void AsyncService::start(
+	void Service::start(
 		size_t numThreads,
 		boost::function<void ()> threadStart,
 		boost::function<void ()> threadStop)
@@ -22,14 +22,21 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void AsyncService::balance(size_t numThreads)
+	void Service::balance(size_t numThreads)
 	{
 		return _impl->balance(numThreads);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void AsyncService::stop()
+	void Service::stop()
 	{
 		return _impl->stop();
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	boost::asio::io_service &Service::get_io_service()
+	{
+		return _impl->get_io_service();
+	}
+
 }

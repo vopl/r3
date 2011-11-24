@@ -1,15 +1,15 @@
-#ifndef _NET_ASYNCSERVICEIMPL_HPP_
-#define _NET_ASYNCSERVICEIMPL_HPP_
+#ifndef _ASYNC_SERVICEIMPL_HPP_
+#define _ASYNC_SERVICEIMPL_HPP_
 
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
 
-namespace net
+namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	class AsyncServiceImpl
-		: public boost::enable_shared_from_this<AsyncServiceImpl>
+	class ServiceImpl
+		: public boost::enable_shared_from_this<ServiceImpl>
 	{
 		boost::asio::io_service			_io_service;
 		boost::shared_ptr<boost::asio::io_service::work>	_work;
@@ -30,8 +30,8 @@ namespace net
 		boost::mutex _mtx;
 
 	public:
-		AsyncServiceImpl();
-		~AsyncServiceImpl();
+		ServiceImpl();
+		~ServiceImpl();
 
 		void start(
 			size_t numThreads,
@@ -41,9 +41,8 @@ namespace net
 		void balance(size_t numThreads);
 		void stop();
 
-	public:
 		boost::asio::io_service &get_io_service();
 	};
-	typedef boost::shared_ptr<AsyncServiceImpl> AsyncServiceImplPtr;
+	typedef boost::shared_ptr<ServiceImpl> ServiceImplPtr;
 }
 #endif
