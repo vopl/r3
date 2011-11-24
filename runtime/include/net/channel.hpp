@@ -19,11 +19,11 @@ namespace net
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	class ChannelImplBase;
+	class ChannelImpl;
 	class Channel
 	{
 	protected:
-		typedef boost::shared_ptr<ChannelImplBase> ImplPtr;
+		typedef boost::shared_ptr<ChannelImpl> ImplPtr;
 		ImplPtr _impl;
 
 	public:

@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "channelImplSocket.hpp"
+#include "channelSocketImpl.hpp"
 #include "utils/fixEndian.hpp"
 
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImplSocket::STransferStateSend::STransferStateSend(
+	ChannelSocketImpl::STransferStateSend::STransferStateSend(
 		const SPacket &packet, 
-		ChannelImplSocketPtr ch, 
+		ChannelSocketImplPtr ch, 
 		function<void ()> ok,
 		function<void (system::error_code)> fail)
 		: _ok(ok)
@@ -20,8 +20,8 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImplSocket::STransferStateReceive::STransferStateReceive(
-		ChannelImplSocketPtr ch, 
+	ChannelSocketImpl::STransferStateReceive::STransferStateReceive(
+		ChannelSocketImplPtr ch, 
 		function<void (const SPacket &)> ok,
 		function<void (system::error_code)> fail)
 		: _ok(ok)
@@ -33,43 +33,43 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImplSocket::ChannelImplSocket(TSocketPtr socket)
+	ChannelSocketImpl::ChannelSocketImpl(TSocketPtr socket)
 		: _socket(socket)
 		, _strand(socket->get_io_service())
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelImplSocket::~ChannelImplSocket()
+	ChannelSocketImpl::~ChannelSocketImpl()
 	{
 		close();
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImplSocket::receive(
+	void ChannelSocketImpl::receive(
 		function<void (const SPacket &)> ok,
 		function<void (system::error_code)> fail)
 	{
-		STransferStateReceivePtr ts(new STransferStateReceive(static_pointer_cast<ChannelImplSocket>(shared_from_this()), ok, fail));
+		STransferStateReceivePtr ts(new STransferStateReceive(static_pointer_cast<ChannelSocketImpl>(shared_from_this()), ok, fail));
 		onReceive(ts, system::error_code(), 0);
 	}
 
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImplSocket::send(
+	void ChannelSocketImpl::send(
 		const SPacket &p,
 		function<void ()> ok,
 		function<void (system::error_code)> fail)
 	{
-		STransferStateSendPtr ts(new STransferStateSend(p, static_pointer_cast<ChannelImplSocket>(shared_from_this()), ok, fail));
+		STransferStateSendPtr ts(new STransferStateSend(p, static_pointer_cast<ChannelSocketImpl>(shared_from_this()), ok, fail));
 		ts->_header[0] = utils::fixEndian(ts->_packet._size);
 		onSend(ts, system::error_code(), 0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImplSocket::onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size)
+	void ChannelSocketImpl::onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size)
 	{
 		if(ec)
 		{
@@ -87,7 +87,7 @@ namespace net
 				buffer((char *)&ts->_header, sizeof(ts->_header)-ts->_transferedSize), 
 				ts->_ch->_strand.wrap(
 					bind(
-						&ChannelImplSocket::onReceive,
+						&ChannelSocketImpl::onReceive,
 						ts, 
 						_1, _2
 					)
@@ -103,7 +103,7 @@ namespace net
 				buffer(ts->_packet._data.get(), ts->_packet._size), 
 				ts->_ch->_strand.wrap(
 					bind(
-						&ChannelImplSocket::onReceive,
+						&ChannelSocketImpl::onReceive,
 						ts, 
 						_1, _2
 					)
@@ -119,7 +119,7 @@ namespace net
 					ts->_packet._size-dataTransferedSize), 
 				ts->_ch->_strand.wrap(
 					bind(
-						&ChannelImplSocket::onReceive,
+						&ChannelSocketImpl::onReceive,
 						ts, 
 						_1, _2
 					)
@@ -134,7 +134,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImplSocket::onSend(STransferStateSendPtr ts, system::error_code ec, size_t size)
+	void ChannelSocketImpl::onSend(STransferStateSendPtr ts, system::error_code ec, size_t size)
 	{
 		if(ec)
 		{
@@ -158,7 +158,7 @@ namespace net
 				packedData, 
 				ts->_ch->_strand.wrap(
 					bind(
-						&ChannelImplSocket::onSend,
+						&ChannelSocketImpl::onSend,
 						ts, 
 						_1, _2
 					)
@@ -177,7 +177,7 @@ namespace net
 				packedData, 
 				ts->_ch->_strand.wrap(
 					bind(
-						&ChannelImplSocket::onSend,
+						&ChannelSocketImpl::onSend,
 						ts, 
 						_1, _2
 					)
@@ -193,7 +193,7 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelImplSocket::close()
+	void ChannelSocketImpl::close()
 	{
 		boost::system::error_code ec;
 		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);

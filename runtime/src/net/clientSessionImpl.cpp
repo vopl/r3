@@ -197,7 +197,7 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	ClientSessionImplPtr ClientSessionImpl::shared_from_this()
 	{
-		return static_pointer_cast<ClientSessionImpl>(ChannelImplBase::shared_from_this());
+		return static_pointer_cast<ClientSessionImpl>(ChannelImpl::shared_from_this());
 	}
 
 

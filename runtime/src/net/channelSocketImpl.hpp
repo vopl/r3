@@ -1,7 +1,7 @@
-#ifndef _NET_CHANNELIMPLSOCKET_HPP_
-#define _NET_CHANNELIMPLSOCKET_HPP_
+#ifndef _NET_CHANNELSOCKETIMPL_HPP_
+#define _NET_CHANNELSOCKETIMPL_HPP_
 #include "net/channel.hpp"
-#include "channelImplBase.hpp"
+#include "channelImpl.hpp"
 
 namespace net
 {
@@ -12,11 +12,11 @@ namespace net
 	typedef shared_ptr<TSocket> TSocketPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ChannelImplSocket;
-	typedef boost::shared_ptr<ChannelImplSocket> ChannelImplSocketPtr;
+	class ChannelSocketImpl;
+	typedef boost::shared_ptr<ChannelSocketImpl> ChannelSocketImplPtr;
 
-	class ChannelImplSocket
-		: public ChannelImplBase
+	class ChannelSocketImpl
+		: public ChannelImpl
 	{
 		TSocketPtr _socket;
 		io_service::strand _strand;
@@ -26,7 +26,7 @@ namespace net
 		{
 			SPacket									_packet;
 			boost::uint32_t							_header[1];
-			ChannelImplSocketPtr					_ch;
+			ChannelSocketImplPtr					_ch;
 			size_t									_transferedSize;
 			function<void (system::error_code)>		_fail;
 		};
@@ -38,7 +38,7 @@ namespace net
 			function<void ()>						_ok;
 			STransferStateSend(
 				const SPacket &packet, 
-				ChannelImplSocketPtr ch, 
+				ChannelSocketImplPtr ch, 
 				function<void ()> ok,
 				function<void (system::error_code)> fail);
 		};
@@ -50,7 +50,7 @@ namespace net
 		{
 			function<void (const SPacket &)>		_ok;
 			STransferStateReceive(
-				ChannelImplSocketPtr ch, 
+				ChannelSocketImplPtr ch, 
 				function<void (const SPacket &)> ok,
 				function<void (system::error_code)> fail);
 		};
@@ -61,8 +61,8 @@ namespace net
 		static void onSend(STransferStateSendPtr ts, system::error_code ec, size_t size);
 
 	public:
-		ChannelImplSocket(TSocketPtr socket);
-		~ChannelImplSocket();
+		ChannelSocketImpl(TSocketPtr socket);
+		~ChannelSocketImpl();
 		void receive(
 			function<void (const SPacket &)> ok,
 			function<void (system::error_code)> fail);

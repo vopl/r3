@@ -3,7 +3,7 @@
 
 #include "net/connector.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include "channelImplSocket.hpp"
+#include "channelSocketImpl.hpp"
 #include <set>
 #include <map>
 

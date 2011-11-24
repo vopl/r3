@@ -202,7 +202,7 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	ChannelHubImplPtr ChannelHubImpl::shared_from_this()
 	{
-		return static_pointer_cast<ChannelHubImpl>(ChannelImplBase::shared_from_this());
+		return static_pointer_cast<ChannelHubImpl>(ChannelImpl::shared_from_this());
 	}
 
 	//////////////////////////////////////////////////////////////////////////

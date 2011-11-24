@@ -8,7 +8,7 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	ClientSession::ClientSession(Connector connector, const char *host, const char *service)
-		: Channel(ChannelImplBasePtr(new ClientSessionImpl(connector, host, service)))
+		: Channel(ChannelImplPtr(new ClientSessionImpl(connector, host, service)))
 	{
 	}
 

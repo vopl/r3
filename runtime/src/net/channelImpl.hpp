@@ -1,5 +1,5 @@
-#ifndef _NET_CHANNELIMPLBASE_HPP_
-#define _NET_CHANNELIMPLBASE_HPP_
+#ifndef _NET_CHANNELIMPL_HPP_
+#define _NET_CHANNELIMPL_HPP_
 #include "net/channel.hpp"
 
 namespace net
@@ -8,14 +8,14 @@ namespace net
 	using namespace boost::asio;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ChannelImplBase;
-	typedef boost::shared_ptr<ChannelImplBase> ChannelImplBasePtr;
+	class ChannelImpl;
+	typedef boost::shared_ptr<ChannelImpl> ChannelImplPtr;
 
-	class ChannelImplBase
-		: public enable_shared_from_this<ChannelImplBase>
+	class ChannelImpl
+		: public enable_shared_from_this<ChannelImpl>
 	{
 	public:
-		virtual ~ChannelImplBase(){};
+		virtual ~ChannelImpl(){};
 		virtual void receive(
 			function<void (const SPacket &)> ok,
 			function<void (system::error_code)> fail) =0;

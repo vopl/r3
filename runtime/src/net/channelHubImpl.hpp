@@ -1,7 +1,7 @@
 #ifndef _NET_CHANNELHUBIMPL_HPP_
 #define _NET_CHANNELHUBIMPL_HPP_
 
-#include "channelImplBase.hpp"
+#include "channelImpl.hpp"
 #include <set>
 
 namespace net
@@ -10,7 +10,7 @@ namespace net
 	typedef boost::shared_ptr<ChannelHubImpl> ChannelHubImplPtr;
 
 	class ChannelHubImpl
-		: public ChannelImplBase
+		: public ChannelImpl
 	{
 		typedef std::set<Channel> TChannels;
 		TChannels _channels;
