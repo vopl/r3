@@ -84,15 +84,7 @@ namespace net
 			}
 		}
 
-		if(isWork)
-		{
-			sw->_ok();
-		}
-		else
-		{
-			sw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
-		}
-
+		sw->_ok();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -151,6 +143,7 @@ namespace net
 			rp->_channel.receive(
 				bind(&ChannelHubImpl::onRecvOk, shared_from_this(), rp->_channel, _1),
 				bind(&ChannelHubImpl::onRecvFail, shared_from_this(), rp->_channel, _1));
+			_recvChannelsAmount++;
 		}
 	}
 
@@ -161,9 +154,18 @@ namespace net
 		{
 			mutex::scoped_lock sl(_mtxRecv);
 
-			RecvPacketPtr rp(new RecvPacket(p, channel));
-			_recvPackets.push_back(rp);
-			balanceRecvs(rcs);
+			if(_recvChannelsAmount)
+			{
+				_recvChannelsAmount--;
+
+				RecvPacketPtr rp(new RecvPacket(p, channel));
+				_recvPackets.push_back(rp);
+				balanceRecvs(rcs);
+			}
+			else
+			{
+				//хаб закрыт?
+			}
 		}
 
 		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
@@ -183,15 +185,21 @@ namespace net
 		TChannels::iterator iter = _channels.find(channel);
 		if(_channels.end() != iter)
 		{
+			std::cout<<ec.message()<<std::endl;
 			assert(!"log error?");
 
 			_channels.erase(iter);
 
 			mutex::scoped_lock sl2(_mtxSend);
+			mutex::scoped_lock sl3(_mtxRecv);
 			_channelsSend.erase(channel);
 			_channelsSendNot.erase(channel);
 
 			balanceSends();
+
+			assert(_recvChannelsAmount);
+			_recvChannelsAmount--;
+
 		}
 		else
 		{
@@ -207,6 +215,7 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	ChannelHubImpl::ChannelHubImpl()
+		: _recvChannelsAmount(0)
 	{
 	}
 
@@ -275,6 +284,7 @@ namespace net
 				rws.swap(_recvWaiters);
 				_recvPackets.clear();
 			}
+			_recvChannelsAmount = 0;
 		}
 
 		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
@@ -291,15 +301,16 @@ namespace net
 	void ChannelHubImpl::attachChannel(Channel channel)
 	{
 		mutex::scoped_lock sl(_mtxChannels);
-		_channels.insert(channel);
+		mutex::scoped_lock sl2(_mtxSend);
+		mutex::scoped_lock sl3(_mtxRecv);
 
-		{
-			mutex::scoped_lock sl(_mtxSend);
-			_channelsSendNot.insert(channel);
-		}
+		_channels.insert(channel);
+		_channelsSendNot.insert(channel);
+
 		channel.receive(
 			bind(&ChannelHubImpl::onRecvOk, shared_from_this(), channel, _1),
 			bind(&ChannelHubImpl::onRecvFail, shared_from_this(), channel, _1));
+		_recvChannelsAmount++;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

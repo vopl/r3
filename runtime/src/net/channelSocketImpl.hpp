@@ -26,7 +26,6 @@ namespace net
 		{
 			SPacket									_packet;
 			boost::uint32_t							_header[1];
-			ChannelSocketImplPtr					_ch;
 			size_t									_transferedSize;
 			function<void (system::error_code)>		_fail;
 		};
@@ -38,7 +37,6 @@ namespace net
 			function<void ()>						_ok;
 			STransferStateSend(
 				const SPacket &packet, 
-				ChannelSocketImplPtr ch, 
 				function<void ()> ok,
 				function<void (system::error_code)> fail);
 		};
@@ -50,15 +48,17 @@ namespace net
 		{
 			function<void (const SPacket &)>		_ok;
 			STransferStateReceive(
-				ChannelSocketImplPtr ch, 
 				function<void (const SPacket &)> ok,
 				function<void (system::error_code)> fail);
 		};
 		typedef shared_ptr<STransferStateReceive> STransferStateReceivePtr;
 
 	private:
-		static void onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size);
-		static void onSend(STransferStateSendPtr ts, system::error_code ec, size_t size);
+		void onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size);
+		void onSend(STransferStateSendPtr ts, system::error_code ec, size_t size);
+
+	public:
+		ChannelSocketImplPtr shared_from_this();
 
 	public:
 		ChannelSocketImpl(TSocketPtr socket);

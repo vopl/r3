@@ -7,27 +7,23 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	ChannelSocketImpl::STransferStateSend::STransferStateSend(
 		const SPacket &packet, 
-		ChannelSocketImplPtr ch, 
 		function<void ()> ok,
 		function<void (system::error_code)> fail)
 		: _ok(ok)
 	{
 		_packet = packet;
 		_header[0] = 0;
-		_ch = ch;
 		_transferedSize = 0;
 		_fail = fail;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ChannelSocketImpl::STransferStateReceive::STransferStateReceive(
-		ChannelSocketImplPtr ch, 
 		function<void (const SPacket &)> ok,
 		function<void (system::error_code)> fail)
 		: _ok(ok)
 	{
 		_header[0] = 0;
-		_ch = ch;
 		_transferedSize = 0;
 		_fail = fail;
 	}
@@ -51,8 +47,13 @@ namespace net
 		function<void (const SPacket &)> ok,
 		function<void (system::error_code)> fail)
 	{
-		STransferStateReceivePtr ts(new STransferStateReceive(static_pointer_cast<ChannelSocketImpl>(shared_from_this()), ok, fail));
-		onReceive(ts, system::error_code(), 0);
+		STransferStateReceivePtr ts(new STransferStateReceive(ok, fail));
+
+		_strand.dispatch(
+			bind(&ChannelSocketImpl::onReceive, shared_from_this(), 
+				ts, 
+				system::error_code(), 
+				size_t(0)));
 	}
 
 
@@ -63,9 +64,14 @@ namespace net
 		function<void ()> ok,
 		function<void (system::error_code)> fail)
 	{
-		STransferStateSendPtr ts(new STransferStateSend(p, static_pointer_cast<ChannelSocketImpl>(shared_from_this()), ok, fail));
+		STransferStateSendPtr ts(new STransferStateSend(p, ok, fail));
 		ts->_header[0] = utils::fixEndian(ts->_packet._size);
-		onSend(ts, system::error_code(), 0);
+		
+		_strand.dispatch(
+			bind(&ChannelSocketImpl::onSend, shared_from_this(), 
+				ts, 
+				system::error_code(), 
+				size_t(0)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -83,43 +89,54 @@ namespace net
 		ts->_transferedSize += size;
 		if(ts->_transferedSize < sizeof(ts->_header))
 		{
-			ts->_ch->_socket->async_read_some(
+			_socket->async_read_some(
 				buffer((char *)&ts->_header, sizeof(ts->_header)-ts->_transferedSize), 
-				ts->_ch->_strand.wrap(
+				_strand.wrap(
 					bind(
-						&ChannelSocketImpl::onReceive,
+						&ChannelSocketImpl::onReceive, shared_from_this(),
 						ts, 
 						_1, _2
 					)
 				)
 			);
+			return;
 		}
 		else if(ts->_transferedSize == sizeof(ts->_header))
 		{
 			ts->_packet._size = utils::fixEndian(ts->_header[0]);
-			ts->_packet._data.reset(new char[ts->_packet._size]);
+			if(ts->_packet._size)
+			{
+				ts->_packet._data.reset(new char[ts->_packet._size]);
 
-			ts->_ch->_socket->async_read_some(
-				buffer(ts->_packet._data.get(), ts->_packet._size), 
-				ts->_ch->_strand.wrap(
-					bind(
-						&ChannelSocketImpl::onReceive,
-						ts, 
-						_1, _2
+				_socket->async_read_some(
+					buffer(ts->_packet._data.get(), ts->_packet._size), 
+					_strand.wrap(
+						bind(
+							&ChannelSocketImpl::onReceive, shared_from_this(),
+							ts, 
+							_1, _2
+						)
 					)
-				)
-			);
+				);
+				return;
+			}
+			else
+			{
+				ts->_packet._data.reset();
+			}
 		}
-		else if(ts->_transferedSize < sizeof(ts->_header)+ ts->_packet._size)
+		
+		if(ts->_transferedSize < sizeof(ts->_header)+ ts->_packet._size)
 		{
 			size_t dataTransferedSize = ts->_transferedSize-sizeof(ts->_header);
-			ts->_ch->_socket->async_read_some(
+
+			_socket->async_read_some(
 				buffer(
 					ts->_packet._data.get()+dataTransferedSize, 
 					ts->_packet._size-dataTransferedSize), 
-				ts->_ch->_strand.wrap(
+				_strand.wrap(
 					bind(
-						&ChannelSocketImpl::onReceive,
+						&ChannelSocketImpl::onReceive, shared_from_this(),
 						ts, 
 						_1, _2
 					)
@@ -154,11 +171,11 @@ namespace net
 				const_buffers_1(ts->_packet._data.get(), ts->_packet._size), 
 			};
 
-			ts->_ch->_socket->async_write_some(
+			_socket->async_write_some(
 				packedData, 
-				ts->_ch->_strand.wrap(
+				_strand.wrap(
 					bind(
-						&ChannelSocketImpl::onSend,
+						&ChannelSocketImpl::onSend, shared_from_this(),
 						ts, 
 						_1, _2
 					)
@@ -173,11 +190,11 @@ namespace net
 				ts->_packet._data.get()+dataTransferedSize, 
 				ts->_packet._size-dataTransferedSize);
 
-			ts->_ch->_socket->async_write_some(
+			_socket->async_write_some(
 				packedData, 
-				ts->_ch->_strand.wrap(
+				_strand.wrap(
 					bind(
-						&ChannelSocketImpl::onSend,
+						&ChannelSocketImpl::onSend, shared_from_this(),
 						ts, 
 						_1, _2
 					)
@@ -189,6 +206,12 @@ namespace net
 			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
 			ts->_ok();
 		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelSocketImplPtr ChannelSocketImpl::shared_from_this()
+	{
+		return static_pointer_cast<ChannelSocketImpl>(ChannelImpl::shared_from_this());
 	}
 
 

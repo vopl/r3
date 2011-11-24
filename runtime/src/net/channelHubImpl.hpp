@@ -64,6 +64,8 @@ namespace net
 		
 		typedef std::deque<RecvPacketPtr> TRecvPackets;
 		TRecvPackets _recvPackets;
+
+		size_t _recvChannelsAmount;
 		
 		mutex _mtxRecv;
 
