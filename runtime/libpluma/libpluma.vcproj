@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="libasync"
-	ProjectGUID="{7C9B9868-1A24-4CA2-8DA1-1BE237078B9A}"
-	RootNamespace="libasync"
+	Name="libpluma"
+	ProjectGUID="{22CC4AD7-F14E-40E5-BFE0-0D60B85630CD}"
+	RootNamespace="libpluma"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="0"
 			>
@@ -41,12 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				AdditionalIncludeDirectories="../include;../src"
+				PreprocessorDefinitions="PLUMA_STATIC;WIN32;_DEBUG;_LIB;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -80,8 +80,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -105,14 +105,11 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
+				AdditionalIncludeDirectories="../include;../src"
+				PreprocessorDefinitions="PLUMA_STATIC;WIN32;NDEBUG;_LIB;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				EnableEnhancedInstructionSet="2"
-				FloatingPointModel="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -153,40 +150,12 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\targetver.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -198,10 +167,30 @@
 			Name="include"
 			>
 			<Filter
-				Name="async"
+				Name="Pluma"
 				>
 				<File
-					RelativePath="..\include\async\service.hpp"
+					RelativePath="..\include\Pluma\Config.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Pluma\Connector.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Pluma\Host.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Pluma\PluginManager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Pluma\Pluma.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Pluma\Provider.hpp"
 					>
 				</File>
 			</Filter>
@@ -210,22 +199,38 @@
 			Name="src"
 			>
 			<Filter
-				Name="async"
+				Name="Pluma"
 				>
 				<File
-					RelativePath="..\src\async\cmaHandler.hpp"
+					RelativePath="..\src\Pluma\Dir.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\async\service.cpp"
+					RelativePath="..\src\Pluma\Dir.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\async\serviceImpl.cpp"
+					RelativePath="..\src\Pluma\DLibrary.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\async\serviceImpl.hpp"
+					RelativePath="..\src\Pluma\DLibrary.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Pluma\Host.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Pluma\PluginManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Pluma\Provider.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Pluma\uce-dirent.h"
 					>
 				</File>
 			</Filter>
