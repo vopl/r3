@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libutils"
 	ProjectGUID="{8A327FE0-2FDB-4EDA-A70C-858C22A1A90F}"
 	RootNamespace="libutils"
@@ -176,7 +176,7 @@
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_SCL_SECURE_NO_WARNINGS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
 				EnableEnhancedInstructionSet="2"

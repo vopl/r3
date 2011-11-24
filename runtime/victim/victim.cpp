@@ -14,7 +14,7 @@ using namespace std;
 //#define LF std::cout<<__FUNCTION__<<std::endl;
 #define LF 
 
-#define PACKETSIZE 1024*64
+#define PACKETSIZE 4
 
 //////////////////////////////////////////////////////////////////////////
 void onThreadStart()
@@ -58,6 +58,11 @@ void onServerReceiveOk(net::ServerSession ss)
 		boost::bind(onServerSendOk, ss),
 		onServerSendFail);
 
+	static size_t k=0;
+	if(!(k++ %1000))
+	{
+		std::cout<<k<<std::endl;
+	}
 	LF;
 }
 
@@ -159,7 +164,7 @@ int main(int argc, char* argv[])
 {
 	net::AsyncService nas;
 
-	nas.start(20, onThreadStart, onThreadStop);
+	nas.start(8, onThreadStart, onThreadStop);
 
 	net::Connector c1(nas);
 	net::ServerSessionManager ssm(c1, "localhost", "3000");
@@ -169,7 +174,7 @@ int main(int argc, char* argv[])
 
 	//net::Connector c2(nas);
 	net::ClientSession cs(c1, "localhost", "3000");
-	cs.start(net::nullClientSid, 10,
+	cs.start(net::nullClientSid, 5,
 		boost::bind(onClientSessionReady, cs, _1),
 		onClientSessionError);
 
