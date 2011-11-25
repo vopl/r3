@@ -1,28 +1,4 @@
 syntax: regexp
-(/|\\)Debug
-(/|\\)Release
-\.user$
-\.ncb$
-\.opt$
-\.suo$
-\.aps$
-\.log$
-\.orig$
-\.tmp$
-\.cbp$
-\.depend$
-\.layout$
-\.pem$
-\.a$
-\.xme$
-\.mta$
--backup.mga$
-
-^runtime/client/GeneratedFiles
 ^runtime/include/pgs/meta/schemas
-^meta/R3Meta-{
-^runtime/include/r3/data
-^runtime/include/r3/protocol
-syntax: glob
-runtime/src/r3/protocol/serialization.hpp
-runtime/src/r3/protocol/serialization_protocol.cpp
+^runtime/make/vs9
+^runtime/lib
