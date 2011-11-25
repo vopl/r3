@@ -33,9 +33,9 @@ inline Pluma::Pluma(){
 template<typename ProviderType>
 void Pluma::acceptProviderType(){
     PluginManager::registerType(
-        ProviderType::PLUMA_PROVIDER_TYPE,
-        ProviderType::PLUMA_INTERFACE_VERSION,
-        ProviderType::PLUMA_INTERFACE_LOWEST_VERSION
+        ProviderType::PLUMA_PROVIDER_TYPE(),
+        ProviderType::PLUMA_INTERFACE_VERSION(),
+        ProviderType::PLUMA_INTERFACE_LOWEST_VERSION()
     );
 }
 
@@ -43,7 +43,7 @@ void Pluma::acceptProviderType(){
 ////////////////////////////////////////////////////////////
 template<typename ProviderType>
 void Pluma::getProviders(std::vector<ProviderType*>& providers){
-    const std::list<Provider*>* lst = PluginManager::getProviders(ProviderType::PLUMA_PROVIDER_TYPE);
+    const std::list<Provider*>* lst = PluginManager::getProviders(ProviderType::PLUMA_PROVIDER_TYPE());
     if (!lst) return;
     providers.reserve(providers.size() + lst->size());
     std::list<Provider*>::const_iterator it;

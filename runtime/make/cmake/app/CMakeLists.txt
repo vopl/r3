@@ -1,1 +1,1 @@
-ADD_SUBDIRECTORY(victim)
+ADD_SUBDIRECTORY(server)

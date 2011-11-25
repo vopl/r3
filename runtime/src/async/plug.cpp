@@ -2,9 +2,10 @@
 #include "pluma/connector.hpp"
 #include "service.hpp"
 
-//PLUMA_CONNECTOR
-bool connect(pluma::Host& host){
-	// add a keyboard provider to host
+
+PLUMA_CONNECTOR
+bool pluma_connect(pluma::Host& host)
+{
 	host.add( new async::ServiceProvider() );
 	return true;
 }

@@ -53,10 +53,10 @@ bool PluginManager::load(const std::string& path){
     if (!lib) return false;
 
     fnRegisterPlugin* registerFunction;
-    registerFunction = reinterpret_cast<fnRegisterPlugin*>(lib->getSymbol("connect"));
+    registerFunction = reinterpret_cast<fnRegisterPlugin*>(lib->getSymbol("pluma_connect"));
 
     if(!registerFunction){
-        fprintf(stderr, "Failed to initialize plugin \"%s\": connect function not found\n", plugName.c_str());
+        fprintf(stderr, "Failed to initialize plugin \"%s\": pluma_connect function not found\n", plugName.c_str());
         delete lib;
         return false;
     }

@@ -3,8 +3,6 @@
 
 namespace async
 {
-	PLUMA_PROVIDER_SOURCE(IService, 1, 1);
-
 	//////////////////////////////////////////////////////////////////////////
 	void Service::workerProc(ServiceWorkerPtr swp)
 	{

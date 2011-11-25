@@ -29,6 +29,6 @@ PRESETUP_BIN_OUT(SRC_STUB)
 	ADD_LIBRARY(async SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR} ${SRC_PCH})
 	CREATE_PCH(async ${SRC_DIR}/async/pch.h ${SRC_PCH})
 	USE_PCH(async ${SRC_DIR}/async/pch.h ${SRC})
-SETUP_BIN_OUT(async bin)
+SETUP_BIN_OUT(async plug)
 
 TARGET_LINK_LIBRARIES(async pluma utils)

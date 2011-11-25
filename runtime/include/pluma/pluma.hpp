@@ -32,6 +32,8 @@
 #include "pluma/provider.hpp"
 #include "pluma/pluginManager.hpp"
 
+#include <boost/shared_ptr.hpp>
+
 ////////////////////////////////////////////////////////////
 // Andy macro to convert parameter to string
 ////////////////////////////////////////////////////////////
@@ -41,37 +43,30 @@
 // Macro that helps host applications defining
 // their provider classes
 ////////////////////////////////////////////////////////////
-#define PLUMA_PROVIDER_HEADER(TYPE)\
-PLUMA_PROVIDER_HEADER_BEGIN(TYPE)\
-virtual TYPE* create() const = 0;\
+#define PLUMA_PROVIDER_HEADER(TYPE, Version, LowestVersion)\
+PLUMA_PROVIDER_HEADER_BEGIN(TYPE, Version, LowestVersion)\
+	virtual boost::shared_ptr<TYPE> create() const = 0;\
 PLUMA_PROVIDER_HEADER_END
 
 ////////////////////////////////////////////////////////////
 // Macro that generate first part of the provider definition
 ////////////////////////////////////////////////////////////
-#define PLUMA_PROVIDER_HEADER_BEGIN(TYPE)\
+#define PLUMA_PROVIDER_HEADER_BEGIN(TYPE, Version, LowestVersion)\
 class TYPE##Provider: public pluma::Provider{\
 private:\
     friend class pluma::Pluma;\
-    static const unsigned int PLUMA_INTERFACE_VERSION;\
-    static const unsigned int PLUMA_INTERFACE_LOWEST_VERSION;\
-    static const std::string PLUMA_PROVIDER_TYPE;\
-    std::string plumaGetType() const{ return PLUMA_PROVIDER_TYPE; }\
+    static const unsigned int PLUMA_INTERFACE_VERSION(){return Version;}\
+    static const unsigned int PLUMA_INTERFACE_LOWEST_VERSION(){return LowestVersion;}\
+	static const std::string PLUMA_PROVIDER_TYPE(){return PLUMA_2STRING( TYPE );}\
+    std::string plumaGetType() const{ return PLUMA_PROVIDER_TYPE(); }\
 public:\
-    unsigned int getVersion() const{ return PLUMA_INTERFACE_VERSION; }
+    unsigned int getVersion() const{ return PLUMA_INTERFACE_VERSION(); }
 
 ////////////////////////////////////////////////////////////
 // Macro that generate last part of the provider definition
 ////////////////////////////////////////////////////////////
 #define PLUMA_PROVIDER_HEADER_END };
 
-////////////////////////////////////////////////////////////
-// Macro that generate the provider declaration
-////////////////////////////////////////////////////////////
-#define PLUMA_PROVIDER_SOURCE(TYPE, Version, LowestVersion)\
-const std::string TYPE##Provider::PLUMA_PROVIDER_TYPE = PLUMA_2STRING( TYPE );\
-const unsigned int TYPE##Provider::PLUMA_INTERFACE_VERSION = Version;\
-const unsigned int TYPE##Provider::PLUMA_INTERFACE_LOWEST_VERSION = LowestVersion;
 
 
 ////////////////////////////////////////////////////////////
@@ -81,7 +76,7 @@ const unsigned int TYPE##Provider::PLUMA_INTERFACE_LOWEST_VERSION = LowestVersio
 #define PLUMA_INHERIT_PROVIDER(SPECIALIZED_TYPE, BASE_TYPE)\
 class SPECIALIZED_TYPE##Provider: public BASE_TYPE##Provider{\
 public:\
-    BASE_TYPE * create() const{ return new SPECIALIZED_TYPE (); }\
+    boost::shared_ptr<BASE_TYPE> create() const{ return boost::shared_ptr<BASE_TYPE>(new SPECIALIZED_TYPE ()); }\
 };
 
 
