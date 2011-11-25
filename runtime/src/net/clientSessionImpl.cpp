@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "clientSessionImpl.hpp"
 #include <boost/bind.hpp>
 #include "utils/variant.hpp"

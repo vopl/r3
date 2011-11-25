@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "channelSocketImpl.hpp"
 #include "utils/fixEndian.hpp"
 

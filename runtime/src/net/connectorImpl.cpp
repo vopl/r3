@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "connectorImpl.hpp"
 #include "channelSocketImpl.hpp"
 

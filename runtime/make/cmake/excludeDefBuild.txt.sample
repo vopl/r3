@@ -1,0 +1,3 @@
+#rename this file to "excludeDefBuild.txt"
+
+#	SET_TARGET_PROPERTIES(tmcon		PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD on)
