@@ -1,15 +1,15 @@
-#ifndef _ASYNC_SERVICEIMPL_HPP_
-#define _ASYNC_SERVICEIMPL_HPP_
+#ifndef _ASYNC_SERVICE_HPP_
+#define _ASYNC_SERVICE_HPP_
 
-#include <boost/shared_ptr.hpp>
+#include "async/iservice.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/function.hpp>
 
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	class ServiceImpl
-		: public boost::enable_shared_from_this<ServiceImpl>
+	class Service
+		: public IService
+		, public boost::enable_shared_from_this<Service>
 	{
 		boost::asio::io_service			_io_service;
 		boost::shared_ptr<boost::asio::io_service::work>	_work;
@@ -30,19 +30,19 @@ namespace async
 		boost::mutex _mtx;
 
 	public:
-		ServiceImpl();
-		~ServiceImpl();
+		Service();
+		~Service();
 
-		void start(
+		virtual void start(
 			size_t numThreads,
 			boost::function<void ()> threadStart,
 			boost::function<void ()> threadStop);
 
-		void balance(size_t numThreads);
-		void stop();
+		virtual void balance(size_t numThreads);
+		virtual void stop();
 
-		boost::asio::io_service &get_io_service();
+		virtual boost::asio::io_service &get_io_service();
 	};
-	typedef boost::shared_ptr<ServiceImpl> ServiceImplPtr;
+	PLUMA_INHERIT_PROVIDER(Service, IService);
 }
 #endif
