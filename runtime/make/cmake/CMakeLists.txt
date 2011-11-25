@@ -5,9 +5,9 @@ INCLUDE(Setup.cmake)
 #SET(CMAKE_SHARED_LIBRARY_PREFIX ../../bin/)
 
 
-ADD_SUBDIRECTORY(apps)
-ADD_SUBDIRECTORY(libs)
-ADD_SUBDIRECTORY(plugs)
+ADD_SUBDIRECTORY(app)
+ADD_SUBDIRECTORY(lib)
+ADD_SUBDIRECTORY(plug)
 
 #INCLUDE(CMakePrintSystemInformation)
 #INCLUDE(CMakeExportBuildSettings)
