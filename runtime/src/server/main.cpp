@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 #ifdef WIN32
 			if(_kbhit())
 			{
-				char ch = (char)POSIXISO(getch)();
+				char ch = (char)_getch();
 				switch(ch)
 				{
 #else
