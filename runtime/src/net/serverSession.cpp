@@ -1,19 +1,19 @@
-#include "stdafx.h"
-#include "net/serverSession.hpp"
-#include "serverSessionImpl.hpp"
+#include "pch.h"
+#include "serverSession.hpp"
 
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
-	ServerSession::ServerSession(ImplPtr impl)
-		: Channel(impl)
+	ServerSession::ServerSession(TServerSid sid)
+		: _sid(sid)
 	{
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	TServerSid ServerSession::sid()
 	{
-		return static_pointer_cast<ServerSessionImpl>(_impl)
-			->sid();
+		assert(0);
+		return nullServerSid;
 	}
 }

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "utils/variant.hpp"
 #include <new>
 
@@ -232,13 +232,13 @@ template void Variant::forceType<Variant::Void>();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::shared_array<char> Variant::save(size_t &size) const
+	boost::shared_array<char> Variant::save(boost::uint32_t &size) const
 	{
 		return CIMPL->save(size);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	bool Variant::load(boost::shared_array<char> data, size_t size)
+	bool Variant::load(boost::shared_array<char> data, boost::uint32_t size)
 	{
 		return IMPL->load(data, size);
 	}
