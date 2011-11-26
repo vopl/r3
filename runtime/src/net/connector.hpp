@@ -1,12 +1,12 @@
-#ifndef _NET_CONNECTORIMPL_HPP_
-#define _NET_CONNECTORIMPL_HPP_
+#ifndef _NET_CONNECTOR_HPP_
+#define _NET_CONNECTOR_HPP_
 
-#include "net/connector.hpp"
+#include "net/iconnector.hpp"
+#include "async/iservice.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include "channelSocketImpl.hpp"
-#include "async/service.hpp"
 #include <set>
 #include <map>
+#include "channelSocket.hpp"
 
 namespace net
 {
@@ -14,30 +14,30 @@ namespace net
 	using namespace boost::asio;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ConnectorImpl;
-	typedef shared_ptr<ConnectorImpl> ConnectorImplPtr;
+	class Connector;
+	typedef shared_ptr<Connector> ConnectorPtr;
 
-	class ConnectorImpl
-		: public enable_shared_from_this<ConnectorImpl>
+	class Connector
+		: public enable_shared_from_this<Connector>
 	{
-		async::Service _asrv;
+		async::IServicePtr _asrv;
 
 	private:
 		typedef shared_ptr<ip::tcp::resolver> TResolverPtr;
 		typedef shared_ptr<ip::tcp::acceptor> TAcceptorPtr;
 		typedef ssl::context TSslContext;
+		typedef shared_ptr<TSslContext> TSslContextPtr;
 
-		TSslContext	_sslContext;
+		TSslContextPtr	_sslContext;
 
 	private:
 		typedef std::pair<std::string, std::string> TAddr;
 		struct SListenState
 		{
-			ConnectorImplPtr						_self;
 			TAddr									_addr;
 			TResolverPtr							_resolver;
 			TAcceptorPtr							_acceptor;
-			function<void (Channel)>				_ok;
+			function<void (IChannelPtr)>			_ok;
 			function<void (system::error_code)>		_fail;
 		};
 		typedef shared_ptr<SListenState> SListenStatePtr;
@@ -53,41 +53,40 @@ namespace net
 
 		struct SConnectState
 		{
-			ConnectorImplPtr						_self;
 			TResolverPtr							_resolver;
-			function<void (Channel)>				_ok;
+			function<void (IChannelPtr)>			_ok;
 			function<void (system::error_code)>		_fail;
 		};
 		typedef shared_ptr<SConnectState> SConnectStatePtr;
 
 	private:
 		static std::string onSslPassword();
-		static void onListenResolve(
+		void onListenResolve(
 			SListenStatePtr ls, 
 			const system::error_code& ec,
 			ip::tcp::resolver::iterator iterator);
 
-		static void onListenAccept(
+		void onListenAccept(
 			SListenStatePtr ls, 
 			const system::error_code& ec,
 			TSocketPtr socket);
 
-		static void onListenHandshake(
+		void onListenHandshake(
 			SListenStatePtr ls, 
 			const system::error_code& ec,
 			TSocketPtr socket);
 
-		static void onConnectResolve(
+		void onConnectResolve(
 			SConnectStatePtr cs, 
 			const system::error_code& ec,
 			ip::tcp::resolver::iterator iterator);
 
-		static void onConnect(
+		void onConnect(
 			SConnectStatePtr cs, 
 			const system::error_code& ec,
 			TSocketPtr socket);
 
-		static void onConnectHandshake(
+		void onConnectHandshake(
 			SConnectStatePtr cs, 
 			const system::error_code& ec,
 			TSocketPtr socket);
@@ -97,19 +96,21 @@ namespace net
 
 
 	public:
-		ConnectorImpl(async::Service asrv);
-		~ConnectorImpl();
+		Connector();
+		~Connector();
+
+		virtual void initialize(async::IServicePtr asrv);
 
 		void listen(
 			const char *host, const char *service,
-			function<void (Channel)> ok,
+			function<void (IChannelPtr)> ok,
 			function<void (system::error_code)> fail);
 
 		bool unlisten(const char *host, const char *service);
 
 		void connect(
 			const char *host, const char *service,
-			function<void (Channel)> ok,
+			function<void (IChannelPtr)> ok,
 			function<void (system::error_code)> fail);
 	};
 }

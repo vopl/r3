@@ -20,10 +20,10 @@ namespace async
 
 		virtual boost::asio::io_service &get_io_service() =0;
 	};
-	
+	typedef boost::shared_ptr<IService> IServicePtr;
+
 	//////////////////////////////////////////////////////////////////////////
 	PLUMA_PROVIDER_HEADER(IService, 1, 1);
 
-	typedef boost::shared_ptr<IService> IServicePtr;
 }
 #endif

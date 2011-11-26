@@ -1,7 +1,6 @@
-#ifndef _NET_CHANNELSOCKETIMPL_HPP_
-#define _NET_CHANNELSOCKETIMPL_HPP_
-#include "net/channel.hpp"
-#include "channelImpl.hpp"
+#ifndef _NET_CHANNELSOCKET_HPP_
+#define _NET_CHANNELSOCKET_HPP_
+#include "net/ichannel.hpp"
 
 namespace net
 {
@@ -12,11 +11,12 @@ namespace net
 	typedef shared_ptr<TSocket> TSocketPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ChannelSocketImpl;
-	typedef boost::shared_ptr<ChannelSocketImpl> ChannelSocketImplPtr;
+	class ChannelSocket;
+	typedef boost::shared_ptr<ChannelSocket> ChannelSocketPtr;
 
-	class ChannelSocketImpl
-		: public ChannelImpl
+	class ChannelSocket
+		: public IChannel
+		, public enable_shared_from_this<ChannelSocket>
 	{
 		TSocketPtr _socket;
 		io_service::strand _strand;
@@ -58,11 +58,8 @@ namespace net
 		void onSend(STransferStateSendPtr ts, system::error_code ec, size_t size);
 
 	public:
-		ChannelSocketImplPtr shared_from_this();
-
-	public:
-		ChannelSocketImpl(TSocketPtr socket);
-		~ChannelSocketImpl();
+		ChannelSocket(TSocketPtr socket);
+		~ChannelSocket();
 		void receive(
 			function<void (const SPacket &)> ok,
 			function<void (system::error_code)> fail);
