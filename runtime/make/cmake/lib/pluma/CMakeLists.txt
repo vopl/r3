@@ -8,6 +8,7 @@ SET(INCLUDE
 	${INC_DIR}/pluma/pluma.hpp
 	${INC_DIR}/pluma/pluma.inl
 	${INC_DIR}/pluma/provider.hpp
+	${INC_DIR}/pluma/heap.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -17,6 +18,8 @@ SET(SRC
 	${SRC_DIR}/pluma/host.cpp
 	${SRC_DIR}/pluma/pluginManager.cpp
 	${SRC_DIR}/pluma/provider.cpp
+	${SRC_DIR}/pluma/heap.cpp
+	${SRC_DIR}/plumaNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 

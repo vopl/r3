@@ -16,8 +16,14 @@ SET(SRC
 	${SRC_DIR}/net/connector.cpp
 	${SRC_DIR}/net/serverSession.cpp
 	${SRC_DIR}/net/serverSessionManager.cpp
+	${SRC_DIR}/net/plug.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
+
+SET(SRC_NOPCH
+	${SRC_DIR}/plumaNewDelete.cpp
+)
+SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
 SET(SRC_HDR
 	${SRC_DIR}/net/serverSession.hpp
@@ -38,7 +44,7 @@ SOURCE_GROUP(src FILES ${SRC_PCH})
 
 
 PRESETUP_BIN_OUT(SRC_STUB)
-	ADD_LIBRARY(net SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR} ${SRC_PCH})
+	ADD_LIBRARY(net SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 	CREATE_PCH(net ${SRC_DIR}/net/pch.h ${SRC_PCH})
 	USE_PCH(net ${SRC_DIR}/net/pch.h ${SRC})
 SETUP_BIN_OUT(net plug)

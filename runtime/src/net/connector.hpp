@@ -18,7 +18,8 @@ namespace net
 	typedef shared_ptr<Connector> ConnectorPtr;
 
 	class Connector
-		: public enable_shared_from_this<Connector>
+		: public IConnector
+		, public enable_shared_from_this<Connector>
 	{
 		async::IServicePtr _asrv;
 
@@ -113,5 +114,7 @@ namespace net
 			function<void (IChannelPtr)> ok,
 			function<void (system::error_code)> fail);
 	};
+
+	PLUMA_INHERIT_PROVIDER(Connector, IConnector);
 }
 #endif

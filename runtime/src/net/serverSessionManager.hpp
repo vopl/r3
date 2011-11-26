@@ -15,7 +15,7 @@ namespace net
 	typedef boost::shared_ptr<ServerSessionManager> ServerSessionManagerPtr;
 
 	class ServerSessionManager
-		: IServerSessionManager
+		: public IServerSessionManager
 		, public enable_shared_from_this<ServerSessionManager>
 	{
 		IConnectorPtr	_connector;
@@ -52,5 +52,7 @@ namespace net
 
 		virtual void stop();
 	};
+
+	PLUMA_INHERIT_PROVIDER(ServerSessionManager, IServerSessionManager);
 }
 #endif

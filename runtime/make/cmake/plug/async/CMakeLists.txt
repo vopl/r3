@@ -11,6 +11,11 @@ SET(SRC
 )
 SOURCE_GROUP(src FILES ${SRC})
 
+SET(SRC_NOPCH
+	${SRC_DIR}/plumaNewDelete.cpp
+)
+SOURCE_GROUP(src FILES ${SRC_NOPCH})
+
 SET(SRC_HDR
 	${SRC_DIR}/async/service.hpp
 	${SRC_DIR}/async/cmaHandler.hpp
@@ -26,7 +31,7 @@ SOURCE_GROUP(src FILES ${SRC_PCH})
 
 
 PRESETUP_BIN_OUT(SRC_STUB)
-	ADD_LIBRARY(async SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR} ${SRC_PCH})
+	ADD_LIBRARY(async SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 	CREATE_PCH(async ${SRC_DIR}/async/pch.h ${SRC_PCH})
 	USE_PCH(async ${SRC_DIR}/async/pch.h ${SRC})
 SETUP_BIN_OUT(async plug)

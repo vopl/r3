@@ -62,5 +62,6 @@ namespace net
 		virtual TClientSid sid();
 
 	};
+	PLUMA_INHERIT_PROVIDER(ClientSession, IClientSession);
 }
 #endif

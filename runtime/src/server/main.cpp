@@ -2,6 +2,9 @@
 #include <signal.h>
 #include "pluma/pluma.hpp"
 #include "async/iservice.hpp"
+#include "net/iconnector.hpp"
+#include "net/iserverSessionManager.hpp"
+#include "net/iclientSession.hpp"
 #include <boost/thread.hpp>
 
 volatile bool bStop = false;
@@ -27,6 +30,9 @@ int main(int argc, char* argv[])
 		pluma::Pluma plugins;
 		// Tell plugins manager to accept providers of the type DeviceProvider
 		plugins.acceptProviderType<async::IServiceProvider>();
+		plugins.acceptProviderType<net::IConnectorProvider>();
+		plugins.acceptProviderType<net::IServerSessionManagerProvider>();
+		plugins.acceptProviderType<net::IClientSessionProvider>();
 		// Load library "standard_devices" from folder "plugins"
 		plugins.loadFromFolder("../plug");
 
