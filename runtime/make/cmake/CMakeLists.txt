@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
 PROJECT(r3)
 
 INCLUDE(Setup.cmake)
@@ -20,16 +20,16 @@ INCLUDE(excludeDefBuild.txt OPTIONAL)
 
 ################### boost
 
-SET(Boost_USE_STATIC_LIBS        ON)
+#SET(Boost_USE_STATIC_LIBS        ON)
 SET(Boost_USE_MULTITHREADED      ON)
-SET(Boost_USE_STATIC_RUNTIME     ON)
+#SET(Boost_USE_STATIC_RUNTIME     ON)
 
-FIND_PACKAGE( Boost 1.36.0 COMPONENTS date_time filesystem system)
+FIND_PACKAGE( Boost 1.42.0 COMPONENTS date_time filesystem system thread serialization)
 IF(NOT Boost_FOUND)
-	MESSAGE(FATAL_ERROR "Boost required")
+	MESSAGE(FATAL_ERROR "Boost 1.42.0 required")
 ENDIF()
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+#LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
 
 

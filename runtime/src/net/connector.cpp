@@ -201,7 +201,7 @@ namespace net
 			}
 			else
 			{
-				BOOST_FOREACH(SListenStatePtr &ls, s)
+				BOOST_FOREACH(const SListenStatePtr &ls, s)
 				{
 					if(ls->_acceptor)
 					{

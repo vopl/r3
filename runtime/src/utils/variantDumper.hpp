@@ -176,7 +176,7 @@ namespace utils
 		ostr<<"[\n";
 		level++;
 
-		BOOST_FOREACH(Container::const_reference v, c)
+		BOOST_FOREACH(typename Container::const_reference v, c)
 		{
 			dumpOstr_indent(ostr, level, false);
 			dumpOstr(ostr, v, level, true);
@@ -198,7 +198,7 @@ namespace utils
 		ostr<<"{\n";
 		level++;
 
-		BOOST_FOREACH(Container::const_reference v, c)
+		BOOST_FOREACH(typename Container::const_reference v, c)
 		{
 			dumpOstr_indent(ostr, level, false);
 			dumpOstr(ostr, v.first, level, true);

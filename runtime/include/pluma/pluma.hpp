@@ -123,7 +123,7 @@ public:
     void getProviders(std::vector<ProviderType*>& providers);
 };
 
-#include <Pluma/Pluma.inl>
+#include "pluma/pluma.inl"
 
 }
 

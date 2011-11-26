@@ -28,8 +28,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <Pluma/Config.hpp>
-#include <Pluma/Provider.hpp>
+#include "pluma/config.hpp"
+#include "pluma/provider.hpp"
 
 #include <vector>
 #include <list>

@@ -18,36 +18,51 @@
 #include <boost/archive/impl/basic_binary_iprimitive.ipp>
 #include <boost/archive/impl/basic_binary_iarchive.ipp>
 
-namespace utils {
-namespace serialization {
 
-// explicitly instantiate for this type of stream
-template class boost::archive::detail::archive_serializer_map<naked_binary_portable_iarchive>;
-template class boost::archive::basic_binary_iprimitive<
-    naked_binary_portable_iarchive,
-    std::istream::char_type, 
-    std::istream::traits_type
->;
-template class boost::archive::basic_binary_iarchive<naked_binary_portable_iarchive> ;
-template class binary_portable_iarchive_impl<
-    naked_binary_portable_iarchive, 
-    std::istream::char_type, 
-    std::istream::traits_type
->;
 
-// explicitly instantiate for this type of stream
-template class boost::archive::detail::archive_serializer_map<binary_portable_iarchive>;
-template class boost::archive::basic_binary_iprimitive<
-    binary_portable_iarchive,
-    std::istream::char_type, 
-    std::istream::traits_type
->;
-template class boost::archive::basic_binary_iarchive<binary_portable_iarchive> ;
-template class binary_portable_iarchive_impl<
-    binary_portable_iarchive, 
-    std::istream::char_type, 
-    std::istream::traits_type
->;
 
-} 
+namespace boost
+{ 
+	namespace archive
+{ 
+	namespace detail
+	{
+		// explicitly instantiate for this type of stream
+		template class archive_serializer_map<utils::serialization::naked_binary_portable_iarchive>;
+		// explicitly instantiate for this type of stream
+		template class archive_serializer_map<utils::serialization::binary_portable_iarchive>;
+		}
+
+		template class basic_binary_iprimitive<
+			utils::serialization::naked_binary_portable_iarchive,
+			std::istream::char_type, 
+			std::istream::traits_type
+		>;
+		template class basic_binary_iarchive<utils::serialization::naked_binary_portable_iarchive> ;
+		template class basic_binary_iprimitive<
+			utils::serialization::binary_portable_iarchive,
+			std::istream::char_type, 
+			std::istream::traits_type
+		>;
+		template class boost::archive::basic_binary_iarchive<utils::serialization::binary_portable_iarchive> ;
+	}
+}
+
+namespace utils
+{
+	namespace serialization
+	{
+		template class binary_portable_iarchive_impl<
+			naked_binary_portable_iarchive, 
+			std::istream::char_type, 
+			std::istream::traits_type
+		>;
+
+		template class binary_portable_iarchive_impl<
+			binary_portable_iarchive, 
+			std::istream::char_type, 
+			std::istream::traits_type
+		>;
+
+	} 
 } 

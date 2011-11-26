@@ -282,12 +282,12 @@ namespace net
 		_isStarted = false;
 
 		_waitConnections = 0;
-		BOOST_FOREACH(IChannelPtr &c, _waitConnectionsChannels)
+		BOOST_FOREACH(const IChannelPtr &c, _waitConnectionsChannels)
 		{
 			c->close();
 		}
 		_waitConnectionsChannels.clear();
-		ChannelHub::close();
+		ChannelHub<IClientSession>::close();
 
 		_connector.reset();
 		_host.clear();

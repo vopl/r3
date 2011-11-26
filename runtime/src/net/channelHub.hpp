@@ -119,8 +119,8 @@ namespace net
 
 				channel->send(
 					sw->_packet, 
-					bind(&ChannelHub::onSendOk, shared_from_this(), channel, sw),
-					bind(&ChannelHub::onSendFail, shared_from_this(), channel, sw, _1));
+					bind(&ChannelHub::onSendOk, ChannelHub<Base>::shared_from_this(), channel, sw),
+					bind(&ChannelHub::onSendFail, ChannelHub<Base>::shared_from_this(), channel, sw, _1));
 				_channelsSend.insert(channel);
 			}
 		}
@@ -203,8 +203,8 @@ namespace net
 				rcs.push_back(rc);
 
 				rp->_channel->receive(
-					bind(&ChannelHub::onRecvOk, shared_from_this(), rp->_channel, _1),
-					bind(&ChannelHub::onRecvFail, shared_from_this(), rp->_channel, _1));
+					bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), rp->_channel, _1),
+					bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), rp->_channel, _1));
 				_recvChannelsAmount++;
 			}
 		}
@@ -327,7 +327,7 @@ namespace net
 				mutex::scoped_lock sl2(_mtxSend);
 				mutex::scoped_lock sl3(_mtxRecv);
 
-				BOOST_FOREACH(IChannelPtr &ch, _channels)
+				BOOST_FOREACH(const IChannelPtr &ch, _channels)
 				{
 					ch->close();
 				}
@@ -346,11 +346,11 @@ namespace net
 				_recvChannelsAmount = 0;
 			}
 
-			BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
+			BOOST_FOREACH(const RecvCallbackPtr &rc, rcs)
 			{
 				rc->_ok(rc->_packet);
 			}
-			BOOST_FOREACH(RecvWaiterPtr &rw, rws)
+			BOOST_FOREACH(const RecvWaiterPtr &rw, rws)
 			{
 				rw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
 			}
@@ -367,8 +367,8 @@ namespace net
 			_channelsSendNot.insert(channel);
 
 			channel->receive(
-				bind(&ChannelHub::onRecvOk, shared_from_this(), channel, _1),
-				bind(&ChannelHub::onRecvFail, shared_from_this(), channel, _1));
+				bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), channel, _1),
+				bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), channel, _1));
 			_recvChannelsAmount++;
 		}
 

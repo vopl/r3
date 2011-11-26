@@ -4,9 +4,12 @@
 #include "net/iserverSessionManager.hpp"
 #include "net/iclientSession.hpp"
 
-#include <conio.h>
+#ifdef WIN32
+#	include <conio.h>
+#else
+#	include <poll.h>
+#endif
 #include <signal.h>
-#include <boost/thread.hpp>
 #include <iostream>
 
 
@@ -25,7 +28,11 @@ int main(int argc, char* argv[])
 	signal(SIGSEGV, onSignal);
 	signal(SIGTERM, onSignal);
 	signal(SIGABRT, onSignal);
+#ifdef WIN32
 	signal(SIGBREAK, onSignal);
+#else
+	signal(SIGKILL, onSignal);
+#endif
 
 	try
 	{
@@ -46,14 +53,31 @@ int main(int argc, char* argv[])
 
 		async::IServicePtr asrv(providers.front()->create());
 		asrv->balance(4);
+
+		//////////////////////////////////////////////////////////////////////////
+#ifdef WIN32
+#else
+		pollfd stdin_pfd[1]={0, POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI,0};
+#endif
 		do
 		{
-
+#ifdef WIN32
 			if(_kbhit())
 			{
-				char ch=_getch();
+				char ch = (char)POSIXISO(getch)();
 				switch(ch)
 				{
+#else
+			if(0<poll(stdin_pfd,1,0))
+			{
+				char ch;
+				if(1 > read(0, &ch, 1))
+				{
+					break;
+				}
+				switch(ch)
+				{
+#endif
 				case 'e':
 					bStop = true;
 					std::cout<<"exit"<<std::endl;
@@ -63,10 +87,10 @@ int main(int argc, char* argv[])
 					break;
 				}
 			}
-			else
-			{
-				boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
-			}
+			// else
+			// {
+				// boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
+			// }
 		} while(!bStop);
 
 		asrv->stop();

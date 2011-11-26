@@ -12,7 +12,6 @@ SOURCE_GROUP(include FILES ${INCLUDE})
 SET(SRC
 	${SRC_DIR}/net/channelSocket.cpp
 	${SRC_DIR}/net/clientSession.cpp
-	${SRC_DIR}/net/clientSession.cpp
 	${SRC_DIR}/net/connector.cpp
 	${SRC_DIR}/net/serverSession.cpp
 	${SRC_DIR}/net/serverSessionManager.cpp
@@ -58,3 +57,8 @@ IF(NOT OPENSSL_FOUND)
 ENDIF()
 INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
 TARGET_LINK_LIBRARIES(net ${OPENSSL_LIBRARIES})
+TARGET_LINK_LIBRARIES(net ${Boost_LIBRARIES})
+
+SET(CMAKE_THREAD_PREFER_PTHREAD ON)
+INCLUDE(FindThreads)
+TARGET_LINK_LIBRARIES(net ${CMAKE_THREAD_LIBS_INIT})

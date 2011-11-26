@@ -47,7 +47,8 @@ SET(SRC_DIR ${ROOT_DIR}/src)
 SET(INC_DIR ${ROOT_DIR}/include)
 SET(DOC_DIR ${ROOT_DIR}/doc)
 SET(BIN_DIR ${ROOT_DIR}/bin)
-SET(MLIB_DIR ${ROOT_DIR}/mlib)
+SET(LIB_DIR ${ROOT_DIR}/lib)
+SET(PLUG_DIR ${ROOT_DIR}/plug)
 
 
 
@@ -71,12 +72,16 @@ IF(CMAKE_SYSTEM MATCHES "FreeBSD*")
 	SET(FREEBSD 1)
 	ADD_DEFINITIONS(-DOS_FREEBSD)
 ENDIF(CMAKE_SYSTEM MATCHES "FreeBSD*")
+IF(CMAKE_SYSTEM MATCHES "Linux*")
+	SET(LINUX 1)
+	ADD_DEFINITIONS(-DOS_LINUX)
+ENDIF(CMAKE_SYSTEM MATCHES "Linux*")
 
-IF(WINDOWS OR SOLARIS OR FREEBSD)
+IF(WINDOWS OR SOLARIS OR FREEBSD OR LINUX)
 	MESSAGE(STATUS "System in use: ${CMAKE_SYSTEM}")
 ELSE(WINDOWS OR SOLARIS OR FREEBSD)
 	MESSAGE(SEND_ERROR "WARNING!!! Unknown system: ${CMAKE_SYSTEM}")
-ENDIF(WINDOWS OR SOLARIS OR FREEBSD)
+ENDIF(WINDOWS OR SOLARIS OR FREEBSD OR LINUX)
 
 
 
@@ -173,11 +178,18 @@ ENDIF(MSVC)
 
 
 #######################################################################################
-IF(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
-	#need for correct resolving symbols with dlsym
-	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -symbolic")
-ENDIF(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
+#IF(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
+#	#need for correct resolving symbols with dlsym
+#	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -symbolic")
+#ENDIF(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
 
+
+#######################################################################################
+IF(CMAKE_COMPILER_IS_GNUCXX)
+	#need for correct resolving symbols with dlsym
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 
 
@@ -246,20 +258,20 @@ ELSE(MSVC)
 
 		GET_DIRECTORY_PROPERTY(DEFS DEFINITIONS)
 
-		SET(PCH_BUILD_COMMAND "${CMAKE_CXX_COMPILER} -fPIC ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${DEFS} ${header}")
+		SET(PCH_BUILD_COMMAND "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${DEFS} ${header}")
 		
 		SET(target_pch ${target}_build_pch)
 
 		ADD_CUSTOM_COMMAND(OUTPUT ${pchfile} COMMAND sh -c "${PCH_BUILD_COMMAND}" DEPENDS ${header})
 
-		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch" )
+		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch -fPIC" )
 		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES OBJECT_DEPENDS ${pchfile} )
 	ENDMACRO(CREATE_PCH)
 
 	MACRO(USE_PCH target header srcfile)
 		PCH_KEY2FILENAME(pchfile key ${header})
 		
-		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch" )
+		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch -fPIC" )
 		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES OBJECT_DEPENDS ${pchfile} )
 	ENDMACRO(USE_PCH)
 	
@@ -278,7 +290,7 @@ ENDIF(MSVC)
 
 #######################################################################################
 IF(WINDOWS)
-	SET(libboost_suffix "")
+	#SET(libboost_suffix "")
 ELSE(WINDOWS)
     IF(SOLARIS)
 	#SET(libboost_suffix "-gcc34")

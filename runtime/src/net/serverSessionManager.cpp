@@ -217,8 +217,12 @@ namespace net
 		_sessions.clear();
 
 		_isStarted = false;
-		_ready.swap(boost::function<void (IServerSessionPtr)>());
-		_fail.swap(boost::function<void (system::error_code)>());
+		
+		boost::function<void (IServerSessionPtr)> nullReady;
+		_ready.swap(nullReady);
+		
+		boost::function<void (system::error_code)> nullFail;
+		_fail.swap(nullFail);
 
 	}
 }
