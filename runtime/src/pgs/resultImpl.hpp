@@ -8,22 +8,22 @@
 namespace pgs
 {
 	class StatementImpl;
-	typedef boost::shared_ptr<StatementImpl> StatementImpl_ptr;
+	typedef boost::shared_ptr<StatementImpl> StatementImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class ResultImpl
 		: public pgc::ResultImpl
 	{
-		pgs::StatementImpl_ptr _stm;
+		pgs::StatementImplPtr _stm;
 
 	public:
-		ResultImpl(const StatementImpl_ptr &stm, PGresult *pgres);
+		ResultImpl(const StatementImplPtr &stm, PGresult *pgres);
 
-		bool fldIndex(size_t &res, const FieldImpl_ptr &fld);
-		bool fldIndices(std::deque<size_t> &res, const CategoryImpl_ptr &cat);
+		bool fldIndex(size_t &res, const FieldImplPtr &fld);
+		bool fldIndices(std::deque<size_t> &res, const CategoryImplPtr &cat);
 
 	};
-	typedef boost::shared_ptr<ResultImpl> ResultImpl_ptr;
+	typedef boost::shared_ptr<ResultImpl> ResultImplPtr;
 }
 
 #endif

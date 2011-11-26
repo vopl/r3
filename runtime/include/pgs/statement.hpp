@@ -9,17 +9,17 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class StatementImpl;
-	typedef boost::shared_ptr<StatementImpl> StatementImpl_ptr;
+	typedef boost::shared_ptr<StatementImpl> StatementImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Statement
 		: public pgc::Statement
 	{
 	protected:
-		typedef StatementImpl_ptr Impl_ptr;
+		typedef StatementImplPtr ImplPtr;
 
 		friend class Select;
-		Statement(Impl_ptr impl);
+		Statement(ImplPtr impl);
 	public:
 
 		using pgc::Statement::bind;

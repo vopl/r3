@@ -13,6 +13,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/uuid/uuid.hpp>
 
 #include <vector>
 #include <map>
@@ -72,6 +73,7 @@ namespace utils
 			etListVariant				=36,
 
 			etChar						=37,
+			etUuid						=38,
 		};
 
 	public:
@@ -113,48 +115,12 @@ namespace utils
 		typedef std::deque<Variant>					DequeVariant;
 		typedef std::list<Variant>					ListVariant;
 		typedef char								Char;
+		typedef boost::uuids::uuid					Uuid;
 
 
 	public:
 		template <class T> struct Type2Enum				{ static const EType et = etUnknown;	};
-		template <> struct Type2Enum<Void>				{ static const EType et = etVoid;	};
-		template <> struct Type2Enum<String>			{ static const EType et = etString;	};
-		template <> struct Type2Enum<Float>				{ static const EType et = etFloat;	};
-		template <> struct Type2Enum<Double>			{ static const EType et = etDouble;	};
-		template <> struct Type2Enum<Int8>				{ static const EType et = etInt8;	};
-		template <> struct Type2Enum<Int16>				{ static const EType et = etInt16;	};
-		template <> struct Type2Enum<Int32>				{ static const EType et = etInt32;	};
-		template <> struct Type2Enum<Int64>				{ static const EType et = etInt64;	};
-		template <> struct Type2Enum<UInt8>				{ static const EType et = etUInt8;	};
-		template <> struct Type2Enum<UInt16>			{ static const EType et = etUInt16;	};
-		template <> struct Type2Enum<UInt32>			{ static const EType et = etUInt32;	};
-		template <> struct Type2Enum<UInt64>			{ static const EType et = etUInt64;	};
-		template <> struct Type2Enum<VectorChar>		{ static const EType et = etVectorChar;	};
-		template <> struct Type2Enum<Date>				{ static const EType et = etDate;	};
-		template <> struct Type2Enum<Time>				{ static const EType et = etTime;	};
-		template <> struct Type2Enum<VectorVariant>		{ static const EType et = etVectorVariant;	};
-		template <> struct Type2Enum<MapStringVariant>	{ static const EType et = etMapStringVariant;	};
-		template <> struct Type2Enum<Bool>				{ static const EType et = etBool;	};
-		template <> struct Type2Enum<Tm>				{ static const EType et = etTm;	};
-		template <> struct Type2Enum<Bitset8>			{ static const EType et = etBitset8;	};
-		template <> struct Type2Enum<Bitset16>			{ static const EType et = etBitset16;	};
-		template <> struct Type2Enum<Bitset32>			{ static const EType et = etBitset32;	};
-		template <> struct Type2Enum<Bitset64>			{ static const EType et = etBitset64;	};
-		template <> struct Type2Enum<Bitset128>			{ static const EType et = etBitset128;	};
-		template <> struct Type2Enum<Bitset256>			{ static const EType et = etBitset256;	};
-		template <> struct Type2Enum<Bitset512>			{ static const EType et = etBitset512;	};
-		template <> struct Type2Enum<DateDuration>		{ static const EType et = etDateDuration;	};
-		template <> struct Type2Enum<TimeDuration>		{ static const EType et = etTimeDuration;	};
-		template <> struct Type2Enum<DateTimeDuration>	{ static const EType et = etDateTimeDuration;	};
 
-		template <> struct Type2Enum<MapVariantVariant>	{ static const EType et = etMapVariantVariant;	};
-		template <> struct Type2Enum<MultimapStringVariant>		{ static const EType et = etMultimapStringVariant;	};
-		template <> struct Type2Enum<MultimapVariantVariant>	{ static const EType et = etMultimapVariantVariant;	};
-		template <> struct Type2Enum<SetVariant>		{ static const EType et = etSetVariant;	};
-		template <> struct Type2Enum<MultisetVariant>	{ static const EType et = etMultisetVariant;	};
-		template <> struct Type2Enum<DequeVariant>		{ static const EType et = etDequeVariant;	};
-		template <> struct Type2Enum<ListVariant>		{ static const EType et = etListVariant;	};
-		template <> struct Type2Enum<Char>				{ static const EType et = etChar;	};
 
 	public:
 		~Variant();
@@ -197,6 +163,7 @@ namespace utils
 		Variant(const DequeVariant &v);
 		Variant(const ListVariant &v);
 		Variant(const Char &v);
+		Variant(const Uuid &v);
 
 		//helper
 		Variant(const char *v);
@@ -238,6 +205,7 @@ namespace utils
 		Variant &operator=(const DequeVariant &v);
 		Variant &operator=(const ListVariant &v);
 		Variant &operator=(const Char &v);
+		Variant &operator=(const Uuid &v);
 
 		//helper
 		Variant &operator=(const char *v);
@@ -279,6 +247,7 @@ namespace utils
 		operator DequeVariant &();
 		operator ListVariant &();
 		operator Char &();
+		operator Uuid &();
 
 		//helper
 		operator const char *();
@@ -320,6 +289,7 @@ namespace utils
 		operator DequeVariant const &() const;
 		operator ListVariant const &() const;
 		operator Char const &() const;
+		operator Uuid const &() const;
 
 		void swap(Variant &);
 
@@ -342,8 +312,8 @@ namespace utils
 		bool operator !=(const Variant &v) const;
 
 	public:
-		boost::shared_array<char> save(size_t &size) const;
-		bool load(boost::shared_array<char> data, size_t size);
+		boost::shared_array<char> save(boost::uint32_t &size) const;
+		bool load(boost::shared_array<char> data, boost::uint32_t size);
 
 	protected:
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);
@@ -357,6 +327,46 @@ namespace utils
 #endif
 	};
 
+
+	template <> struct Variant::Type2Enum<Variant::Void>				{ static const EType et = Variant::etVoid;	};
+	template <> struct Variant::Type2Enum<Variant::String>				{ static const EType et = Variant::etString;	};
+	template <> struct Variant::Type2Enum<Variant::Float>				{ static const EType et = Variant::etFloat;	};
+	template <> struct Variant::Type2Enum<Variant::Double>				{ static const EType et = Variant::etDouble;	};
+	template <> struct Variant::Type2Enum<Variant::Int8>				{ static const EType et = Variant::etInt8;	};
+	template <> struct Variant::Type2Enum<Variant::Int16>				{ static const EType et = Variant::etInt16;	};
+	template <> struct Variant::Type2Enum<Variant::Int32>				{ static const EType et = Variant::etInt32;	};
+	template <> struct Variant::Type2Enum<Variant::Int64>				{ static const EType et = Variant::etInt64;	};
+	template <> struct Variant::Type2Enum<Variant::UInt8>				{ static const EType et = Variant::etUInt8;	};
+	template <> struct Variant::Type2Enum<Variant::UInt16>				{ static const EType et = Variant::etUInt16;	};
+	template <> struct Variant::Type2Enum<Variant::UInt32>				{ static const EType et = Variant::etUInt32;	};
+	template <> struct Variant::Type2Enum<Variant::UInt64>				{ static const EType et = Variant::etUInt64;	};
+	template <> struct Variant::Type2Enum<Variant::VectorChar>			{ static const EType et = Variant::etVectorChar;	};
+	template <> struct Variant::Type2Enum<Variant::Date>				{ static const EType et = Variant::etDate;	};
+	template <> struct Variant::Type2Enum<Variant::Time>				{ static const EType et = Variant::etTime;	};
+	template <> struct Variant::Type2Enum<Variant::VectorVariant>		{ static const EType et = Variant::etVectorVariant;	};
+	template <> struct Variant::Type2Enum<Variant::MapStringVariant>	{ static const EType et = Variant::etMapStringVariant;	};
+	template <> struct Variant::Type2Enum<Variant::Bool>				{ static const EType et = Variant::etBool;	};
+	template <> struct Variant::Type2Enum<Variant::Tm>					{ static const EType et = Variant::etTm;	};
+	template <> struct Variant::Type2Enum<Variant::Bitset8>				{ static const EType et = Variant::etBitset8;	};
+	template <> struct Variant::Type2Enum<Variant::Bitset16>			{ static const EType et = Variant::etBitset16;	};
+	template <> struct Variant::Type2Enum<Variant::Bitset32>			{ static const EType et = Variant::etBitset32;	};
+	template <> struct Variant::Type2Enum<Variant::Bitset64>			{ static const EType et = Variant::etBitset64;	};
+	template <> struct Variant::Type2Enum<Variant::Bitset128>			{ static const EType et = Variant::etBitset128;	};
+	template <> struct Variant::Type2Enum<Variant::Bitset256>			{ static const EType et = Variant::etBitset256;	};
+	template <> struct Variant::Type2Enum<Variant::Bitset512>			{ static const EType et = Variant::etBitset512;	};
+	template <> struct Variant::Type2Enum<Variant::DateDuration>		{ static const EType et = Variant::etDateDuration;	};
+	template <> struct Variant::Type2Enum<Variant::TimeDuration>		{ static const EType et = Variant::etTimeDuration;	};
+	template <> struct Variant::Type2Enum<Variant::DateTimeDuration>	{ static const EType et = Variant::etDateTimeDuration;	};
+
+	template <> struct Variant::Type2Enum<Variant::MapVariantVariant>	{ static const EType et = Variant::etMapVariantVariant;	};
+	template <> struct Variant::Type2Enum<Variant::MultimapStringVariant>		{ static const EType et = Variant::etMultimapStringVariant;	};
+	template <> struct Variant::Type2Enum<Variant::MultimapVariantVariant>	{ static const EType et = Variant::etMultimapVariantVariant;	};
+	template <> struct Variant::Type2Enum<Variant::SetVariant>			{ static const EType et = Variant::etSetVariant;	};
+	template <> struct Variant::Type2Enum<Variant::MultisetVariant>		{ static const EType et = Variant::etMultisetVariant;	};
+	template <> struct Variant::Type2Enum<Variant::DequeVariant>		{ static const EType et = Variant::etDequeVariant;	};
+	template <> struct Variant::Type2Enum<Variant::ListVariant>			{ static const EType et = Variant::etListVariant;	};
+	template <> struct Variant::Type2Enum<Variant::Char>				{ static const EType et = Variant::etChar;	};
+	template <> struct Variant::Type2Enum<Variant::Uuid>				{ static const EType et = Variant::etUuid;	};	
 	typedef boost::shared_ptr<Variant> VariantPtr;
 
 

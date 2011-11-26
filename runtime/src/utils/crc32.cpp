@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "utils/crc32.hpp"
 
 namespace utils

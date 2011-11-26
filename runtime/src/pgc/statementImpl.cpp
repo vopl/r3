@@ -203,7 +203,7 @@ namespace pgc
 			res = PQexecParams(
 				_con->_pgcon,
 				_sql.c_str(),
-				_bindTyp.size(),
+				(int)_bindTyp.size(),
 				&_bindTyp[0],
 				&_bindVal[0],
 				&_bindLen[0],
@@ -668,7 +668,7 @@ namespace pgc
 				{
 					std::vector<unsigned char> &vec = *(std::vector<unsigned char> *)valCpp;
 					bindVal = (char *)&vec[0];
-					bindLen = vec.size();
+					bindLen = (int)vec.size();
 					bindOwn = false;
 				}
 			}

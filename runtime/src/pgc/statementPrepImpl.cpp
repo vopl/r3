@@ -142,7 +142,7 @@ namespace pgc
 			res = PQexecPrepared(
 				_con->pgcon(),
 				_id.c_str(),
-				_bindVal.size(),
+				(int)_bindVal.size(),
 				&_bindVal[0],
 				&_bindLen[0],
 				&_bindFmt[0],
@@ -203,7 +203,7 @@ namespace pgc
 
 			if(_bindTyp.size())
 			{
-				res = PQprepare(_conn, id, _sql.data(), _bindTyp.size(), &_bindTyp[0]);
+				res = PQprepare(_conn, id, _sql.data(), (int)_bindTyp.size(), &_bindTyp[0]);
 			}
 			else
 			{

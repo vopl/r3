@@ -17,32 +17,32 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	class SelectImpl
 	{
-		std::deque<ExpressionImpl_ptr>	_whats;
+		std::deque<ExpressionImplPtr>	_whats;
 
-		CategoryImpl_ptr				_from;
-		std::deque<LinkImpl_ptr>		_links;
+		CategoryImplPtr				_from;
+		std::deque<LinkImplPtr>		_links;
 
-		ExpressionImpl_ptr				_where;
-		ExpressionImpl_ptr				_limit;
-		ExpressionImpl_ptr				_offset;
+		ExpressionImplPtr				_where;
+		ExpressionImplPtr				_limit;
+		ExpressionImplPtr				_offset;
 
-		std::deque<OrderImpl_ptr>		_orders;
+		std::deque<OrderImplPtr>		_orders;
 
 	public:
 		SelectImpl();
 
-		void whats(ExpressionImpl_ptr);
+		void whats(ExpressionImplPtr);
 
-		void from(CategoryImpl_ptr);
-		void links(LinkImpl_ptr);
-		void where(ExpressionImpl_ptr);
+		void from(CategoryImplPtr);
+		void links(LinkImplPtr);
+		void where(ExpressionImplPtr);
 
-		void limit(ExpressionImpl_ptr);
-		void offset(ExpressionImpl_ptr);
-		void orders(OrderImpl_ptr);
+		void limit(ExpressionImplPtr);
+		void offset(ExpressionImplPtr);
+		void orders(OrderImplPtr);
 
 	public:
-		StatementImpl_ptr compile(const ClusterImpl_ptr &cluster);
+		StatementImplPtr compile(const ClusterImplPtr &cluster);
 
 	private:
 		void mkWhats(std::deque<std::string> &res,	SCompileState &state);

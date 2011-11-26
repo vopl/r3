@@ -24,7 +24,7 @@ namespace pgs
 	//объект состояния компиляции
 	struct SCompileState
 	{
-		ClusterImpl_ptr				_cluster;
+		ClusterImplPtr				_cluster;
 		std::set<std::string>		_aliases;
 		size_t						_nextCrossIndex;
 		size_t						_nextWhatColumnIndex;
@@ -51,13 +51,13 @@ namespace pgs
 	public:
 		virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm)=0;
 	};
-	typedef boost::shared_ptr<ExpressionImpl> ExpressionImpl_ptr;
+	typedef boost::shared_ptr<ExpressionImpl> ExpressionImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class ExpressionImpl_list
 		: public ExpressionImpl
 	{
-		std::vector<ExpressionImpl_ptr> _list;
+		std::vector<ExpressionImplPtr> _list;
 	public:
 		ExpressionImpl_list();
 		~ExpressionImpl_list();
@@ -66,7 +66,7 @@ namespace pgs
 
 		virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 	};
-	typedef boost::shared_ptr<ExpressionImpl_list> ExpressionImpl_list_ptr;
+	typedef boost::shared_ptr<ExpressionImpl_list> ExpressionImpl_listPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class ExpressionImpl_op0
@@ -85,7 +85,7 @@ namespace pgs
 		: public ExpressionImpl
 	{
 		std::string		_name;
-		ExpressionImpl_ptr	_a;
+		ExpressionImplPtr	_a;
 		bool			_isPre;
 	public:
 		ExpressionImpl_op1(const char *name, const Expression &a, bool isPre=true);
@@ -99,8 +99,8 @@ namespace pgs
 		: public ExpressionImpl
 	{
 		std::string		_name;
-		ExpressionImpl_ptr	_a;
-		ExpressionImpl_ptr	_b;
+		ExpressionImplPtr	_a;
+		ExpressionImplPtr	_b;
 	public:
 		ExpressionImpl_op2(const char *name, const Expression &a, const Expression &b);
 		~ExpressionImpl_op2();
@@ -125,7 +125,7 @@ namespace pgs
 	{
 		std::string	_name;
 
-		typedef std::vector<ExpressionImpl_ptr> TVArgs;
+		typedef std::vector<ExpressionImplPtr> TVArgs;
 		TVArgs _args;
 	public:
 		ExpressionImpl_func(const char *name);

@@ -13,50 +13,50 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SelectImpl::whats(ExpressionImpl_ptr e)
+	void SelectImpl::whats(ExpressionImplPtr e)
 	{
 		_whats.push_back(e);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SelectImpl::from(CategoryImpl_ptr c)
+	void SelectImpl::from(CategoryImplPtr c)
 	{
 		_from = c;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SelectImpl::links(LinkImpl_ptr l)
+	void SelectImpl::links(LinkImplPtr l)
 	{
 		_links.push_back(l);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SelectImpl::where(ExpressionImpl_ptr e)
+	void SelectImpl::where(ExpressionImplPtr e)
 	{
 		//перебрать дерево выражения, проверить наличие всех полей, собрать все переменные
 		_where = e;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SelectImpl::limit(ExpressionImpl_ptr e)
+	void SelectImpl::limit(ExpressionImplPtr e)
 	{
 		_limit = e;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SelectImpl::offset(ExpressionImpl_ptr e)
+	void SelectImpl::offset(ExpressionImplPtr e)
 	{
 		_offset = e;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SelectImpl::orders(OrderImpl_ptr o)
+	void SelectImpl::orders(OrderImplPtr o)
 	{
 		_orders.push_back(o);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	StatementImpl_ptr SelectImpl::compile(const ClusterImpl_ptr &cluster)
+	StatementImplPtr SelectImpl::compile(const ClusterImplPtr &cluster)
 	{
 		std::string sql;
 		//выделить значения для bind
@@ -143,7 +143,7 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		StatementImpl_ptr stm(new StatementImpl(
+		StatementImplPtr stm(new StatementImpl(
 			cluster, 
 			state._bindName2idx,
 			state._fetchName2idx));
@@ -156,7 +156,7 @@ namespace pgs
 	void SelectImpl::mkWhats(std::deque<std::string> &res, SCompileState &state)
 	{
 		bool first = true;
-		BOOST_FOREACH(ExpressionImpl_ptr &expr, _whats)
+		BOOST_FOREACH(ExpressionImplPtr &expr, _whats)
 		{
 			if(first)
 			{
@@ -189,7 +189,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	void SelectImpl::mkLinks(std::deque<std::string> &res, SCompileState &state)
 	{
-		BOOST_FOREACH(LinkImpl_ptr &link, _links)
+		BOOST_FOREACH(LinkImplPtr &link, _links)
 		{
 			res += " ";
 			link->compile(res, state, ecmSelectLink);
@@ -209,7 +209,7 @@ namespace pgs
 	void SelectImpl::mkOrders(std::deque<std::string> &res, SCompileState &state)
 	{
 		bool first = true;
-		BOOST_FOREACH(OrderImpl_ptr &order, _orders)
+		BOOST_FOREACH(OrderImplPtr &order, _orders)
 		{
 			if(first)
 			{

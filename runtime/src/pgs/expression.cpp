@@ -8,22 +8,22 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	Expression op1_pre(const char *name, const Expression &a)
 	{
-		return ImplAccess<Expression>(ExpressionImpl_ptr(new ExpressionImpl_op1(name, a, true)));
+		return ImplAccess<Expression>(ExpressionImplPtr(new ExpressionImpl_op1(name, a, true)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expression op1_post(const char *name, const Expression &a)
 	{
-		return ImplAccess<Expression>(ExpressionImpl_ptr(new ExpressionImpl_op1(name, a, false)));
+		return ImplAccess<Expression>(ExpressionImplPtr(new ExpressionImpl_op1(name, a, false)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expression op2(const char *name, const Expression &a, const Expression &b)
 	{
-		return ImplAccess<Expression>(ExpressionImpl_ptr(new ExpressionImpl_op2(name, a, b)));
+		return ImplAccess<Expression>(ExpressionImplPtr(new ExpressionImpl_op2(name, a, b)));
 	}
 	//////////////////////////////////////////////////////////////////////////
 	Expression op3(const char *name1, const char *name2, const Expression &a, const Expression &b, const Expression &c)
 	{
-		return ImplAccess<Expression>(ExpressionImpl_ptr(new ExpressionImpl_op3(name1, name2, a, b, c)));
+		return ImplAccess<Expression>(ExpressionImplPtr(new ExpressionImpl_op3(name1, name2, a, b, c)));
 	}
 
 
@@ -193,7 +193,7 @@ namespace pgs
 	Expression func(const char *name)
 	{
 		ExpressionImpl_func *p = new ExpressionImpl_func(name);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -201,7 +201,7 @@ namespace pgs
 	{
 		ExpressionImpl_func *p = new ExpressionImpl_func(name);
 		p->pushArg(a);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -210,7 +210,7 @@ namespace pgs
 		ExpressionImpl_func *p = new ExpressionImpl_func(name);
 		p->pushArg(a);
 		p->pushArg(b);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -220,7 +220,7 @@ namespace pgs
 		p->pushArg(a);
 		p->pushArg(b);
 		p->pushArg(c);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -231,7 +231,7 @@ namespace pgs
 		p->pushArg(b);
 		p->pushArg(c);
 		p->pushArg(d);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -263,7 +263,7 @@ namespace pgs
 	{
 		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -272,7 +272,7 @@ namespace pgs
 		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushElse(el);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -281,7 +281,7 @@ namespace pgs
 		ExpressionImpl_casec *p = new ExpressionImpl_casec();
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -291,7 +291,7 @@ namespace pgs
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushElse(el);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -301,7 +301,7 @@ namespace pgs
 		p->pushPair(c1, r1);
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -312,7 +312,7 @@ namespace pgs
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
 		p->pushElse(el);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -323,7 +323,7 @@ namespace pgs
 		p->pushPair(c2, r2);
 		p->pushPair(c3, r3);
 		p->pushPair(c4, r4);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -335,7 +335,7 @@ namespace pgs
 		p->pushPair(c3, r3);
 		p->pushPair(c4, r4);
 		p->pushElse(el);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -343,7 +343,7 @@ namespace pgs
 	{
 		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -352,7 +352,7 @@ namespace pgs
 		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushElse(el);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ namespace pgs
 		ExpressionImpl_casee *p = new ExpressionImpl_casee(e);
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -371,7 +371,7 @@ namespace pgs
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushElse(el);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -381,7 +381,7 @@ namespace pgs
 		p->pushPair(v1, r1);
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -392,7 +392,7 @@ namespace pgs
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
 		p->pushElse(el);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -403,7 +403,7 @@ namespace pgs
 		p->pushPair(v2, r2);
 		p->pushPair(v3, r3);
 		p->pushPair(v4, r4);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -415,7 +415,7 @@ namespace pgs
 		p->pushPair(v3, r3);
 		p->pushPair(v4, r4);
 		p->pushElse(el);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -423,7 +423,7 @@ namespace pgs
 	{
 		ExpressionImpl_func *p = new ExpressionImpl_func("IN");
 		p->pushArg(v1);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -432,7 +432,7 @@ namespace pgs
 		ExpressionImpl_func *p = new ExpressionImpl_func("IN");
 		p->pushArg(v1);
 		p->pushArg(v2);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -442,7 +442,7 @@ namespace pgs
 		p->pushArg(v1);
 		p->pushArg(v2);
 		p->pushArg(v3);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -453,7 +453,7 @@ namespace pgs
 		p->pushArg(v2);
 		p->pushArg(v3);
 		p->pushArg(v4);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -461,20 +461,20 @@ namespace pgs
 	{
 		ExpressionImpl_func *p = new ExpressionImpl_func("ANY");
 		p->pushArg(a);
-		return ImplAccess<Expression>(ExpressionImpl_ptr(p));
+		return ImplAccess<Expression>(ExpressionImplPtr(p));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Expression list(const Expression &v1, const Expression &v2)
 	{
-		ExpressionImpl_list_ptr l1 = boost::shared_dynamic_cast<ExpressionImpl_list>(ImplAccess<Expression>(v1).impl());
+		ExpressionImpl_listPtr l1 = boost::shared_dynamic_cast<ExpressionImpl_list>(ImplAccess<Expression>(v1).impl());
 		if(l1)
 		{
 			l1->push(v2);
 			return v1;
 		}
 
-		ExpressionImpl_list_ptr l(new ExpressionImpl_list);
+		ExpressionImpl_listPtr l(new ExpressionImpl_list);
 		l->push(v1);
 		l->push(v2);
 

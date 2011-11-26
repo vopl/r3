@@ -8,7 +8,7 @@ namespace pgs
 
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement::Statement(Impl_ptr impl)
+	Statement::Statement(ImplPtr impl)
 		: pgc::Statement(impl)
 	{
 	}
@@ -39,7 +39,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	Result Statement::exec()
 	{
-		ResultImpl_ptr res(new ResultImpl(
+		ResultImplPtr res(new ResultImpl(
 			boost::static_pointer_cast<StatementImpl>(_impl), 
 			_impl->exec()));
 		return Result(res);

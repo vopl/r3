@@ -10,17 +10,17 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class ResultImpl;
-	typedef boost::shared_ptr<ResultImpl> ResultImpl_ptr;
+	typedef boost::shared_ptr<ResultImpl> ResultImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Result
 		: public pgc::Result
 	{
 	protected:
-		typedef ResultImpl_ptr Impl_ptr;
+		typedef ResultImplPtr ImplPtr;
 
 		friend class Statement;
-		Result(Impl_ptr impl);
+		Result(ImplPtr impl);
 
 	protected:
 		bool fldIndex(size_t &res, const Field &fld);

@@ -24,7 +24,7 @@ misrepresented as being the original source code.
 Rene Nyffenegger rene.nyffenegger@adp-gmbh.ch
 
 */
-#include "stdafx.h"
+#include "pch.h"
 #include "utils/base64.h"
 #include <iostream>
 
@@ -56,16 +56,16 @@ namespace utils
 		}
 	}
 
-	std::string base64_encode(const char * bytes_to_encode, unsigned int in_len, size_t maxLineLen)
+	std::string base64_encode(const char * bytes_to_encode, size_t in_len, size_t maxLineLen)
 	{
 		return base64_encode((const unsigned char *) bytes_to_encode, in_len, maxLineLen);
 	}
 
-	std::string base64_encode(const unsigned char * bytes_to_encode, unsigned int in_len, size_t maxLineLen)
+	std::string base64_encode(const unsigned char * bytes_to_encode, size_t in_len, size_t maxLineLen)
 	{
 		std::string ret;
-		int i = 0;
-		int j = 0;
+		size_t i = 0;
+		size_t j = 0;
 		unsigned char char_array_3[3];
 		unsigned char char_array_4[4];
 
@@ -142,10 +142,10 @@ namespace utils
 
 	std::string base64_decode(const std::string &encoded_string)
 	{
-		int in_len = encoded_string.size();
-		int i = 0;
-		int j = 0;
-		int in_ = 0;
+		size_t in_len = encoded_string.size();
+		size_t i = 0;
+		size_t j = 0;
+		size_t in_ = 0;
 		unsigned char char_array_4[4], char_array_3[3];
 		std::string ret;
 

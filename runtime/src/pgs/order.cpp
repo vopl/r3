@@ -7,7 +7,7 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Order::Order(...)
-		: Expression(ImplAccess<Expression>(Impl_ptr(new OrderImpl)))
+		: Expression(ImplAccess<Expression>(ImplPtr(new OrderImpl)))
 	{
 	}
 }

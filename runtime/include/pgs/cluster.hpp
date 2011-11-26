@@ -32,14 +32,14 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	class ClusterImpl;
-	typedef boost::shared_ptr<ClusterImpl> ClusterImpl_ptr;
+	typedef boost::shared_ptr<ClusterImpl> ClusterImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Cluster
 	{
 	protected:
-		typedef ClusterImpl_ptr Impl_ptr;
-		Impl_ptr	_impl;
+		typedef ClusterImplPtr ImplPtr;
+		ImplPtr	_impl;
 
 	public:
 		Cluster(pgs::meta::Cluster metaCluster);

@@ -16,14 +16,14 @@ namespace pgs
 	{
 		//////////////////////////////////////////////////////////////////////////
 		class ClusterImpl;
-		typedef boost::shared_ptr<ClusterImpl> ClusterImpl_ptr;
+		typedef boost::shared_ptr<ClusterImpl> ClusterImplPtr;
 
 		//////////////////////////////////////////////////////////////////////////
 		class Cluster
 		{
 		protected:
-			typedef ClusterImpl_ptr Impl_ptr;
-			Impl_ptr	_impl;
+			typedef ClusterImplPtr ImplPtr;
+			ImplPtr	_impl;
 			void add(boost::shared_ptr<Schema> schema, boost::shared_ptr<SchemaInitializerBase> schemaInitializer);
 
 		public:

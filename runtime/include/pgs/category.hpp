@@ -7,14 +7,14 @@
 namespace pgs
 {
 	class CategoryImpl;
-	typedef boost::shared_ptr<CategoryImpl> CategoryImpl_ptr;
+	typedef boost::shared_ptr<CategoryImpl> CategoryImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Category
 		: public Expression
 	{
 	public:
-		typedef CategoryImpl_ptr Impl_ptr;
+		typedef CategoryImplPtr ImplPtr;
 
 	public:
 		Category(pgs::meta::CategoryCPtr cat, const std::string &alias="");

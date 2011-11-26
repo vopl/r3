@@ -80,7 +80,8 @@ namespace utils
 	ENUMTYPES_ONE(MultisetVariant)			\
 	ENUMTYPES_ONE(DequeVariant)				\
 	ENUMTYPES_ONE(ListVariant)				\
-	ENUMTYPES_ONE(Char)						//\
+	ENUMTYPES_ONE(Char)						\
+	ENUMTYPES_ONE(Uuid)						//\
 
 
 
@@ -89,7 +90,7 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	class VariantImpl
-		: private Variant
+		: public Variant
 	{
 		//////////////////////////////////////////////////////////////////////////
 		//выделение блока памяти под данные
@@ -153,57 +154,11 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		void construct()
-		{
-			_et = Type2Enum<T>::et;
-			alloc<T>();
-			new (&as<T>()) T();
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		template <>
-		void construct<Tm>()
-		{
-			_et = Type2Enum<Tm>::et;
-			alloc<Tm>();
-			new (&as<Tm>()) Tm;
-		}
+		void construct();
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		void construct(const T &v)
-		{
-			_et = Type2Enum<T>::et;
-			alloc<T>();
-			new (&as<T>()) T(v);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		template <>
-		void construct(const Variant &v)
-		{
-			if(v.isNull())
-			{
-				_et = -(ETypeStorage)v.type();
-				return;
-			}
-			else
-			{
-				_et = (ETypeStorage)v.type();
-			}
-
-			switch(type())
-			{
-			case etVoid: break;
-
-#define ENUMTYPES_ONE(T) case et ## T: alloc<T>(); new (&as<T>()) T(v.as<T>()); break;
-				ENUMTYPES
-#undef ENUMTYPES_ONE
-			default:
-				assert(!"bad et");
-				throw "bad et";
-			}
-		}
+		void construct(const T &v);
 
 		//////////////////////////////////////////////////////////////////////////
 		void construct(const char *v)
@@ -246,48 +201,13 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		template <class T>
-		void assign(const T &v)
-		{
-			if(is<T>())
-			{
-				setNull(false);
-				as<T>() = v;
-				return;
-			}
+		void assign(const T &v);
+		
+		
+		
+		
+		
 
-			destruct();
-			construct(v);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		template <>
-		void assign(const Variant &v)
-		{
-			if(v.type() == type())
-			{
-				if(v.isNull())
-				{
-					setNull(true);
-				}
-				else
-				{
-					switch(type())
-					{
-					case etVoid: destruct(); break;
-#define ENUMTYPES_ONE(T) case et ## T: assign<T>(v.as<T>()); break;
-						ENUMTYPES
-#undef ENUMTYPES_ONE
-					default:
-						assert(!"bad et");
-						throw "bad et";
-					}
-				}
-				return;
-			}
-
-			destruct();
-			construct<Variant>(v);
-		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void assign(const char *v)
@@ -310,33 +230,7 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void setNull(bool n)
-		{
-			if(n)
-			{
-				if(!isNull())
-				{
-					destruct();
-				}
-			}
-			else
-			{
-				if(isNull())
-				{
-					switch(type())
-					{
-					case etVoid: break;
-
-#define ENUMTYPES_ONE(T) case et ## T: construct<T>(); break;
-						ENUMTYPES
-#undef ENUMTYPES_ONE
-					default:
-						assert(!"bad et");
-						throw "bad et";
-					}
-				}
-			}
-		}
+		void setNull(bool n);
 
 		//////////////////////////////////////////////////////////////////////////
 		EType type() const
@@ -431,19 +325,7 @@ namespace utils
 			destruct();
 			_et = -(ETypeStorage)Type2Enum<T>::et;
 		}
-		//////////////////////////////////////////////////////////////////////////
-		template<> 
-		void forceType<Void>()
-		{
-			if(is<Void>())
-			{
-				return;
-			}
-
-			destruct();
-			_et = -(ETypeStorage)Type2Enum<Void>::et;
-		}
-
+		
 		//////////////////////////////////////////////////////////////////////////
 		void forceType(EType et)
 		{
@@ -540,8 +422,8 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		boost::shared_array<char> save(size_t &size) const;
-		bool load(boost::shared_array<char> data, size_t size);
+		boost::shared_array<char> save(boost::uint32_t &size) const;
+		bool load(boost::shared_array<char> data, boost::uint32_t size);
 
 	private:
 		friend class boost::serialization::access;
@@ -550,6 +432,189 @@ namespace utils
 		template<class Archive> void load(Archive & ar, const unsigned int version);
 		BOOST_SERIALIZATION_SPLIT_MEMBER()
 	};
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <>
+	void VariantImpl::construct(const Variant &v)
+	{
+		if(v.isNull())
+		{
+			_et = -(ETypeStorage)v.type();
+			return;
+		}
+		else
+		{
+			_et = (ETypeStorage)v.type();
+		}
+
+		switch(type())
+		{
+		case etVoid: break;
+
+#define ENUMTYPES_ONE(T) case et ## T: alloc<T>(); new (&as<T>()) T(v.as<T>()); break;
+			ENUMTYPES
+#undef ENUMTYPES_ONE
+		default:
+			assert(!"bad et");
+			throw "bad et";
+		}
+	}
+
+		
+	//////////////////////////////////////////////////////////////////////////
+	template <>
+	void VariantImpl::construct<Variant::Tm>()
+	{
+		_et = Type2Enum<Tm>::et;
+		alloc<Tm>();
+		new (&as<Tm>()) Tm;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <>
+	void VariantImpl::construct<Variant::Uuid>()
+	{
+		_et = Type2Enum<Uuid>::et;
+		alloc<Uuid>();
+		new (&as<Uuid>()) Uuid;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <>
+	void VariantImpl::assign(const Variant &v)
+	{
+		if(v.type() == type())
+		{
+			if(v.isNull())
+			{
+				setNull(true);
+			}
+			else
+			{
+				switch(type())
+				{
+				case etVoid: destruct(); break;
+#define ENUMTYPES_ONE(T) case et ## T: assign<T>(v.as<T>()); break;
+					ENUMTYPES
+#undef ENUMTYPES_ONE
+				default:
+					assert(!"bad et");
+					throw "bad et";
+				}
+			}
+			return;
+		}
+
+		Variant stub(v);
+		swap(stub);
+	}		
+	//////////////////////////////////////////////////////////////////////////
+	template<> 
+	void VariantImpl::forceType<Variant::Void>()
+	{
+		if(is<Void>())
+		{
+			return;
+		}
+
+		destruct();
+		_et = -(ETypeStorage)Type2Enum<Void>::et;
+	}
+	
+	
+	
+	
+	
+	
+	
+	//////////////////////////////////////////////////////////////////////////
+	template <class T>
+	void VariantImpl::construct()
+	{
+		_et = Type2Enum<T>::et;
+		alloc<T>();
+		new (&as<T>()) T();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class T>
+	void VariantImpl::construct(const T &v)
+	{
+		_et = Type2Enum<T>::et;
+		alloc<T>();
+		new (&as<T>()) T(v);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	template <class T>
+	void VariantImpl::assign(const T &v)
+	{
+		if(is<T>())
+		{
+			setNull(false);
+			as<T>() = v;
+			return;
+		}
+
+		destruct();
+		construct(v);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantImpl::setNull(bool n)
+	{
+		if(n)
+		{
+			if(!isNull())
+			{
+				destruct();
+			}
+		}
+		else
+		{
+			if(isNull())
+			{
+				switch(type())
+				{
+				case etVoid: break;
+
+#define ENUMTYPES_ONE(T) case et ## T: construct<T>(); break;
+					ENUMTYPES
+#undef ENUMTYPES_ONE
+				default:
+					assert(!"bad et");
+					throw "bad et";
+				}
+			}
+		}
+	}
+	
 }
 
 //BOOST_CLASS_TRACKING(utils::VariantImpl, boost::serialization::track_always)
@@ -574,7 +639,7 @@ namespace utils
 {
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
-	boost::shared_array<char> VariantImpl::save(size_t &size) const
+	boost::shared_array<char> VariantImpl::save(boost::uint32_t &size) const
 	{
 		utils::StreambufOnArray sbuf;
 		{
@@ -589,7 +654,7 @@ namespace utils
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool VariantImpl::load(boost::shared_array<char> data, size_t size)
+	bool VariantImpl::load(boost::shared_array<char> data, boost::uint32_t size)
 	{
 		try
 		{

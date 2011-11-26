@@ -23,7 +23,7 @@ namespace pgs
 
 		virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 	};
-	typedef boost::shared_ptr<LinkImpl> LinkImpl_ptr;
+	typedef boost::shared_ptr<LinkImpl> LinkImplPtr;
 }
 
 #endif

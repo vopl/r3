@@ -149,7 +149,7 @@ namespace pgc
 
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
-			if(!fetch(v[name(colIdx)], colIdx, rowIdx))
+			if(!fetch(v[name(colIdx)], (int)colIdx, rowIdx))
 			{
 				return false;
 			}
@@ -167,7 +167,7 @@ namespace pgc
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
 			assert(colIndices[colIdx] < Result::columns());
-			if(!fetch(v[name(colIndices[colIdx])], colIndices[colIdx], rowIdx))
+			if(!fetch(v[name(colIndices[colIdx])], (int)colIndices[colIdx], rowIdx))
 			{
 				return false;
 			}

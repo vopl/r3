@@ -29,8 +29,8 @@ namespace pgc
 	{
 	protected:
 		friend class Blob;
-		typedef boost::shared_ptr<ConnectionImpl> Impl_ptr;
-		Impl_ptr _impl;
+		typedef boost::shared_ptr<ConnectionImpl> ImplPtr;
+		ImplPtr _impl;
 
 	public:
 		Connection();

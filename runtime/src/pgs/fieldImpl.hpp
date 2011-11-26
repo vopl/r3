@@ -23,7 +23,7 @@ namespace pgs
 
 		virtual void compile(std::deque<std::string> &res, SCompileState &state, ECompileMode ecm);
 	};
-	typedef boost::shared_ptr<FieldImpl> FieldImpl_ptr;
+	typedef boost::shared_ptr<FieldImpl> FieldImplPtr;
 }
 
 #endif
