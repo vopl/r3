@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
+if(POLICY CMP0011)
+    # Included scripts do automatic cmake_policy PUSH and POP.
+    cmake_policy(SET CMP0011 OLD)
+endif(POLICY CMP0011)
+
 PROJECT(r3)
 
 INCLUDE(Setup.cmake)
