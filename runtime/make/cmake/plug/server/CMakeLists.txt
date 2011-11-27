@@ -1,4 +1,4 @@
-PROJECT (server)
+PROJECT (plugserver)
 
 SET(INCLUDE
 	${INC_DIR}/server/iserver.hpp
@@ -36,16 +36,16 @@ SOURCE_GROUP(src FILES ${SRC_PCH})
 
 
 PRESETUP_BIN_OUT(SRC_STUB)
-	ADD_LIBRARY(server SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
-	CREATE_PCH(server ${SRC_DIR}/server/pch.h ${SRC_PCH})
-	USE_PCH(server ${SRC_DIR}/server/pch.h ${SRC})
-SETUP_BIN_OUT(server plug)
+	ADD_LIBRARY(plugserver SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
+	CREATE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC_PCH})
+	USE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC})
+SETUP_BIN_OUT(plugserver plug)
 
-TARGET_LINK_LIBRARIES(server heap pluma utils)
+TARGET_LINK_LIBRARIES(plugserver libheap libpluma libutils)
 
 IF(LINUX)
 	SET(CMAKE_THREAD_PREFER_PTHREAD ON)
 	INCLUDE(FindThreads)
-	TARGET_LINK_LIBRARIES(entry ${CMAKE_THREAD_LIBS_INIT})
-	TARGET_LINK_LIBRARIES(entry ${Boost_LIBRARIES})
+	TARGET_LINK_LIBRARIES(plugserver ${CMAKE_THREAD_LIBS_INIT})
+	TARGET_LINK_LIBRARIES(plugserver ${Boost_LIBRARIES})
 ENDIF()

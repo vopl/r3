@@ -1,4 +1,4 @@
-PROJECT (utils)
+PROJECT (libutils)
 
 SET(INCLUDE
 	${INC_DIR}/utils/aton.hpp
@@ -55,11 +55,11 @@ SOURCE_GROUP(src FILES ${SRC_PCH})
 INCLUDE_DIRECTORIES("${SRC_DIR}/utils")
 
 PRESETUP_BIN_OUT(SRC_STUB)
-ADD_LIBRARY(utils STATIC ${SRC_STUB} ${INCLUDE} ${INCLUDE_SERIALIZATION} ${SRC} ${SRC_SERIALIZATION} ${SRC_PCH})
+ADD_LIBRARY(libutils STATIC ${SRC_STUB} ${INCLUDE} ${INCLUDE_SERIALIZATION} ${SRC} ${SRC_SERIALIZATION} ${SRC_PCH})
 
-CREATE_PCH(utils ${SRC_DIR}/utils/pch.h ${SRC_PCH})
-USE_PCH(utils ${SRC_DIR}/utils/pch.h ${SRC})
-USE_PCH(utils ${SRC_DIR}/utils/pch.h ${SRC_SERIALIZATION})
+CREATE_PCH(libutils ${SRC_DIR}/utils/pch.h ${SRC_PCH})
+USE_PCH(libutils ${SRC_DIR}/utils/pch.h ${SRC})
+USE_PCH(libutils ${SRC_DIR}/utils/pch.h ${SRC_SERIALIZATION})
 
-SETUP_BIN_OUT(utils lib)
+SETUP_BIN_OUT(libutils lib)
 

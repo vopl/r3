@@ -1,4 +1,4 @@
-PROJECT (libheap)
+PROJECT (libheapqt)
 
 SET(INCLUDE
 	${INC_DIR}/heap/heap.hpp
@@ -6,7 +6,7 @@ SET(INCLUDE
 SOURCE_GROUP(include FILES ${INCLUDE})
 
 SET(SRC
-	${SRC_DIR}/heap/heap.cpp
+	${SRC_DIR}/heap/heapqt.cpp
 	${SRC_DIR}/heapNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
@@ -18,5 +18,5 @@ SOURCE_GROUP(src FILES ${SRC_HDR})
 ADD_DEFINITIONS(-DHEAP_EXPORTS)
 
 PRESETUP_BIN_OUT(SRC_STUB)
-ADD_LIBRARY(libheap SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR})
-SETUP_BIN_OUT(libheap bin)
+ADD_LIBRARY(libheapqt SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR})
+SETUP_BIN_OUT(libheapqt bin)
