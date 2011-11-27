@@ -2,10 +2,12 @@
 #define _SERVER_SERVER_HPP_
 
 #include "server/iserver.hpp"
-#include <boost/enable_shared_from_this.hpp>
+#include "server/isession.hpp"
 
 namespace server
 {
+	using namespace boost;
+
 	//////////////////////////////////////////////////////////////////////////
 	class Server
 		: public IServer
@@ -13,6 +15,10 @@ namespace server
 	{
 		pluma::Pluma *_plugs;
 		async::IServicePtr	_async;
+
+	private:
+		void onSsmOk(ISessionPtr session);
+		void onSsmFail(system::error_code ec);
 
 	public:
 		Server();

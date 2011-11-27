@@ -125,6 +125,10 @@ public:
 
 	template<typename ProviderType>
 	typename ProviderType::ITypePtr create();
+
+	template<typename ProviderType>
+	void createAll(std::vector<typename ProviderType::ITypePtr> &instances);
+
 };
 
 #include "pluma/pluma.inl"

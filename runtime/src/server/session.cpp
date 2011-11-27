@@ -1,17 +1,17 @@
 #include "pch.h"
-#include "serverSession.hpp"
+#include "session.hpp"
 
-namespace net
+namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	ServerSession::ServerSession(TServerSid sid)
+	Session::Session(TServerSid sid)
 		: _sid(sid)
 	{
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	TServerSid ServerSession::sid()
+	TServerSid Session::sid()
 	{
 		assert(0);
 		return nullServerSid;

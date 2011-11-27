@@ -1,15 +1,14 @@
 #include "pch.h"
-#include "serverSessionManager.hpp"
-#include <boost/bind.hpp>
+#include "sessionManager.hpp"
 #include "utils/variant.hpp"
 
 //#define LF 		std::cerr<<__FUNCTION__ "\n";std::cerr.flush();
 #define LF
 
-namespace net
+namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManager::onAcceptOk(IChannelPtr channel)
+	void SessionManager::onAcceptOk(IChannelPtr channel)
 	{
 		LF;
 
@@ -21,12 +20,12 @@ namespace net
 		}
 
 		channel->receive(
-			bind(&ServerSessionManager::onReceiveSidOk, shared_from_this(), channel, _1),
-			bind(&ServerSessionManager::onReceiveSidFail, shared_from_this(), channel, _1));
+			bind(&SessionManager::onReceiveSidOk, shared_from_this(), channel, _1),
+			bind(&SessionManager::onReceiveSidFail, shared_from_this(), channel, _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManager::onAcceptFail(system::error_code ec)
+	void SessionManager::onAcceptFail(system::error_code ec)
 	{
 		LF;
 		{
@@ -41,12 +40,12 @@ namespace net
 
 		_connector->listen(
 			_host.c_str(), _service.c_str(), 
-			bind(&ServerSessionManager::onAcceptOk, shared_from_this(), _1),
-			bind(&ServerSessionManager::onAcceptFail, shared_from_this(), _1));
+			bind(&SessionManager::onAcceptOk, shared_from_this(), _1),
+			bind(&SessionManager::onAcceptFail, shared_from_this(), _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManager::onReceiveSidOk(IChannelPtr channel, const SPacket &packet)
+	void SessionManager::onReceiveSidOk(IChannelPtr channel, const SPacket &packet)
 	{
 		LF;
 		mutex::scoped_lock sl(_mtx);
@@ -86,8 +85,8 @@ namespace net
 				SPacket packet;
 				packet._data = v.save(packet._size);
 				channel->send(packet, 
-					bind(&ServerSessionManager::onAcceptOk, shared_from_this(), channel),
-					bind(&ServerSessionManager::onAcceptFail, shared_from_this(), _1));
+					bind(&SessionManager::onAcceptOk, shared_from_this(), channel),
+					bind(&SessionManager::onAcceptFail, shared_from_this(), _1));
 			}
 			else
 			{
@@ -97,8 +96,8 @@ namespace net
 				SPacket packet;
 				packet._data = v.save(packet._size);
 				channel->send(packet, 
-					bind(&ServerSessionManager::attach2Session, shared_from_this(), iter->second, channel),
-					bind(&ServerSessionManager::attach2SessionFail, shared_from_this(), channel));
+					bind(&SessionManager::attach2Session, shared_from_this(), iter->second, channel),
+					bind(&SessionManager::attach2SessionFail, shared_from_this(), channel));
 			}
 		}
 		else
@@ -109,7 +108,7 @@ namespace net
 			{
 				newSid = _sidGen();
 			}
-			ServerSessionPtr session(new ServerSession(newSid));
+			SessionPtr session(new Session(newSid));
 			_sessions[newSid] = session;
 
 			v.as<utils::Variant::MapStringVariant>(true)["sid"] = newSid;
@@ -117,13 +116,13 @@ namespace net
 			SPacket packet;
 			packet._data = v.save(packet._size);
 			channel->send(packet, 
-				bind(&ServerSessionManager::attach2Session, shared_from_this(), session, channel),
-				bind(&ServerSessionManager::attach2SessionFail, shared_from_this(), channel));
+				bind(&SessionManager::attach2Session, shared_from_this(), session, channel),
+				bind(&SessionManager::attach2SessionFail, shared_from_this(), channel));
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManager::onReceiveSidFail(IChannelPtr channel, system::error_code ec)
+	void SessionManager::onReceiveSidFail(IChannelPtr channel, system::error_code ec)
 	{
 		LF;
 		channel->close();
@@ -140,7 +139,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManager::attach2Session(ServerSessionPtr session, IChannelPtr channel)
+	void SessionManager::attach2Session(SessionPtr session, IChannelPtr channel)
 	{
 		LF;
 		{
@@ -151,7 +150,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManager::attach2SessionFail(IChannelPtr channel)
+	void SessionManager::attach2SessionFail(IChannelPtr channel)
 	{
 		LF;
 		channel->close();
@@ -159,7 +158,7 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	ServerSessionManager::ServerSessionManager()
+	SessionManager::SessionManager()
 		: _connector()
 		, _host()
 		, _service()
@@ -168,10 +167,10 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManager::start(
+	void SessionManager::start(
 		IConnectorPtr connector,
 		const char *host, const char *service,
-		boost::function<void (IServerSessionPtr)> ready,
+		boost::function<void (ISessionPtr)> ready,
 		boost::function<void (system::error_code)> fail)
 	{
 		assert(!_connector && _host.empty() && _service.empty());
@@ -195,12 +194,12 @@ namespace net
 
 		_connector->listen(
 			_host.c_str(), _service.c_str(), 
-			bind(&ServerSessionManager::onAcceptOk, shared_from_this(), _1),
-			bind(&ServerSessionManager::onAcceptFail, shared_from_this(), _1));
+			bind(&SessionManager::onAcceptOk, shared_from_this(), _1),
+			bind(&SessionManager::onAcceptFail, shared_from_this(), _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServerSessionManager::stop()
+	void SessionManager::stop()
 	{
 		mutex::scoped_lock sl(_mtx);
 		if(!_isStarted)
@@ -218,7 +217,7 @@ namespace net
 
 		_isStarted = false;
 		
-		boost::function<void (IServerSessionPtr)> nullReady;
+		boost::function<void (ISessionPtr)> nullReady;
 		_ready.swap(nullReady);
 		
 		boost::function<void (system::error_code)> nullFail;

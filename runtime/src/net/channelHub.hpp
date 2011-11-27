@@ -2,7 +2,6 @@
 #define _NET_CHANNELHUB_HPP_
 
 #include "net/ichannel.hpp"
-#include <set>
 
 namespace net
 {

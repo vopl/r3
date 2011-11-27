@@ -1,22 +1,21 @@
-#ifndef _NET_SERVERSESSIONMANAGER_HPP_
-#define _NET_SERVERSESSIONMANAGER_HPP_
+#ifndef _SERVER_SESSIONMANAGER_HPP_
+#define _SERVER_SESSIONMANAGER_HPP_
 
-#include "net/iserverSessionManager.hpp"
-#include "serverSession.hpp"
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/uuid/random_generator.hpp>
+#include "server/isessionManager.hpp"
+#include "session.hpp"
 
-namespace net
+namespace server
 {
 	using namespace boost;
+	using namespace net;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ServerSessionManager;
-	typedef boost::shared_ptr<ServerSessionManager> ServerSessionManagerPtr;
+	class SessionManager;
+	typedef boost::shared_ptr<SessionManager> ServerSessionManagerPtr;
 
-	class ServerSessionManager
-		: public IServerSessionManager
-		, public enable_shared_from_this<ServerSessionManager>
+	class SessionManager
+		: public ISessionManager
+		, public enable_shared_from_this<SessionManager>
 	{
 		IConnectorPtr	_connector;
 		std::string		_host;
@@ -24,11 +23,11 @@ namespace net
 
 		mutex _mtx;
 		bool										_isStarted;
-		boost::function<void (IServerSessionPtr)>	_ready;
+		boost::function<void (ISessionPtr)>	_ready;
 		boost::function<void (system::error_code)>	_fail;
 		boost::uuids::random_generator				_sidGen;
 
-		typedef std::map<TServerSid, ServerSessionPtr> TMSessions;
+		typedef std::map<TServerSid, SessionPtr> TMSessions;
 		TMSessions			_sessions;
 
 	private:
@@ -38,21 +37,21 @@ namespace net
 		void onReceiveSidOk(IChannelPtr channel, const SPacket &packet);
 		void onReceiveSidFail(IChannelPtr channel, system::error_code ec);
 
-		void attach2Session(ServerSessionPtr session, IChannelPtr channel);
+		void attach2Session(SessionPtr session, IChannelPtr channel);
 		void attach2SessionFail(IChannelPtr channel);
 
 	public:
-		ServerSessionManager();
+		SessionManager();
 
 		virtual void start(
 			IConnectorPtr connector,
 			const char *host, const char *service,
-			boost::function<void (IServerSessionPtr)> ready,
+			boost::function<void (ISessionPtr)> ready,
 			boost::function<void (system::error_code)> fail);
 
 		virtual void stop();
 	};
 
-	PLUMA_INHERIT_PROVIDER(ServerSessionManager, IServerSessionManager);
+	PLUMA_INHERIT_PROVIDER(SessionManager, ISessionManager);
 }
 #endif

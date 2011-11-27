@@ -3,9 +3,6 @@
 
 #include "net/iconnector.hpp"
 #include "async/iservice.hpp"
-#include <boost/enable_shared_from_this.hpp>
-#include <set>
-#include <map>
 #include "channelSocket.hpp"
 
 namespace net

@@ -1,8 +1,6 @@
 #ifndef _SERVER_ISERVER_HPP_
 #define _SERVER_ISERVER_HPP_
 
-#include "pluma/pluma.hpp"
-#include <boost/shared_ptr.hpp>
 #include "async/iservice.hpp"
 
 

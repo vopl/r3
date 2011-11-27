@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "clientSession.hpp"
-#include <boost/bind.hpp>
 #include "utils/variant.hpp"
 
 //#define LF 		std::cerr<<__FUNCTION__ "\n";std::cerr.flush();

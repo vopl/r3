@@ -63,3 +63,16 @@ typename ProviderType::ITypePtr Pluma::create()
 	}
 	return providers.front()->create();
 }
+
+//////////////////////////////////////////////////////////////////////////
+template<typename ProviderType>
+void Pluma::createAll(std::vector<typename ProviderType::ITypePtr> &instances)
+{
+	std::vector<ProviderType *> providers;
+	getProviders(providers);
+	instances.resize(providers.size());
+	for(size_t i(0); i<instances.size(); i++)
+	{
+		instances[i] = providers[i]->create();
+	}
+}

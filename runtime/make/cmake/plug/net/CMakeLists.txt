@@ -4,8 +4,6 @@ SET(INCLUDE
 	${INC_DIR}/net/ichannel.hpp
 	${INC_DIR}/net/iclientSession.hpp
 	${INC_DIR}/net/iconnector.hpp
-	${INC_DIR}/net/iserverSession.hpp
-	${INC_DIR}/net/iserverSessionManager.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -13,8 +11,6 @@ SET(SRC
 	${SRC_DIR}/net/channelSocket.cpp
 	${SRC_DIR}/net/clientSession.cpp
 	${SRC_DIR}/net/connector.cpp
-	${SRC_DIR}/net/serverSession.cpp
-	${SRC_DIR}/net/serverSessionManager.cpp
 	${SRC_DIR}/net/plug.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
@@ -25,8 +21,6 @@ SET(SRC_NOPCH
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
 SET(SRC_HDR
-	${SRC_DIR}/net/serverSession.hpp
-	${SRC_DIR}/net/serverSessionManager.hpp
 	${SRC_DIR}/net/connector.hpp
 	${SRC_DIR}/net/channelHub.hpp
 	${SRC_DIR}/net/channelSocket.hpp
