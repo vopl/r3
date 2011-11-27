@@ -12,7 +12,7 @@ SET(SRC
 	${SRC_DIR}/client/entry.cpp
 	${SRC_DIR}/heapNewDelete.cpp
 )
-
+SOURCE_GROUP(src FILES ${SRC})
 QT4_AUTOMOC(${SRC})
 
 
