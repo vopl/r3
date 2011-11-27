@@ -16,7 +16,7 @@ SET(SRC
 SOURCE_GROUP(src FILES ${SRC})
 
 SET(SRC_NOPCH
-	${SRC_DIR}/plumaNewDelete.cpp
+	${SRC_DIR}/heapNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
@@ -42,7 +42,7 @@ PRESETUP_BIN_OUT(SRC_STUB)
 	USE_PCH(net ${SRC_DIR}/net/pch.h ${SRC})
 SETUP_BIN_OUT(net plug)
 
-TARGET_LINK_LIBRARIES(net pluma utils)
+TARGET_LINK_LIBRARIES(net heap pluma utils)
 
 
 INCLUDE(FindOpenSSL.cmake)

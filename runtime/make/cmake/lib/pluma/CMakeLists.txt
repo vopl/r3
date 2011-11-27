@@ -8,7 +8,6 @@ SET(INCLUDE
 	${INC_DIR}/pluma/pluma.hpp
 	${INC_DIR}/pluma/pluma.inl
 	${INC_DIR}/pluma/provider.hpp
-	${INC_DIR}/pluma/heap.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -18,8 +17,7 @@ SET(SRC
 	${SRC_DIR}/pluma/host.cpp
 	${SRC_DIR}/pluma/pluginManager.cpp
 	${SRC_DIR}/pluma/provider.cpp
-	${SRC_DIR}/pluma/heap.cpp
-	${SRC_DIR}/plumaNewDelete.cpp
+	${SRC_DIR}/heapNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -36,6 +34,8 @@ ADD_DEFINITIONS(-DPLUMA_EXPORTS)
 PRESETUP_BIN_OUT(SRC_STUB)
 	ADD_LIBRARY(pluma SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR})
 SETUP_BIN_OUT(pluma bin)
+
+TARGET_LINK_LIBRARIES(pluma heap)
 
 IF(LINUX)
 	TARGET_LINK_LIBRARIES(pluma dl)

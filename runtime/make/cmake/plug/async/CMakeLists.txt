@@ -12,7 +12,7 @@ SET(SRC
 SOURCE_GROUP(src FILES ${SRC})
 
 SET(SRC_NOPCH
-	${SRC_DIR}/plumaNewDelete.cpp
+	${SRC_DIR}/heapNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
@@ -36,7 +36,7 @@ PRESETUP_BIN_OUT(SRC_STUB)
 	USE_PCH(async ${SRC_DIR}/async/pch.h ${SRC})
 SETUP_BIN_OUT(async plug)
 
-TARGET_LINK_LIBRARIES(async pluma utils)
+TARGET_LINK_LIBRARIES(async heap pluma utils)
 
 IF(LINUX)
 	SET(CMAKE_THREAD_PREFER_PTHREAD ON)

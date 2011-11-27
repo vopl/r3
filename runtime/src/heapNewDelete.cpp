@@ -1,4 +1,4 @@
-#include "pluma/heap.hpp"
+#include "heap/heap.hpp"
 #include <new>
 
 
@@ -6,11 +6,11 @@
 //////////////////////////////////////////////////////////////////////////
 void operator delete[](void *p) throw()
 {
-	pluma::free(p);
+	heap::free(p);
 }
 void operator delete(void *p) throw()
 {
-	pluma::free(p);
+	heap::free(p);
 }
 
 #ifdef _MSC_VER
@@ -19,7 +19,7 @@ void *operator new[](size_t s) throw(...)
 void *operator new[](std::size_t s) throw(std::bad_alloc)
 #endif
 {
-	return pluma::alloc((unsigned int)s);
+	return heap::alloc((unsigned int)s);
 }
 #ifdef _MSC_VER
 void *operator new(size_t s) throw(...)
@@ -27,7 +27,7 @@ void *operator new(size_t s) throw(...)
 void *operator new(std::size_t s) throw(std::bad_alloc)
 #endif
 {
-	return pluma::alloc((unsigned int)s);
+	return heap::alloc((unsigned int)s);
 }
 
 
@@ -44,7 +44,7 @@ void * operator new(
 	int
 	)
 {
-	return pluma::alloc((unsigned int)s);
+	return heap::alloc((unsigned int)s);
 }
 
 void * operator new[](
@@ -54,17 +54,17 @@ void * operator new[](
 	int
 	)
 {
-	return pluma::alloc((unsigned int)s);
+	return heap::alloc((unsigned int)s);
 }
 
 void operator delete(void * p, int, const char *, int)
 {
-	pluma::free(p);
+	heap::free(p);
 }
 
 void operator delete[](void * p, int, const char *, int)
 {
-	pluma::free(p);
+	heap::free(p);
 }
 
 #endif

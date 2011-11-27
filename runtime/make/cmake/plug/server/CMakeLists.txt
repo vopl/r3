@@ -16,7 +16,7 @@ SET(SRC
 SOURCE_GROUP(src FILES ${SRC})
 
 SET(SRC_NOPCH
-	${SRC_DIR}/plumaNewDelete.cpp
+	${SRC_DIR}/heapNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
@@ -41,7 +41,7 @@ PRESETUP_BIN_OUT(SRC_STUB)
 	USE_PCH(server ${SRC_DIR}/server/pch.h ${SRC})
 SETUP_BIN_OUT(server plug)
 
-TARGET_LINK_LIBRARIES(server pluma utils)
+TARGET_LINK_LIBRARIES(server heap pluma utils)
 
 IF(LINUX)
 	SET(CMAKE_THREAD_PREFER_PTHREAD ON)
