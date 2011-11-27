@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
 	server::IServerPtr srv(providers.front()->create());
 
-	srv->run(&plugins);
+	srv->run(&plugins, "localhost", "29431");
 
 	return EXIT_SUCCESS;
 }

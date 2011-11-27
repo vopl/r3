@@ -8,9 +8,7 @@
 #include <signal.h>
 
 #include "async/iservice.hpp"
-#include "net/iconnector.hpp"
 #include "net/iserverSessionManager.hpp"
-#include "net/iclientSession.hpp"
 #include <boost/thread.hpp>
 #include <iostream>
 
@@ -44,7 +42,7 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Server::run(pluma::Pluma *plugs)
+	void Server::run(pluma::Pluma *plugs, const char *host, const char *service)
 	{
 		assert(!_plugs);
 		_plugs = plugs;
@@ -63,13 +61,13 @@ namespace server
 
 		try
 		{
-			std::vector<async::IServiceProvider *> providers;
-			plugs->getProviders(providers);
+			//////////////////////////////////////////////////////////////////////////
+			//поднять асинхронный двиг
+			_async = _plugs->create<async::IServiceProvider>();
+			assert(_async);
+			_async->balance(4);
 
-			assert(!providers.empty());
 
-			async::IServicePtr asrv(providers.front()->create());
-			asrv->balance(4);
 
 			//////////////////////////////////////////////////////////////////////////
 #ifdef WIN32
@@ -109,8 +107,8 @@ namespace server
 				}
 			} while(!bStop);
 
-			asrv->stop();
-			asrv.reset();
+			_async->stop();
+			_async.reset();
 			//instance.reset();
 		}
 		catch(const std::exception &e)
@@ -123,6 +121,18 @@ namespace server
 		}
 
 		_plugs = NULL;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	pluma::Pluma *Server::getPlugs()
+	{
+		return _plugs;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	async::IServicePtr Server::getAsync()
+	{
+		return _async;
 	}
 
 }

@@ -12,13 +12,15 @@ namespace server
 		, public boost::enable_shared_from_this<Server>
 	{
 		pluma::Pluma *_plugs;
+		async::IServicePtr	_async;
 
 	public:
 		Server();
 		~Server();
 
-		virtual void run(pluma::Pluma *plugs);
-
+		virtual void run(pluma::Pluma *plugs, const char *host, const char *service);
+		virtual pluma::Pluma * getPlugs();
+		virtual async::IServicePtr getAsync();
 	};
 	PLUMA_INHERIT_PROVIDER(Server, IServer);
 }

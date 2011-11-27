@@ -3,14 +3,17 @@
 
 #include "pluma/pluma.hpp"
 #include <boost/shared_ptr.hpp>
-// #include <boost/function.hpp>
-// #include <boost/asio/io_service.hpp>
+#include "async/iservice.hpp"
+
 
 namespace server
 {
 	struct IServer
 	{
-		virtual void run(pluma::Pluma *plugs) =0;
+		virtual void run(pluma::Pluma *plugs, const char *host, const char *service) =0;
+		
+		virtual pluma::Pluma * getPlugs() =0;
+		virtual async::IServicePtr getAsync() =0;
 	};
 	typedef boost::shared_ptr<IServer> IServerPtr;
 
