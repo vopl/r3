@@ -3,6 +3,7 @@
 #include "net/iconnector.hpp"
 #include "net/iserverSessionManager.hpp"
 #include "net/iclientSession.hpp"
+#include <boost/thread.hpp>
 
 #ifdef WIN32
 #	include <conio.h>
@@ -55,23 +56,21 @@ int main(int argc, char* argv[])
 #endif
 		do
 		{
+			char ch;
 #ifdef WIN32
 			if(_kbhit())
 			{
-				char ch = (char)_getch();
-				switch(ch)
-				{
+				ch = (char)_getch();
 #else
 			if(0<poll(stdin_pfd,1,0))
 			{
-				char ch;
 				if(1 > read(0, &ch, 1))
 				{
 					break;
 				}
+#endif
 				switch(ch)
 				{
-#endif
 				case 'e':
 					bStop = true;
 					std::cout<<"exit"<<std::endl;
@@ -81,10 +80,11 @@ int main(int argc, char* argv[])
 					break;
 				}
 			}
-			// else
-			// {
-				// boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
-			// }
+			else
+			{
+				//std::cout<<"sleep"<<std::endl;
+				boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
+			}
 		} while(!bStop);
 
 		asrv->stop();
