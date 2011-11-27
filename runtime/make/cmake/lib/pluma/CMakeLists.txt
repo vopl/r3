@@ -33,7 +33,8 @@ ADD_DEFINITIONS(-DPLUMA_EXPORTS)
 
 PRESETUP_BIN_OUT(SRC_STUB)
 	ADD_LIBRARY(libpluma SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR})
-SETUP_BIN_OUT(libpluma bin)
+SETUP_BIN_OUT(libpluma server)
+SETUP_BIN_OUT(libpluma client)
 
 TARGET_LINK_LIBRARIES(libpluma libheap)
 

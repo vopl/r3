@@ -2,5 +2,6 @@ syntax: regexp
 ^runtime/include/pgs/meta/schemas
 ^runtime/make/vs9
 ^runtime/lib
-^runtime/bin
+^runtime/client
+^runtime/server
 ^runtime/plug
