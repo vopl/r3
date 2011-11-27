@@ -1,14 +1,14 @@
 #include "pch.h"
-#include "clientSession.hpp"
+#include "session.hpp"
 #include "utils/variant.hpp"
 
 //#define LF 		std::cerr<<__FUNCTION__ "\n";std::cerr.flush();
 #define LF
 
-namespace net
+namespace client
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::checkbalance()
+	void Session::checkbalance()
 	{
 		LF;
 		//уже заблокировано
@@ -19,8 +19,8 @@ namespace net
 		{
 			_connector->connect(
 				_host.c_str(), _service.c_str(), 
-				bind(&ClientSession::onConnectOk, shared_from_this(), _1),
-				bind(&ClientSession::onConnectError, shared_from_this(), _1));
+				bind(&Session::onConnectOk, shared_from_this(), _1),
+				bind(&Session::onConnectError, shared_from_this(), _1));
 			_waitConnections++;
 		}
 
@@ -32,7 +32,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::onConnectOk(IChannelPtr channel)
+	void Session::onConnectOk(IChannelPtr channel)
 	{
 		LF;
 		mutex::scoped_lock sl(_mtx);
@@ -51,14 +51,14 @@ namespace net
 		//послать сид
 		channel->send(
 			packet, 
-			bind(&ClientSession::onSendSidOk, shared_from_this(), channel),
-			bind(&ClientSession::onSendSidFail, shared_from_this(), channel, _1));
+			bind(&Session::onSendSidOk, shared_from_this(), channel),
+			bind(&Session::onSendSidFail, shared_from_this(), channel, _1));
 		
 		_waitConnectionsChannels.insert(channel);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::onConnectError(system::error_code ec)
+	void Session::onConnectError(system::error_code ec)
 	{
 		LF;
 		mutex::scoped_lock sl(_mtx);
@@ -72,7 +72,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::onSendSidOk(IChannelPtr channel)
+	void Session::onSendSidOk(IChannelPtr channel)
 	{
 		LF;
 		mutex::scoped_lock sl(_mtx);
@@ -83,12 +83,12 @@ namespace net
 		}
 		//принять сид
 		channel->receive(
-			bind(&ClientSession::onReceiveSidOk, shared_from_this(), channel, _1),
-			bind(&ClientSession::onReceiveSidFail, shared_from_this(), channel, _1));
+			bind(&Session::onReceiveSidOk, shared_from_this(), channel, _1),
+			bind(&Session::onReceiveSidFail, shared_from_this(), channel, _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::onSendSidFail(IChannelPtr channel, system::error_code ec)
+	void Session::onSendSidFail(IChannelPtr channel, system::error_code ec)
 	{
 		LF;
 		channel->close();
@@ -109,7 +109,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::onReceiveSidOk(IChannelPtr channel, const SPacket &packet)
+	void Session::onReceiveSidOk(IChannelPtr channel, const SPacket &packet)
 	{
 		LF;
 		mutex::scoped_lock sl(_mtx);
@@ -172,7 +172,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::onReceiveSidFail(IChannelPtr channel, system::error_code ec)
+	void Session::onReceiveSidFail(IChannelPtr channel, system::error_code ec)
 	{
 		LF;
 		channel->close();
@@ -194,14 +194,14 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	ClientSessionPtr ClientSession::shared_from_this()
+	SessionPtr Session::shared_from_this()
 	{
-		return static_pointer_cast<ClientSession>(ChannelHub<IClientSession>::shared_from_this());
+		return static_pointer_cast<Session>(ChannelHub<ISession>::shared_from_this());
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	ClientSession::ClientSession()
+	Session::Session()
 		: _connector()
 		, _host()
 		, _service()
@@ -214,7 +214,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::start(
+	void Session::start(
 		IConnectorPtr connector,
 		const char *host, const char *service,
 		TClientSid sid, 
@@ -260,7 +260,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::close()
+	void Session::close()
 	{
 		mutex::scoped_lock sl(_mtx);
 		if(!_isStarted)
@@ -286,7 +286,7 @@ namespace net
 			c->close();
 		}
 		_waitConnectionsChannels.clear();
-		ChannelHub<IClientSession>::close();
+		ChannelHub<ISession>::close();
 
 		_connector.reset();
 		_host.clear();
@@ -294,13 +294,13 @@ namespace net
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::stop()
+	void Session::stop()
 	{
 		return close();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClientSession::balance(size_t numChannels)
+	void Session::balance(size_t numChannels)
 	{
 		mutex::scoped_lock sl(_mtx);
 		if(!_isStarted)
@@ -313,7 +313,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	TClientSid ClientSession::sid()
+	TClientSid Session::sid()
 	{
 		mutex::scoped_lock sl(_mtx);
 		return _sid;

@@ -1,16 +1,19 @@
-#ifndef _NET_CLIENTSESSION_HPP_
-#define _NET_CLIENTSESSION_HPP_
+#ifndef _CLIENT_SESSION_HPP_
+#define _CLIENT_SESSION_HPP_
 
-#include "net/iclientSession.hpp"
-#include "channelHub.hpp"
+#include "client/isession.hpp"
+#include "../net/channelHub.hpp"
 
-namespace net
+namespace client
 {
-	class ClientSession;
-	typedef boost::shared_ptr<ClientSession> ClientSessionPtr;
+	using namespace boost;
+	using namespace net;
 
-	class ClientSession
-		: public ChannelHub<IClientSession>
+	class Session;
+	typedef boost::shared_ptr<Session> SessionPtr;
+
+	class Session
+		: public ChannelHub<ISession>
 	{
 		IConnectorPtr	_connector;
 		std::string		_host;
@@ -41,10 +44,10 @@ namespace net
 
 
 	public:
-		ClientSessionPtr shared_from_this();
+		SessionPtr shared_from_this();
 
 	public:
-		ClientSession();
+		Session();
 
 		virtual void start(
 			IConnectorPtr connector,
@@ -62,6 +65,6 @@ namespace net
 		virtual TClientSid sid();
 
 	};
-	PLUMA_INHERIT_PROVIDER(ClientSession, IClientSession);
+	PLUMA_INHERIT_PROVIDER(Session, ISession);
 }
 #endif

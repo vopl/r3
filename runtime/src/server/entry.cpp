@@ -7,12 +7,8 @@ int main(int argc, char* argv[])
 	pluma::Pluma plugins;
 	plugins.loadFromFolder("../plug");
 
-	std::vector<server::IServerProvider*> providers;
-	plugins.getProviders(providers);
-
-	assert(!providers.empty());
-
-	server::IServerPtr srv(providers.front()->create());
+	server::IServerPtr srv(plugins.create<server::IServerProvider>());
+	assert(srv);
 
 	srv->run(&plugins, "localhost", "29431");
 

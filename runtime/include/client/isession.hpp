@@ -1,21 +1,21 @@
-#ifndef _NET_ICLIENTSESSION_HPP_
-#define _NET_ICLIENTSESSION_HPP_
+#ifndef _CLIENT_ISESSION_HPP_
+#define _CLIENT_ISESSION_HPP_
 
 #include "net/iconnector.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/nil_generator.hpp>
 
-namespace net
+namespace client
 {
 	typedef boost::uuids::uuid TClientSid;
 	static const TClientSid nullClientSid = boost::uuids::nil_uuid();
 
 	//////////////////////////////////////////////////////////////////////////
-	struct IClientSession
-		: public IChannel
+	struct ISession
+		: public net::IChannel
 	{
 		virtual void start(
-			IConnectorPtr connector,
+			net::IConnectorPtr connector,
 			const char *host, const char *service,
 			TClientSid sid, 
 			size_t numChannels,
@@ -27,9 +27,9 @@ namespace net
 
 		virtual TClientSid sid() =0;
 	};
-	typedef boost::shared_ptr<IClientSession> IClientSessionPtr;
+	typedef boost::shared_ptr<ISession> ISessionPtr;
 
 
-	PLUMA_PROVIDER_HEADER(IClientSession, 1, 1);
+	PLUMA_PROVIDER_HEADER(ISession, 1, 1);
 }
 #endif
