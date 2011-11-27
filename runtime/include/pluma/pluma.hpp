@@ -53,14 +53,13 @@ PLUMA_PROVIDER_HEADER_END
 ////////////////////////////////////////////////////////////
 #define PLUMA_PROVIDER_HEADER_BEGIN(TYPE, Version, LowestVersion)\
 class TYPE##Provider: public pluma::Provider{\
-private:\
-    friend class pluma::Pluma;\
+public:\
     static const unsigned int PLUMA_INTERFACE_VERSION(){return Version;}\
     static const unsigned int PLUMA_INTERFACE_LOWEST_VERSION(){return LowestVersion;}\
 	static const std::string PLUMA_PROVIDER_TYPE(){return PLUMA_2STRING( TYPE );}\
-    std::string plumaGetType() const{ return PLUMA_PROVIDER_TYPE(); }\
-public:\
-    unsigned int getVersion() const{ return PLUMA_INTERFACE_VERSION(); }
+    std::string getType() const{ return PLUMA_PROVIDER_TYPE(); }\
+	unsigned int getVersion() const{ return PLUMA_INTERFACE_VERSION(); }\
+	unsigned int getLowestVersion() const{ return PLUMA_INTERFACE_LOWEST_VERSION(); }
 
 ////////////////////////////////////////////////////////////
 // Macro that generate last part of the provider definition

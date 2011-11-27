@@ -57,7 +57,8 @@ public:
     /// \return Version number.
     ///
     ////////////////////////////////////////////////////////////
-    virtual unsigned int getVersion() const = 0;
+	virtual unsigned int getVersion() const = 0;
+	virtual unsigned int getLowestVersion() const = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Check compatibility with host.
@@ -75,7 +76,7 @@ public:
     bool isCompatible(const Host& host) const;
 
 
-private:
+public:
 
     ////////////////////////////////////////////////////////////
     /// \brief Get provider type.
@@ -87,7 +88,7 @@ private:
     /// \return Provider type id.
     ///
     ////////////////////////////////////////////////////////////
-    virtual std::string plumaGetType() const = 0;
+    virtual std::string getType() const = 0;
 
 };
 

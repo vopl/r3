@@ -44,11 +44,14 @@ bool Host::add(Provider* provider){
         fprintf(stderr, "Trying to add a null provider.\n");
         return false;
     }
+
+	registerType(provider->getType(), provider->getVersion(), provider->getLowestVersion());
+
     if (!validateProvider(provider)){
         delete provider;
         return false;
     }
-    addRequests[ provider->plumaGetType() ].push_back(provider);
+    addRequests[ provider->getType() ].push_back(provider);
     return true;
 }
 
@@ -120,7 +123,7 @@ const std::list<Provider*>* Host::getProviders(const std::string& type) const{
 
 ////////////////////////////////////////////////////////////
 bool Host::validateProvider(Provider* provider) const{
-    const std::string& type = provider->plumaGetType();
+    const std::string& type = provider->getType();
     if ( !knows(type) ){
         fprintf(stderr, "%s provider type isn't registered.\n", type.c_str());
         return false;
@@ -139,7 +142,7 @@ bool Host::registerProvider(Provider* provider){
         delete provider;
         return false;
     }
-    knownTypes[ provider->plumaGetType() ].providers.push_back(provider);
+    knownTypes[ provider->getType() ].providers.push_back(provider);
     return true;
 }
 

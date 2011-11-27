@@ -41,7 +41,7 @@ Provider::~Provider(){
 ////////////////////////////////////////////////////////////
 bool Provider::isCompatible(const Host& host) const{
     // check compatibility with host
-    const std::string& type = this->plumaGetType();
+    const std::string& type = this->getType();
     if (!host.knows(type)) return false;
     unsigned int lowest = host.getLowestVersion(type);
     unsigned int current = host.getVersion(type);
