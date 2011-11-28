@@ -18,7 +18,7 @@ namespace server
 		virtual void send(
 			IServicePtr service,
 			ISessionPtr session,
-			TEndpoint endpoint,
+			const TEndpoint &endpoint,
 			utils::VariantPtr data,
 			boost::function<void ()> ok,
 			boost::function<void (boost::system::error_code)> fail) =0;

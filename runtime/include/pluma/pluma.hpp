@@ -58,7 +58,7 @@ public:\
 	typedef boost::shared_ptr<TYPE> ITypePtr;\
     static const unsigned int PLUMA_INTERFACE_VERSION(){return Version;}\
     static const unsigned int PLUMA_INTERFACE_LOWEST_VERSION(){return LowestVersion;}\
-	static const std::string PLUMA_PROVIDER_TYPE(){return PLUMA_2STRING( TYPE );}\
+	static const std::string PLUMA_PROVIDER_TYPE(){return typeid( TYPE ).name();}\
     std::string getType() const{ return PLUMA_PROVIDER_TYPE(); }\
 	unsigned int getVersion() const{ return PLUMA_INTERFACE_VERSION(); }\
 	unsigned int getLowestVersion() const{ return PLUMA_INTERFACE_LOWEST_VERSION(); }

@@ -29,8 +29,8 @@ namespace server
 		//если просто не осталось низких каналов - то ошибка не должна приходить, надо переработать хаб канала
 		//а если закрыта - то сначало должен был быть вызван delSession
 
-		//??? универсальное решение - повесить перезапрос на таймер через время
-		assert(0);
+		session->close();
+		delSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ namespace server
 				bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
 
 			//оповестить службы
-			BOOST_FOREACH(TMServicesFwd::value_type &pair, _servicesFwd)
+			BOOST_FOREACH(TMServices::value_type &pair, _services)
 			{
 				pair.second->onSessionAdd(session);
 			}
@@ -71,7 +71,7 @@ namespace server
 		if(_sessions.end() != iter)
 		{
 			//оповестить службы
-			BOOST_FOREACH(TMServicesFwd::value_type &pair, _servicesFwd)
+			BOOST_FOREACH(TMServices::value_type &pair, _services)
 			{
 				pair.second->onSessionDel(session);
 			}
@@ -85,26 +85,22 @@ namespace server
 	void ServiceHub::addService(IServicePtr service)
 	{
 		mutex::scoped_lock sl(_mtx);
-		TEndpoint id = _endpointGenerator();
-		while(_servicesFwd.end() != _servicesFwd.find(id))
+		if(_services.end() == _services.find(service->getEndpoint()))
 		{
-			id = _endpointGenerator();
+			_services[service->getEndpoint()] = service;
+			service->onHubAdd(shared_from_this());
 		}
-		_servicesFwd[id] = service;
-		_servicesBwd[service] = id;
-		service->onHubAdd(shared_from_this());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::delService(IServicePtr service)
 	{
 		mutex::scoped_lock sl(_mtx);
-		TMServicesBwd::iterator iter = _servicesBwd.find(service);
-		if(_servicesBwd.end() != iter)
+		TMServices::iterator iter = _services.find(service->getEndpoint());
+		if(_services.end() != iter)
 		{
 			service->onHubDel(shared_from_this());
-			_servicesFwd.erase(iter->second);
-			_servicesBwd.erase(iter);
+			_services.erase(iter);
 		}
 	}
 
@@ -112,7 +108,7 @@ namespace server
 	void ServiceHub::send(
 		IServicePtr service,
 		ISessionPtr session,
-		TEndpoint endpoint,
+		const TEndpoint &endpoint,
 		utils::VariantPtr data,
 		boost::function<void ()> ok,
 		boost::function<void (boost::system::error_code)> fail)

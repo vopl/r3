@@ -5,6 +5,9 @@
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
+	const TEndpoint ServiceEcho::_endpoint = "echo";
+
+	//////////////////////////////////////////////////////////////////////////
 	void ServiceEcho::onSendOk()
 	{
 		//
@@ -14,6 +17,12 @@ namespace server
 	void ServiceEcho::onSendFail(system::error_code ec)
 	{
 		//
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const TEndpoint &ServiceEcho::getEndpoint()
+	{
+		return _endpoint;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -44,7 +53,7 @@ namespace server
 	void ServiceEcho::onReceive(
 		IServiceHubPtr hub,
 		ISessionPtr session,
-		TEndpoint endpoint,
+		const TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{
 		hub->send(shared_from_this(), session, endpoint, data, 

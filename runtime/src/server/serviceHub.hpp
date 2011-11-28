@@ -14,14 +14,11 @@ namespace server
 		, public enable_shared_from_this<ServiceHub>
 	{
 		typedef std::map<TServerSid, ISessionPtr> TMSessions;
-		typedef std::map<TEndpoint, IServicePtr> TMServicesFwd;
-		typedef std::map<IServicePtr, TEndpoint> TMServicesBwd;
+		typedef std::map<TEndpoint, IServicePtr> TMServices;
 
 		TMSessions	_sessions;
-		TMServicesFwd	_servicesFwd;
-		TMServicesBwd	_servicesBwd;
+		TMServices	_services;
 
-		uuids::random_generator	_endpointGenerator;
 		mutex	_mtx;
 
 	private:
@@ -42,7 +39,7 @@ namespace server
 		virtual void send(
 			IServicePtr service,
 			ISessionPtr session,
-			TEndpoint endpoint,
+			const TEndpoint &endpoint,
 			utils::VariantPtr data,
 			boost::function<void ()> ok,
 			boost::function<void (boost::system::error_code)> fail);

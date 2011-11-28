@@ -8,7 +8,7 @@
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	typedef boost::uuids::uuid TEndpoint;
+	typedef std::string TEndpoint;
 
 	//////////////////////////////////////////////////////////////////////////
 	struct IServiceHub;
@@ -19,6 +19,8 @@ namespace server
 	{
 		virtual ~IService(){}
 
+		virtual const TEndpoint &getEndpoint() =0;
+
 		virtual void onHubAdd(IServiceHubPtr hub) =0;
 		virtual void onHubDel(IServiceHubPtr hub) =0;
 
@@ -28,7 +30,7 @@ namespace server
 		virtual void onReceive(
 			IServiceHubPtr hub,
 			ISessionPtr session,
-			TEndpoint endpoint,
+			const TEndpoint &endpoint,
 			utils::VariantPtr data) =0;
 	};
 	typedef boost::shared_ptr<IService> IServicePtr;

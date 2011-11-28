@@ -13,10 +13,14 @@ namespace server
 		: public IService
 		, public enable_shared_from_this<ServiceEcho>
 	{
+		static const TEndpoint _endpoint;
 		void onSendOk();
 		void onSendFail(system::error_code ec);
 
 	public:
+
+		virtual const TEndpoint &getEndpoint();
+
 		virtual void onHubAdd(IServiceHubPtr hub);
 		virtual void onHubDel(IServiceHubPtr hub);
 
@@ -26,7 +30,7 @@ namespace server
 		virtual void onReceive(
 			IServiceHubPtr hub,
 			ISessionPtr session,
-			TEndpoint endpoint,
+			const TEndpoint &endpoint,
 			utils::VariantPtr data);
 	};
 	typedef boost::shared_ptr<ServiceEcho> ServiceEchoPtr;

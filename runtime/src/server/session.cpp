@@ -13,7 +13,6 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	TServerSid Session::sid()
 	{
-		assert(0);
-		return nullServerSid;
+		return _sid;
 	}
 }

@@ -2,7 +2,8 @@
 #define _SERVER_SERVER_HPP_
 
 #include "server/iserver.hpp"
-#include "server/isession.hpp"
+#include "server/isessionManager.hpp"
+#include "server/iserviceHub.hpp"
 
 namespace server
 {
@@ -15,6 +16,8 @@ namespace server
 	{
 		pluma::Pluma *_plugs;
 		async::IServicePtr	_async;
+		ISessionManagerPtr	_sessionManager;
+		IServiceHubPtr		_serviceHub;
 
 	private:
 		void onSsmOk(ISessionPtr session);
@@ -24,7 +27,8 @@ namespace server
 		Server();
 		~Server();
 
-		virtual void run(pluma::Pluma *plugs, const char *host, const char *service);
+		virtual void start(pluma::Pluma *plugs, const char *host, const char *service);
+		virtual void stop();
 		virtual pluma::Pluma * getPlugs();
 		virtual async::IServicePtr getAsync();
 	};

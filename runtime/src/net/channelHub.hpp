@@ -14,8 +14,9 @@ namespace net
 		, public enable_shared_from_this<ChannelHub<Base> >
 	{
 		typedef std::set<IChannelPtr> TChannels;
-		TChannels _channels;
-		mutex _mtxChannels;
+		TChannels	_channels;
+		bool		_work;
+		mutex		_mtxChannels;
 
 		//////////////////////////////////////////////////////////////////////////
 		struct SendWaiter
@@ -130,12 +131,12 @@ namespace net
 			bool isWork = false;
 			{
 				mutex::scoped_lock sl(_mtxSend);
+				isWork = _work;
 				TChannels::iterator iter = _channelsSend.find(channel);
 				if(_channelsSend.end() != iter)
 				{
 					_channelsSend.erase(iter);
 					_channelsSendNot.insert(channel);
-					isWork = true;
 					balanceSends();
 				}
 				else
@@ -156,10 +157,12 @@ namespace net
 			bool isWork = false;
 			{
 				mutex::scoped_lock sl(_mtxChannels);
+				isWork = _work;
 				TChannels::iterator iter = _channels.find(channel);
 				if(_channels.end() != iter)
 				{
-					assert(!"log error?");
+					std::cout<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+					//assert(!"log error?");
 
 					_channels.erase(iter);
 
@@ -171,7 +174,6 @@ namespace net
 					_sendWaiters.push_front(sw);
 
 					balanceSends();
-					isWork = true;
 				}
 				else
 				{
@@ -243,11 +245,12 @@ namespace net
 
 			bool isWork = false;
 			mutex::scoped_lock sl(_mtxChannels);
+			isWork = _work;
 			TChannels::iterator iter = _channels.find(channel);
 			if(_channels.end() != iter)
 			{
-				std::cout<<ec.message()<<std::endl;
-				assert(!"log error?");
+				std::cout<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+				//assert(!"log error?");
 
 				_channels.erase(iter);
 
@@ -273,6 +276,7 @@ namespace net
 		//////////////////////////////////////////////////////////////////////////
 		ChannelHub()
 			: _recvChannelsAmount(0)
+			, _work(true)
 		{
 		}
 
@@ -284,19 +288,28 @@ namespace net
 		{
 			RecvCallbacks rcs;
 
+			bool isWork;
 			{
 				mutex::scoped_lock sl(_mtxRecv);
+				isWork = _work;
 
-				//положить в очередь на отправку
-				RecvWaiterPtr rp(new RecvWaiter(ok,fail));
-				_recvWaiters.push_back(rp);
+				if(_work)
+				{
+					//положить в очередь на отправку
+					RecvWaiterPtr rp(new RecvWaiter(ok,fail));
+					_recvWaiters.push_back(rp);
 
-				balanceRecvs(rcs);
+					balanceRecvs(rcs);
+				}
 			}
 
 			BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
 			{
 				rc->_ok(rc->_packet);
+			}
+			if(!isWork)
+			{
+				fail(system::errc::make_error_code(system::errc::operation_canceled));
 			}
 
 		}
@@ -307,13 +320,22 @@ namespace net
 			function<void ()> ok,
 			function<void (system::error_code)> fail)
 		{
-			mutex::scoped_lock sl(_mtxSend);
+			bool isWork;
+			{
+				mutex::scoped_lock sl(_mtxSend);
+				isWork = _work;
 
-			//положить в очередь на отправку
-			SendWaiterPtr sw(new SendWaiter(p,ok,fail));
-			_sendWaiters.push_back(sw);
+				//положить в очередь на отправку
+				SendWaiterPtr sw(new SendWaiter(p,ok,fail));
+				_sendWaiters.push_back(sw);
 
-			balanceSends();
+				balanceSends();
+			}
+
+			if(!isWork)
+			{
+				fail(system::errc::make_error_code(system::errc::operation_canceled));
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -343,6 +365,7 @@ namespace net
 					_recvPackets.clear();
 				}
 				_recvChannelsAmount = 0;
+				_work = false;
 			}
 
 			BOOST_FOREACH(const RecvCallbackPtr &rc, rcs)
@@ -369,6 +392,8 @@ namespace net
 				bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), channel, _1),
 				bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), channel, _1));
 			_recvChannelsAmount++;
+
+			_work = true;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

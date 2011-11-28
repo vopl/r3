@@ -1,14 +1,6 @@
 #include "pch.h"
 #include "server.hpp"
-#ifdef WIN32
-#	include <conio.h>
-#else
-#	include <poll.h>
-#endif
-#include <signal.h>
-
 #include "async/iservice.hpp"
-#include "server/isessionManager.hpp"
 
 
 
@@ -16,18 +8,10 @@ namespace server
 {
 
 
-	volatile bool bStop = false;
-	void onSignal(int /*sig*/)
-	{
-		//printf("signal %d\n", sig);
-		bStop = true;
-	}
-
-
 	//////////////////////////////////////////////////////////////////////////
 	void Server::onSsmOk(ISessionPtr session)
 	{
-		assert(0);
+		_serviceHub->addSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -52,22 +36,10 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Server::run(pluma::Pluma *plugs, const char *host, const char *service)
+	void Server::start(pluma::Pluma *plugs, const char *host, const char *service)
 	{
 		assert(!_plugs);
 		_plugs = plugs;
-
-		signal(SIGINT, onSignal);
-		signal(SIGILL, onSignal);
-		signal(SIGFPE, onSignal);
-		signal(SIGSEGV, onSignal);
-		signal(SIGTERM, onSignal);
-		signal(SIGABRT, onSignal);
-#ifdef WIN32
-		signal(SIGBREAK, onSignal);
-#else
-		signal(SIGKILL, onSignal);
-#endif
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять асинхронный двиг
@@ -83,58 +55,40 @@ namespace server
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять менеджер сессий
-		ISessionManagerPtr ssm = _plugs->create<ISessionManagerProvider>();
-		assert(ssm);
-		ssm->start(connector, host, service, 
+		assert(!_sessionManager);
+		_sessionManager = _plugs->create<ISessionManagerProvider>();
+		assert(_sessionManager);
+		_sessionManager->start(connector, host, service, 
 			bind(&Server::onSsmOk, shared_from_this(), _1),
 			bind(&Server::onSsmFail, shared_from_this(), _1));
 
-		//запускать асинхронный двиг
-		_async->balance(4);
-
+		//////////////////////////////////////////////////////////////////////////
+		//поднять хаб служб
+		assert(!_serviceHub);
+		_serviceHub = _plugs->create<IServiceHubProvider>();
+		assert(_serviceHub);
 
 		//////////////////////////////////////////////////////////////////////////
-#ifdef WIN32
-#else
-		pollfd stdin_pfd[1]={0, POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI,0};
-#endif
-		do
+		//набавить службы
+		std::vector<IServicePtr> services;
+		_plugs->createAll<IServiceProvider>(services);
+		BOOST_FOREACH(IServicePtr &s, services)
 		{
-			char ch;
-#ifdef WIN32
-			if(_kbhit())
-			{
-				ch = (char)_getch();
-#else
-			if(0<poll(stdin_pfd,1,0))
-			{
-				if(1 > read(0, &ch, 1))
-				{
-					break;
-				}
-#endif
-				switch(ch)
-				{
-				case 'e':
-					bStop = true;
-					std::cout<<"exit"<<std::endl;
-					break;
-				default:
-					std::cout<<"what?"<<std::endl;
-					break;
-				}
-			}
-			else
-			{
-				//std::cout<<"sleep"<<std::endl;
-				boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
-			}
-		} while(!bStop);
+			_serviceHub->addService(s);
+		}
 
-		ssm->stop();
+		//запускать асинхронный двиг
+		_async->balance(4);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Server::stop()
+	{
+		assert(_sessionManager);
+		_sessionManager->stop();
+		_sessionManager.reset();
 		_async->stop();
 		_async.reset();
-		//instance.reset();
 		_plugs = NULL;
 	}
 
