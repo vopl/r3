@@ -29,6 +29,8 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	struct IChannel
 	{
+		virtual ~IChannel(){}
+
 		virtual void receive(
 			boost::function<void (const SPacket &)> ok,
 			boost::function<void (boost::system::error_code)> fail = boost::function<void (boost::system::error_code)>()) =0;

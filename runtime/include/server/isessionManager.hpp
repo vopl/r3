@@ -8,6 +8,8 @@ namespace server
 {
 	struct ISessionManager
 	{
+		virtual ~ISessionManager(){}
+
 		virtual void start(
 			net::IConnectorPtr connector, 
 			const char *host, const char *service,

@@ -1,5 +1,5 @@
-#ifndef _UTILS_DATA_HPP_
-#define _UTILS_DATA_HPP_
+#ifndef _UTILS_VARIANT_HPP_
+#define _UTILS_VARIANT_HPP_
 
 
 //для autoexp.dat

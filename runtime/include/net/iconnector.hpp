@@ -8,6 +8,8 @@ namespace net
 {
 	struct IConnector
 	{
+		virtual ~IConnector(){}
+
 		virtual void initialize(async::IServicePtr asrv) =0;
 
 		virtual void listen(

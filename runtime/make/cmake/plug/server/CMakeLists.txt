@@ -4,6 +4,9 @@ SET(INCLUDE
 	${INC_DIR}/server/iserver.hpp
 	${INC_DIR}/server/isession.hpp
 	${INC_DIR}/server/isessionManager.hpp
+
+	${INC_DIR}/server/iservice.hpp
+	${INC_DIR}/server/iserviceHub.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -12,6 +15,8 @@ SET(SRC
 	${SRC_DIR}/server/plug.cpp
 	${SRC_DIR}/server/session.cpp
 	${SRC_DIR}/server/sessionManager.cpp
+	${SRC_DIR}/server/serviceEcho.cpp
+	${SRC_DIR}/server/serviceHub.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -24,6 +29,8 @@ SET(SRC_HDR
 	${SRC_DIR}/server/server.hpp
 	${SRC_DIR}/server/session.hpp
 	${SRC_DIR}/server/sessionManager.hpp
+	${SRC_DIR}/server/serviceEcho.hpp
+	${SRC_DIR}/server/serviceHub.hpp
 	${SRC_DIR}/server/pch.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
