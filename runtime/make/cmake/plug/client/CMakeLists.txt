@@ -3,6 +3,9 @@ PROJECT (plugclient)
 SET(INCLUDE
 	${INC_DIR}/client/iclient.hpp
 	${INC_DIR}/client/isession.hpp
+	${INC_DIR}/client/iagent.hpp
+	${INC_DIR}/client/iagentHub.hpp
+	${INC_DIR}/client/endpoint.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 

@@ -46,9 +46,15 @@ namespace client
 	public:
 		SessionPtr shared_from_this();
 
+	private:
+		virtual void onLowChannelSendFail(IChannelPtr channel, system::error_code ec);
+		virtual void onLowChannelRecvFail(IChannelPtr channel, system::error_code ec);
+
+
 	public:
 		Session();
 
+	public://ISession
 		virtual void start(
 			IConnectorPtr connector,
 			const char *host, const char *service,
@@ -58,12 +64,23 @@ namespace client
 			boost::function<void (size_t, system::error_code)> fail);
 
 		virtual void stop();
-		virtual void close();
 
 		virtual void balance(size_t numChannels);
-
 		virtual TClientSid sid();
 
+	public://net::IChannel
+		virtual void close();
+
+	public://IAgentHub
+		virtual void addAgent(IAgentPtr agent);
+		virtual void delAgent(IAgentPtr agent);
+
+		virtual void send(
+			IAgentPtr agent,
+			const server::TEndpoint &endpoint,
+			utils::VariantPtr data,
+			boost::function<void ()> ok,
+			boost::function<void (boost::system::error_code)> fail);
 	};
 	PLUMA_INHERIT_PROVIDER(Session, ISession);
 }

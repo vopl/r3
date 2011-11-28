@@ -2,6 +2,7 @@
 #include "server/iserver.hpp"
 
 #include <boost/thread.hpp>
+#include <iostream>
 
 #ifdef WIN32
 #	include <conio.h>

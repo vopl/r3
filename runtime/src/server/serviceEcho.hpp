@@ -30,7 +30,7 @@ namespace server
 		virtual void onReceive(
 			IServiceHubPtr hub,
 			ISessionPtr session,
-			const TEndpoint &endpoint,
+			const client::TEndpoint &endpoint,
 			utils::VariantPtr data);
 	};
 	typedef boost::shared_ptr<ServiceEcho> ServiceEchoPtr;

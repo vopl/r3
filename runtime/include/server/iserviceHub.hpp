@@ -2,6 +2,7 @@
 #define _SERVER_ISERVICEHUB_HPP_
 
 #include "server/iservice.hpp"
+#include "server/endpoint.hpp"
 
 namespace server
 {
@@ -19,7 +20,7 @@ namespace server
 		virtual void send(
 			IServicePtr service,
 			ISessionPtr session,
-			const TEndpoint &endpoint,
+			const client::TEndpoint &endpoint,
 			utils::VariantPtr data,
 			boost::function<void ()> ok,
 			boost::function<void (boost::system::error_code)> fail) =0;

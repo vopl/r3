@@ -4,12 +4,11 @@
 #include "pluma/pluma.hpp"
 #include "utils/variant.hpp"
 #include "server/isession.hpp"
+#include "server/endpoint.hpp"
+#include "client/endpoint.hpp"
 
 namespace server
 {
-	//////////////////////////////////////////////////////////////////////////
-	typedef std::string TEndpoint;
-
 	//////////////////////////////////////////////////////////////////////////
 	struct IServiceHub;
 	typedef boost::shared_ptr<IServiceHub> IServiceHubPtr;
@@ -30,7 +29,7 @@ namespace server
 		virtual void onReceive(
 			IServiceHubPtr hub,
 			ISessionPtr session,
-			const TEndpoint &endpoint,
+			const client::TEndpoint &endpoint,
 			utils::VariantPtr data) =0;
 	};
 	typedef boost::shared_ptr<IService> IServicePtr;

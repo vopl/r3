@@ -2,6 +2,7 @@
 #define _CLIENT_ISESSION_HPP_
 
 #include "net/iconnector.hpp"
+#include "client/iagentHub.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/nil_generator.hpp>
 
@@ -13,6 +14,7 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	struct ISession
 		: public net::IChannel
+		, public IAgentHub
 	{
 		virtual void start(
 			net::IConnectorPtr connector,

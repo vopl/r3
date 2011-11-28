@@ -7,6 +7,8 @@ SET(INCLUDE
 
 	${INC_DIR}/server/iservice.hpp
 	${INC_DIR}/server/iserviceHub.hpp
+
+	${INC_DIR}/server/endpoint.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 

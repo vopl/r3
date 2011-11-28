@@ -112,62 +112,72 @@ namespace client
 	void Session::onReceiveSidOk(IChannelPtr channel, const SPacket &packet)
 	{
 		LF;
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
+		bool oneMoreWithNullSid = false;
 		{
-			channel->close();
-			return;
-		}
-
-		utils::Variant v;
-		if(	!v.load(packet._data, packet._size) || 
-			!v.is<utils::Variant::MapStringVariant>())
-		{
-			//bad packet
-
-			assert(!"log error?");
-			channel->close();
-
-			_waitConnections--;
-			checkbalance();
-			return;
-		}
-
-		utils::Variant::MapStringVariant &msv = v.as<utils::Variant::MapStringVariant>();
-
-		if(msv.end() != msv.find("badSid"))
-		{
-			//сессия утеряня, поднять новую
-			assert(!"sid lost!");
-			_needSid = nullClientSid;
-			_waitConnectionsChannels.erase(channel);
-			onConnectOk(channel);
-			return;
-		}
-		else if(msv.end() != msv.find("sid") && msv["sid"].is<TClientSid>())
-		{
-			size_t channels;
+			mutex::scoped_lock sl(_mtx);
+			if(!_isStarted)
 			{
-				_sid = msv["sid"];
-				_needSid = msv["sid"];
+				channel->close();
+				return;
+			}
 
-				attachChannel(channel);
-				channels = getChannelsAmount();
+			utils::Variant v;
+			if(	!v.load(packet._data, packet._size) || 
+				!v.is<utils::Variant::MapStringVariant>())
+			{
+				//bad packet
+
+				assert(!"log error?");
+				channel->close();
 
 				_waitConnectionsChannels.erase(channel);
 				_waitConnections--;
 				checkbalance();
+				return;
 			}
-			_ready(channels);
+
+			utils::Variant::MapStringVariant &msv = v.as<utils::Variant::MapStringVariant>();
+
+			if(msv.end() != msv.find("badSid"))
+			{
+				//сессия утеряня, поднять новую
+				//assert(!"sid lost!");
+				_needSid = nullClientSid;
+				_waitConnectionsChannels.erase(channel);
+				oneMoreWithNullSid = true;
+			}
+			else if(msv.end() != msv.find("sid") && msv["sid"].is<TClientSid>())
+			{
+				size_t channels;
+				{
+					_sid = msv["sid"];
+					_needSid = _sid;
+
+					attachChannel(channel);
+					channels = getChannelsAmount();
+
+					_waitConnectionsChannels.erase(channel);
+					_waitConnections--;
+					checkbalance();
+				}
+				_ready(channels);
+				return;
+			}
+			else
+			{
+				assert(!"packet out of format");
+				_waitConnectionsChannels.erase(channel);
+				channel->close();
+				_waitConnections--;
+				checkbalance();
+				return;
+			}
 		}
-		else
+
+
+		if(oneMoreWithNullSid)
 		{
-			assert(!"packet out of format");
-			_waitConnectionsChannels.erase(channel);
-			channel->close();
-			_waitConnections--;
-			checkbalance();
-			return;
+			onConnectOk(channel);
 		}
 	}
 
@@ -198,6 +208,28 @@ namespace client
 	{
 		return static_pointer_cast<Session>(ChannelHub<ISession>::shared_from_this());
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Session::onLowChannelSendFail(IChannelPtr channel, system::error_code ec)
+	{
+		mutex::scoped_lock sl(_mtx);
+		if(_isStarted)
+		{
+			checkbalance();
+		}
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void Session::onLowChannelRecvFail(IChannelPtr channel, system::error_code ec)
+	{
+		mutex::scoped_lock sl(_mtx);
+		if(_isStarted)
+		{
+			checkbalance();
+		}
+	}
+
+
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -318,4 +350,29 @@ namespace client
 		mutex::scoped_lock sl(_mtx);
 		return _sid;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Session::addAgent(IAgentPtr agent)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Session::delAgent(IAgentPtr agent)
+	{
+		assert(0);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Session::send(
+		IAgentPtr agent,
+		const server::TEndpoint &endpoint,
+		utils::VariantPtr data,
+		boost::function<void ()> ok,
+		boost::function<void (boost::system::error_code)> fail)
+	{
+		assert(0);
+	}
+	
+
 }

@@ -8,13 +8,13 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Client::onSOk(size_t numChannels)
 	{
-		assert(0);
+		std::cout<<__FUNCTION__<<": "<<numChannels<<std::endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Client::onSFail(size_t numChannels, system::error_code ec)
 	{
-		assert(0);
+		std::cout<<__FUNCTION__<<": "<<numChannels<<", "<<ec.message()<<std::endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ namespace client
 		assert(s);
 		s->start(
 			connector, host, service, 
-			nullClientSid, 1,
+			nullClientSid, 10,
 			bind(&Client::onSOk, shared_from_this(), _1),
 			bind(&Client::onSFail, shared_from_this(), _1, _2));
 

@@ -53,7 +53,7 @@ namespace server
 	void ServiceEcho::onReceive(
 		IServiceHubPtr hub,
 		ISessionPtr session,
-		const TEndpoint &endpoint,
+		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{
 		hub->send(shared_from_this(), session, endpoint, data, 
