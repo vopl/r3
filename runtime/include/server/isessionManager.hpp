@@ -13,8 +13,8 @@ namespace server
 		virtual void start(
 			net::IConnectorPtr connector, 
 			const char *host, const char *service,
-			boost::function<void (ISessionPtr)> ready,
-			boost::function<void (boost::system::error_code)> fail) =0;
+			boost::function<void (ISessionPtr)> sstart,
+			boost::function<void (ISessionPtr)> sstop) =0;
 
 		virtual void stop() =0;
 	};

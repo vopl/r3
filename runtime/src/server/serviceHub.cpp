@@ -29,8 +29,9 @@ namespace server
 		//если просто не осталось низких каналов - то ошибка не должна приходить, надо переработать хаб канала
 		//а если закрыта - то сначало должен был быть вызван delSession
 
-		session->close();
-		delSession(session);
+		//уже все закрыто
+		//session->close();
+		//delSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -103,6 +104,18 @@ namespace server
 			_services.erase(iter);
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceHub::delServices()
+	{
+		mutex::scoped_lock sl(_mtx);
+		BOOST_FOREACH(TMServices::value_type &p, _services)
+		{
+			p.second->onHubDel(shared_from_this());
+		}
+		_services.clear();
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::send(

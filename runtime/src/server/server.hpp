@@ -20,8 +20,8 @@ namespace server
 		IServiceHubPtr		_serviceHub;
 
 	private:
-		void onSsmOk(ISessionPtr session);
-		void onSsmFail(system::error_code ec);
+		void onSessionStart(ISessionPtr session);
+		void onSessionStop(ISessionPtr session);
 
 	public:
 		Server();

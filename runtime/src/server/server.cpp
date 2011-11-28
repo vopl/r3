@@ -9,15 +9,15 @@ namespace server
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void Server::onSsmOk(ISessionPtr session)
+	void Server::onSessionStart(ISessionPtr session)
 	{
 		_serviceHub->addSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Server::onSsmFail(system::error_code ec)
+	void Server::onSessionStop(ISessionPtr session)
 	{
-		assert(0);
+		_serviceHub->delSession(session);
 	}
 
 
@@ -59,8 +59,8 @@ namespace server
 		_sessionManager = _plugs->create<ISessionManagerProvider>();
 		assert(_sessionManager);
 		_sessionManager->start(connector, host, service, 
-			bind(&Server::onSsmOk, shared_from_this(), _1),
-			bind(&Server::onSsmFail, shared_from_this(), _1));
+			bind(&Server::onSessionStart, shared_from_this(), _1),
+			bind(&Server::onSessionStop, shared_from_this(), _1));
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять хаб служб
@@ -84,11 +84,16 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void Server::stop()
 	{
+		assert(_serviceHub);
+		_serviceHub->delServices();
+
 		assert(_sessionManager);
 		_sessionManager->stop();
 		_sessionManager.reset();
+		
 		_async->stop();
 		_async.reset();
+		
 		_plugs = NULL;
 	}
 

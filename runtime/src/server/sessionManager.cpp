@@ -111,6 +111,7 @@ namespace server
 			SessionPtr session(new Session(newSid));
 			_sessions[newSid] = session;
 
+
 			v.as<utils::Variant::MapStringVariant>(true)["sid"] = newSid;
 
 			SPacket packet;
@@ -118,6 +119,9 @@ namespace server
 			channel->send(packet, 
 				bind(&SessionManager::attach2Session, shared_from_this(), session, channel),
 				bind(&SessionManager::attach2SessionFail, shared_from_this(), channel));
+
+			_sstart(session);
+			session->listenStop(bind(&SessionManager::onSeessionStop, shared_from_this(), session));
 		}
 	}
 
@@ -146,7 +150,6 @@ namespace server
 			mutex::scoped_lock sl(_mtx);
 			session->attachChannel(channel);
 		}
-		_ready(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -154,6 +157,21 @@ namespace server
 	{
 		LF;
 		channel->close();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void SessionManager::onSeessionStop(SessionPtr session)
+	{
+		boost::function<void (ISessionPtr)> sstop;
+		{
+			mutex::scoped_lock sl(_mtx);
+			_sessions.erase(session->sid());
+			sstop = _sstop;
+		}
+		if(sstop)
+		{
+			sstop(session);
+		}
 	}
 
 
@@ -170,8 +188,8 @@ namespace server
 	void SessionManager::start(
 		IConnectorPtr connector,
 		const char *host, const char *service,
-		boost::function<void (ISessionPtr)> ready,
-		boost::function<void (system::error_code)> fail)
+		boost::function<void (ISessionPtr)> sstart,
+		boost::function<void (ISessionPtr)> sstop)
 	{
 		assert(!_connector && _host.empty() && _service.empty());
 		_connector = connector;
@@ -184,11 +202,11 @@ namespace server
 			stop();
 		}
 
-		assert(!_ready);
-		_ready = ready;
+		assert(!_sstart);
+		_sstart = sstart;
 
-		assert(!_fail);
-		_fail = fail;
+		assert(!_sstop);
+		_sstop = sstop;
 
 		_isStarted = true;
 
@@ -201,27 +219,36 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void SessionManager::stop()
 	{
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
+		TMSessions sessions;
 		{
-			return;
-		}
-		_connector->unlisten(_host.c_str(), _service.c_str());
+			mutex::scoped_lock sl(_mtx);
+			if(!_isStarted)
+			{
+				return;
+			}
+			_connector->unlisten(_host.c_str(), _service.c_str());
 
-		BOOST_FOREACH(TMSessions::value_type &p, _sessions)
+			_sessions.swap(sessions);
+
+			_isStarted = false;
+		}
+
+		BOOST_FOREACH(TMSessions::value_type &p, sessions)
 		{
 			p.second->close();
 			p.second.reset();
 		}
-		_sessions.clear();
 
-		_isStarted = false;
-		
-		boost::function<void (ISessionPtr)> nullReady;
-		_ready.swap(nullReady);
-		
-		boost::function<void (system::error_code)> nullFail;
-		_fail.swap(nullFail);
+		{
+			mutex::scoped_lock sl(_mtx);
+
+			boost::function<void (ISessionPtr)> nullSStart;
+			_sstart.swap(nullSStart);
+
+			boost::function<void (ISessionPtr)> nullSStop;
+			_sstop.swap(nullSStop);
+		}
+
 
 	}
 }

@@ -6,15 +6,23 @@
 
 namespace server
 {
+	using namespace boost;
+
+	//////////////////////////////////////////////////////////////////////////
 	class Session;
 	typedef boost::shared_ptr<Session> SessionPtr;
 
+	//////////////////////////////////////////////////////////////////////////
 	class Session
 		: public net::ChannelHub<ISession>
 	{
-		TServerSid		_sid;
+		TServerSid			_sid;
+		function<void ()>	_sstop;
 	public:
 		Session(TServerSid sid);
+
+		void listenStop(function<void ()> sstop);
+		virtual void close();
 
 		TServerSid sid();
 	};

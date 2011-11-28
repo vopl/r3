@@ -23,8 +23,8 @@ namespace server
 
 		mutex _mtx;
 		bool										_isStarted;
-		boost::function<void (ISessionPtr)>	_ready;
-		boost::function<void (system::error_code)>	_fail;
+		boost::function<void (ISessionPtr)>			_sstart;
+		boost::function<void (ISessionPtr)>			_sstop;
 		boost::uuids::random_generator				_sidGen;
 
 		typedef std::map<TServerSid, SessionPtr> TMSessions;
@@ -40,14 +40,16 @@ namespace server
 		void attach2Session(SessionPtr session, IChannelPtr channel);
 		void attach2SessionFail(IChannelPtr channel);
 
+		void onSeessionStop(SessionPtr session);
+
 	public:
 		SessionManager();
 
 		virtual void start(
 			IConnectorPtr connector,
 			const char *host, const char *service,
-			boost::function<void (ISessionPtr)> ready,
-			boost::function<void (system::error_code)> fail);
+			boost::function<void (ISessionPtr)> sstart,
+			boost::function<void (ISessionPtr)> sstop);
 
 		virtual void stop();
 	};

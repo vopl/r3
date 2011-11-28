@@ -35,6 +35,7 @@ namespace server
 
 		virtual void addService(IServicePtr service);
 		virtual void delService(IServicePtr service);
+		virtual void delServices();
 
 		virtual void send(
 			IServicePtr service,
