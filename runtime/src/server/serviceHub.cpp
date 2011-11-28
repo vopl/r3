@@ -6,17 +6,12 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::onReceiveOk(ISessionPtr session, const net::SPacket &p)
 	{
-		//найти сессию, если нет то нештатная ситуация
 		mutex::scoped_lock sl(_mtx);
-		if(_sessions.end() == _sessions.find(session->sid()))
-		{
-			assert(!"пришел пакет на удаленную сессию, че делать?");
-			return;
-		}
-		//распарсить пакет, найти службу и передать ей
 
+		//распарсить пакет, найти службу и передать ей
 		assert(0);
 
+		//слушать сессию дальше
 		session->receive(
 			bind(&ServiceHub::onReceiveOk, shared_from_this(), session, _1),
 			bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
@@ -47,10 +42,8 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::addSession(ISessionPtr session)
 	{
-		mutex::scoped_lock sl(_mtx);
-		if(_sessions.end() == _sessions.find(session->sid()))
 		{
-			_sessions[session->sid()] = session;
+			mutex::scoped_lock sl(_mtx);
 			session->receive(
 				bind(&ServiceHub::onReceiveOk, shared_from_this(), session, _1),
 				bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
@@ -66,19 +59,17 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::delSession(ISessionPtr session)
 	{
-		mutex::scoped_lock sl(_mtx);
 
-		TMSessions::iterator iter = _sessions.find(session->sid());
-		if(_sessions.end() != iter)
 		{
+			mutex::scoped_lock sl(_mtx);
+
 			//оповестить службы
 			BOOST_FOREACH(TMServices::value_type &pair, _services)
 			{
 				pair.second->onSessionDel(session);
 			}
 
-			_sessions.erase(session->sid());
-			//надо отменить прослушивание, а как?
+ 			//надо отменить прослушивание, а как?
 		}
 	}
 
@@ -126,7 +117,6 @@ namespace server
 		boost::function<void ()> ok,
 		boost::function<void (boost::system::error_code)> fail)
 	{
-		//проверить наличие службы и сессии
 		//запаковать данные
 		//отослать
 		assert(0);

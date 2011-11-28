@@ -16,7 +16,6 @@ namespace server
 		typedef std::map<TServerSid, ISessionPtr> TMSessions;
 		typedef std::map<TEndpoint, IServicePtr> TMServices;
 
-		TMSessions	_sessions;
 		TMServices	_services;
 
 		mutex	_mtx;
