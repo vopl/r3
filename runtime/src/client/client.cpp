@@ -54,7 +54,7 @@ namespace client
 		assert(s);
 		s->start(
 			connector, host, service, 
-			nullClientSid, 10,
+			nullClientSid, 100000,
 			bind(&Client::onSOk, shared_from_this(), _1),
 			bind(&Client::onSFail, shared_from_this(), _1, _2));
 

@@ -649,7 +649,7 @@ namespace utils
 			oa << *this;
 		}
 
-		size = sbuf.size();
+		size = (boost::uint32_t)sbuf.size();
 		return sbuf.data();
 	}
 

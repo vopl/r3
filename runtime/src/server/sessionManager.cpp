@@ -148,7 +148,10 @@ namespace server
 		LF;
 		{
 			mutex::scoped_lock sl(_mtx);
-			session->attachChannel(channel);
+			if(_isStarted)
+			{
+				session->attachChannel(channel);
+			}
 		}
 	}
 
