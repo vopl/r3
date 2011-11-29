@@ -36,7 +36,8 @@ namespace server
 			}
 		}
 
-		assert(!"log error?");
+		//assert(!"log error?");
+		std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
 
 		_connector->listen(
 			_host.c_str(), _service.c_str(), 
@@ -60,7 +61,9 @@ namespace server
 			!v.is<utils::Variant::MapStringVariant>())
 		{
 			//bad packet
-			assert(!"log error?");
+			//assert(!"log error?");
+			std::cerr<<__FUNCTION__<<": bad packet"<<std::endl;
+
 			channel->close();
 			return;
 		}
@@ -68,7 +71,9 @@ namespace server
 		if(	!v.is<TServerSid>())
 		{
 			//bad packet
-			assert(!"log error?");
+			//assert(!"log error?");
+			std::cerr<<__FUNCTION__<<": bad packet"<<std::endl;
+
 			channel->close();
 			return;
 		}
@@ -131,7 +136,8 @@ namespace server
 		LF;
 		channel->close();
 
-		assert(!"log error?");
+		//assert(!"log error?");
+		std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
 
 		{
 			mutex::scoped_lock sl(_mtx);

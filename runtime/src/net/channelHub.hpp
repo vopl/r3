@@ -226,8 +226,8 @@ namespace net
 			TChannels::iterator iter = _channels.find(channel);
 			if(_channels.end() != iter)
 			{
-				std::cout<<__FUNCTION__<<": "<<ec.message()<<std::endl;
 				//assert(!"log error?");
+				std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
 
 				_channels.erase(iter);
 
@@ -329,8 +329,8 @@ namespace net
 			TChannels::iterator iter = _channels.find(channel);
 			if(_channels.end() != iter)
 			{
-				std::cout<<__FUNCTION__<<": "<<ec.message()<<std::endl;
 				//assert(!"log error?");
+				std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
 
 				_channels.erase(iter);
 

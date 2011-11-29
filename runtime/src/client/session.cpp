@@ -67,6 +67,8 @@ namespace client
 			return;
 		}
 		//assert(!"log error?");
+		std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+
 		_waitConnections--;
 		checkbalance();
 	}
@@ -100,7 +102,8 @@ namespace client
 				return;
 			}
 
-			assert(!"log error?");
+			//assert(!"log error?");
+			std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
 			_waitConnections--;
 			_waitConnectionsChannels.erase(channel);
 			channel->close();
@@ -127,7 +130,8 @@ namespace client
 			{
 				//bad packet
 
-				assert(!"log error?");
+				//assert(!"log error?");
+				std::cerr<<__FUNCTION__<<": bad packet"<<std::endl;
 				channel->close();
 
 				_waitConnectionsChannels.erase(channel);
@@ -195,6 +199,8 @@ namespace client
 			}
 
 			//assert(!"log error?");
+			std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+
 			_waitConnectionsChannels.erase(channel);
 			channel->close();
 			_waitConnections--;
