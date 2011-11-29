@@ -40,7 +40,6 @@ namespace client
 		//подн€ть асинхронный двиг
 		_async = _plugs->create<async::IServiceProvider>();
 		assert(_async);
-		_async->balance(4);
 
 		//////////////////////////////////////////////////////////////////////////
 		//подн€ть коннектор
