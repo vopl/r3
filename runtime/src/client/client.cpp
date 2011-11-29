@@ -8,18 +8,21 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Client::onSOk(size_t numChannels)
 	{
-		std::cout<<__FUNCTION__<<": "<<numChannels<<std::endl;
+		//std::cout<<__FUNCTION__<<": "<<numChannels<<std::endl;
+		_onChannelChange(numChannels, boost::system::errc::make_error_code(boost::system::errc::success));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Client::onSFail(size_t numChannels, system::error_code ec)
 	{
-		std::cout<<__FUNCTION__<<": "<<numChannels<<", "<<ec.message()<<std::endl;
+		//std::cout<<__FUNCTION__<<": "<<numChannels<<", "<<ec.message()<<std::endl;
+		_onChannelChange(numChannels, ec);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Client::Client()
 		: _plugs(NULL)
+		, _asyncOwn(false)
 	{
 
 	}
@@ -31,15 +34,45 @@ namespace client
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Client::run(pluma::Pluma *plugs, const char *host, const char *service)
+	void Client::start(
+		pluma::Pluma *plugs,
+		async::IServicePtr async,
+		boost::function<void (size_t numChannels, boost::system::error_code ec)> onChannelChange)
 	{
+		_onChannelChange = onChannelChange;
+
 		assert(!_plugs);
 		_plugs = plugs;
 
-		//////////////////////////////////////////////////////////////////////////
-		//поднять асинхронный двиг
-		_async = _plugs->create<async::IServiceProvider>();
-		assert(_async);
+		assert(!_async);
+		_async = async;
+		if(!_async)
+		{
+			//////////////////////////////////////////////////////////////////////////
+			//поднять асинхронный двиг
+			_async = _plugs->create<async::IServiceProvider>();
+			assert(_async);
+
+			_asyncOwn = true;
+
+			//запускать асинхронный двиг
+			_async->balance(1);
+		}
+		else
+		{
+			_asyncOwn = false;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Client::connect(const char *host, const char *service)
+	{
+		if(_session)
+		{
+			_session->close();
+			_session->stop();
+			_session.reset();
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять коннектор
@@ -54,12 +87,9 @@ namespace client
 		assert(_session);
 		_session->start(
 			connector, host, service, 
-			nullClientSid, 100000,
+			nullClientSid, 2,
 			bind(&Client::onSOk, shared_from_this(), _1),
 			bind(&Client::onSFail, shared_from_this(), _1, _2));
-
-		//запускать асинхронный двиг
-		_async->balance(4);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -77,12 +107,20 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Client::stop()
 	{
-		_session->close();
-		_session->stop();
-		_session.reset();
-		_async->stop();
+		if(_session)
+		{
+			_session->close();
+			_session->stop();
+			_session.reset();
+		}
+
+		if(_asyncOwn)
+		{
+			_async->stop();
+		}
 		_async.reset();
 		_plugs = NULL;
+		boost::function<void (size_t numChannels, boost::system::error_code ec)>().swap(_onChannelChange);
 	}
 
 

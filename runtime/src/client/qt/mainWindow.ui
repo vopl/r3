@@ -37,9 +37,44 @@
      <height>18</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuProgram">
+    <property name="title">
+     <string>program</string>
+    </property>
+    <addaction name="actionNetwork"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <addaction name="menuProgram"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionNetwork">
+   <property name="text">
+    <string>network</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>exit</string>
+   </property>
+  </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

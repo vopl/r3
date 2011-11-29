@@ -61,16 +61,17 @@ namespace client
 	void Session::onConnectError(system::error_code ec)
 	{
 		LF;
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
 		{
-			return;
-		}
-		//assert(!"log error?");
-		std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+			mutex::scoped_lock sl(_mtx);
+			if(!_isStarted)
+			{
+				return;
+			}
 
-		_waitConnections--;
-		checkbalance();
+			_waitConnections--;
+			checkbalance();
+		}
+		_fail(getChannelsAmount(), ec);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -102,13 +103,12 @@ namespace client
 				return;
 			}
 
-			//assert(!"log error?");
-			std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
 			_waitConnections--;
 			_waitConnectionsChannels.erase(channel);
 			channel->close();
 			checkbalance();
 		}
+		_fail(getChannelsAmount(), ec);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -129,9 +129,8 @@ namespace client
 				!v.is<utils::Variant::MapStringVariant>())
 			{
 				//bad packet
+				_fail(getChannelsAmount(), system::errc::make_error_code(system::errc::bad_message));
 
-				//assert(!"log error?");
-				std::cerr<<__FUNCTION__<<": bad packet"<<std::endl;
 				channel->close();
 
 				_waitConnectionsChannels.erase(channel);
@@ -198,14 +197,13 @@ namespace client
 				return;
 			}
 
-			//assert(!"log error?");
-			std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
-
 			_waitConnectionsChannels.erase(channel);
 			channel->close();
 			_waitConnections--;
 			checkbalance();
 		}
+		_fail(getChannelsAmount(), ec);
+
 	}
 
 
@@ -218,21 +216,27 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Session::onLowChannelSendFail(IChannelPtr channel, system::error_code ec)
 	{
-		mutex::scoped_lock sl(_mtx);
-		if(_isStarted)
 		{
-			checkbalance();
+			mutex::scoped_lock sl(_mtx);
+			if(_isStarted)
+			{
+				checkbalance();
+			}
 		}
+		_fail(getChannelsAmount(), ec);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	void Session::onLowChannelRecvFail(IChannelPtr channel, system::error_code ec)
 	{
-		mutex::scoped_lock sl(_mtx);
-		if(_isStarted)
 		{
-			checkbalance();
+			mutex::scoped_lock sl(_mtx);
+			if(_isStarted)
+			{
+				checkbalance();
+			}
 		}
+		_fail(getChannelsAmount(), ec);
 	}
 
 

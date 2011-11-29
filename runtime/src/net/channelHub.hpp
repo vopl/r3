@@ -208,7 +208,7 @@ namespace net
 	template <class Base>
 	void ChannelHub<Base>::onLowChannelSendFail(IChannelPtr channel, system::error_code ec)
 	{
-		//nothing
+		std::cerr<<ec.message()<<std::endl;
 	}
 
 
@@ -226,9 +226,6 @@ namespace net
 			TChannels::iterator iter = _channels.find(channel);
 			if(_channels.end() != iter)
 			{
-				//assert(!"log error?");
-				std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
-
 				_channels.erase(iter);
 
 				mutex::scoped_lock sl2(_mtxSend);
@@ -312,7 +309,7 @@ namespace net
 	template <class Base>
 	void ChannelHub<Base>::onLowChannelRecvFail(IChannelPtr channel, system::error_code ec)
 	{
-		//nothing
+		std::cerr<<ec.message()<<std::endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -329,9 +326,6 @@ namespace net
 			TChannels::iterator iter = _channels.find(channel);
 			if(_channels.end() != iter)
 			{
-				//assert(!"log error?");
-				std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
-
 				_channels.erase(iter);
 
 				mutex::scoped_lock sl2(_mtxSend);

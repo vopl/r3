@@ -32,12 +32,14 @@ SOURCE_GROUP(src FILES ${SRC_HDR})
 
 SET(SRC_QT
 	${SRC_DIR}/client/qt/mainWindow.cpp
+	${SRC_DIR}/client/qt/networkDialog.cpp
 )
 SOURCE_GROUP(src\\qt FILES ${SRC_QT})
 #wtf? QT4_AUTOMOC(${SRC_QT})
 
 SET(SRC_QT_HDR
 	${SRC_DIR}/client/qt/mainWindow.hpp
+	${SRC_DIR}/client/qt/networkDialog.hpp
 )
 SOURCE_GROUP(src\\qt FILES ${SRC_QT_HDR})
 QT4_WRAP_CPP(MOC_SOURCES ${SRC_QT_HDR})
@@ -45,6 +47,7 @@ SOURCE_GROUP(genarated FILES ${MOC_SOURCES})
 
 SET(SRC_QT_UI
 	${SRC_DIR}/client/qt/mainWindow.ui
+	${SRC_DIR}/client/qt/networkDialog.ui
 )
 SOURCE_GROUP(src\\qt FILES ${SRC_QT_UI})
 QT4_WRAP_UI(UI_HEADERS ${SRC_QT_UI})

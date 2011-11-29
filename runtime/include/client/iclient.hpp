@@ -10,7 +10,12 @@ namespace client
 	{
 		virtual ~IClient(){}
 
-		virtual void run(pluma::Pluma *plugs, const char *host, const char *service) =0;
+		virtual void start(
+			pluma::Pluma *plugs,
+			async::IServicePtr async,
+			boost::function<void (size_t numChannels, boost::system::error_code ec)> onChannelChange) =0;
+
+		virtual void connect(const char *host, const char *service) =0;
 		
 		virtual pluma::Pluma * getPlugs() =0;
 		virtual async::IServicePtr getAsync() =0;
