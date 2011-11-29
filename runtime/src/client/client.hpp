@@ -13,8 +13,9 @@ namespace client
 		: public IClient
 		, public boost::enable_shared_from_this<Client>
 	{
-		pluma::Pluma *_plugs;
+		pluma::Pluma		*_plugs;
 		async::IServicePtr	_async;
+		ISessionPtr			_session;
 
 	protected:
 		void onSOk(size_t numChannels);

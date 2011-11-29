@@ -50,9 +50,10 @@ namespace client
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять сессию
-		ISessionPtr s = _plugs->create<ISessionProvider>();
-		assert(s);
-		s->start(
+		assert(!_session);
+		_session = _plugs->create<ISessionProvider>();
+		assert(_session);
+		_session->start(
 			connector, host, service, 
 			nullClientSid, 100000,
 			bind(&Client::onSOk, shared_from_this(), _1),
@@ -77,6 +78,9 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Client::stop()
 	{
+		_session->close();
+		_session->stop();
+		_session.reset();
 		_async->stop();
 		_async.reset();
 		_plugs = NULL;

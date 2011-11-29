@@ -1,6 +1,7 @@
 #include "pchqt.h"
 #include "pluma/pluma.hpp"
 #include "client/iclient.hpp"
+#include "qt/mainWindow.hpp"
 #include <QtGui/QApplication>
 
 int main(int argc, char *argv[])
@@ -16,8 +17,8 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 	int res;
 	{
-// 		Client w;
-// 		w.show();
+		client::qt::MainWindow mw;
+ 		mw.show();
 		res = a.exec();
 	}
 	cl->stop();
