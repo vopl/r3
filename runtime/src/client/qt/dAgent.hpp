@@ -2,6 +2,7 @@
 #define _CLIENT_QT_AGENT_HPP_
 
 #include <QtCore/QObject>
+#include <QtDeclarative/QDeclarativeItem>
 #include <QtCore/QVariant>
 #include <boost/enable_shared_from_this.hpp>
 #include "client/iagent.hpp"
@@ -13,6 +14,7 @@ namespace client
 	{
 		class DAgent
 			: public QObject
+
 		{
 			Q_OBJECT
 
@@ -47,7 +49,7 @@ namespace client
 
 
 		public:
-			DAgent();
+			DAgent(QObject *parent = 0);
 			//Agent(IAgentHubPtr lowAgentHub);
 			~DAgent();
 

@@ -6,8 +6,14 @@ namespace client
 	namespace qt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		DHost::DHost(QDeclarativeItem *parent)
-			: QDeclarativeItem(parent)
+		QObject *DHost::qmlAttachedProperties(QObject *)
+		{
+			return NULL;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		DHost::DHost(QObject *parent)
+			: QObject(parent)
 		{
 
 		}

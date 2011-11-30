@@ -32,7 +32,7 @@ namespace client
 
 
 		//////////////////////////////////////////////////////////////////////////
-		DAgent::DAgent()
+		DAgent::DAgent(QObject *parent)
 			: _lowAgentHub()
 		{
 // 			qRegisterMetaType<client::IAgentHubPtr>("client::IAgentHubPtr");

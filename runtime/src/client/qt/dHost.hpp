@@ -8,21 +8,22 @@ namespace client
 	namespace qt
 	{
 		class DHost
-			: public QDeclarativeItem
+			: public QObject
 		{
 			Q_OBJECT
 
 			//Q_PROPERTY(Agent *agent READ agent)
 			//Q_PROPERTY(Env *env READ env)
 
-			bool qmlAttachedProperties;
+		public:
+			static QObject *qmlAttachedProperties(QObject *);
 
 		public:
-			DHost(QDeclarativeItem *parent = 0);
+			DHost(QObject *parent = 0);
 			~DHost();
 
 		};
 	}
 }
-//QML_DECLARE_TYPEINFO(DeclarativeHost, QML_HAS_ATTACHED_PROPERTIES)
+QML_DECLARE_TYPEINFO(client::qt::DHost, QML_HAS_ATTACHED_PROPERTIES)
 #endif
