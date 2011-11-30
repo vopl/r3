@@ -76,12 +76,19 @@ namespace client
 				boost::bind(&MainWindow::onChannelChange_, this, _1, _2));
 
 			onAddrChanged(_nd->getHost(), _nd->getService());
+
+			//////////////////////////////////////////////////////////////////////////
+			_view = new QDeclarativeView(this);
+			setCentralWidget(_view);
+			_view->setSource(QUrl("qrc:/central.qml"));
+			_view->show();
 		}
 
 		MainWindow::~MainWindow()
 		{
 			delete _nd;
 			_client->stop();
+			delete _view;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

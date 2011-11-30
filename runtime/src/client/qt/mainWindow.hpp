@@ -2,6 +2,7 @@
 #define _CLIENT_QT_MAINWINDOW_HPP_
 
 #include <QtGui/QMainWindow>
+#include <QtDeclarative/QDeclarativeView>
 #include "ui_mainWindow.h"
 #include "pluma/pluma.hpp"
 #include "client/iclient.hpp"
@@ -20,6 +21,8 @@ namespace client
 			client::IClientPtr	_client;
 			NetworkDialog		*_nd;
 			QLabel				*_labelConnected;
+
+			QDeclarativeView	*_view;
 
 		private:
 			void onChannelChange_(size_t numChannels, boost::system::error_code ec);
