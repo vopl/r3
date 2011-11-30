@@ -23,6 +23,7 @@ namespace client
 
 				_nd->logLowError(s);
 			}
+
 			_nd->setNumChannels(numChannels);
 			_labelConnected->setNum(numChannels);
 		}
@@ -30,6 +31,8 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onAddrChanged(QString host, QString service)
 		{
+			_nd->setNumChannels(0);
+			_labelConnected->setNum(0);
 			_client->connect(host.toUtf8(), service.toUtf8());
 		}
 

@@ -16,6 +16,9 @@ namespace client
 		private:
 			QString	_host;
 			QString	_service;
+			QString	_lastLowError;
+			int		_numChannels;
+
 
 		public:
 			NetworkDialog(QWidget *parent = 0, Qt::WFlags flags = 0);

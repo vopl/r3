@@ -1,5 +1,7 @@
 #include "pchqt.h"
 #include "networkDialog.hpp"
+#include <QtCore/QDateTime.h>
+
 
 namespace client
 {
@@ -10,10 +12,15 @@ namespace client
 			: QDialog(parent, flags)
 			, _host("localhost")
 			, _service("29431")
+			, _numChannels(0)
 		{
 			ui.setupUi(this);
+			ui._logErrors->setLineWrapMode(QPlainTextEdit::NoWrap);
+			ui._logErrors->setMaximumBlockCount(500);
+
 			ui._host->setText(_host);
 			ui._service->setText(_service);
+
 
 			connect(
 				ui.pushButton_ok, SIGNAL(clicked()),
@@ -47,12 +54,22 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void NetworkDialog::logLowError(const QString &s)
 		{
-			ui._logErrors->appendPlainText(s);
+			if(_lastLowError != s)
+			{
+				_lastLowError = s;
+				ui._logErrors->appendPlainText(QDateTime::currentDateTime().toString() + ": " + s);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void NetworkDialog::setNumChannels(int numChannels)
 		{
+			if(_numChannels < numChannels)
+			{
+				logLowError(QString("connection established"));
+			}
+			_numChannels = numChannels;
+
 			ui._numChannels->setNum(numChannels);
 		}
 
