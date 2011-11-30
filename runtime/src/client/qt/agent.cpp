@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "agent.hpp"
+#include <QtDeclarative/qdeclarative.h>
 
 namespace client
 {
@@ -31,9 +32,23 @@ namespace client
 
 
 		//////////////////////////////////////////////////////////////////////////
+		Agent::Agent()
+			: _lowAgentHub()
+		{
+			connect(
+				this, SIGNAL(onReceive_sig(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
+				this, SLOT(onReceive_slot(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
+				Qt::QueuedConnection);
+
+			_lowAgent.reset(new LowAgent(this));
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		Agent::Agent(IAgentHubPtr lowAgentHub)
 			: _lowAgentHub(lowAgentHub)
 		{
+			qmlRegisterType<Agent>("r3.clientqt", 1, 0, "Agent");
+
 			qRegisterMetaType<client::IAgentHubPtr>("client::IAgentHubPtr");
 			qRegisterMetaType<server::TEndpoint>("server::TEndpoint");
 			qRegisterMetaType<utils::VariantPtr>("utils::VariantPtr");

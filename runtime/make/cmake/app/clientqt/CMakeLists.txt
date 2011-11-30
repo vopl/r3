@@ -1,6 +1,6 @@
 PROJECT(clientqt)
 
-FIND_PACKAGE(Qt4 4.7.4 REQUIRED QtCore QtGui)
+FIND_PACKAGE(Qt4 4.7.4 REQUIRED QtCore QtGui QtDeclarative)
 INCLUDE(${QT_USE_FILE})
 
 

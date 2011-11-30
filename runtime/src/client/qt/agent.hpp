@@ -47,6 +47,7 @@ namespace client
 
 
 		public:
+			Agent();
 			Agent(IAgentHubPtr lowAgentHub);
 			~Agent();
 
