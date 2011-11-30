@@ -1,4 +1,4 @@
-#include "pchqt.h"
+#include "pch.h"
 #include "mainWindow.hpp"
 #include <boost/bind.hpp>
 

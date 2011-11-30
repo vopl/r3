@@ -1,5 +1,5 @@
-#include "pchqt.h"
-#include "qt/mainWindow.hpp"
+#include "pch.h"
+#include "mainWindow.hpp"
 #include <QtGui/QApplication>
 
 int main(int argc, char *argv[])

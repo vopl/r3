@@ -1,4 +1,4 @@
-#include "pchqt.h"
+#include "pch.h"
 #include "networkDialog.hpp"
 #include <QtCore/QDateTime.h>
 

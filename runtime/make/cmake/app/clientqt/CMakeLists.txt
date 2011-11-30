@@ -1,4 +1,4 @@
-PROJECT(client)
+PROJECT(clientqt)
 
 FIND_PACKAGE(Qt4 4.7.4 REQUIRED QtCore QtGui)
 INCLUDE(${QT_USE_FILE})
@@ -13,15 +13,15 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
 
 SET(SRC
-	${SRC_DIR}/client/entry.cpp
+	${SRC_DIR}/client/qt/entry.cpp
 )
-SOURCE_GROUP(src FILES ${SRC})
+SOURCE_GROUP(src\\qt FILES ${SRC})
 QT4_AUTOMOC(${SRC})
 
 SET(SRC_HDR
-	${SRC_DIR}/client/pchqt.h
+	${SRC_DIR}/client/qt/pch.h
 )
-SOURCE_GROUP(src FILES ${SRC_HDR})
+SOURCE_GROUP(src\\qt FILES ${SRC_HDR})
 
 
 
@@ -60,26 +60,27 @@ SOURCE_GROUP(genarated FILES ${UI_HEADERS})
 
 
 SET(SRC_PCH
-	${SRC_DIR}/client/pchqt.cpp
+	${SRC_DIR}/client/qt/pch.cpp
 )
-SOURCE_GROUP(src FILES ${SRC_PCH})
+SOURCE_GROUP(src\\qt FILES ${SRC_PCH})
 
 
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+INCLUDE_DIRECTORIES(${SRC_DIR}/client/qt)
 
 PRESETUP_BIN_OUT(SRC_STUB)
-ADD_EXECUTABLE(client
+ADD_EXECUTABLE(clientqt
 	${SRC_STUB} ${SRC_NOPCH} ${SRC_PCH} ${SRC} ${SRC_HDR} 
 	${SRC_QT} ${SRC_QT_HDR} ${MOC_SOURCES} ${UI_HEADERS})
 
-CREATE_PCH(client ${SRC_DIR}/client/pchqt.h ${SRC_PCH})
-USE_PCH(client ${SRC_DIR}/client/pchqt.h ${SRC})
-USE_PCH(client ${SRC_QT_DIR}/client/pchqt.h ${SRC_QT})
-SETUP_BIN_OUT(client client)
+CREATE_PCH(client ${SRC_DIR}/client/qt/pch.h ${SRC_PCH})
+USE_PCH(client ${SRC_DIR}/client/qt/pch.h ${SRC})
+USE_PCH(client ${SRC_QT_DIR}/client/qt/pch.h ${SRC_QT})
+SETUP_BIN_OUT(clientqt client)
 
-TARGET_LINK_LIBRARIES(client libheap libpluma)
-TARGET_LINK_LIBRARIES(client ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(clientqt libheap libpluma)
+TARGET_LINK_LIBRARIES(clientqt ${QT_LIBRARIES})
 
 #IF(WIN32)
 #	TARGET_LINK_LIBRARIES(client ${QT_QTMAIN_LIBRARY})
