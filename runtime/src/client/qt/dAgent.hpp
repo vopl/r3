@@ -11,7 +11,7 @@ namespace client
 {
 	namespace qt
 	{
-		class Agent
+		class DAgent
 			: public QObject
 		{
 			Q_OBJECT
@@ -21,13 +21,13 @@ namespace client
 				: public IAgent
 				, public boost::enable_shared_from_this<LowAgent>
 			{
-				Agent *_agent;
+				DAgent *_agent;
 				virtual void onReceive(
 					IAgentHubPtr hub,
 					const server::TEndpoint &endpoint,
 					utils::VariantPtr data);
 			public:
-				LowAgent(Agent *agent);
+				LowAgent(DAgent *agent);
 			};
 
 		private:
@@ -47,9 +47,9 @@ namespace client
 
 
 		public:
-			Agent();
-			Agent(IAgentHubPtr lowAgentHub);
-			~Agent();
+			DAgent();
+			//Agent(IAgentHubPtr lowAgentHub);
+			~DAgent();
 
 		public:
 			Q_INVOKABLE void send(QString service, QVariant data);

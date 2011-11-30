@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "mainWindow.hpp"
 #include <boost/bind.hpp>
+#include <QtDeclarative/QDeclarativeContext>
+#include "dHost.hpp"
+#include "dAgent.hpp"
 
 namespace client
 {
@@ -43,6 +46,10 @@ namespace client
 			, _nd(false)
 		{
 			qRegisterMetaType<boost::system::error_code>("boost::system::error_code");
+
+			qmlRegisterType<DHost>("MyLib", 1,0, "Host");
+			qmlRegisterType<DAgent>("MyLib", 1,0, "Agent");
+
 
 			connect(
 				this, SIGNAL(onChannelChange_sig(int, boost::system::error_code)), 

@@ -1,19 +1,19 @@
 #include "pch.h"
-#include "declarativeHost.hpp"
+#include "dHost.hpp"
 
 namespace client
 {
 	namespace qt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		DeclarativeHost::DeclarativeHost(QObject *parent)
-			: QDeclarativeComponent(parent)
+		DHost::DHost(QDeclarativeItem *parent)
+			: QDeclarativeItem(parent)
 		{
 
 		}
 		
 		//////////////////////////////////////////////////////////////////////////
-		DeclarativeHost::~DeclarativeHost()
+		DHost::~DHost()
 		{
 
 		}
