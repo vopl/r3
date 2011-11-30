@@ -81,7 +81,8 @@ namespace utils
 	ENUMTYPES_ONE(DequeVariant)				\
 	ENUMTYPES_ONE(ListVariant)				\
 	ENUMTYPES_ONE(Char)						\
-	ENUMTYPES_ONE(Uuid)						//\
+	ENUMTYPES_ONE(Uuid)						\
+	ENUMTYPES_ONE(VariantPtr)				//\
 
 
 
@@ -630,6 +631,21 @@ namespace boost
 		void serialize(Archive & ar, utils::Variant &x, const unsigned int /*version*/)
 		{
 			ar & static_cast<utils::VariantImpl &>(x);
+		}
+	} // namespace serialization
+} // namespace boost
+
+//////////////////////////////////////////////////////////////////////////
+//utils::Variant 
+namespace boost 
+{
+	namespace serialization 
+	{
+		//////////////////////////////////////////////////////////////////////////
+		template<class Archive>
+		void serialize(Archive & ar, utils::VariantPtr &x, const unsigned int /*version*/)
+		{
+			ar & (x);
 		}
 	} // namespace serialization
 } // namespace boost

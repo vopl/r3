@@ -25,6 +25,9 @@
 namespace utils
 {
 	//////////////////////////////////////////////////////////////////////////
+	class Variant;
+	typedef boost::shared_ptr<Variant> VariantPtr;
+
 	//////////////////////////////////////////////////////////////////////////
 	class Variant
 	{
@@ -74,6 +77,8 @@ namespace utils
 
 			etChar						=37,
 			etUuid						=38,
+
+			etVariantPtr				=39,
 		};
 
 	public:
@@ -116,6 +121,7 @@ namespace utils
 		typedef std::list<Variant>					ListVariant;
 		typedef char								Char;
 		typedef boost::uuids::uuid					Uuid;
+		typedef VariantPtr							VariantPtr;
 
 
 	public:
@@ -164,6 +170,7 @@ namespace utils
 		Variant(const ListVariant &v);
 		Variant(const Char &v);
 		Variant(const Uuid &v);
+		Variant(const VariantPtr &v);
 
 		//helper
 		Variant(const char *v);
@@ -206,6 +213,7 @@ namespace utils
 		Variant &operator=(const ListVariant &v);
 		Variant &operator=(const Char &v);
 		Variant &operator=(const Uuid &v);
+		Variant &operator=(const VariantPtr &v);
 
 		//helper
 		Variant &operator=(const char *v);
@@ -248,6 +256,7 @@ namespace utils
 		operator ListVariant &();
 		operator Char &();
 		operator Uuid &();
+		operator VariantPtr &();
 
 		//helper
 		operator const char *();
@@ -290,6 +299,7 @@ namespace utils
 		operator ListVariant const &() const;
 		operator Char const &() const;
 		operator Uuid const &() const;
+		operator VariantPtr const &() const;
 
 		void swap(Variant &);
 
@@ -367,7 +377,7 @@ namespace utils
 	template <> struct Variant::Type2Enum<Variant::ListVariant>			{ static const EType et = Variant::etListVariant;	};
 	template <> struct Variant::Type2Enum<Variant::Char>				{ static const EType et = Variant::etChar;	};
 	template <> struct Variant::Type2Enum<Variant::Uuid>				{ static const EType et = Variant::etUuid;	};	
-	typedef boost::shared_ptr<Variant> VariantPtr;
+	template <> struct Variant::Type2Enum<Variant::VariantPtr>			{ static const EType et = Variant::etVariantPtr;	};	
 
 
 	std::ostream &operator <<(std::ostream &ostr, const Variant &v);
@@ -380,6 +390,7 @@ namespace utils
 	std::ostream &operator <<(std::ostream &ostr, const Variant::MultisetVariant &v);
 	std::ostream &operator <<(std::ostream &ostr, const Variant::DequeVariant &v);
 	std::ostream &operator <<(std::ostream &ostr, const Variant::ListVariant &v);
+	std::ostream &operator <<(std::ostream &ostr, const Variant::VariantPtr &v);
 
 
 
