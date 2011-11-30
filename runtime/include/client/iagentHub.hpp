@@ -2,6 +2,8 @@
 #define _CLIENT_IAGENTHUB_HPP_
 
 #include "client/iagent.hpp"
+#include <boost/function.hpp>
+#include <boost/system/error_code.hpp>
 
 namespace client
 {

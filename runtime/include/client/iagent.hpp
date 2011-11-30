@@ -2,7 +2,6 @@
 #define _CLIENT_IAGENT_HPP_
 
 #include "utils/variant.hpp"
-#include "client/isession.hpp"
 #include "server/endpoint.hpp"
 
 namespace client
