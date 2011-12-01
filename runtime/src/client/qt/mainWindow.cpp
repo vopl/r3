@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "mainWindow.hpp"
 #include <boost/bind.hpp>
-#include <QtDeclarative/QDeclarativeContext>
-#include "dHost.hpp"
+#include <QtDeclarative/qdeclarative.h>
+#include <QtDeclarative/QDeclarativeView>
 #include "dAgent.hpp"
 
 namespace client
@@ -13,6 +13,18 @@ namespace client
 		void MainWindow::onChannelChange_(size_t numChannels, boost::system::error_code ec)
 		{
 			emit onChannelChange_sig((int)numChannels, ec);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::onSessionStart_(ISessionPtr session)
+		{
+			emit onSessionStart_sig(session);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::onSessionStop_(ISessionPtr session)
+		{
+			emit onSessionStop_sig(session);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -32,6 +44,29 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::onSessionStart_slot(ISessionPtr session)
+		{
+			DAgent::_lowAgentHub = session;
+
+			assert(!_view);
+			_view = new QDeclarativeView(this);
+			setCentralWidget(_view);
+			_view->setSource(QUrl("qrc:/central.qml"));
+			_view->show();
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::onSessionStop_slot(ISessionPtr session)
+		{
+			assert(_view);
+			setCentralWidget(NULL);
+			delete _view;
+
+			DAgent::_lowAgentHub.reset();
+		}
+
+
+		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onAddrChanged(QString host, QString service)
 		{
 			_nd->setNumChannels(0);
@@ -44,16 +79,28 @@ namespace client
 		MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 			: QMainWindow(parent, flags)
 			, _nd(false)
+			, _view(NULL)
 		{
 			qRegisterMetaType<boost::system::error_code>("boost::system::error_code");
+			qRegisterMetaType<server::TEndpoint>("server::TEndpoint");
+			qRegisterMetaType<utils::VariantPtr>("utils::VariantPtr");
+			qRegisterMetaType<ISessionPtr>("ISessionPtr");
+			qRegisterMetaType<IAgentHubPtr>("IAgentHubPtr");
 
-			qmlRegisterType<DHost>("MyLib", 1,0, "Host");
-			qmlRegisterType<DAgent>("MyLib", 1,0, "Agent");
+			qmlRegisterType<DAgent>("Client", 1,0, "Agent");
 
 
 			connect(
 				this, SIGNAL(onChannelChange_sig(int, boost::system::error_code)), 
 				this, SLOT(onChannelChange_slot(int, boost::system::error_code)), 
+				Qt::QueuedConnection);
+			connect(
+				this, SIGNAL(onSessionStart_sig(ISessionPtr)), 
+				this, SLOT(onSessionStart_slot(ISessionPtr)), 
+				Qt::QueuedConnection);
+			connect(
+				this, SIGNAL(onSessionStop_sig(ISessionPtr)), 
+				this, SLOT(onSessionStop_slot(ISessionPtr)), 
 				Qt::QueuedConnection);
 
 			ui.setupUi(this);
@@ -80,22 +127,21 @@ namespace client
 			_client->start(
 				&_plugins, 
 				async::IServicePtr(), 
+				boost::bind(&MainWindow::onSessionStart_, this, _1),
+				boost::bind(&MainWindow::onSessionStop_, this, _1),
 				boost::bind(&MainWindow::onChannelChange_, this, _1, _2));
 
 			onAddrChanged(_nd->getHost(), _nd->getService());
-
-			//////////////////////////////////////////////////////////////////////////
-			_view = new QDeclarativeView(this);
-			setCentralWidget(_view);
-			_view->setSource(QUrl("qrc:/central.qml"));
-			_view->show();
 		}
 
 		MainWindow::~MainWindow()
 		{
 			delete _nd;
+			if(_view)
+			{
+				delete _view;
+			}
 			_client->stop();
-			delete _view;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

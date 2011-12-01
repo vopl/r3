@@ -7,6 +7,9 @@ namespace client
 	namespace qt
 	{
 		//////////////////////////////////////////////////////////////////////////
+		IAgentHubPtr DAgent::_lowAgentHub;
+
+		//////////////////////////////////////////////////////////////////////////
 		void DAgent::LowAgent::onReceive(
 			IAgentHubPtr hub,
 			const server::TEndpoint &endpoint,
@@ -27,50 +30,32 @@ namespace client
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data)
 		{
-			emit receive(QString("srv"), QVariant(220));
+			assert(!"конвертировать данные");
+			emit receive(QVariant(220), QString("srv"));
 		}
 
 
 		//////////////////////////////////////////////////////////////////////////
 		DAgent::DAgent(QObject *parent)
-			: _lowAgentHub()
 		{
-// 			qRegisterMetaType<client::IAgentHubPtr>("client::IAgentHubPtr");
-// 			connect(
-// 				this, SIGNAL(onReceive_sig(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
-// 				this, SLOT(onReceive_slot(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
-// 				Qt::QueuedConnection);
+			connect(
+				this, SIGNAL(onReceive_sig(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
+				this, SLOT(onReceive_slot(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
+				Qt::QueuedConnection);
 
-			//_lowAgent.reset(new LowAgent(this));
+			_lowAgent.reset(new LowAgent(this));
+			_lowAgentHub->addAgent(_lowAgent);
 		}
 
-// 		//////////////////////////////////////////////////////////////////////////
-// 		Agent::Agent(IAgentHubPtr lowAgentHub)
-// 			: _lowAgentHub(lowAgentHub)
-// 		{
-// 			qmlRegisterType<Agent>("r3.clientqt", 1, 0, "Agent");
-// 
-// 			qRegisterMetaType<client::IAgentHubPtr>("client::IAgentHubPtr");
-// 			qRegisterMetaType<server::TEndpoint>("server::TEndpoint");
-// 			qRegisterMetaType<utils::VariantPtr>("utils::VariantPtr");
-// 
-// 			connect(
-// 				this, SIGNAL(onReceive_sig(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
-// 				this, SLOT(onReceive_slot(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
-// 				Qt::QueuedConnection);
-// 
-// 			_lowAgent.reset(new LowAgent(this));
-// 			_lowAgentHub->addAgent(_lowAgent);
-// 		}
-		
+	
 		//////////////////////////////////////////////////////////////////////////
 		DAgent::~DAgent()
 		{
-			//_lowAgentHub->delAgent(_lowAgent);
+			_lowAgentHub->delAgent(_lowAgent);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void DAgent::send(QString service, QVariant data)
+		void DAgent::send(QVariant data, QString service)
 		{
 			assert(0);
 			//endpoint

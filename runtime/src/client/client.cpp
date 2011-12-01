@@ -8,6 +8,12 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Client::onSOk(size_t numChannels)
 	{
+		if(!_onSessionStartCalled)
+		{
+			_onSessionStart(_session);
+			_onSessionStartCalled = true;
+		}
+
 		//std::cout<<__FUNCTION__<<": "<<numChannels<<std::endl;
 		_onChannelChange(numChannels, boost::system::errc::make_error_code(boost::system::errc::success));
 	}
@@ -23,6 +29,7 @@ namespace client
 	Client::Client()
 		: _plugs(NULL)
 		, _asyncOwn(false)
+		, _onSessionStartCalled(false)
 	{
 
 	}
@@ -37,8 +44,13 @@ namespace client
 	void Client::start(
 		pluma::Pluma *plugs,
 		async::IServicePtr async,
+		boost::function<void (ISessionPtr)> onSessionStart,
+		boost::function<void (ISessionPtr)> onSessionStop,
 		boost::function<void (size_t numChannels, boost::system::error_code ec)> onChannelChange)
 	{
+		_onSessionStartCalled = false;
+		_onSessionStart = onSessionStart;
+		_onSessionStop = onSessionStop;
 		_onChannelChange = onChannelChange;
 
 		assert(!_plugs);
@@ -69,10 +81,16 @@ namespace client
 	{
 		if(_session)
 		{
+			if(_onSessionStartCalled)
+			{
+				_onSessionStop(_session);
+			}
 			_session->close();
 			_session->stop();
 			_session.reset();
 		}
+
+		_onSessionStartCalled = false;
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять коннектор

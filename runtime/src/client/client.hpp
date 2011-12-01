@@ -17,6 +17,10 @@ namespace client
 		async::IServicePtr	_async;
 		bool				_asyncOwn;
 		ISessionPtr			_session;
+
+		bool	_onSessionStartCalled;
+		boost::function<void (ISessionPtr)> _onSessionStart;
+		boost::function<void (ISessionPtr)> _onSessionStop;
 		boost::function<void (size_t numChannels, boost::system::error_code ec)> _onChannelChange;
 
 	protected:
@@ -30,6 +34,8 @@ namespace client
 		virtual void start(
 			pluma::Pluma *plugs,
 			async::IServicePtr async,
+			boost::function<void (ISessionPtr)> onSessionStart,
+			boost::function<void (ISessionPtr)> onSessionStop,
 			boost::function<void (size_t numChannels, boost::system::error_code ec)> onChannelChange);
 
 		virtual void connect(const char *host, const char *service);

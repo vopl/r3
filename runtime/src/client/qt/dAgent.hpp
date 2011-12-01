@@ -2,7 +2,6 @@
 #define _CLIENT_QT_AGENT_HPP_
 
 #include <QtCore/QObject>
-#include <QtDeclarative/QDeclarativeItem>
 #include <QtCore/QVariant>
 #include <boost/enable_shared_from_this.hpp>
 #include "client/iagent.hpp"
@@ -19,6 +18,11 @@ namespace client
 			Q_OBJECT
 
 		private:
+			friend class MainWindow;
+			static IAgentHubPtr	_lowAgentHub;
+
+
+		private:
 			class LowAgent
 				: public IAgent
 				, public boost::enable_shared_from_this<LowAgent>
@@ -32,10 +36,7 @@ namespace client
 				LowAgent(DAgent *agent);
 			};
 
-		private:
 			IAgentPtr		_lowAgent;
-			IAgentHubPtr	_lowAgentHub;
-
 		signals:
 			void onReceive_sig(
 				IAgentHubPtr hub,
@@ -50,14 +51,13 @@ namespace client
 
 		public:
 			DAgent(QObject *parent = 0);
-			//Agent(IAgentHubPtr lowAgentHub);
 			~DAgent();
 
 		public:
-			Q_INVOKABLE void send(QString service, QVariant data);
+			Q_INVOKABLE void send(QVariant data, QString service=QString(""));
 
 		signals:
-			void receive(QString service, QVariant data);
+			void receive(QVariant data, QString service);
 		};
 	}
 }
