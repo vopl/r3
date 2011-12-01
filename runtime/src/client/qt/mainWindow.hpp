@@ -39,6 +39,9 @@ namespace client
 			void onSessionStop_slot(ISessionPtr session);
 			void onAddrChanged(QString host, QString service);
 
+		private:
+			virtual void closeEvent(QCloseEvent *);
+
 		public:
 			MainWindow(QWidget *parent = 0, Qt::WFlags flags = 0);
 			~MainWindow();

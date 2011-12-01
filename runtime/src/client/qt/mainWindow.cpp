@@ -60,12 +60,18 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onSessionStop_slot(ISessionPtr session)
 		{
-			assert(_view);
-			setCentralWidget(NULL);
-			delete _view;
+			if(_view)
+			{
+				setCentralWidget(NULL);
+				delete _view;
+				_view = NULL;
+			}
 
-			DAgent::_lowAgentHub->deinitialize();
-			DAgent::_lowAgentHub.reset();
+			if(DAgent::_lowAgentHub)
+			{
+				DAgent::_lowAgentHub->deinitialize();
+				DAgent::_lowAgentHub.reset();
+			}
 		}
 
 
@@ -77,6 +83,18 @@ namespace client
 			_client->connect(host.toUtf8(), service.toUtf8());
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::closeEvent(QCloseEvent *evt)
+		{
+			_client->stop();
+
+			onSessionStop_slot(ISessionPtr());
+
+			delete _nd;
+			_nd = NULL;
+			QMainWindow::closeEvent(evt);
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
@@ -84,15 +102,6 @@ namespace client
 			, _nd(false)
 			, _view(NULL)
 		{
-			qRegisterMetaType<boost::system::error_code>("boost::system::error_code");
-			qRegisterMetaType<server::TEndpoint>("server::TEndpoint");
-			qRegisterMetaType<utils::VariantPtr>("utils::VariantPtr");
-			qRegisterMetaType<ISessionPtr>("ISessionPtr");
-			qRegisterMetaType<IAgentHubPtr>("IAgentHubPtr");
-
-			qmlRegisterType<DAgent>("Client", 1,0, "Agent");
-
-
 			connect(
 				this, SIGNAL(onChannelChange_sig(int, boost::system::error_code)), 
 				this, SLOT(onChannelChange_slot(int, boost::system::error_code)), 
@@ -139,14 +148,6 @@ namespace client
 
 		MainWindow::~MainWindow()
 		{
-			_client->stop();
-
-			if(_view)
-			{
-				onSessionStop_slot(ISessionPtr());
-			}
-
-			delete _nd;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
