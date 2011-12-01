@@ -9,7 +9,39 @@ namespace server
 		mutex::scoped_lock sl(_mtx);
 
 		//распарсить пакет, найти службу и передать ей
-		assert(0);
+		bool packetOk = false;
+		utils::Variant v;
+		if(	v.load(p._data, p._size) &&
+			v.is<utils::Variant::MapStringVariant>())
+		{
+			utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>();
+			utils::Variant endpoint = m["server::endpoint"];
+
+			if(endpoint.is<TEndpoint>())
+			{
+				TMServices::iterator iter = _services.find(endpoint);
+				if(_services.end() != iter)
+				{
+					utils::Variant clientEndpoint = m["client::endpoint"];
+					utils::Variant data = m["data"];
+					if(	clientEndpoint.is<client::TEndpoint>() &&
+						data.is<utils::VariantPtr>())
+					{
+						packetOk = true;
+						iter->second->onReceive(
+							shared_from_this(),
+							session,
+							clientEndpoint.as<client::TEndpoint>(),
+							data.as<utils::VariantPtr>());
+					}
+				}
+			}
+		}
+
+		if(!packetOk)
+		{
+			//assert(!"ничего не слать");
+		}
 
 		//слушать сессию дальше
 		session->receive(
@@ -118,7 +150,18 @@ namespace server
 		boost::function<void (boost::system::error_code)> fail)
 	{
 		//запаковать данные
+		utils::Variant v;
+		utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>(true);
+		m["server::endpoint"] = service->getEndpoint();
+		m["client::endpoint"] = endpoint;
+		m["data"] = data;
+
+		net::SPacket p;
+		p._data = v.save(p._size);
+
 		//отослать
-		assert(0);
+		session->send(p, 
+			ok,
+			fail);
 	}
 }

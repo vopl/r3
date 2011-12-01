@@ -13,6 +13,6 @@ Item {
 		property int i: 220
 	}
 
-	Component.onCompleted: {console.log("Completed Running!"); agent.send(220);}
+	Component.onCompleted: {console.log("Completed Running!"); agent.send(220, "echo");}
 	Component.onDestruction: console.log("Destruction Beginning!")
 }

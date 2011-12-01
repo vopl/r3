@@ -9,7 +9,38 @@ namespace client
 		mutex::scoped_lock sl(_mtx);
 
 		//распарсить пакет, найти агента и передать ему
-		assert(0);
+		bool packetOk = false;
+		utils::Variant v;
+		if(	v.load(p._data, p._size) &&
+			v.is<utils::Variant::MapStringVariant>())
+		{
+			utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>();
+			utils::Variant endpoint = m["client::endpoint"];
+
+			if(endpoint.is<TEndpoint>())
+			{
+				TMAgentsFwd::iterator iter = _agentsFwd.find(endpoint);
+				if(_agentsFwd.end() != iter)
+				{
+					utils::Variant serverEndpoint = m["server::endpoint"];
+					utils::Variant data = m["data"];
+					if(	serverEndpoint.is<server::TEndpoint>() &&
+						data.is<utils::VariantPtr>())
+					{
+						packetOk = true;
+						iter->second->onReceive(
+							shared_from_this(),
+							serverEndpoint.as<server::TEndpoint>(),
+							data.as<utils::VariantPtr>());
+					}
+				}
+			}
+		}
+
+		if(!packetOk)
+		{
+			//assert(!"ничего не слать");
+		}
 
 		//слушать сессию дальше
 		assert(_session);
