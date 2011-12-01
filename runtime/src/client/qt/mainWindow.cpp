@@ -139,12 +139,14 @@ namespace client
 
 		MainWindow::~MainWindow()
 		{
-			delete _nd;
+			_client->stop();
+
 			if(_view)
 			{
-				delete _view;
+				onSessionStop_slot(ISessionPtr());
 			}
-			_client->stop();
+
+			delete _nd;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

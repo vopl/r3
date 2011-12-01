@@ -127,6 +127,10 @@ namespace client
 	{
 		if(_session)
 		{
+			if(_onSessionStartCalled)
+			{
+				_onSessionStop(_session);
+			}
 			_session->close();
 			_session->stop();
 			_session.reset();
