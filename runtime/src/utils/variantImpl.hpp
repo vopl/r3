@@ -635,21 +635,6 @@ namespace boost
 	} // namespace serialization
 } // namespace boost
 
-//////////////////////////////////////////////////////////////////////////
-//utils::Variant 
-namespace boost 
-{
-	namespace serialization 
-	{
-		//////////////////////////////////////////////////////////////////////////
-		template<class Archive>
-		void serialize(Archive & ar, utils::VariantPtr &x, const unsigned int /*version*/)
-		{
-			ar & (x);
-		}
-	} // namespace serialization
-} // namespace boost
-
 
 namespace utils
 {

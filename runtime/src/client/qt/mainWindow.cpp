@@ -46,7 +46,9 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onSessionStart_slot(ISessionPtr session)
 		{
-			DAgent::_lowAgentHub = session;
+			DAgent::_lowAgentHub = _plugins.create<IAgentHubProvider>();
+			assert(DAgent::_lowAgentHub);
+			DAgent::_lowAgentHub->initialize(session);
 
 			assert(!_view);
 			_view = new QDeclarativeView(this);
@@ -62,6 +64,7 @@ namespace client
 			setCentralWidget(NULL);
 			delete _view;
 
+			DAgent::_lowAgentHub->deinitialize();
 			DAgent::_lowAgentHub.reset();
 		}
 

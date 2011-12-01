@@ -10,6 +10,7 @@
 
 
 #include "utils/serialization/collection_size_type.hpp"
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/deque.hpp>
 #include <boost/serialization/vector.hpp>

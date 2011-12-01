@@ -36,7 +36,7 @@ SOURCE_GROUP(src FILES ${SRC})
 SET(SRC_HDR
 	${SRC_DIR}/utils/variantDumper.hpp
 	${SRC_DIR}/utils/variantImpl.hpp
-	${SRC_DIR}/utils/pch.hpp
+	${SRC_DIR}/utils/pch.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
@@ -55,7 +55,7 @@ SOURCE_GROUP(src FILES ${SRC_PCH})
 INCLUDE_DIRECTORIES("${SRC_DIR}/utils")
 
 PRESETUP_BIN_OUT(SRC_STUB)
-ADD_LIBRARY(libutils STATIC ${SRC_STUB} ${INCLUDE} ${INCLUDE_SERIALIZATION} ${SRC} ${SRC_SERIALIZATION} ${SRC_PCH})
+ADD_LIBRARY(libutils STATIC ${SRC_STUB} ${INCLUDE} ${INCLUDE_SERIALIZATION} ${SRC} ${SRC_HDR} ${SRC_SERIALIZATION} ${SRC_PCH})
 
 CREATE_PCH(libutils ${SRC_DIR}/utils/pch.h ${SRC_PCH})
 USE_PCH(libutils ${SRC_DIR}/utils/pch.h ${SRC})

@@ -13,6 +13,7 @@ SET(SRC
 	${SRC_DIR}/client/client.cpp
 	${SRC_DIR}/client/plug.cpp
 	${SRC_DIR}/client/session.cpp
+	${SRC_DIR}/client/agentHub.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -24,6 +25,7 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 SET(SRC_HDR
 	${SRC_DIR}/client/client.hpp
 	${SRC_DIR}/client/session.hpp
+	${SRC_DIR}/client/agentHub.hpp
 	${SRC_DIR}/client/pch.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})

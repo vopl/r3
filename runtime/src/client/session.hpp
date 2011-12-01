@@ -71,16 +71,6 @@ namespace client
 	public://net::IChannel
 		virtual void close();
 
-	public://IAgentHub
-		virtual void addAgent(IAgentPtr agent);
-		virtual void delAgent(IAgentPtr agent);
-
-		virtual void send(
-			IAgentPtr agent,
-			const server::TEndpoint &endpoint,
-			utils::VariantPtr data,
-			boost::function<void ()> ok,
-			boost::function<void (boost::system::error_code)> fail);
 	};
 	PLUMA_INHERIT_PROVIDER(Session, ISession);
 }

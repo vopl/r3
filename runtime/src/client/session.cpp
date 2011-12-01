@@ -360,29 +360,4 @@ namespace client
 		mutex::scoped_lock sl(_mtx);
 		return _sid;
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::addAgent(IAgentPtr agent)
-	{
-		assert(0);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::delAgent(IAgentPtr agent)
-	{
-		assert(0);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::send(
-		IAgentPtr agent,
-		const server::TEndpoint &endpoint,
-		utils::VariantPtr data,
-		boost::function<void ()> ok,
-		boost::function<void (boost::system::error_code)> fail)
-	{
-		assert(0);
-	}
-	
-
 }
