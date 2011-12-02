@@ -50,7 +50,7 @@ namespace client
 
 		private:
 			static void variantCnvt(utils::Variant &dst, const QVariant &src);
-			static void variantCnvt(const QVariant &dst, utils::Variant &src);
+			static void variantCnvt(QVariant &dst, const utils::Variant &src);
 
 		public:
 			DAgent(QObject *parent = 0);

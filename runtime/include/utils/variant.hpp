@@ -305,13 +305,15 @@ namespace utils
 
 		bool isNull() const;
 		void setNull(bool n=true);
+		template<typename T> void setNull(bool n=true);
 
 		EType type() const;
 		void *data();
 		void const *data() const;
 
-		template<typename T> T &as(bool forceType = false);
+		template<typename T> T &as(bool forceType);
 		template<typename T> T const &as() const;
+		template<typename T> T &as();
 		template<typename T> bool is() const;
 		template<typename T> void forceType();
 		void forceType(EType et);
