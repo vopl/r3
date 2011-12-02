@@ -2,29 +2,50 @@ import QtQuick 1.0
 import Client 1.0
 
 Item {
-    Image
-    {
-        anchors.horizontalCenter: parent.horizontalCenter
-    }
+	Text {
+		id: label
+		color: "blue"
+		anchors.centerIn: parent
+		text: "sfdg"
+		width: 400
+	}
 
 	Agent
 	{
 		id: agent
-		property int i: 220
 		
 		function trata(data, service)
 		{
-			if(! (data%1000))
-			{
-				console.log("receive from "+service+", data: "+data); 
-			}
-			send(data+1, "echo");
+			label.text=data.cnt;
+			data.cnt++;
+			send(data, "echo");
 		}
 		onReceive: trata(data, service)
 	}
 	
 	//agent.onReceive: {console.log("receive");}
 
-	Component.onCompleted: {console.log("Completed Running!"); agent.send(0, "echo");}
+	Component.onCompleted: 
+	{
+		console.log("Completed Running!"); 
+		var ld = "very long";
+		ld = [ld,ld,ld,ld,ld];
+		ld = {a:ld,b:ld};
+		ld = [ld,ld,ld,ld,ld];
+		ld = [ld,ld,ld,ld,ld];
+		ld = [ld,ld,ld,ld,ld];
+		//ld = [ld,ld,ld,ld,ld];
+		agent.send({cnt:0,ld:ld}, "echo");
+		agent.send({cnt:10,ld:ld}, "echo");
+		agent.send({cnt:20,ld:ld}, "echo");
+		agent.send({cnt:30,ld:ld}, "echo");
+		agent.send({cnt:40,ld:ld}, "echo");
+		agent.send({cnt:50,ld:ld}, "echo");
+		agent.send({cnt:60,ld:ld}, "echo");
+		agent.send({cnt:70,ld:ld}, "echo");
+		agent.send({cnt:80,ld:ld}, "echo");
+		agent.send({cnt:90,ld:ld}, "echo");
+		agent.send({cnt:100,ld:ld}, "echo");
+	}
 	Component.onDestruction: console.log("Destruction Beginning!")
 }

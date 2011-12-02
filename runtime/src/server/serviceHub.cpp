@@ -6,47 +6,67 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::onReceiveOk(ISessionPtr session, const net::SPacket &p)
 	{
-		mutex::scoped_lock sl(_mtx);
-
-		//распарсить пакет, найти службу и передать ей
-		bool packetOk = false;
-		utils::Variant v;
-		if(	v.load(p._data, p._size) &&
-			v.is<utils::Variant::MapStringVariant>())
-		{
-			utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>();
-			utils::Variant endpoint = m["server::endpoint"];
-
-			if(endpoint.is<TEndpoint>())
-			{
-				TMServices::iterator iter = _services.find(endpoint);
-				if(_services.end() != iter)
-				{
-					utils::Variant clientEndpoint = m["client::endpoint"];
-					utils::Variant data = m["data"];
-					if(	clientEndpoint.is<client::TEndpoint>() &&
-						data.is<utils::VariantPtr>())
-					{
-						packetOk = true;
-						iter->second->onReceive(
-							shared_from_this(),
-							session,
-							clientEndpoint.as<client::TEndpoint>(),
-							data.as<utils::VariantPtr>());
-					}
-				}
-			}
-		}
-
-		if(!packetOk)
-		{
-			//assert(!"ничего не слать");
-		}
 
 		//слушать сессию дальше
 		session->receive(
 			bind(&ServiceHub::onReceiveOk, shared_from_this(), session, _1),
 			bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
+
+		//а этот пакет просунуть в сервис
+		client::TEndpoint clientEndpoint_;
+		utils::VariantPtr data_;
+		IServicePtr service_;
+		bool packetOk = false;
+
+		{
+			//распарсить пакет, найти службу и передать ей
+			utils::Variant v;
+			if(	v.load(p._data, p._size) &&
+				v.is<utils::Variant::MapStringVariant>())
+			{
+				utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>();
+				utils::Variant endpoint = m["server::endpoint"];
+
+				if(endpoint.is<TEndpoint>())
+				{
+					{
+						mutex::scoped_lock sl(_mtx);
+						TMServices::iterator iter = _services.find(endpoint);
+						if(_services.end() != iter)
+						{
+							service_ = iter->second;
+						}
+					}
+
+					if(service_)
+					{
+						utils::Variant clientEndpoint = m["client::endpoint"];
+						utils::Variant data = m["data"];
+						if(	clientEndpoint.is<client::TEndpoint>() &&
+							data.is<utils::VariantPtr>())
+						{
+							packetOk = true;
+							clientEndpoint_ = clientEndpoint.as<client::TEndpoint>();
+							data_ = data.as<utils::VariantPtr>();
+						}
+					}
+				}
+			}
+		}
+
+
+		if(packetOk)
+		{
+			service_->onReceive(
+				shared_from_this(),
+				session,
+				clientEndpoint_,
+				data_);
+		}
+		else
+		{
+			//assert(!"log error?");
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,18 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void AgentHub::onReceiveOk(const net::SPacket &p)
 	{
-		mutex::scoped_lock sl(_mtx);
+		//слушать сессию дальше
+		assert(_session);
+		if(_session)
+		{
+			_session->receive(
+				bind(&AgentHub::onReceiveOk, shared_from_this(), _1),
+				bind(&AgentHub::onReceiveFail, shared_from_this(), _1));
+		}
+
+		IAgentPtr agent_;
+		utils::VariantPtr data_;
+		server::TEndpoint serverEndpoint_;
 
 		//распарсить пакет, найти агента и передать ему
 		bool packetOk = false;
@@ -19,36 +30,40 @@ namespace client
 
 			if(endpoint.is<TEndpoint>())
 			{
-				TMAgentsFwd::iterator iter = _agentsFwd.find(endpoint);
-				if(_agentsFwd.end() != iter)
+				{
+					mutex::scoped_lock sl(_mtx);
+					TMAgentsFwd::iterator iter = _agentsFwd.find(endpoint);
+					if(_agentsFwd.end() != iter)
+					{
+						agent_ = iter->second;
+					}
+				}
+
+				if(agent_)
 				{
 					utils::Variant serverEndpoint = m["server::endpoint"];
 					utils::Variant data = m["data"];
 					if(	serverEndpoint.is<server::TEndpoint>() &&
 						data.is<utils::VariantPtr>())
 					{
+						serverEndpoint_ = serverEndpoint.as<server::TEndpoint>();
+						data_ = data.as<utils::VariantPtr>();
 						packetOk = true;
-						iter->second->onReceive(
-							shared_from_this(),
-							serverEndpoint.as<server::TEndpoint>(),
-							data.as<utils::VariantPtr>());
 					}
 				}
 			}
 		}
 
-		if(!packetOk)
+		if(packetOk)
 		{
-			//assert(!"ничего не слать");
+			agent_->onReceive(
+				shared_from_this(),
+				serverEndpoint_,
+				data_);
 		}
-
-		//слушать сессию дальше
-		assert(_session);
-		if(_session)
+		else
 		{
-			_session->receive(
-				bind(&AgentHub::onReceiveOk, shared_from_this(), _1),
-				bind(&AgentHub::onReceiveFail, shared_from_this(), _1));
+			//assert(!"log error?");
 		}
 	}
 
