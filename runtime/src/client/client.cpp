@@ -105,7 +105,7 @@ namespace client
 		assert(_session);
 		_session->start(
 			connector, host, service, 
-			nullClientSid, 2,
+			nullClientSid, 4,
 			bind(&Client::onSOk, shared_from_this(), _1),
 			bind(&Client::onSFail, shared_from_this(), _1, _2));
 	}

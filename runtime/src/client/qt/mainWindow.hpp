@@ -22,6 +22,8 @@ namespace client
 			NetworkDialog		*_nd;
 			QLabel				*_labelConnected;
 
+			int					_numChannels;
+
 			QDeclarativeView	*_view;
 
 		private:
@@ -38,6 +40,11 @@ namespace client
 			void onSessionStart_slot(ISessionPtr session);
 			void onSessionStop_slot(ISessionPtr session);
 			void onAddrChanged(QString host, QString service);
+
+		signals:
+			void onChannelChange(int numChannels);
+		public:
+			int getNumChannels();
 
 		private:
 			virtual void closeEvent(QCloseEvent *);

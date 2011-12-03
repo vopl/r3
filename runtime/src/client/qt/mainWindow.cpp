@@ -41,11 +41,18 @@ namespace client
 
 			_nd->setNumChannels(numChannels);
 			_labelConnected->setNum(numChannels);
+
+			if(numChannels != _numChannels)
+			{
+				_numChannels = numChannels;
+				emit onChannelChange(numChannels);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onSessionStart_slot(ISessionPtr session)
 		{
+			DAgent::_mainWindow = this;
 			DAgent::_lowAgentHub = _plugins.create<IAgentHubProvider>();
 			assert(DAgent::_lowAgentHub);
 			DAgent::_lowAgentHub->initialize(session);
@@ -72,6 +79,12 @@ namespace client
 				DAgent::_lowAgentHub->deinitialize();
 				DAgent::_lowAgentHub.reset();
 			}
+
+			if(DAgent::_mainWindow)
+			{
+				DAgent::_mainWindow = NULL;
+			}
+
 		}
 
 
@@ -81,6 +94,12 @@ namespace client
 			_nd->setNumChannels(0);
 			_labelConnected->setNum(0);
 			_client->connect(host.toUtf8(), service.toUtf8());
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		int MainWindow::getNumChannels()
+		{
+			return _numChannels;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -101,6 +120,7 @@ namespace client
 			: QMainWindow(parent, flags)
 			, _nd(false)
 			, _view(NULL)
+			, _numChannels(0)
 		{
 			connect(
 				this, SIGNAL(onChannelChange_sig(int, boost::system::error_code)), 

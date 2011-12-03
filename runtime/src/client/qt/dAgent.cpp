@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "dAgent.hpp"
 #include <QtDeclarative/qdeclarative.h>
+#include "mainWindow.hpp"
 
 namespace client
 {
@@ -8,6 +9,7 @@ namespace client
 	{
 		//////////////////////////////////////////////////////////////////////////
 		IAgentHubPtr DAgent::_lowAgentHub;
+		MainWindow *DAgent::_mainWindow=NULL;
 
 		//////////////////////////////////////////////////////////////////////////
 		void DAgent::LowAgent::onReceive(
@@ -34,6 +36,13 @@ namespace client
 			variantCnvt(qtv, *data);
 			emit receive(qtv, QString::fromUtf8(endpoint.data(), endpoint.size()));
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void DAgent::onChannelChange_slot(int numChannels)
+		{
+			emit numChannelsChanged();
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		void DAgent::variantCnvt(utils::Variant &dst, const QVariant &src)
@@ -847,7 +856,8 @@ namespace client
 				//////////////////////////////////////////////////////////////////////////
 // 			case utils::Variant::etMapVariantVariant:
 // 				break;
-				//////////////////////////////////////////////////////////////////////////// 			case utils::Variant::etMultimapVariantVariant:
+				//////////////////////////////////////////////////////////////////////////
+// 			case utils::Variant::etMultimapVariantVariant:
 // 				break;
 				//////////////////////////////////////////////////////////////////////////
 			case utils::Variant::etMultimapStringVariant:
@@ -963,14 +973,25 @@ namespace client
 			}
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		int DAgent::getNumChannels()
+		{
+			return _mainWindow->getNumChannels();
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		DAgent::DAgent(QObject *parent)
+			: QObject(parent)
 		{
 			connect(
 				this, SIGNAL(onReceive_sig(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
 				this, SLOT(onReceive_slot(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
 				Qt::QueuedConnection);
+
+			connect(
+				(QObject *)_mainWindow, SIGNAL(onChannelChange(int)),
+				this, SLOT(onChannelChange_slot(int)));
 
 			_lowAgent.reset(new LowAgent(this));
 			_lowAgentHub->addAgent(_lowAgent);

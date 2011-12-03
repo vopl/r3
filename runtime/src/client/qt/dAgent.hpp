@@ -20,6 +20,7 @@ namespace client
 		private:
 			friend class MainWindow;
 			static IAgentHubPtr	_lowAgentHub;
+			static MainWindow	*_mainWindow;
 
 
 		private:
@@ -47,20 +48,25 @@ namespace client
 				IAgentHubPtr hub,
 				const server::TEndpoint &endpoint,
 				utils::VariantPtr data);
+			void onChannelChange_slot(int numChannels);
 
 		private:
 			static void variantCnvt(utils::Variant &dst, const QVariant &src);
 			static void variantCnvt(QVariant &dst, const utils::Variant &src);
+
+			int getNumChannels();
 
 		public:
 			DAgent(QObject *parent = 0);
 			~DAgent();
 
 		public:
+			Q_PROPERTY(int numChannels READ getNumChannels);
 			Q_INVOKABLE void send(QVariant data, QString service=QString(""));
 
 		signals:
 			void receive(QVariant data, QString service);
+			void numChannelsChanged();
 		};
 	}
 }

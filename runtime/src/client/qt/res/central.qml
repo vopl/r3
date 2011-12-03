@@ -9,31 +9,15 @@ Item {
 		text: "sfdg"
 		width: 400
 	}
-
-	Agent
-	{
-		id: agent
-		
-		function trata(data, service)
-		{
-			label.text=data.cnt;
-			data.cnt++;
-			send(data, "echo");
-		}
-		onReceive: trata(data, service)
-	}
 	
-	//agent.onReceive: {console.log("receive");}
-
-	Component.onCompleted: 
+	function start()
 	{
-		console.log("Completed Running!"); 
 		var ld = "very long";
-		ld = [ld,ld,ld,ld,ld];
-		ld = {a:ld,b:ld};
-		ld = [ld,ld,ld,ld,ld];
-		ld = [ld,ld,ld,ld,ld];
-		ld = [ld,ld,ld,ld,ld];
+		//ld = [ld,ld,ld,ld,ld];
+		//ld = {a:ld,b:ld};
+		//ld = [ld,ld,ld,ld,ld];
+		//ld = [ld,ld,ld,ld,ld];
+		//ld = [ld,ld,ld,ld,ld];
 		//ld = [ld,ld,ld,ld,ld];
 		agent.send({cnt:0,ld:ld}, "echo");
 		agent.send({cnt:10,ld:ld}, "echo");
@@ -46,6 +30,43 @@ Item {
 		agent.send({cnt:80,ld:ld}, "echo");
 		agent.send({cnt:90,ld:ld}, "echo");
 		agent.send({cnt:100,ld:ld}, "echo");
+		
+		console.log("start ping pong")
 	}
-	Component.onDestruction: console.log("Destruction Beginning!")
+
+	property int numChannelsWas:1
+	Agent
+	{
+		id: agent
+		
+		function trata(data, service)
+		{
+			label.text=data.cnt;
+			data.cnt++;
+			send(data, "echo");
+		}
+		onReceive: trata(data, service)
+		
+		
+		function trata2()
+		{
+			if(!numChannelsWas && numChannels)
+			{
+				start();
+			}
+			numChannelsWas = numChannels;
+			if(!numChannels)
+			{
+				console.log("no connections")
+			}
+		}
+		onNumChannelsChanged: trata2()
+	}
+	
+
+	Component.onCompleted: 
+	{
+		start();
+	}
+	//Component.onDestruction: console.log("Destruction Beginning!")
 }
