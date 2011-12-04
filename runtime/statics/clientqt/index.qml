@@ -9,6 +9,14 @@ Item {
 		text: "sfdg"
 		width: 400
 	}
+
+	Image {
+             id: background
+             //anchors.fill: parent
+             source: "background.jpg"
+             //fillMode: Image.PreserveAspectCrop
+         }
+
 	
 	function start()
 	{
@@ -20,6 +28,7 @@ Item {
 		//ld = [ld,ld,ld,ld,ld];
 		//ld = [ld,ld,ld,ld,ld];
 		agent.send({cnt:0,ld:ld}, "echo");
+		/*
 		agent.send({cnt:10,ld:ld}, "echo");
 		agent.send({cnt:20,ld:ld}, "echo");
 		agent.send({cnt:30,ld:ld}, "echo");
@@ -30,7 +39,7 @@ Item {
 		agent.send({cnt:80,ld:ld}, "echo");
 		agent.send({cnt:90,ld:ld}, "echo");
 		agent.send({cnt:100,ld:ld}, "echo");
-		
+		*/
 		console.log("start ping pong")
 	}
 

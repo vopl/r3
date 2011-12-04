@@ -135,6 +135,7 @@ namespace server
 			}
 		}
 
+		//std::cerr<<"statics: "<<path.as<utils::Variant::String>()<<std::endl;
 		hub->send(shared_from_this(), session, endpoint, data, 
 			bind(&ServiceStatics::onSendOk, shared_from_this()),
 			bind(&ServiceStatics::onSendFail, shared_from_this(), _1));
