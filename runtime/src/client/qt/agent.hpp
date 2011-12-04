@@ -43,6 +43,10 @@ namespace client
 			Agent();
 			~Agent();
 
+			void send(
+				const server::TEndpoint &endpoint,
+				utils::VariantPtr data);
+
 			int getNumChannels();
 		};
 	}

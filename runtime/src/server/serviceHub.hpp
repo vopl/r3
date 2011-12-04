@@ -21,6 +21,9 @@ namespace server
 		mutex	_mtx;
 
 	private:
+		void onSendOk(ISessionPtr session);
+		void onSendFail(ISessionPtr session, system::error_code ec);
+
 		void onReceiveOk(ISessionPtr session, const net::SPacket &p);
 		void onReceiveFail(ISessionPtr session, system::error_code ec);
 

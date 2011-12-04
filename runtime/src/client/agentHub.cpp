@@ -50,6 +50,12 @@ namespace client
 						data_ = data.as<utils::VariantPtr>();
 						packetOk = true;
 					}
+					else if(!m["error"].isNull())
+					{
+						std::cerr<<"error from service: "<<m["error"]<<std::endl;
+
+					}
+
 				}
 			}
 		}

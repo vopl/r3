@@ -13,10 +13,13 @@ namespace server
 			bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
 
 		//а этот пакет просунуть в сервис
+		server::TEndpoint serverEndpoint_;
 		client::TEndpoint clientEndpoint_;
 		utils::VariantPtr data_;
 		IServicePtr service_;
-		bool packetOk = false;
+		bool serverEndpointExists = false;
+		bool clientEndpointExists = false;
+		bool dataExists = false;
 
 		{
 			//распарсить пакет, найти службу и передать ей
@@ -25,37 +28,40 @@ namespace server
 				v.is<utils::Variant::MapStringVariant>())
 			{
 				utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>();
-				utils::Variant endpoint = m["server::endpoint"];
+				utils::Variant serverEndpoint = m["server::endpoint"];
 
-				if(endpoint.is<TEndpoint>())
+				if(serverEndpoint.is<TEndpoint>())
 				{
+					serverEndpoint_ = serverEndpoint.as<TEndpoint>();
+					serverEndpointExists = true;
 					{
 						mutex::scoped_lock sl(_mtx);
-						TMServices::iterator iter = _services.find(endpoint);
+						TMServices::iterator iter = _services.find(serverEndpoint_);
 						if(_services.end() != iter)
 						{
 							service_ = iter->second;
 						}
 					}
 
-					if(service_)
+					utils::Variant clientEndpoint = m["client::endpoint"];
+					if(	clientEndpoint.is<client::TEndpoint>())
 					{
-						utils::Variant clientEndpoint = m["client::endpoint"];
-						utils::Variant data = m["data"];
-						if(	clientEndpoint.is<client::TEndpoint>() &&
-							data.is<utils::VariantPtr>())
-						{
-							packetOk = true;
-							clientEndpoint_ = clientEndpoint.as<client::TEndpoint>();
-							data_ = data.as<utils::VariantPtr>();
-						}
+						clientEndpoint_ = clientEndpoint.as<client::TEndpoint>();
+						clientEndpointExists = true;
+					}
+
+					utils::Variant data = m["data"];
+					if(data.is<utils::VariantPtr>())
+					{
+						data_ = data.as<utils::VariantPtr>();
+						dataExists = true;
 					}
 				}
 			}
 		}
 
 
-		if(packetOk)
+		if(service_ && dataExists && clientEndpointExists)
 		{
 			service_->onReceive(
 				shared_from_this(),
@@ -66,8 +72,39 @@ namespace server
 		else
 		{
 			//assert(!"log error?");
+
+			if(clientEndpointExists && serverEndpointExists)
+			{
+				//запаковать данные
+				utils::Variant v;
+				utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>(true);
+				m["server::endpoint"] = serverEndpoint_;
+				m["client::endpoint"] = clientEndpoint_;
+				m["error"] = "badRequest";
+
+				net::SPacket p;
+				p._data = v.save(p._size);
+
+				//отослать
+				session->send(p, 
+					bind(&ServiceHub::onSendOk, shared_from_this(), session),
+					bind(&ServiceHub::onSendFail, shared_from_this(), session, _1));
+			}
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceHub::onSendOk(ISessionPtr session)
+	{
+		//ok
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceHub::onSendFail(ISessionPtr session, system::error_code ec)
+	{
+		//assert(!"log error?");
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::onReceiveFail(ISessionPtr session, system::error_code ec)

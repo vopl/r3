@@ -7,6 +7,7 @@
 #include "pluma/pluma.hpp"
 #include "client/iclient.hpp"
 #include "networkDialog.hpp"
+#include "networkAccessManagerFactory.hpp"
 
 namespace client
 {
@@ -24,6 +25,7 @@ namespace client
 
 			int					_numChannels;
 
+			NetworkAccessManagerFactory _networkAccessManagerFactory;
 			QDeclarativeView	*_view;
 
 		private:

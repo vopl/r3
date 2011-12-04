@@ -3,6 +3,7 @@
 #include <boost/bind.hpp>
 #include <QtDeclarative/qdeclarative.h>
 #include <QtDeclarative/QDeclarativeView>
+#include <QtDeclarative/QDeclarativeEngine>
 #include "agent.hpp"
 
 namespace client
@@ -60,7 +61,10 @@ namespace client
 			assert(!_view);
 			_view = new QDeclarativeView(this);
 			setCentralWidget(_view);
-			_view->setSource(QUrl("qrc:/central.qml"));
+
+			_view->engine()->setNetworkAccessManagerFactory(&_networkAccessManagerFactory);
+			_view->engine()->setBaseUrl(QUrl("client://statics/"));
+			_view->setSource(QUrl("index.qml"));
 			_view->show();
 		}
 

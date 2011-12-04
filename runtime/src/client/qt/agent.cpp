@@ -40,6 +40,14 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Agent::send(
+			const server::TEndpoint &endpoint,
+			utils::VariantPtr data)
+		{
+			return _lowAgentHub->send(_lowAgent, endpoint, data);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		int Agent::getNumChannels()
 		{
 			return _mainWindow->getNumChannels();
