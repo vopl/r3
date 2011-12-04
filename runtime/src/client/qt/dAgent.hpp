@@ -1,11 +1,9 @@
-#ifndef _CLIENT_QT_AGENT_HPP_
-#define _CLIENT_QT_AGENT_HPP_
+#ifndef _CLIENT_QT_DAGENT_HPP_
+#define _CLIENT_QT_DAGENT_HPP_
 
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
-#include <boost/enable_shared_from_this.hpp>
-#include "client/iagent.hpp"
-#include "client/iagentHub.hpp"
+#include "agent.hpp"
 
 namespace client
 {
@@ -13,31 +11,17 @@ namespace client
 	{
 		class DAgent
 			: public QObject
+			, public Agent
 
 		{
 			Q_OBJECT
 
 		private:
-			friend class MainWindow;
-			static IAgentHubPtr	_lowAgentHub;
-			static MainWindow	*_mainWindow;
+			virtual void onReceive(
+				IAgentHubPtr hub,
+				const server::TEndpoint &endpoint,
+				utils::VariantPtr data);
 
-
-		private:
-			class LowAgent
-				: public IAgent
-				, public boost::enable_shared_from_this<LowAgent>
-			{
-				DAgent *_agent;
-				virtual void onReceive(
-					IAgentHubPtr hub,
-					const server::TEndpoint &endpoint,
-					utils::VariantPtr data);
-			public:
-				LowAgent(DAgent *agent);
-			};
-
-			IAgentPtr		_lowAgent;
 		signals:
 			void onReceive_sig(
 				IAgentHubPtr hub,
@@ -54,7 +38,10 @@ namespace client
 			static void variantCnvt(utils::Variant &dst, const QVariant &src);
 			static void variantCnvt(QVariant &dst, const utils::Variant &src);
 
-			int getNumChannels();
+		private:
+			QString	_service;
+			QString getService();
+			void setService(QString service);
 
 		public:
 			DAgent(QObject *parent = 0);
@@ -62,6 +49,7 @@ namespace client
 
 		public:
 			Q_PROPERTY(int numChannels READ getNumChannels);
+			Q_PROPERTY(QString service READ getService WRITE setService);
 			Q_INVOKABLE void send(QVariant data, QString service=QString(""));
 
 		signals:

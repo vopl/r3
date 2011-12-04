@@ -14,12 +14,14 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
 SET(SRC
 	${SRC_DIR}/client/qt/entry.cpp
+	${SRC_DIR}/client/qt/agent.cpp
 )
 SOURCE_GROUP(src\\qt FILES ${SRC})
 QT4_AUTOMOC(${SRC})
 
 SET(SRC_HDR
 	${SRC_DIR}/client/qt/pch.h
+	${SRC_DIR}/client/qt/agent.hpp
 )
 SOURCE_GROUP(src\\qt FILES ${SRC_HDR})
 

@@ -3,7 +3,7 @@
 #include <boost/bind.hpp>
 #include <QtDeclarative/qdeclarative.h>
 #include <QtDeclarative/QDeclarativeView>
-#include "dAgent.hpp"
+#include "agent.hpp"
 
 namespace client
 {
@@ -52,10 +52,10 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onSessionStart_slot(ISessionPtr session)
 		{
-			DAgent::_mainWindow = this;
-			DAgent::_lowAgentHub = _plugins.create<IAgentHubProvider>();
-			assert(DAgent::_lowAgentHub);
-			DAgent::_lowAgentHub->initialize(session);
+			Agent::_mainWindow = this;
+			Agent::_lowAgentHub = _plugins.create<IAgentHubProvider>();
+			assert(Agent::_lowAgentHub);
+			Agent::_lowAgentHub->initialize(session);
 
 			assert(!_view);
 			_view = new QDeclarativeView(this);
@@ -74,15 +74,15 @@ namespace client
 				_view = NULL;
 			}
 
-			if(DAgent::_lowAgentHub)
+			if(Agent::_lowAgentHub)
 			{
-				DAgent::_lowAgentHub->deinitialize();
-				DAgent::_lowAgentHub.reset();
+				Agent::_lowAgentHub->deinitialize();
+				Agent::_lowAgentHub.reset();
 			}
 
-			if(DAgent::_mainWindow)
+			if(Agent::_mainWindow)
 			{
-				DAgent::_mainWindow = NULL;
+				Agent::_mainWindow = NULL;
 			}
 
 		}

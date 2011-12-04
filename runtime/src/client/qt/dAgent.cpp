@@ -8,22 +8,12 @@ namespace client
 	namespace qt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		IAgentHubPtr DAgent::_lowAgentHub;
-		MainWindow *DAgent::_mainWindow=NULL;
-
-		//////////////////////////////////////////////////////////////////////////
-		void DAgent::LowAgent::onReceive(
+		void DAgent::onReceive(
 			IAgentHubPtr hub,
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data)
 		{
-			_agent->onReceive_sig(hub, endpoint, data);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		DAgent::LowAgent::LowAgent(DAgent *agent)
-			: _agent(agent)
-		{
+			emit onReceive_sig(hub, endpoint, data);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -974,9 +964,15 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		int DAgent::getNumChannels()
+		QString DAgent::getService()
 		{
-			return _mainWindow->getNumChannels();
+			return _service;
+		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		void DAgent::setService(QString service)
+		{
+			_service = service;
 		}
 
 
@@ -992,21 +988,22 @@ namespace client
 			connect(
 				(QObject *)_mainWindow, SIGNAL(onChannelChange(int)),
 				this, SLOT(onChannelChange_slot(int)));
-
-			_lowAgent.reset(new LowAgent(this));
-			_lowAgentHub->addAgent(_lowAgent);
 		}
 
 	
 		//////////////////////////////////////////////////////////////////////////
 		DAgent::~DAgent()
 		{
-			_lowAgentHub->delAgent(_lowAgent);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void DAgent::send(QVariant data, QString service)
 		{
+			if(service.isEmpty() || service.isNull())
+			{
+				service = _service;
+			}
+
 			utils::VariantPtr pv(new utils::Variant);
 			variantCnvt(*pv, data);
 			_lowAgentHub->send(_lowAgent, std::string(service.toUtf8()), pv);
