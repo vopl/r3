@@ -72,7 +72,7 @@ QT4_ADD_RESOURCES(SRC_QT_RES_SRC ${SRC_QT_RES})
 SOURCE_GROUP(genarated FILES ${SRC_QT_RES_SRC})
 
 SET(SRC_QT_RES_DATA
-	${SRC_DIR}/client/qt/res/central.qml
+	#${SRC_DIR}/client/qt/res/central.qml
 )
 SOURCE_GROUP(src\\qt\\res FILES ${SRC_QT_RES_DATA})
 

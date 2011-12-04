@@ -2,7 +2,6 @@
  <RCC version="1.0">
 
  <qresource prefix="/">
-     <file>central.qml</file>
  </qresource>
 
  </RCC>

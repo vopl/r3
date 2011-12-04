@@ -16,27 +16,14 @@ namespace client
 			Q_OBJECT
 
 		private:
-			virtual bool 	atEnd () const;
-			virtual qint64 	bytesAvailable () const;
-			virtual qint64 	bytesToWrite () const;
-			virtual bool 	canReadLine () const;
-			virtual void 	close ();
-			virtual bool 	isSequential () const;
-			virtual bool 	open ( OpenMode mode );
-			virtual qint64 	pos () const;
-			virtual bool 	reset ();
-			virtual bool 	seek ( qint64 pos );
-			virtual qint64 	size () const;
-			virtual bool 	waitForBytesWritten ( int msecs );
-			virtual bool 	waitForReadyRead ( int msecs );
+			utils::VariantPtr	_data;
+			size_t				_readPos;
 
-			virtual qint64 	readData ( char * data, qint64 maxSize );
-			virtual qint64 	readLineData ( char * data, qint64 maxSize );
-			virtual qint64 	writeData ( const char * data, qint64 maxSize );
-
-			virtual void	abort();
-			virtual void 	setReadBufferSize ( qint64 size );
-			virtual void 	ignoreSslErrors ();
+		private:
+			void abort();
+			qint64 bytesAvailable() const;
+			bool isSequential() const;
+			qint64 readData(char *data, qint64 maxSize);
 
 		protected:
 			virtual void onReceive(

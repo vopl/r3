@@ -66,7 +66,8 @@ Item {
 
 	Component.onCompleted: 
 	{
+		console.log("Component.onCompleted")
 		start();
 	}
-	//Component.onDestruction: console.log("Destruction Beginning!")
+	Component.onDestruction: console.log("Destruction Beginning!")
 }

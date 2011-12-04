@@ -17,8 +17,10 @@ SET(SRC
 	${SRC_DIR}/server/plug.cpp
 	${SRC_DIR}/server/session.cpp
 	${SRC_DIR}/server/sessionManager.cpp
-	${SRC_DIR}/server/serviceEcho.cpp
 	${SRC_DIR}/server/serviceHub.cpp
+
+	${SRC_DIR}/server/serviceEcho.cpp
+	${SRC_DIR}/server/serviceStatics.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -31,9 +33,12 @@ SET(SRC_HDR
 	${SRC_DIR}/server/server.hpp
 	${SRC_DIR}/server/session.hpp
 	${SRC_DIR}/server/sessionManager.hpp
-	${SRC_DIR}/server/serviceEcho.hpp
 	${SRC_DIR}/server/serviceHub.hpp
 	${SRC_DIR}/server/pch.h
+	
+	${SRC_DIR}/server/serviceEcho.hpp
+	${SRC_DIR}/server/serviceStatics.hpp
+	
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 

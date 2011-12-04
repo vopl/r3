@@ -6,133 +6,39 @@ namespace client
 	namespace qt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		bool NetworkReply::atEnd () const
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		qint64 NetworkReply::bytesAvailable () const
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		qint64 NetworkReply::bytesToWrite () const
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool NetworkReply::canReadLine () const
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void NetworkReply::close ()
-		{
-			assert(0);
-			return;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool NetworkReply::isSequential () const
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool NetworkReply::open ( OpenMode mode )
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		qint64 NetworkReply::pos () const
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool NetworkReply::reset ()
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool NetworkReply::seek ( qint64 pos )
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		qint64 NetworkReply::size () const
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool NetworkReply::waitForBytesWritten ( int msecs )
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		bool NetworkReply::waitForReadyRead ( int msecs )
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		qint64 NetworkReply::readData ( char * data, qint64 maxSize )
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		qint64 NetworkReply::readLineData ( char * data, qint64 maxSize )
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		qint64 NetworkReply::writeData ( const char * data, qint64 maxSize )
-		{
-			assert(0);
-			return 0;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
 		void NetworkReply::abort()
 		{
-			assert(0);
+			//
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void NetworkReply::setReadBufferSize ( qint64 size )
+		qint64 NetworkReply::bytesAvailable() const
 		{
-			assert(0);
+			return 
+				(qint64)_data->as<utils::Variant::VectorChar>().size() - 
+				_readPos;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void NetworkReply::ignoreSslErrors ()
+		bool NetworkReply::isSequential() const
 		{
-			assert(0);
+			return true;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		qint64 NetworkReply::readData(char *data, qint64 maxSize)
+		{
+			utils::Variant::VectorChar &vc = _data->as<utils::Variant::VectorChar>();
+			if (_readPos >= vc.size())
+			{
+				return -1;
+			}
+
+			qint64 number = qMin(maxSize, (qint64)vc.size() - _readPos);
+			memcpy(data, &vc[_readPos], number);
+			_readPos += number;
+
+			return number;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -141,11 +47,29 @@ namespace client
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data)
 		{
-			assert(0);
+			if(data->is<utils::Variant::VectorChar>())
+			{
+				_data = data;
+				_readPos = 0;
+				open(ReadOnly | Unbuffered);
+				setHeader(QNetworkRequest::ContentLengthHeader, QVariant((qint64)data->as<utils::Variant::VectorChar>().size()));
+
+				emit readyRead();
+				emit finished();
+			}
+			else
+			{
+				_data.reset();
+				_readPos = 0;
+				setError(ContentNotFoundError, QString("notFound"));
+				emit error(ContentNotFoundError);
+				emit finished();
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		NetworkReply::NetworkReply(QObject *parent, QUrl url)
+			: _readPos(0)
 		{
 			utils::VariantPtr v(new utils::Variant);
 			utils::Variant::MapStringVariant &m = v->as<utils::Variant::MapStringVariant>(true);
@@ -153,14 +77,11 @@ namespace client
 			m["path"] = url.path().toUtf8().constData();
 
 			send(url.host().toUtf8().constData(), v);
-
-			emit finished();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		NetworkReply::~NetworkReply()
 		{
-			assert(0);
 		}
 	}
 }

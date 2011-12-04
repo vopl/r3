@@ -64,7 +64,7 @@ namespace client
 
 			_view->engine()->setNetworkAccessManagerFactory(&_networkAccessManagerFactory);
 			_view->engine()->setBaseUrl(QUrl("client://statics/"));
-			_view->setSource(QUrl("index.qml"));
+			_view->setSource(QUrl("/index.qml"));
 			_view->show();
 		}
 
