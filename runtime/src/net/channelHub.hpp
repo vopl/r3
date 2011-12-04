@@ -2,7 +2,6 @@
 #define _NET_CHANNELHUB_HPP_
 
 #include "net/ichannel.hpp"
-#include <set>
 
 namespace net
 {
@@ -15,8 +14,9 @@ namespace net
 		, public enable_shared_from_this<ChannelHub<Base> >
 	{
 		typedef std::set<IChannelPtr> TChannels;
-		TChannels _channels;
-		mutex _mtxChannels;
+		TChannels	_channels;
+		bool		_work;
+		mutex		_mtxChannels;
 
 		//////////////////////////////////////////////////////////////////////////
 		struct SendWaiter
@@ -104,152 +104,228 @@ namespace net
 
 	private:
 		//////////////////////////////////////////////////////////////////////////
-		void balanceSends()
-		{
-			//уже заблокировано
-
-			if(!_sendWaiters.empty() && !_channelsSendNot.empty())
-			{
-				//есть пакет к отправке и свободный канал
-				IChannelPtr channel = *_channelsSendNot.begin();
-				_channelsSendNot.erase(_channelsSendNot.begin());
-
-				SendWaiterPtr sw = _sendWaiters.front();
-				_sendWaiters.pop_front();
-
-				channel->send(
-					sw->_packet, 
-					bind(&ChannelHub::onSendOk, ChannelHub<Base>::shared_from_this(), channel, sw),
-					bind(&ChannelHub::onSendFail, ChannelHub<Base>::shared_from_this(), channel, sw, _1));
-				_channelsSend.insert(channel);
-			}
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void onSendOk(IChannelPtr channel, SendWaiterPtr sw)
-		{
-			bool isWork = false;
-			{
-				mutex::scoped_lock sl(_mtxSend);
-				TChannels::iterator iter = _channelsSend.find(channel);
-				if(_channelsSend.end() != iter)
-				{
-					_channelsSend.erase(iter);
-					_channelsSendNot.insert(channel);
-					isWork = true;
-					balanceSends();
-				}
-				else
-				{
-					//хаб закрыт?
-				}
-			}
-
-			sw->_ok();
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void onSendFail(IChannelPtr channel, SendWaiterPtr sw, system::error_code ec)
-		{
-			//закрыть канал и избавится от него
-			channel->close();
-
-			bool isWork = false;
-			{
-				mutex::scoped_lock sl(_mtxChannels);
-				TChannels::iterator iter = _channels.find(channel);
-				if(_channels.end() != iter)
-				{
-					assert(!"log error?");
-
-					_channels.erase(iter);
-
-					mutex::scoped_lock sl2(_mtxSend);
-					_channelsSend.erase(channel);
-					_channelsSendNot.erase(channel);
-
-					//пакет переложить обратно в очередь (в начало, он обиженый)
-					_sendWaiters.push_front(sw);
-
-					balanceSends();
-					isWork = true;
-				}
-				else
-				{
-					//хаб закрыт?
-				}
-			}
-
-			if(!isWork)
-			{
-				sw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
-			}
-		}
+		void balanceSends();
+		void onSendOk(IChannelPtr channel, SendWaiterPtr sw);
+		virtual void onLowChannelSendFail(IChannelPtr channel, system::error_code ec);
+		void onSendFail(IChannelPtr channel, SendWaiterPtr sw, system::error_code ec);
 
 
 		//////////////////////////////////////////////////////////////////////////
-		void balanceRecvs(RecvCallbacks &rcs)
+		void balanceRecvs(RecvCallbacks &rcs);
+		void onRecvOk(IChannelPtr channel, const SPacket &p);
+		virtual void onLowChannelRecvFail(IChannelPtr channel, system::error_code ec);
+		void onRecvFail(IChannelPtr channel, system::error_code ec);
+
+
+	public:
+		//////////////////////////////////////////////////////////////////////////
+		ChannelHub();
+
+
+		//////////////////////////////////////////////////////////////////////////
+		virtual void receive(
+			function<void (const SPacket &)> ok,
+			function<void (system::error_code)> fail);
+
+		//////////////////////////////////////////////////////////////////////////
+		virtual void send(
+			const SPacket &p,
+			function<void ()> ok,
+			function<void (system::error_code)> fail);
+
+		//////////////////////////////////////////////////////////////////////////
+		virtual void close();
+
+		//////////////////////////////////////////////////////////////////////////
+		void attachChannel(IChannelPtr channel);
+
+		//////////////////////////////////////////////////////////////////////////
+		size_t getChannelsAmount();
+	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::balanceSends()
+	{
+		//уже заблокировано
+
+		if(!_sendWaiters.empty() && !_channelsSendNot.empty())
 		{
-			//уже заблокировано
+			//есть пакет к отправке и свободный канал
+			IChannelPtr channel = *_channelsSendNot.begin();
+			_channelsSendNot.erase(_channelsSendNot.begin());
 
-			while(!_recvPackets.empty() && !_recvWaiters.empty())
+			SendWaiterPtr sw = _sendWaiters.front();
+			_sendWaiters.pop_front();
+
+			channel->send(
+				sw->_packet, 
+				bind(&ChannelHub::onSendOk, ChannelHub<Base>::shared_from_this(), channel, sw),
+				bind(&ChannelHub::onSendFail, ChannelHub<Base>::shared_from_this(), channel, sw, _1));
+			_channelsSend.insert(channel);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::onSendOk(IChannelPtr channel, SendWaiterPtr sw)
+	{
+		bool isWork = false;
+		{
+			mutex::scoped_lock sl(_mtxSend);
+			isWork = _work;
+			TChannels::iterator iter = _channelsSend.find(channel);
+			if(_channelsSend.end() != iter)
 			{
-				RecvPacketPtr rp = _recvPackets.front();
-				_recvPackets.pop_front();
-				RecvWaiterPtr rw = _recvWaiters.front();
-				_recvWaiters.pop_front();
-
-				RecvCallbackPtr rc(new RecvCallback(rp->_packet, rw->_ok));
-				rcs.push_back(rc);
-
-				rp->_channel->receive(
-					bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), rp->_channel, _1),
-					bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), rp->_channel, _1));
-				_recvChannelsAmount++;
+				_channelsSend.erase(iter);
+				_channelsSendNot.insert(channel);
+				balanceSends();
+			}
+			else
+			{
+				//хаб закрыт?
 			}
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		void onRecvOk(IChannelPtr channel, const SPacket &p)
+		sw->_ok();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::onLowChannelSendFail(IChannelPtr channel, system::error_code ec)
+	{
+		std::cerr<<ec.message()<<std::endl;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::onSendFail(IChannelPtr channel, SendWaiterPtr sw, system::error_code ec)
+	{
+		//закрыть канал и избавится от него
+		channel->close();
+
+		bool isWork = false;
 		{
-			RecvCallbacks rcs;
-			{
-				mutex::scoped_lock sl(_mtxRecv);
-
-				if(_recvChannelsAmount)
-				{
-					_recvChannelsAmount--;
-
-					RecvPacketPtr rp(new RecvPacket(p, channel));
-					_recvPackets.push_back(rp);
-					balanceRecvs(rcs);
-				}
-				else
-				{
-					//хаб закрыт?
-				}
-			}
-
-			BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
-			{
-				rc->_ok(rc->_packet);
-			}
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void onRecvFail(IChannelPtr channel, system::error_code ec)
-		{
-			//закрыть канал и избавится от него
-			channel->close();
-
-			bool isWork = false;
 			mutex::scoped_lock sl(_mtxChannels);
+			isWork = _work;
 			TChannels::iterator iter = _channels.find(channel);
 			if(_channels.end() != iter)
 			{
-				std::cout<<ec.message()<<std::endl;
-				assert(!"log error?");
+				_channels.erase(iter);
 
+				mutex::scoped_lock sl2(_mtxSend);
+				_channelsSend.erase(channel);
+				_channelsSendNot.erase(channel);
+
+				//пакет переложить обратно в очередь (в начало, он обиженый)
+				_sendWaiters.push_front(sw);
+
+				balanceSends();
+			}
+			else
+			{
+				//хаб закрыт?
+			}
+		}
+
+		if(!isWork)
+		{
+			sw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
+		}
+		else
+		{
+			onLowChannelSendFail(channel, ec);
+		}
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::balanceRecvs(RecvCallbacks &rcs)
+	{
+		//уже заблокировано
+
+		while(!_recvPackets.empty() && !_recvWaiters.empty())
+		{
+			RecvPacketPtr rp = _recvPackets.front();
+			_recvPackets.pop_front();
+			RecvWaiterPtr rw = _recvWaiters.front();
+			_recvWaiters.pop_front();
+
+			RecvCallbackPtr rc(new RecvCallback(rp->_packet, rw->_ok));
+			rcs.push_back(rc);
+
+			rp->_channel->receive(
+				bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), rp->_channel, _1),
+				bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), rp->_channel, _1));
+			_recvChannelsAmount++;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::onRecvOk(IChannelPtr channel, const SPacket &p)
+	{
+		RecvCallbacks rcs;
+		{
+			mutex::scoped_lock sl(_mtxRecv);
+
+			if(_recvChannelsAmount)
+			{
+				_recvChannelsAmount--;
+
+				RecvPacketPtr rp(new RecvPacket(p, channel));
+				_recvPackets.push_back(rp);
+				balanceRecvs(rcs);
+			}
+			else
+			{
+				//хаб закрыт?
+			}
+		}
+
+		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
+		{
+			rc->_ok(rc->_packet);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::onLowChannelRecvFail(IChannelPtr channel, system::error_code ec)
+	{
+		std::cerr<<ec.message()<<std::endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::onRecvFail(IChannelPtr channel, system::error_code ec)
+	{
+		//закрыть канал и избавится от него
+		channel->close();
+
+		bool isWork = false;
+		{
+			mutex::scoped_lock sl(_mtxChannels);
+			isWork = _work;
+			TChannels::iterator iter = _channels.find(channel);
+			if(_channels.end() != iter)
+			{
 				_channels.erase(iter);
 
 				mutex::scoped_lock sl2(_mtxSend);
@@ -261,54 +337,73 @@ namespace net
 
 				assert(_recvChannelsAmount);
 				_recvChannelsAmount--;
-
 			}
 			else
 			{
 				//хаб закрыт?
 			}
 		}
-
-
-	public:
-		//////////////////////////////////////////////////////////////////////////
-		ChannelHub()
-			: _recvChannelsAmount(0)
+		if(isWork)
 		{
+			onLowChannelRecvFail(channel, ec);
 		}
+	}
 
 
-		//////////////////////////////////////////////////////////////////////////
-		virtual void receive(
-			function<void (const SPacket &)> ok,
-			function<void (system::error_code)> fail)
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	ChannelHub<Base>::ChannelHub()
+		: _recvChannelsAmount(0)
+		, _work(true)
+	{
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::receive(
+		function<void (const SPacket &)> ok,
+		function<void (system::error_code)> fail)
+	{
+		RecvCallbacks rcs;
+
+		bool isWork;
 		{
-			RecvCallbacks rcs;
+			mutex::scoped_lock sl(_mtxRecv);
+			isWork = _work;
 
+			if(_work)
 			{
-				mutex::scoped_lock sl(_mtxRecv);
-
 				//положить в очередь на отправку
 				RecvWaiterPtr rp(new RecvWaiter(ok,fail));
 				_recvWaiters.push_back(rp);
 
 				balanceRecvs(rcs);
 			}
-
-			BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
-			{
-				rc->_ok(rc->_packet);
-			}
-
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		virtual void send(
-			const SPacket &p,
-			function<void ()> ok,
-			function<void (system::error_code)> fail)
+		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
+		{
+			rc->_ok(rc->_packet);
+		}
+		if(!isWork)
+		{
+			fail(system::errc::make_error_code(system::errc::operation_canceled));
+		}
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::send(
+		const SPacket &p,
+		function<void ()> ok,
+		function<void (system::error_code)> fail)
+	{
+		bool isWork;
 		{
 			mutex::scoped_lock sl(_mtxSend);
+			isWork = _work;
 
 			//положить в очередь на отправку
 			SendWaiterPtr sw(new SendWaiter(p,ok,fail));
@@ -317,68 +412,79 @@ namespace net
 			balanceSends();
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		virtual void close()
+		if(!isWork)
 		{
-			RecvCallbacks rcs;
-			TRecvWaiters rws;
-			{
-				mutex::scoped_lock sl(_mtxChannels);
-				mutex::scoped_lock sl2(_mtxSend);
-				mutex::scoped_lock sl3(_mtxRecv);
-
-				BOOST_FOREACH(const IChannelPtr &ch, _channels)
-				{
-					ch->close();
-				}
-				_channels.clear();
-
-				{
-					_channelsSend.clear();
-					_channelsSendNot.clear();
-				}
-
-				{
-					balanceRecvs(rcs);
-					rws.swap(_recvWaiters);
-					_recvPackets.clear();
-				}
-				_recvChannelsAmount = 0;
-			}
-
-			BOOST_FOREACH(const RecvCallbackPtr &rc, rcs)
-			{
-				rc->_ok(rc->_packet);
-			}
-			BOOST_FOREACH(const RecvWaiterPtr &rw, rws)
-			{
-				rw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
-			}
+			fail(system::errc::make_error_code(system::errc::operation_canceled));
 		}
+	}
 
-		//////////////////////////////////////////////////////////////////////////
-		void attachChannel(IChannelPtr channel)
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::close()
+	{
+		RecvCallbacks rcs;
+		TRecvWaiters rws;
 		{
 			mutex::scoped_lock sl(_mtxChannels);
 			mutex::scoped_lock sl2(_mtxSend);
 			mutex::scoped_lock sl3(_mtxRecv);
 
-			_channels.insert(channel);
-			_channelsSendNot.insert(channel);
+			BOOST_FOREACH(const IChannelPtr &ch, _channels)
+			{
+				ch->close();
+			}
+			_channels.clear();
 
-			channel->receive(
-				bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), channel, _1),
-				bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), channel, _1));
-			_recvChannelsAmount++;
+			{
+				_channelsSend.clear();
+				_channelsSendNot.clear();
+			}
+
+			{
+				balanceRecvs(rcs);
+				rws.swap(_recvWaiters);
+				_recvPackets.clear();
+			}
+			_recvChannelsAmount = 0;
+			_work = false;
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		size_t getChannelsAmount()
+		BOOST_FOREACH(const RecvCallbackPtr &rc, rcs)
 		{
-			mutex::scoped_lock sl(_mtxChannels);
-			return _channels.size();
+			rc->_ok(rc->_packet);
 		}
+		BOOST_FOREACH(const RecvWaiterPtr &rw, rws)
+		{
+			rw->_fail(system::errc::make_error_code(system::errc::operation_canceled));
+		}
+	}
 
-	};
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::attachChannel(IChannelPtr channel)
+	{
+		mutex::scoped_lock sl(_mtxChannels);
+		mutex::scoped_lock sl2(_mtxSend);
+		mutex::scoped_lock sl3(_mtxRecv);
+
+		_channels.insert(channel);
+		_channelsSendNot.insert(channel);
+
+		channel->receive(
+			bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), channel, _1),
+			bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), channel, _1));
+		_recvChannelsAmount++;
+
+		_work = true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	size_t ChannelHub<Base>::getChannelsAmount()
+	{
+		mutex::scoped_lock sl(_mtxChannels);
+		return _channels.size();
+	}
+
 }
 #endif

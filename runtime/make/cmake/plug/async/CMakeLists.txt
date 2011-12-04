@@ -1,4 +1,4 @@
-PROJECT (async)
+PROJECT (plugasync)
 
 SET(INCLUDE
 	${INC_DIR}/async/iservice.hpp
@@ -12,7 +12,7 @@ SET(SRC
 SOURCE_GROUP(src FILES ${SRC})
 
 SET(SRC_NOPCH
-	${SRC_DIR}/plumaNewDelete.cpp
+	${SRC_DIR}/heapNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
@@ -31,16 +31,16 @@ SOURCE_GROUP(src FILES ${SRC_PCH})
 
 
 PRESETUP_BIN_OUT(SRC_STUB)
-	ADD_LIBRARY(async SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
-	CREATE_PCH(async ${SRC_DIR}/async/pch.h ${SRC_PCH})
-	USE_PCH(async ${SRC_DIR}/async/pch.h ${SRC})
-SETUP_BIN_OUT(async plug)
+ADD_LIBRARY(plugasync SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
+CREATE_PCH(plugasync ${SRC_DIR}/async/pch.h ${SRC_PCH})
+USE_PCH(plugasync ${SRC_DIR}/async/pch.h ${SRC})
+SETUP_BIN_OUT(plugasync plug)
 
-TARGET_LINK_LIBRARIES(async pluma utils)
+TARGET_LINK_LIBRARIES(plugasync libheap libpluma libutils)
 
 IF(LINUX)
 	SET(CMAKE_THREAD_PREFER_PTHREAD ON)
 	INCLUDE(FindThreads)
-	TARGET_LINK_LIBRARIES(async ${CMAKE_THREAD_LIBS_INIT})
-	TARGET_LINK_LIBRARIES(async ${Boost_LIBRARIES})
+	TARGET_LINK_LIBRARIES(plugasync ${CMAKE_THREAD_LIBS_INIT})
+	TARGET_LINK_LIBRARIES(plugasync ${Boost_LIBRARIES})
 ENDIF()

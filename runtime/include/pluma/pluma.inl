@@ -50,3 +50,29 @@ void Pluma::getProviders(std::vector<ProviderType*>& providers){
     for (it = lst->begin() ; it != lst->end() ; ++it)
         providers.push_back(static_cast<ProviderType*>(*it));
 }
+
+//////////////////////////////////////////////////////////////////////////
+template<typename ProviderType>
+typename ProviderType::ITypePtr Pluma::create()
+{
+	std::vector<ProviderType *> providers;
+	getProviders(providers);
+	if(providers.empty())
+	{
+		return ProviderType::ITypePtr();
+	}
+	return providers.front()->create();
+}
+
+//////////////////////////////////////////////////////////////////////////
+template<typename ProviderType>
+void Pluma::createAll(std::vector<typename ProviderType::ITypePtr> &instances)
+{
+	std::vector<ProviderType *> providers;
+	getProviders(providers);
+	instances.resize(providers.size());
+	for(size_t i(0); i<instances.size(); i++)
+	{
+		instances[i] = providers[i]->create();
+	}
+}

@@ -40,6 +40,7 @@ utils::Variant{
 		#case -36 ( #("ListVariant=Null") )
 		#case -37 ( #("Char=Null") )
 		#case -38 ( #("Uuid=Null") )
+		#case -39 ( #("VariantPtr=Null") )
 		#case 0 ( #("Unknown=", [$e,!]) )		
 		#case 1 ( #("Void=<void>") )
 		#case 2 ( #("String=", *(std::basic_string<char,std::char_traits<char>,std::allocator<char> > *)$e._dbgData) )
@@ -79,6 +80,7 @@ utils::Variant{
 		#case 36 ( #("ListVariant") )
 		#case 37 ( #("Char=", *(char *)$e._dbgData) )
 		#case 38 ( #("Uuid=", *(boost::uuids::uuid *)$e._dbgData) )
+		#case 39 ( #("VariantPtr=", *(boost::shared_ptr<utils::Variant> *)$e._dbgData) )
 		#default ( #("UNKNOWN=", [$e,!]) )		
 	)
 
@@ -123,6 +125,7 @@ utils::Variant{
 		#case -36 ( #(ListVariant : *((void*)0)) )
 		#case -37 ( #(Char : *((void*)0)) )
 		#case -38 ( #(Uuid : *((void*)0)) )
+		#case -39 ( #(VariantPtr : *((void*)0)) )
 		#case 0 (#( Unknown: [$e,!]) )
 		#case 1 (#( Void : *((void*)0)))
 		#case 2 (#( String : *(std::basic_string<char,std::char_traits<char>,std::allocator<char> > *)$e._dbgData))
@@ -162,6 +165,7 @@ utils::Variant{
 		#case 36 (#( ListVariant : *(std::list<utils::Variant,std::allocator<utils::Variant> >*)$e._dbgData) )
 		#case 37 (#( Char : *(char *)$e._dbgData) )
 		#case 38 (#( Uuid : *(boost::uuids::uuid *)$e._dbgData) )
+		#case 39 (#( VariantPtr : *(boost::shared_ptr<utils::Variant> *)$e._dbgData) )
 
 		#default (#( UNKNOWN: [$e,!]) )
 	)

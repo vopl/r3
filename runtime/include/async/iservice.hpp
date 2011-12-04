@@ -10,6 +10,8 @@ namespace async
 {
 	struct IService
 	{
+		virtual ~IService(){}
+
 		virtual void start(
 			size_t numThreads,
 			boost::function<void ()> threadStart = boost::function<void ()>(),

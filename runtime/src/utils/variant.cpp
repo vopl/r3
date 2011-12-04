@@ -135,6 +135,14 @@ ENUMTYPES
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	template<typename T> void setNull(bool n)
+	{
+		IMPL->validateType<T>();
+		IMPL->forceType<T>();
+		return IMPL->setNull(n);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	Variant::EType Variant::type() const
 	{
 		return CIMPL->type();
@@ -182,6 +190,18 @@ ENUMTYPES
 		return CIMPL->as<T>();
 	}
 #define ENUMTYPES_ONE(T) template Variant::T const &Variant::as<Variant::T>() const;
+ENUMTYPES
+#undef ENUMTYPES_ONE
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template<typename T> T &Variant::as()
+	{
+		CIMPL->validateType<T>();
+		CIMPL->validateValue<T>();
+		return IMPL->as<T>();
+	}
+#define ENUMTYPES_ONE(T) template Variant::T &Variant::as<Variant::T>();
 ENUMTYPES
 #undef ENUMTYPES_ONE
 

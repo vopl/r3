@@ -45,7 +45,7 @@
 ////////////////////////////////////////////////////////////
 #define PLUMA_PROVIDER_HEADER(TYPE, Version, LowestVersion)\
 PLUMA_PROVIDER_HEADER_BEGIN(TYPE, Version, LowestVersion)\
-	virtual boost::shared_ptr<TYPE> create() const = 0;\
+	virtual ITypePtr create() const = 0;\
 PLUMA_PROVIDER_HEADER_END
 
 ////////////////////////////////////////////////////////////
@@ -54,9 +54,11 @@ PLUMA_PROVIDER_HEADER_END
 #define PLUMA_PROVIDER_HEADER_BEGIN(TYPE, Version, LowestVersion)\
 class TYPE##Provider: public pluma::Provider{\
 public:\
+	typedef TYPE IType;\
+	typedef boost::shared_ptr<TYPE> ITypePtr;\
     static const unsigned int PLUMA_INTERFACE_VERSION(){return Version;}\
     static const unsigned int PLUMA_INTERFACE_LOWEST_VERSION(){return LowestVersion;}\
-	static const std::string PLUMA_PROVIDER_TYPE(){return PLUMA_2STRING( TYPE );}\
+	static const std::string PLUMA_PROVIDER_TYPE(){return typeid( TYPE ).name();}\
     std::string getType() const{ return PLUMA_PROVIDER_TYPE(); }\
 	unsigned int getVersion() const{ return PLUMA_INTERFACE_VERSION(); }\
 	unsigned int getLowestVersion() const{ return PLUMA_INTERFACE_LOWEST_VERSION(); }
@@ -120,6 +122,13 @@ public:
     ////////////////////////////////////////////////////////////
     template<typename ProviderType>
     void getProviders(std::vector<ProviderType*>& providers);
+
+	template<typename ProviderType>
+	typename ProviderType::ITypePtr create();
+
+	template<typename ProviderType>
+	void createAll(std::vector<typename ProviderType::ITypePtr> &instances);
+
 };
 
 #include "pluma/pluma.inl"

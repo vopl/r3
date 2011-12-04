@@ -2,19 +2,14 @@ PROJECT (server)
 
 
 SET(SRC
-	${SRC_DIR}/server/main.cpp
-	${SRC_DIR}/plumaNewDelete.cpp
+	${SRC_DIR}/server/entry.cpp
+	${SRC_DIR}/heapNewDelete.cpp
 )
+SOURCE_GROUP(src FILES ${SRC})
 
 PRESETUP_BIN_OUT(SRC_STUB)
 ADD_EXECUTABLE(server ${SRC_STUB} ${SRC})
-SETUP_BIN_OUT(server bin)
+SETUP_BIN_OUT(server server)
 
-TARGET_LINK_LIBRARIES(server pluma)
+TARGET_LINK_LIBRARIES(server libheap libpluma)
 
-IF(LINUX)
-	SET(CMAKE_THREAD_PREFER_PTHREAD ON)
-	INCLUDE(FindThreads)
-	TARGET_LINK_LIBRARIES(server ${CMAKE_THREAD_LIBS_INIT})
-	TARGET_LINK_LIBRARIES(server ${Boost_LIBRARIES})
-ENDIF()

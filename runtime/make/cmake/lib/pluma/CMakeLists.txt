@@ -1,4 +1,4 @@
-PROJECT (pluma)
+PROJECT (libpluma)
 
 SET(INCLUDE
 	${INC_DIR}/pluma/config.hpp
@@ -8,7 +8,6 @@ SET(INCLUDE
 	${INC_DIR}/pluma/pluma.hpp
 	${INC_DIR}/pluma/pluma.inl
 	${INC_DIR}/pluma/provider.hpp
-	${INC_DIR}/pluma/heap.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -18,8 +17,7 @@ SET(SRC
 	${SRC_DIR}/pluma/host.cpp
 	${SRC_DIR}/pluma/pluginManager.cpp
 	${SRC_DIR}/pluma/provider.cpp
-	${SRC_DIR}/pluma/heap.cpp
-	${SRC_DIR}/plumaNewDelete.cpp
+	${SRC_DIR}/heapNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -34,9 +32,12 @@ SOURCE_GROUP(src FILES ${SRC_HDR})
 ADD_DEFINITIONS(-DPLUMA_EXPORTS)
 
 PRESETUP_BIN_OUT(SRC_STUB)
-	ADD_LIBRARY(pluma SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR})
-SETUP_BIN_OUT(pluma bin)
+	ADD_LIBRARY(libpluma SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR})
+SETUP_BIN_OUT(libpluma server)
+SETUP_BIN_OUT(libpluma client)
+
+TARGET_LINK_LIBRARIES(libpluma libheap)
 
 IF(LINUX)
-	TARGET_LINK_LIBRARIES(pluma dl)
+	TARGET_LINK_LIBRARIES(libpluma dl)
 ENDIF()
