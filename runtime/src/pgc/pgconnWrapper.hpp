@@ -40,6 +40,8 @@ namespace pgc
 		PGconnWrapper(PGconn *lowConn, asio::io_service &io_service);
 		~PGconnWrapper();
 
+		void close();
+
 		operator PGconn *() const;
 		void waitRead(function<void()> ready);
 		void waitWrite(function<void()> ready);

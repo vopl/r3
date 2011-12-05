@@ -104,6 +104,18 @@ namespace server
 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
 
 		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
 
 		//запускать асинхронный двиг
 		_async->balance(4);

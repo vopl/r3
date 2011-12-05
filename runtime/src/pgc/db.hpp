@@ -24,14 +24,25 @@ namespace pgc
 		function<void (size_t)> _onConnectionLost;
 
 	private:
-		std::set<PGconnWrapperPtr>						_startConnections;
-		std::set<PGconnWrapperPtr>						_readyConnections;
-		std::set<PGconnWrapperPtr>						_workConnections;
+		typedef std::set<PGconnWrapperPtr> TSConnectins;
+		TSConnectins									_startConnections;
+		TSConnectins									_readyConnections;
+		TSConnectins									_workConnections;
 		std::deque<function<void (IConnectionPtr)> >	_waiters;
+
+		typedef asio::deadline_timer Timeout;
+		typedef boost::shared_ptr<Timeout> TimeoutPtr;
+		std::set<TimeoutPtr>	_timeouts;
 
 	private:
 		void balanceConnections();
 		void makeConnection_poll(PGconnWrapperPtr pcw);
+
+	private:
+		void onReconnectTimer(TimeoutPtr t, const boost::system::error_code& ec);
+
+	public:
+		void unwork(PGconnWrapperPtr pcw);
 
 	public:
 		Db();

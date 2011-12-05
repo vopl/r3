@@ -51,8 +51,12 @@ namespace pgc
 						if(CONNECTION_BAD == PQstatus(*pcw))
 						{
 							pcw.reset();
-							std::cerr<<__FUNCTION__<<": CONNECTION_BAD, goto sleep"<<std::endl;
-							assert(0);
+							std::cerr<<__FUNCTION__<<": CONNECTION_BAD, wait timeout"<<std::endl;
+
+							TimeoutPtr timeout(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
+							_timeouts.insert(timeout);
+							timeout->async_wait(
+								bind(&Db::onReconnectTimer, shared_from_this(), timeout, _1));
 						}
 						else
 						{
@@ -72,7 +76,10 @@ namespace pgc
 		BOOST_FOREACH(SWorkPair &wp, readyWaiters)
 		{
 			IConnectionPtr c(new Connection(shared_from_this(), wp._con));
-			wp._waiter(c);
+			if(wp._waiter)
+			{
+				wp._waiter(c);
+			}
 		}
 
 	}
@@ -108,12 +115,16 @@ namespace pgc
 		switch(PQconnectPoll(*pcw))
 		{
 		case PGRES_POLLING_FAILED:
-			std::cerr<<__FUNCTION__<<": PGRES_POLLING_FAILED, goto sleep ("<<PQerrorMessage(*pcw)<<")"<<std::endl;
+			std::cerr<<__FUNCTION__<<": PGRES_POLLING_FAILED, wait timeout ("<<PQerrorMessage(*pcw)<<")"<<std::endl;
 			{
 				mutex::scoped_lock sl(_mtx);
 				_startConnections.erase(pcw);
+
+				TimeoutPtr timeout(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
+				_timeouts.insert(timeout);
+				timeout->async_wait(
+					bind(&Db::onReconnectTimer, shared_from_this(), timeout, _1));
 			}
-			assert(0);
 			return;
 		case PGRES_POLLING_READING:
 			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_READING"<<std::endl;
@@ -125,16 +136,51 @@ namespace pgc
 			break;
 		case PGRES_POLLING_OK:
 			std::cerr<<__FUNCTION__<<": PGRES_POLLING_OK"<<std::endl;
+			
 			{
-				mutex::scoped_lock sl(_mtx);
-				_readyConnections.insert(pcw);
+				size_t numConnections=0;
+				{
+					mutex::scoped_lock sl(_mtx);
+					_startConnections.erase(pcw);
+					_readyConnections.insert(pcw);
+					numConnections = _readyConnections.size() + _workConnections.size();
+				}
+				balanceConnections();
+				_onConnectionMade(numConnections);
 			}
-			balanceConnections();
 			return;
 		default:
 			break;
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Db::onReconnectTimer(TimeoutPtr t, const boost::system::error_code& ec)
+	{
+		{
+			mutex::scoped_lock sl(_mtx);
+			_timeouts.erase(t);
+		}
+
+		if(!ec)
+		{
+			balanceConnections();
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Db::unwork(PGconnWrapperPtr pcw)
+	{
+		mutex::scoped_lock sl(_mtx);
+
+		TSConnectins::iterator iter = _workConnections.find(pcw);
+		if(_workConnections.end() != iter)
+		{
+			_workConnections.erase(iter);
+			_readyConnections.insert(pcw);
+		}
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void Db::initialize(
@@ -192,7 +238,34 @@ namespace pgc
 	void Db::deinitialize()
 	{
 		mutex::scoped_lock sl(_mtx);
-		assert(0);
+
+		//////////////////////////////////////////////////////////////////////////
+		system::error_code ec;
+		BOOST_FOREACH(TimeoutPtr &t, _timeouts)
+		{
+			t->cancel(ec);
+		}
+		_timeouts.clear();
+
+		//////////////////////////////////////////////////////////////////////////
+		BOOST_FOREACH(PGconnWrapperPtr &c, _startConnections)
+		{
+			c->close();
+		}
+		_startConnections.clear();
+		BOOST_FOREACH(PGconnWrapperPtr &c, _readyConnections)
+		{
+			c->close();
+		}
+		_readyConnections.clear();
+		BOOST_FOREACH(PGconnWrapperPtr &c, _workConnections)
+		{
+			c->close();
+		}
+		_workConnections.clear();
+
+		//////////////////////////////////////////////////////////////////////////
+		_waiters.clear();
 	}
 
 
