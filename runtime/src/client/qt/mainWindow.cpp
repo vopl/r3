@@ -61,9 +61,11 @@ namespace client
 			assert(!_view);
 			_view = new QDeclarativeView(this);
 			setCentralWidget(_view);
+			_view->engine()->addImportPath(QString("../QmlModules/"));
 
 			_view->engine()->setNetworkAccessManagerFactory(&_networkAccessManagerFactory);
 			_view->engine()->setBaseUrl(QUrl("client://statics/"));
+
 			_view->setSource(QUrl("/clientqt/index.qml"));
 			_view->show();
 		}
