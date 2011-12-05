@@ -10,6 +10,7 @@ namespace utils
 	template <class Container> std::ostream &dumpOstr_seq(std::ostream &ostr, const Container &c, size_t level, bool levelApplyed);
 	template <class Container> std::ostream &dumpOstr_assoc(std::ostream &ostr, const Container &c, size_t level, bool levelApplyed);
 	std::ostream &dumpOstr_variant(std::ostream &ostr, const Variant &v, size_t level, bool levelApplyed);
+	std::ostream &dumpOstr_variantPtr(std::ostream &ostr, const VariantPtr &v, size_t level, bool levelApplyed);
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -53,6 +54,13 @@ namespace utils
 	std::ostream &dumpOstr<Variant>(std::ostream &ostr, const Variant &v, size_t level, bool levelApplyed)
 	{
 		return dumpOstr_variant(ostr, v, level, levelApplyed);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <>
+	std::ostream &dumpOstr<VariantPtr>(std::ostream &ostr, const VariantPtr &v, size_t level, bool levelApplyed)
+	{
+		return dumpOstr_variantPtr(ostr, v, level, levelApplyed);
 	}
 
 	// std::ostream &operator <<(std::ostream &ostr, const Variant::VectorVariant &v);
@@ -169,6 +177,22 @@ namespace utils
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	std::ostream &dumpOstr_variantPtr(std::ostream &ostr, const VariantPtr &v, size_t level, bool levelApplyed)
+	{
+		ostr<<"*";
+		if(v)
+		{
+			dumpOstr_variant(ostr, *v, level, levelApplyed);
+		}
+		else
+		{
+			ostr<<"NULL";
+		}
+
+		return ostr;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	template <class Container>
 	std::ostream &dumpOstr_seq(std::ostream &ostr, const Container &c, size_t level, bool levelApplyed)
 	{
@@ -176,7 +200,7 @@ namespace utils
 		ostr<<"[\n";
 		level++;
 
-		BOOST_FOREACH(Container::const_reference v, c)
+		BOOST_FOREACH(typename Container::const_reference v, c)
 		{
 			dumpOstr_indent(ostr, level, false);
 			dumpOstr(ostr, v, level, true);
@@ -198,7 +222,7 @@ namespace utils
 		ostr<<"{\n";
 		level++;
 
-		BOOST_FOREACH(Container::const_reference v, c)
+		BOOST_FOREACH(typename Container::const_reference v, c)
 		{
 			dumpOstr_indent(ostr, level, false);
 			dumpOstr(ostr, v.first, level, true);
@@ -286,6 +310,12 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	std::ostream &operator <<(std::ostream &ostr, const Variant::ListVariant &v)
+	{
+		return dumpOstr(ostr, v, 0, false);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::ostream &operator <<(std::ostream &ostr, const Variant::VariantPtr &v)
 	{
 		return dumpOstr(ostr, v, 0, false);
 	}
