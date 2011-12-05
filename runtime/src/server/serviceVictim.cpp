@@ -22,8 +22,18 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ServiceVictim::onResult(pgc::IResultPtr r)
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::onConnection(pgc::IConnectionPtr c)
 	{
+		pgc::IStatementPtr s = _pluma->create<pgc::IStatementProvider>();
+		s->setSql("show server_version");
+		c->exec(s, 
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
 
 	}
 
@@ -37,7 +47,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::onHubAdd(IServiceHubPtr hub)
 	{
-		
+		_pluma = hub->getServer()->getPlugs();
 		pgc::IDbPtr db = hub->getServer()->getDb();
 
 		db->allocConnection(

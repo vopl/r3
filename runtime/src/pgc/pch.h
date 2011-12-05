@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#include <boost/uuid/random_generator.hpp>
 
 #include <set>
 #include <deque>

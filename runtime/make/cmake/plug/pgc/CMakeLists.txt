@@ -15,6 +15,7 @@ SET(SRC
 	${SRC_DIR}/pgc/statement.cpp
 	${SRC_DIR}/pgc/result.cpp
 	${SRC_DIR}/pgc/pgconnWrapper.cpp
+	${SRC_DIR}/pgc/bindData.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -30,7 +31,7 @@ SET(SRC_HDR
 	${SRC_DIR}/pgc/statement.hpp
 	${SRC_DIR}/pgc/result.hpp
 	${SRC_DIR}/pgc/pgconnWrapper.hpp
-	
+	${SRC_DIR}/pgc/bindData.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 

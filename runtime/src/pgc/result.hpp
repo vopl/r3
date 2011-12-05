@@ -12,8 +12,9 @@ namespace pgc
 		: public IResult
 		, public enable_shared_from_this<Result>
 	{
+		PGresult *_pgr;
 	public:
-		Result();
+		Result(PGresult *pgr);
 		~Result();
 	};
 }

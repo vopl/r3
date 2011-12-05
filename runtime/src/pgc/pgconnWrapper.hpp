@@ -31,7 +31,12 @@ namespace pgc
 		asio::basic_raw_socket<SockProtocol> _sock;
 
 	private:
-		static void onWait(
+		static void onWaitRead(
+			function<void()> ready,
+			const system::error_code& error, 
+			std::size_t bytes_transferre);
+
+		static void onWaitWrite(
 			function<void()> ready,
 			const system::error_code& error, 
 			std::size_t bytes_transferre);

@@ -3,6 +3,7 @@
 
 #include "pgc/istatement.hpp"
 #include "pgc/iresult.hpp"
+#include "utils/variant.hpp"
 
 namespace pgc
 {
@@ -12,6 +13,10 @@ namespace pgc
 		virtual ~IConnection(){}
 
 		virtual void exec(IStatementPtr s,
+			boost::function<void (IResultPtr)> done) =0;
+
+		virtual void exec(IStatementPtr s,
+			const utils::Variant &data,
 			boost::function<void (IResultPtr)> done) =0;
 	};
 	typedef boost::shared_ptr<IConnection> IConnectionPtr;

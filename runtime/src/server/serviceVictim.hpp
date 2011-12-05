@@ -18,7 +18,10 @@ namespace server
 		void onSendOk();
 		void onSendFail(system::error_code ec);
 
+		pluma::Pluma *_pluma;
 
+
+		void onResult(pgc::IResultPtr r);
 		void onConnection(pgc::IConnectionPtr c);
 
 	public:

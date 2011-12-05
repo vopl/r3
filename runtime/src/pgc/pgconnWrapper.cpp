@@ -5,7 +5,20 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	void PGconnWrapper::onWait(
+	void PGconnWrapper::onWaitRead(
+		function<void()> ready, 
+		const boost::system::error_code& error, 
+		std::size_t bytes_transferre)
+	{
+		assert(!bytes_transferre);
+		if(ready)
+		{
+			ready();
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::onWaitWrite(
 		function<void()> ready, 
 		const boost::system::error_code& error, 
 		std::size_t bytes_transferre)
@@ -70,7 +83,7 @@ namespace pgc
 	{
 		_sock.async_receive(
 			asio::null_buffers(), 
-			bind(&PGconnWrapper::onWait, 
+			bind(&PGconnWrapper::onWaitRead, 
 				ready, 
 				boost::asio::placeholders::error,
 				boost::asio::placeholders::bytes_transferred));
@@ -81,7 +94,7 @@ namespace pgc
 	{
 		_sock.async_send(
 			asio::null_buffers(), 
-			bind(&PGconnWrapper::onWait, 
+			bind(&PGconnWrapper::onWaitWrite, 
 			ready, 
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred));
