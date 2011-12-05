@@ -22,6 +22,13 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ServiceVictim::onConnection(pgc::IConnectionPtr c)
+	{
+
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	const TEndpoint &ServiceVictim::getEndpoint()
 	{
 		return _endpoint;
@@ -32,6 +39,9 @@ namespace server
 	{
 		
 		pgc::IDbPtr db = hub->getServer()->getDb();
+
+		db->allocConnection(
+			bind(&ServiceVictim::onConnection, shared_from_this(), _1));
 
 		int k = 220;
 		//

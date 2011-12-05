@@ -3,6 +3,7 @@
 
 #include "server/iservice.hpp"
 #include <boost/enable_shared_from_this.hpp>
+#include "pgc/iconnection.hpp"
 
 namespace server
 {
@@ -16,6 +17,9 @@ namespace server
 		static const TEndpoint _endpoint;
 		void onSendOk();
 		void onSendFail(system::error_code ec);
+
+
+		void onConnection(pgc::IConnectionPtr c);
 
 	public:
 
