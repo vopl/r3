@@ -6,6 +6,7 @@
 #include "serviceHub.hpp"
 #include "serviceEcho.hpp"
 #include "serviceStatics.hpp"
+#include "serviceVictim.hpp"
 
 
 PLUMA_CONNECTOR
@@ -18,6 +19,7 @@ bool pluma_connect(pluma::Host& host)
 
 	host.add( new server::ServiceEchoProvider() );
 	host.add( new server::ServiceStaticsProvider() );
+	host.add( new server::ServiceVictimProvider() );
 
 	return true;
 }

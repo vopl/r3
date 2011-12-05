@@ -21,6 +21,7 @@ SET(SRC
 
 	${SRC_DIR}/server/serviceEcho.cpp
 	${SRC_DIR}/server/serviceStatics.cpp
+	${SRC_DIR}/server/serviceVictim.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -38,7 +39,7 @@ SET(SRC_HDR
 	
 	${SRC_DIR}/server/serviceEcho.hpp
 	${SRC_DIR}/server/serviceStatics.hpp
-	
+	${SRC_DIR}/server/serviceVictim.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 

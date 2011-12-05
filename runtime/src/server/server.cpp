@@ -58,10 +58,24 @@ namespace server
 		//поднять асинхронный двиг
 		_async = _plugs->create<async::IServiceProvider>();
 		assert(_async);
-		_async->balance(4);
+		//_async->balance(4);
+
 
 		//////////////////////////////////////////////////////////////////////////
-		//поднять коннектор
+		//поднять коннектор базы
+		assert(!_db);
+		_db = _plugs->create<pgc::IDbProvider>();
+		assert(_db);
+
+		_db->initialize(
+			_async, 
+			"host=localhost port=5432 dbname=test user=test password=test",
+			10,
+			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
+			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
+
+		//////////////////////////////////////////////////////////////////////////
+		//поднять сетевой коннектор
 		net::IConnectorPtr connector = _plugs->create<net::IConnectorProvider>();
 		assert(connector);
 		connector->initialize(_async);
@@ -80,6 +94,7 @@ namespace server
 		assert(!_serviceHub);
 		_serviceHub = _plugs->create<IServiceHubProvider>();
 		assert(_serviceHub);
+		_serviceHub->setServer(shared_from_this());
 
 		//////////////////////////////////////////////////////////////////////////
 		//набавить службы
@@ -90,32 +105,6 @@ namespace server
 			_serviceHub->addService(s);
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		//поднять коннектор базы
-		assert(!_db);
-		_db = _plugs->create<pgc::IDbProvider>();
-		assert(_db);
-
-		_db->initialize(
-			_async, 
-			"host=localhost port=5432 dbname=test user=test password=test",
-			10,
-			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
-			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
-
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
-		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
 
 		//запускать асинхронный двиг
 		_async->balance(4);
@@ -151,5 +140,12 @@ namespace server
 	{
 		return _async;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	pgc::IDbPtr Server::getDb()
+	{
+		return _db;
+	}
+
 
 }

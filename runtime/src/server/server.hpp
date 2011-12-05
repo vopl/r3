@@ -38,6 +38,7 @@ namespace server
 		virtual void stop();
 		virtual pluma::Pluma * getPlugs();
 		virtual async::IServicePtr getAsync();
+		virtual pgc::IDbPtr getDb();
 	};
 	PLUMA_INHERIT_PROVIDER(Server, IServer);
 }

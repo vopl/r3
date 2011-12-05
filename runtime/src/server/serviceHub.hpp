@@ -9,7 +9,7 @@ namespace server
 	using namespace boost;
 
 	//////////////////////////////////////////////////////////////////////////
-	struct ServiceHub
+	class ServiceHub
 		: public IServiceHub
 		, public enable_shared_from_this<ServiceHub>
 	{
@@ -18,7 +18,9 @@ namespace server
 
 		TMServices	_services;
 
-		mutex	_mtx;
+		IServerPtr	_server;
+
+		mutex		_mtx;
 
 	private:
 		void onSendOk(ISessionPtr session);
@@ -32,10 +34,14 @@ namespace server
 		ServiceHub();
 		virtual ~ServiceHub();
 
+		virtual void setServer(IServerPtr server);
+		virtual IServerPtr getServer();
+
 		virtual void addSession(ISessionPtr session);
 		virtual void delSession(ISessionPtr session);
 
 		virtual void addService(IServicePtr service);
+		virtual IServicePtr getService(const TEndpoint &endpoint);
 		virtual void delService(IServicePtr service);
 		virtual void delServices();
 
