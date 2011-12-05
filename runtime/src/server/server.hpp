@@ -5,6 +5,8 @@
 #include "server/isessionManager.hpp"
 #include "server/iserviceHub.hpp"
 
+#include "pgc/idb.hpp"
+
 namespace server
 {
 	using namespace boost;
@@ -19,9 +21,14 @@ namespace server
 		ISessionManagerPtr	_sessionManager;
 		IServiceHubPtr		_serviceHub;
 
+		pgc::IDbPtr			_db;
+
 	private:
 		void onSessionStart(ISessionPtr session);
 		void onSessionStop(ISessionPtr session);
+
+		void onDbConnectionMade(size_t numConnections);
+		void onDbConnectionLost(size_t numConnections);
 
 	public:
 		Server();

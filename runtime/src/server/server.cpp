@@ -20,6 +20,19 @@ namespace server
 		_serviceHub->delSession(session);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void Server::onDbConnectionMade(size_t numConnections)
+	{
+		std::cerr<<__FUNCTION__<<": "<<numConnections<<std::endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Server::onDbConnectionLost(size_t numConnections)
+	{
+		std::cerr<<__FUNCTION__<<": "<<numConnections<<std::endl;
+	}
+
+
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -77,6 +90,21 @@ namespace server
 			_serviceHub->addService(s);
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		//поднять коннектор базы
+		assert(!_db);
+		_db = _plugs->create<pgc::IDbProvider>();
+		assert(_db);
+
+		_db->initialize(
+			_async, 
+			"host=localhost port=5432 dbname=test user=test password=test",
+			10,
+			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
+			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
+
+		_db->allocConnection(function<void (pgc::IConnectionPtr)>());
+
 		//запускать асинхронный двиг
 		_async->balance(4);
 	}
@@ -90,7 +118,10 @@ namespace server
 		assert(_sessionManager);
 		_sessionManager->stop();
 		_sessionManager.reset();
-		
+
+		assert(_db);
+		_db->deinitialize();
+
 		_async->stop();
 		_async.reset();
 		

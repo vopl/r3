@@ -3,6 +3,10 @@
 
 #include "pgc/idb.hpp"
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/thread/mutex.hpp>
+#include <set>
+#include <deque>
+#include "pgconnWrapper.hpp"
 
 namespace pgc
 {
@@ -12,6 +16,23 @@ namespace pgc
 		: public IDb
 		, public enable_shared_from_this<Db>
 	{
+		mutex					_mtx;
+		async::IServicePtr		_asrv;
+		std::string				_conninfo;
+		size_t					_maxConnections;
+		function<void (size_t)> _onConnectionMade;
+		function<void (size_t)> _onConnectionLost;
+
+	private:
+		std::set<PGconnWrapperPtr>						_startConnections;
+		std::set<PGconnWrapperPtr>						_readyConnections;
+		std::set<PGconnWrapperPtr>						_workConnections;
+		std::deque<function<void (IConnectionPtr)> >	_waiters;
+
+	private:
+		void balanceConnections();
+		void makeConnection_poll(PGconnWrapperPtr pcw);
+
 	public:
 		Db();
 		~Db();
