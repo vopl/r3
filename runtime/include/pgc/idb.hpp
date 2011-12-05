@@ -2,6 +2,9 @@
 #define _PGC_IDB_HPP_
 
 #include "async/iservice.hpp"
+#include "pgc/iconnection.hpp"
+#include "pluma/pluma.hpp"
+
 
 namespace pgc
 {
@@ -17,7 +20,9 @@ namespace pgc
 			boost::function<void (size_t)> connectionMade,
 			boost::function<void (size_t)> connectionLost) =0;
 
-		virtual void close() =0;
+		virtual void allocConnection(boost::function<void (IConnectionPtr)> ready) =0;
+
+		virtual void deinitialize() =0;
 	};
 	typedef boost::shared_ptr<IDb> IDbPtr;
 
