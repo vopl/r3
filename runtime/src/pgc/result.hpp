@@ -44,6 +44,8 @@ namespace pgc
 		bool extractor_bool			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
 		bool extractor_varbit		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
 		bool extractor_oid			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
+		bool extractor_uuid			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
+		bool extractor_char			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
 		bool extractor_null			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
 
 		void initExtractors();

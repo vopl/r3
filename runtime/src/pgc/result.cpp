@@ -335,6 +335,14 @@ namespace pgc
 					_extractors[colIdx]._meth = &Result::extractor_oid;
 					_extractors[colIdx]._favorType = Variant::Type2Enum<boost::uint32_t>::et;
 					break;
+				case 2950://uuid
+					_extractors[colIdx]._meth = &Result::extractor_uuid;
+					_extractors[colIdx]._favorType = Variant::Type2Enum<boost::uuids::uuid>::et;
+					break;
+				case 18://char
+					_extractors[colIdx]._meth = &Result::extractor_char;
+					_extractors[colIdx]._favorType = Variant::Type2Enum<char>::et;
+					break;
 				default:
 					_extractors[colIdx]._meth = &Result::extractor_null;
 					_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;

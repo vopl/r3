@@ -374,11 +374,11 @@ namespace pgc
 		const utils::Variant &data,
 		boost::function<void (IResultPtr)> done)
 	{
-		BindDataPtr bindData(new BindData(data));
+		BindDataPtr bindData(new BindData(data, _con));
 
 		if(s->getPreparedId().empty())
 		{
-			prepare_(s, bindData, bind(&Connection::exec_, shared_from_this(), s, bindData, done));
+			prepare_(s, bindData, done);
 			return;
 		}
 		exec_(s, bindData, done);

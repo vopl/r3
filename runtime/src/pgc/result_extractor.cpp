@@ -1792,6 +1792,87 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::extractor_uuid		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp)
+	{
+		char *valDb = PQgetvalue(_pgr, rowIdx, colIdx);
+		if(!valDb)
+		{
+			//null
+			return false;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		switch(typCpp)
+		{
+		case Variant::Type2Enum<std::string>::et:
+			{
+				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
+				std::string &strCpp = *(std::string*)valCpp;
+				strCpp.assign(valDb, valDb+lenDb);
+			}
+			return true;
+		case Variant::Type2Enum<std::vector<unsigned char> >::et:
+			{
+				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
+				(*(std::vector<unsigned char> *)valCpp).assign((unsigned char *)valDb, (unsigned char*)valDb+lenDb);
+			}
+			return true;
+		case Variant::Type2Enum<boost::uuids::uuid>::et:
+			{
+				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
+				boost::uuids::uuid &u = *(boost::uuids::uuid *)valCpp;
+				if(lenDb > (int)u.size())
+				{
+					lenDb = u.size();
+				}
+				std::copy((char *)valDb, (char *)valDb+lenDb, u.begin());
+			}
+			return true;
+		}
+
+
+		//assert(!"unsupported cpp type for uuid");
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::extractor_char		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp)
+	{
+		char *valDb = PQgetvalue(_pgr, rowIdx, colIdx);
+		if(!valDb)
+		{
+			//null
+			return false;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		switch(typCpp)
+		{
+		case Variant::Type2Enum<std::string>::et:
+			{
+				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
+				std::string &strCpp = *(std::string*)valCpp;
+				strCpp.assign(valDb, valDb+lenDb);
+			}
+			return true;
+		case Variant::Type2Enum<std::vector<unsigned char> >::et:
+			{
+				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
+				(*(std::vector<unsigned char> *)valCpp).assign((unsigned char *)valDb, (unsigned char*)valDb+lenDb);
+			}
+			return true;
+		}
+
+
+		//assert(!"unsupported cpp type for char");
+		return false;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	bool Result::extractor_null			(int /*rowIdx*/, int /*colIdx*/, Variant::EType /*typCpp*/, void * /*valCpp*/)
 	{
 		return false;
