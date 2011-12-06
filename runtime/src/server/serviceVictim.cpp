@@ -25,7 +25,6 @@ namespace server
 	void ServiceVictim::onResult(pgc::IResultPtr r)
 	{
 		std::cout<<r->errorCode()<<", "<<r->errorMsg()<<std::endl;
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////

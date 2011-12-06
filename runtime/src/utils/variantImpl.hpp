@@ -43,51 +43,6 @@ namespace utils
 
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-#define ENUMTYPES					\
-	ENUMTYPES_ONE(String)			\
-	ENUMTYPES_ONE(Float)			\
-	ENUMTYPES_ONE(Double)			\
-	ENUMTYPES_ONE(Int8)				\
-	ENUMTYPES_ONE(Int16)			\
-	ENUMTYPES_ONE(Int32)			\
-	ENUMTYPES_ONE(Int64)			\
-	ENUMTYPES_ONE(UInt8)			\
-	ENUMTYPES_ONE(UInt16)			\
-	ENUMTYPES_ONE(UInt32)			\
-	ENUMTYPES_ONE(UInt64)			\
-	ENUMTYPES_ONE(VectorChar)		\
-	ENUMTYPES_ONE(Date)				\
-	ENUMTYPES_ONE(Time)				\
-	ENUMTYPES_ONE(VectorVariant)	\
-	ENUMTYPES_ONE(MapStringVariant)	\
-	ENUMTYPES_ONE(Bool)				\
-	ENUMTYPES_ONE(Tm)				\
-	ENUMTYPES_ONE(Bitset8)			\
-	ENUMTYPES_ONE(Bitset16)			\
-	ENUMTYPES_ONE(Bitset32)			\
-	ENUMTYPES_ONE(Bitset64)			\
-	ENUMTYPES_ONE(Bitset128)		\
-	ENUMTYPES_ONE(Bitset256)		\
-	ENUMTYPES_ONE(Bitset512)		\
-	ENUMTYPES_ONE(DateDuration)		\
-	ENUMTYPES_ONE(TimeDuration)		\
-	ENUMTYPES_ONE(DateTimeDuration)	\
-	ENUMTYPES_ONE(MapVariantVariant)		\
-	ENUMTYPES_ONE(MultimapVariantVariant)	\
-	ENUMTYPES_ONE(MultimapStringVariant)	\
-	ENUMTYPES_ONE(SetVariant)				\
-	ENUMTYPES_ONE(MultisetVariant)			\
-	ENUMTYPES_ONE(DequeVariant)				\
-	ENUMTYPES_ONE(ListVariant)				\
-	ENUMTYPES_ONE(Char)						\
-	ENUMTYPES_ONE(Uuid)						\
-	ENUMTYPES_ONE(VariantPtr)				//\
-
-
-
-
-
 
 	//////////////////////////////////////////////////////////////////////////
 	class VariantImpl
@@ -175,9 +130,9 @@ namespace utils
 			switch(type())
 			{
 			case etVoid: break;
-#define ENUMTYPES_ONE(T) case et ## T: destruct<T>(); break;
-				ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: destruct< n >(); break;
+				ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 			default:
 				assert(!"bad et");
 				throw "bad et";
@@ -250,9 +205,9 @@ namespace utils
 			switch(type())
 			{
 			case etVoid: return NULL;
-#define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
-				ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: return &as<n>();
+				ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 			default:
 				assert(!"bad et");
 				throw "bad et";
@@ -273,9 +228,9 @@ namespace utils
 			switch(type())
 			{
 			case etVoid: return NULL;
-#define ENUMTYPES_ONE(T) case et ## T: return &as<T>();
-				ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: return &as<n>();
+				ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 			default:
 				assert(!"bad et");
 				throw "bad et";
@@ -369,9 +324,9 @@ namespace utils
 				switch(type())
 				{
 				case etVoid: return false;
-#define ENUMTYPES_ONE(T) case et ## T: return as<T>() < v.as<T>();
-					ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: return as<n>() < v.as<n>();
+					ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 				default:
 					assert(!"bad et");
 					throw "bad et";
@@ -409,9 +364,9 @@ namespace utils
 				switch(type())
 				{
 				case etVoid: return true;
-#define ENUMTYPES_ONE(T) case et ## T: return as<T>() == v.as<T>();
-					ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: return as<n>() == v.as<n>();
+					ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 				default:
 					assert(!"bad et");
 					throw "bad et";
@@ -478,9 +433,9 @@ namespace utils
 		{
 		case etVoid: break;
 
-#define ENUMTYPES_ONE(T) case et ## T: alloc<T>(); new (&as<T>()) T(v.as<T>()); break;
-			ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: alloc<n>(); new (&as<n>()) n(v.as<n>()); break;
+			ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 		default:
 			assert(!"bad et");
 			throw "bad et";
@@ -521,9 +476,9 @@ namespace utils
 				switch(type())
 				{
 				case etVoid: destruct(); break;
-#define ENUMTYPES_ONE(T) case et ## T: assign<T>(v.as<T>()); break;
-					ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: assign<n>(v.as<n>()); break;
+					ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 				default:
 					assert(!"bad et");
 					throw "bad et";
@@ -605,9 +560,9 @@ namespace utils
 				{
 				case etVoid: break;
 
-#define ENUMTYPES_ONE(T) case et ## T: construct<T>(); break;
-					ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: construct<n>(); break;
+					ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 				default:
 					assert(!"bad et");
 					throw "bad et";
@@ -687,9 +642,9 @@ namespace utils
 			switch(_et)
 			{
 			case etVoid: break;
-#define ENUMTYPES_ONE(T) case et ## T: ar & as<T>(); break;
-				ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: ar & as<n>(); break;
+				ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 			default:
 				assert(!"bad et");
 				throw "bad et";
@@ -714,9 +669,9 @@ namespace utils
 			switch(et)
 			{
 			case etVoid: destruct(); break;
-#define ENUMTYPES_ONE(T) case et ## T: forceType<T>(); setNull(false); ar & as<T>(); break;
-				ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: forceType<n>(); setNull(false); ar & as<n>(); break;
+				ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 			default:
 				assert(!"bad et");
 				throw "bad et";
