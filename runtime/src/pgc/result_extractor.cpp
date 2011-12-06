@@ -5,7 +5,6 @@
 #include "utils/ntoa.hpp"
 #include "utils/aton.hpp"
 #include "utils/julian.h"
-#include <boost/static_assert.hpp>
 
 
 namespace pgc
@@ -292,11 +291,6 @@ namespace pgc
 
 
 		//////////////////////////////////////////////////////////////////////////
-		BOOST_STATIC_ASSERT(1 == sizeof(char));
-		BOOST_STATIC_ASSERT(2 == sizeof(short));
-		BOOST_STATIC_ASSERT(4 == sizeof(int));
-		BOOST_STATIC_ASSERT(8 == sizeof(long long));
-
 		//////////////////////////////////////////////////////////////////////////
 		switch(typCpp)
 		{
@@ -325,28 +319,28 @@ namespace pgc
 			}
 			return true;
 		case Variant::Type2Enum<boost::int8_t>::et:
-			*(boost::int8_t *)valCpp = _atoc(str);
+			_aton(str, *(boost::int8_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::int16_t>::et:
-			*(boost::int16_t *)valCpp = _atos(str);
+			_aton(str, *(boost::int16_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::int32_t>::et:
-			*(boost::int32_t *)valCpp = _atoi(str);
+			_aton(str, *(boost::int32_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::int64_t>::et:
-			*(boost::int64_t *)valCpp = _atoll(str);
+			_aton(str, *(boost::int64_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::uint8_t>::et:
-			*(boost::uint8_t *)valCpp = _atouc(str);
+			_atoun(str, *(boost::uint8_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::uint16_t>::et:
-			*(boost::uint16_t *)valCpp = _atous(str);
+			_atoun(str, *(boost::uint16_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::uint32_t>::et:
-			*(boost::uint32_t *)valCpp = _atoui(str);
+			_atoun(str, *(boost::uint32_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::uint64_t>::et:
-			*(boost::uint64_t *)valCpp = _atoul(str);
+			_atoun(str, *(boost::uint64_t *)valCpp);
 			return true;
 		}
 
@@ -560,11 +554,6 @@ namespace pgc
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		BOOST_STATIC_ASSERT(1 == sizeof(char));
-		BOOST_STATIC_ASSERT(2 == sizeof(short));
-		BOOST_STATIC_ASSERT(4 == sizeof(int));
-		BOOST_STATIC_ASSERT(8 == sizeof(long long));
-
 		//////////////////////////////////////////////////////////////////////////
 		switch(typCpp)
 		{
@@ -598,28 +587,28 @@ namespace pgc
 			}
 			return true;
 		case Variant::Type2Enum<boost::int8_t>::et:
-			*(boost::int8_t *)valCpp = _atoc(valDb);
+			_aton(valDb, *(boost::int8_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::int16_t>::et:
-			*(boost::int16_t *)valCpp = _atos(valDb);
+			_aton(valDb, *(boost::int16_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::int32_t>::et:
-			*(boost::int32_t *)valCpp = _atoi(valDb);
+			_aton(valDb, *(boost::int32_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::int64_t>::et:
-			*(boost::int64_t *)valCpp = _atoll(valDb);
+			_aton(valDb, *(boost::int64_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::uint8_t>::et:
-			*(boost::uint8_t *)valCpp = _atouc(valDb);
+			_atoun(valDb, *(boost::uint8_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::uint16_t>::et:
-			*(boost::uint16_t *)valCpp = _atous(valDb);
+			_atoun(valDb, *(boost::uint16_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::uint32_t>::et:
-			*(boost::uint32_t *)valCpp = _atoui(valDb);
+			_atoun(valDb, *(boost::uint32_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<boost::uint64_t>::et:
-			*(boost::uint64_t *)valCpp = _atoul(valDb);
+			_atoun(valDb, *(boost::uint64_t *)valCpp);
 			return true;
 		case Variant::Type2Enum<std::vector<unsigned char> >::et:
 			{
