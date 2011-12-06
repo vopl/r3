@@ -98,42 +98,42 @@ public:
 	void load(boost::int16_t & t)
 	{
 		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
-		t = utils::fixEndian(t);
+		t = utils::litEndian(t);
 	}
 	void load(boost::int32_t & t)
 	{
 		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
-		t = utils::fixEndian(t);
+		t = utils::litEndian(t);
 	}
 	void load(boost::int64_t & t)
 	{
 		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
-		t = utils::fixEndian(t);
+		t = utils::litEndian(t);
 	}
 	void load(boost::uint16_t & t)
 	{
 		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
-		t = utils::fixEndian(t);
+		t = utils::litEndian(t);
 	}
 	void load(boost::uint32_t & t)
 	{
 		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
-		t = utils::fixEndian(t);
+		t = utils::litEndian(t);
 	}
 	void load(boost::uint64_t & t)
 	{
 		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
-		t = utils::fixEndian(t);
+		t = utils::litEndian(t);
 	}
 	void load(float & t)
 	{
 		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
-		t = utils::fixEndian(t);
+		t = utils::litEndian(t);
 	}
 	void load(double & t)
 	{
 		boost::archive::basic_binary_iprimitive<Archive, Elem, Tr>::load(t);
-		t = utils::fixEndian(t);
+		t = utils::litEndian(t);
 	}
 
 };

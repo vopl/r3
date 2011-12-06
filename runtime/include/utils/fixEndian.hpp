@@ -139,11 +139,20 @@ namespace utils
 		};
 	}
 
+	//////////////////////////////////////////////////////////////////////////
 	template <class T>
-	inline T fixEndian(const T &v)
+	inline T bigEndian(const T &v)
 	{
 		static const bool le = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
 		return impl::FixEndian<le>::call(v);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class T>
+	inline T litEndian(const T &v)
+	{
+		static const bool le = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
+		return impl::FixEndian<!le>::call(v);
 	}
 }
 #endif

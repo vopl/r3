@@ -1,16 +1,10 @@
 #include "pch.h"
 #include "result.hpp"
-//#include "connectionImpl.hpp"
-//#include "pgc/Variant::Type2Enum.hpp"
 #include "pgDataType.h"
 #include "utils/fixEndian.hpp"
 #include "utils/ntoa.hpp"
 #include "utils/aton.hpp"
 #include "utils/julian.h"
-
-// #include "pgc/blob.hpp"
-// #include "blobImpl.hpp"
-
 #include <boost/static_assert.hpp>
 
 
@@ -28,7 +22,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (fixEndian(*(boost::int16_t *)valDb))
+#define VAL (bigEndian(*(boost::int16_t *)valDb))
 
 		switch(typCpp)
 		{
@@ -91,7 +85,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (fixEndian(*(boost::int32_t *)valDb))
+#define VAL (bigEndian(*(boost::int32_t *)valDb))
 
 		switch(typCpp)
 		{
@@ -154,7 +148,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (fixEndian(*(boost::int64_t *)valDb))
+#define VAL (bigEndian(*(boost::int64_t *)valDb))
 
 		switch(typCpp)
 		{
@@ -233,10 +227,10 @@ namespace pgc
 		memcpy(&buf.front(), valDb, lenDb);
 		PG_NumericData &v = *(PG_NumericData *)&buf.front();
 
-		v.ndigits = fixEndian(v.ndigits);
-		v.weight = fixEndian(v.weight);
-		//v.sign = fixEndian(v.sign);
-		v.dscale = fixEndian(v.dscale);
+		v.ndigits = bigEndian(v.ndigits);
+		v.weight = bigEndian(v.weight);
+		//v.sign = bigEndian(v.sign);
+		v.dscale = bigEndian(v.dscale);
 
 
 		std::vector<char> strBuf;
@@ -270,7 +264,7 @@ namespace pgc
 
 		for(int idx(0); idx<v.ndigits; idx++)
 		{
-			v.NumericDigits[idx] = fixEndian(v.NumericDigits[idx]);
+			v.NumericDigits[idx] = bigEndian(v.NumericDigits[idx]);
 			char numStrPart[8];
 			size_t numStrPartPos=7;
 			numStrPart[numStrPartPos--] = 0;
@@ -371,7 +365,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (fixEndian(*(float *)valDb))
+#define VAL (bigEndian(*(float *)valDb))
 
 		switch(typCpp)
 		{
@@ -435,7 +429,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (fixEndian(*(double *)valDb))
+#define VAL (bigEndian(*(double *)valDb))
 
 		switch(typCpp)
 		{
@@ -499,7 +493,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (fixEndian(*(boost::int64_t *)valDb))
+#define VAL (bigEndian(*(boost::int64_t *)valDb))
 
 		switch(typCpp)
 		{
@@ -789,11 +783,11 @@ namespace pgc
 		boost::uint64_t VAL;
 		if(_con->integerDatetimes())
 		{
-			VAL = fixEndian(*(boost::uint64_t *)valDb);
+			VAL = bigEndian(*(boost::uint64_t *)valDb);
 		}
 		else
 		{
-			double v = fixEndian(*(double *)valDb);
+			double v = bigEndian(*(double *)valDb);
 			VAL = (boost::int64_t)v;
 			v -= VAL;
 			VAL *= 1000000;
@@ -1021,18 +1015,18 @@ namespace pgc
 		memcpy(buf, valDb, sizeof(PG_Interval));
 		PG_Interval &v = *(PG_Interval *)buf;
 
-		//v.time = fixEndian(v.time);
-		v.day = fixEndian(v.day);
-		v.month = fixEndian(v.month);
+		//v.time = bigEndian(v.time);
+		v.day = bigEndian(v.day);
+		v.month = bigEndian(v.month);
 
 
 		if(_con->integerDatetimes())
 		{
-			v.time = fixEndian(v.time);
+			v.time = bigEndian(v.time);
 		}
 		else
 		{
-			double dv = fixEndian(*(double *)&v.time);
+			double dv = bigEndian(*(double *)&v.time);
 			v.time = (boost::int64_t)dv;
 			dv -= v.time;
 			v.time *= 1000000;
@@ -1181,7 +1175,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (fixEndian(*(boost::int32_t *)valDb) + POSTGRES_EPOCH_JDATE)
+#define VAL (bigEndian(*(boost::int32_t *)valDb) + POSTGRES_EPOCH_JDATE)
 
 		switch(typCpp)
 		{
@@ -1288,11 +1282,11 @@ namespace pgc
 		boost::uint64_t VAL;
 		if(_con->integerDatetimes())
 		{
-			VAL = fixEndian(*(boost::uint64_t *)valDb);
+			VAL = bigEndian(*(boost::uint64_t *)valDb);
 		}
 		else
 		{
-			double v = fixEndian(*(double *)valDb);
+			double v = bigEndian(*(double *)valDb);
 			VAL = (boost::int64_t)v;
 			v -= VAL;
 			VAL *= 1000000;
@@ -1600,7 +1594,7 @@ namespace pgc
 		memcpy(&buf.front(), valDb, lenDb);
 		PG_VarBit &v = *(PG_VarBit *)&buf.front();
 
-		v.amount = fixEndian(v.amount);
+		v.amount = bigEndian(v.amount);
 
 		switch(typCpp)
 		{
@@ -1747,7 +1741,7 @@ namespace pgc
 			return false;
 		}
 
-#define VAL (fixEndian(*(boost::uint32_t *)valDb))
+#define VAL (bigEndian(*(boost::uint32_t *)valDb))
 
 		switch(typCpp)
 		{

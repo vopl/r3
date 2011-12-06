@@ -97,35 +97,35 @@ public:
 	}
 	void save(const boost::int16_t & t)
 	{
-		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
 	void save(const boost::int32_t & t)
 	{
-		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
 	void save(const boost::int64_t & t)
 	{
-		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
 	void save(const boost::uint16_t & t)
 	{
-		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
 	void save(const boost::uint32_t & t)
 	{
-		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
 	void save(const boost::uint64_t & t)
 	{
-		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
 	void save(const float & t)
 	{
-		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
 	void save(const double & t)
 	{
-		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::fixEndian(t));
+		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
 };
 
