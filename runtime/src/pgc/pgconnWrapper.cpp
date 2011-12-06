@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "pgconnWrapper.hpp"
-#include <Winsock2.h>
+
+#ifdef _WIN32
+#	include <Winsock2.h>
+#else
+#	include <sys/socket.h>
+#endif
 
 namespace pgc
 {
@@ -31,41 +36,79 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	PGconnWrapper::PGconnWrapper(PGconn *lowConn, boost::asio::io_service &io_service)
-		: _lowConn(lowConn)
-		, _sock(io_service)
+	int PGconnWrapper::sockFamily(int sock)
 	{
-
-		//int test = PQisnonblocking(_lowConn);
-		PQsetnonblocking(_lowConn, 1);
-
-		int rawSock = PQsocket(lowConn);
 		sockaddr name;
 		socklen_t name_len = sizeof(name);
 		if(!getsockname(
-			rawSock, 
+			sock, 
 			&name,
 			&name_len))
 		{
-			int type;
-			int length = sizeof(type);
-			if(!getsockopt(rawSock, SOL_SOCKET, SO_TYPE, (char *)&type, &length))
-			{
-
-				SockProtocol protocol;
-				protocol._family = name.sa_family;
-				protocol._type = type;
-				protocol._protocol = IPPROTO_TCP;
-
-				_sock.assign(protocol, rawSock);
-			}
+			return name.sa_family;
 		}
+		else
+		{
+			std::cerr<<__FUNCTION__<<": getsockname failed"<<std::endl;
+		}
+		return 0;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	int PGconnWrapper::sockType(int sock)
+	{
+		int type;
+		int length = sizeof(type);
+		if(!getsockopt(sock, SOL_SOCKET, SO_TYPE, (char *)&type, &length))
+		{
+			return type;
+		}
+		else
+		{
+			std::cerr<<__FUNCTION__<<": getsockopt failed"<<std::endl;
+		}
+		return 0;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	PGconnWrapper::PGconnWrapper(PGconn *lowConn, boost::asio::io_service &io_service)
+		: _lowConn(lowConn)
+		, _sock(io_service, SockProtocol(sockFamily(PQsocket(_lowConn)), sockType(PQsocket(_lowConn)), IPPROTO_TCP), PQsocket(_lowConn))
+		, _integerDatetimes(false)
+	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	PGconnWrapper::~PGconnWrapper()
 	{
 		close();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::onOpen()
+	{
+		const char *csz = PQparameterStatus(_lowConn, "integer_datetimes");
+
+		if(csz)
+		{
+			if(!strcmp("on", csz))
+			{
+				_integerDatetimes = true;
+			}
+			else if(!strcmp("off", csz))
+			{
+				_integerDatetimes = false;
+			}
+			else
+			{
+				assert(0);
+				_integerDatetimes = false;
+			}
+		}
+
+		PQsetnonblocking(_lowConn, 1);
+		PQsetClientEncoding(_lowConn, "UTF-8");
 	}
 
 	//////////////////////////////////////////////////////////////////////////

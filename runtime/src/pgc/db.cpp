@@ -138,6 +138,7 @@ namespace pgc
 			std::cerr<<__FUNCTION__<<": PGRES_POLLING_OK"<<std::endl;
 			
 			{
+				pcw->onOpen();
 				size_t numConnections=0;
 				{
 					mutex::scoped_lock sl(_mtx);
