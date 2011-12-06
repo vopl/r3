@@ -54,7 +54,7 @@ namespace utils
 	template <>
 	std::ostream &dumpOstr<boost::uuids::uuid>(std::ostream &ostr, const boost::uuids::uuid &v, size_t /*level*/, bool /*levelApplyed*/)
 	{
-		ostr<<"{"<<boost::uuids::to_string(v)<<"}";
+		ostr<<boost::uuids::to_string(v);
 
 		return ostr;
 	}
