@@ -4,10 +4,16 @@
 #include <boost/asio.hpp>
 #include <boost/asio/local/basic_endpoint.hpp>
 #include <libpq-fe.h>
+#include "pgc/istatement.hpp"
+
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
 
 namespace pgc
 {
 	using namespace boost;
+	using namespace boost::multi_index;
 
 	//////////////////////////////////////////////////////////////////////////
 	class PGconnWrapper
@@ -33,6 +39,40 @@ namespace pgc
 		PGconn *_lowConn;
 		asio::basic_raw_socket<SockProtocol> _sock;
 		bool	_integerDatetimes;
+
+		//подготовленные запросы
+		static const size_t _maxPreparedStatements = 1000;
+		static const size_t _timeoutPreparedStatements = 1000*60*60*12;//millisec
+
+		struct StatementPrepareState
+		{
+			std::string					_prid;
+			IStatementWtr				_stm;
+			boost::posix_time::ptime	_timeout;
+		};
+		typedef multi_index_container<
+			StatementPrepareState,
+			indexed_by<
+				ordered_unique<
+					member<
+						StatementPrepareState, 
+						IStatementWtr,
+						&StatementPrepareState::_stm
+					>
+				>,
+				ordered_non_unique<
+					member<
+						StatementPrepareState, 
+						boost::posix_time::ptime,
+						&StatementPrepareState::_timeout
+					>
+				>
+			> 
+		> TPrepareds;
+
+		TPrepareds	_prepareds;
+
+		void cleanPrepareds();
 
 	private:
 		static void onWaitRead(
@@ -60,6 +100,12 @@ namespace pgc
 		operator PGconn *() const;
 		void waitRead(function<void()> ready);
 		void waitWrite(function<void()> ready);
+
+
+		void touchPrepared(IStatementWtr p);
+		bool hasPrepared(IStatementWtr p);
+		std::string getPrid(IStatementWtr p);
+		void genPrid(IStatementWtr p);
 	};
 	typedef shared_ptr<PGconnWrapper> PGconnWrapperPtr;
 }

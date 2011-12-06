@@ -90,25 +90,25 @@ namespace pgc
 		switch(PQstatus(*pcw))
 		{
 		case CONNECTION_STARTED:
-			std::cerr<<"Waiting for connection to be made."<<std::endl;
+			//std::cerr<<"Waiting for connection to be made."<<std::endl;
 			break;
 		case CONNECTION_MADE:
 			std::cerr<<"Connection OK; waiting to send."<<std::endl;
 			break;
 		case CONNECTION_AWAITING_RESPONSE:
-			std::cerr<<"Waiting for a response from the postmaster."<<std::endl;
+			//std::cerr<<"Waiting for a response from the postmaster."<<std::endl;
 			break;
 		case CONNECTION_AUTH_OK:
-			std::cerr<<"Received authentication; waiting for backend startup."<<std::endl;
+			//std::cerr<<"Received authentication; waiting for backend startup."<<std::endl;
 			break;
 		case CONNECTION_SETENV:
-			std::cerr<<"Negotiating environment."<<std::endl;
+			//std::cerr<<"Negotiating environment."<<std::endl;
 			break;
 		case CONNECTION_SSL_STARTUP:
-			std::cerr<<"Negotiating SSL."<<std::endl;
+			//std::cerr<<"Negotiating SSL."<<std::endl;
 			break;
 		case CONNECTION_NEEDED:
-			std::cerr<<"Internal state: connect() needed"<<std::endl;
+			//std::cerr<<"Internal state: connect() needed"<<std::endl;
 			break;
 		}
 
@@ -135,7 +135,7 @@ namespace pgc
 			pcw->waitWrite(bind(&Db::makeConnection_poll, shared_from_this(), pcw));
 			break;
 		case PGRES_POLLING_OK:
-			std::cerr<<__FUNCTION__<<": PGRES_POLLING_OK"<<std::endl;
+			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_OK"<<std::endl;
 			
 			{
 				pcw->onOpen();
@@ -172,13 +172,22 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Db::unwork(PGconnWrapperPtr pcw)
 	{
-		mutex::scoped_lock sl(_mtx);
-
-		TSConnectins::iterator iter = _workConnections.find(pcw);
-		if(_workConnections.end() != iter)
+		bool needBalance = false;
 		{
-			_workConnections.erase(iter);
-			_readyConnections.insert(pcw);
+			mutex::scoped_lock sl(_mtx);
+
+			TSConnectins::iterator iter = _workConnections.find(pcw);
+			if(_workConnections.end() != iter)
+			{
+				_workConnections.erase(iter);
+				_readyConnections.insert(pcw);
+			}
+			needBalance = _waiters.size()?true:false;
+		}
+
+		if(needBalance)
+		{
+			balanceConnections();
 		}
 	}
 

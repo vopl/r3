@@ -8,7 +8,12 @@
 #include <boost/foreach.hpp>
 #include <boost/uuid/random_generator.hpp>
 
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
+
 #include <set>
 #include <deque>
+#include <iostream>
 
 #include <libpq-fe.h>

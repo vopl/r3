@@ -23,12 +23,9 @@ namespace pgc
 		DbPtr _db;
 		PGconnWrapperPtr _con;
 
-		static boost::uuids::random_generator _uuidGen;
-		static std::string preparedIdGen();
-
-
-		boost::function<void (IResultPtr)> _done;
-		std::deque<PGresult *> _results;
+		bool								_inProcess;
+		boost::function<void (IResultPtr)>	_done;
+		std::deque<PGresult *>				_results;
 
 	private:
 
@@ -47,7 +44,6 @@ namespace pgc
 			BindDataPtr		_data;
 			boost::function<void (IResultPtr)> _done;
 			bool			_inTrans;
-			std::string		_uniq;
 		};
 		typedef boost::shared_ptr<SPrepState> SPrepStatePtr;
 

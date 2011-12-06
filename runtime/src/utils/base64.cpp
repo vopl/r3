@@ -35,7 +35,7 @@ namespace utils
 		static const std::string base64_chars = 
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			"abcdefghijklmnopqrstuvwxyz"
-			"0123456789+/";
+			"0123456789_$";
 
 		std::string mkbase64_charsrev(const std::string &base64_chars)
 		{
@@ -52,7 +52,7 @@ namespace utils
 
 		static inline bool is_base64(unsigned char c)
 		{
-			return ((c>='A' && c<='Z' || c>='a' && c<='z' || c>='0' && c<='9') || (c == '+') || (c == '/'));
+			return base64_charsrev[c]?true:false;
 		}
 	}
 
