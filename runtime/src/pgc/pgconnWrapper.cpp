@@ -74,7 +74,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	PGconnWrapper::PGconnWrapper(PGconn *lowConn, boost::asio::io_service &io_service)
 		: _lowConn(lowConn)
-		, _sock(io_service, SockProtocol(sockFamily(PQsocket(_lowConn)), sockType(PQsocket(_lowConn)), IPPROTO_TCP), PQsocket(_lowConn))
+		, _sock(io_service, SockProtocol(sockFamily(PQsocket(_lowConn)), sockType(PQsocket(_lowConn)), IPPROTO_RAW), PQsocket(_lowConn))
 		, _integerDatetimes(false)
 	{
 	}
