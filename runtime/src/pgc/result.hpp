@@ -16,6 +16,13 @@ namespace pgc
 	public:
 		Result(PGresult *pgr);
 		~Result();
+
+		virtual EExecStatus status();
+		virtual const char *errorMsg();
+		virtual const char *errorCode();
+
+		virtual size_t cmdRows();
+
 	};
 }
 

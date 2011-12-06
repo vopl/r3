@@ -26,6 +26,10 @@ namespace pgc
 		static boost::uuids::random_generator _uuidGen;
 		static std::string preparedIdGen();
 
+
+		boost::function<void (IResultPtr)> _done;
+		std::deque<PGresult *> _results;
+
 	private:
 
 		enum EPrepState
@@ -33,8 +37,8 @@ namespace pgc
 			epsStart,
 			epsSPMaked,
 			epsPrepMaked,
-			epsSPReverted,
-			epsSPReleased,
+			epsPrepared,
+			epsError,
 		};
 		struct SPrepState
 		{
@@ -47,14 +51,23 @@ namespace pgc
 		};
 		typedef boost::shared_ptr<SPrepState> SPrepStatePtr;
 
+		void prepareStep_(SPrepStatePtr state, IResultPtr lastRes=IResultPtr());
 		void prepare_(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done);
-		void prepareStep_(SPrepStatePtr state);
 
+		void execStep_(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done, IResultPtr lastRes);
 		void exec_(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done);
+
+	private:
+		void continueSend();
+		void continueRecv();
+		void execSimple(const char *sql, boost::function<void (IResultPtr)> done);
 
 	public:
 		Connection(DbPtr db, PGconnWrapperPtr con);
 		~Connection();
+
+		virtual void exec(const char *sql,
+			boost::function<void (IResultPtr)> done);
 
 		virtual void exec(IStatementPtr s,
 			boost::function<void (IResultPtr)> done);

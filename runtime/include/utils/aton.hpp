@@ -107,6 +107,12 @@ namespace utils
 		impl::_atoun(a, res);
 		return res;
 	}
+	inline size_t _atost(const char *a)
+	{
+		size_t res;
+		impl::_atoun(a, res);
+		return res;
+	}
 
 }
 

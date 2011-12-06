@@ -36,6 +36,9 @@ namespace pgc
 		, _sock(io_service)
 	{
 
+		//int test = PQisnonblocking(_lowConn);
+		PQsetnonblocking(_lowConn, 1);
+
 		int rawSock = PQsocket(lowConn);
 		sockaddr name;
 		socklen_t name_len = sizeof(name);
@@ -95,9 +98,9 @@ namespace pgc
 		_sock.async_send(
 			asio::null_buffers(), 
 			bind(&PGconnWrapper::onWaitWrite, 
-			ready, 
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred));
+				ready, 
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred));
 	}
 
 }

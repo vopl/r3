@@ -26,7 +26,8 @@ namespace pgc
 	std::string Connection::preparedIdGen()
 	{
 		std::string result;
-		result.reserve(32);
+		result.reserve(33);
+		result += '_';
 		const uuids::uuid &u = _uuidGen();
 
 		std::size_t i=0;
@@ -52,8 +53,6 @@ namespace pgc
 		state->_done = done;
 		state->_s = s;
 
-		PQclear(PQexec(*_con, "BEGIN"));
-
 		switch(PQtransactionStatus(*_con))
 		{
 		case PQTRANS_ACTIVE:
@@ -67,71 +66,10 @@ namespace pgc
 		}
 
 		prepareStep_(state);
-		PQclear(PQexec(*_con, "END"));
-
-
-
-// 		boost::uint64_t sapox;
-// 		char sapo[256];
-// 		char id[64];
-// 		for(;;)
-// 		{
-// 			if(inTrans)
-// 			{
-// 				sapox = rand()*rand();
-// 				sprintf(sapo, "SAVEPOINT pgc_prepare_%08x", sapox);
-// 				PQclear(PQexec(*_con, sapo));
-// 			}
-// 
-// 			sprintf(id, "pgc_ps_%08x", rand()*rand());
-// 			PGresult *res;
-// 
-// 			if(data && data->typ.size())
-// 			{
-// 				res = PQprepare(*_con, id, s->getSql().c_str(), (int)data->typ.size(), &data->typ[0]);
-// 			}
-// 			else
-// 			{
-// 				res = PQprepare(*_con, id, s->getSql().c_str(), 0, NULL);
-// 			}
-// 			ExecStatusType est = PQresultStatus(res);
-// 			if(PGRES_FATAL_ERROR == est)
-// 			{
-// 				if(inTrans)
-// 				{
-// 					sprintf(sapo, "ROLLBACK TO SAVEPOINT pgc_prepare_%08x", sapox);
-// 					PQclear(PQexec(*_con, sapo));
-// 				}
-// 				char *s4 = PQresultErrorField(res, PG_DIAG_SQLSTATE);
-// 				if(s4 && !strcmp(s4, "42P05"))//DUPLICATE PREPARED STATEMENT
-// 				{
-// 					PQclear(res);
-// 					continue;
-// 				}
-// 			}
-// 			if(inTrans)
-// 			{
-// 				sprintf(sapo, "RELEASE SAVEPOINT pgc_prepare_%08x", sapox);
-// 				PQclear(PQexec(*_con, sapo));
-// 			}
-// 			if(PGRES_COMMAND_OK != est)
-// 			{
-// 				IResultPtr rp(new Result(res));
-// 				done(rp);
-// 				return;
-// 			}
-// 
-// 			//ok
-// 			PQclear(res);
-// 			break;
-// 		};
-// 
-// 		s->setPreparedId(id);
-// 		exec_(s, data, done);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Connection::prepareStep_(SPrepStatePtr state)
+	void Connection::prepareStep_(SPrepStatePtr state, IResultPtr lastRes)
 	{
 		switch(state->_eps)
 		{
@@ -140,32 +78,29 @@ namespace pgc
 				state->_uniq = preparedIdGen();
 				if(state->_inTrans)
 				{
-					if(!PQsendQuery(*_con, ("SAVEPOINT pgc_prepare_"+state->_uniq).c_str()))
-					{
-						std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(*_con)<<std::endl;
-						state->_done(IResultPtr());
-						return;
-					}
 					state->_eps = epsSPMaked;
-					_con->waitRead(
-						bind(&Connection::prepareStep_, shared_from_this(), state));
+					execSimple(
+						("SAVEPOINT pgc_prepare_"+state->_uniq+";").c_str(),
+						bind(&Connection::prepareStep_, shared_from_this(), state, _1));
 					return;
 				}
 				else
 				{
 					state->_eps = epsSPMaked;
 					prepareStep_(state);
+					return;
 				}
 			}
 			break;
 		case epsSPMaked:
 			{
-				PQconsumeInput(*_con);
-				PGresult *res;
-				res = PQgetResult(*_con);
-				if(res)
+				if(lastRes && eesCommandOk != lastRes->status())
 				{
-					state->_done(IResultPtr(new Result(res)));
+					std::cerr<<__FUNCTION__<<": "<<lastRes->errorMsg()<<std::endl;
+					if(state->_done)
+					{
+						state->_done(lastRes);
+					}
 					return;
 				}
 				int nParams = state->_data?state->_data->typ.size():0;
@@ -178,46 +113,107 @@ namespace pgc
 					paramTypes))
 				{
 					std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(*_con)<<std::endl;
-					state->_done(IResultPtr());
+					if(state->_done)
+					{
+						state->_done(IResultPtr());
+					}
 					return;
 				}
+
 				state->_eps = epsPrepMaked;
-				_con->waitRead(
-					bind(&Connection::prepareStep_, shared_from_this(), state));
+				assert(!_done);
+				assert(_results.empty());
+				_done = bind(&Connection::prepareStep_, shared_from_this(), state, _1);
+				continueSend();
 				return;
 			}
 			break;
 		case epsPrepMaked:
-// 			{
-// 				PGresult *res;
-// 				res = PQgetResult(*_con);
-// 				if(res)
-// 				{
-// 					ExecStatusType est = PQresultStatus(res);
-// 					if(PGRES_FATAL_ERROR == est)
-// 					{
-// 						char *s4 = PQresultErrorField(res, PG_DIAG_SQLSTATE);
-// 						if(s4 && !strcmp(s4, "42P05"))//DUPLICATE PREPARED STATEMENT
-// 						{
-// 							PQclear(res);
-// 							state->_eps = epsStart;
-// 						}
-// 						if(inTrans)
-// 						{
-// 							sprintf(sapo, "ROLLBACK TO SAVEPOINT pgc_prepare_%08x", sapox);
-// 							PQclear(PQexec(*_con, sapo));
-// 						}
-// 
-// 					}
-// 				}
-// 			}
+			{
+				if(eesCommandOk != lastRes->status())
+				{
+					const char *s4 = lastRes->errorCode();
+					if(s4 && !strcmp(s4, "42P05"))//DUPLICATE PREPARED STATEMENT
+					{
+						state->_eps = epsStart;
+						if(state->_inTrans)
+						{
+							execSimple(
+								("ROLLBACK TO SAVEPOINT pgc_prepare_"+state->_uniq+";").c_str(),
+								bind(&Connection::prepareStep_, shared_from_this(), state, IResultPtr()));
+						}
+						else
+						{
+							prepareStep_(state, IResultPtr());
+						}
+						return;
+					}
+					else
+					{
+						state->_eps = epsError;
+						if(state->_inTrans)
+						{
+							execSimple(
+								("ROLLBACK TO SAVEPOINT pgc_prepare_"+state->_uniq+";").c_str(),
+								bind(&Connection::prepareStep_, shared_from_this(), state, lastRes));
+						}
+						else
+						{
+							prepareStep_(state, lastRes);
+						}
+						return;
+					}
+				}
+				else
+				{
+					state->_eps = epsPrepared;
+					if(state->_inTrans)
+					{
+						execSimple(
+							("RELEASE SAVEPOINT pgc_prepare_"+state->_uniq+";").c_str(),
+							bind(&Connection::prepareStep_, shared_from_this(), state, lastRes));
+					}
+					else
+					{
+						prepareStep_(state, lastRes);
+					}
+					return;
+				}
+			}
 			break;
-		case epsSPReverted:
+		case epsPrepared:
+			state->_s->setPreparedId(state->_uniq.c_str());
+			exec_(state->_s, state->_data, state->_done);
 			break;
-		case epsSPReleased:
+		case epsError:
+			std::cerr<<__FUNCTION__<<": "<<lastRes->errorMsg()<<std::endl;
+			if(state->_done)
+			{
+				state->_done(lastRes);
+			}
 			break;
 		default:
 			assert(0);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Connection::execStep_(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done, IResultPtr lastRes)
+	{
+		if(eesError == lastRes->status())
+		{
+			const char *s4 = lastRes->errorCode();
+			if(s4 && !strcmp(s4, "26000"))//INVALID SQL STATEMENT NAME
+			{
+				s->setPreparedId("");
+				prepare_(s, data, done);
+				return;
+			}
+		}
+
+		if(done)
+		{
+			done(lastRes);
 		}
 	}
 
@@ -225,7 +221,118 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Connection::exec_(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done)
 	{
-		assert(0);
+		int nParams = data?data->typ.size():0;
+		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
+		const char * const *paramValues = nParams?&data->val[0]:NULL;
+		const int *paramLengths = nParams?&data->len[0]:NULL;
+		const int *paramFormats = nParams?&data->fmt[0]:NULL;
+
+		if(!PQsendQueryPrepared(
+			*_con, 
+			s->getPreparedId().c_str(),
+			nParams,
+			paramValues,
+			paramLengths,
+			paramFormats,
+			1))
+		{
+			std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(*_con)<<std::endl;
+			if(done)
+			{
+				done(IResultPtr());
+			}
+			return;
+		}
+
+		assert(!_done);
+		assert(_results.empty());
+		_done = bind(&Connection::execStep_, shared_from_this(), s, data, done, _1);
+		continueSend();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Connection::continueSend()
+	{
+		if(PQflush(*_con))
+		{
+			_con->waitWrite(
+				bind(&Connection::continueSend, shared_from_this()));
+			return;
+
+		}
+
+		_con->waitRead(
+			bind(&Connection::continueRecv, shared_from_this()));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Connection::continueRecv()
+	{
+		if(!PQconsumeInput(*_con))
+		{
+			std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(*_con)<<std::endl;
+		}
+
+		PGresult *pgr = PQgetResult(*_con);
+		while(pgr)
+		{
+			_results.push_back(pgr);
+
+			if(!PQconsumeInput(*_con))
+			{
+				std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(*_con)<<std::endl;
+			}
+			if(PQisBusy(*_con))
+			{
+				_con->waitRead(
+					bind(&Connection::continueRecv, shared_from_this()));
+
+				return;
+			}
+
+			pgr = PQgetResult(*_con);
+		}
+
+
+		if(_done)
+		{
+			std::deque<PGresult *> results;
+			results.swap(_results);
+
+			boost::function<void (IResultPtr)> done;
+			done.swap(_done);
+
+			BOOST_FOREACH(PGresult *pgr, results)
+			{
+				done(IResultPtr(new Result(pgr)));
+			}
+		}
+		else
+		{
+			BOOST_FOREACH(PGresult *pgr, _results)
+			{
+				PQclear(pgr);
+			}
+			_results.clear();
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Connection::execSimple(const char *sql, boost::function<void (IResultPtr)> done)
+	{
+		assert(!_done);
+		assert(_results.empty());
+		_done = done;
+		if(!PQsendQuery(*_con, sql))
+		{
+			std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(*_con)<<std::endl;
+			if(done)
+			{
+				done(IResultPtr());
+			}
+			return;
+		}
+		continueSend();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -239,6 +346,13 @@ namespace pgc
 	Connection::~Connection()
 	{
 		_db->unwork(_con);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Connection::exec(const char *sql,
+		boost::function<void (IResultPtr)> done)
+	{
+		execSimple(sql, done);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

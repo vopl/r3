@@ -62,4 +62,4 @@ USE_PCH(plugpgc ${SRC_DIR}/pgc/pch.h ${SRC})
 SETUP_BIN_OUT(plugpgc plug)
 
 TARGET_LINK_LIBRARIES(plugpgc libheap libpluma libutils)
-TARGET_LINK_LIBRARIES(plugpgc ${PostgreSQL_LIBRARIES})
+TARGET_LINK_LIBRARIES(plugpgc ${PostgreSQL_LIBRARY})

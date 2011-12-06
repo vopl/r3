@@ -145,8 +145,8 @@ namespace pgc
 					_readyConnections.insert(pcw);
 					numConnections = _readyConnections.size() + _workConnections.size();
 				}
-				balanceConnections();
 				_onConnectionMade(numConnections);
+				balanceConnections();
 			}
 			return;
 		default:
