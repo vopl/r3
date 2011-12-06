@@ -187,7 +187,7 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	//тип в число
-#define ENUM_VARIANT_TYPE(i,n,...) template <> struct Variant::Type2Enum<Variant::n>				{ static const EType et = Variant::et##n;	};
+#define ENUM_VARIANT_TYPE(i,n,...) template <> struct Variant::Type2Enum<Variant::n> { static const EType et = Variant::et##n;	};
 	ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 

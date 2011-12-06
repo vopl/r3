@@ -14,6 +14,7 @@ SET(SRC
 	${SRC_DIR}/pgc/connection.cpp
 	${SRC_DIR}/pgc/statement.cpp
 	${SRC_DIR}/pgc/result.cpp
+	${SRC_DIR}/pgc/result_extractor.cpp
 	${SRC_DIR}/pgc/pgconnWrapper.cpp
 	${SRC_DIR}/pgc/bindData.cpp
 )

@@ -55,6 +55,8 @@ namespace pgc
 		void onOpen();
 		void close();
 
+		bool integerDatetimes();
+
 		operator PGconn *() const;
 		void waitRead(function<void()> ready);
 		void waitWrite(function<void()> ready);

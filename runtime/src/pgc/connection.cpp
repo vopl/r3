@@ -304,7 +304,7 @@ namespace pgc
 
 			BOOST_FOREACH(PGresult *pgr, results)
 			{
-				done(IResultPtr(new Result(pgr)));
+				done(IResultPtr(new Result(pgr, _con)));
 			}
 		}
 		else

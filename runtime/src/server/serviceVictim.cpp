@@ -24,7 +24,47 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::onResult(pgc::IResultPtr r)
 	{
-		std::cout<<r->errorCode()<<", "<<r->errorMsg()<<std::endl;
+		std::cout<<r->status()<<std::endl;
+		std::cout<<r->errorMsg()<<std::endl;
+		std::cout<<r->errorCode()<<std::endl;
+
+		std::cout<<r->cmdRows()<<std::endl;
+
+		std::cout<<r->rows()<<std::endl;
+		std::cout<<r->cols()<<std::endl;
+
+		std::cout<<r->colName(0)<<std::endl;
+		std::cout<<(r->colName(10)?r->colName(10):"NULL")<<std::endl;
+		std::cout<<r->colIdx(r->colName(0))<<std::endl;
+		std::cout<<r->colIdx("abracadabra")<<std::endl;
+
+		std::cout<<r->isNull(0,0)<<std::endl;
+		std::cout<<r->isNull(10,0)<<std::endl;
+		std::cout<<r->isNull(0,10)<<std::endl;
+		std::cout<<r->isNull(10,10)<<std::endl;
+
+		std::cout<<r->colType(0)<<std::endl;
+		std::cout<<r->colType(10)<<std::endl;
+
+		utils::Variant v(220LL);
+		r->fetch(v, 0,0);
+		std::cout<<v<<std::endl;
+
+
+		std::cout<<r->fetchInt32(0,0)<<std::endl;
+		std::cout<<r->fetchUInt32(0,0)<<std::endl;
+		std::cout<<r->fetchString(0,0)<<std::endl;
+
+		r->fetchRowList(v);
+		std::cout<<v<<std::endl;
+		r->fetchRowsList(v);
+		std::cout<<v<<std::endl;
+
+		r->fetchRowMap(v);
+		std::cout<<v<<std::endl;
+		r->fetchRowsMap(v);
+		std::cout<<v<<std::endl;
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
