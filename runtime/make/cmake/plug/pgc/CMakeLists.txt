@@ -16,6 +16,9 @@ SET(SRC
 	${SRC_DIR}/pgc/result.cpp
 	${SRC_DIR}/pgc/result_extractor.cpp
 	${SRC_DIR}/pgc/pgconnWrapper.cpp
+	${SRC_DIR}/pgc/connectionLow.cpp
+	${SRC_DIR}/pgc/connectionRunner.cpp
+	${SRC_DIR}/pgc/connectionPrepareds.cpp
 	${SRC_DIR}/pgc/bindData.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
@@ -32,6 +35,9 @@ SET(SRC_HDR
 	${SRC_DIR}/pgc/statement.hpp
 	${SRC_DIR}/pgc/result.hpp
 	${SRC_DIR}/pgc/pgconnWrapper.hpp
+	${SRC_DIR}/pgc/connectionLow.hpp
+	${SRC_DIR}/pgc/connectionRunner.hpp
+	${SRC_DIR}/pgc/connectionPrepareds.hpp
 	${SRC_DIR}/pgc/bindData.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
