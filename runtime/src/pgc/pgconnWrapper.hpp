@@ -5,6 +5,7 @@
 #include <boost/asio/local/basic_endpoint.hpp>
 #include <libpq-fe.h>
 #include "pgc/istatement.hpp"
+#include "pgc/iresult.hpp"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -16,7 +17,12 @@ namespace pgc
 	using namespace boost::multi_index;
 
 	//////////////////////////////////////////////////////////////////////////
+	class BindData;
+	typedef boost::shared_ptr<BindData> BindDataPtr;
+
+	//////////////////////////////////////////////////////////////////////////
 	class PGconnWrapper
+		: public boost::enable_shared_from_this<PGconnWrapper>
 	{
 		struct SockProtocol
 		{
@@ -35,11 +41,31 @@ namespace pgc
 				SockProtocol protocol(){ return SockProtocol(0,0,0);}
 			};
 		};
-	private:
-		PGconn *_lowConn;
-		asio::basic_raw_socket<SockProtocol> _sock;
-		bool	_integerDatetimes;
 
+	private:
+		//////////////////////////////////////////////////////////////////////////
+		PGconn									*_lowConn;
+		asio::basic_raw_socket<SockProtocol>	_sock;
+		asio::strand							_sockReadStrand;
+		bool									_integerDatetimes;
+		posix_time::ptime						_now;
+
+	public:
+		//////////////////////////////////////////////////////////////////////////
+		//поддержка исполнения простого запроса
+		bool								_inProcess;
+		boost::function<void (IResultPtr)>	_done;
+		std::deque<PGresult *>				_results;
+
+		void continueSend();
+		void continueRecv();
+		void execSimple(const char *sql, boost::function<void (IResultPtr)> done);
+		void execPrepare(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done);
+		void execPrepared(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done);
+
+
+	private:
+		//////////////////////////////////////////////////////////////////////////
 		//подготовленные запросы
 		static const size_t _maxPreparedStatements = 1000;
 		static const size_t _timeoutPreparedStatements = 1000*60*60*12;//millisec
@@ -72,15 +98,15 @@ namespace pgc
 
 		TPrepareds	_prepareds;
 
-		void cleanPrepareds();
+		void cleanPrepareds(function<void()> ready);
 
 	private:
-		static void onWaitRead(
+		void onWaitRead(
 			function<void()> ready,
 			const system::error_code& error, 
 			std::size_t bytes_transferre);
 
-		static void onWaitWrite(
+		void onWaitWrite(
 			function<void()> ready,
 			const system::error_code& error, 
 			std::size_t bytes_transferre);
@@ -94,6 +120,9 @@ namespace pgc
 
 		void onOpen();
 		void close();
+
+		void beginWork(function<void()> ready);
+		void endWork(function<void()> ready);
 
 		bool integerDatetimes();
 

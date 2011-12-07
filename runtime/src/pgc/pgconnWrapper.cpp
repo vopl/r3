@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "pgconnWrapper.hpp"
+#include "result.hpp"
+#include "bindData.hpp"
 #include <boost/random/random_device.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
@@ -12,14 +14,28 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	void PGconnWrapper::cleanPrepareds()
+	void PGconnWrapper::cleanPrepareds(function<void()> ready)
 	{
 		assert(_maxPreparedStatements > 0);
+
 		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
-		while(timedIndex.size() > _maxPreparedStatements)
+		if(timedIndex.size() > _maxPreparedStatements)
 		{
-			timedIndex.erase(timedIndex.end()--);
+			std::string prid = timedIndex.begin()->_prid;
+			timedIndex.erase(timedIndex.begin());
+			execSimple(("DEALLOCATE "+prid).c_str(), bind(&PGconnWrapper::cleanPrepareds, shared_from_this(), ready));
+			return;
 		}
+
+		if(_now > timedIndex.begin()->_timeout)
+		{
+			std::string prid = timedIndex.begin()->_prid;
+			timedIndex.erase(timedIndex.begin());
+			execSimple(("DEALLOCATE "+prid).c_str(), bind(&PGconnWrapper::cleanPrepareds, shared_from_this(), ready));
+			return;
+		}
+
+		ready();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -88,7 +104,9 @@ namespace pgc
 	PGconnWrapper::PGconnWrapper(PGconn *lowConn, boost::asio::io_service &io_service)
 		: _lowConn(lowConn)
 		, _sock(io_service, SockProtocol(sockFamily(PQsocket(_lowConn)), sockType(PQsocket(_lowConn)), IPPROTO_RAW), PQsocket(_lowConn))
+		, _sockReadStrand(io_service)
 		, _integerDatetimes(false)
+		, _inProcess(false)
 	{
 	}
 
@@ -127,8 +145,25 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void PGconnWrapper::close()
 	{
-		PQfinish(_lowConn);
-		_lowConn = NULL;
+		assert(!_inProcess);
+		if(_lowConn)
+		{
+			PQfinish(_lowConn);
+			_lowConn = NULL;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::beginWork(function<void()> ready)
+	{
+		_now = posix_time::microsec_clock::local_time();
+		ready();
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::endWork(function<void()> ready)
+	{
+		cleanPrepareds(ready);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -149,10 +184,11 @@ namespace pgc
 	{
 		_sock.async_receive(
 			asio::null_buffers(), 
-			bind(&PGconnWrapper::onWaitRead, 
-				ready, 
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred));
+			_sockReadStrand.wrap(
+				bind(&PGconnWrapper::onWaitRead, shared_from_this(),
+					ready, 
+					boost::asio::placeholders::error,
+					boost::asio::placeholders::bytes_transferred)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -160,7 +196,7 @@ namespace pgc
 	{
 		_sock.async_send(
 			asio::null_buffers(), 
-			bind(&PGconnWrapper::onWaitWrite, 
+			bind(&PGconnWrapper::onWaitWrite, shared_from_this(),
 				ready, 
 				boost::asio::placeholders::error,
 				boost::asio::placeholders::bytes_transferred));
@@ -201,7 +237,7 @@ namespace pgc
 			posix_time::ptime newTimeout;
 		};
 
-		posix_time::ptime timeout = posix_time::microsec_clock::local_time() + posix_time::microseconds(_timeoutPreparedStatements);
+		posix_time::ptime timeout = _now + posix_time::microseconds(_timeoutPreparedStatements);
 
 		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
 		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);
@@ -265,6 +301,186 @@ namespace pgc
 			return;
 		}
 		assert(!"statement absent!");
+	}
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::continueSend()
+	{
+		assert(_inProcess);
+
+		if(PQflush(_lowConn))
+		{
+			waitWrite(
+				bind(&PGconnWrapper::continueSend, shared_from_this()));
+			return;
+
+		}
+
+		waitRead(
+				bind(&PGconnWrapper::continueRecv, shared_from_this()));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::continueRecv()
+	{
+		assert(_inProcess);
+
+		if(_lowConn)
+		{
+			if(!PQconsumeInput(_lowConn))
+			{
+				std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(_lowConn)<<std::endl;
+			}
+
+			PGresult *pgr = PQgetResult(_lowConn);
+			while(pgr)
+			{
+				_results.push_back(pgr);
+
+				if(!PQconsumeInput(_lowConn))
+				{
+					std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(_lowConn)<<std::endl;
+				}
+				if(PQisBusy(_lowConn))
+				{
+					waitRead(
+							bind(&PGconnWrapper::continueRecv, shared_from_this()));
+
+					return;
+				}
+
+				pgr = PQgetResult(_lowConn);
+			}
+		}
+
+		if(_done)
+		{
+			assert(_inProcess);
+			_inProcess = false;
+
+			std::deque<PGresult *> results;
+			results.swap(_results);
+
+			boost::function<void (IResultPtr)> done;
+			done.swap(_done);
+
+			BOOST_FOREACH(PGresult *pgr, results)
+			{
+				done(IResultPtr(new Result(pgr, shared_from_this())));
+			}
+		}
+		else
+		{
+			BOOST_FOREACH(PGresult *pgr, _results)
+			{
+				PQclear(pgr);
+			}
+			_results.clear();
+			assert(_inProcess);
+			_inProcess = false;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::execSimple(const char *sql, boost::function<void (IResultPtr)> done)
+	{
+		assert(!_inProcess);
+		assert(!_done);
+		assert(_results.empty());
+
+		_inProcess = true;
+
+		if(!PQsendQuery(_lowConn, sql))
+		{
+			std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(_lowConn)<<std::endl;
+			_inProcess = false;
+			if(done)
+			{
+				done(IResultPtr());
+			}
+			return;
+		}
+
+		_done = done;
+		continueSend();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::execPrepare(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done)
+	{
+		assert(!_inProcess);
+		assert(!_done);
+		assert(_results.empty());
+
+		_inProcess = true;
+
+		int nParams = data?data->typ.size():0;
+		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
+		if(!PQsendPrepare(
+			_lowConn, 
+			getPrid(s).c_str(),
+			s->getSql().c_str(),
+			nParams,
+			paramTypes))
+		{
+			std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(_lowConn)<<std::endl;
+			_inProcess = false;
+			if(done)
+			{
+				done(IResultPtr());
+			}
+			return;
+		}
+
+		_done = done;
+		continueSend();
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void PGconnWrapper::execPrepared(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done)
+	{
+		assert(!_inProcess);
+		assert(!_done);
+		assert(_results.empty());
+
+		_inProcess = true;
+
+		int nParams = data?data->typ.size():0;
+		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
+		const char * const *paramValues = nParams?&data->val[0]:NULL;
+		const int *paramLengths = nParams?&data->len[0]:NULL;
+		const int *paramFormats = nParams?&data->fmt[0]:NULL;
+
+		if(!PQsendQueryPrepared(
+			_lowConn, 
+			getPrid(s).c_str(),
+			nParams,
+			paramValues,
+			paramLengths,
+			paramFormats,
+			1))
+		{
+			std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(_lowConn)<<std::endl;
+			_inProcess = false;
+			if(done)
+			{
+				done(IResultPtr());
+			}
+			return;
+		}
+
+		_done = done;
+		continueSend();
 	}
 
 

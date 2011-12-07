@@ -42,7 +42,13 @@ namespace pgc
 		void onReconnectTimer(TimeoutPtr t, const boost::system::error_code& ec);
 
 	public:
+		void onBeginWork(PGconnWrapperPtr pcw, function<void (IConnectionPtr)> ready);
+		void onEndWork(PGconnWrapperPtr pcw);
+
 		void unwork(PGconnWrapperPtr pcw);
+
+	private:
+		void closer(IConnectionPtr c);
 
 	public:
 		Db();

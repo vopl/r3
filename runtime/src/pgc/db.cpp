@@ -170,8 +170,17 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::unwork(PGconnWrapperPtr pcw)
+	void Db::onBeginWork(PGconnWrapperPtr pcw, function<void (IConnectionPtr)> ready)
 	{
+		IConnectionPtr c(new Connection(shared_from_this(), pcw));
+		ready(c);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Db::onEndWork(PGconnWrapperPtr pcw)
+	{
+		assert(!pcw->_inProcess);
+
 		bool needBalance = false;
 		{
 			mutex::scoped_lock sl(_mtx);
@@ -188,6 +197,36 @@ namespace pgc
 		if(needBalance)
 		{
 			balanceConnections();
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Db::unwork(PGconnWrapperPtr pcw)
+	{
+		if((PGconn*)*pcw)
+		{
+			pcw->endWork(bind(&Db::onEndWork, shared_from_this(), pcw));
+		}
+		else
+		{
+			size_t numConnections = 0;
+			{
+				mutex::scoped_lock sl(_mtx);
+				assert(_workConnections.end() != _workConnections.find(pcw));
+				_workConnections.erase(pcw);
+				numConnections = _readyConnections.size() + _workConnections.size();
+			}
+			_onConnectionLost(numConnections);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Db::closer(IConnectionPtr c)
+	{
+		if(c)
+		{
+			c->close();
+			allocConnection(bind(&Db::closer, shared_from_this(), _1));
 		}
 	}
 
@@ -214,28 +253,48 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Db::allocConnection(function<void (IConnectionPtr)> ready)
 	{
-		IConnectionPtr c;
+		PGconnWrapperPtr pcw;
 
 		bool needBalanceConnections = false;
+		bool unableAlloc = false;
 		{
 			mutex::scoped_lock sl(_mtx);
 			if(_readyConnections.size())
 			{
-				c.reset(new Connection(shared_from_this(), *_readyConnections.begin()));
-				_workConnections.insert(*_readyConnections.begin());
+				pcw = *_readyConnections.begin();
+				_workConnections.insert(pcw);
 				_readyConnections.erase(_readyConnections.begin());
 			}
 			else
 			{
-				_waiters.push_back(ready);
+				if(_maxConnections)
+				{
+					_waiters.push_back(ready);
+					needBalanceConnections = _startConnections.size() + _readyConnections.size() + _workConnections.size() < _maxConnections;
+				}
+				else
+				{
+					needBalanceConnections = true;
 
-				needBalanceConnections = _startConnections.size() + _readyConnections.size() + _workConnections.size() < _maxConnections;
+					if(_startConnections.size() + _workConnections.size())
+					{
+						_waiters.push_back(ready);
+					}
+					else
+					{
+						unableAlloc = true;
+					}
+				}
 			}
 		}
 
-		if(c)
+		if(pcw)
 		{
-			ready(c);
+			pcw->beginWork(bind(&Db::onBeginWork, shared_from_this(), pcw, ready));
+		}
+		if(unableAlloc)
+		{
+			ready(IConnectionPtr());
 		}
 		
 		if(needBalanceConnections)
@@ -247,35 +306,45 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Db::deinitialize()
 	{
-		mutex::scoped_lock sl(_mtx);
+		{
+			mutex::scoped_lock sl(_mtx);
 
-		//////////////////////////////////////////////////////////////////////////
-		system::error_code ec;
-		BOOST_FOREACH(TimeoutPtr &t, _timeouts)
-		{
-			t->cancel(ec);
-		}
-		_timeouts.clear();
+			//////////////////////////////////////////////////////////////////////////
+			system::error_code ec;
+			BOOST_FOREACH(TimeoutPtr &t, _timeouts)
+			{
+				t->cancel(ec);
+			}
+			_timeouts.clear();
 
-		//////////////////////////////////////////////////////////////////////////
-		BOOST_FOREACH(PGconnWrapperPtr &c, _startConnections)
-		{
-			c->close();
+			_maxConnections = 0;
+			_conninfo.clear();
 		}
-		_startConnections.clear();
-		BOOST_FOREACH(PGconnWrapperPtr &c, _readyConnections)
-		{
-			c->close();
-		}
-		_readyConnections.clear();
-		BOOST_FOREACH(PGconnWrapperPtr &c, _workConnections)
-		{
-			c->close();
-		}
-		_workConnections.clear();
 
-		//////////////////////////////////////////////////////////////////////////
-		_waiters.clear();
+		allocConnection(bind(&Db::closer, shared_from_this(), _1));
+
+		//_onConnectionMade.swap(function<void (size_t)>());
+		//_onConnectionLost.swap(function<void (size_t)>());
+
+// 		//////////////////////////////////////////////////////////////////////////
+// 		BOOST_FOREACH(PGconnWrapperPtr &c, _startConnections)
+// 		{
+// 			c->close();
+// 		}
+// 		_startConnections.clear();
+// 		BOOST_FOREACH(PGconnWrapperPtr &c, _readyConnections)
+// 		{
+// 			c->close();
+// 		}
+// 		_readyConnections.clear();
+// 		BOOST_FOREACH(PGconnWrapperPtr &c, _workConnections)
+// 		{
+// 			c->close();
+// 		}
+// 		_workConnections.clear();
+// 
+// 		//////////////////////////////////////////////////////////////////////////
+// 		_waiters.clear();
 	}
 
 

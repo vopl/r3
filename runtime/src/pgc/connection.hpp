@@ -23,10 +23,6 @@ namespace pgc
 		DbPtr _db;
 		PGconnWrapperPtr _con;
 
-		bool								_inProcess;
-		boost::function<void (IResultPtr)>	_done;
-		std::deque<PGresult *>				_results;
-
 	private:
 
 		enum EPrepState
@@ -50,13 +46,9 @@ namespace pgc
 		void prepareStep_(SPrepStatePtr state, IResultPtr lastRes=IResultPtr());
 		void prepare_(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done);
 
-		void execStep_(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done, IResultPtr lastRes);
 		void exec_(IStatementPtr s, BindDataPtr data, boost::function<void (IResultPtr)> done);
 
-	private:
-		void continueSend();
-		void continueRecv();
-		void execSimple(const char *sql, boost::function<void (IResultPtr)> done);
+		void keeper(boost::function<void (IResultPtr)> done, IResultPtr res);
 
 	public:
 		Connection(DbPtr db, PGconnWrapperPtr con);
@@ -71,6 +63,9 @@ namespace pgc
 		virtual void exec(IStatementPtr s,
 			const utils::Variant &data,
 			boost::function<void (IResultPtr)> done);
+
+		virtual void close();
+
 	};
 	typedef boost::shared_ptr<Connection> ConnectionPtr;
 }
