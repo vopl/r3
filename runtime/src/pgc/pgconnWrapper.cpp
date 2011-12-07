@@ -143,6 +143,18 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	bool PGconnWrapper::isOpened()
+	{
+		if(!_lowConn)
+		{
+			return false;
+		}
+		ConnStatusType status = PQstatus(_lowConn);
+		return CONNECTION_BAD != status;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	void PGconnWrapper::close()
 	{
 		assert(!_inProcess);
@@ -237,7 +249,7 @@ namespace pgc
 			posix_time::ptime newTimeout;
 		};
 
-		posix_time::ptime timeout = _now + posix_time::microseconds(_timeoutPreparedStatements);
+		posix_time::ptime timeout = _now + posix_time::milliseconds(_timeoutPreparedStatements);
 
 		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
 		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);

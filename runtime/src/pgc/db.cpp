@@ -30,8 +30,14 @@ namespace pgc
 		{
 			mutex::scoped_lock sl(_mtx);
 
+			if(_waiters.empty())
+			{
+				int k=220;
+			}
 			while(!_waiters.empty())
 			{
+				std::cout<<__FUNCTION__<<std::endl;
+
 				if(!_readyConnections.empty())
 				{
 					SWorkPair swp = {*_readyConnections.begin(), _waiters.front()};
@@ -47,21 +53,7 @@ namespace pgc
 						_readyConnections.size() + _workConnections.size() < _maxConnections)
 					{
 						pcw.reset(new PGconnWrapper(PQconnectStart(_conninfo.c_str()), _asrv->get_io_service()));
-
-						if(CONNECTION_BAD == PQstatus(*pcw))
-						{
-							pcw.reset();
-							std::cerr<<__FUNCTION__<<": CONNECTION_BAD, wait timeout"<<std::endl;
-
-							TimeoutPtr timeout(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
-							_timeouts.insert(timeout);
-							timeout->async_wait(
-								bind(&Db::onReconnectTimer, shared_from_this(), timeout, _1));
-						}
-						else
-						{
-							_startConnections.insert(pcw);
-						}
+						_startConnections.insert(pcw);
 					}
 					break;
 				}
@@ -89,6 +81,12 @@ namespace pgc
 	{
 		switch(PQstatus(*pcw))
 		{
+		case CONNECTION_OK:
+			std::cerr<<"CONNECTION_OK"<<std::endl;
+			break;
+		case CONNECTION_BAD:
+			std::cerr<<"CONNECTION_BAD"<<std::endl;
+			break;
 		case CONNECTION_STARTED:
 			//std::cerr<<"Waiting for connection to be made."<<std::endl;
 			break;
@@ -122,6 +120,7 @@ namespace pgc
 
 				TimeoutPtr timeout(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
 				_timeouts.insert(timeout);
+				std::cout<<"-----------_timeouts.insert(timeout);"<<_timeouts.size()<<std::endl;
 				timeout->async_wait(
 					bind(&Db::onReconnectTimer, shared_from_this(), timeout, _1));
 			}
@@ -151,6 +150,9 @@ namespace pgc
 			}
 			return;
 		default:
+			{
+				int k=220;
+			}
 			break;
 		}
 	}
@@ -161,11 +163,16 @@ namespace pgc
 		{
 			mutex::scoped_lock sl(_mtx);
 			_timeouts.erase(t);
+			std::cout<<"-----------_timeouts.erase(t);"<<_timeouts.size()<<std::endl;
 		}
 
 		if(!ec)
 		{
 			balanceConnections();
+		}
+		else
+		{
+			std::cout<<ec.message()<<std::endl;
 		}
 	}
 
@@ -191,7 +198,7 @@ namespace pgc
 				_workConnections.erase(iter);
 				_readyConnections.insert(pcw);
 			}
-			needBalance = _waiters.size()?true:false;
+			needBalance = (!_waiters.empty() && !_readyConnections.empty());
 		}
 
 		if(needBalance)
@@ -203,7 +210,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Db::unwork(PGconnWrapperPtr pcw)
 	{
-		if((PGconn*)*pcw)
+		if(pcw->isOpened())
 		{
 			pcw->endWork(bind(&Db::onEndWork, shared_from_this(), pcw));
 		}
@@ -217,6 +224,7 @@ namespace pgc
 				numConnections = _readyConnections.size() + _workConnections.size();
 			}
 			_onConnectionLost(numConnections);
+			balanceConnections();
 		}
 	}
 
@@ -227,7 +235,14 @@ namespace pgc
 		{
 			c->close();
 			allocConnection(bind(&Db::closer, shared_from_this(), _1));
+			return;
 		}
+
+		mutex::scoped_lock sl(_mtx);
+
+		_onConnectionMade.swap(function<void (size_t)>());
+		_onConnectionLost.swap(function<void (size_t)>());
+		_waiters.clear();
 	}
 
 

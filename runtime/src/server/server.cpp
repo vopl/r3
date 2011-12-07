@@ -70,7 +70,7 @@ namespace server
 		_db->initialize(
 			_async, 
 			"host=localhost port=5432 dbname=test user=test password=test",
-			10,
+			1,
 			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
 
@@ -107,7 +107,7 @@ namespace server
 
 
 		//запускать асинхронный двиг
-		_async->balance(4);
+		_async->balance(1);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

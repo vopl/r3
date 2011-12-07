@@ -77,6 +77,10 @@ namespace pgc
 			break;
 		case epsPrepMaked:
 			{
+				if(!lastRes)
+				{
+					return;
+				}
 				if(eesCommandOk != lastRes->status())
 				{
 					const char *s4 = lastRes->errorCode();

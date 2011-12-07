@@ -38,9 +38,10 @@ namespace server
 	{
 		if(!c)
 		{
+			std::cout<<"onConnection NULL"<<std::endl;
 			return;
 		}
-		if(!s)
+		if(!s || (rand()%10)==5)
 		{
 			s = _pluma->create<pgc::IStatementProvider>();
 			s->setSql("SELECT * FROM t_club");
@@ -63,6 +64,7 @@ namespace server
 	{
 		if(!c)
 		{
+			std::cout<<"onConnection2 NULL"<<std::endl;
 			return;
 		}
 

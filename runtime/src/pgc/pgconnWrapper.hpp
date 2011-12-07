@@ -119,6 +119,7 @@ namespace pgc
 		~PGconnWrapper();
 
 		void onOpen();
+		bool isOpened();
 		void close();
 
 		void beginWork(function<void()> ready);
