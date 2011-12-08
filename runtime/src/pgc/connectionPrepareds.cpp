@@ -125,7 +125,28 @@ namespace pgc
 			ptrIndex.modify(iter, ChangePrid(pridGenerator()));
 			return;
 		}
-		assert(!"statement absent!");
+
+		StatementPrepareState sps = 
+		{
+			pridGenerator(),
+			p, 
+			_now
+		};
+		_prepareds.insert(sps);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::delPrepared(IStatementWtr p)
+	{
+		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
+		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);
+		if(ptrIndex.end() != iter)
+		{
+			ptrIndex.erase(iter);
+			return;
+		}
+
+		assert(!"unknown statement for delete");
 	}
 
 
@@ -157,13 +178,14 @@ namespace pgc
 					return;
 				}
 
-				genPrid(s);
 				runPrepare(getPrid(s), s->getSql(), data, 
 					bind(&ConnectionPrepareds::onPrepare, shared_from_this(), s, data, done, _1, false));
 				return;
 			}
 			else
 			{
+				std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
+				delPrepared(s);
 				done(result);
 				return;
 			}

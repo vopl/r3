@@ -64,6 +64,7 @@ namespace pgc
 		bool hasPrepared(IStatementWtr p);
 		std::string getPrid(IStatementWtr p);
 		void genPrid(IStatementWtr p);
+		void delPrepared(IStatementWtr p);
 
 		void cleanPrepareds(posix_time::ptime boundATime, TDone done, IResultPtr result);
 
