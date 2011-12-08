@@ -118,12 +118,17 @@ namespace server
 
 		assert(_sessionManager);
 		_sessionManager->stop();
-		_sessionManager.reset();
+
 
 		assert(_db);
 		_db->deinitialize();
 
 		_async->stop();
+
+
+		_serviceHub.reset();
+		_sessionManager.reset();
+		_db.reset();
 		_async.reset();
 		
 		_plugs = NULL;
