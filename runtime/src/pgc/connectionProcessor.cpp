@@ -1,33 +1,33 @@
 #include "pch.h"
-#include "connectionRunner.hpp"
+#include "connectionProcessor.hpp"
 #include "result.hpp"
 #include "bindData.hpp"
 
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionRunnerPtr ConnectionRunner::shared_from_this()
+	ConnectionProcessorPtr ConnectionProcessor::shared_from_this()
 	{
-		return static_pointer_cast<ConnectionRunner>(ConnectionLow::shared_from_this());
+		return static_pointer_cast<ConnectionProcessor>(ConnectionLow::shared_from_this());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionRunner::processStart()
+	void ConnectionProcessor::processStart()
 	{
 		assert(_inProcess);
 		assert(pgcon());
 
 		if(PQflush(pgcon()))
 		{
-			waitSend(bind(&ConnectionRunner::onProcessCanSend, shared_from_this(), _1));
+			waitSend(bind(&ConnectionProcessor::onProcessCanSend, shared_from_this(), _1));
 			return;
 		}
 
-		waitRecv(bind(&ConnectionRunner::onProcessCanRecv, shared_from_this(), _1));
+		waitRecv(bind(&ConnectionProcessor::onProcessCanRecv, shared_from_this(), _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionRunner::onProcessCanSend(const system::error_code &ec)
+	void ConnectionProcessor::onProcessCanSend(const system::error_code &ec)
 	{
 		assert(_inProcess);
 		if(ec)
@@ -39,15 +39,15 @@ namespace pgc
 		assert(pgcon());
 		if(PQflush(pgcon()))
 		{
-			waitSend(bind(&ConnectionRunner::onProcessCanSend, shared_from_this(), _1));
+			waitSend(bind(&ConnectionProcessor::onProcessCanSend, shared_from_this(), _1));
 			return;
 		}
 
-		waitRecv(bind(&ConnectionRunner::onProcessCanRecv, shared_from_this(), _1));
+		waitRecv(bind(&ConnectionProcessor::onProcessCanRecv, shared_from_this(), _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionRunner::onProcessCanRecv(const system::error_code &ec)
+	void ConnectionProcessor::onProcessCanRecv(const system::error_code &ec)
 	{
 		assert(_inProcess);
 		if(ec)
@@ -74,7 +74,7 @@ namespace pgc
 			if(PQisBusy(pgcon()))
 			{
 				waitRecv(
-					bind(&ConnectionRunner::onProcessCanRecv, shared_from_this(), _1));
+					bind(&ConnectionProcessor::onProcessCanRecv, shared_from_this(), _1));
 
 				return;
 			}
@@ -86,7 +86,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionRunner::processStop()
+	void ConnectionProcessor::processStop()
 	{
 		assert(_inProcess);
 
@@ -117,7 +117,7 @@ namespace pgc
 			_inProcess = false;
 		}
 
-		runNextRequest(false);
+		runNextRequest();
 	}
 
 
@@ -131,25 +131,13 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionRunner::runNextRequest(bool isLocked)
+	void ConnectionProcessor::runNextRequest()
 	{
 		SRequestPtr r;
-		if(isLocked)
+		if(!_requests.empty())
 		{
-			mutex::scoped_lock sl(_requestsMtx);
-			if(!_requests.empty())
-			{
-				r = _requests.front();
-				_requests.pop_front();
-			}
-		}
-		else
-		{
-			if(!_requests.empty())
-			{
-				r = _requests.front();
-				_requests.pop_front();
-			}
+			r = _requests.front();
+			_requests.pop_front();
 		}
 
 		if(!r)
@@ -228,7 +216,7 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionRunner::ConnectionRunner(PGconn *pgcon, asio::io_service &io_service)
+	ConnectionProcessor::ConnectionProcessor(PGconn *pgcon, asio::io_service &io_service)
 		: ConnectionLow(pgcon, io_service)
 		, _inProcess(false)
 		, _done()
@@ -238,7 +226,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionRunner::~ConnectionRunner()
+	ConnectionProcessor::~ConnectionProcessor()
 	{
 		assert(!_inProcess);
 	}
@@ -253,26 +241,23 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionRunner::runQuery(const char *sql, boost::function<void (IResultPtr)> done)
+	void ConnectionProcessor::runQuery(const std::string &sql, boost::function<void (IResultPtr)> done)
 	{
-		mutex::scoped_lock sl(_requestsMtx);
 		_requests.push_back(SRequestPtr(new SQuery(done, sql)));
-		runNextRequest(true);
+		runNextRequest();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionRunner::runPrepare(const char *prid, std::string sql, BindDataPtr data, boost::function<void (IResultPtr)> done)
+	void ConnectionProcessor::runPrepare(const std::string &prid, const std::string &sql, BindDataPtr data, boost::function<void (IResultPtr)> done)
 	{
-		mutex::scoped_lock sl(_requestsMtx);
 		_requests.push_back(SRequestPtr(new SPrepare(done, prid, sql, data)));
-		runNextRequest(true);
+		runNextRequest();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionRunner::runQueryPrepared(const char *prid, BindDataPtr data, boost::function<void (IResultPtr)> done)
+	void ConnectionProcessor::runQueryPrepared(const std::string &prid, BindDataPtr data, boost::function<void (IResultPtr)> done)
 	{
-		mutex::scoped_lock sl(_requestsMtx);
 		_requests.push_back(SRequestPtr(new SQueryPrepared(done, prid, data)));
-		runNextRequest(true);
+		runNextRequest();
 	}
 }

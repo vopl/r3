@@ -64,6 +64,8 @@ namespace pgc
 			const utils::Variant &data,
 			boost::function<void (IResultPtr)> done);
 
+		virtual EConnectionStatus status(){return ecsOk;};
+
 		virtual void close();
 
 	};

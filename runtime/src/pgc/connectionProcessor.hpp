@@ -1,5 +1,5 @@
-#ifndef _PGC_CONNECTIONRUNNER_HPP_
-#define _PGC_CONNECTIONRUNNER_HPP_
+#ifndef _PGC_CONNECTIONPROCESSOR_HPP_
+#define _PGC_CONNECTIONPROCESSOR_HPP_
 
 #include "connectionLow.hpp"
 #include "pgc/istatement.hpp"
@@ -19,13 +19,13 @@ namespace pgc
 	*/
 
 	//////////////////////////////////////////////////////////////////////////
-	class ConnectionRunner;
-	typedef shared_ptr<ConnectionRunner> ConnectionRunnerPtr;
-	class ConnectionRunner
+	class ConnectionProcessor;
+	typedef shared_ptr<ConnectionProcessor> ConnectionProcessorPtr;
+	class ConnectionProcessor
 		: public ConnectionLow
 	{
 	private:
-		ConnectionRunnerPtr shared_from_this();
+		ConnectionProcessorPtr shared_from_this();
 
 	private:
 		typedef boost::function<void (IResultPtr)> TDone;
@@ -69,7 +69,7 @@ namespace pgc
 			std::string		_prid;
 			std::string		_sql;
 			BindDataPtr		_data;
-			SPrepare(const TDone &done, const std::string &prid, std::string sql, BindDataPtr data) :SRequest(ertPrepare, done), _prid(prid), _sql(sql), _data(data){}
+			SPrepare(const TDone &done, const std::string &prid, const std::string &sql, BindDataPtr data) :SRequest(ertPrepare, done), _prid(prid), _sql(sql), _data(data){}
 		};
 		struct SQueryPrepared : SRequest
 		{
@@ -80,27 +80,27 @@ namespace pgc
 
 		typedef std::deque<SRequestPtr> TRequests;
 		TRequests	_requests;
-		mutex		_requestsMtx;
+		//mutex		_requestsMtx;
 
 	private:
-		void runNextRequest(bool isLocked);
+		void runNextRequest();
 
 	public:
-		ConnectionRunner(PGconn *pgcon, asio::io_service &io_service);
-		~ConnectionRunner();
+		ConnectionProcessor(PGconn *pgcon, asio::io_service &io_service);
+		~ConnectionProcessor();
 
 		void runQuery(
-			const char *sql, 
+			const std::string &sql, 
 			boost::function<void (IResultPtr)> done);
 
 		void runPrepare(
-			const char *prid, 
-			std::string sql, 
+			const std::string &prid, 
+			const std::string &sql, 
 			BindDataPtr data, 
 			boost::function<void (IResultPtr)> done);
 
 		void runQueryPrepared(
-			const char *prid, 
+			const std::string &prid, 
 			BindDataPtr data, 
 			boost::function<void (IResultPtr)> done);
 

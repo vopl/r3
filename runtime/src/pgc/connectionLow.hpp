@@ -5,6 +5,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <libpq-fe.h>
 #include "pgc/iresult.hpp"
+#include "pgc/iconnection.hpp"
 
 namespace pgc
 {
@@ -18,13 +19,6 @@ namespace pgc
 		2. предоставление статуса подключения (закрыто, утеряно, ...), используется базой для переподключения
 		3. на базе постгресового сокета организует асинхронное ожидание возможности чтения и записи в постгрес
 	*/
-
-	enum ELowConnectionStatus
-	{
-		eclsNull,
-		eclsLost,
-		eclsOk,
-	};
 
 	//////////////////////////////////////////////////////////////////////////
 	class ConnectionLow
@@ -51,6 +45,7 @@ namespace pgc
 		//////////////////////////////////////////////////////////////////////////
 		PGconn									*_pgcon;
 		asio::basic_raw_socket<PGSockProtocol>	_sock;
+		asio::io_service::strand				_strand;
 		bool									_integerDatetimes;
 
 	private:
@@ -69,7 +64,7 @@ namespace pgc
 		PGconn *pgcon();
 
 		void onOpen();
-		ELowConnectionStatus status();
+		EConnectionStatus status();
 		void close();
 
 		bool integerDatetimes();

@@ -132,8 +132,8 @@ namespace pgc
 		void waitWrite(function<void()> ready);
 
 
-		void touchPrepared(IStatementWtr p);
 		bool hasPrepared(IStatementWtr p);
+		void touchPrepared(IStatementWtr p);
 		std::string getPrid(IStatementWtr p);
 		void genPrid(IStatementWtr p);
 	};

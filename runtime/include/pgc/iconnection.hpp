@@ -7,6 +7,14 @@
 
 namespace pgc
 {
+	enum EConnectionStatus
+	{
+		ecsNull,
+		ecsLost,
+		ecsOk,
+	};
+
+
 	//////////////////////////////////////////////////////////////////////////
 	struct IConnection
 	{
@@ -21,6 +29,8 @@ namespace pgc
 		virtual void exec(IStatementPtr s,
 			const utils::Variant &data,
 			boost::function<void (IResultPtr)> done) =0;
+
+		virtual EConnectionStatus status() =0;
 
 		virtual void close() =0;
 	};

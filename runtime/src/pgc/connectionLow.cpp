@@ -41,19 +41,20 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::waitSend(function<void(const system::error_code &)> ready)
 	{
-		_sock.async_send(asio::null_buffers(), bind(ready, _1));
+		_sock.async_send(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::waitRecv(function<void(const system::error_code &)> ready)
 	{
-		_sock.async_receive(asio::null_buffers(), bind(ready, _1));
+		_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionLow::ConnectionLow(PGconn *pgcon, asio::io_service &io_service)
 		: _pgcon(pgcon)
 		, _sock(io_service, PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_RAW), PQsocket(_pgcon))
+		, _strand(io_service)
 		, _integerDatetimes(false)
 	{
 
@@ -62,7 +63,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionLow::~ConnectionLow()
 	{
-		assert(eclsNull == status());
+		assert(ecsNull == status());
 		close();
 	}
 
@@ -91,14 +92,14 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ELowConnectionStatus ConnectionLow::status()
+	EConnectionStatus ConnectionLow::status()
 	{
 		if(!_pgcon)
 		{
-			return eclsNull;
+			return ecsNull;
 		}
 		ConnStatusType status = PQstatus(_pgcon);
-		return CONNECTION_BAD == status ? eclsLost : eclsOk;
+		return CONNECTION_BAD == status ? ecsLost : ecsOk;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
