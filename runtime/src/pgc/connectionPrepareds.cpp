@@ -143,10 +143,7 @@ namespace pgc
 			}
 			else
 			{
-				if(done)
-				{
-					done(result);
-				}
+				done(result);
 				return;
 			}
 		}
@@ -170,10 +167,7 @@ namespace pgc
 		if(eesCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
-			if(done)
-			{
-				done(IResultPtr());
-			}
+			done(IResultPtr());
 			return;
 		}
 
@@ -190,10 +184,7 @@ namespace pgc
 		if(eesCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
-			if(done)
-			{
-				done(IResultPtr());
-			}
+			done(IResultPtr());
 			return;
 		}
 
@@ -212,39 +203,28 @@ namespace pgc
 		if(eesCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
-			if(done)
-			{
-				done(IResultPtr());
-			}
+			done(IResultPtr());
 			return;
 		}
 
 		runQueryPrepared(getPrid(s), data, done);
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	ConnectionPrepareds::ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service)
-		: ConnectionProcessor(pgcon, io_service)
+	void ConnectionPrepareds::runNextRequest()
 	{
+		if(_requests.empty())
+		{
+			return;
+		}
+		SRequestPtr r = _requests.front();
+		_requests.pop_front();
 
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	ConnectionPrepareds::~ConnectionPrepareds()
-	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::runQueryWithPrepare(IStatementPtr s,
-		BindDataPtr data,
-		boost::function<void (IResultPtr)> done)
-	{
-		if(hasPrepared(s))
+		if(hasPrepared(r->_s))
 		{
 			runQueryPrepared(
-				getPrid(s), 
-				data, 
-				done);
+				getPrid(r->_s), 
+				r->_data, 
+				r->_done);
 			return;
 		}
 		//этот запрос еще не подготовлен
@@ -262,14 +242,48 @@ namespace pgc
 		if(inTrans)
 		{
 			runQuery(
-				"SAVEPOINT pgcp"+getPrid(s),
-				bind(&ConnectionPrepareds::onSavepoint, shared_from_this(), s, data, done, _1));
+				"SAVEPOINT pgcp"+getPrid(r->_s),
+				bind(&ConnectionPrepareds::onSavepoint, shared_from_this(), r->_s, r->_data, r->_done, _1));
 		}
 		else
 		{
-			runPrepare(getPrid(s), s->getSql(), data, 
-				bind(&ConnectionPrepareds::onPrepare, shared_from_this(), s, data, done, _1, false));
+			runPrepare(getPrid(r->_s), r->_s->getSql(), r->_data, 
+				bind(&ConnectionPrepareds::onPrepare, shared_from_this(), r->_s, r->_data, r->_done, _1, false));
 		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::terminator(TDone done, IResultPtr result)
+	{
+		runNextRequest();
+		if(done)
+		{
+			done(result);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ConnectionPrepareds::ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service)
+		: ConnectionProcessor(pgcon, io_service)
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ConnectionPrepareds::~ConnectionPrepareds()
+	{
+		assert(_requests.empty());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::runQueryWithPrepare(IStatementPtr s,
+		BindDataPtr data,
+		boost::function<void (IResultPtr)> done)
+	{
+		_requests.push_back(SRequestPtr(new SRequest(s, data, 
+			bind(&ConnectionPrepareds::terminator, shared_from_this(), done, _1))));
+
+		runNextRequest();
 	}
 
 }

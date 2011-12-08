@@ -54,7 +54,7 @@ namespace pgc
 		Connection(DbPtr db, PGconnWrapperPtr con);
 		~Connection();
 
-		virtual void exec(const char *sql,
+		virtual void exec(const std::string &sql,
 			boost::function<void (IResultPtr)> done);
 
 		virtual void exec(IStatementPtr s,

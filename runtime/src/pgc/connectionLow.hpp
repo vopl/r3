@@ -68,6 +68,8 @@ namespace pgc
 		void close();
 
 		bool integerDatetimes();
+
+		void dispatch(function<void()> action);
 	};
 	typedef shared_ptr<ConnectionLow> LowConnectionPtr;
 }

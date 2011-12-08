@@ -27,7 +27,7 @@ namespace pgc
 	private:
 		ConnectionProcessorPtr shared_from_this();
 
-	private:
+	protected:
 		typedef boost::function<void (IResultPtr)> TDone;
 
 	private:
@@ -80,9 +80,7 @@ namespace pgc
 
 		typedef std::deque<SRequestPtr> TRequests;
 		TRequests	_requests;
-		//mutex		_requestsMtx;
 
-	private:
 		void runNextRequest();
 
 	public:

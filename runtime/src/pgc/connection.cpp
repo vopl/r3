@@ -184,7 +184,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Connection::exec(const char *sql,
+	void Connection::exec(const std::string &sql,
 		boost::function<void (IResultPtr)> done)
 	{
 		assert(!_con->_inProcess);
@@ -197,7 +197,7 @@ namespace pgc
 			return;
 		}
 
-		_con->execSimple(sql, bind(&Connection::keeper, shared_from_this(), done, _1));
+		_con->execSimple(sql.c_str(), bind(&Connection::keeper, shared_from_this(), done, _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

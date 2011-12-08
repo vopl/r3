@@ -20,7 +20,7 @@ namespace pgc
 	{
 		virtual ~IConnection(){}
 
-		virtual void exec(const char *sql,
+		virtual void exec(const std::string &sql,
 			boost::function<void (IResultPtr)> done) =0;
 
 		virtual void exec(IStatementPtr s,

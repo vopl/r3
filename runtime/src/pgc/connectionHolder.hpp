@@ -22,13 +22,14 @@ namespace pgc
 		DbPtr _db;
 		ConnectionPreparedsPtr _con;
 
-		//void keeper();
+		typedef boost::function<void (IResultPtr)> TDone;
+		void keeper(TDone done, IResultPtr result);
 
 	public:
 		ConnectionHolder(DbPtr db, ConnectionPreparedsPtr con);
 		~ConnectionHolder();
 
-		virtual void exec(const char *sql,
+		virtual void exec(const std::string &sql,
 			boost::function<void (IResultPtr)> done);
 
 		virtual void exec(IStatementPtr s,

@@ -120,4 +120,11 @@ namespace pgc
 		return _integerDatetimes;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionLow::dispatch(function<void()> action)
+	{
+		_strand.dispatch(action);
+	}
+
+
 }

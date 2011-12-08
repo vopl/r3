@@ -133,17 +133,12 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionProcessor::runNextRequest()
 	{
-		SRequestPtr r;
-		if(!_requests.empty())
-		{
-			r = _requests.front();
-			_requests.pop_front();
-		}
-
-		if(!r)
+		if(_requests.empty())
 		{
 			return;
 		}
+		SRequestPtr r = _requests.front();
+		_requests.pop_front();
 
 		assert(!_inProcess);
 		assert(!_done);
@@ -229,6 +224,7 @@ namespace pgc
 	ConnectionProcessor::~ConnectionProcessor()
 	{
 		assert(!_inProcess);
+		assert(_requests.empty());
 	}
 
 

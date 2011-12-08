@@ -91,6 +91,25 @@ namespace pgc
 			boost::function<void (IResultPtr)> done,
 			IResultPtr result);
 
+	private:
+		//очередь
+		struct SRequest
+		{
+			IStatementPtr	_s;
+			BindDataPtr		_data;
+			TDone			_done;
+			SRequest(IStatementPtr s, BindDataPtr data, TDone done)
+				: _s(s), _data(data), _done(done)
+			{}
+		};
+		typedef shared_ptr<SRequest> SRequestPtr;
+
+		typedef std::deque<SRequestPtr> TRequests;
+		TRequests	_requests;
+
+		void runNextRequest();
+		void terminator(TDone done, IResultPtr result);
+
 	public:
 		ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service);
 		~ConnectionPrepareds();
