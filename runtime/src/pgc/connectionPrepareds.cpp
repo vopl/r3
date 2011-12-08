@@ -68,9 +68,14 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::cleanPrepareds(posix_time::ptime boundATime, function<void()> done)
+	void ConnectionPrepareds::cleanPrepareds(posix_time::ptime boundATime, TDone done, IResultPtr result)
 	{
 		assert(_max > 0);
+
+		if(result && ersCommandOk != result->status())
+		{
+			_prepareds.clear();
+		}
 
 		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
 		if(timedIndex.size() > _max)
@@ -79,7 +84,7 @@ namespace pgc
 			timedIndex.erase(timedIndex.begin());
 			runQuery(
 				"DEALLOCATE "+prid, 
-				bind(&ConnectionPrepareds::cleanPrepareds, shared_from_this(), boundATime, done));
+				bind(&ConnectionPrepareds::cleanPrepareds, shared_from_this(), boundATime, done, _1));
 			return;
 		}
 
@@ -89,11 +94,11 @@ namespace pgc
 			timedIndex.erase(timedIndex.begin());
 			runQuery(
 				"DEALLOCATE "+prid,
-				bind(&ConnectionPrepareds::cleanPrepareds, shared_from_this(), boundATime, done));
+				bind(&ConnectionPrepareds::cleanPrepareds, shared_from_this(), boundATime, done, _1));
 			return;
 		}
 
-		done();
+		done(result);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -136,7 +141,7 @@ namespace pgc
 		IResultPtr result,
 		bool inTrans)
 	{
-		if(eesCommandOk != result->status())
+		if(ersCommandOk != result->status())
 		{
 			const char *s4 = result->errorCode();
 			if(s4 && !strcmp(s4, "42P05"))//DUPLICATE PREPARED STATEMENT
@@ -179,7 +184,7 @@ namespace pgc
 		boost::function<void (IResultPtr)> done,
 		IResultPtr result)
 	{
-		if(eesCommandOk != result->status())
+		if(ersCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
 			done(IResultPtr());
@@ -196,7 +201,7 @@ namespace pgc
 		boost::function<void (IResultPtr)> done,
 		IResultPtr result)
 	{
-		if(eesCommandOk != result->status())
+		if(ersCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
 			done(IResultPtr());
@@ -215,7 +220,7 @@ namespace pgc
 		boost::function<void (IResultPtr)> done,
 		IResultPtr result)
 	{
-		if(eesCommandOk != result->status())
+		if(ersCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
 			done(IResultPtr());
@@ -281,7 +286,7 @@ namespace pgc
 				SCleanPrepareds * q = static_cast<SCleanPrepareds *>(r.get());
 
 				posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
-				cleanPrepareds(boundATime, q->_done);
+				cleanPrepareds(boundATime, q->_done, IResultPtr());
 			}
 			break;
 		default:
@@ -299,17 +304,6 @@ namespace pgc
 			done(result);
 		}
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::cleanTerminator(function<void()> done)
-	{
-		runNextRequest();
-		if(done)
-		{
-			done();
-		}
-	}
-
 
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionPrepareds::ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service)
@@ -331,10 +325,10 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::endWork(function<void()> done)
+	void ConnectionPrepareds::endWork(function<void(IResultPtr)> done)
 	{
 		_requests.push_back(SRequestPtr(new SCleanPrepareds(
-			bind(&ConnectionPrepareds::cleanTerminator, shared_from_this(), done))));
+			bind(&ConnectionPrepareds::requestTerminator, shared_from_this(), done, _1))));
 
 		runNextRequest();
 	}

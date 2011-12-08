@@ -366,7 +366,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	EExecStatus Result::status()
+	EResultStatus Result::status()
 	{
 		if(_pgr)
 		{
@@ -374,12 +374,12 @@ namespace pgc
 			{
 			case PGRES_EMPTY_QUERY:
 			case PGRES_COMMAND_OK:
-				return eesCommandOk;
+				return ersCommandOk;
 			case PGRES_TUPLES_OK:
-				return eesTuplesOk;
+				return ersTuplesOk;
 			}
 		}
-		return eesError;
+		return ersError;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

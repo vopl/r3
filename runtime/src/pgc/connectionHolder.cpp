@@ -30,7 +30,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::~ConnectionHolder()
 	{
-		boost::function<void ()> done = 
+		boost::function<void (IResultPtr)> done = 
 			bind(&ConnectionHolder::onEndWork, 
 				_db, _con);
 

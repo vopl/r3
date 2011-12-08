@@ -53,7 +53,7 @@ namespace pgc
 		Result(PGresult *pgr, ConnectionLowPtr con);
 		~Result();
 
-		virtual EExecStatus status();
+		virtual EResultStatus status();
 		virtual const char *errorMsg();
 		virtual const char *errorCode();
 

@@ -6,11 +6,11 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	enum EExecStatus
+	enum EResultStatus
 	{
-		eesCommandOk,
-		eesTuplesOk,
-		eesError,
+		ersCommandOk,
+		ersTuplesOk,
+		ersError,
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ namespace pgc
 	{
 		virtual ~IResult(){}
 
-		virtual EExecStatus status() = 0;
+		virtual EResultStatus status() = 0;
 		virtual const char *errorMsg() = 0;
 		virtual const char *errorCode() = 0;
 
