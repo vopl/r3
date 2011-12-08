@@ -75,7 +75,17 @@ namespace pgc
 		if(result && ersCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
-			_prepareds.clear();
+			const char * errCode = result->errorCode();
+			if(errCode && !strcmp("26000", errCode))
+			{
+				//ERROR:  prepared statement "XXX" does not exist
+			}
+			else
+			{
+				//другая ошибка - фатально
+				_prepareds.clear();
+			}
+
 		}
 
 		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
@@ -279,9 +289,10 @@ namespace pgc
 				//этот запрос еще не подготовлен
 
 				bool inTrans = false;
-				switch(PQtransactionStatus(pgcon()))
+				PGTransactionStatusType tstatus = PQtransactionStatus(pgcon());
+				switch(tstatus)
 				{
-				case PQTRANS_ACTIVE:
+// 				case PQTRANS_ACTIVE:
 				case PQTRANS_INTRANS:
 				case PQTRANS_INERROR:
 					inTrans = true;

@@ -25,7 +25,7 @@ namespace server
 	void ServiceVictim::onResult(pgc::IResultPtr r)
 	{
 		cnt++;
-		if(!(cnt%1000))
+		if(!(cnt%10000))
 		{
 			std::cout<<__FUNCTION__<<": "<<cnt<<std::endl;
 		}
@@ -41,12 +41,30 @@ namespace server
 			std::cout<<"onConnection NULL"<<std::endl;
 			return;
 		}
-		if(!s || (rand()%10)==5)
+		if(!s || (rand()%50)==25)
 		{
 			s = _pluma->create<pgc::IStatementProvider>();
 			s->setSql("SELECT * FROM t_club");
 		}
 
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
 		c->exec(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
 
@@ -55,6 +73,10 @@ namespace server
 // 		xt.sec += 1;
 // 		boost::thread::sleep(xt);
 
+		if(!_db)
+		{
+			return;
+		}
 		_db->allocConnection(
 			bind(&ServiceVictim::onConnection, shared_from_this(), _1));
 	}
@@ -70,12 +92,34 @@ namespace server
 
 		c->exec(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+		c->exec(s, //v,
+			bind(&ServiceVictim::onResult, shared_from_this(), _1));
 
 // 		boost::xtime xt;
 // 		boost::xtime_get(&xt, boost::TIME_UTC);
 // 		xt.sec += 1;
 // 		boost::thread::sleep(xt);
 
+		if(!_db)
+		{
+			return;
+		}
 		_db->allocConnection(
 			bind(&ServiceVictim::onConnection2, shared_from_this(), _1));
 	}
@@ -117,7 +161,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::onHubDel(IServiceHubPtr hub)
 	{
-		//
+		_db.reset();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
