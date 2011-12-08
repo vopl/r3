@@ -21,6 +21,8 @@ void onSignal(int /*sig*/)
 }
 
 
+//удалено не будет
+static pluma::Pluma *g_plugins = new pluma::Pluma;
 
 
 int main(int argc, char* argv[])
@@ -38,13 +40,12 @@ int main(int argc, char* argv[])
 #endif
 
 	//////////////////////////////////////////////////////////////////////////
-	pluma::Pluma plugins;
-	plugins.loadFromFolder("../plug");
+	g_plugins->loadFromFolder("../plug");
 
-	server::IServerPtr srv(plugins.create<server::IServerProvider>());
+	server::IServerPtr srv(g_plugins->create<server::IServerProvider>());
 	assert(srv);
 
-	srv->start(&plugins, "localhost", "29431");
+	srv->start(g_plugins, "localhost", "29431");
 
 	//////////////////////////////////////////////////////////////////////////
 #ifdef WIN32

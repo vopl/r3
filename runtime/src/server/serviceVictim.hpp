@@ -28,6 +28,8 @@ namespace server
 		void onConnection2(pgc::IConnectionPtr c);
 
 	public:
+		ServiceVictim();
+		~ServiceVictim();
 
 		virtual const TEndpoint &getEndpoint();
 
