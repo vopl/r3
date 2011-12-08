@@ -388,7 +388,8 @@ namespace pgc
 
 			BOOST_FOREACH(PGresult *pgr, results)
 			{
-				done(IResultPtr(new Result(pgr, shared_from_this())));
+				assert(!"устарело");
+				//done(IResultPtr(new Result(pgr, shared_from_this())));
 			}
 		}
 		else

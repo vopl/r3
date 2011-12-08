@@ -25,11 +25,19 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::touchPrepared(IStatementWtr p)
+	bool ConnectionPrepareds::hasPrepared(IStatementWtr p)
 	{
-		struct changeAccessTime
+		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
+		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);
+		return ptrIndex.end() != iter;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::string ConnectionPrepareds::getPrid(IStatementWtr p)
+	{
+		struct ChangeAccessTime
 		{
-			changeAccessTime(const posix_time::ptime& accessTime):_accessTime(accessTime){}
+			ChangeAccessTime(const posix_time::ptime& accessTime):_accessTime(accessTime){}
 
 			void operator()(StatementPrepareState& e)
 			{
@@ -40,12 +48,13 @@ namespace pgc
 			posix_time::ptime _accessTime;
 		};
 
+
 		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
 		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);
 		if(ptrIndex.end() != iter)
 		{
-			ptrIndex.modify(iter, changeAccessTime(_now));
-			return;
+			ptrIndex.modify(iter, ChangeAccessTime(_now));
+			return iter->_prid;
 		}
 
 		StatementPrepareState sps = 
@@ -55,30 +64,36 @@ namespace pgc
 			_now
 		};
 		_prepareds.insert(sps);
+		return sps._prid;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ConnectionPrepareds::hasPrepared(IStatementWtr p)
+	void ConnectionPrepareds::cleanPrepareds(posix_time::ptime boundATime, function<void()> done)
 	{
-		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
-		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);
-		return ptrIndex.end() != iter;
-	}
+		assert(_max > 0);
 
-	//////////////////////////////////////////////////////////////////////////
-	const std::string &ConnectionPrepareds::getPrid(IStatementWtr p)
-	{
-		touchPrepared(p);
-
-		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
-		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);
-		if(ptrIndex.end() != iter)
+		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
+		if(timedIndex.size() > _max)
 		{
-			return iter->_prid;
+			std::string prid = timedIndex.begin()->_prid;
+			timedIndex.erase(timedIndex.begin());
+			runQuery(
+				"DEALLOCATE "+prid, 
+				bind(&ConnectionPrepareds::cleanPrepareds, shared_from_this(), boundATime, done));
+			return;
 		}
-		assert(0);
-		static std::string stub = "unknown";
-		return stub;
+
+		if(!timedIndex.empty() && boundATime > timedIndex.begin()->_accessTime)
+		{
+			std::string prid = timedIndex.begin()->_prid;
+			timedIndex.erase(timedIndex.begin());
+			runQuery(
+				"DEALLOCATE "+prid,
+				bind(&ConnectionPrepareds::cleanPrepareds, shared_from_this(), boundATime, done));
+			return;
+		}
+
+		done();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -216,44 +231,67 @@ namespace pgc
 		{
 			return;
 		}
+
 		SRequestPtr r = _requests.front();
 		_requests.pop_front();
 
-		if(hasPrepared(r->_s))
+		switch(r->_ert)
 		{
-			runQueryPrepared(
-				getPrid(r->_s), 
-				r->_data, 
-				r->_done);
-			return;
-		}
-		//этот запрос еще не подготовлен
+		case ertQueryWithPrepare:
+			{
+				SQueryWithPrepare * q = static_cast<SQueryWithPrepare *>(r.get());
+				if(hasPrepared(q->_s))
+				{
+					runQueryPrepared(
+						getPrid(q->_s), 
+						q->_data, 
+						q->_done);
+					return;
+				}
+				//этот запрос еще не подготовлен
 
-		bool inTrans = false;
-		switch(PQtransactionStatus(pgcon()))
-		{
-		case PQTRANS_ACTIVE:
-		case PQTRANS_INTRANS:
-		case PQTRANS_INERROR:
-			inTrans = true;
+				bool inTrans = false;
+				switch(PQtransactionStatus(pgcon()))
+				{
+				case PQTRANS_ACTIVE:
+				case PQTRANS_INTRANS:
+				case PQTRANS_INERROR:
+					inTrans = true;
+					break;
+				}
+
+				if(inTrans)
+				{
+					runQuery(
+						"SAVEPOINT pgcp"+getPrid(q->_s),
+						bind(&ConnectionPrepareds::onSavepoint, shared_from_this(), q->_s, q->_data, q->_done, _1));
+				}
+				else
+				{
+					runPrepare(
+						getPrid(q->_s), 
+						q->_s->getSql(), 
+						q->_data, 
+						bind(&ConnectionPrepareds::onPrepare, shared_from_this(), q->_s, q->_data, q->_done, _1, false));
+				}
+			}
 			break;
-		}
+		case ertCleanPrepareds:
+			{
+				SCleanPrepareds * q = static_cast<SCleanPrepareds *>(r.get());
 
-		if(inTrans)
-		{
-			runQuery(
-				"SAVEPOINT pgcp"+getPrid(r->_s),
-				bind(&ConnectionPrepareds::onSavepoint, shared_from_this(), r->_s, r->_data, r->_done, _1));
-		}
-		else
-		{
-			runPrepare(getPrid(r->_s), r->_s->getSql(), r->_data, 
-				bind(&ConnectionPrepareds::onPrepare, shared_from_this(), r->_s, r->_data, r->_done, _1, false));
+				posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
+				cleanPrepareds(boundATime, q->_done);
+			}
+			break;
+		default:
+			assert(!"unknown request type");
+			return;
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::terminator(TDone done, IResultPtr result)
+	void ConnectionPrepareds::requestTerminator(TDone done, IResultPtr result)
 	{
 		runNextRequest();
 		if(done)
@@ -261,6 +299,17 @@ namespace pgc
 			done(result);
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::cleanTerminator(function<void()> done)
+	{
+		runNextRequest();
+		if(done)
+		{
+			done();
+		}
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionPrepareds::ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service)
@@ -276,12 +325,27 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::beginWork()
+	{
+		_now = posix_time::microsec_clock::local_time();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::endWork(function<void()> done)
+	{
+		_requests.push_back(SRequestPtr(new SCleanPrepareds(
+			bind(&ConnectionPrepareds::cleanTerminator, shared_from_this(), done))));
+
+		runNextRequest();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::runQueryWithPrepare(IStatementPtr s,
 		BindDataPtr data,
 		boost::function<void (IResultPtr)> done)
 	{
-		_requests.push_back(SRequestPtr(new SRequest(s, data, 
-			bind(&ConnectionPrepareds::terminator, shared_from_this(), done, _1))));
+		_requests.push_back(SRequestPtr(new SQueryWithPrepare(s, data, 
+			bind(&ConnectionPrepareds::requestTerminator, shared_from_this(), done, _1))));
 
 		runNextRequest();
 	}

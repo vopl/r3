@@ -2,7 +2,7 @@
 #define _PGC_BINDDATA_HPP_
 
 #include "utils/variant.hpp"
-#include "pgconnWrapper.hpp"
+#include "connectionLow.hpp"
 
 namespace pgc
 {
@@ -10,7 +10,7 @@ namespace pgc
 
 	class BindData
 	{
-		PGconnWrapperPtr	_con;
+		ConnectionLowPtr	_con;
 
 		std::vector<Oid>	_typ;
 		std::vector<char *>	_val;
@@ -33,7 +33,7 @@ namespace pgc
 		bool bindFiller(const Variant &v, size_t idx);
 
 	public:
-		BindData(const Variant &data, PGconnWrapperPtr con);
+		BindData(const Variant &data, ConnectionLowPtr con);
 		~BindData();
 
 		const std::vector<Oid> &	typ;

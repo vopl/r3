@@ -25,6 +25,8 @@ namespace pgc
 		typedef boost::function<void (IResultPtr)> TDone;
 		void keeper(TDone done, IResultPtr result);
 
+		static void onEndWork(DbPtr db, ConnectionPreparedsPtr con);
+
 	public:
 		ConnectionHolder(DbPtr db, ConnectionPreparedsPtr con);
 		~ConnectionHolder();

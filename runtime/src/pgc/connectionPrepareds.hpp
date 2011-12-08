@@ -62,9 +62,10 @@ namespace pgc
 
 	private:
 		bool hasPrepared(IStatementWtr p);
-		void touchPrepared(IStatementWtr p);
-		const std::string &getPrid(IStatementWtr p);
+		std::string getPrid(IStatementWtr p);
 		void genPrid(IStatementWtr p);
+
+		void cleanPrepareds(posix_time::ptime boundATime, function<void()> done);
 
 	private:
 		ConnectionPreparedsPtr shared_from_this();
@@ -93,29 +94,53 @@ namespace pgc
 
 	private:
 		//очередь
+		enum ERequestType
+		{
+			ertQueryWithPrepare,
+			ertCleanPrepareds,
+		};
 		struct SRequest
+		{
+			ERequestType	_ert;
+			SRequest(ERequestType ert)
+				: _ert(ert)
+			{}
+		};
+		typedef shared_ptr<SRequest> SRequestPtr;
+
+		struct SQueryWithPrepare
+			: SRequest
 		{
 			IStatementPtr	_s;
 			BindDataPtr		_data;
 			TDone			_done;
-			SRequest(IStatementPtr s, BindDataPtr data, TDone done)
-				: _s(s), _data(data), _done(done)
+			SQueryWithPrepare(IStatementPtr s, BindDataPtr data, TDone done)
+				: SRequest(ertQueryWithPrepare), _s(s), _data(data), _done(done)
 			{}
 		};
-		typedef shared_ptr<SRequest> SRequestPtr;
+
+		struct SCleanPrepareds
+			: SRequest
+		{
+			function<void()> _done;
+			SCleanPrepareds(function<void()> done)
+				: SRequest(ertCleanPrepareds), _done(done)
+			{}
+		};
 
 		typedef std::deque<SRequestPtr> TRequests;
 		TRequests	_requests;
 
 		void runNextRequest();
-		void terminator(TDone done, IResultPtr result);
+		void requestTerminator(TDone done, IResultPtr result);
+		void cleanTerminator(function<void()> done);
 
 	public:
 		ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service);
 		~ConnectionPrepareds();
 
-		//beginWork
-		//endWork
+		void beginWork();
+		void endWork(function<void()> done);
 
 		void runQueryWithPrepare(IStatementPtr s,
 			BindDataPtr data,

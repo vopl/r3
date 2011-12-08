@@ -352,7 +352,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result::Result(PGresult *pgr, PGconnWrapperPtr con)
+	Result::Result(PGresult *pgr, ConnectionLowPtr con)
 		: _pgr(pgr)
 		, _con(con)
 	{

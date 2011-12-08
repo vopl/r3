@@ -241,7 +241,8 @@ namespace pgc
 			return;
 		}
 
-		BindDataPtr bindData(new BindData(data, _con));
+		assert(!"устарело");
+		BindDataPtr bindData;//(new BindData(data, _con));
 
 		if(!_con->hasPrepared(s))
 		{

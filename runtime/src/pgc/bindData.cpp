@@ -58,7 +58,7 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	BindData::BindData(const Variant &data, PGconnWrapperPtr con)
+	BindData::BindData(const Variant &data, ConnectionLowPtr con)
 		: _con(con)
 		, typ(_typ)
 		, val(_val)

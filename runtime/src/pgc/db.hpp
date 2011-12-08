@@ -6,7 +6,7 @@
 #include <boost/thread/mutex.hpp>
 #include <set>
 #include <deque>
-#include "pgconnWrapper.hpp"
+#include "connectionHolder.hpp"
 
 namespace pgc
 {
@@ -24,7 +24,7 @@ namespace pgc
 		function<void (size_t)> _onConnectionLost;
 
 	private:
-		typedef std::set<PGconnWrapperPtr> TSConnectins;
+		typedef std::set<ConnectionPreparedsPtr> TSConnectins;
 		TSConnectins									_startConnections;
 		TSConnectins									_readyConnections;
 		TSConnectins									_workConnections;
@@ -36,16 +36,16 @@ namespace pgc
 
 	private:
 		void balanceConnections();
-		void makeConnection_poll(PGconnWrapperPtr pcw);
+		void makeConnection_poll(const system::error_code &ec, ConnectionPreparedsPtr pcw);
 
 	private:
 		void onReconnectTimer(TimeoutPtr t, const boost::system::error_code& ec);
 
 	public:
-		void onBeginWork(PGconnWrapperPtr pcw, function<void (IConnectionPtr)> ready);
-		void onEndWork(PGconnWrapperPtr pcw);
+		void onBeginWork(ConnectionPreparedsPtr pcw, function<void (IConnectionPtr)> ready);
+		void onEndWork(ConnectionPreparedsPtr pcw);
 
-		void unwork(PGconnWrapperPtr pcw);
+		void unwork(ConnectionPreparedsPtr pcw);
 
 	private:
 		void closer(IConnectionPtr c);

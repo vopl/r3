@@ -102,8 +102,7 @@ namespace pgc
 
 			BOOST_FOREACH(PGresult *pgr, results)
 			{
-				assert(!"перепеши конструктор результа");
-				//done(IResultPtr(new Result(pgr, shared_from_this())));
+				done(IResultPtr(new Result(pgr, shared_from_this())));
 			}
 		}
 		else
@@ -133,6 +132,11 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionProcessor::runNextRequest()
 	{
+		if(_inProcess)
+		{
+			return;
+		}
+
 		if(_requests.empty())
 		{
 			return;
@@ -190,6 +194,7 @@ namespace pgc
 			break;
 		default:
 			assert(!"unknown request type");
+			processStop();
 			return;
 		}
 
@@ -226,7 +231,6 @@ namespace pgc
 		assert(!_inProcess);
 		assert(_requests.empty());
 	}
-
 
 
 

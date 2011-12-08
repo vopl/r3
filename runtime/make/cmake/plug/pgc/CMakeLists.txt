@@ -11,11 +11,9 @@ SOURCE_GROUP(include FILES ${INCLUDE})
 SET(SRC
 	${SRC_DIR}/pgc/plug.cpp
 	${SRC_DIR}/pgc/db.cpp
-	${SRC_DIR}/pgc/connection.cpp
 	${SRC_DIR}/pgc/statement.cpp
 	${SRC_DIR}/pgc/result.cpp
 	${SRC_DIR}/pgc/result_extractor.cpp
-	${SRC_DIR}/pgc/pgconnWrapper.cpp
 	${SRC_DIR}/pgc/connectionLow.cpp
 	${SRC_DIR}/pgc/connectionProcessor.cpp
 	${SRC_DIR}/pgc/connectionPrepareds.cpp
@@ -32,10 +30,8 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 SET(SRC_HDR
 	${SRC_DIR}/pgc/pch.h
 	${SRC_DIR}/pgc/db.hpp
-	${SRC_DIR}/pgc/connection.hpp
 	${SRC_DIR}/pgc/statement.hpp
 	${SRC_DIR}/pgc/result.hpp
-	${SRC_DIR}/pgc/pgconnWrapper.hpp
 	${SRC_DIR}/pgc/connectionLow.hpp
 	${SRC_DIR}/pgc/connectionProcessor.hpp
 	${SRC_DIR}/pgc/connectionPrepareds.hpp

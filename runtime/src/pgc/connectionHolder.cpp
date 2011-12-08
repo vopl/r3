@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "connectionHolder.hpp"
+#include "db.hpp"
 
 namespace pgc
 {
@@ -13,15 +14,29 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ConnectionHolder::onEndWork(DbPtr db, ConnectionPreparedsPtr con)
+	{
+		db->unwork(con);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::ConnectionHolder(DbPtr db, ConnectionPreparedsPtr con)
 		: _db(db)
 		, _con(con)
 	{
+		_con->beginWork();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::~ConnectionHolder()
 	{
+		boost::function<void ()> done = 
+			bind(&ConnectionHolder::onEndWork, 
+				_db, _con);
+
+		_con->dispatch(
+			bind(&ConnectionPrepareds::endWork, _con, 
+				done));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -61,8 +76,7 @@ namespace pgc
 			bind(&ConnectionHolder::keeper, shared_from_this(), 
 			done, _1);
 
-		assert(!"перебей дату на ConnectionLow");
-		BindDataPtr bindData;//(new BindData(data, _con));
+		BindDataPtr bindData(new BindData(data, _con));
 
 		_con->dispatch(
 			bind(&ConnectionPrepareds::runQueryWithPrepare, _con, 

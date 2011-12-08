@@ -3,7 +3,7 @@
 
 #include "pgc/iresult.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include "pgconnWrapper.hpp"
+#include "connectionLow.hpp"
 
 namespace pgc
 {
@@ -15,7 +15,7 @@ namespace pgc
 		, public enable_shared_from_this<Result>
 	{
 		PGresult *_pgr;
-		PGconnWrapperPtr _con;
+		ConnectionLowPtr _con;
 
 		typedef bool (Result::*MExtractor)(int rowIdx, int colIdx, Variant::EType typCpp, void *valCpp);
 
@@ -50,7 +50,7 @@ namespace pgc
 
 		void initExtractors();
 	public:
-		Result(PGresult *pgr, PGconnWrapperPtr con);
+		Result(PGresult *pgr, ConnectionLowPtr con);
 		~Result();
 
 		virtual EExecStatus status();

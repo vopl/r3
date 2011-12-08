@@ -53,7 +53,7 @@ namespace pgc
 		static int sockFamily(int sock);
 		static int sockType(int sock);
 
-	protected:
+	public:
 		void waitSend(function<void(const system::error_code &)> ready);
 		void waitRecv(function<void(const system::error_code &)> ready);
 
@@ -71,6 +71,6 @@ namespace pgc
 
 		void dispatch(function<void()> action);
 	};
-	typedef shared_ptr<ConnectionLow> LowConnectionPtr;
+	typedef shared_ptr<ConnectionLow> ConnectionLowPtr;
 }
 #endif

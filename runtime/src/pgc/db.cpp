@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "db.hpp"
-#include "connection.hpp"
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
@@ -21,12 +20,12 @@ namespace pgc
 	{
 		struct SWorkPair
 		{
-			PGconnWrapperPtr _con;
+			ConnectionPreparedsPtr _con;
 			function<void (IConnectionPtr)>	_waiter;
 		};
 		std::deque<SWorkPair> readyWaiters;
 
-		PGconnWrapperPtr pcw;
+		ConnectionPreparedsPtr pcw;
 		{
 			mutex::scoped_lock sl(_mtx);
 
@@ -36,8 +35,6 @@ namespace pgc
 			}
 			while(!_waiters.empty())
 			{
-				std::cout<<__FUNCTION__<<std::endl;
-
 				if(!_readyConnections.empty())
 				{
 					SWorkPair swp = {*_readyConnections.begin(), _waiters.front()};
@@ -52,7 +49,7 @@ namespace pgc
 					if(	_startConnections.empty() && 
 						_readyConnections.size() + _workConnections.size() < _maxConnections)
 					{
-						pcw.reset(new PGconnWrapper(PQconnectStart(_conninfo.c_str()), _asrv->get_io_service()));
+						pcw.reset(new ConnectionPrepareds(PQconnectStart(_conninfo.c_str()), _asrv->get_io_service()));
 						_startConnections.insert(pcw);
 					}
 					break;
@@ -62,12 +59,12 @@ namespace pgc
 
 		if(pcw)
 		{
-			makeConnection_poll(pcw);
+			makeConnection_poll(system::errc::make_error_code(system::errc::success), pcw);
 		}
 
 		BOOST_FOREACH(SWorkPair &wp, readyWaiters)
 		{
-			IConnectionPtr c(new Connection(shared_from_this(), wp._con));
+			IConnectionPtr c(new ConnectionHolder(shared_from_this(), wp._con));
 			if(wp._waiter)
 			{
 				wp._waiter(c);
@@ -77,9 +74,14 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::makeConnection_poll(PGconnWrapperPtr pcw)
+	void Db::makeConnection_poll(const system::error_code &ec, ConnectionPreparedsPtr pcw)
 	{
-		switch(PQstatus(*pcw))
+		if(ec)
+		{
+			std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+		}
+
+		switch(PQstatus(pcw->pgcon()))
 		{
 		case CONNECTION_OK:
 			std::cerr<<"CONNECTION_OK"<<std::endl;
@@ -110,10 +112,10 @@ namespace pgc
 			break;
 		}
 
-		switch(PQconnectPoll(*pcw))
+		switch(PQconnectPoll(pcw->pgcon()))
 		{
 		case PGRES_POLLING_FAILED:
-			std::cerr<<__FUNCTION__<<": PGRES_POLLING_FAILED, wait timeout ("<<PQerrorMessage(*pcw)<<")"<<std::endl;
+			std::cerr<<__FUNCTION__<<": PGRES_POLLING_FAILED, wait timeout ("<<PQerrorMessage(pcw->pgcon())<<")"<<std::endl;
 			{
 				mutex::scoped_lock sl(_mtx);
 				_startConnections.erase(pcw);
@@ -127,11 +129,11 @@ namespace pgc
 			return;
 		case PGRES_POLLING_READING:
 			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_READING"<<std::endl;
-			pcw->waitRead(bind(&Db::makeConnection_poll, shared_from_this(), pcw));
+			pcw->waitRecv(bind(&Db::makeConnection_poll, shared_from_this(), _1, pcw));
 			break;
 		case PGRES_POLLING_WRITING:
 			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_WRITING"<<std::endl;
-			pcw->waitWrite(bind(&Db::makeConnection_poll, shared_from_this(), pcw));
+			pcw->waitSend(bind(&Db::makeConnection_poll, shared_from_this(), _1, pcw));
 			break;
 		case PGRES_POLLING_OK:
 			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_OK"<<std::endl;
@@ -177,17 +179,15 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::onBeginWork(PGconnWrapperPtr pcw, function<void (IConnectionPtr)> ready)
+	void Db::onBeginWork(ConnectionPreparedsPtr pcw, function<void (IConnectionPtr)> ready)
 	{
-		IConnectionPtr c(new Connection(shared_from_this(), pcw));
+		IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
 		ready(c);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::onEndWork(PGconnWrapperPtr pcw)
+	void Db::onEndWork(ConnectionPreparedsPtr pcw)
 	{
-		assert(!pcw->_inProcess);
-
 		bool needBalance = false;
 		{
 			mutex::scoped_lock sl(_mtx);
@@ -208,11 +208,11 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::unwork(PGconnWrapperPtr pcw)
+	void Db::unwork(ConnectionPreparedsPtr pcw)
 	{
-		if(pcw->isOpened())
+		if(ecsOk == pcw->status())
 		{
-			pcw->endWork(bind(&Db::onEndWork, shared_from_this(), pcw));
+			onEndWork(pcw);
 		}
 		else
 		{
@@ -268,7 +268,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Db::allocConnection(function<void (IConnectionPtr)> ready)
 	{
-		PGconnWrapperPtr pcw;
+		ConnectionPreparedsPtr pcw;
 
 		bool needBalanceConnections = false;
 		bool unableAlloc = false;
@@ -305,7 +305,7 @@ namespace pgc
 
 		if(pcw)
 		{
-			pcw->beginWork(bind(&Db::onBeginWork, shared_from_this(), pcw, ready));
+			onBeginWork(pcw, ready);
 		}
 		if(unableAlloc)
 		{
@@ -342,17 +342,17 @@ namespace pgc
 		//_onConnectionLost.swap(function<void (size_t)>());
 
 // 		//////////////////////////////////////////////////////////////////////////
-// 		BOOST_FOREACH(PGconnWrapperPtr &c, _startConnections)
+// 		BOOST_FOREACH(ConnectionPreparedsPtr &c, _startConnections)
 // 		{
 // 			c->close();
 // 		}
 // 		_startConnections.clear();
-// 		BOOST_FOREACH(PGconnWrapperPtr &c, _readyConnections)
+// 		BOOST_FOREACH(ConnectionPreparedsPtr &c, _readyConnections)
 // 		{
 // 			c->close();
 // 		}
 // 		_readyConnections.clear();
-// 		BOOST_FOREACH(PGconnWrapperPtr &c, _workConnections)
+// 		BOOST_FOREACH(ConnectionPreparedsPtr &c, _workConnections)
 // 		{
 // 			c->close();
 // 		}

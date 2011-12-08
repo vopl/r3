@@ -63,7 +63,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionLow::~ConnectionLow()
 	{
-		assert(ecsNull == status());
+		assert(ecsOk != status());
 		close();
 	}
 
@@ -109,7 +109,7 @@ namespace pgc
 		{
 			PQfinish(_pgcon);
 			_pgcon = NULL;
-			_sock.assign(PGSockProtocol(0,0,0), -1);
+			//_sock.assign(PGSockProtocol(0,0,0), -1);
 			_integerDatetimes = false;
 		}
 	}

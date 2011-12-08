@@ -25,7 +25,7 @@ namespace server
 	void ServiceVictim::onResult(pgc::IResultPtr r)
 	{
 		cnt++;
-		if(!(cnt%10000))
+		if(!(cnt%1000))
 		{
 			std::cout<<__FUNCTION__<<": "<<cnt<<std::endl;
 		}
