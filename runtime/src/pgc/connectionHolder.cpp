@@ -14,7 +14,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::onEndWork(DbPtr db, ConnectionPreparedsPtr con)
+	void ConnectionHolder::onEndWork(DbPtr db, ConnectionPreparedsPtr con, IResultPtr /*result*/)
 	{
 		db->unwork(con);
 	}
@@ -32,7 +32,7 @@ namespace pgc
 	{
 		boost::function<void (IResultPtr)> done = 
 			bind(&ConnectionHolder::onEndWork, 
-				_db, _con);
+				_db, _con, _1);
 
 		_con->dispatch(
 			bind(&ConnectionPrepareds::endWork, _con, 
@@ -92,7 +92,8 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::close()
 	{
-		return _con->close();
+		_con->dispatch(
+			bind(&ConnectionLow::close, _con));
 	}
 
 }

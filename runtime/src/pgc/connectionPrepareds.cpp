@@ -74,6 +74,7 @@ namespace pgc
 
 		if(result && ersCommandOk != result->status())
 		{
+			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
 			_prepareds.clear();
 		}
 
