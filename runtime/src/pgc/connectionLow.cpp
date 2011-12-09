@@ -48,16 +48,17 @@ namespace pgc
 	void ConnectionLow::waitRecv(function<void(const system::error_code &)> ready)
 	{
 		_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
+		//_sock.async_read(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionLow::ConnectionLow(PGconn *pgcon, asio::io_service &io_service)
 		: _pgcon(pgcon)
-		, _sock(io_service, PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_RAW), PQsocket(_pgcon))
+		, _sock(io_service, PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
 		, _strand(io_service)
 		, _integerDatetimes(false)
 	{
-
+		PQsetnonblocking(_pgcon, 0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -87,7 +88,7 @@ namespace pgc
 			_integerDatetimes = false;
 		}
 
-		PQsetnonblocking(_pgcon, 1);
+		//PQsetnonblocking(_pgcon, 0);
 		PQsetClientEncoding(_pgcon, "UTF-8");
 	}
 

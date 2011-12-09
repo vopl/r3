@@ -32,14 +32,14 @@ namespace pgc
 
 		typedef asio::deadline_timer Timeout;
 		typedef boost::shared_ptr<Timeout> TimeoutPtr;
-		std::set<TimeoutPtr>	_timeouts;
+		TimeoutPtr	_timeout;
 
 	private:
 		void balanceConnections();
-		void makeConnection_poll(const system::error_code &ec, ConnectionPreparedsPtr pcw);
+		void makeConnection_poll(ConnectionPreparedsPtr pcw);
 
 	private:
-		void onReconnectTimer(TimeoutPtr t, const boost::system::error_code& ec);
+		void onReconnectTimer();
 
 	public:
 		void unwork(ConnectionPreparedsPtr pcw);

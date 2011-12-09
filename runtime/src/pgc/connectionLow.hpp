@@ -41,12 +41,13 @@ namespace pgc
 			};
 		};
 
+		typedef asio::basic_stream_socket<PGSockProtocol> PGSock;
 	private:
 		//////////////////////////////////////////////////////////////////////////
-		PGconn									*_pgcon;
-		asio::basic_raw_socket<PGSockProtocol>	_sock;
-		asio::io_service::strand				_strand;
-		bool									_integerDatetimes;
+		PGconn						*_pgcon;
+		PGSock						_sock;
+		asio::io_service::strand	_strand;
+		bool						_integerDatetimes;
 
 	private:
 		//помогалки для инициализации постгресового сокета в asio
