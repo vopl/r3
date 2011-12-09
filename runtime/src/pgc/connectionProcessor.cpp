@@ -292,4 +292,14 @@ namespace pgc
 		_requests.push_back(SRequestPtr(new SQueryPrepared(done, prid, data)));
 		runNextRequest();
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionProcessor::close()
+	{
+		assert(!_inProcess);
+		assert(_requests.empty());
+
+		ConnectionLow::close();
+	}
+
 }

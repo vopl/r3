@@ -110,6 +110,7 @@ namespace pgc
 		//void runDescribePrepared...
 		//void runDescribePortal...
 
+		void close();
 	};
 }
 #endif

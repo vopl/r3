@@ -146,6 +146,8 @@ namespace pgc
 		void runQueryWithPrepare(IStatementPtr s,
 			BindDataPtr data,
 			boost::function<void (IResultPtr)> done);
+
+		void close();
 	};
 }
 #endif

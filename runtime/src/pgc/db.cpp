@@ -24,6 +24,7 @@ namespace pgc
 			function<void (IConnectionPtr)>	_waiter;
 		};
 		std::deque<SWorkPair> readyWaiters;
+		std::deque<size_t> lostsConnections;
 
 		ConnectionPreparedsPtr pcw;
 		{
@@ -55,6 +56,14 @@ namespace pgc
 					break;
 				}
 			}
+
+			while(	!_readyConnections.empty() &&
+					_readyConnections.size() + _workConnections.size() + _startConnections.size() > _maxConnections)
+			{
+				(*_readyConnections.begin())->close();
+				_readyConnections.erase(_readyConnections.begin());
+				lostsConnections.push_back(_readyConnections.size() + _workConnections.size());
+			}
 		}
 
 		if(pcw)
@@ -69,6 +78,11 @@ namespace pgc
 			{
 				wp._waiter(c);
 			}
+		}
+
+		BOOST_FOREACH(size_t numConnections, lostsConnections)
+		{
+			_onConnectionLost(numConnections);
 		}
 
 	}
@@ -179,40 +193,29 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::onBeginWork(ConnectionPreparedsPtr pcw, function<void (IConnectionPtr)> ready)
-	{
-		IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
-		ready(c);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Db::onEndWork(ConnectionPreparedsPtr pcw)
-	{
-		bool needBalance = false;
-		{
-			mutex::scoped_lock sl(_mtx);
-
-			TSConnectins::iterator iter = _workConnections.find(pcw);
-			if(_workConnections.end() != iter)
-			{
-				_workConnections.erase(iter);
-				_readyConnections.insert(pcw);
-			}
-			needBalance = (!_waiters.empty() && !_readyConnections.empty());
-		}
-
-		if(needBalance)
-		{
-			balanceConnections();
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	void Db::unwork(ConnectionPreparedsPtr pcw)
 	{
 		if(ecsOk == pcw->status())
 		{
-			onEndWork(pcw);
+			{
+				mutex::scoped_lock sl(_mtx);
+
+				TSConnectins::iterator iter = _workConnections.find(pcw);
+				if(_workConnections.end() != iter)
+				{
+					if(_maxConnections < _readyConnections.size() + _workConnections.size() + _startConnections.size())
+					{
+						_workConnections.erase(iter);
+						pcw->close();
+						pcw.reset();
+					}
+					else
+					{
+						_workConnections.erase(iter);
+						_readyConnections.insert(pcw);
+					}
+				}
+			}
 		}
 		else
 		{
@@ -224,27 +227,10 @@ namespace pgc
 				numConnections = _readyConnections.size() + _workConnections.size();
 			}
 			_onConnectionLost(numConnections);
-			balanceConnections();
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Db::closer(IConnectionPtr c)
-	{
-		if(c)
-		{
-			c->close();
-			allocConnection(bind(&Db::closer, shared_from_this(), _1));
-			return;
 		}
 
-		mutex::scoped_lock sl(_mtx);
-
-		_onConnectionMade.swap(function<void (size_t)>());
-		_onConnectionLost.swap(function<void (size_t)>());
-		_waiters.clear();
+		balanceConnections();
 	}
-
 
 	//////////////////////////////////////////////////////////////////////////
 	void Db::initialize(
@@ -270,7 +256,6 @@ namespace pgc
 	{
 		ConnectionPreparedsPtr pcw;
 
-		bool needBalanceConnections = false;
 		bool unableAlloc = false;
 		{
 			mutex::scoped_lock sl(_mtx);
@@ -285,12 +270,9 @@ namespace pgc
 				if(_maxConnections)
 				{
 					_waiters.push_back(ready);
-					needBalanceConnections = _startConnections.size() + _readyConnections.size() + _workConnections.size() < _maxConnections;
 				}
 				else
 				{
-					needBalanceConnections = true;
-
 					if(_startConnections.size() + _workConnections.size())
 					{
 						_waiters.push_back(ready);
@@ -305,22 +287,22 @@ namespace pgc
 
 		if(pcw)
 		{
-			onBeginWork(pcw, ready);
+			IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
+			ready(c);
 		}
-		if(unableAlloc)
+		else if(unableAlloc)
 		{
 			ready(IConnectionPtr());
 		}
 		
-		if(needBalanceConnections)
-		{
-			balanceConnections();
-		}
+		balanceConnections();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Db::deinitialize()
 	{
+		std::deque<function<void (IConnectionPtr)> > waiters;
+
 		{
 			mutex::scoped_lock sl(_mtx);
 
@@ -334,9 +316,13 @@ namespace pgc
 
 			_maxConnections = 0;
 			_conninfo.clear();
+			waiters.swap(_waiters);
 		}
-
-		allocConnection(bind(&Db::closer, shared_from_this(), _1));
+		BOOST_FOREACH(function<void (IConnectionPtr)> &w, waiters)
+		{
+			w(IConnectionPtr());
+		}
+		balanceConnections();
 
 		//_onConnectionMade.swap(function<void (size_t)>());
 		//_onConnectionLost.swap(function<void (size_t)>());

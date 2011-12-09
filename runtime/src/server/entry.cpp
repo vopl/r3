@@ -87,6 +87,7 @@ int main(int argc, char* argv[])
 
 
 	srv->stop();
+	srv.reset();
 
 	return EXIT_SUCCESS;
 }

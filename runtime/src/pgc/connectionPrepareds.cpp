@@ -445,4 +445,15 @@ namespace pgc
 		runNextRequest();
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::close()
+	{
+		assert(!_inProcess);
+		assert(_requests.empty());
+
+		_prepareds.clear();
+
+		ConnectionProcessor::close();
+	}
+
 }
