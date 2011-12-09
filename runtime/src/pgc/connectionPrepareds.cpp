@@ -214,7 +214,7 @@ namespace pgc
 			return;
 		}
 
-		runQueryPrepared(getPrid(s), data, done);
+		runQueryPrepared(getPrid(s), data, bind(&ConnectionPrepareds::onQueryPrepared, shared_from_this(), s, data, done, _1));
 	}
 
 	void ConnectionPrepareds::onSavepoint(IStatementPtr s,
@@ -277,7 +277,37 @@ namespace pgc
 			return;
 		}
 
-		runQueryPrepared(getPrid(s), data, done);
+		runQueryPrepared(getPrid(s), data, bind(&ConnectionPrepareds::onQueryPrepared, shared_from_this(), s, data, done, _1));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::onQueryPrepared(IStatementPtr s,
+		BindDataPtr data,
+		boost::function<void (IResultPtr)> done,
+		IResultPtr result)
+	{
+		if(!result)
+		{
+			done(result);
+			return;
+		}
+		if(ersError == result->status())
+		{
+			const char * errCode = result->errorCode();
+			if(errCode && !strcmp("26000", errCode))
+			{
+				//ERROR:  prepared statement "XXX" does not exist
+				delPrepared(s);
+				_requests.push_back(SRequestPtr(new SQueryWithPrepare(s, data, done)));
+
+				runNextRequest();
+			}
+			else
+			{
+				//другая ошибка - клиента
+			}
+		}
+		done(result);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -340,7 +370,7 @@ namespace pgc
 					runQueryPrepared(
 						getPrid(q->_s), 
 						q->_data, 
-						q->_done);
+						bind(&ConnectionPrepareds::onQueryPrepared, shared_from_this(), q->_s, q->_data, q->_done, _1));
 					return;
 				}
 				//этот запрос еще не подготовлен

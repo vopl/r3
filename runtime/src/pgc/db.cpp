@@ -318,6 +318,8 @@ namespace pgc
 			if(_readyConnections.size())
 			{
 				pcw = *_readyConnections.begin();
+				EConnectionStatus status = pcw->status();
+				assert(ecsOk == status);
 				_workConnections.insert(pcw);
 				_readyConnections.erase(_readyConnections.begin());
 			}

@@ -93,6 +93,12 @@ namespace pgc
 			boost::function<void (IResultPtr)> done,
 			IResultPtr result);
 
+
+		void onQueryPrepared(IStatementPtr s,
+			BindDataPtr data,
+			boost::function<void (IResultPtr)> done,
+			IResultPtr result);
+
 	private:
 		//очередь
 		enum ERequestType
