@@ -139,8 +139,29 @@ namespace pgc
 
 		if(_requests.empty())
 		{
+			this->queueEmpty();
 			return;
 		}
+
+		switch(status())
+		{
+		case ecsNull:
+		case ecsLost:
+			//соединение утеряно или закрыто
+			{
+				std::cerr<<__FUNCTION__<<": connection lost or closed"<<std::endl;
+				IResultPtr nullResult;
+				TRequests requests;
+				requests.swap(_requests);
+				BOOST_FOREACH(SRequestPtr &r, requests)
+				{
+					r->_done(nullResult);
+					r.reset();
+				}
+			}
+			return;
+		}
+
 		SRequestPtr r = _requests.front();
 		_requests.pop_front();
 
@@ -210,6 +231,17 @@ namespace pgc
 
 
 
+	//////////////////////////////////////////////////////////////////////////
+	bool ConnectionProcessor::inProcess()
+	{
+		return _inProcess;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionProcessor::queueEmpty()
+	{
+		//тут ничего, производный класс должен получить уведомление
+	}
 
 
 

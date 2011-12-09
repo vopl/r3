@@ -52,9 +52,9 @@ namespace pgc
 
 	private:
 		//ограничение на количество одновременно хранимых запросов
-		static const size_t	_max = 1000;
+		static const size_t	_max = 10000000;
 		//таймаут удаления по бездействию
-		static const size_t	_timeout = 1000*60*30;//millisec
+		static const size_t	_timeout = 1000*60*10;//millisec
 		//время на момент начала работы
 		posix_time::ptime	_now;
 		//контейнер с запросами
@@ -130,7 +130,9 @@ namespace pgc
 
 		typedef std::deque<SRequestPtr> TRequests;
 		TRequests	_requests;
+		bool		_inProcess;
 
+		virtual void queueEmpty();
 		void runNextRequest();
 		void requestTerminator(TDone done, IResultPtr result);
 

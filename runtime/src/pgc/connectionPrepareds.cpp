@@ -173,6 +173,12 @@ namespace pgc
 		IResultPtr result,
 		bool inTrans)
 	{
+		if(!result)
+		{
+			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
+			done(result);
+			return;
+		}
 		if(ersCommandOk != result->status())
 		{
 			const char *s4 = result->errorCode();
@@ -217,6 +223,12 @@ namespace pgc
 		boost::function<void (IResultPtr)> done,
 		IResultPtr result)
 	{
+		if(!result)
+		{
+			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
+			done(result);
+			return;
+		}
 		if(ersCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
@@ -234,6 +246,12 @@ namespace pgc
 		boost::function<void (IResultPtr)> done,
 		IResultPtr result)
 	{
+		if(!result)
+		{
+			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
+			done(result);
+			return;
+		}
 		if(ersCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
@@ -253,6 +271,12 @@ namespace pgc
 		boost::function<void (IResultPtr)> done,
 		IResultPtr result)
 	{
+		if(!result)
+		{
+			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
+			done(result);
+			return;
+		}
 		if(ersCommandOk != result->status())
 		{
 			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
@@ -263,15 +287,55 @@ namespace pgc
 		runQueryPrepared(getPrid(s), data, done);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionPrepareds::queueEmpty()
+	{
+		runNextRequest();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::runNextRequest()
 	{
+		if(inProcess())
+		{
+			//когда нижний уровень закончит - он позовет queueEmpty()
+			return;
+		}
+
+		if(_inProcess)
+		{
+			//свой процесс исполняется
+			return;
+		}
+
 		if(_requests.empty())
 		{
+			//нечего исполнять
+			return;
+		}
+
+		switch(status())
+		{
+		case ecsNull:
+		case ecsLost:
+			//соединение утеряно или закрыто
+			{
+				std::cerr<<__FUNCTION__<<": connection lost or closed"<<std::endl;
+				IResultPtr nullResult;
+				TRequests requests;
+				requests.swap(_requests);
+				BOOST_FOREACH(SRequestPtr &r, requests)
+				{
+					r->_done(nullResult);
+					r.reset();
+				}
+			}
 			return;
 		}
 
 		SRequestPtr r = _requests.front();
 		_requests.pop_front();
+		_inProcess = true;
 
 		switch(r->_ert)
 		{
@@ -290,6 +354,7 @@ namespace pgc
 
 				bool inTrans = false;
 				PGTransactionStatusType tstatus = PQtransactionStatus(pgcon());
+				assert(PQTRANS_ACTIVE != tstatus);
 				switch(tstatus)
 				{
 // 				case PQTRANS_ACTIVE:
@@ -332,6 +397,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::requestTerminator(TDone done, IResultPtr result)
 	{
+		_inProcess = false;
 		runNextRequest();
 		if(done)
 		{
@@ -342,6 +408,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionPrepareds::ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service)
 		: ConnectionProcessor(pgcon, io_service)
+		, _inProcess(false)
 	{
 
 	}

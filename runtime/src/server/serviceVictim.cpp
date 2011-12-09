@@ -27,7 +27,11 @@ namespace server
 		cnt++;
 		if(!(cnt%10000))
 		{
-			std::cout<<__FUNCTION__<<": "<<cnt<<std::endl;
+			pgc::EResultStatus s = r->status();
+			const char *msg = r->errorMsg();
+			utils::Variant v;
+			r->fetchRowsMap(v);
+			std::cout<<__FUNCTION__<<": "<<cnt<<", "<<s<<", "<<msg<<", "<<v<<std::endl;
 		}
 	}
 

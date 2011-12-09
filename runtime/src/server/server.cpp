@@ -58,7 +58,6 @@ namespace server
 		//поднять асинхронный двиг
 		_async = _plugs->create<async::IServiceProvider>();
 		assert(_async);
-		//_async->balance(4);
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -70,7 +69,7 @@ namespace server
 		_db->initialize(
 			_async, 
 			"host=localhost port=5432 dbname=test user=test password=test",
-			50,
+			boost::thread::hardware_concurrency()*4,
 			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
 

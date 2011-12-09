@@ -83,6 +83,10 @@ namespace pgc
 
 		void runNextRequest();
 
+	protected:
+		bool inProcess();
+		virtual void queueEmpty();
+
 	public:
 		ConnectionProcessor(PGconn *pgcon, asio::io_service &io_service);
 		~ConnectionProcessor();
