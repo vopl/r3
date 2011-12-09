@@ -25,7 +25,7 @@ namespace server
 	void ServiceVictim::onResult(pgc::IResultPtr r)
 	{
 		cnt++;
-		if(!(cnt%10000))
+		if(!(cnt%100000))
 		{
 			pgc::EResultStatus s = r->status();
 			const char *msg = r->errorMsg();
