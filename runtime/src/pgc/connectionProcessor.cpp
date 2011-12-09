@@ -65,7 +65,7 @@ namespace pgc
 		PGresult *pgr = PQgetResult(pgcon());
 		while(pgr)
 		{
-			_results.push_back(pgr);
+			_results.push_back(IResultPtr(new Result(pgr, shared_from_this())));
 
 			if(!PQconsumeInput(pgcon()))
 			{
@@ -94,25 +94,16 @@ namespace pgc
 		{
 			_inProcess = false;
 
-			std::deque<PGresult *> results;
+			IResultPtrs results;
 			results.swap(_results);
 
-			boost::function<void (IResultPtr)> done;
+			TDone done;
 			done.swap(_done);
 
-			BOOST_FOREACH(PGresult *pgr, results)
-			{
-				done(IResultPtr(new Result(pgr, shared_from_this())));
-			}
-			//последний пустой
-			done(IResultPtr());
+			done(results);
 		}
 		else
 		{
-			BOOST_FOREACH(PGresult *pgr, _results)
-			{
-				PQclear(pgr);
-			}
 			_results.clear();
 			assert(_inProcess);
 			_inProcess = false;
@@ -152,7 +143,7 @@ namespace pgc
 			//соединение утеряно или закрыто
 			{
 				std::cerr<<__FUNCTION__<<": connection lost or closed"<<std::endl;
-				IResultPtr nullResult;
+				IResultPtrs nullResult;
 				TRequests requests;
 				requests.swap(_requests);
 				BOOST_FOREACH(SRequestPtr &r, requests)
@@ -275,21 +266,21 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionProcessor::runQuery(const std::string &sql, boost::function<void (IResultPtr)> done)
+	void ConnectionProcessor::runQuery(const std::string &sql, TDone done)
 	{
 		_requests.push_back(SRequestPtr(new SQuery(done, sql)));
 		runNextRequest();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionProcessor::runPrepare(const std::string &prid, const std::string &sql, BindDataPtr data, boost::function<void (IResultPtr)> done)
+	void ConnectionProcessor::runPrepare(const std::string &prid, const std::string &sql, BindDataPtr data, TDone done)
 	{
 		_requests.push_back(SRequestPtr(new SPrepare(done, prid, sql, data)));
 		runNextRequest();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionProcessor::runQueryPrepared(const std::string &prid, BindDataPtr data, boost::function<void (IResultPtr)> done)
+	void ConnectionProcessor::runQueryPrepared(const std::string &prid, BindDataPtr data, TDone done)
 	{
 		_requests.push_back(SRequestPtr(new SQueryPrepared(done, prid, data)));
 		runNextRequest();

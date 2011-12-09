@@ -23,7 +23,7 @@ namespace server
 
 		pgc::IDbPtr _db;
 
-		void onResult(pgc::IResultPtr r);
+		void onResult(pgc::IResultPtrs r);
 		void onConnection(pgc::IConnectionPtr c);
 		void onConnection2(pgc::IConnectionPtr c);
 

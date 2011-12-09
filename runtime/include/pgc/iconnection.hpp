@@ -21,14 +21,14 @@ namespace pgc
 		virtual ~IConnection(){}
 
 		virtual void exec(const std::string &sql,
-			boost::function<void (IResultPtr)> done) =0;
+			boost::function<void (IResultPtrs)> done) =0;
 
 		virtual void exec(IStatementPtr s,
-			boost::function<void (IResultPtr)> done) =0;
+			boost::function<void (IResultPtrs)> done) =0;
 
 		virtual void exec(IStatementPtr s,
 			const utils::Variant &data,
-			boost::function<void (IResultPtr)> done) =0;
+			boost::function<void (IResultPtrs)> done) =0;
 
 		virtual EConnectionStatus status() =0;
 

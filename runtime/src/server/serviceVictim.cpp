@@ -22,21 +22,21 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	static size_t cnt(0);
-	void ServiceVictim::onResult(pgc::IResultPtr r)
+	void ServiceVictim::onResult(pgc::IResultPtrs r)
 	{
-		if(!r)
+		assert(r.size()<2);
+		if(r.empty())
 		{
-			//терминатор
 			return;
 		}
 
 		cnt++;
 		if(!(cnt%100000))
 		{
-			pgc::EResultStatus s = r->status();
-			const char *msg = r->errorMsg();
+			pgc::EResultStatus s = r[0]->status();
+			const char *msg = r[0]->errorMsg();
 			utils::Variant v;
-			r->fetchRowsMap(v);
+			r[0]->fetchRowsMap(v);
 			std::cout<<__FUNCTION__<<": "<<cnt<<", "<<s<<", "<<msg<<", "<<v<<std::endl;
 		}
 	}

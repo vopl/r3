@@ -9,7 +9,7 @@
 
 namespace pgc
 {
-	using namespace boost::multi_index;
+	using namespace multi_index;
 
 	//////////////////////////////////////////////////////////////////////////
 	class ConnectionPrepareds;
@@ -26,7 +26,7 @@ namespace pgc
 			//экземпл€р, у него уникальный адрес, sql
 			IStatementWtr				_stm;
 			//врем€ последнего доступа
-			boost::posix_time::ptime	_accessTime;
+			posix_time::ptime	_accessTime;
 		};
 
 		//контейнер, индексирован по таймауту и адресу запроса
@@ -43,7 +43,7 @@ namespace pgc
 				ordered_non_unique<
 					member<
 						StatementPrepareState, 
-						boost::posix_time::ptime,
+						posix_time::ptime,
 						&StatementPrepareState::_accessTime
 					>
 				>
@@ -66,7 +66,7 @@ namespace pgc
 		void genPrid(IStatementWtr p);
 		void delPrepared(IStatementWtr p);
 
-		void cleanPrepareds(posix_time::ptime boundATime, TDone done, IResultPtr result);
+		void cleanPrepareds(posix_time::ptime boundATime, TDone done, IResultPtrs result);
 
 	private:
 		ConnectionPreparedsPtr shared_from_this();
@@ -74,30 +74,30 @@ namespace pgc
 	private:
 		void onPrepare(IStatementPtr s,
 			BindDataPtr data,
-			boost::function<void (IResultPtr)> done,
-			IResultPtr result,
+			TDone done,
+			IResultPtrs result,
 			bool inTrans);
 
 		void onSavepoint(IStatementPtr s,
 			BindDataPtr data,
-			boost::function<void (IResultPtr)> done,
-			IResultPtr result);
+			TDone done,
+			IResultPtrs result);
 
 		void onRollbackSavepoint(IStatementPtr s,
 			BindDataPtr data,
-			boost::function<void (IResultPtr)> done,
-			IResultPtr result);
+			TDone done,
+			IResultPtrs result);
 
 		void onReleaseSavepoint(IStatementPtr s,
 			BindDataPtr data,
-			boost::function<void (IResultPtr)> done,
-			IResultPtr result);
+			TDone done,
+			IResultPtrs result);
 
 
 		void onQueryPrepared(IStatementPtr s,
 			BindDataPtr data,
-			boost::function<void (IResultPtr)> done,
-			IResultPtr result);
+			TDone done,
+			IResultPtrs result);
 
 	private:
 		//очередь
@@ -140,18 +140,18 @@ namespace pgc
 
 		virtual void queueEmpty();
 		void runNextRequest();
-		void requestTerminator(TDone done, IResultPtr result);
+		void requestTerminator(TDone done, IResultPtrs result);
 
 	public:
 		ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service);
 		~ConnectionPrepareds();
 
 		void beginWork();
-		void endWork(boost::function<void (IResultPtr)> done);
+		void endWork(TDone done);
 
 		void runQueryWithPrepare(IStatementPtr s,
 			BindDataPtr data,
-			boost::function<void (IResultPtr)> done);
+			TDone done);
 
 		void close();
 	};

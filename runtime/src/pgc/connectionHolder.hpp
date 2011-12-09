@@ -12,7 +12,7 @@ namespace pgc
 
 
 	class Db;
-	typedef boost::shared_ptr<Db> DbPtr;
+	typedef shared_ptr<Db> DbPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class ConnectionHolder
@@ -22,30 +22,30 @@ namespace pgc
 		DbPtr _db;
 		ConnectionPreparedsPtr _con;
 
-		typedef boost::function<void (IResultPtr)> TDone;
-		void keeper(TDone done, IResultPtr result);
+		typedef function<void (IResultPtrs)> TDone;
+		void keeper(TDone done, IResultPtrs result);
 
-		static void onEndWork(DbPtr db, ConnectionPreparedsPtr con, IResultPtr result);
+		static void onEndWork(DbPtr db, ConnectionPreparedsPtr con, IResultPtrs result);
 
 	public:
 		ConnectionHolder(DbPtr db, ConnectionPreparedsPtr con);
 		~ConnectionHolder();
 
 		virtual void exec(const std::string &sql,
-			boost::function<void (IResultPtr)> done);
+			TDone done);
 
 		virtual void exec(IStatementPtr s,
-			boost::function<void (IResultPtr)> done);
+			TDone done);
 
 		virtual void exec(IStatementPtr s,
 			const utils::Variant &data,
-			boost::function<void (IResultPtr)> done);
+			TDone done);
 
 		virtual EConnectionStatus status();
 
 		virtual void close();
 	};
-	typedef boost::shared_ptr<ConnectionHolder> ConnectionHolderPtr;
+	typedef shared_ptr<ConnectionHolder> ConnectionHolderPtr;
 }
 
 #endif

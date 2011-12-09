@@ -57,5 +57,6 @@ namespace pgc
 		virtual std::string fetchString(size_t colIdx, size_t rowIdx) =0;
 	};
 	typedef boost::shared_ptr<IResult> IResultPtr;
+	typedef std::deque<IResultPtr> IResultPtrs;
 }
 #endif

@@ -8,7 +8,7 @@ namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
 	class BindData;
-	typedef boost::shared_ptr<BindData> BindDataPtr;
+	typedef shared_ptr<BindData> BindDataPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	/*
@@ -27,15 +27,14 @@ namespace pgc
 	private:
 		ConnectionProcessorPtr shared_from_this();
 
-	protected:
-		typedef boost::function<void (IResultPtr)> TDone;
-
+	public:
+		typedef function<void (IResultPtrs)> TDone;
 	private:
 		//////////////////////////////////////////////////////////////////////////
 		//поддержка исполнения простого запроса
 		bool					_inProcess;
 		TDone					_done;
-		std::deque<PGresult *>	_results;
+		IResultPtrs				_results;
 
 		void processStart();
 		void onProcessCanSend(const system::error_code &ec);
@@ -93,18 +92,18 @@ namespace pgc
 
 		void runQuery(
 			const std::string &sql, 
-			boost::function<void (IResultPtr)> done);
+			TDone done);
 
 		void runPrepare(
 			const std::string &prid, 
 			const std::string &sql, 
 			BindDataPtr data, 
-			boost::function<void (IResultPtr)> done);
+			TDone done);
 
 		void runQueryPrepared(
 			const std::string &prid, 
 			BindDataPtr data, 
-			boost::function<void (IResultPtr)> done);
+			TDone done);
 
 		//а так же всякие describe
 		//void runDescribePrepared...

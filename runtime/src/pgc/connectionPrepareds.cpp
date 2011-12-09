@@ -9,8 +9,8 @@ namespace pgc
 	{
 		//////////////////////////////////////////////////////////////////////////
 		char pridGenChars[] = "abcdefghijklmnopqrstuvwxyz01234567890";
-		boost::random::random_device pridGenRng;
-		boost::random::uniform_int_distribution<> pridGenIndexDist(0, sizeof(pridGenChars)-2);
+		random::random_device pridGenRng;
+		random::uniform_int_distribution<> pridGenIndexDist(0, sizeof(pridGenChars)-2);
 		std::string pridGenerator()
 		{
 			std::string res;
@@ -68,14 +68,14 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::cleanPrepareds(posix_time::ptime boundATime, TDone done, IResultPtr result)
+	void ConnectionPrepareds::cleanPrepareds(posix_time::ptime boundATime, TDone done, IResultPtrs result)
 	{
-		assert(_max > 0);
+		assert(result.size()<2);
 
-		if(result && ersCommandOk != result->status())
+		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
-			const char * errCode = result->errorCode();
+			std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+			const char * errCode = result[0]->errorCode();
 			if(errCode && !strcmp("26000", errCode))
 			{
 				//ERROR:  prepared statement "XXX" does not exist
@@ -110,7 +110,7 @@ namespace pgc
 		}
 
 		//терминатор
-		done(IResultPtr());
+		done(IResultPtrs());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -170,17 +170,14 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::onPrepare(IStatementPtr s,
 		BindDataPtr data,
-		boost::function<void (IResultPtr)> done,
-		IResultPtr result,
+		TDone done,
+		IResultPtrs result,
 		bool inTrans)
 	{
-		if(!result)
+		assert(result.size()<2);
+		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			return;
-		}
-		if(ersCommandOk != result->status())
-		{
-			const char *s4 = result->errorCode();
+			const char *s4 = result[0]->errorCode();
 			if(s4 && !strcmp(s4, "42P05"))//DUPLICATE PREPARED STATEMENT
 			{
 				if(inTrans)
@@ -199,7 +196,7 @@ namespace pgc
 			}
 			else
 			{
-				std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
+				std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
 				delPrepared(s);
 				done(result);
 				return;
@@ -219,17 +216,14 @@ namespace pgc
 
 	void ConnectionPrepareds::onSavepoint(IStatementPtr s,
 		BindDataPtr data,
-		boost::function<void (IResultPtr)> done,
-		IResultPtr result)
+		TDone done,
+		IResultPtrs result)
 	{
-		if(!result)
+		assert(result.size()<2);
+		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			return;
-		}
-		if(ersCommandOk != result->status())
-		{
-			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
-			done(IResultPtr());
+			std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+			done(IResultPtrs());
 			return;
 		}
 
@@ -240,17 +234,14 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::onRollbackSavepoint(IStatementPtr s,
 		BindDataPtr data,
-		boost::function<void (IResultPtr)> done,
-		IResultPtr result)
+		TDone done,
+		IResultPtrs result)
 	{
-		if(!result)
+		assert(result.size()<2);
+		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			return;
-		}
-		if(ersCommandOk != result->status())
-		{
-			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
-			done(IResultPtr());
+			std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+			done(IResultPtrs());
 			return;
 		}
 
@@ -263,17 +254,14 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::onReleaseSavepoint(IStatementPtr s,
 		BindDataPtr data,
-		boost::function<void (IResultPtr)> done,
-		IResultPtr result)
+		TDone done,
+		IResultPtrs result)
 	{
-		if(!result)
+		assert(result.size()<2);
+		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			return;
-		}
-		if(ersCommandOk != result->status())
-		{
-			std::cerr<<__FUNCTION__<<": "<<result->errorMsg()<<std::endl;
-			done(IResultPtr());
+			std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+			done(IResultPtrs());
 			return;
 		}
 
@@ -283,17 +271,12 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::onQueryPrepared(IStatementPtr s,
 		BindDataPtr data,
-		boost::function<void (IResultPtr)> done,
-		IResultPtr result)
+		TDone done,
+		IResultPtrs result)
 	{
-		if(!result)
+		if(!result.empty() && ersError == result[0]->status())
 		{
-			done(result);
-			return;
-		}
-		if(ersError == result->status())
-		{
-			const char * errCode = result->errorCode();
+			const char * errCode = result[0]->errorCode();
 			if(errCode && !strcmp("26000", errCode))
 			{
 				//ERROR:  prepared statement "XXX" does not exist
@@ -304,7 +287,7 @@ namespace pgc
 			}
 			else
 			{
-				//другая ошибка - клиента
+				//другая ошибка - транслировать клиенту
 			}
 		}
 		done(result);
@@ -344,7 +327,7 @@ namespace pgc
 			//соединение утеряно или закрыто
 			{
 				std::cerr<<__FUNCTION__<<": connection lost or closed"<<std::endl;
-				IResultPtr nullResult;
+				IResultPtrs nullResult;
 				TRequests requests;
 				requests.swap(_requests);
 				BOOST_FOREACH(SRequestPtr &r, requests)
@@ -408,7 +391,7 @@ namespace pgc
 				SCleanPrepareds * q = static_cast<SCleanPrepareds *>(r.get());
 
 				posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
-				cleanPrepareds(boundATime, q->_done, IResultPtr());
+				cleanPrepareds(boundATime, q->_done, IResultPtrs());
 			}
 			break;
 		default:
@@ -418,19 +401,15 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::requestTerminator(TDone done, IResultPtr result)
+	void ConnectionPrepareds::requestTerminator(TDone done, IResultPtrs result)
 	{
 		if(done)
 		{
 			done(result);
 		}
 
-		if(!result)
-		{
-			//результатов больше нет - выполнено
-			_inProcess = false;
-			runNextRequest();
-		}
+		_inProcess = false;
+		runNextRequest();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -454,7 +433,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionPrepareds::endWork(function<void(IResultPtr)> done)
+	void ConnectionPrepareds::endWork(TDone done)
 	{
 		_requests.push_back(SRequestPtr(new SCleanPrepareds(
 			bind(&ConnectionPrepareds::requestTerminator, shared_from_this(), done, _1))));
@@ -465,7 +444,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::runQueryWithPrepare(IStatementPtr s,
 		BindDataPtr data,
-		boost::function<void (IResultPtr)> done)
+		TDone done)
 	{
 		_requests.push_back(SRequestPtr(new SQueryWithPrepare(s, data, 
 			bind(&ConnectionPrepareds::requestTerminator, shared_from_this(), done, _1))));

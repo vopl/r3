@@ -5,7 +5,7 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::keeper(TDone done, IResultPtr result)
+	void ConnectionHolder::keeper(TDone done, IResultPtrs result)
 	{
 		if(done)
 		{
@@ -14,7 +14,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::onEndWork(DbPtr db, ConnectionPreparedsPtr con, IResultPtr /*result*/)
+	void ConnectionHolder::onEndWork(DbPtr db, ConnectionPreparedsPtr con, IResultPtrs /*result*/)
 	{
 		db->unwork(con);
 	}
@@ -30,7 +30,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::~ConnectionHolder()
 	{
-		boost::function<void (IResultPtr)> done = 
+		TDone done = 
 			bind(&ConnectionHolder::onEndWork, 
 				_db, _con, _1);
 
@@ -41,9 +41,9 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::exec(const std::string &sql,
-		boost::function<void (IResultPtr)> done)
+		TDone done)
 	{
-		boost::function<void (IResultPtr)> keepedDone = 
+		TDone keepedDone = 
 			bind(&ConnectionHolder::keeper, shared_from_this(), 
 				done, _1);
 
@@ -54,9 +54,9 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::exec(IStatementPtr s,
-		boost::function<void (IResultPtr)> done)
+		TDone done)
 	{
-		boost::function<void (IResultPtr)> keepedDone = 
+		TDone keepedDone = 
 			bind(&ConnectionHolder::keeper, shared_from_this(), 
 				done, _1);
 
@@ -70,9 +70,9 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::exec(IStatementPtr s,
 		const utils::Variant &data,
-		boost::function<void (IResultPtr)> done)
+		TDone done)
 	{
-		boost::function<void (IResultPtr)> keepedDone = 
+		TDone keepedDone = 
 			bind(&ConnectionHolder::keeper, shared_from_this(), 
 			done, _1);
 
