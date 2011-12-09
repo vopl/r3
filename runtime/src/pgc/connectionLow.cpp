@@ -110,7 +110,12 @@ namespace pgc
 		{
 			PQfinish(_pgcon);
 			_pgcon = NULL;
-			//_sock.assign(PGSockProtocol(0,0,0), -1);
+			system::error_code ec;
+// 			_sock.close(ec);
+// 			if(ec)
+// 			{
+// 				std::cerr<<ec.message()<<std::endl;
+// 			}
 			_integerDatetimes = false;
 		}
 	}

@@ -104,6 +104,8 @@ namespace pgc
 			{
 				done(IResultPtr(new Result(pgr, shared_from_this())));
 			}
+			//последний пустой
+			done(IResultPtr());
 		}
 		else
 		{

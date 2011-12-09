@@ -109,7 +109,8 @@ namespace pgc
 			return;
 		}
 
-		done(result);
+		//терминатор
+		done(IResultPtr());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -175,8 +176,6 @@ namespace pgc
 	{
 		if(!result)
 		{
-			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
-			done(result);
 			return;
 		}
 		if(ersCommandOk != result->status())
@@ -225,8 +224,6 @@ namespace pgc
 	{
 		if(!result)
 		{
-			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
-			done(result);
 			return;
 		}
 		if(ersCommandOk != result->status())
@@ -248,8 +245,6 @@ namespace pgc
 	{
 		if(!result)
 		{
-			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
-			done(result);
 			return;
 		}
 		if(ersCommandOk != result->status())
@@ -273,8 +268,6 @@ namespace pgc
 	{
 		if(!result)
 		{
-			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
-			done(result);
 			return;
 		}
 		if(ersCommandOk != result->status())
@@ -354,7 +347,7 @@ namespace pgc
 
 				bool inTrans = false;
 				PGTransactionStatusType tstatus = PQtransactionStatus(pgcon());
-				assert(PQTRANS_ACTIVE != tstatus);
+				//assert(PQTRANS_ACTIVE != tstatus);
 				switch(tstatus)
 				{
 // 				case PQTRANS_ACTIVE:
@@ -397,11 +390,16 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::requestTerminator(TDone done, IResultPtr result)
 	{
-		_inProcess = false;
-		runNextRequest();
 		if(done)
 		{
 			done(result);
+		}
+
+		if(!result)
+		{
+			//результатов больше нет - выполнено
+			_inProcess = false;
+			runNextRequest();
 		}
 	}
 

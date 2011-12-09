@@ -2,6 +2,8 @@
 #include "db.hpp"
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#include <boost/thread.hpp>
+
 
 namespace pgc
 {
@@ -25,6 +27,7 @@ namespace pgc
 		};
 		std::deque<SWorkPair> readyWaiters;
 		std::deque<size_t> lostsConnections;
+		ConnectionPreparedsPtr pcwStarted;
 
 		{
 			mutex::scoped_lock sl(_mtx);
@@ -50,7 +53,8 @@ namespace pgc
 						bool isOk = true;
 						if(pgcon)
 						{
-							if(CONNECTION_BAD == PQstatus(pgcon))
+							ConnStatusType status = PQstatus(pgcon);
+							if(CONNECTION_BAD == status)
 							{
 								std::cerr<<__FUNCTION__<<": "<<"PQconnectStart has failed"<<std::endl;
 								PQfinish(pgcon);
@@ -65,9 +69,13 @@ namespace pgc
 
 						if(isOk)
 						{
-							ConnectionPreparedsPtr pcw(new ConnectionPrepareds(pgcon, _asrv->get_io_service()));
-							_startConnections.insert(pcw);
-							pcw->waitSend(bind(&Db::makeConnection_poll, shared_from_this(), pcw));
+							PostgresPollingStatusType status;
+							status = PQconnectPoll(pgcon);
+							status = PQconnectPoll(pgcon);
+							status = PQconnectPoll(pgcon);
+
+							pcwStarted.reset(new ConnectionPrepareds(pgcon, _asrv->get_io_service()));
+							_startConnections.insert(pcwStarted);
 						}
 						else
 						{
@@ -90,6 +98,11 @@ namespace pgc
 				_readyConnections.erase(_readyConnections.begin());
 				lostsConnections.push_back(_readyConnections.size() + _workConnections.size());
 			}
+		}
+
+		if(pcwStarted)
+		{
+			makeConnection_poll(pcwStarted);
 		}
 
 		BOOST_FOREACH(size_t numConnections, lostsConnections)
@@ -212,7 +225,6 @@ namespace pgc
 			return;
 		case PGRES_POLLING_OK:
 			std::cerr<<__FUNCTION__<<": PGRES_POLLING_OK"<<std::endl;
-			
 			{
 				pcw->onOpen();
 				size_t numConnections=0;

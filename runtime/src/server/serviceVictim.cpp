@@ -24,6 +24,12 @@ namespace server
 	static size_t cnt(0);
 	void ServiceVictim::onResult(pgc::IResultPtr r)
 	{
+		if(!r)
+		{
+			//терминатор
+			return;
+		}
+
 		cnt++;
 		if(!(cnt%100000))
 		{
