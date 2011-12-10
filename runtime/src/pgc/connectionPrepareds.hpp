@@ -52,9 +52,9 @@ namespace pgc
 
 	private:
 		//ограничение на количество одновременно хранимых запросов
-		static const size_t	_max = 10000000;
+		static const size_t	_max = 1000;
 		//таймаут удаления по бездействию
-		static const size_t	_timeout = 1000*60*10;//millisec
+		static const size_t	_timeout = 1000*60*5;//millisec
 		//время на момент начала работы
 		posix_time::ptime	_now;
 		//контейнер с запросами
