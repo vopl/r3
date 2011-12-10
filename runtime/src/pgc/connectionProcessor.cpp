@@ -32,7 +32,9 @@ namespace pgc
 		assert(_inProcess);
 		if(ec)
 		{
+			std::cerr<<__FUNCTION__<<": "<<ec.message()<<", "<<ec.value()<<std::endl;
 			processStop();
+			close();
 			return;
 		}
 
@@ -52,7 +54,9 @@ namespace pgc
 		assert(_inProcess);
 		if(ec)
 		{
+			std::cerr<<__FUNCTION__<<": "<<ec.message()<<", "<<ec.value()<<std::endl;
 			processStop();
+			close();
 			return;
 		}
 
@@ -100,6 +104,7 @@ namespace pgc
 			TDone done;
 			done.swap(_done);
 
+			runNextRequest();
 			done(results);
 		}
 		else
@@ -107,9 +112,9 @@ namespace pgc
 			_results.clear();
 			assert(_inProcess);
 			_inProcess = false;
-		}
 
-		runNextRequest();
+			runNextRequest();
+		}
 	}
 
 

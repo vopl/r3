@@ -68,7 +68,7 @@ namespace server
 
 		_db->initialize(
 			_async, 
-			"host=localhost port=5432 connect_timeout=2 sslmode=disable dbname=test user=test password=test",
+			"host=localhost port=5432 dbname=test user=test password=test",
 			boost::thread::hardware_concurrency()*2,
 			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));

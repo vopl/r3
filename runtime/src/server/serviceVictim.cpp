@@ -27,6 +27,7 @@ namespace server
 		assert(r.size()<2);
 		if(r.empty())
 		{
+			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
 			return;
 		}
 

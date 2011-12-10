@@ -26,7 +26,7 @@ namespace pgc
 			//экземпл€р, у него уникальный адрес, sql
 			IStatementWtr				_stm;
 			//врем€ последнего доступа
-			posix_time::ptime	_accessTime;
+			posix_time::ptime			_accessTime;
 		};
 
 		//контейнер, индексирован по таймауту и адресу запроса

@@ -88,8 +88,8 @@ namespace pgc
 			_integerDatetimes = false;
 		}
 
-		//PQsetnonblocking(_pgcon, 0);
 		PQsetClientEncoding(_pgcon, "UTF-8");
+		PQsetnonblocking(_pgcon, 0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

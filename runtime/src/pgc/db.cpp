@@ -107,7 +107,7 @@ namespace pgc
 
 		BOOST_FOREACH(size_t numConnections, lostsConnections)
 		{
-			_onConnectionLost(numConnections);
+			_asrv->get_io_service().post(bind(_onConnectionLost, numConnections));
 		}
 
 		BOOST_FOREACH(SWorkPair &wp, readyWaiters)
@@ -115,7 +115,7 @@ namespace pgc
 			IConnectionPtr c(new ConnectionHolder(shared_from_this(), wp._con));
 			if(wp._waiter)
 			{
-				wp._waiter(c);
+				_asrv->get_io_service().post(bind(wp._waiter, c));
 			}
 		}
 
@@ -235,7 +235,7 @@ namespace pgc
 					_readyConnections.insert(pcw);
 					numConnections = _readyConnections.size() + _workConnections.size();
 				}
-				_onConnectionMade(numConnections);
+				_asrv->get_io_service().post(bind(_onConnectionMade, numConnections));
 				balanceConnections();
 			}
 			return;
@@ -282,7 +282,7 @@ namespace pgc
 				_workConnections.erase(pcw);
 				numConnections = _readyConnections.size() + _workConnections.size();
 			}
-			_onConnectionLost(numConnections);
+			_asrv->get_io_service().post(bind(_onConnectionLost, numConnections));
 		}
 
 		balanceConnections();

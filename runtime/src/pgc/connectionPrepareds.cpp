@@ -302,18 +302,6 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::runNextRequest()
 	{
-		if(inProcess())
-		{
-			//когда нижний уровень закончит - он позовет queueEmpty()
-			return;
-		}
-
-		if(_inProcess)
-		{
-			//свой процесс исполняется
-			return;
-		}
-
 		if(_requests.empty())
 		{
 			//нечего исполнять
@@ -327,6 +315,9 @@ namespace pgc
 			//соединение утеряно или закрыто
 			{
 				std::cerr<<__FUNCTION__<<": connection lost or closed"<<std::endl;
+
+				_inProcess = false;
+
 				IResultPtrs nullResult;
 				TRequests requests;
 				requests.swap(_requests);
@@ -336,6 +327,11 @@ namespace pgc
 					r.reset();
 				}
 			}
+			return;
+		}
+
+		if(_inProcess)
+		{
 			return;
 		}
 
@@ -403,13 +399,12 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::requestTerminator(TDone done, IResultPtrs result)
 	{
+		_inProcess = false;
+		runNextRequest();
 		if(done)
 		{
 			done(result);
 		}
-
-		_inProcess = false;
-		runNextRequest();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -455,9 +450,9 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionPrepareds::close()
 	{
-		assert(!_inProcess);
 		assert(_requests.empty());
 
+		_inProcess = false;
 		_prepareds.clear();
 
 		ConnectionProcessor::close();
