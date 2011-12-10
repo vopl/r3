@@ -36,7 +36,7 @@ namespace pgc
 
 	private:
 		void balanceConnections();
-		void makeConnection_poll(ConnectionPreparedsPtr pcw);
+		void makeConnection_poll(ConnectionPreparedsPtr pcw, system::error_code ec);
 
 	private:
 		void onReconnectTimer();

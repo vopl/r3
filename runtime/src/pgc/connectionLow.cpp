@@ -48,7 +48,6 @@ namespace pgc
 	void ConnectionLow::waitRecv(function<void(const system::error_code &)> ready)
 	{
 		_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
-		//_sock.async_read(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

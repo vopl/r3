@@ -102,7 +102,7 @@ namespace pgc
 
 		if(pcwStarted)
 		{
-			makeConnection_poll(pcwStarted);
+			makeConnection_poll(pcwStarted, system::errc::make_error_code(system::errc::success));
 		}
 
 		BOOST_FOREACH(size_t numConnections, lostsConnections)
@@ -122,8 +122,12 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::makeConnection_poll(ConnectionPreparedsPtr pcw)
+	void Db::makeConnection_poll(ConnectionPreparedsPtr pcw, system::error_code ec)
 	{
+		if(ec)
+		{
+			std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+		}
 
 // 		switch(PQstatus(pcw->pgcon()))
 // 		{
@@ -179,7 +183,7 @@ namespace pgc
 			return;
 		case PGRES_POLLING_READING:
 			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_READING"<<std::endl;
-			pcw->waitRecv(bind(&Db::makeConnection_poll, shared_from_this(), pcw));
+			pcw->waitRecv(bind(&Db::makeConnection_poll, shared_from_this(), pcw, _1));
 // 			{
 // 				int sock = PQsocket(pcw->pgcon());
 // 				fd_set fds_r, fds_w, fds_e;
@@ -202,7 +206,7 @@ namespace pgc
 			return;
 		case PGRES_POLLING_WRITING:
 			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_WRITING"<<std::endl;
-			pcw->waitSend(bind(&Db::makeConnection_poll, shared_from_this(), pcw));
+			pcw->waitSend(bind(&Db::makeConnection_poll, shared_from_this(), pcw, _1));
 // 			{
 // 				int sock = PQsocket(pcw->pgcon());
 // 				fd_set fds_r, fds_w, fds_e;
