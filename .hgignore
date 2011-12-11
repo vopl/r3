@@ -5,3 +5,4 @@ syntax: regexp
 ^runtime/client
 ^runtime/server
 ^runtime/plug
+^runtime/log

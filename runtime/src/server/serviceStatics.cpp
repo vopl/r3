@@ -1,4 +1,9 @@
 #include "pch.h"
+
+#undef LOG_NAME
+#define LOG_NAME server_statics
+#include "log/client.hpp"
+
 #include "serviceStatics.hpp"
 #include "server/iserviceHub.hpp"
 
@@ -102,7 +107,7 @@ namespace server
 
 		if(!filesystem::is_regular_file(bpath))
 		{
-			std::cerr<<"statics not found: "<<path.as<utils::Variant::String>()<<std::endl;
+			ELOG("not found "<<path.as<utils::Variant::String>());
 			data.reset(new utils::Variant);
 			utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 			m["error"] = "notFound";
@@ -124,7 +129,7 @@ namespace server
 
 			if(size != in.gcount())
 			{
-				std::cerr<<"statics not found(corrupted?): "<<path.as<utils::Variant::String>()<<std::endl;
+				ELOG("not found (corrupted?) "<<path.as<utils::Variant::String>());
 				data.reset(new utils::Variant);
 				utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 				m["error"] = "notFound";
@@ -135,7 +140,7 @@ namespace server
 			}
 		}
 
-		std::cerr<<"statics: "<<path.as<utils::Variant::String>()<<std::endl;
+		ILOG("statics "<<path.as<utils::Variant::String>());
 		hub->send(shared_from_this(), session, endpoint, data, 
 			bind(&ServiceStatics::onSendOk, shared_from_this()),
 			bind(&ServiceStatics::onSendFail, shared_from_this(), _1));

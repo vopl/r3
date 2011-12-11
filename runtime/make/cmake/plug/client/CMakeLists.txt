@@ -43,4 +43,4 @@ CREATE_PCH(plugclient ${SRC_DIR}/client/pch.h ${SRC_PCH})
 USE_PCH(plugclient ${SRC_DIR}/client/pch.h ${SRC})
 SETUP_BIN_OUT(plugclient plug)
 
-TARGET_LINK_LIBRARIES(plugclient libheap libpluma libutils)
+TARGET_LINK_LIBRARIES(plugclient libheap libpluma libutils liblog)

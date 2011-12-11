@@ -52,8 +52,7 @@ namespace client
 					}
 					else if(!m["error"].isNull())
 					{
-						std::cerr<<"error from service: "<<m["error"]<<std::endl;
-
+						ELOG("error from service: "<<m["error"]);
 					}
 
 				}

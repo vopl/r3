@@ -1,6 +1,9 @@
 #include "pluma/pluma.hpp"
 #include "server/iserver.hpp"
 
+#define LOG_NAME entry
+#include "log/client.hpp"
+
 #include <boost/thread.hpp>
 #include <iostream>
 
@@ -20,13 +23,15 @@ void onSignal(int /*sig*/)
 	bStop = true;
 }
 
-
 //удалено не будет
 static pluma::Pluma *g_plugins = new pluma::Pluma;
 
 
 int main(int argc, char* argv[])
 {
+	ILOG("startup");
+
+
 	signal(SIGINT, onSignal);
 	signal(SIGILL, onSignal);
 	signal(SIGFPE, onSignal);
@@ -39,13 +44,26 @@ int main(int argc, char* argv[])
 	signal(SIGKILL, onSignal);
 #endif
 
+
+
 	//////////////////////////////////////////////////////////////////////////
+	ILOG("load plugins");
 	g_plugins->loadFromFolder("../plug");
 
+	ILOG("create server");
 	server::IServerPtr srv(g_plugins->create<server::IServerProvider>());
 	assert(srv);
+	if(!srv)
+	{
+		FLOG("unable to create server");
+		return EXIT_FAILURE;
+	}
 
-	srv->start(g_plugins, "localhost", "29431");
+	if(!srv->start(g_plugins, "localhost", "29431"))
+	{
+		FLOG("unable to start server");
+		return EXIT_FAILURE;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 #ifdef WIN32
@@ -71,10 +89,10 @@ int main(int argc, char* argv[])
 			{
 			case 'e':
 				bStop = true;
-				std::cout<<"exit"<<std::endl;
+				ILOG("exit request");
 				break;
 			default:
-				std::cout<<"what?"<<std::endl;
+				ILOG("?");
 				break;
 			}
 		}
@@ -86,9 +104,11 @@ int main(int argc, char* argv[])
 	} while(!bStop);
 
 
+	ILOG("stopping server");
 	srv->stop();
 	srv.reset();
 
+	ILOG("exiting");
 	return EXIT_SUCCESS;
 }
 

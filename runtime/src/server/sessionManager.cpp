@@ -37,7 +37,7 @@ namespace server
 		}
 
 		//assert(!"log error?");
-		std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+		ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 
 		_connector->listen(
 			_host.c_str(), _service.c_str(), 
@@ -60,9 +60,7 @@ namespace server
 		if(	!v.load(packet._data, packet._size) || 
 			!v.is<utils::Variant::MapStringVariant>())
 		{
-			//bad packet
-			//assert(!"log error?");
-			std::cerr<<__FUNCTION__<<": bad packet"<<std::endl;
+			ELOG(__FUNCTION__<<", bad packet");
 
 			channel->close();
 			return;
@@ -70,9 +68,7 @@ namespace server
 		v = utils::Variant(v.as<utils::Variant::MapStringVariant>()["sid"]);
 		if(	!v.is<TServerSid>())
 		{
-			//bad packet
-			//assert(!"log error?");
-			std::cerr<<__FUNCTION__<<": bad packet"<<std::endl;
+			ELOG(__FUNCTION__<<", bad packet");
 
 			channel->close();
 			return;
@@ -136,8 +132,7 @@ namespace server
 		LF;
 		channel->close();
 
-		//assert(!"log error?");
-		std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+		ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 
 		{
 			mutex::scoped_lock sl(_mtx);

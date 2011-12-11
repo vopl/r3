@@ -6,6 +6,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void Service::workerProc(ServiceWorkerPtr swp)
 	{
+		ILOG("workerProc started");
 		boost::function<void ()> func0;
 		{
 			boost::mutex::scoped_lock sl(_mtx);
@@ -37,6 +38,7 @@ namespace async
 		{
 			func0();
 		}
+		ILOG("workerProc stopped");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -51,7 +53,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	Service::~Service()
 	{
-		stop();
+		//stop();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -60,6 +62,7 @@ namespace async
 		boost::function<void ()> threadStart,
 		boost::function<void ()> threadStop)
 	{
+		ILOG("start");
 		{
 			boost::mutex::scoped_lock sl(_mtx);
 			assert(!_threadStart);
@@ -72,6 +75,8 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void Service::balance(size_t numThreads)
 	{
+		ILOG("balance "<<numThreads);
+
 		std::vector<ServiceWorkerPtr> stopped;
 
 		{
@@ -120,12 +125,16 @@ namespace async
 			}
 
 		}
+		ILOG("balance done");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Service::stop()
 	{
+		ILOG("stop");
 		balance(0);
+		_threadStart.swap(boost::function<void ()>());
+		_threadStop.swap(boost::function<void ()>());
 	}
 
 	//////////////////////////////////////////////////////////////////////////

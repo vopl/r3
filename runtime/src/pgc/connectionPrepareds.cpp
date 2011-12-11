@@ -74,7 +74,7 @@ namespace pgc
 
 		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+			ELOG(__FUNCTION__<<", "<<result[0]->errorMsg()<<"("<<result[0]->errorCode()<<")");
 			const char * errCode = result[0]->errorCode();
 			if(errCode && !strcmp("26000", errCode))
 			{
@@ -196,7 +196,7 @@ namespace pgc
 			}
 			else
 			{
-				std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+				ELOG(__FUNCTION__<<", "<<result[0]->errorMsg()<<"("<<result[0]->errorCode()<<")");
 				delPrepared(s);
 				done(result);
 				return;
@@ -222,7 +222,7 @@ namespace pgc
 		assert(result.size()<2);
 		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+			ELOG(__FUNCTION__<<", "<<result[0]->errorMsg()<<"("<<result[0]->errorCode()<<")");
 			done(IResultPtrs());
 			return;
 		}
@@ -240,7 +240,7 @@ namespace pgc
 		assert(result.size()<2);
 		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+			ELOG(__FUNCTION__<<", "<<result[0]->errorMsg()<<"("<<result[0]->errorCode()<<")");
 			done(IResultPtrs());
 			return;
 		}
@@ -260,7 +260,7 @@ namespace pgc
 		assert(result.size()<2);
 		if(!result.empty() && ersCommandOk != result[0]->status())
 		{
-			std::cerr<<__FUNCTION__<<": "<<result[0]->errorMsg()<<std::endl;
+			ELOG(__FUNCTION__<<", "<<result[0]->errorMsg()<<"("<<result[0]->errorCode()<<")");
 			done(IResultPtrs());
 			return;
 		}
@@ -314,7 +314,7 @@ namespace pgc
 		case ecsLost:
 			//соединение утеряно или закрыто
 			{
-				std::cerr<<__FUNCTION__<<": connection lost or closed"<<std::endl;
+				ELOG("connection lost or closed");
 
 				_inProcess = false;
 

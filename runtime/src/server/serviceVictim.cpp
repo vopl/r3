@@ -1,4 +1,9 @@
 #include "pch.h"
+
+#undef LOG_NAME
+#define LOG_NAME server_victim
+#include "log/client.hpp"
+
 #include "serviceVictim.hpp"
 #include "server/iserviceHub.hpp"
 #include "server/iserver.hpp"
@@ -27,9 +32,10 @@ namespace server
 		assert(r.size()<2);
 		if(r.empty())
 		{
-			std::cerr<<__FUNCTION__<<": null result"<<std::endl;
+			TLOG("onResult NULL");
 			return;
 		}
+		//TLOG("onResult");
 
 		cnt++;
 		if(!(cnt%100000))
@@ -38,7 +44,7 @@ namespace server
 			const char *msg = r[0]->errorMsg();
 			utils::Variant v;
 			r[0]->fetchRowsMap(v);
-			std::cout<<__FUNCTION__<<": "<<cnt<<", "<<s<<", "<<msg<<", "<<v<<std::endl;
+			TLOG(cnt<<", "<<s<<", "<<msg<<", "<<v);
 		}
 	}
 
@@ -49,9 +55,10 @@ namespace server
 	{
 		if(!c)
 		{
-			std::cout<<"onConnection NULL"<<std::endl;
+			TLOG("onConnection NULL");
 			return;
 		}
+		//TLOG("onConnection");
 		if(!s || (rand()%50)==25)
 		{
 			s = _pluma->create<pgc::IStatementProvider>();
@@ -97,9 +104,10 @@ namespace server
 	{
 		if(!c)
 		{
-			std::cout<<"onConnection2 NULL"<<std::endl;
+			TLOG("onConnection2 NULL");
 			return;
 		}
+		//TLOG("onConnection");
 
 		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
@@ -157,6 +165,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::onHubAdd(IServiceHubPtr hub)
 	{
+		TLOG("add to hub");
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
@@ -172,6 +181,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::onHubDel(IServiceHubPtr hub)
 	{
+		TLOG("del from hub");
 		_db.reset();
 	}
 

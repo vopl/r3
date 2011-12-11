@@ -35,6 +35,7 @@ namespace pgc
 			while(	!_readyConnections.empty() &&
 				_readyConnections.size() + _workConnections.size() + _startConnections.size() > _maxConnections)
 			{
+				ILOG("close connection");
 				(*_readyConnections.begin())->close();
 				_readyConnections.erase(_readyConnections.begin());
 				_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
@@ -71,7 +72,7 @@ namespace pgc
 				{
 					//готовых нет, стартующих нет, можно подключать новое
 
-					//std::cerr<<__FUNCTION__<<": "<<"PQconnectStart"<<std::endl;
+					ILOG("start connection");
 					PGconn *pgcon = PQconnectStart(_conninfo.c_str());
 					bool isOk = true;
 					if(pgcon)
@@ -79,14 +80,14 @@ namespace pgc
 						ConnStatusType status = PQstatus(pgcon);
 						if(CONNECTION_BAD == status)
 						{
-							std::cerr<<__FUNCTION__<<": "<<"PQconnectStart has failed"<<std::endl;
+							ILOG("start connection failed, bad status");
 							PQfinish(pgcon);
 							isOk = false;
 						}
 					}
 					else
 					{
-						std::cerr<<__FUNCTION__<<": "<<"libpq has been unable to allocate a new PGconn structure"<<std::endl;
+						ILOG("start connection failed, libpq has been unable to allocate a new PGconn structure");
 						isOk = false;
 					}
 
@@ -104,6 +105,7 @@ namespace pgc
 					{
 						if(!_timeout)
 						{
+							ILOG("wait 1 second for reconnect");
 							_timeout.reset(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
 							_timeout->async_wait(
 								bind(&Db::onReconnectTimer, shared_from_this()));
@@ -139,40 +141,40 @@ namespace pgc
 	{
 		if(ec)
 		{
-			std::cerr<<__FUNCTION__<<": "<<ec.message()<<std::endl;
+			ILOG("poll with bad ec: "<<ec.message()<<"("<<ec.value()<<")");
 		}
 
 // 		switch(PQstatus(pcw->pgcon()))
 // 		{
 // 		case CONNECTION_OK:
-// 			std::cerr<<"CONNECTION_OK"<<std::endl;
+// 			ILOG("poll status CONNECTION_OK");
 // 			break;
 // 		case CONNECTION_BAD:
-// 			std::cerr<<"CONNECTION_BAD"<<std::endl;
+// 			ILOG("poll status CONNECTION_OK");
 // 			break;
 // 		case CONNECTION_STARTED:
-// 			std::cerr<<"Waiting for connection to be made."<<std::endl;
+// 			ILOG("poll status CONNECTION_STARTED");
 // 			break;
 // 		case CONNECTION_MADE:
-// 			std::cerr<<"Connection OK; waiting to send."<<std::endl;
+// 			ILOG("poll status CONNECTION_MADE");
 // 			break;
 // 		case CONNECTION_AWAITING_RESPONSE:
-// 			std::cerr<<"Waiting for a response from the postmaster."<<std::endl;
+// 			ILOG("poll status CONNECTION_AWAITING_RESPONSE");
 // 			break;
 // 		case CONNECTION_AUTH_OK:
-// 			std::cerr<<"Received authentication; waiting for backend startup."<<std::endl;
+// 			ILOG("poll status CONNECTION_AUTH_OK");
 // 			break;
 // 		case CONNECTION_SETENV:
-// 			std::cerr<<"Negotiating environment."<<std::endl;
+// 			ILOG("poll status CONNECTION_SETENV");
 // 			break;
 // 		case CONNECTION_SSL_STARTUP:
-// 			std::cerr<<"Negotiating SSL."<<std::endl;
+// 			ILOG("poll status CONNECTION_SSL_STARTUP");
 // 			break;
 // 		case CONNECTION_NEEDED:
-// 			std::cerr<<"Internal state: connect() needed"<<std::endl;
+// 			ILOG("poll status CONNECTION_NEEDED");
 // 			break;
 // 		default:
-// 			std::cerr<<"UNKNOWN"<<std::endl;
+// 			ILOG("poll status UNKNOWN");
 // 			break;
 // 		}
 
@@ -180,7 +182,7 @@ namespace pgc
 		switch(PQconnectPoll(pcw->pgcon()))
 		{
 		case PGRES_POLLING_FAILED:
-			std::cerr<<__FUNCTION__<<": PGRES_POLLING_FAILED, wait timeout ("<<PQerrorMessage(pcw->pgcon())<<")"<<std::endl;
+			ELOG("poll result FAILED: "<<PQerrorMessage(pcw->pgcon()));
 			{
 				mutex::scoped_lock sl(_mtx);
 				assert(_startConnections.end() != _startConnections.find(pcw));
@@ -188,6 +190,7 @@ namespace pgc
 
 				if(!_timeout)
 				{
+					ILOG("wait 1 second for reconnect");
 					_timeout.reset(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
 					_timeout->async_wait(
 						bind(&Db::onReconnectTimer, shared_from_this()));
@@ -195,54 +198,14 @@ namespace pgc
 			}
 			return;
 		case PGRES_POLLING_READING:
-			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_READING"<<std::endl;
 			pcw->waitRecv(bind(&Db::makeConnection_poll, shared_from_this(), pcw, _1));
-// 			{
-// 				int sock = PQsocket(pcw->pgcon());
-// 				fd_set fds_r, fds_w, fds_e;
-// 				FD_ZERO(&fds_r);
-// 				FD_ZERO(&fds_w);
-// 				FD_ZERO(&fds_e);
-// 				FD_SET(sock, &fds_r);
-// 
-// 				struct timeval wait_time;
-// 				wait_time.tv_sec= 5;
-// 				wait_time.tv_usec= 0;
-// 				int res = select(1, &fds_r, &fds_w, &fds_e, &wait_time);
-// 
-// 				if(!res)
-// 				{
-// 					//pcw->close();
-// 				}
-// 			}
-//			makeConnection_poll(pcw);
 			return;
 		case PGRES_POLLING_WRITING:
-			//std::cerr<<__FUNCTION__<<": PGRES_POLLING_WRITING"<<std::endl;
 			pcw->waitSend(bind(&Db::makeConnection_poll, shared_from_this(), pcw, _1));
-// 			{
-// 				int sock = PQsocket(pcw->pgcon());
-// 				fd_set fds_r, fds_w, fds_e;
-// 				FD_ZERO(&fds_r);
-// 				FD_ZERO(&fds_w);
-// 				FD_ZERO(&fds_e);
-// 				FD_SET(sock, &fds_w);
-// 
-// 				struct timeval wait_time;
-// 				wait_time.tv_sec= 5;
-// 				wait_time.tv_usec= 0;
-// 				int res = select(1, &fds_r, &fds_w, &fds_e, &wait_time);
-// 
-// 				if(!res)
-// 				{
-// 					//pcw->close();
-// 				}
-// 			}
-//			makeConnection_poll(pcw);
 			return;
 		case PGRES_POLLING_OK:
-			std::cerr<<__FUNCTION__<<": PGRES_POLLING_OK"<<std::endl;
 			{
+				//ILOG("poll result OK");
 				pcw->onOpen();
 				size_t numConnections=0;
 				{
@@ -256,7 +219,7 @@ namespace pgc
 			}
 			return;
 		default:
-			std::cerr<<"POLL UNKNOWN"<<std::endl;
+			ELOG("poll result UNKNOWN");
 			{
 				assert(0);
 				int k=220;
@@ -268,6 +231,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Db::onReconnectTimer()
 	{
+		ILOG("reconnect timer now");
 		{
 			mutex::scoped_lock sl(_mtx);
 			_timeout.reset();
@@ -291,6 +255,7 @@ namespace pgc
 		}
 		else
 		{
+			ELOG("bad connection detected");
 			{
 				mutex::scoped_lock sl(_mtx);
 				assert(_workConnections.end() != _workConnections.find(pcw));
@@ -310,6 +275,7 @@ namespace pgc
 		function<void (size_t)> connectionMade,
 		function<void (size_t)> connectionLost)
 	{
+		ILOG("initialize");
 		mutex::scoped_lock sl(_mtx);
 		assert(!_asrv);
 		_asrv = asrv;
@@ -329,15 +295,33 @@ namespace pgc
 		bool unableAlloc = false;
 		{
 			mutex::scoped_lock sl(_mtx);
-			if(_readyConnections.size())
+			while(_readyConnections.size())
 			{
-				pcw = *_readyConnections.begin();
+				ConnectionPreparedsPtr pcw = *_readyConnections.begin();
+
+				if(ecsOk != pcw->status())
+				{
+					ELOG("bad connection detected");
+					{
+						mutex::scoped_lock sl(_mtx);
+						assert(_workConnections.end() != _workConnections.find(pcw));
+						_workConnections.erase(pcw);
+						_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+					}
+					continue;
+				}
+
 				EConnectionStatus status = pcw->status();
 				assert(ecsOk == status);
 				_workConnections.insert(pcw);
 				_readyConnections.erase(_readyConnections.begin());
+
+				IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
+				_asrv->get_io_service().post(bind(ready, c));
+				return;
 			}
-			else
+
+			//не удалось выделить из готовых
 			{
 				if(_maxConnections)
 				{
@@ -351,28 +335,20 @@ namespace pgc
 					}
 					else
 					{
-						unableAlloc = true;
+						ELOG("alloc connection force NULL result");
+						_asrv->get_io_service().post(bind(ready, IConnectionPtr()));
 					}
 				}
 			}
 		}
 
-		if(pcw)
-		{
-			IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
-			_asrv->get_io_service().post(bind(ready, c));
-		}
-		else if(unableAlloc)
-		{
-			_asrv->get_io_service().post(bind(ready, IConnectionPtr()));
-		}
-		
 		balanceConnections();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Db::deinitialize()
 	{
+		ILOG("deinitialize");
 		std::deque<function<void (IConnectionPtr)> > waiters;
 		{
 			mutex::scoped_lock sl(_mtx);
@@ -415,6 +391,4 @@ namespace pgc
 
 		_asrv.reset();
 	}
-
-
 }

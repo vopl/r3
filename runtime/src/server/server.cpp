@@ -11,25 +11,27 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void Server::onSessionStart(ISessionPtr session)
 	{
+		ILOG("sessin start");
 		_serviceHub->addSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Server::onSessionStop(ISessionPtr session)
 	{
+		ILOG("sessin stop");
 		_serviceHub->delSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Server::onDbConnectionMade(size_t numConnections)
 	{
-		std::cerr<<__FUNCTION__<<": "<<numConnections<<std::endl;
+		ILOG("database connection made");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Server::onDbConnectionLost(size_t numConnections)
 	{
-		std::cerr<<__FUNCTION__<<": "<<numConnections<<std::endl;
+		ILOG("database connection lost");
 	}
 
 
@@ -49,8 +51,10 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Server::start(pluma::Pluma *plugs, const char *host, const char *service)
+	bool Server::start(pluma::Pluma *plugs, const char *host, const char *service)
 	{
+		ILOG("start");
+
 		assert(!_plugs);
 		_plugs = plugs;
 
@@ -58,6 +62,11 @@ namespace server
 		//поднять асинхронный двиг
 		_async = _plugs->create<async::IServiceProvider>();
 		assert(_async);
+		if(!_async)
+		{
+			FLOG("failed to create async instance");
+			return false;
+		}
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -65,6 +74,11 @@ namespace server
 		assert(!_db);
 		_db = _plugs->create<pgc::IDbProvider>();
 		assert(_db);
+		if(!_db)
+		{
+			FLOG("failed to create db instance");
+			return false;
+		}
 
 		_db->initialize(
 			_async, 
@@ -77,6 +91,12 @@ namespace server
 		//поднять сетевой коннектор
 		net::IConnectorPtr connector = _plugs->create<net::IConnectorProvider>();
 		assert(connector);
+		if(!connector)
+		{
+			FLOG("failed to create net connector");
+			return false;
+		}
+
 		connector->initialize(_async);
 
 		//////////////////////////////////////////////////////////////////////////
@@ -84,6 +104,11 @@ namespace server
 		assert(!_sessionManager);
 		_sessionManager = _plugs->create<ISessionManagerProvider>();
 		assert(_sessionManager);
+		if(!_sessionManager)
+		{
+			FLOG("failed to create session manager");
+			return false;
+		}
 		_sessionManager->start(connector, host, service, 
 			bind(&Server::onSessionStart, shared_from_this(), _1),
 			bind(&Server::onSessionStop, shared_from_this(), _1));
@@ -93,6 +118,11 @@ namespace server
 		assert(!_serviceHub);
 		_serviceHub = _plugs->create<IServiceHubProvider>();
 		assert(_serviceHub);
+		if(!_serviceHub)
+		{
+			FLOG("failed to create service hub");
+			return false;
+		}
 		_serviceHub->setServer(shared_from_this());
 
 		//////////////////////////////////////////////////////////////////////////
@@ -106,12 +136,15 @@ namespace server
 
 
 		//запускать асинхронный двиг
-		_async->balance(boost::thread::hardware_concurrency()*2);
+		_async->start(boost::thread::hardware_concurrency()*2);
+
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Server::stop()
 	{
+		ILOG("stop");
 		assert(_serviceHub);
 		_serviceHub->delServices();
 

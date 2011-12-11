@@ -10,7 +10,7 @@ namespace server
 	{
 		virtual ~IServer(){}
 
-		virtual void start(pluma::Pluma *plugs, const char *host, const char *service) =0;
+		virtual bool start(pluma::Pluma *plugs, const char *host, const char *service) =0;
 		virtual void stop() =0;
 		
 		virtual pluma::Pluma * getPlugs() =0;
