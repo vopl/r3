@@ -20,4 +20,6 @@ IF(WINDOWS)
 		SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "p:/sdk/OpenSSL-Win32-1.0.0.e/include")
 		SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "P:/sdk/OpenSSL-Win32-1.0.0.e/lib/VC/static")
 	ENDIF()
+
+	SET(ENV{PostgreSQL_ROOT} "C:/Program Files (x86)/PostgreSQL/9.1")
 ENDIF()

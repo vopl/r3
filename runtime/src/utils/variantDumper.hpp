@@ -1,4 +1,5 @@
 #include <boost/foreach.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace utils
 {
@@ -45,6 +46,15 @@ namespace utils
 			<<" (wday="<<v.tm_wday
 			<<", yday="<<v.tm_yday
 			<<", isdst="<<v.tm_isdst<<")";
+
+		return ostr;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <>
+	std::ostream &dumpOstr<boost::uuids::uuid>(std::ostream &ostr, const boost::uuids::uuid &v, size_t /*level*/, bool /*levelApplyed*/)
+	{
+		ostr<<boost::uuids::to_string(v);
 
 		return ostr;
 	}
@@ -150,9 +160,9 @@ namespace utils
 			{
 			case Variant::etVoid: ostr<<"Void# Null"; break;
 
-#define ENUMTYPES_ONE(T) case Variant::et ## T: ostr<< #T<<"# Null"; break;
-				ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case Variant::et ## n: ostr<< #n<<"# Null"; break;
+				ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 			default:
 				assert(!"bad et for dumpOstr_variant");
 				throw "bad et for dumpOstr_variant";
@@ -164,9 +174,9 @@ namespace utils
 			{
 			case Variant::etVoid: ostr<<"Void# <void>"; break;
 
-#define ENUMTYPES_ONE(T) case Variant::et ## T: ostr<< #T<<"# "; dumpOstr(ostr, v.as<Variant::T>(), level, levelApplyed); break;
-				ENUMTYPES
-#undef ENUMTYPES_ONE
+#define ENUM_VARIANT_TYPE(i,n,...) case Variant::et ## n: ostr<< #n<<"# "; dumpOstr(ostr, v.as<Variant::n>(), level, levelApplyed); break;
+				ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 			default:
 				assert(!"bad et for dumpOstr_variant");
 				throw "bad et for dumpOstr_variant";

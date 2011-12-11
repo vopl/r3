@@ -1,67 +1,46 @@
-#include "pgc/statement.hpp"
-#include "statementImpl.hpp"
+#include "pch.h"
+#include "statement.hpp"
 
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	bool Statement::bindNative(int typCpp, void const *valCpp, size_t idx)
-	{
-		return _impl->bind(typCpp, valCpp, idx);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Statement::Statement(StatementImplPtr impl)
-		: _impl(impl)
+	Statement::Statement()
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Statement::~Statement()
 	{
-		_impl.reset();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement &Statement::sql(const char *sql)
+	void Statement::setSql(const char *csz)
 	{
-		_impl->sql(sql);
-		return *this;
+		_sql = csz;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement &Statement::sql(const std::string &sql)
+	void Statement::setSql(const std::string &sql)
 	{
-		_impl->sql(sql);
-		return *this;
+		_sql = sql;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Statement::empty() const
+	const std::string &Statement::getSql()
 	{
-		return _impl->empty();
+		return _sql;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement &Statement::bind(const utils::Variant &v, size_t idx)
+	const std::string &Statement::getPreparedId()
 	{
-		if(!bindNative(v.type(), v.data(), idx))
-		{
-			throw std::invalid_argument("for Statement::bind");
-		}
-		return *this;
+		return _preparedId;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement &Statement::unbind(size_t idx)
+	void Statement::setPreparedId(const char *csz)
 	{
-		_impl->unbind(idx);
-		return *this;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Result Statement::exec()
-	{
-		return Result(ResultImplPtr(new ResultImpl(_impl->con(), _impl->exec())));
+		_preparedId = csz;
 	}
 
 }

@@ -1,155 +1,46 @@
-#include "pgc/result.hpp"
-#include "pgc/exception.hpp"
-#include "resultImpl.hpp"
-#include <cassert>
+#include "pch.h"
+#include "result.hpp"
+#include <libpq-fe.h>
+#include "utils/aton.hpp"
 
 namespace pgc
 {
-	//////////////////////////////////////////////////////////////////////////
-	Result::Result(ResultImplPtr impl)
-		: _impl(impl)
-	{
-	}
+	using namespace utils;
+
+
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchNative(int typCpp, void *valCpp, size_t colIdx, size_t rowIdx)
-	{
-		return _impl->fetch(typCpp, valCpp, colIdx, rowIdx);
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchNative(int typCpp, void *valCpp, const char *colName, size_t rowIdx)
-	{
-		return _impl->fetch(typCpp, valCpp, colName, rowIdx);
-	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result::~Result()
+	template <class SequenceVariant>
+	bool Result::fetchRowList_(SequenceVariant &v, size_t rowIdx)
 	{
-		_impl.reset();
-	}
+		size_t columns = this->cols();
+		v.resize(columns);
 
-	//////////////////////////////////////////////////////////////////////////
-	EExecStatus Result::status()
-	{
-		return _impl->status();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	const char *Result::errorMsg()
-	{
-		return _impl->errorMsg();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	const char *Result::errorCode()
-	{
-		return _impl->errorCode();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Result &Result::throwIfError()
-	{
-		if(_impl->status() == ees_error)
+		SequenceVariant::iterator iter = v.begin();
+		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
-			throw Exception(_impl);
-		}
-		return *this;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	int Result::bestType(size_t colIdx) const
-	{
-		return _impl->bestType((int)colIdx);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	int Result::bestType(const char *colName) const
-	{
-		return _impl->bestType(colName);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	const char *Result::name(size_t colIdx) const
-	{
-		return _impl->name(colIdx);
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	size_t Result::cmdRows()
-	{
-		return _impl->cmdRows();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	size_t Result::rows()
-	{
-		return _impl->rows();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	size_t Result::columns()
-	{
-		return _impl->columns();
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetch(utils::Variant &v, int colIdx, size_t rowIdx)
-	{
-		int bestType = this->bestType(colIdx);
-		switch(bestType)
-		{
-		case CppDataType<Blob>::cdt_index:
-			bestType = CppDataType<boost::uint32_t>::cdt_index;
-			break;
-		case CppDataType<Money>::cdt_index:
-			bestType = CppDataType<boost::int64_t>::cdt_index;
-			break;
-		}
-		v.forceType((utils::Variant::EType)bestType);
-		if(isNull(colIdx, rowIdx))
-		{
-			v.setNull();
-			return true;
+			utils::Variant &rv = *iter;
+			if(!fetch(rv, colIdx, rowIdx))
+			{
+				return false;
+			}
+			iter++;
 		}
 
-		v.setNull(false);
-		return fetchNative(v.type(), v.data(), colIdx, rowIdx);
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetch(utils::Variant &v, const char *colName, size_t rowIdx)
+	bool Result::fetchRowMap_(utils::Variant::MapStringVariant &v, size_t rowIdx)
 	{
-		int bestType = this->bestType(colName);
-		switch(bestType)
-		{
-		case CppDataType<Blob>::cdt_index:
-			bestType = CppDataType<boost::uint32_t>::cdt_index;
-			break;
-		case CppDataType<Money>::cdt_index:
-			bestType = CppDataType<boost::int64_t>::cdt_index;
-			break;
-		}
-		v.forceType((utils::Variant::EType)bestType);
-		if(isNull(colName, rowIdx))
-		{
-			v.setNull();
-			return true;
-		}
-		return fetchNative(v.type(), v.data(), colName, rowIdx);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowMap(utils::Variant::MapStringVariant &v, size_t rowIdx)
-	{
-		size_t columns = Result::columns();
+		size_t columns = Result::cols();
 		v.clear();
 
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
-			if(!fetch(v[name(colIdx)], (int)colIdx, rowIdx))
+			if(!fetch(v[colName(colIdx)], colIdx, rowIdx))
 			{
 				return false;
 			}
@@ -159,15 +50,109 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowMap(utils::Variant::MapStringVariant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	template <class SequenceVariant>
+	bool Result::fetchRowsList_(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		size_t rows = this->rows();
+		if(rowEndIdx > rows) 
+		{
+			rowEndIdx = rows;
+		}
+
+		if(rowBeginIdx>=rowEndIdx)
+		{
+			v.clear();
+			return true;
+		}
+
+		v.resize(rowEndIdx - rowBeginIdx);
+		SequenceVariant::iterator iter = v.begin();
+		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
+		{
+			utils::Variant &rv = *iter;
+			if(!fetchRowList_(rv.as<SequenceVariant>(true), rowIdx))
+			{
+				return false;
+			}
+			iter++;
+		}
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class SequenceVariant>
+	bool Result::fetchRowsMap_(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		size_t rows = this->rows();
+		if(rowEndIdx > rows)
+		{
+			rowEndIdx = rows;
+		}
+
+		if(rowBeginIdx>=rowEndIdx)
+		{
+			v.clear();
+			return true;
+		}
+
+		v.resize(rowEndIdx - rowBeginIdx);
+		SequenceVariant::iterator iter = v.begin();
+		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
+		{
+			utils::Variant &rv = *iter;
+			if(!fetchRowMap_(rv.as<utils::Variant::MapStringVariant>(true), rowIdx))
+			{
+				return false;
+			}
+			iter++;
+		}
+		return true;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	template <class SequenceVariant>
+	bool Result::fetchRowList_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	{
+		size_t columns = colIndices.size();
+		v.resize(columns);
+
+		SequenceVariant::iterator iter = v.begin();
+		for(size_t colIdx(0); colIdx<columns; colIdx++)
+		{
+			assert(colIndices[colIdx] < Result::cols());
+			utils::Variant &rv = *iter;
+			if(!fetch(rv, colIndices[colIdx], rowIdx))
+			{
+				return false;
+			}
+			iter++;
+		}
+
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowMap_(utils::Variant::MapStringVariant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
 	{
 		size_t columns = colIndices.size();
 		v.clear();
 
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
-			assert(colIndices[colIdx] < Result::columns());
-			if(!fetch(v[name(colIndices[colIdx])], (int)colIndices[colIdx], rowIdx))
+			assert(colIndices[colIdx] < Result::cols());
+			if(!fetch(v[colName(colIndices[colIdx])], colIndices[colIdx], rowIdx))
 			{
 				return false;
 			}
@@ -177,89 +162,460 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::int32_t Result::fetchInt32(int colIdx, size_t rowIdx)
+	template <class SequenceVariant>
+	bool Result::fetchRowsList_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
 	{
-		boost::int32_t res;
-		if(!fetch(res, colIdx, rowIdx))
+		size_t rows = this->rows();
+		if(rowEndIdx > rows) 
 		{
-			throw std::runtime_error("fetchInt32 failed");
-			return res;
+			rowEndIdx = rows;
 		}
-		return res;
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	boost::int32_t Result::fetchInt32(const char *colName, size_t rowIdx)
-	{
-		boost::int32_t res;
-		if(!fetch(res, colName, rowIdx))
+		if(rowBeginIdx>=rowEndIdx)
 		{
-			throw std::runtime_error("fetchInt32 failed");
-			return res;
+			v.clear();
+			return true;
 		}
-		return res;
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	boost::uint32_t Result::fetchUInt32(int colIdx, size_t rowIdx)
-	{
-		boost::uint32_t res;
-		if(!fetch(res, colIdx, rowIdx))
+		v.resize(rowEndIdx - rowBeginIdx);
+		SequenceVariant::iterator iter = v.begin();
+		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
 		{
-			throw std::runtime_error("fetchUInt32 failed");
-			return res;
+			utils::Variant &rv = *iter;
+			if(!fetchRowList_(rv.as<SequenceVariant>(true), colIndices, rowIdx))
+			{
+				return false;
+			}
+			iter++;
 		}
-		return res;
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::uint32_t Result::fetchUInt32(const char *colName, size_t rowIdx)
+	template <class SequenceVariant>
+	bool Result::fetchRowsMap_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
 	{
-		boost::uint32_t res;
-		if(!fetch(res, colName, rowIdx))
+		size_t rows = this->rows();
+		if(rowEndIdx > rows)
 		{
-			throw std::runtime_error("fetchUInt32 failed");
-			return res;
+			rowEndIdx = rows;
 		}
-		return res;
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	std::string Result::fetchString(int colIdx, size_t rowIdx)
-	{
-		std::string res;
-		if(!fetch(res, colIdx, rowIdx))
+		if(rowBeginIdx>=rowEndIdx)
 		{
-			throw std::runtime_error("fetchString failed");
-			return res;
+			v.clear();
+			return true;
 		}
-		return res;
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	std::string Result::fetchString(const char *colName, size_t rowIdx)
-	{
-		std::string res;
-		if(!fetch(res, colName, rowIdx))
+		v.resize(rowEndIdx - rowBeginIdx);
+		SequenceVariant::iterator iter = v.begin();
+		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
 		{
-			throw std::runtime_error("fetchString failed");
-			return res;
+			utils::Variant &rv = *iter;
+			if(!fetchRowMap_(rv.as<utils::Variant::MapStringVariant>(true), colIndices, rowIdx))
+			{
+				return false;
+			}
+			iter++;
 		}
-		return res;
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::isNull(int colIdx, size_t rowIdx)
+	template <class SequenceVariant>
+	bool Result::fetchColumn_(SequenceVariant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
 	{
-		return _impl->isNull(colIdx, rowIdx);
+		size_t rows = this->rows();
+		if(rowEndIdx > rows)
+		{
+			rowEndIdx = rows;
+		}
+
+		if(rowBeginIdx>=rowEndIdx)
+		{
+			v.clear();
+			return true;
+		}
+
+		v.resize(rowEndIdx - rowBeginIdx);
+		SequenceVariant::iterator iter = v.begin();
+		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
+		{
+			utils::Variant &rv = *iter;
+			if(!fetch(rv, colIdx, rowIdx))
+			{
+				return false;
+			}
+			iter++;
+		}
+		return true;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	void Result::initExtractors()
+	{
+		int cols = PQnfields(_pgr);
+		_extractors.resize(cols);
+
+		for(int colIdx(0); colIdx<cols; colIdx++)
+		{
+			Oid typDb = PQftype(_pgr, colIdx);
+
+			switch(typDb)
+			{
+			case 21://int2
+				_extractors[colIdx]._meth = &Result::extractor_int2;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::int16_t>::et;
+				break;
+			case 23://int4
+				_extractors[colIdx]._meth = &Result::extractor_int4;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::int32_t>::et;
+				break;
+			case 20://int8
+				_extractors[colIdx]._meth = &Result::extractor_int8;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::int64_t>::et;
+				break;
+			case 1700://numeric
+				_extractors[colIdx]._meth = &Result::extractor_numeric;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
+				break;
+			case 700://float4
+				_extractors[colIdx]._meth = &Result::extractor_float4;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<float>::et;
+				break;
+			case 701://float8
+				_extractors[colIdx]._meth = &Result::extractor_float8;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<double>::et;
+				break;
+			case 790://money
+				_extractors[colIdx]._meth = &Result::extractor_money;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::uint64_t>::et;
+				break;
+			case 1043://varchar
+			case 1042://bpchar
+			case 25://text
+				_extractors[colIdx]._meth = &Result::extractor_varchar;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
+				break;
+			case 17://bytea
+				_extractors[colIdx]._meth = &Result::extractor_bytea;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
+				break;
+			case 1114://timestamp
+			case 1184://timestamptz
+				_extractors[colIdx]._meth = &Result::extractor_timestamp;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::posix_time::ptime>::et;
+				break;
+			case 1186://interval
+				_extractors[colIdx]._meth = &Result::extractor_interval;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::posix_time::time_duration>::et;
+				break;
+			case 1082://date
+				_extractors[colIdx]._meth = &Result::extractor_date;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::gregorian::date>::et;
+				break;
+			case 1083://time
+			case 1266://timetz
+				_extractors[colIdx]._meth = &Result::extractor_time;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::posix_time::time_duration>::et;
+				break;
+			case 16://bool
+				_extractors[colIdx]._meth = &Result::extractor_bool;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<bool>::et;
+				break;
+			case 1560://bit
+			case 1562://varbit
+				_extractors[colIdx]._meth = &Result::extractor_varbit;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
+				break;
+			case 26://oid
+				_extractors[colIdx]._meth = &Result::extractor_oid;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::uint32_t>::et;
+				break;
+			case 2950://uuid
+				_extractors[colIdx]._meth = &Result::extractor_uuid;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::uuids::uuid>::et;
+				break;
+			case 18://char
+				_extractors[colIdx]._meth = &Result::extractor_char;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<char>::et;
+				break;
+			default:
+				_extractors[colIdx]._meth = &Result::extractor_null;
+				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
+			}
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::isNull(const char *colName, size_t rowIdx)
+	Result::Result(PGresult *pgr, ConnectionLowPtr con)
+		: _pgr(pgr)
+		, _con(con)
 	{
-		return _impl->isNull(colName, rowIdx);
+		assert(_pgr);
+		initExtractors();
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	Result::~Result()
+	{
+		PQclear(_pgr);
+	}
 
+	//////////////////////////////////////////////////////////////////////////
+	EResultStatus Result::status()
+	{
+		switch(PQresultStatus(_pgr))
+		{
+		case PGRES_EMPTY_QUERY:
+		case PGRES_COMMAND_OK:
+			return ersCommandOk;
+		case PGRES_TUPLES_OK:
+			return ersTuplesOk;
+		}
+		return ersError;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const char *Result::errorMsg()
+	{
+		const char *res = PQresultErrorMessage(_pgr);
+		return res?res:"";
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const char *Result::errorCode()
+	{
+		const char *res = PQresultErrorField(_pgr, PG_DIAG_SQLSTATE);
+		return res?res:"";
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	size_t Result::cmdRows()
+	{
+		return _atost(PQcmdTuples(_pgr));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	size_t Result::rows()
+	{
+		return (size_t)PQntuples(_pgr);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	size_t Result::cols()
+	{
+		return (size_t)PQnfields(_pgr);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	size_t Result::colIdx(const char *colName)
+	{
+		return (size_t)PQfnumber(_pgr, colName);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const char *Result::colName(size_t colIdx)
+	{
+		return PQfname(_pgr, (int)colIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::isNull(size_t colIdx, size_t rowIdx)
+	{
+		return PQgetisnull(_pgr, (int)rowIdx, (int)colIdx)?true:false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Variant::EType Result::colType(size_t colIdx)
+	{
+		if(colIdx >= (int)_extractors.size())
+		{
+			return Variant::etUnknown;
+		}
+
+		assert(1 == PQfformat(_pgr, colIdx));
+		return _extractors[colIdx]._favorType;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetch(Variant &v, size_t colIdx, size_t rowIdx)
+	{
+		if(colIdx >= (int)_extractors.size())
+		{
+			return false;
+		}
+
+		assert(1 == PQfformat(_pgr, colIdx));
+
+		switch(v.type())
+		{
+		case Variant::etUnknown:
+		case Variant::etVoid:
+			v.forceType(_extractors[colIdx]._favorType);
+			break;
+		}
+		if(PQgetisnull(_pgr, (int)rowIdx, (int)colIdx))
+		{
+			v.setNull();
+			return true;
+		}
+		v.setNull(false);
+		return (this->*_extractors[colIdx]._meth)(colIdx, rowIdx, v.type(), v.data());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowList(Variant &v, size_t rowIdx)
+	{
+		switch(v.type())
+		{
+		case Variant::etDequeVariant:
+			return fetchRowList_(v.as<Variant::DequeVariant>(), rowIdx);
+		case Variant::etListVariant:
+			return fetchRowList_(v.as<Variant::ListVariant>(), rowIdx);
+		case Variant::etVectorVariant:
+			return fetchRowList_(v.as<Variant::VectorVariant>(), rowIdx);
+		}
+		return fetchRowList_(v.as<Variant::DequeVariant>(true), rowIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowMap(Variant &v, size_t rowIdx)
+	{
+		return fetchRowMap_(v.as<Variant::MapStringVariant>(true), rowIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowsList(Variant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		switch(v.type())
+		{
+		case Variant::etDequeVariant:
+			return fetchRowsList_(v.as<Variant::DequeVariant>(), rowBeginIdx, rowEndIdx);
+		case Variant::etListVariant:
+			return fetchRowsList_(v.as<Variant::ListVariant>(), rowBeginIdx, rowEndIdx);
+		case Variant::etVectorVariant:
+			return fetchRowsList_(v.as<Variant::VectorVariant>(), rowBeginIdx, rowEndIdx);
+		}
+		return fetchRowsList_(v.as<Variant::DequeVariant>(true), rowBeginIdx, rowEndIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowsMap(Variant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		switch(v.type())
+		{
+		case Variant::etDequeVariant:
+			return fetchRowsMap_(v.as<Variant::DequeVariant>(), rowBeginIdx, rowEndIdx);
+		case Variant::etListVariant:
+			return fetchRowsMap_(v.as<Variant::ListVariant>(), rowBeginIdx, rowEndIdx);
+		case Variant::etVectorVariant:
+			return fetchRowsMap_(v.as<Variant::VectorVariant>(), rowBeginIdx, rowEndIdx);
+		}
+		return fetchRowsMap_(v.as<Variant::DequeVariant>(true), rowBeginIdx, rowEndIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowList(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	{
+		switch(v.type())
+		{
+		case Variant::etDequeVariant:
+			return fetchRowList_(v.as<Variant::DequeVariant>(), colIndices, rowIdx);
+		case Variant::etListVariant:
+			return fetchRowList_(v.as<Variant::ListVariant>(), colIndices, rowIdx);
+		case Variant::etVectorVariant:
+			return fetchRowList_(v.as<Variant::VectorVariant>(), colIndices, rowIdx);
+		}
+		return fetchRowList_(v.as<Variant::DequeVariant>(true), colIndices, rowIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	{
+		return fetchRowMap_(v.as<Variant::MapStringVariant>(true), colIndices, rowIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowsList(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		switch(v.type())
+		{
+		case Variant::etDequeVariant:
+			return fetchRowsList_(v.as<Variant::DequeVariant>(), colIndices, rowBeginIdx, rowEndIdx);
+		case Variant::etListVariant:
+			return fetchRowsList_(v.as<Variant::ListVariant>(), colIndices, rowBeginIdx, rowEndIdx);
+		case Variant::etVectorVariant:
+			return fetchRowsList_(v.as<Variant::VectorVariant>(), colIndices, rowBeginIdx, rowEndIdx);
+		}
+		return fetchRowsList_(v.as<Variant::DequeVariant>(true), colIndices, rowBeginIdx, rowEndIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchRowsMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		switch(v.type())
+		{
+		case Variant::etDequeVariant:
+			return fetchRowsMap_(v.as<Variant::DequeVariant>(), colIndices, rowBeginIdx, rowEndIdx);
+		case Variant::etListVariant:
+			return fetchRowsMap_(v.as<Variant::ListVariant>(), colIndices, rowBeginIdx, rowEndIdx);
+		case Variant::etVectorVariant:
+			return fetchRowsMap_(v.as<Variant::VectorVariant>(), colIndices, rowBeginIdx, rowEndIdx);
+		}
+		return fetchRowsMap_(v.as<Variant::DequeVariant>(true), colIndices, rowBeginIdx, rowEndIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Result::fetchColumn(Variant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
+	{
+		switch(v.type())
+		{
+		case Variant::etDequeVariant:
+			return fetchColumn_(v.as<Variant::DequeVariant>(), rowBeginIdx, rowEndIdx);
+		case Variant::etListVariant:
+			return fetchColumn_(v.as<Variant::ListVariant>(), rowBeginIdx, rowEndIdx);
+		case Variant::etVectorVariant:
+			return fetchColumn_(v.as<Variant::VectorVariant>(), rowBeginIdx, rowEndIdx);
+		}
+		return fetchColumn_(v.as<Variant::DequeVariant>(true), rowBeginIdx, rowEndIdx);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	boost::int32_t Result::fetchInt32(size_t colIdx, size_t rowIdx)
+	{
+		Variant v;
+		v.as<boost::int32_t>(true);
+		if(!fetch(v, colIdx, rowIdx))
+		{
+			return 0;
+		}
+		return v.as<boost::int32_t>();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	boost::uint32_t Result::fetchUInt32(size_t colIdx, size_t rowIdx)
+	{
+		Variant v;
+		v.as<boost::uint32_t>(true);
+		if(!fetch(v, colIdx, rowIdx))
+		{
+			return 0;
+		}
+		return v.as<boost::uint32_t>();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	std::string Result::fetchString(size_t colIdx, size_t rowIdx)
+	{
+		Variant v;
+		v.as<std::string>(true);
+		if(!fetch(v, colIdx, rowIdx))
+		{
+			return 0;
+		}
+		return v.as<std::string>();
+	}
 
 }

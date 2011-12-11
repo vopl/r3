@@ -65,7 +65,7 @@ namespace net
 		function<void (system::error_code)> fail)
 	{
 		STransferStateSendPtr ts(new STransferStateSend(p, ok, fail));
-		ts->_header[0] = utils::fixEndian(ts->_packet._size);
+		ts->_header[0] = utils::litEndian(ts->_packet._size);
 		
 		_strand.dispatch(
 			bind(&ChannelSocket::onSend, shared_from_this(), 
@@ -103,7 +103,7 @@ namespace net
 		}
 		else if(ts->_transferedSize == sizeof(ts->_header))
 		{
-			ts->_packet._size = utils::fixEndian(ts->_header[0]);
+			ts->_packet._size = utils::litEndian(ts->_header[0]);
 			if(ts->_packet._size)
 			{
 				ts->_packet._data.reset(new char[ts->_packet._size]);

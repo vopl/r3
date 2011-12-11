@@ -6,14 +6,23 @@
 
 namespace server
 {
+	//////////////////////////////////////////////////////////////////////////
+	struct IServer;
+	typedef boost::shared_ptr<IServer> IServerPtr;
+
+	//////////////////////////////////////////////////////////////////////////
 	struct IServiceHub
 	{
 		virtual ~IServiceHub(){}
+
+		virtual void setServer(IServerPtr server) =0;
+		virtual IServerPtr getServer() =0;
 
 		virtual void addSession(ISessionPtr session) =0;
 		virtual void delSession(ISessionPtr session) =0;
 
 		virtual void addService(IServicePtr service) =0;
+		virtual IServicePtr getService(const TEndpoint &endpoint) =0;
 		virtual void delService(IServicePtr service) =0;
 		virtual void delServices() =0;
 

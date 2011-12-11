@@ -129,6 +129,19 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ServiceHub::setServer(IServerPtr server)
+	{
+		_server = server;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	IServerPtr ServiceHub::getServer()
+	{
+		return _server;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::addSession(ISessionPtr session)
 	{
 		{
@@ -165,23 +178,49 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::addService(IServicePtr service)
 	{
-		mutex::scoped_lock sl(_mtx);
-		if(_services.end() == _services.find(service->getEndpoint()))
+		bool isOk = false;
 		{
-			_services[service->getEndpoint()] = service;
+			mutex::scoped_lock sl(_mtx);
+			if(_services.end() == _services.find(service->getEndpoint()))
+			{
+				_services[service->getEndpoint()] = service;
+				isOk = true;
+			}
+		}
+		if(isOk)
+		{
 			service->onHubAdd(shared_from_this());
 		}
+	}
+
+	IServicePtr ServiceHub::getService(const TEndpoint &endpoint)
+	{
+		mutex::scoped_lock sl(_mtx);
+		TMServices::iterator iter = _services.find(endpoint);
+		if(_services.end() != iter)
+		{
+			return iter->second;
+		}
+		return IServicePtr();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceHub::delService(IServicePtr service)
 	{
-		mutex::scoped_lock sl(_mtx);
-		TMServices::iterator iter = _services.find(service->getEndpoint());
-		if(_services.end() != iter)
+		bool isOk = false;
+		{
+			mutex::scoped_lock sl(_mtx);
+			TMServices::iterator iter = _services.find(service->getEndpoint());
+			if(_services.end() != iter)
+			{
+				_services.erase(iter);
+				isOk = true;
+			}
+		}
+
+		if(isOk)
 		{
 			service->onHubDel(shared_from_this());
-			_services.erase(iter);
 		}
 	}
 
