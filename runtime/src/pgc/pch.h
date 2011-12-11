@@ -1,4 +1,4 @@
-#define LOG_NAME "pgc"
+#define LOG_NAME pgc
 #include "log/client.hpp"
 
 #include <boost/shared_ptr.hpp>

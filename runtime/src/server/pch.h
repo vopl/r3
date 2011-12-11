@@ -1,4 +1,4 @@
-#define LOG_NAME "server"
+#define LOG_NAME server
 #include "log/client.hpp"
 
 #include <deque>

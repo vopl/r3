@@ -1,7 +1,7 @@
 #include "pluma/pluma.hpp"
 #include "server/iserver.hpp"
 
-#define LOG_NAME "entry"
+#define LOG_NAME entry
 #include "log/client.hpp"
 
 #include <boost/thread.hpp>

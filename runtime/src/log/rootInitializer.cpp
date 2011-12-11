@@ -23,16 +23,16 @@ namespace
 			SharedAppenderPtr conApp(new ConsoleAppender());
 			conApp->setName("STDOUT");
 			conApp->setLayout(std::auto_ptr<Layout>(new PatternLayout(logformat)));
-			conApp->setThreshold(NOT_SET_LOG_LEVEL);
+			//conApp->setThreshold(NOT_SET_LOG_LEVEL);
 
 
 
 
 
-			SharedAppenderPtr fileApp(new RollingFileAppender("../log/warn"));
+			SharedAppenderPtr fileApp(new DailyRollingFileAppender("../log/root", DAILY, true, 150));
 			fileApp->setName("file");
 			fileApp->setLayout(std::auto_ptr<Layout>(new PatternLayout(logformat)));
-			fileApp->setThreshold(WARN_LOG_LEVEL);
+			//fileApp->setThreshold(WARN_LOG_LEVEL);
 
 			Logger::getRoot().removeAllAppenders();
 			Logger::getRoot().addAppender(conApp);

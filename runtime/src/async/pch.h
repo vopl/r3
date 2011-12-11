@@ -3,5 +3,5 @@
 #include <boost/foreach.hpp>
 #include <boost/asio.hpp>
 
-#define LOG_NAME "async"
+#define LOG_NAME async
 #include "log/client.hpp"
