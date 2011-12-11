@@ -31,8 +31,6 @@ namespace pgc
 			boost::function<void (IResultPtrs)> done) =0;
 
 		virtual EConnectionStatus status() =0;
-
-		virtual void close() =0;
 	};
 	typedef boost::shared_ptr<IConnection> IConnectionPtr;
 }

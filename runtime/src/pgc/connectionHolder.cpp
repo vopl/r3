@@ -89,11 +89,4 @@ namespace pgc
 		return _con->status();
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::close()
-	{
-		_con->dispatch(
-			bind(&ConnectionLow::close, _con));
-	}
-
 }

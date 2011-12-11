@@ -32,71 +32,86 @@ namespace pgc
 		{
 			mutex::scoped_lock sl(_mtx);
 
+			//закрытие
+			while(	!_readyConnections.empty() &&
+				_readyConnections.size() + _workConnections.size() + _startConnections.size() > _maxConnections)
+			{
+				(*_readyConnections.begin())->close();
+				_readyConnections.erase(_readyConnections.begin());
+				lostsConnections.push_back(_readyConnections.size() + _workConnections.size());
+			}
+
+			//распределение и открытие
 			while(!_waiters.empty())
 			{
+				if(!_maxConnections)
+				{
+					//больше выделять нельзя, освободить всех ожидающих нулями
+					SWorkPair swp = {ConnectionPreparedsPtr(), _waiters.front()};
+					_waiters.erase(_waiters.begin());
+
+					readyWaiters.push_back(swp);
+					continue;
+				}
+
 				if(!_readyConnections.empty())
 				{
+					//есть готовые соединения
 					SWorkPair swp = {*_readyConnections.begin(), _waiters.front()};
 					_readyConnections.erase(_readyConnections.begin());
 					_waiters.erase(_waiters.begin());
 
 					readyWaiters.push_back(swp);
 					_workConnections.insert(swp._con);
+
+					continue;
 				}
-				else
+
+				if(	_startConnections.empty() && 
+					_readyConnections.size() + _workConnections.size() < _maxConnections)
 				{
-					if(	_startConnections.empty() && 
-						_readyConnections.size() + _workConnections.size() < _maxConnections)
+					//готовых нет, стартующих нет, можно подключать новое
+
+					//std::cerr<<__FUNCTION__<<": "<<"PQconnectStart"<<std::endl;
+					PGconn *pgcon = PQconnectStart(_conninfo.c_str());
+					bool isOk = true;
+					if(pgcon)
 					{
-						//std::cerr<<__FUNCTION__<<": "<<"PQconnectStart"<<std::endl;
-						PGconn *pgcon = PQconnectStart(_conninfo.c_str());
-						bool isOk = true;
-						if(pgcon)
+						ConnStatusType status = PQstatus(pgcon);
+						if(CONNECTION_BAD == status)
 						{
-							ConnStatusType status = PQstatus(pgcon);
-							if(CONNECTION_BAD == status)
-							{
-								std::cerr<<__FUNCTION__<<": "<<"PQconnectStart has failed"<<std::endl;
-								PQfinish(pgcon);
-								isOk = false;
-							}
-						}
-						else
-						{
-							std::cerr<<__FUNCTION__<<": "<<"libpq has been unable to allocate a new PGconn structure"<<std::endl;
+							std::cerr<<__FUNCTION__<<": "<<"PQconnectStart has failed"<<std::endl;
+							PQfinish(pgcon);
 							isOk = false;
 						}
+					}
+					else
+					{
+						std::cerr<<__FUNCTION__<<": "<<"libpq has been unable to allocate a new PGconn structure"<<std::endl;
+						isOk = false;
+					}
 
-						if(isOk)
-						{
-							PostgresPollingStatusType status;
-							status = PQconnectPoll(pgcon);
-							status = PQconnectPoll(pgcon);
-							status = PQconnectPoll(pgcon);
+					if(isOk)
+					{
+// 							PostgresPollingStatusType status;
+// 							status = PQconnectPoll(pgcon);
+// 							status = PQconnectPoll(pgcon);
+// 							status = PQconnectPoll(pgcon);
 
-							pcwStarted.reset(new ConnectionPrepareds(pgcon, _asrv->get_io_service()));
-							_startConnections.insert(pcwStarted);
-						}
-						else
+						pcwStarted.reset(new ConnectionPrepareds(pgcon, _asrv->get_io_service()));
+						_startConnections.insert(pcwStarted);
+					}
+					else
+					{
+						if(!_timeout)
 						{
-							if(!_timeout)
-							{
-								_timeout.reset(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
-								_timeout->async_wait(
-									bind(&Db::onReconnectTimer, shared_from_this()));
-							}
+							_timeout.reset(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
+							_timeout->async_wait(
+								bind(&Db::onReconnectTimer, shared_from_this()));
 						}
 					}
-					break;
 				}
-			}
-
-			while(	!_readyConnections.empty() &&
-					_readyConnections.size() + _workConnections.size() + _startConnections.size() > _maxConnections)
-			{
-				(*_readyConnections.begin())->close();
-				_readyConnections.erase(_readyConnections.begin());
-				lostsConnections.push_back(_readyConnections.size() + _workConnections.size());
+				break;
 			}
 		}
 
@@ -112,7 +127,11 @@ namespace pgc
 
 		BOOST_FOREACH(SWorkPair &wp, readyWaiters)
 		{
-			IConnectionPtr c(new ConnectionHolder(shared_from_this(), wp._con));
+			IConnectionPtr c;
+			if(wp._con)
+			{
+				c.reset(new ConnectionHolder(shared_from_this(), wp._con));
+			}
 			if(wp._waiter)
 			{
 				_asrv->get_io_service().post(bind(wp._waiter, c));
@@ -350,11 +369,11 @@ namespace pgc
 		if(pcw)
 		{
 			IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
-			ready(c);
+			_asrv->get_io_service().post(bind(ready, c));
 		}
 		else if(unableAlloc)
 		{
-			ready(IConnectionPtr());
+			_asrv->get_io_service().post(bind(ready, IConnectionPtr()));
 		}
 		
 		balanceConnections();
@@ -376,40 +395,34 @@ namespace pgc
 			_maxConnections = 0;
 			_conninfo.clear();
 			waiters.swap(_waiters);
-
-			BOOST_FOREACH(ConnectionPreparedsPtr &c, _startConnections)
-			{
-				c->close();
-			}
 		}
 		BOOST_FOREACH(function<void (IConnectionPtr)> &w, waiters)
 		{
 			w(IConnectionPtr());
 		}
-		balanceConnections();
 
-		//_onConnectionMade.swap(function<void (size_t)>());
-		//_onConnectionLost.swap(function<void (size_t)>());
+		bool doWait = true;
+		while(doWait)
+		{
+			{
+				mutex::scoped_lock sl(_mtx);
+				doWait = !(_startConnections.empty() && _readyConnections.empty() && _workConnections.empty());
+			}
+			if(doWait)
+			{
+				balanceConnections();
 
-// 		//////////////////////////////////////////////////////////////////////////
-// 		BOOST_FOREACH(ConnectionPreparedsPtr &c, _startConnections)
-// 		{
-// 			c->close();
-// 		}
-// 		_startConnections.clear();
-// 		BOOST_FOREACH(ConnectionPreparedsPtr &c, _readyConnections)
-// 		{
-// 			c->close();
-// 		}
-// 		_readyConnections.clear();
-// 		BOOST_FOREACH(ConnectionPreparedsPtr &c, _workConnections)
-// 		{
-// 			c->close();
-// 		}
-// 		_workConnections.clear();
-// 
-// 		//////////////////////////////////////////////////////////////////////////
-// 		_waiters.clear();
+				boost::xtime xt;
+				boost::xtime_get(&xt, boost::TIME_UTC);
+				xt.nsec += 100000000;
+				boost::thread::sleep(xt);
+			}
+		}
+
+		_onConnectionMade.swap(function<void (size_t)>());
+		_onConnectionLost.swap(function<void (size_t)>());
+
+		_asrv.reset();
 	}
 
 

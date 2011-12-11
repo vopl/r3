@@ -42,8 +42,6 @@ namespace pgc
 			TDone done);
 
 		virtual EConnectionStatus status();
-
-		virtual void close();
 	};
 	typedef shared_ptr<ConnectionHolder> ConnectionHolderPtr;
 }
