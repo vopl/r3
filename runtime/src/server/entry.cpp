@@ -90,10 +90,9 @@ int main(int argc, char* argv[])
 			case 'e':
 				bStop = true;
 				ILOG("exit request");
-				std::cout<<"exit"<<std::endl;
 				break;
 			default:
-				std::cout<<"what?"<<std::endl;
+				ILOG("?");
 				break;
 			}
 		}

@@ -1,3 +1,5 @@
+#define LOG_NAME client
+#include "log/client.hpp"
 
 #include <deque>
 #include <set>

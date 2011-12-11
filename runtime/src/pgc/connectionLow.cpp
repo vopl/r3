@@ -17,7 +17,7 @@ namespace pgc
 		}
 		else
 		{
-			std::cerr<<__FUNCTION__<<": getsockname failed"<<std::endl;
+			ELOG(__FUNCTION__<<", getsockname failed");
 		}
 		return 0;
 	}
@@ -33,7 +33,7 @@ namespace pgc
 		}
 		else
 		{
-			std::cerr<<__FUNCTION__<<": getsockopt failed"<<std::endl;
+			ELOG(__FUNCTION__<<", getsockopt failed");
 		}
 		return 0;
 	}

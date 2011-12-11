@@ -32,7 +32,7 @@ namespace pgc
 		assert(_inProcess);
 		if(ec)
 		{
-			std::cerr<<__FUNCTION__<<": "<<ec.message()<<", "<<ec.value()<<std::endl;
+			ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 			processStop();
 			close();
 			return;
@@ -54,7 +54,7 @@ namespace pgc
 		assert(_inProcess);
 		if(ec)
 		{
-			std::cerr<<__FUNCTION__<<": "<<ec.message()<<", "<<ec.value()<<std::endl;
+			ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 			processStop();
 			close();
 			return;
@@ -63,7 +63,7 @@ namespace pgc
 		assert(pgcon());
 		if(!PQconsumeInput(pgcon()))
 		{
-			std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(pgcon())<<std::endl;
+			ELOG(__FUNCTION__<<", "<<PQerrorMessage(pgcon())<<")");
 		}
 
 		PGresult *pgr = PQgetResult(pgcon());
@@ -73,7 +73,7 @@ namespace pgc
 
 			if(!PQconsumeInput(pgcon()))
 			{
-				std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(pgcon())<<std::endl;
+				ELOG(__FUNCTION__<<", "<<PQerrorMessage(pgcon())<<")");
 			}
 			if(PQisBusy(pgcon()))
 			{
@@ -147,7 +147,7 @@ namespace pgc
 		case ecsLost:
 			//соединение утеряно или закрыто
 			{
-				std::cerr<<__FUNCTION__<<": connection lost or closed"<<std::endl;
+				ELOG("connection lost or closed");
 				IResultPtrs nullResult;
 				TRequests requests;
 				requests.swap(_requests);
@@ -219,7 +219,7 @@ namespace pgc
 
 		if(!sendStatus)
 		{
-			std::cerr<<__FUNCTION__<<": "<<PQerrorMessage(pgcon())<<std::endl;
+			ELOG(__FUNCTION__<<", "<<PQerrorMessage(pgcon())<<")");
 			processStop();
 			return;
 		}

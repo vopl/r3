@@ -208,7 +208,7 @@ namespace net
 	template <class Base>
 	void ChannelHub<Base>::onLowChannelSendFail(IChannelPtr channel, system::error_code ec)
 	{
-		std::cerr<<ec.message()<<std::endl;
+		ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 	}
 
 
@@ -216,6 +216,7 @@ namespace net
 	template <class Base>
 	void ChannelHub<Base>::onSendFail(IChannelPtr channel, SendWaiterPtr sw, system::error_code ec)
 	{
+		ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 		//закрыть канал и избавится от него
 		channel->close();
 
@@ -309,7 +310,7 @@ namespace net
 	template <class Base>
 	void ChannelHub<Base>::onLowChannelRecvFail(IChannelPtr channel, system::error_code ec)
 	{
-		std::cerr<<ec.message()<<std::endl;
+		ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
