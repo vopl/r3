@@ -615,7 +615,7 @@ DailyRollingFileAppender::~DailyRollingFileAppender()
 void
 DailyRollingFileAppender::close()
 {
-    rollover();
+    //rollover();
     FileAppender::close();
 }
 
