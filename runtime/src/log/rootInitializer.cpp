@@ -13,7 +13,7 @@ namespace
 	public:
 		_static_root_log4cplus_initializer()
 		{
-			std::string logformat="%c %d{%H:%M:%S:%q} %-5p [%t]:%m%n";
+			std::string logformat = "[%t] %d{%H:%M:%S.%q} %p %c: %m%n";
 			using namespace log4cplus;
 
 

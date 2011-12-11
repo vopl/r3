@@ -26,8 +26,12 @@
 #include <log4cplus/config.hxx>
 #include <log4cplus/tstring.h>
 #include <log4cplus/helpers/socketbuffer.h>
+
 #if defined(_WIN32)
-#include <winsock.h>
+//#	include <winsock.h>
+# include <winsock2.h>
+# include <ws2tcpip.h>
+# include <mswsock.h>
 #endif
 
 namespace log4cplus {

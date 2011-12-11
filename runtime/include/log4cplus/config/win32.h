@@ -24,6 +24,9 @@
 #define LOG4CPLUS_CONFIG_WIN32_HEADER_
 
 #ifdef _WIN32
+# include <winsock2.h>
+# include <ws2tcpip.h>
+# include <mswsock.h>
 #include <windows.h>
 
 #if ! defined (_WIN32_WCE)

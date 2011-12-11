@@ -1,3 +1,5 @@
+#define LOG_NAME "server"
+#include "log/client.hpp"
 
 #include <deque>
 #include <set>
@@ -13,5 +15,3 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
-
-

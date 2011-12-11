@@ -34,7 +34,7 @@ namespace server
 		Server();
 		~Server();
 
-		virtual void start(pluma::Pluma *plugs, const char *host, const char *service);
+		virtual bool start(pluma::Pluma *plugs, const char *host, const char *service);
 		virtual void stop();
 		virtual pluma::Pluma * getPlugs();
 		virtual async::IServicePtr getAsync();

@@ -36,7 +36,7 @@ CREATE_PCH(plugasync ${SRC_DIR}/async/pch.h ${SRC_PCH})
 USE_PCH(plugasync ${SRC_DIR}/async/pch.h ${SRC})
 SETUP_BIN_OUT(plugasync plug)
 
-TARGET_LINK_LIBRARIES(plugasync libheap libpluma libutils)
+TARGET_LINK_LIBRARIES(plugasync libheap libpluma libutils liblog)
 
 IF(LINUX)
 	SET(CMAKE_THREAD_PREFER_PTHREAD ON)

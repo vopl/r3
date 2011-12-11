@@ -1,7 +1,9 @@
 #include "pluma/pluma.hpp"
 #include "server/iserver.hpp"
-#define LOG_NAME "server"
+
+#define LOG_NAME "entry"
 #include "log/client.hpp"
+
 #include <boost/thread.hpp>
 #include <iostream>
 
@@ -27,7 +29,7 @@ static pluma::Pluma *g_plugins = new pluma::Pluma;
 
 int main(int argc, char* argv[])
 {
-	LOGI("startup");
+	ILOG("startup");
 
 
 	signal(SIGINT, onSignal);
@@ -45,19 +47,23 @@ int main(int argc, char* argv[])
 
 
 	//////////////////////////////////////////////////////////////////////////
-	LOGI("load plugins");
+	ILOG("load plugins");
 	g_plugins->loadFromFolder("../plug");
 
-	LOGI("create server");
+	ILOG("create server");
 	server::IServerPtr srv(g_plugins->create<server::IServerProvider>());
 	assert(srv);
 	if(!srv)
 	{
-		LOGF("unable to create server plugin");
+		FLOG("unable to create server");
 		return EXIT_FAILURE;
 	}
 
-	srv->start(g_plugins, "localhost", "29431");
+	if(!srv->start(g_plugins, "localhost", "29431"))
+	{
+		FLOG("unable to start server");
+		return EXIT_FAILURE;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 #ifdef WIN32
@@ -83,7 +89,7 @@ int main(int argc, char* argv[])
 			{
 			case 'e':
 				bStop = true;
-				LOGI("exit request");
+				ILOG("exit request");
 				std::cout<<"exit"<<std::endl;
 				break;
 			default:
@@ -99,11 +105,11 @@ int main(int argc, char* argv[])
 	} while(!bStop);
 
 
-	LOGI("stopping server");
+	ILOG("stopping server");
 	srv->stop();
 	srv.reset();
 
-	LOGI("exiting");
+	ILOG("exiting");
 	return EXIT_SUCCESS;
 }
 

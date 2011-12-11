@@ -17,7 +17,7 @@ namespace log_
 		//////////////////////////////////////////////////////////////////////////
 		static log4cplus::Logger initializer(const std::string name)
 		{
-			std::string logformat="%d{%H:%M:%S} %-5p [%t]:%m%n";
+			std::string logformat = "[%t] %d{%H:%M:%S.%q} %p: %m%n";
 			using namespace log4cplus;
 
 
@@ -41,15 +41,14 @@ namespace log_
 
 	template <bool b>
 	log4cplus::Logger StaticLoggerHolder<b>::_instance = StaticLoggerHolder<b>::initializer(LOG_NAME);
-
-
-
-#define LOGF(...)	LOG4CPLUS_FATAL(log_::StaticLoggerHolder<true>::_instance, __VA_ARGS__)
-#define LOGE(...)	LOG4CPLUS_ERROR(log_::StaticLoggerHolder<true>::_instance, __VA_ARGS__)
-#define LOGW(...)	LOG4CPLUS_WARN(log_::StaticLoggerHolder<true>::_instance, __VA_ARGS__)
-#define LOGI(...)	LOG4CPLUS_INFO(log_::StaticLoggerHolder<true>::_instance, __VA_ARGS__)
-#define LOGD(...)	LOG4CPLUS_DEBUG(log_::StaticLoggerHolder<true>::_instance, __VA_ARGS__)
-#define LOGT(...)	LOG4CPLUS_TRACE(log_::StaticLoggerHolder<true>::_instance, __VA_ARGS__)
 }
+
+
+#define FLOG(msg)	LOG4CPLUS_FATAL(log_::StaticLoggerHolder<true>::_instance, msg)
+#define ELOG(msg)	LOG4CPLUS_ERROR(log_::StaticLoggerHolder<true>::_instance, msg)
+#define WLOG(msg)	LOG4CPLUS_WARN(log_::StaticLoggerHolder<true>::_instance, msg)
+#define ILOG(msg)	LOG4CPLUS_INFO(log_::StaticLoggerHolder<true>::_instance, msg)
+#define DLOG(msg)	LOG4CPLUS_DEBUG(log_::StaticLoggerHolder<true>::_instance, msg)
+#define TLOG(msg)	LOG4CPLUS_TRACE(log_::StaticLoggerHolder<true>::_instance, msg)
 
 #endif
