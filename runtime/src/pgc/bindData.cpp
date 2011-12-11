@@ -53,7 +53,12 @@ namespace pgc
 	void BindData::bindScalar(const Variant &v)
 	{
 		resizeArrays(1);
-		bindFiller(v, 0);
+		if(!bindFiller(v, 0))
+		{
+			assert(0);
+			ELOG("bind scalar failed");
+			resizeArrays(0);
+		}
 	}
 
 
