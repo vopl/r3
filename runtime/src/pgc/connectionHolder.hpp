@@ -31,13 +31,13 @@ namespace pgc
 		ConnectionHolder(DbPtr db, ConnectionPreparedsPtr con);
 		~ConnectionHolder();
 
-		virtual void exec(const std::string &sql,
+		virtual void query(const std::string &sql,
 			TDone done);
 
-		virtual void exec(IStatementPtr s,
+		virtual void query(IStatementPtr s,
 			TDone done);
 
-		virtual void exec(IStatementPtr s,
+		virtual void query(IStatementPtr s,
 			const utils::Variant &data,
 			TDone done);
 

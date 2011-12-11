@@ -20,13 +20,13 @@ namespace pgc
 	{
 		virtual ~IConnection(){}
 
-		virtual void exec(const std::string &sql,
+		virtual void query(const std::string &sql,
 			boost::function<void (IResultPtrs)> done) =0;
 
-		virtual void exec(IStatementPtr s,
+		virtual void query(IStatementPtr s,
 			boost::function<void (IResultPtrs)> done) =0;
 
-		virtual void exec(IStatementPtr s,
+		virtual void query(IStatementPtr s,
 			const utils::Variant &data,
 			boost::function<void (IResultPtrs)> done) =0;
 

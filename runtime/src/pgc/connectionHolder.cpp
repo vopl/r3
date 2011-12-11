@@ -40,7 +40,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::exec(const std::string &sql,
+	void ConnectionHolder::query(const std::string &sql,
 		TDone done)
 	{
 		TDone keepedDone = 
@@ -53,7 +53,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::exec(IStatementPtr s,
+	void ConnectionHolder::query(IStatementPtr s,
 		TDone done)
 	{
 		TDone keepedDone = 
@@ -68,7 +68,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::exec(IStatementPtr s,
+	void ConnectionHolder::query(IStatementPtr s,
 		const utils::Variant &data,
 		TDone done)
 	{

@@ -26,7 +26,6 @@ namespace pgc
 			function<void (IConnectionPtr)>	_waiter;
 		};
 		std::deque<SWorkPair> readyWaiters;
-		std::deque<size_t> lostsConnections;
 		ConnectionPreparedsPtr pcwStarted;
 
 		{
@@ -38,7 +37,7 @@ namespace pgc
 			{
 				(*_readyConnections.begin())->close();
 				_readyConnections.erase(_readyConnections.begin());
-				lostsConnections.push_back(_readyConnections.size() + _workConnections.size());
+				_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
 			}
 
 			//распределение и открытие
@@ -118,11 +117,6 @@ namespace pgc
 		if(pcwStarted)
 		{
 			makeConnection_poll(pcwStarted, system::errc::make_error_code(system::errc::success));
-		}
-
-		BOOST_FOREACH(size_t numConnections, lostsConnections)
-		{
-			_asrv->get_io_service().post(bind(_onConnectionLost, numConnections));
 		}
 
 		BOOST_FOREACH(SWorkPair &wp, readyWaiters)
@@ -256,9 +250,8 @@ namespace pgc
 					assert(_startConnections.end() != _startConnections.find(pcw));
 					_startConnections.erase(pcw);
 					_readyConnections.insert(pcw);
-					numConnections = _readyConnections.size() + _workConnections.size();
+					_asrv->get_io_service().post(bind(_onConnectionMade, _readyConnections.size() + _workConnections.size()));
 				}
-				_asrv->get_io_service().post(bind(_onConnectionMade, numConnections));
 				balanceConnections();
 			}
 			return;
@@ -298,14 +291,12 @@ namespace pgc
 		}
 		else
 		{
-			size_t numConnections = 0;
 			{
 				mutex::scoped_lock sl(_mtx);
 				assert(_workConnections.end() != _workConnections.find(pcw));
 				_workConnections.erase(pcw);
-				numConnections = _readyConnections.size() + _workConnections.size();
+				_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
 			}
-			_asrv->get_io_service().post(bind(_onConnectionLost, numConnections));
 		}
 
 		balanceConnections();

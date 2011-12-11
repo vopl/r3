@@ -58,25 +58,25 @@ namespace server
 			s->setSql("SELECT * FROM t_club");
 		}
 
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
 
 // 		boost::xtime xt;
@@ -101,25 +101,25 @@ namespace server
 			return;
 		}
 
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->exec(s, //v,
+		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
 
 // 		boost::xtime xt;
