@@ -2,11 +2,13 @@ PROJECT (log)
 
 
 set (INCLUDE
+	${INC_DIR}/log/client.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
 set (SRC
 	${SRC_DIR}/heapNewDelete.cpp
+	${SRC_DIR}/log/rootInitializer.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
