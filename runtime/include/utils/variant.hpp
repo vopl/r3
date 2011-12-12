@@ -45,7 +45,7 @@ namespace utils
 	ENUM_VARIANT_TYPE(12,	UInt64,						boost::uint64_t)\
 	ENUM_VARIANT_TYPE(13,	VectorChar,					std::vector<char>)\
 	ENUM_VARIANT_TYPE(14,	Date,						boost::gregorian::date)\
-	ENUM_VARIANT_TYPE(15,	Time,						boost::posix_time::ptime)\
+	ENUM_VARIANT_TYPE(15,	Datetime,					boost::posix_time::ptime)\
 	ENUM_VARIANT_TYPE(16,	VectorVariant,				std::vector<Variant>)\
 	ENUM_VARIANT_TYPE(17,	MapStringVariant,			std::map<std::string, Variant>)\
 	ENUM_VARIANT_TYPE(18,	Bool,						bool)\

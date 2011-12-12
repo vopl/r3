@@ -358,13 +358,13 @@ namespace pgc
 				}
 			}
 			break;
-		case Variant::etTime:
+		case Variant::etDatetime:
 			{
 				typ = 1114;//timestamp
 				fmt = 1;
 				if(!v.isNull())
 				{
-					const boost::posix_time::ptime &ptm = v.as<Variant::Time>();
+					const boost::posix_time::ptime &ptm = v.as<Variant::Datetime>();
 
 					boost::gregorian::date bgd = ptm.date();
 					boost::posix_time::time_duration pt = ptm.time_of_day();

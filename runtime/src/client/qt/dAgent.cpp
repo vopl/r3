@@ -257,7 +257,7 @@ namespace client
 			case QVariant::DateTime:
 				if(isNull)
 				{
-					dst.setNull<utils::Variant::Time>(true);
+					dst.setNull<utils::Variant::Datetime>(true);
 				}
 				else
 				{
@@ -265,7 +265,7 @@ namespace client
 					QDate qd = qdt.date();
 					QTime qt = qdt.time();
 
-					dst.as<utils::Variant::Time>(true) = utils::Variant::Time(
+					dst.as<utils::Variant::Datetime>(true) = utils::Variant::Datetime(
 						utils::Variant::Date(qd.year(), qd.month()-1, qd.day()),
 						boost::posix_time::hours(qt.hour())+
 							boost::posix_time::minutes(qt.minute())+
@@ -582,21 +582,21 @@ namespace client
 				}
 				break;
 				//////////////////////////////////////////////////////////////////////////
-			case utils::Variant::etTime:
+			case utils::Variant::etDatetime:
 				if(isNull)
 				{
 					dst = QVariant(QVariant::DateTime);
 				}
 				else
 				{
-					const utils::Variant::Time &t = src.as<utils::Variant::Time>();
+					const utils::Variant::Datetime &dt = src.as<utils::Variant::Datetime>();
 
-					const utils::Variant::Date d = t.date();
-					const utils::Variant::TimeDuration td = t.time_of_day();
+					const utils::Variant::Date d = dt.date();
+					const utils::Variant::TimeDuration t = dt.time_of_day();
 
 					dst = QDateTime(
 						QDate(d.year(), d.month()+1, d.day()),
-						QTime(td.hours(), td.minutes(), td.seconds(), td.fractional_seconds()*1000/td.ticks_per_second()));
+						QTime(t.hours(), t.minutes(), t.seconds(), t.fractional_seconds()*1000/t.ticks_per_second()));
 				}
 				break;
 				//////////////////////////////////////////////////////////////////////////
