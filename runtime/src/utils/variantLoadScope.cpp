@@ -110,4 +110,29 @@ namespace utils
 
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_string(const std::string &content)
+	{
+		std::cout<<__FUNCTION__<<": "<<content<<std::endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_double(const double &content)
+	{
+		std::cout<<__FUNCTION__<<": "<<content<<std::endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_float(const float &content)
+	{
+		std::cout<<__FUNCTION__<<": "<<content<<std::endl;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_integer(const std::string &content)
+	{
+		std::cout<<__FUNCTION__<<": "<<content<<std::endl;
+	}
+
+
 }

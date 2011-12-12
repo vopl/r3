@@ -19,43 +19,95 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_scalar.name("scalar");
-		_scalar %= 
-			_string | _real | _integer | _datetime | _bool | _bitset | _uuid;
+		_scalar = 
+			_string				[phx::bind(&VariantLoadScope::set_string, _scope, _1)] | 
+			_float				[phx::bind(&VariantLoadScope::set_float, _scope, _1)] | 
+			_double				[phx::bind(&VariantLoadScope::set_double, _scope, _1)] | 
+			_integer			[phx::bind(&VariantLoadScope::set_integer, _scope, _1)] | 
+			_datetime | 
+			_bool | 
+			_bitset | 
+			_uuid;
+
+
+
+
+
+
+
+
+
 
 		//////////////////////////////////////////////////////////////////////////
-		_stringStart.name("stringStart");
-		_stringStart %= qi::lexeme[qi::char_("'\"")];
-
-		_stringChar.name("stringChar");
-		_stringChar = (qi::char_ - qi::char_(_r1)) | (qi::char_('\\') >> qi::char_(_r1));
-
-		_stringStop.name("stringStop");
-		_stringStop = qi::char_(_r1);
-
 		_string.name("string");
-		_string %=
-			_stringStart[_a = _1] >
-			*_stringChar(_a) >
- 			_stringStop(_a);
+		_string =
+			(
+				qi::lit('"') >
+				*((qi::lit('\\') >> qi::char_('"')) | (qi::char_ - qi::char_('"'))) >
+ 				qi::lit('"')
+			)|
+			(
+				qi::lit('\'') >
+				*((qi::lit('\\') >> qi::char_('\'')) | (qi::char_ - qi::char_('\''))) >
+ 				qi::lit('\'')
+			);
+
+		//////////////////////////////////////////////////////////////////////////
+		_float.name("float");
+		_float = 
+			qi::real_parser<float, qi::strict_real_policies<float> >() >>qi::lit('f');
+
+		//////////////////////////////////////////////////////////////////////////
+		_double.name("double");
+		_double = 
+			qi::real_parser<double, qi::strict_real_policies<double> >();
+
+		//////////////////////////////////////////////////////////////////////////
+		_integer.name("integer");
+		_integer =
+			(
+				+qi::char_("0-9") >> 
+				-((qi::ascii::string("ui") | qi::char_('u') | qi::char_('i')) >>
+					-(qi::ascii::string("8")|qi::ascii::string("16")|qi::ascii::string("32")|qi::ascii::string("64")
+					)
+				)
+			)|
+			(
+				+qi::char_('-') >>
+				+qi::char_("0-9") >> 
+				-(qi::char_('i') >>
+					-(qi::ascii::string("8")|qi::ascii::string("16")|qi::ascii::string("32")|qi::ascii::string("64")
+					)
+				)
+			);
+
+
+
+
+
+
+
+
+
 
 		//////////////////////////////////////////////////////////////////////////
 		_map.name("map");
-		_map %= qi::lit("map");
+		_map = qi::lit("map");
 
 		//////////////////////////////////////////////////////////////////////////
 		_array.name("array");
-		_array %= 
+		_array = 
 			qi::lit("[") > 
 			*(_variant >> (qi::lit(",")|qi::eps)) > 
 			qi::lit("]");
 
 		//////////////////////////////////////////////////////////////////////////
 		_include.name("include");
-		_include %= qi::lit("include");
+		_include = qi::lit("include");
 
 		//////////////////////////////////////////////////////////////////////////
 		_variant.name("variant");
-		_variant %= _scalar | _map | _array | _include;
+		_variant = _scalar | _map | _array | _include;
 
 		using namespace qi::labels;
 
