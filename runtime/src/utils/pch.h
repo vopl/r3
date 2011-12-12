@@ -4,6 +4,20 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/cstdint.hpp>
 
+
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/support_multi_pass.hpp>
+#include <boost/spirit/include/qi_grammar.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_function.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+
+
 #include <string>
 #include <vector>
 #include <map>

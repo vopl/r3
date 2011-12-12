@@ -172,6 +172,8 @@ namespace utils
 		boost::shared_array<char> serialize(boost::uint32_t &size) const;
 		bool deserialize(boost::shared_array<char> data, boost::uint32_t size);
 
+		bool load(const char *fileName, std::string *errors=NULL);
+
 	protected:
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);
 		char _data[_dataSize];

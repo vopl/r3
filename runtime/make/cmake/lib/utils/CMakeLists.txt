@@ -30,12 +30,17 @@ SET(SRC
 	${SRC_DIR}/utils/base64.cpp
 	${SRC_DIR}/utils/crc32.cpp
 	${SRC_DIR}/utils/variant.cpp
+	${SRC_DIR}/utils/variantLoad.cpp
+	${SRC_DIR}/utils/variantLoadScope.cpp
+	${SRC_DIR}/utils/variantLoadGrammar.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
 SET(SRC_HDR
 	${SRC_DIR}/utils/variantDumper.hpp
 	${SRC_DIR}/utils/variantImpl.hpp
+	${SRC_DIR}/utils/variantLoadScope.hpp
+	${SRC_DIR}/utils/variantLoadGrammar.hpp
 	${SRC_DIR}/utils/pch.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})

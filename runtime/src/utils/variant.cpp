@@ -262,10 +262,6 @@ template void Variant::forceType<Variant::Void>();
 	{
 		return IMPL->deserialize(data, size);
 	}
-
-
-
-
 }
 
 
