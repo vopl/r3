@@ -61,7 +61,7 @@ namespace log_
 			fileApp->setLayout(std::auto_ptr<Layout>(new PatternLayout(logformat)));
 			result.addAppender(fileApp);
 
-			result.setLogLevel(TRACE_LOG_LEVEL);
+			//result.setLogLevel(TRACE_LOG_LEVEL);
 			return result;
 		}
 

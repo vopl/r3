@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 	srv->stop();
 	srv.reset();
 
-	ILOG("exiting");
+	ILOG("shutdown");
 	return EXIT_SUCCESS;
 }
 
