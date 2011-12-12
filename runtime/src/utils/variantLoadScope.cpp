@@ -295,7 +295,7 @@ namespace utils
 	void VariantLoadScope::array_push()
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(_stack.size() > 1);
 
 		Variant v;
 		v.swap(_stack.back());
@@ -306,7 +306,45 @@ namespace utils
 	void VariantLoadScope::array_stop()
 	{
 		if(_errorWas) return;
+		assert(_stack.size() > 1);
+
+		_stack.pop_back();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::map_start()
+	{
+		if(_errorWas) return;
 		assert(_stack.size() > 0);
+
+		_stack.back().as<Variant::MapStringVariant>(true);
+		_stack.push_back(Variant());
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::map_key(const std::string &content)
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 1);
+		_mapKey = content;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::map_push()
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 1);
+
+		_stack[_stack.size()-2].as<Variant::MapStringVariant>()[_mapKey].swap(_stack.back());
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::map_stop()
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 1);
 
 		_stack.pop_back();
 	}

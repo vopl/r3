@@ -18,6 +18,9 @@ namespace utils
 		std::string		*_errors;
 		bool			_errorWas;
 
+
+		std::string		_mapKey;
+
 	public:
 		VariantLoadScope(
 			Variant *root, 
@@ -37,6 +40,11 @@ namespace utils
 		void array_start();
 		void array_push();
 		void array_stop();
+
+		void map_start();
+		void map_key(const std::string &content);
+		void map_push();
+		void map_stop();
 
 	};
 }

@@ -25,6 +25,7 @@ namespace utils
 
 		qi::rule<const char *> _scalar;
 		qi::rule<const char *, qi::ascii::space_type> _map;
+		qi::rule<const char *, qi::ascii::space_type> _mapPair;
 		qi::rule<const char *, qi::ascii::space_type> _array;
 		qi::rule<const char *, qi::ascii::space_type> _include;
 
@@ -36,6 +37,8 @@ namespace utils
 		qi::rule<const char *> _bool;
 		qi::rule<const char *> _bitset;
 		qi::rule<const char *> _uuid;
+
+		qi::rule<const char *, std::string()> _ident;
 
 		VariantLoadScope &_scope;
 	};

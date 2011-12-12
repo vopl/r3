@@ -90,6 +90,9 @@ namespace utils
 			);
 
 
+		_ident.name("ident");
+		_ident = 
+			((qi::alpha | qi::char_('_')) >> *(qi::alnum | qi::char_('_')));
 
 
 
@@ -100,13 +103,30 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_map.name("map");
-		_map = qi::lit("map");
+		_map = 
+			qi::lit("{")[phx::bind(&VariantLoadScope::map_start, _scope)] > 
+			-(
+				_mapPair >> 
+				*(qi::lit(",") > _mapPair) >> 
+				-qi::lit(",")
+			) > 
+			qi::lit("}")[phx::bind(&VariantLoadScope::map_stop, _scope)];
+
+		_mapPair.name("mapPair");
+		_mapPair = 
+			(_ident | _string)[phx::bind(&VariantLoadScope::map_key, _scope, _1)] >
+			(qi::lit(':')|qi::lit('=')) >
+			_variant[phx::bind(&VariantLoadScope::map_push, _scope)];
 
 		//////////////////////////////////////////////////////////////////////////
 		_array.name("array");
 		_array = 
 			qi::lit("[")[phx::bind(&VariantLoadScope::array_start, _scope)] > 
-			-(_variant[phx::bind(&VariantLoadScope::array_push, _scope)] >> *(qi::lit(",") > _variant[phx::bind(&VariantLoadScope::array_push, _scope)]) >> -qi::lit(",")) > 
+			-(
+				_variant[phx::bind(&VariantLoadScope::array_push, _scope)] >> 
+				*(qi::lit(",") > _variant[phx::bind(&VariantLoadScope::array_push, _scope)]) >> 
+				-qi::lit(",")
+			) > 
 			qi::lit("]")[phx::bind(&VariantLoadScope::array_stop, _scope)];
 
 		//////////////////////////////////////////////////////////////////////////
@@ -115,7 +135,7 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_variant.name("variant");
-		_variant = _scalar | _map | _array | _include;
+		_variant = _map | _array | _include | _scalar;
 
 		using namespace qi::labels;
 
