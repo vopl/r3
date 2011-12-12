@@ -28,10 +28,10 @@ namespace utils
 		qi::rule<const char *, qi::ascii::space_type> _array;
 		qi::rule<const char *, qi::ascii::space_type> _include;
 
-		qi::rule<const char *, qi::locals<std::string> > _string;
-		qi::rule<const char *, std::string()> _stringStart;
-		qi::rule<const char *, void(std::string)> _stringChar;
-		qi::rule<const char *, void(std::string)> _stringStop;
+		qi::rule<const char *, qi::locals<char> > _string;
+		qi::rule<const char *, char()> _stringStart;
+		qi::rule<const char *, void(char)> _stringChar;
+		qi::rule<const char *, void(char)> _stringStop;
 
 		qi::rule<const char *> _real;
 		qi::rule<const char *> _integer;
