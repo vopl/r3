@@ -2,6 +2,7 @@ PROJECT (libutils)
 
 SET(INCLUDE
 	${INC_DIR}/utils/aton.hpp
+	${INC_DIR}/utils/xton.hpp
 	${INC_DIR}/utils/base64.h
 	${INC_DIR}/utils/crc32.hpp
 	${INC_DIR}/utils/dateTimeDuration.hpp

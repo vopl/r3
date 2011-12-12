@@ -66,6 +66,14 @@ namespace utils
 		_integer.name("integer");
 		_integer =
 			(
+				qi::ascii::string("0x") > 
+				+qi::char_("0-9a-fA-F") >>
+				-(qi::char_('u') >>
+					-(qi::ascii::string("8")|qi::ascii::string("16")|qi::ascii::string("32")|qi::ascii::string("64")
+					)
+				)
+			)|
+			(
 				+qi::char_("0-9") >> 
 				-((qi::ascii::string("ui") | qi::char_('u') | qi::char_('i')) >>
 					-(qi::ascii::string("8")|qi::ascii::string("16")|qi::ascii::string("32")|qi::ascii::string("64")
@@ -73,7 +81,7 @@ namespace utils
 				)
 			)|
 			(
-				+qi::char_('-') >>
+				qi::char_('-') >>
 				+qi::char_("0-9") >> 
 				-(qi::char_('i') >>
 					-(qi::ascii::string("8")|qi::ascii::string("16")|qi::ascii::string("32")|qi::ascii::string("64")
@@ -97,9 +105,9 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		_array.name("array");
 		_array = 
-			qi::lit("[") > 
-			*(_variant >> (qi::lit(",")|qi::eps)) > 
-			qi::lit("]");
+			qi::lit("[")[phx::bind(&VariantLoadScope::array_start, _scope)] > 
+			-(_variant[phx::bind(&VariantLoadScope::array_push, _scope)] >> *(qi::lit(",") > _variant[phx::bind(&VariantLoadScope::array_push, _scope)]) >> -qi::lit(",")) > 
+			qi::lit("]")[phx::bind(&VariantLoadScope::array_stop, _scope)];
 
 		//////////////////////////////////////////////////////////////////////////
 		_include.name("include");

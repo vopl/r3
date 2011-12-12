@@ -2,16 +2,21 @@
 #define _UTILS_VARIANTLOADSCOPE_HPP_
 
 #include "utils/variant.hpp"
+#include <deque>
 
 namespace utils
 {
 	class VariantLoadScope
 	{
 		Variant			*_root;
+
+		std::deque<Variant>			_stack;
+
 		std::string		_fileName;
 		const char		*_first;
 		const char		*_last;
 		std::string		*_errors;
+		bool			_errorWas;
 
 	public:
 		VariantLoadScope(
@@ -28,6 +33,10 @@ namespace utils
 		void set_double(const double &content);
 		void set_float(const float &content);
 		void set_integer(const std::string &content);
+
+		void array_start();
+		void array_push();
+		void array_stop();
 
 	};
 }
