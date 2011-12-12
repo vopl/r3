@@ -46,7 +46,7 @@ namespace client
 		v.as<utils::Variant::MapStringVariant>(true)["sid"] = _needSid;
 
 		SPacket packet;
-		packet._data = v.save(packet._size);
+		packet._data = v.serialize(packet._size);
 
 		//послать сид
 		channel->send(
@@ -125,7 +125,7 @@ namespace client
 			}
 
 			utils::Variant v;
-			if(	!v.load(packet._data, packet._size) || 
+			if(	!v.deserialize(packet._data, packet._size) || 
 				!v.is<utils::Variant::MapStringVariant>())
 			{
 				//bad packet

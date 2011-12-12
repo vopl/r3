@@ -22,7 +22,7 @@ namespace client
 		//распарсить пакет, найти агента и передать ему
 		bool packetOk = false;
 		utils::Variant v;
-		if(	v.load(p._data, p._size) &&
+		if(	v.deserialize(p._data, p._size) &&
 			v.is<utils::Variant::MapStringVariant>())
 		{
 			utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>();
@@ -184,7 +184,7 @@ namespace client
 			m["data"] = data;
 
 			net::SPacket p;
-			p._data = v.save(p._size);
+			p._data = v.serialize(p._size);
 
 			//отослать
 			_session->send(p, 
