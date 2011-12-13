@@ -32,10 +32,12 @@ namespace utils
 
 		void error(const char *first, const char *last, const char *errorPos, const boost::spirit::info &what);
 		
+		void set_null();
 		void set_string(const std::string &content);
 		void set_double(const double &content);
 		void set_float(const float &content);
 		void set_integer(const std::string &content);
+		void set_bool(bool v);
 
 		void array_start();
 		void array_push();

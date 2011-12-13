@@ -125,6 +125,15 @@ namespace utils
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_null()
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 0);
+
+		_stack.back().setNull<void>(true);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void VariantLoadScope::set_string(const std::string &content)
 	{
 		if(_errorWas) return;
@@ -279,6 +288,16 @@ namespace utils
 			}
 			break;
 		}
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_bool(bool b)
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 0);
+
+		_stack.back() = b;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
