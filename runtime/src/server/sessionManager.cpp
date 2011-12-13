@@ -57,7 +57,7 @@ namespace server
 		}
 
 		utils::Variant v;
-		if(	!v.load(packet._data, packet._size) || 
+		if(	!v.deserialize(packet._data, packet._size) || 
 			!v.is<utils::Variant::MapStringVariant>())
 		{
 			ELOG(__FUNCTION__<<", bad packet");
@@ -84,7 +84,7 @@ namespace server
 				v.as<utils::Variant::MapStringVariant>(true)["badSid"] = true;
 
 				SPacket packet;
-				packet._data = v.save(packet._size);
+				packet._data = v.serialize(packet._size);
 				channel->send(packet, 
 					bind(&SessionManager::onAcceptOk, shared_from_this(), channel),
 					bind(&SessionManager::onAcceptFail, shared_from_this(), _1));
@@ -95,7 +95,7 @@ namespace server
 				v.as<utils::Variant::MapStringVariant>(true)["sid"] = sid;
 
 				SPacket packet;
-				packet._data = v.save(packet._size);
+				packet._data = v.serialize(packet._size);
 				channel->send(packet, 
 					bind(&SessionManager::attach2Session, shared_from_this(), iter->second, channel),
 					bind(&SessionManager::attach2SessionFail, shared_from_this(), channel));
@@ -116,7 +116,7 @@ namespace server
 			v.as<utils::Variant::MapStringVariant>(true)["sid"] = newSid;
 
 			SPacket packet;
-			packet._data = v.save(packet._size);
+			packet._data = v.serialize(packet._size);
 			channel->send(packet, 
 				bind(&SessionManager::attach2Session, shared_from_this(), session, channel),
 				bind(&SessionManager::attach2SessionFail, shared_from_this(), channel));

@@ -6,3 +6,4 @@ syntax: regexp
 ^runtime/server
 ^runtime/plug
 ^runtime/log
+^runtime/todo/backup/

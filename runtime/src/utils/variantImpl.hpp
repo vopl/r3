@@ -378,8 +378,8 @@ namespace utils
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		boost::shared_array<char> save(boost::uint32_t &size) const;
-		bool load(boost::shared_array<char> data, boost::uint32_t size);
+		boost::shared_array<char> serialize(boost::uint32_t &size) const;
+		bool deserialize(boost::shared_array<char> data, boost::uint32_t size);
 
 	private:
 		friend class boost::serialization::access;
@@ -595,7 +595,7 @@ namespace utils
 {
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
-	boost::shared_array<char> VariantImpl::save(boost::uint32_t &size) const
+	boost::shared_array<char> VariantImpl::serialize(boost::uint32_t &size) const
 	{
 		utils::StreambufOnArray sbuf;
 		{
@@ -610,7 +610,7 @@ namespace utils
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool VariantImpl::load(boost::shared_array<char> data, boost::uint32_t size)
+	bool VariantImpl::deserialize(boost::shared_array<char> data, boost::uint32_t size)
 	{
 		try
 		{

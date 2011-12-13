@@ -169,8 +169,10 @@ namespace utils
 		bool operator !=(const Variant &v) const;
 
 	public:
-		boost::shared_array<char> save(boost::uint32_t &size) const;
-		bool load(boost::shared_array<char> data, boost::uint32_t size);
+		boost::shared_array<char> serialize(boost::uint32_t &size) const;
+		bool deserialize(boost::shared_array<char> data, boost::uint32_t size);
+
+		bool load(const char *fileName, std::string *errors=NULL);
 
 	protected:
 		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);
@@ -187,6 +189,7 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	//тип в число
+	template <> struct Variant::Type2Enum<Variant::Void> { static const EType et = Variant::etVoid;	};
 #define ENUM_VARIANT_TYPE(i,n,...) template <> struct Variant::Type2Enum<Variant::n> { static const EType et = Variant::et##n;	};
 	ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE

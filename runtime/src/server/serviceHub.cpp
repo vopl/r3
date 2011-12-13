@@ -24,7 +24,7 @@ namespace server
 		{
 			//распарсить пакет, найти службу и передать ей
 			utils::Variant v;
-			if(	v.load(p._data, p._size) &&
+			if(	v.deserialize(p._data, p._size) &&
 				v.is<utils::Variant::MapStringVariant>())
 			{
 				utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>();
@@ -83,7 +83,7 @@ namespace server
 				m["error"] = "badRequest";
 
 				net::SPacket p;
-				p._data = v.save(p._size);
+				p._data = v.serialize(p._size);
 
 				//отослать
 				session->send(p, 
@@ -253,7 +253,7 @@ namespace server
 		m["data"] = data;
 
 		net::SPacket p;
-		p._data = v.save(p._size);
+		p._data = v.serialize(p._size);
 
 		//отослать
 		session->send(p, 
