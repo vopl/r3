@@ -6,11 +6,67 @@
 #include <string>
 #include <vector>
 
+BOOST_FUSION_ADAPT_STRUCT(
+	utils::VariantLoadScope::SDate,
+	(unsigned, _year)
+	(unsigned, _month)
+	(unsigned, _day)
+);
+
+
+BOOST_FUSION_ADAPT_STRUCT(
+	utils::VariantLoadScope::STime,
+	(int, _hour)
+	(unsigned, _minute)
+	(unsigned, _second)
+	(unsigned, _microsec)
+);
 
 namespace utils
 {
 	using namespace qi::labels;
 	using namespace qi;
+
+	//////////////////////////////////////////////////////////////////////////
+	struct Checker
+	{
+		//////////////////////////////////////////////////////////////////////////
+		template <typename Context>
+		void operator()(const VariantLoadScope::SDate &d, Context& context, bool& pass) const
+		{
+			try
+			{
+				boost::gregorian::date gd(d._year, d._month, d._day);
+				pass = !gd.is_special();
+			}
+			catch (...)
+			{
+				pass = false;
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		template <typename Context>
+		void operator()(const VariantLoadScope::STime &t, Context& context, bool& pass) const
+		{
+			try
+			{
+				
+				boost::posix_time::time_duration ptd(
+					t._hour, 
+					t._minute, 
+					t._second);
+				ptd += boost::posix_time::microseconds(t._microsec);
+
+				pass = !ptd.is_not_a_date_time();
+			}
+			catch (...)
+			{
+				pass = false;
+			}
+		}
+
+	};
 
 	//////////////////////////////////////////////////////////////////////////
 	VariantLoadGrammar::VariantLoadGrammar(VariantLoadScope &scope)
@@ -25,6 +81,9 @@ namespace utils
 			_string				[phx::bind(&VariantLoadScope::set_string, _scope, _1)] | 
 			_uuid				[phx::bind(&VariantLoadScope::set_uuid, _scope, _1)] |
 			_bool				[phx::bind(&VariantLoadScope::set_bool, _scope, _1)] | 
+
+			_dateScope			[phx::bind(&VariantLoadScope::set_date, _scope, _1)] | 
+			_timeScope			[phx::bind(&VariantLoadScope::set_time, _scope, _1)] | 
 
 			_float				[phx::bind(&VariantLoadScope::set_float, _scope, _1)] | 
 			_double				[phx::bind(&VariantLoadScope::set_double, _scope, _1)] | 
@@ -98,6 +157,48 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_datetime;
+
+		//////////////////////////////////////////////////////////////////////////
+		_dateScope.name("dateScope");
+		_dateScope = 
+			_dateTemplate[_val = _1] > 
+			_validDate(_val)[Checker()];
+
+		//////////////////////////////////////////////////////////////////////////
+		_dateTemplate.name("dateTemplate");
+		_dateTemplate = 
+			uint_parser<unsigned, 10, 4, 4>()>> lit('-') >>
+			uint_parser<unsigned, 10, 2, 2>()>> lit('-') >>
+			uint_parser<unsigned, 10, 2, 2>();
+
+		_validDate.name("validDate");
+		_validDate =
+			eps[_val=_r1];
+
+
+		//////////////////////////////////////////////////////////////////////////
+		_timeScope.name("timeScope");
+		_timeScope = 
+			_timeTemplate[_val = _1] > 
+			_validTime(_val)[Checker()];
+
+		//////////////////////////////////////////////////////////////////////////
+		_timeTemplate.name("timeTemplate");
+		_timeTemplate = 
+			int_parser<int, 10, 2, 2>()>> lit(':') >>
+			uint_parser<unsigned, 10, 2, 2>()>> lit(':') >>
+			uint_parser<unsigned, 10, 2, 2>()>> 
+			-(
+				lit('.') > _timeTemplate_microseconds
+			);
+
+		_timeTemplate_microseconds.name("microseconds(6 decimal digits)");
+		_timeTemplate_microseconds = 
+			uint_parser<unsigned, 10, 6, 6>();
+
+		_validTime.name("validTime");
+		_validTime =
+			eps[_val=_r1];
 
 		//////////////////////////////////////////////////////////////////////////
 		_bool.name("bool");

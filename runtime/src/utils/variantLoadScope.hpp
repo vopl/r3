@@ -22,6 +22,38 @@ namespace utils
 		std::string		_mapKey;
 
 	public:
+		//////////////////////////////////////////////////////////////////////////
+		struct SDate
+		{
+			unsigned _year;
+			unsigned _month;
+			unsigned _day;
+
+			SDate()
+				: _year(0)
+				, _month(0)
+				, _day(0)
+			{}
+		};
+
+		//////////////////////////////////////////////////////////////////////////
+		struct STime
+		{
+			int _hour;
+			unsigned _minute;
+			unsigned _second;
+			unsigned _microsec;
+
+			STime()
+				: _hour(0)
+				, _minute(0)
+				, _second(0)
+				, _microsec(0)
+			{}
+		};
+
+
+	public:
 		VariantLoadScope(
 			Variant *root, 
 			const char *fileName, 
@@ -39,6 +71,9 @@ namespace utils
 		void set_integer(const std::string &content);
 		void set_bool(bool v);
 		void set_uuid(const std::string &content);
+
+		void set_date(const SDate &d);
+		void set_time(const STime &t);
 
 		void array_start();
 		void array_push();

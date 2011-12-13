@@ -322,6 +322,33 @@ namespace utils
 		_stack.back() = u;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_date(const SDate &d)
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 0);
+
+		boost::gregorian::date gd(d._year, d._month, d._day);
+
+		_stack.back() = gd;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_time(const STime &t)
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 0);
+
+		boost::posix_time::time_duration pt(
+			t._hour, 
+			t._minute, 
+			t._second);
+		pt += boost::posix_time::microseconds(t._microsec);
+
+		_stack.back() = pt;
+	}
+
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void VariantLoadScope::array_start()

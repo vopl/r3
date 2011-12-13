@@ -27,41 +27,20 @@ void onSignal(int /*sig*/)
 static pluma::Pluma *g_plugins = new pluma::Pluma;
 
 
-#include <boost/date_time.hpp>
-#include <boost/thread.hpp>
-
 int main(int argc, char* argv[])
 {
-	boost::xtime xt1;
-	boost::xtime_get(&xt1, boost::TIME_UTC);
 
-	size_t tc=0;
-	for(size_t k(0); k<10000; k++)
+	utils::Variant v;
+	std::string errors;
+	bool b = v.load("P:\\projects\\r3\\repo\\runtime\\server\\test.js", &errors);
+
+	std::cout<<(b?"success":"failure")<<std::endl;
+	if(!b)
 	{
-
-		utils::Variant v;
-		std::string errors;
-		bool b = v.load("P:\\projects\\r3\\repo\\runtime\\server\\test.js", &errors);
-
-// 		std::cout<<(b?"success":"failure")<<std::endl;
-// 		if(!b)
-// 		{
-// 			std::cout<<errors<<std::endl;
-// 		}
-// 
- 		std::cout<<v<<std::endl;
-		tc += v.type();
+		std::cout<<errors<<std::endl;
 	}
 
-	boost::xtime xt2;
-	boost::xtime_get(&xt2, boost::TIME_UTC);
-
-	boost::system_time st1 = xt1;
-	boost::system_time st2 = xt2;
-
-	std::cout<<tc<<std::endl;
-
-	std::cout<<st2 - st1;
+	std::cout<<v<<std::endl;
 
 	return EXIT_SUCCESS;
 	ILOG("startup");

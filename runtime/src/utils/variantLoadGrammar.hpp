@@ -8,12 +8,14 @@
 // #include <boost/spirit/include/phoenix_operator.hpp>
 // #include <boost/spirit/home/phoenix/bind/bind_member_function.hpp>
 
+
 namespace utils
 {
 	namespace spirit = boost::spirit;
 	namespace phx = boost::phoenix;
 	namespace qi = boost::spirit::qi;
 
+	//////////////////////////////////////////////////////////////////////////
 	struct VariantLoadGrammar
 		: qi::grammar<const char *, qi::ascii::space_type>
 	{
@@ -35,6 +37,16 @@ namespace utils
 		qi::rule<const char *, double()> _double;
 		qi::rule<const char *, std::string()> _integer;
 		qi::rule<const char *> _datetime;
+
+		qi::rule<const char *, VariantLoadScope::SDate()> _dateScope;
+		qi::rule<const char *, VariantLoadScope::SDate()> _dateTemplate;
+		qi::rule<const char *, VariantLoadScope::SDate(VariantLoadScope::SDate)> _validDate;
+
+		qi::rule<const char *, VariantLoadScope::STime()> _timeScope;
+		qi::rule<const char *, VariantLoadScope::STime()> _timeTemplate;
+		qi::rule<const char *, unsigned()> _timeTemplate_microseconds;
+		qi::rule<const char *, VariantLoadScope::STime(VariantLoadScope::STime)> _validTime;
+
 		qi::rule<const char *, bool()> _bool;
 		qi::symbols<char, bool> _boolSymbols;
 		qi::rule<const char *> _bitset;
