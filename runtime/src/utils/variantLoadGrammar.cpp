@@ -66,11 +66,33 @@ namespace utils
 			}
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		template <typename Context>
+		void operator()(const VariantLoadScope::SDateTime &dt, Context& context, bool& pass) const
+		{
+			try
+			{
+
+				boost::gregorian::date gd(dt._year, dt._month, dt._day);
+				boost::posix_time::time_duration ptd(
+					dt._hour, 
+					dt._minute, 
+					dt._second);
+				ptd += boost::posix_time::microseconds(dt._microsec);
+
+				pass = !boost::posix_time::ptime(gd, ptd).is_not_a_date_time();
+			}
+			catch (...)
+			{
+				pass = false;
+			}
+		}
+
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 	VariantLoadGrammar::VariantLoadGrammar(VariantLoadScope &scope)
-		: base_type(_variant, "variant")
+		: base_type(_start, "variant")
 		, _scope(scope)
 	{
 
@@ -82,13 +104,13 @@ namespace utils
 			_uuid				[phx::bind(&VariantLoadScope::set_uuid, _scope, _1)] |
 			_bool				[phx::bind(&VariantLoadScope::set_bool, _scope, _1)] | 
 
+			_dateTimeScope		[phx::bind(&VariantLoadScope::set_datetime, _scope, _1)] | 
 			_dateScope			[phx::bind(&VariantLoadScope::set_date, _scope, _1)] | 
 			_timeScope			[phx::bind(&VariantLoadScope::set_time, _scope, _1)] | 
 
 			_float				[phx::bind(&VariantLoadScope::set_float, _scope, _1)] | 
 			_double				[phx::bind(&VariantLoadScope::set_double, _scope, _1)] | 
 			_integer			[phx::bind(&VariantLoadScope::set_integer, _scope, _1)] | 
-			_datetime | 
 			_bitset 
 			;
 
@@ -155,8 +177,15 @@ namespace utils
 				)
 			);
 
-		//////////////////////////////////////////////////////////////////////////
-		_datetime;
+
+
+
+
+
+
+
+
+
 
 		//////////////////////////////////////////////////////////////////////////
 		_dateScope.name("dateScope");
@@ -164,7 +193,6 @@ namespace utils
 			_dateTemplate[_val = _1] > 
 			_validDate(_val)[Checker()];
 
-		//////////////////////////////////////////////////////////////////////////
 		_dateTemplate.name("dateTemplate");
 		_dateTemplate = 
 			uint_parser<unsigned, 10, 4, 4>()>> lit('-') >>
@@ -174,6 +202,13 @@ namespace utils
 		_validDate.name("validDate");
 		_validDate =
 			eps[_val=_r1];
+
+
+
+
+
+
+
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -199,6 +234,27 @@ namespace utils
 		_validTime.name("validTime");
 		_validTime =
 			eps[_val=_r1];
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		_dateTimeScope.name("dateTimeScope");
+		_dateTimeScope = 
+			_dateTimeTemplate[_val = _1] >
+			_validDateTime(_val)[Checker()];
+
+
+		_dateTimeTemplate.name("dateTimeTemplate");
+		_dateTimeTemplate = 
+			_dateTemplate[_val=_1] >>
+			(lit(' ')|'T') >>
+			_timeTemplate[_val=_1];
+
+		_validDateTime.name("validDateTime");
+		_validDateTime =
+			eps[_val=_r1];
+
 
 		//////////////////////////////////////////////////////////////////////////
 		_bool.name("bool");
@@ -275,12 +331,14 @@ namespace utils
 		_variant.name("variant");
 		_variant = _map | _array | _include | _scalar;
 
-		using namespace labels;
+		_start.name("variant");
+		_start =
+			eps > _variant;
 
 		//////////////////////////////////////////////////////////////////////////
 		on_error<fail>
 			(
-			_variant, 
+			_start, 
 			phx::bind(&VariantLoadScope::error, _scope, _1, _2, _3, _4)
 			);
 

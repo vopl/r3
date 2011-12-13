@@ -346,13 +346,30 @@ namespace utils
 		if(_errorWas) return;
 		assert(_stack.size() > 0);
 
-		boost::posix_time::time_duration pt(
+		boost::posix_time::time_duration ptd(
 			t._hour, 
 			t._minute, 
 			t._second);
-		pt += boost::posix_time::microseconds(t._microsec);
+		ptd += boost::posix_time::microseconds(t._microsec);
 
-		_stack.back() = pt;
+		_stack.back() = ptd;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_datetime(const SDateTime &dt)
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 0);
+
+		boost::gregorian::date gd(dt._year, dt._month, dt._day);
+
+		boost::posix_time::time_duration ptd(
+			dt._hour, 
+			dt._minute, 
+			dt._second);
+		ptd += boost::posix_time::microseconds(dt._microsec);
+
+		_stack.back() = boost::posix_time::ptime(gd, ptd);
 	}
 
 

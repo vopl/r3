@@ -52,6 +52,22 @@ namespace utils
 			{}
 		};
 
+		//////////////////////////////////////////////////////////////////////////
+		struct SDateTime
+			: SDate, STime
+		{
+			SDateTime &operator=(const SDate &d)
+			{
+				*(SDate *)this = d;
+				return *this;
+			}
+			SDateTime &operator=(const STime &t)
+			{
+				*(STime *)this = t;
+				return *this;
+			}
+		};
+
 
 	public:
 		VariantLoadScope(
@@ -76,6 +92,7 @@ namespace utils
 
 		void set_date(const SDate &d);
 		void set_time(const STime &t);
+		void set_datetime(const SDateTime &t);
 
 		void array_start();
 		void array_push();

@@ -28,7 +28,7 @@
 #include <boost/variant/recursive_variant.hpp>
 #include <boost/foreach.hpp>
 #include <boost/spirit/include/qi_repeat.hpp>
-
+#include <boost/spirit/repository/include/qi_confix.hpp>
 
 #include <string>
 #include <vector>

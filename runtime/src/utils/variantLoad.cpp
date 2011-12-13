@@ -50,7 +50,7 @@ namespace utils
 			first, 
 			last,
 			VariantLoadGrammar(scope),
-			spirit::ascii::space);
+			SkipGrammar());
 
 		if(parseResult)
 		{
