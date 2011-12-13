@@ -1,4 +1,5 @@
-boost::uuids::uuid{
+; endian всегда big, в студии литл
+disable_boost::uuids::uuid{
 	preview
 	(
 		*(GUID *)$e.data
