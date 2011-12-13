@@ -48,6 +48,7 @@ namespace utils
 		qi::rule<const char *, SkipGrammar> _mapPair;
 		qi::rule<const char *, SkipGrammar> _array;
 		qi::rule<const char *, SkipGrammar> _include;
+		qi::rule<const char *, std::string(), SkipGrammar> _includePath;
 
 		qi::rule<const char *> _null;
 		qi::rule<const char *, std::string()> _string;
@@ -72,7 +73,6 @@ namespace utils
 
 		qi::rule<const char *, bool()> _bool;
 		qi::symbols<char, bool> _boolSymbols;
-		qi::rule<const char *> _bitset;
 		qi::rule<const char *, std::string()> _uuid;
 
 		qi::rule<const char *, std::string()> _ident;

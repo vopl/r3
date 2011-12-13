@@ -3,6 +3,7 @@
 
 #include "utils/variant.hpp"
 #include <deque>
+#include <boost/filesystem.hpp>
 
 namespace utils
 {
@@ -12,7 +13,7 @@ namespace utils
 
 		std::deque<Variant>			_stack;
 
-		std::string		_fileName;
+		boost::filesystem::path _fileName;
 		const char		*_first;
 		const char		*_last;
 		std::string		*_errors;
@@ -72,7 +73,7 @@ namespace utils
 	public:
 		VariantLoadScope(
 			Variant *root, 
-			const char *fileName, 
+			boost::filesystem::path fileName, 
 			const char *first,
 			const char *last,
 			std::string *errors);
@@ -102,6 +103,9 @@ namespace utils
 		void map_key(const std::string &content);
 		void map_push();
 		void map_stop();
+
+
+		bool do_include(const std::string &path);
 
 	};
 }

@@ -9,7 +9,7 @@ namespace utils
 	//////////////////////////////////////////////////////////////////////////
 	VariantLoadScope::VariantLoadScope(
 		Variant *root, 
-		const char *fileName, 
+		boost::filesystem::path fileName, 
 		const char *first,
 		const char *last,
 		std::string *errors)
@@ -97,7 +97,8 @@ namespace utils
 		}
 		std::string(firstContext, lastContext);
 
-		msg += "error at line ";
+		msg += _fileName.string();
+		msg += ", line ";
 		char tmp[32];
 		msg += _ntoa(line, tmp);
 		msg += " column ";
@@ -440,6 +441,37 @@ namespace utils
 		assert(_stack.size() > 1);
 
 		_stack.pop_back();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool VariantLoadScope::do_include(const std::string &path)
+	{
+		if(_errorWas) return false;
+		assert(_stack.size() > 0);
+
+		boost::filesystem::path bpath(path);
+		if(bpath.is_absolute())
+		{
+			//use this path
+		}
+		else
+		{
+			bpath = _fileName.parent_path() / bpath;
+		}
+
+		std::string erorros;
+		if(!_stack.back().load(bpath.string().c_str(), &erorros))
+		{
+			_errorWas = true;
+			if(_errors)
+			{
+				*_errors += erorros;
+			}
+
+			return false;
+		}
+
+		return true;
 	}
 
 

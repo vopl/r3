@@ -15,7 +15,8 @@ namespace utils
 	//////////////////////////////////////////////////////////////////////////
 	bool Variant::load(const char *fileName, std::string *errors)
 	{
-		std::ifstream in(fileName, std::ios::binary);
+		boost::filesystem::path p = boost::filesystem::absolute(fileName);
+		std::ifstream in(p.string().c_str(), std::ios::binary);
 		if(!in)
 		{
 			if(errors)
@@ -31,19 +32,22 @@ namespace utils
 		in.seekg(0, std::ios::end);
 		buffer.resize(in.tellg());
 		in.seekg(std::ios::beg, 0);
+
+
+		const char *first;
+		const char *last;
 		if(buffer.size())
 		{
 			in.read(&buffer[0], buffer.size());
 			in.close();
+			first = &buffer[0];
+			last = first + buffer.size();
 		}
 		else
 		{
-			forceType<void>();
-			return true;
+			first = "";
+			last = first + 0;
 		}
-
-		const char *first = &buffer[0];
-		const char *last = first + buffer.size();
 
 		VariantLoadScope scope(this, fileName, first, last, errors);
         bool parseResult = qi::phrase_parse(

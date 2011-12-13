@@ -91,6 +91,24 @@ namespace utils
 	};
 
 	//////////////////////////////////////////////////////////////////////////
+	struct CheckerInclude
+	{
+		VariantLoadScope &_scope;
+		CheckerInclude(VariantLoadScope &scope)
+			: _scope(scope)
+		{
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		template <typename Context>
+		void operator()(const std::string &path, Context& context, bool& pass) const
+		{
+			pass = _scope.do_include(path);
+		}
+	};
+
+
+	//////////////////////////////////////////////////////////////////////////
 	VariantLoadGrammar::VariantLoadGrammar(VariantLoadScope &scope)
 		: base_type(_start, "variant")
 		, _scope(scope)
@@ -110,8 +128,7 @@ namespace utils
 
 			_float				[phx::bind(&VariantLoadScope::set_float, _scope, _1)] | 
 			_double				[phx::bind(&VariantLoadScope::set_double, _scope, _1)] | 
-			_integer			[phx::bind(&VariantLoadScope::set_integer, _scope, _1)] | 
-			_bitset 
+			_integer			[phx::bind(&VariantLoadScope::set_integer, _scope, _1)]
 			;
 
 
@@ -269,9 +286,6 @@ namespace utils
 			("off", false);
 
 		//////////////////////////////////////////////////////////////////////////
-		_bitset;
-
-		//////////////////////////////////////////////////////////////////////////
 		_uuid.name("uuid");
 		_uuid =
 			repeat(8)[_hexDigit] >> lit('-') >>
@@ -325,11 +339,21 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_include.name("include");
-		_include = lit("include");
+		_include = 
+			lit("include") > 
+			_includePath[CheckerInclude(_scope)];
+
+		_includePath.name("includePath");
+		_includePath %=
+			_string;
 
 		//////////////////////////////////////////////////////////////////////////
 		_variant.name("variant");
-		_variant = _map | _array | _include | _scalar;
+		_variant = 
+			_map | 
+			_array | 
+			_include | 
+			_scalar;
 
 		_start.name("variant");
 		_start =
@@ -337,10 +361,10 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		on_error<fail>
-			(
+		(
 			_start, 
 			phx::bind(&VariantLoadScope::error, _scope, _1, _2, _3, _4)
-			);
+		);
 
 	}
 
