@@ -321,11 +321,11 @@ namespace utils
 			boost::uint8_t &b = *(u.begin()+i);
 			b = x2n(content[i*2])<<4 | x2n(content[i*2+1]);
 		}
-// 
-// 		*(boost::uint32_t *)(u.begin()+0) = bigEndian(*(boost::uint32_t *)(u.begin()+0));
-// 		*(boost::uint16_t *)(u.begin()+4) = bigEndian(*(boost::uint16_t *)(u.begin()+4));
-// 		*(boost::uint16_t *)(u.begin()+6) = bigEndian(*(boost::uint16_t *)(u.begin()+6));
-// 
+
+		*(boost::uint32_t *)(u.begin()+0) = fixEndian(*(boost::uint32_t *)(u.begin()+0));
+		*(boost::uint16_t *)(u.begin()+4) = fixEndian(*(boost::uint16_t *)(u.begin()+4));
+		*(boost::uint16_t *)(u.begin()+6) = fixEndian(*(boost::uint16_t *)(u.begin()+6));
+
 		_stack.back() = u;
 	}
 

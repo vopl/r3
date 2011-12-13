@@ -154,5 +154,12 @@ namespace utils
 		static const bool le = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
 		return impl::FixEndian<!le>::call(v);
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class T>
+	inline T fixEndian(const T &v)
+	{
+		return impl::FixEndian<true>::call(v);
+	}
 }
 #endif

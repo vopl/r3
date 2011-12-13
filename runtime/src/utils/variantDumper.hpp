@@ -54,23 +54,23 @@ namespace utils
 	template <>
 	std::ostream &dumpOstr<boost::uuids::uuid>(std::ostream &ostr, const boost::uuids::uuid &v, size_t /*level*/, bool /*levelApplyed*/)
 	{
-		ostr<<boost::uuids::to_string(v);
+		//ostr<<boost::uuids::to_string(v);
 
-// 		boost::uint32_t time_low = *(boost::uint32_t *)(v.begin()+0);
-// 		boost::uint16_t time_mid = *(boost::uint16_t *)(v.begin()+4);
-// 		boost::uint16_t time_hi_and_version = *(boost::uint16_t *)(v.begin()+6);
-// 
-// 		char buf[64];
-// 		sprintf(buf, "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-", 
-// 			time_low, time_mid, time_hi_and_version, 
-// 			v.begin()[8], v.begin()[9]);
-// 
-// 		for(size_t i = 0; i < 6; i++)
-// 		{
-// 			sprintf(buf+24+i*2, "%2.2x", v.begin()[10+i]);
-// 		}
-// 
-// 		ostr<<buf;
+		boost::uint32_t time_low = litEndian(*(boost::uint32_t *)(v.begin()+0));
+		boost::uint16_t time_mid = litEndian(*(boost::uint16_t *)(v.begin()+4));
+		boost::uint16_t time_hi_and_version = litEndian(*(boost::uint16_t *)(v.begin()+6));
+
+		char buf[64];
+		sprintf(buf, "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-", 
+			time_low, time_mid, time_hi_and_version, 
+			v.begin()[8], v.begin()[9]);
+
+		for(size_t i = 0; i < 6; i++)
+		{
+			sprintf(buf+24+i*2, "%2.2x", v.begin()[10+i]);
+		}
+
+		ostr<<buf;
 
 		return ostr;
 	}
