@@ -52,7 +52,16 @@ namespace utils
 			VariantLoadGrammar(scope),
 			spirit::ascii::space);
 
-		return parseResult;
+		if(parseResult)
+		{
+			if(first != last)
+			{
+				boost::spirit::info what(std::string("end"));
+				scope.error(&buffer[0], last, first, what);
+			}
+		}
+
+		return parseResult && !scope.errorWas();
 	}
 
 

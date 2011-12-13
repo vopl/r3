@@ -89,8 +89,8 @@ namespace utils
 			_double				[phx::bind(&VariantLoadScope::set_double, _scope, _1)] | 
 			_integer			[phx::bind(&VariantLoadScope::set_integer, _scope, _1)] | 
 			_datetime | 
-			_bitset | 
-			eps;
+			_bitset 
+			;
 
 
 

@@ -62,6 +62,8 @@ namespace utils
 			std::string *errors);
 		~VariantLoadScope();
 
+		bool errorWas();
+
 		void error(const char *first, const char *last, const char *errorPos, const boost::spirit::info &what);
 		
 		void set_null();
