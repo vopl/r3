@@ -23,13 +23,15 @@ namespace utils
 		_scalar = 
 			_null				[phx::bind(&VariantLoadScope::set_null, _scope)] | 
 			_string				[phx::bind(&VariantLoadScope::set_string, _scope, _1)] | 
+			_uuid				[phx::bind(&VariantLoadScope::set_uuid, _scope, _1)] |
+			_bool				[phx::bind(&VariantLoadScope::set_bool, _scope, _1)] | 
+
 			_float				[phx::bind(&VariantLoadScope::set_float, _scope, _1)] | 
 			_double				[phx::bind(&VariantLoadScope::set_double, _scope, _1)] | 
 			_integer			[phx::bind(&VariantLoadScope::set_integer, _scope, _1)] | 
 			_datetime | 
-			_bool				[phx::bind(&VariantLoadScope::set_bool, _scope, _1)] | 
 			_bitset | 
-			_uuid;
+			eps;
 
 
 
@@ -72,7 +74,7 @@ namespace utils
 		_integer =
 			(
 				ascii::string("0x") > 
-				+char_("0-9a-fA-F") >>
+				+_hexDigit >>
 				-(char_('u') >>
 					-(ascii::string("8")|ascii::string("16")|ascii::string("32")|ascii::string("64")
 					)
@@ -113,8 +115,13 @@ namespace utils
 		_bitset;
 
 		//////////////////////////////////////////////////////////////////////////
-		_uuid;
-
+		_uuid.name("uuid");
+		_uuid =
+			repeat(8)[_hexDigit] >> lit('-') >>
+			repeat(4)[_hexDigit] >> lit('-') >>
+			repeat(4)[_hexDigit] >> lit('-') >>
+			repeat(4)[_hexDigit] >> lit('-') >>
+			repeat(12)[_hexDigit];
 
 		//////////////////////////////////////////////////////////////////////////
 		_ident.name("ident");
@@ -123,6 +130,9 @@ namespace utils
 
 
 
+		_hexDigit.name("hexDigit");
+		_hexDigit = 
+			char_("0-9a-fA-F");
 
 
 

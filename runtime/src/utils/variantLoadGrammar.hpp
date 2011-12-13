@@ -38,9 +38,10 @@ namespace utils
 		qi::rule<const char *, bool()> _bool;
 		qi::symbols<char, bool> _boolSymbols;
 		qi::rule<const char *> _bitset;
-		qi::rule<const char *> _uuid;
+		qi::rule<const char *, std::string()> _uuid;
 
 		qi::rule<const char *, std::string()> _ident;
+		qi::rule<const char *, char()> _hexDigit;
 
 		VariantLoadScope &_scope;
 	};

@@ -27,6 +27,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/variant/recursive_variant.hpp>
 #include <boost/foreach.hpp>
+#include <boost/spirit/include/qi_repeat.hpp>
 
 
 #include <string>

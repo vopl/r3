@@ -38,6 +38,7 @@ namespace utils
 		void set_float(const float &content);
 		void set_integer(const std::string &content);
 		void set_bool(bool v);
+		void set_uuid(const std::string &content);
 
 		void array_start();
 		void array_push();

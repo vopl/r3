@@ -301,6 +301,29 @@ namespace utils
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void VariantLoadScope::set_uuid(const std::string &content)
+	{
+		if(_errorWas) return;
+		assert(_stack.size() > 0);
+
+		assert(32 == content.size());
+
+		boost::uuids::uuid u;
+		for(size_t i(0); i<16; i++)
+		{
+			boost::uint8_t &b = *(u.begin()+i);
+			b = x2n(content[i*2])<<4 | x2n(content[i*2+1]);
+		}
+
+		*(boost::uint32_t *)(u.begin()+0) = bigEndian(*(boost::uint32_t *)(u.begin()+0));
+		*(boost::uint16_t *)(u.begin()+4) = bigEndian(*(boost::uint16_t *)(u.begin()+4));
+		*(boost::uint16_t *)(u.begin()+6) = bigEndian(*(boost::uint16_t *)(u.begin()+6));
+
+		_stack.back() = u;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	void VariantLoadScope::array_start()
 	{
 		if(_errorWas) return;
@@ -356,7 +379,7 @@ namespace utils
 		assert(_stack.size() > 1);
 
 		_stack[_stack.size()-2].as<Variant::MapStringVariant>()[_mapKey].swap(_stack.back());
-
+		_stack.back().setNull<void>(true);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
