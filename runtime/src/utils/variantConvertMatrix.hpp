@@ -10,11 +10,10 @@ namespace utils
 			//////////////////////////////////////////////////////////////////////////
 			//default
 			template <class Dst, class Src>
-			bool exec(Dst &dst, const Src &src);
-// 			{
-// 				assert(!"default convertor");
-// 				return false;
-// 			}
+			bool exec(Dst &dst, const Src &src)
+			{
+				return false;
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////

@@ -247,6 +247,11 @@ namespace utils
 		template<typename T> void convert();
 		void convert(EType et);
 
+#ifdef _DEBUG
+		template<typename T> bool canConvert() const;
+		bool canConvert(EType et) const;
+#endif
+
 #define ENUM_VARIANT_TYPE(T) operator T () const;
 		ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE

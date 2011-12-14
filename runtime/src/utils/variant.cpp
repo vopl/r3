@@ -338,6 +338,35 @@ ENUM_VARIANT_TYPES
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+#ifdef _DEBUG
+	template<typename T> bool Variant::canConvert() const
+	{
+		T stub;
+		return CIMPL->convert<T>(stub);
+	}
+	template<> bool Variant::canConvert<void>() const
+	{
+		return false;
+	}
+
+	bool Variant::canConvert(EType et) const
+	{
+		switch(et)
+		{
+		case etVoid: return canConvert<Void>();
+#define ENUM_VARIANT_TYPE(n) case et##n: return canConvert<n>();
+ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
+		default:
+			assert(!"bad et");
+			throw "bad et";
+		}
+	}
+#endif
+
+
+
+	//////////////////////////////////////////////////////////////////////////
 	Variant Variant::operator[](const std::string &key)
 	{
 		Variant v;
