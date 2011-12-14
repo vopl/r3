@@ -5,12 +5,29 @@ namespace utils
 {
 	namespace impl
 	{
+		//////////////////////////////////////////////////////////////////////////
 		template <class Dst, class Src>
-		bool variantConvertMatrix(Dst &dst, const Src &src)
+		struct VariantConvertMatrix
 		{
-			assert(0);
-			return false;
-		}
+			static bool exec(Dst &dst, const Src &src)
+			{
+				assert(!"no transform");
+				return false;
+			}
+		};
+
+
+		//////////////////////////////////////////////////////////////////////////
+		//identity
+		template <class T>
+		struct VariantConvertMatrix<T, T>
+		{
+			static bool exec(T &dst, const T &src)
+			{
+				dst = src;
+				return true;
+			}
+		};
 	}
 }
 

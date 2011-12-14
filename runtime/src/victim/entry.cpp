@@ -22,11 +22,12 @@ int main(int argc, char* argv[])
 	b = v.isScalar();
 	b = v.isMap();
 	b = v.isArray();
-	size_t size = v;
+	//size_t size = v;
 	Variant d = v["deque"];
 	Variant m = v["map"];
 
 	Variant d0 = d[0];
+	d0.convert<int>();
 
 	return EXIT_SUCCESS;
 }

@@ -389,7 +389,7 @@ namespace utils
 			switch(type())
 			{
 			case etVoid: return false;
-#define ENUM_VARIANT_TYPE(n) case et ## n: return impl::variantConvertMatrix(dst, as<n>());
+#define ENUM_VARIANT_TYPE(n) case et ## n: return impl::VariantConvertMatrix<Dst, n>::exec(dst, as<n>());
 				ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 			default:
