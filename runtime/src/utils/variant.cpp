@@ -35,7 +35,7 @@ namespace utils
 
 
 	//////////////////////////////////////////////////////////////////////////
-#define ENUM_VARIANT_TYPE(i,n,...)		\
+#define ENUM_VARIANT_TYPE(n)		\
 	Variant::Variant(const n &v)	\
 	{								\
 			IMPL->validateType<n>();\
@@ -54,7 +54,7 @@ ENUM_VARIANT_TYPES
 	}
 
 //////////////////////////////////////////////////////////////////////////
-#define ENUM_VARIANT_TYPE(i,n,...)			\
+#define ENUM_VARIANT_TYPE(n)			\
 	Variant &Variant::operator=(const n &v)	\
 	{										\
 		IMPL->validateType<n>();			\
@@ -77,7 +77,7 @@ Variant &Variant::operator=(const char * v)
 }
 
 //////////////////////////////////////////////////////////////////////////
-#define ENUM_VARIANT_TYPE(i,n,...)	\
+#define ENUM_VARIANT_TYPE(n)	\
 	Variant::operator n &()			\
 	{								\
 		IMPL->validateType<n>();	\
@@ -97,7 +97,7 @@ ENUM_VARIANT_TYPES
 
 
 //////////////////////////////////////////////////////////////////////////
-#define ENUM_VARIANT_TYPE(i,n,...)			\
+#define ENUM_VARIANT_TYPE(n)			\
 	Variant::operator n const &() const		\
 	{										\
 		CIMPL->validateType<n>();			\
@@ -177,7 +177,7 @@ ENUM_VARIANT_TYPES
 
 		return IMPL->as<T>();
 	}
-#define ENUM_VARIANT_TYPE(i,n,...) template Variant::n &Variant::as<Variant::n>(bool forceType);
+#define ENUM_VARIANT_TYPE(n) template Variant::n &Variant::as<Variant::n>(bool forceType);
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 
@@ -189,7 +189,7 @@ ENUM_VARIANT_TYPES
 		CIMPL->validateValue<T>();
 		return CIMPL->as<T>();
 	}
-#define ENUM_VARIANT_TYPE(i,n,...) template Variant::n const &Variant::as<Variant::n>() const;
+#define ENUM_VARIANT_TYPE(n) template Variant::n const &Variant::as<Variant::n>() const;
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 
@@ -201,7 +201,7 @@ ENUM_VARIANT_TYPES
 		CIMPL->validateValue<T>();
 		return IMPL->as<T>();
 	}
-#define ENUM_VARIANT_TYPE(i,n,...) template Variant::n &Variant::as<Variant::n>();
+#define ENUM_VARIANT_TYPE(n) template Variant::n &Variant::as<Variant::n>();
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 
@@ -211,7 +211,7 @@ ENUM_VARIANT_TYPES
 		CIMPL->validateType<T>();
 		return CIMPL->is<T>();
 	}
-#define ENUM_VARIANT_TYPE(i,n,...) template bool Variant::is<Variant::n>() const;
+#define ENUM_VARIANT_TYPE(n) template bool Variant::is<Variant::n>() const;
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 template bool Variant::is<Variant::Void>() const;
@@ -222,7 +222,7 @@ template bool Variant::is<Variant::Void>() const;
 		IMPL->validateType<T>();
 		return IMPL->forceType<T>();
 	}
-#define ENUM_VARIANT_TYPE(i,n,...) template void Variant::forceType<Variant::n>();
+#define ENUM_VARIANT_TYPE(n) template void Variant::forceType<Variant::n>();
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 template void Variant::forceType<Variant::Void>();

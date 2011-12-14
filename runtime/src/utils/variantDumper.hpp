@@ -176,7 +176,7 @@ namespace utils
 			{
 			case Variant::etVoid: ostr<<"Void# Null"; break;
 
-#define ENUM_VARIANT_TYPE(i,n,...) case Variant::et ## n: ostr<< #n<<"# Null"; break;
+#define ENUM_VARIANT_TYPE(n) case Variant::et ## n: ostr<< #n<<"# Null"; break;
 				ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 			default:
@@ -190,7 +190,7 @@ namespace utils
 			{
 			case Variant::etVoid: ostr<<"Void# <void>"; break;
 
-#define ENUM_VARIANT_TYPE(i,n,...) case Variant::et ## n: ostr<< #n<<"# "; dumpOstr(ostr, v.as<Variant::n>(), level, levelApplyed); break;
+#define ENUM_VARIANT_TYPE(n) case Variant::et ## n: ostr<< #n<<"# "; dumpOstr(ostr, v.as<Variant::n>(), level, levelApplyed); break;
 				ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 			default:

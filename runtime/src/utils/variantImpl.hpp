@@ -130,7 +130,7 @@ namespace utils
 			switch(type())
 			{
 			case etVoid: break;
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: destruct< n >(); break;
+#define ENUM_VARIANT_TYPE(n) case et ## n: destruct< n >(); break;
 				ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 			default:
@@ -205,7 +205,7 @@ namespace utils
 			switch(type())
 			{
 			case etVoid: return NULL;
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: return &as<n>();
+#define ENUM_VARIANT_TYPE(n) case et ## n: return &as<n>();
 				ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 			default:
@@ -228,7 +228,7 @@ namespace utils
 			switch(type())
 			{
 			case etVoid: return NULL;
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: return &as<n>();
+#define ENUM_VARIANT_TYPE(n) case et ## n: return &as<n>();
 				ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 			default:
@@ -324,7 +324,7 @@ namespace utils
 				switch(type())
 				{
 				case etVoid: return false;
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: return as<n>() < v.as<n>();
+#define ENUM_VARIANT_TYPE(n) case et ## n: return as<n>() < v.as<n>();
 					ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 				default:
@@ -364,7 +364,7 @@ namespace utils
 				switch(type())
 				{
 				case etVoid: return true;
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: return as<n>() == v.as<n>();
+#define ENUM_VARIANT_TYPE(n) case et ## n: return as<n>() == v.as<n>();
 					ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 				default:
@@ -433,7 +433,7 @@ namespace utils
 		{
 		case etVoid: break;
 
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: alloc<n>(); new (&as<n>()) n(v.as<n>()); break;
+#define ENUM_VARIANT_TYPE(n) case et ## n: alloc<n>(); new (&as<n>()) n(v.as<n>()); break;
 			ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 		default:
@@ -476,7 +476,7 @@ namespace utils
 				switch(type())
 				{
 				case etVoid: destruct(); break;
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: assign<n>(v.as<n>()); break;
+#define ENUM_VARIANT_TYPE(n) case et ## n: assign<n>(v.as<n>()); break;
 					ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 				default:
@@ -560,7 +560,7 @@ namespace utils
 				{
 				case etVoid: break;
 
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: construct<n>(); break;
+#define ENUM_VARIANT_TYPE(n) case et ## n: construct<n>(); break;
 					ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 				default:
@@ -642,7 +642,7 @@ namespace utils
 			switch(_et)
 			{
 			case etVoid: break;
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: ar & as<n>(); break;
+#define ENUM_VARIANT_TYPE(n) case et ## n: ar & as<n>(); break;
 				ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 			default:
@@ -669,7 +669,7 @@ namespace utils
 			switch(et)
 			{
 			case etVoid: destruct(); break;
-#define ENUM_VARIANT_TYPE(i,n,...) case et ## n: forceType<n>(); setNull(false); ar & as<n>(); break;
+#define ENUM_VARIANT_TYPE(n) case et ## n: forceType<n>(); setNull(false); ar & as<n>(); break;
 				ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 			default:
