@@ -1,6 +1,9 @@
 #ifndef _UTILS_IMPL_VARIANTCONVERTMATRIX_HPP_
 #define _UTILS_IMPL_VARIANTCONVERTMATRIX_HPP_
 
+#include <boost/bind.hpp>
+#include "utils/ntoa.hpp"
+
 namespace utils
 {
 	namespace impl
@@ -351,7 +354,134 @@ namespace utils
 			MSEQUENCE2SEQUENCE(DequeVariant)
 			MSEQUENCE2SEQUENCE(ListVariant)
 
+
+
+
+
+
+
+
+
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
 			//assoc to assoc
+			struct AssocHelper
+			{
+				//////////////////////////////////////////////////////////////////////////
+				template <class Dst, class Src>
+				static 
+					typename boost::enable_if<
+						boost::is_same<Dst, Src>
+						, bool>::type 
+					convert(Dst &dst, const Src &src)
+				{
+					dst = src;
+					return true;
+				}
+				
+				//////////////////////////////////////////////////////////////////////////
+				template <class Dst, class Src>
+				static 
+					typename boost::enable_if<
+						boost::mpl::not_<boost::is_same<Dst, Src> >
+						, bool>::type 
+					convert(Dst &dst, const Src &src)
+				{
+					dst.clear();
+					std::copy (src.begin(), src.end(), std::inserter(dst, dst.begin()));
+					return true;
+				}
+			};
+#define ASSOC2ASSOC(DST, SRC)\
+	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){return AssocHelper::convert(dst, src);}\
+
+#define MASSOC2ASSOC(SRC)\
+	ASSOC2ASSOC(MapStringVariant, SRC)\
+	ASSOC2ASSOC(MapVariantVariant, SRC)\
+	ASSOC2ASSOC(MultimapStringVariant, SRC)\
+	ASSOC2ASSOC(MultimapVariantVariant, SRC)\
+
+			MASSOC2ASSOC(MapStringVariant)
+			MASSOC2ASSOC(MapVariantVariant)
+			MASSOC2ASSOC(MultimapStringVariant)
+			MASSOC2ASSOC(MultimapVariantVariant)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//assoc to seq
+			//seq to assoc
+			struct Assoc2SeqHelper
+			{
+				//////////////////////////////////////////////////////////////////////////
+				template <class Dst, class Src>
+				static bool fwd(Dst &dst, const Src &src)
+				{
+					dst.clear();
+					std::transform(src.begin(), src.end(), 
+						std::inserter(dst, dst.begin()),
+						boost::bind(&Src::value_type::second,_1));
+					return true;
+				}
+				//////////////////////////////////////////////////////////////////////////
+				template <class Dst, class Src>
+				static bool bwd(Dst &dst, const Src &src)
+				{
+					dst.clear();
+
+					size_t idx(0);
+					BOOST_FOREACH(Src::const_reference s, src)
+					{
+						char tmp[32];
+						dst.insert(std::make_pair(utils::_ntoa(idx++, tmp), s));
+					}
+					return true;
+				}
+			};
+#define ASSOC2SEQ(DST, SRC)\
+	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){return Assoc2SeqHelper::fwd(dst, src);}\
+	template <>	bool exec<>(Variant::SRC &dst, const Variant::DST &src){return Assoc2SeqHelper::bwd(dst, src);}\
+
+#define MASSOC2SEQ(SRC)\
+	ASSOC2SEQ(VectorVariant, SRC)\
+	ASSOC2SEQ(SetVariant, SRC)\
+	ASSOC2SEQ(MultisetVariant, SRC)\
+	ASSOC2SEQ(DequeVariant, SRC)\
+	ASSOC2SEQ(ListVariant, SRC)\
+
+			MASSOC2SEQ(MapStringVariant)
+			MASSOC2SEQ(MapVariantVariant)
+			MASSOC2SEQ(MultimapStringVariant)
+			MASSOC2SEQ(MultimapVariantVariant)
+
 
 			//ptr to some
 			//some to ptr
