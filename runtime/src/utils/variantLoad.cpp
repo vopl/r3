@@ -28,44 +28,54 @@ namespace utils
 			return false;
 		}
 
-		std::vector<char> buffer;
-		in.seekg(0, std::ios::end);
-		buffer.resize(in.tellg());
-		in.seekg(std::ios::beg, 0);
+		bool parseResult;
 
-
-		const char *first;
-		const char *last;
-		if(buffer.size())
 		{
-			in.read(&buffer[0], buffer.size());
-			in.close();
-			first = &buffer[0];
-			last = first + buffer.size();
-		}
-		else
-		{
-			first = "";
-			last = first + 0;
-		}
+			std::vector<char> buffer;
+			in.seekg(0, std::ios::end);
+			buffer.resize(in.tellg());
+			in.seekg(std::ios::beg, 0);
 
-		VariantLoadScope scope(this, fileName, first, last, errors);
-        bool parseResult = qi::phrase_parse(
-			first, 
-			last,
-			VariantLoadGrammar(scope),
-			SkipGrammar());
 
-		if(parseResult)
-		{
-			if(first != last)
+			const char *first;
+			const char *last;
+			if(buffer.size())
 			{
-				boost::spirit::info what(std::string("end"));
-				scope.error(&buffer[0], last, first, what);
+				in.read(&buffer[0], buffer.size());
+				in.close();
+				first = &buffer[0];
+				last = first + buffer.size();
+			}
+			else
+			{
+				first = "";
+				last = first + 0;
+			}
+
+			VariantLoadScope scope(this, fileName, first, last, errors);
+			parseResult = qi::phrase_parse(
+				first, 
+				last,
+				VariantLoadGrammar(scope),
+				SkipGrammar());
+
+			if(parseResult)
+			{
+				if(first != last)
+				{
+					boost::spirit::info what(std::string("end"));
+					scope.error(&buffer[0], last, first, what);
+				}
+			}
+
+			if(scope.errorWas())
+			{
+				parseResult = false;
 			}
 		}
 
-		return parseResult && !scope.errorWas();
+
+		return parseResult;
 	}
 
 
