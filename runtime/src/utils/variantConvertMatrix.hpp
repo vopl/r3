@@ -263,7 +263,93 @@ namespace utils
 			MBITSET2INT(UInt64)
 
 
+
+
+
+
+
+
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
 			//sequence to sequence
+			struct SequenceHelper
+			{
+				//////////////////////////////////////////////////////////////////////////
+				template <class Dst, class Src>
+				static 
+					typename boost::enable_if<
+						boost::is_same<Dst, Src>
+						, bool>::type 
+					convert(Dst &dst, const Src &src)
+				{
+					dst = src;
+					return true;
+				}
+
+				//////////////////////////////////////////////////////////////////////////
+				template <class Dst, class Src>
+				static 
+					typename boost::enable_if<
+						boost::mpl::and_<
+							boost::mpl::not_<boost::is_same<Dst, Src> >,
+							boost::mpl::not_<
+								boost::mpl::or_<
+									boost::is_same<Dst, Variant::SetVariant>,
+									boost::is_same<Dst, Variant::MultisetVariant>
+								>
+							>
+						>
+						, bool>::type 
+					convert(Dst &dst, const Src &src)
+				{
+					dst.clear();
+					std::copy (src.begin(), src.end(), std::back_inserter(dst));
+					return true;
+				}
+				//////////////////////////////////////////////////////////////////////////
+				template <class Dst, class Src>
+				static 
+					typename boost::enable_if<
+						boost::mpl::and_<
+							boost::mpl::not_<boost::is_same<Dst, Src> >,
+							boost::mpl::or_<
+								boost::is_same<Dst, Variant::SetVariant>,
+								boost::is_same<Dst, Variant::MultisetVariant>
+							>
+						>
+						, bool>::type 
+					convert(Dst &dst, const Src &src)
+				{
+					dst.clear();
+					std::copy (src.begin(), src.end(), std::inserter(dst, dst.begin()));
+					return true;
+				}
+			};
+
+#define SEQUENCE2SEQUENCE(DST, SRC)\
+	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){return SequenceHelper::convert(dst, src);}\
+
+#define MSEQUENCE2SEQUENCE(SRC)\
+	SEQUENCE2SEQUENCE(SRC, VectorVariant)\
+	SEQUENCE2SEQUENCE(SRC, SetVariant)\
+	SEQUENCE2SEQUENCE(SRC, MultisetVariant)\
+	SEQUENCE2SEQUENCE(SRC, DequeVariant)\
+	SEQUENCE2SEQUENCE(SRC, ListVariant)\
+
+			MSEQUENCE2SEQUENCE(VectorVariant)
+			MSEQUENCE2SEQUENCE(SetVariant)
+			MSEQUENCE2SEQUENCE(MultisetVariant)
+			MSEQUENCE2SEQUENCE(DequeVariant)
+			MSEQUENCE2SEQUENCE(ListVariant)
 
 			//assoc to assoc
 
