@@ -52,7 +52,7 @@ namespace utils
 				last = first + 0;
 			}
 
-			VariantLoadScope scope(this, fileName, first, last, errors);
+			VariantLoadScope scope(fileName, first, last, errors);
 			parseResult = qi::phrase_parse(
 				first, 
 				last,
@@ -71,6 +71,10 @@ namespace utils
 			if(scope.errorWas())
 			{
 				parseResult = false;
+			}
+			if(parseResult)
+			{
+				this->swap(scope.getValue());
 			}
 		}
 

@@ -78,35 +78,17 @@ Variant &Variant::operator=(const char * v)
 
 //////////////////////////////////////////////////////////////////////////
 #define ENUM_VARIANT_TYPE(n)	\
-	Variant::operator n &()			\
+	Variant::operator n ()const		\
 	{								\
-		IMPL->validateType<n>();	\
-		IMPL->validateValue<n>();	\
-		return IMPL->as<n>();		\
+		CIMPL->validateType<n>();	\
+		n res;						\
+		CIMPL->convert<n>(res);		\
+		return res;					\
 	}								//\
 
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 
-	Variant::operator const char *()
-	{
-		IMPL->validateType<String>();
-		IMPL->validateValue<String>();
-		return IMPL->as<String>().data();
-	}
-
-
-//////////////////////////////////////////////////////////////////////////
-#define ENUM_VARIANT_TYPE(n)			\
-	Variant::operator n const &() const		\
-	{										\
-		CIMPL->validateType<n>();			\
-		CIMPL->validateValue<n>();			\
-		return CIMPL->as<n>();				\
-	}										//\
-
-ENUM_VARIANT_TYPES
-#undef ENUM_VARIANT_TYPE
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -232,6 +214,169 @@ template void Variant::forceType<Variant::Void>();
 	{
 		return IMPL->forceType(et);
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Variant::isMap() const
+	{
+		switch(type())
+		{
+		case etMapStringVariant:
+		case etMapVariantVariant:
+		case etMultimapStringVariant:
+		case etMultimapVariantVariant:
+			return true;
+		}
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Variant::isArray() const
+	{
+		switch(type())
+		{
+		case etVectorVariant:
+		case etDequeVariant:
+			return true;
+		}
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Variant::isScalar() const
+	{
+		switch(type())
+		{
+		case etString:
+		case etFloat:
+		case etDouble:
+		case etInt8:
+		case etInt16:
+		case etInt32:
+		case etInt64:
+		case etUInt8:
+		case etUInt16:
+		case etUInt32:
+		case etUInt64:
+		case etVectorChar:
+		case etDate:
+		case etDatetime:
+		case etBool:
+		case etTm:
+		case etBitset8:
+		case etBitset16:
+		case etBitset32:
+		case etBitset64:
+		case etBitset128:
+		case etBitset256:
+		case etBitset512:
+		case etDateDuration:
+		case etTimeDuration:
+		case etDateTimeDuration:
+		case etChar:
+		case etUuid:
+			return true;
+		}
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template<typename T> T Variant::to() const
+	{
+		CIMPL->validateType<T>();
+		T res;
+		CIMPL->convert<T>(res);
+		return res;
+	}
+#define ENUM_VARIANT_TYPE(n) template Variant::n Variant::to<Variant::n>() const;
+ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
+
+
+	//////////////////////////////////////////////////////////////////////////
+	template<typename T> void Variant::to(T &dst) const
+	{
+		CIMPL->validateType<T>();
+		if(!CIMPL->convert<T>(dst))
+		{
+			dst = T();
+		}
+	}
+#define ENUM_VARIANT_TYPE(n) template void Variant::to<Variant::n>(n &dst) const;
+ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
+
+	//////////////////////////////////////////////////////////////////////////
+	template<typename T> void Variant::convert()
+	{
+		CIMPL->validateType<T>();
+		if(is<T>())
+		{
+			return;
+		}
+		T dst;
+		CIMPL->convert<T>(dst);
+		*this = dst;
+	}
+	template<> void Variant::convert<Variant::Void>()
+	{
+		forceType<Variant::Void>();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Variant::convert(EType et)
+	{
+		switch(et)
+		{
+		case etVoid: convert<Void>();
+#define ENUM_VARIANT_TYPE(n) case et##n: convert<n>(); break;
+ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
+		default:
+			assert(!"bad et");
+			throw "bad et";
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Variant Variant::operator[](const std::string &key)
+	{
+		Variant v;
+		CIMPL->containerDereference(v, key);
+		return v;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Variant Variant::operator[](const char *key)
+	{
+		Variant v;
+		CIMPL->containerDereference(v, std::string(key));
+		return v;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Variant Variant::operator[](const Variant &key)
+	{
+		Variant v;
+		CIMPL->containerDereference(v, key);
+		return v;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Variant Variant::operator[](size_t idx)
+	{
+		Variant v;
+		CIMPL->containerDereference(v, idx);
+		return v;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Variant Variant::operator[](int idx)
+	{
+		Variant v;
+		CIMPL->containerDereference(v, (size_t)idx);
+		return v;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	bool Variant::operator <(const Variant &v) const

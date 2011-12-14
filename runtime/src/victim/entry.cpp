@@ -1,11 +1,13 @@
 #include "pch.h"
 #include "utils/variant.hpp"
 
+using namespace utils;
+
 //////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
 
-	utils::Variant v;
+	Variant v;
 	std::string errors;
 	bool b = v.load("P:\\projects\\r3\\repo\\runtime\\server\\test.js", &errors);
 
@@ -16,6 +18,15 @@ int main(int argc, char* argv[])
 	}
 
 	std::cout<<v<<std::endl;
+
+	b = v.isScalar();
+	b = v.isMap();
+	b = v.isArray();
+	size_t size = v;
+	Variant d = v["deque"];
+	Variant m = v["map"];
+
+	Variant d0 = d[0];
 
 	return EXIT_SUCCESS;
 }

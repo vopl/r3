@@ -178,78 +178,111 @@ namespace utils
 		~Variant();
 
 		//////////////////////////////////////////////////////////////////////////
+		//конструкторы
 		Variant();
 		Variant(const Variant &v);
-		
-		//конструкторы
+		Variant(const char *v);//String
 #define ENUM_VARIANT_TYPE(T) Variant(const T &v);
 		ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 
-		//helper
-		Variant(const char *v);
 
 
 
 		//////////////////////////////////////////////////////////////////////////
-		Variant &operator=(const Variant &v);
 		//присваивание
+		Variant &operator=(const Variant &v);
+		Variant &operator=(const char *v);//String
 #define ENUM_VARIANT_TYPE(T) Variant &operator=(const T &v);
-		ENUM_VARIANT_TYPES
-#undef ENUM_VARIANT_TYPE
-
-		//helper
-		Variant &operator=(const char *v);
-
-		//////////////////////////////////////////////////////////////////////////
-		// приведение к ссылке на хранимый тип
-#define ENUM_VARIANT_TYPE(T) operator T &();
-		ENUM_VARIANT_TYPES
-#undef ENUM_VARIANT_TYPE
-
-		//helper
-		operator const char *();
-
-#define ENUM_VARIANT_TYPE(T) operator T const &() const;
 		ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 
 		//////////////////////////////////////////////////////////////////////////
 		void swap(Variant &);
 
+		//////////////////////////////////////////////////////////////////////////
+		//проверки
+
+		//на NULL
 		bool isNull() const;
+		//на внутренний тип
+		template<typename T> bool is() const;
+		//на возможность использования operator[](string)
+		bool isMap() const;
+		//на возможность использования operator[](size_t)
+		bool isArray() const;
+		//на скаляр
+		bool isScalar() const;
+
+		//////////////////////////////////////////////////////////////////////////
+		//внутренние преобразования
+		//установить нул/ненул для текущего типа
 		void setNull(bool n=true);
+
+		//установить нул/ненул для заданного типа, старое значение сохраняется если не нул и тип не изменился
 		template<typename T> void setNull(bool n=true);
 
+		//установить заданный тип, старое значение сохраняется если не нул и тип не изменился
+		template<typename T> void forceType();
+		//установить заданный тип, старое значение сохраняется если не нул и тип не изменился
+		void forceType(EType et);
+
+		//////////////////////////////////////////////////////////////////////////
+		//доступ к сырым данным
+		//тип
 		EType type() const;
+		//адрес хранимого объекта
 		void *data();
 		void const *data() const;
 
+		//доступ ко ссылке на хранимый объект
 		template<typename T> T &as(bool forceType);
 		template<typename T> T const &as() const;
 		template<typename T> T &as();
-		template<typename T> bool is() const;
-		template<typename T> void forceType();
-		void forceType(EType et);
+
+		//////////////////////////////////////////////////////////////////////////
+		//матричное преобразование
+		template<typename T> T to() const;
+		template<typename T> void to(T &dst) const;
+		template<typename T> void convert();
+		void convert(EType et);
+
+#define ENUM_VARIANT_TYPE(T) operator T () const;
+		ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
+
+	public://интерфейс ассоциативной карты и индексируемого массива
+		Variant operator[](const std::string &key);
+		Variant operator[](const char *key);
+		Variant operator[](const Variant &key);
+		Variant operator[](size_t idx);
+		Variant operator[](int idx);
 
 	public:
+		//для упорядоченного контейнера
 		bool operator <(const Variant &v) const;
+		//на всякий случай
 		bool operator ==(const Variant &v) const;
 		bool operator !=(const Variant &v) const;
 
 	public:
+		//сериализация в портабельный бинарник
 		boost::shared_array<char> serialize(boost::uint32_t &size) const;
 		bool deserialize(boost::shared_array<char> data, boost::uint32_t size);
 
+		//загрузка из текстового файла (JSON-подобного)
 		bool load(const char *fileName, std::string *errors=NULL);
 
 	protected:
-		static const size_t _dataSize = sizeof(void *)<=8?8:sizeof(void *);
+		//буфер
+		static const size_t _dataSize = sizeof(void *)<=12?12:sizeof(void *);
 		char _data[_dataSize];
 
+		//тип
 		typedef boost::int16_t ETypeStorage;//негативный - null
 		ETypeStorage _et;
 
+		//для отладчика помогалка
 #ifdef UTILS_VARIANT_DBGDATA
 		void *_dbgData;
 #endif

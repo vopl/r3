@@ -9,8 +9,6 @@ namespace utils
 {
 	class VariantLoadScope
 	{
-		Variant			*_root;
-
 		std::deque<Variant>			_stack;
 
 		boost::filesystem::path _fileName;
@@ -72,13 +70,13 @@ namespace utils
 
 	public:
 		VariantLoadScope(
-			Variant *root, 
 			boost::filesystem::path fileName, 
 			const char *first,
 			const char *last,
 			std::string *errors);
 		~VariantLoadScope();
 
+		Variant &getValue();
 		bool errorWas();
 
 		void error(const char *first, const char *last, const char *errorPos, const boost::spirit::info &what);
