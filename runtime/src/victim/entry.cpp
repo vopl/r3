@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
 // 	}
 // 	cout<<endl;
 
+	size_t count=0;
 	for(size_t i(0); i<nTypes+1; i++)
 	{
 		cout<<"--";
@@ -52,6 +53,7 @@ int main(int argc, char* argv[])
 		{
 			if(v.canConvert(_sps[i]._et))
 			{
+				count++;
 				cout<<"<>";
 			}
 			else
@@ -68,6 +70,8 @@ int main(int argc, char* argv[])
 		cout<<"--";
 	}
 	cout<<endl;
+
+	cout<<count<<"/"<<nTypes*nTypes<<endl;
 
 	return EXIT_SUCCESS;
 }

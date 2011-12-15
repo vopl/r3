@@ -2,7 +2,9 @@
 #define _UTILS_IMPL_VARIANTCONVERTMATRIX_HPP_
 
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 #include "utils/ntoa.hpp"
+#include "utils/xton.hpp"
 
 namespace utils
 {
@@ -71,6 +73,7 @@ namespace utils
 #define ASSIGN(DST, SRC)	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){dst = src;return true;}
 
 #define MASSIGN(SRC)\
+	ASSIGN(Bool, SRC)\
 	ASSIGN(Char, SRC)\
 	ASSIGN(Int8, SRC)\
 	ASSIGN(Int16, SRC)\
@@ -83,6 +86,7 @@ namespace utils
 	ASSIGN(Float, SRC)\
 	ASSIGN(Double, SRC)\
 
+			MASSIGN(Bool)
 			MASSIGN(Char)
 			MASSIGN(Int8)
 			MASSIGN(Int16)
@@ -99,6 +103,7 @@ namespace utils
 			//container to real - size
 #define CONTAINERSIZE(DST, SRC)	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){dst = src.size();return true;}
 #define MCONTAINERSIZE(SRC)\
+	CONTAINERSIZE(Bool, SRC)\
 	CONTAINERSIZE(Char, SRC)\
 	CONTAINERSIZE(Int8, SRC)\
 	CONTAINERSIZE(Int16, SRC)\
@@ -219,6 +224,33 @@ namespace utils
 					}
 					return true;
 				}
+
+
+
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				//bool < bs
+				//////////////////////////////////////////////////////////////////////////
+				template <size_t NSrc>
+				static bool bs2int(Variant::Bool &dst, const std::bitset<NSrc> &src)
+				{
+					dst = src.test(0);
+					return true;
+				}
+
+				//////////////////////////////////////////////////////////////////////////
+				//bs < bool
+				//////////////////////////////////////////////////////////////////////////
+				template <size_t NDst>
+				static bool int2bs(std::bitset<NDst> &dst, const Variant::Bool &src)
+				{
+					dst.reset();
+					dst.set(0, src);
+					return true;
+				}
+
 			};
 			
 
@@ -258,6 +290,7 @@ namespace utils
 	BITSET2INT(DST, Bitset256)\
 	BITSET2INT(DST, Bitset512)\
 
+			MBITSET2INT(Bool)
 			MBITSET2INT(Char)
 			MBITSET2INT(Int8)
 			MBITSET2INT(Int16)
@@ -550,13 +583,200 @@ namespace utils
 				return true;
 			}
 
-			//some to string
-			//string to some
 
-			//some to bool
-			//bool to some
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			//datetime to datetime
+// 			Date;
+// 			Datetime;
+// 			Tm;
+// 
+// 			DateDuration;
+// 			TimeDuration;
+// 			DateTimeDuration;
+
+#define CNVTCODE(DST, SRC, CODE) template <> bool exec<>(Variant::DST &dst, const Variant::SRC &src){CODE;return true;}
+			CNVTCODE(Date, Datetime, dst = src.date())
+			CNVTCODE(Date, Tm, try{dst = boost::gregorian::date_from_tm(src);}catch(const std::out_of_range &){dst=Variant::Date();})
+
+			CNVTCODE(Datetime, Date, dst = Variant::Datetime(src))
+			CNVTCODE(Datetime, Tm, try{dst = boost::posix_time::ptime_from_tm(src);}catch(const std::out_of_range &){dst=Variant::Datetime();})
+
+			CNVTCODE(Tm, Date, try{dst = boost::gregorian::to_tm(src);}catch(const std::out_of_range &){dst=Variant::Tm();})
+			CNVTCODE(Tm, Datetime, try{dst = boost::posix_time::to_tm(src);}catch(const std::out_of_range &){dst=Variant::Tm();})
+
+
+			CNVTCODE(DateDuration, DateTimeDuration, dst = src._dd)
+			CNVTCODE(TimeDuration, DateTimeDuration, dst = src._td)
+
+			CNVTCODE(DateTimeDuration, DateDuration, dst._dd = src;dst._td=Variant::TimeDuration())
+			CNVTCODE(DateTimeDuration, TimeDuration, dst._td = src;dst._dd=Variant::DateDuration())
+
+
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//some to string
+			//string to some
+#define SOME2STRING(SRC)\
+	template <>	bool exec<>(Variant::String &dst, const Variant::SRC &src){try{dst = boost::lexical_cast<Variant::String>(src);}catch(const boost::bad_lexical_cast&){dst.clear();};return true;}\
+	template <>	bool exec<>(Variant::SRC &dst, const Variant::String &src){if(src.empty()){dst=Variant::SRC();return true;}try{dst = boost::lexical_cast<Variant::SRC>(src);}catch(const boost::bad_lexical_cast&){dst=Variant::SRC();};return true;}\
+
+			SOME2STRING(Char)
+			SOME2STRING(Int8)
+			SOME2STRING(Int16)
+			SOME2STRING(Int32)
+			SOME2STRING(Int64)
+			SOME2STRING(UInt8)
+			SOME2STRING(UInt16)
+			SOME2STRING(UInt32)
+			SOME2STRING(UInt64)
+			SOME2STRING(Float)
+			SOME2STRING(Double)
+			SOME2STRING(Date)
+			SOME2STRING(Datetime)
+			SOME2STRING(Bool)
+			SOME2STRING(Bitset8)
+			SOME2STRING(Bitset16)
+			SOME2STRING(Bitset32)
+			SOME2STRING(Bitset64)
+			SOME2STRING(Bitset128)
+			SOME2STRING(Bitset256)
+			SOME2STRING(Bitset512)
+			SOME2STRING(DateDuration)
+			SOME2STRING(TimeDuration)
+			//SOME2STRING(DateTimeDuration)
+			//SOME2STRING(Uuid)
+
+			//dateTimeDuration
+			template <> bool exec<>(Variant::String &dst, const Variant::DateTimeDuration &src)
+			{
+				std::ostringstream os;
+				os<<src._dd<<" "<<src._td;
+				dst = os.str();
+				return true;
+			}
+
+			template <> bool exec<>(Variant::DateTimeDuration &dst, const Variant::String &src)
+			{
+				std::istringstream is(src);
+				is>>dst._dd>>dst._td;
+				return true;
+			}
+
+			//tm
+			template <> bool exec<>(Variant::String &dst, const Variant::Tm &src)
+			{
+				Variant::Datetime dt;
+				exec(dt, src);
+				return exec(dst, dt);
+			}
+
+			template <> bool exec<>(Variant::Tm &dst, const Variant::String &src)
+			{
+				Variant::Datetime dt;
+				exec(dt, src);
+				return exec(dst, dt);
+			}
+
+			//uuid
+			template <> bool exec<>(Variant::String &dst, const Variant::Uuid &src)
+			{
+				boost::uint32_t time_low = litEndian(*(boost::uint32_t *)(src.begin()+0));
+				boost::uint16_t time_mid = litEndian(*(boost::uint16_t *)(src.begin()+4));
+				boost::uint16_t time_hi_and_version = litEndian(*(boost::uint16_t *)(src.begin()+6));
+
+				char buf[37];
+				sprintf(buf, "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-", 
+					time_low, time_mid, time_hi_and_version, 
+					src.begin()[8], src.begin()[9]);
+
+				for(size_t i = 0; i < 6; i++)
+				{
+					sprintf(buf+24+i*2, "%2.2x", src.begin()[10+i]);
+				}
+				dst = buf;
+				return true;
+			}
+
+			template <> bool exec<>(Variant::Uuid &dst, const Variant::String &src)
+			{
+				Variant::Uuid u;
+				if(src.size() == 36)
+				{
+					for(size_t i(0), si(0); i<16; i++)
+					{
+						switch(i)
+						{
+						case 4:
+						case 6:
+						case 8:
+						case 10:
+							si++;
+						}
+
+						boost::uint8_t &b = *(u.begin()+i);
+
+						signed char d1 = x2n(src[si++]);
+						signed char d2 = x2n(src[si++]);
+
+						if(d1<0 || d2 < 0)
+						{
+							return false;
+						}
+
+						b = d1<<4 | d2;
+					}
+				}
+				else if(src.size() == 32)
+				{
+					for(size_t i(0); i<16; i++)
+					{
+						boost::uint8_t &b = *(u.begin()+i);
+
+						signed char d1 = x2n(src[i*2]);
+						signed char d2 = x2n(src[i*2+1]);
+
+						if(d1<0 || d2 < 0)
+						{
+							return false;
+						}
+
+						b = d1<<4 | d2;
+					}
+				}
+
+				*(boost::uint32_t *)(u.begin()+0) = fixEndian(*(boost::uint32_t *)(u.begin()+0));
+				*(boost::uint16_t *)(u.begin()+4) = fixEndian(*(boost::uint16_t *)(u.begin()+4));
+				*(boost::uint16_t *)(u.begin()+6) = fixEndian(*(boost::uint16_t *)(u.begin()+6));
+
+				dst = u;
+				return true;
+			}
+
+
+
+
+
+
 		}
 	}
 }
