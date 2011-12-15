@@ -45,9 +45,12 @@ namespace utils
 		{
 
 			//////////////////////////////////////////////////////////////////////////
-			//identity
+			//identity, except VariantPtr
 			template <class T>
-			bool exec<>(T &dst, const T &src)
+				typename boost::enable_if<
+					boost::mpl::not_<boost::is_same<Variant::VariantPtr, T> >
+					, bool>::type 
+				exec<>(T &dst, const T &src)
 			{
 				dst = src;
 				return true;
@@ -483,8 +486,69 @@ namespace utils
 			MASSOC2SEQ(MultimapVariantVariant)
 
 
+
+
+
+
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
 			//ptr to some
+			template <class Dst> 
+				typename boost::enable_if<
+					boost::mpl::not_<boost::is_same<Dst, Variant::VariantPtr> >
+					, bool>::type 
+				exec<>(Dst &dst, const Variant::VariantPtr &src)
+			{
+				if(src)
+				{
+					dst = (const Dst&)*src;
+					return true;
+				}
+				return false;
+			}
 			//some to ptr
+			template <class Src> 
+				typename boost::enable_if<
+					boost::mpl::not_<boost::is_same<Variant::VariantPtr, Src> >
+					, bool>::type 
+				exec<>(Variant::VariantPtr &dst, const Src &src)
+			{
+				if(dst)
+				{
+					*dst = src;
+				}
+				else
+				{
+					dst.reset(new Variant(src));
+				}
+				return true;
+			}
+			//ptr to ptr
+			template <> bool exec<Variant::VariantPtr, Variant::VariantPtr>(Variant::VariantPtr &dst, const Variant::VariantPtr &src)
+			{
+				if(src)
+				{
+					if(dst)
+					{
+						*dst = *src;
+					}
+					else
+					{
+						dst.reset(new Variant(*src));
+					}
+				}
+				else
+				{
+					dst.reset();
+				}
+				return true;
+			}
 
 			//some to string
 			//string to some

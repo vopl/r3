@@ -42,6 +42,11 @@ int main(int argc, char* argv[])
 		cout<<'|';
 		v.forceType(_sps[i]._et);
 		v.setNull(false);
+		if(_sps[i]._et == Variant::etVariantPtr)
+		{
+			v.as<VariantPtr>().reset(new Variant("tratata"));
+			VariantPtr vp = v;
+		}
 // 		cout<<_sps[i]._name<<"\t";
 		for(size_t i(0); i<nTypes; i++)
 		{
