@@ -7,7 +7,10 @@ SOURCE_GROUP(include FILES ${INCLUDE})
 
 SET(SRC
 	${SRC_DIR}/async/service.cpp
+	${SRC_DIR}/async/serviceWorker.cpp
 	${SRC_DIR}/async/plug.cpp
+	${SRC_DIR}/async/fiber.cpp
+	${SRC_DIR}/async/fiberRoot.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -18,8 +21,11 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
 SET(SRC_HDR
 	${SRC_DIR}/async/service.hpp
+	${SRC_DIR}/async/serviceWorker.hpp
 	${SRC_DIR}/async/cmaHandler.hpp
 	${SRC_DIR}/async/pch.h
+	${SRC_DIR}/async/fiber.hpp
+	${SRC_DIR}/async/fiberRoot.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
@@ -28,6 +34,7 @@ SET(SRC_PCH
 	${SRC_DIR}/async/pch.cpp
 )
 SOURCE_GROUP(src FILES ${SRC_PCH})
+
 
 
 PRESETUP_BIN_OUT(SRC_STUB)

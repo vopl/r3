@@ -1,46 +1,10 @@
 #include "pch.h"
 #include "service.hpp"
 
+#include <boost/foreach.hpp>
+
 namespace async
 {
-	//////////////////////////////////////////////////////////////////////////
-	void Service::workerProc(ServiceWorkerPtr swp)
-	{
-		ILOG("workerProc started");
-		boost::function<void ()> func0;
-		{
-			boost::mutex::scoped_lock sl(_mtx);
-			func0 = _threadStart;
-		}
-		if(func0)
-		{
-			func0();
-		}
-
-		boost::system::error_code ec;
-		for(;;)
-		{
-			_io_service.run(ec);
-			if(swp->_stop)
-			{
-				//выкачать остаток сообщений
-				_io_service.run(ec);
-				break;
-			}
-			swp->_thread.sleep(boost::get_system_time() + boost::posix_time::milliseconds(500));
-		}
-
-		{
-			boost::mutex::scoped_lock sl(_mtx);
-			func0 = _threadStop;
-		}
-		if(func0)
-		{
-			func0();
-		}
-		ILOG("workerProc stopped");
-	}
-
 	//////////////////////////////////////////////////////////////////////////
 	Service::Service()
 		: _io_service()
@@ -64,7 +28,7 @@ namespace async
 	{
 		ILOG("start");
 		{
-			boost::mutex::scoped_lock sl(_mtx);
+			//boost::mutex::scoped_lock sl(_mtx);
 			assert(!_threadStart);
 			_threadStart = threadStart;
 			_threadStop = threadStop;
@@ -77,54 +41,37 @@ namespace async
 	{
 		ILOG("balance "<<numThreads);
 
-		std::vector<ServiceWorkerPtr> stopped;
-
+		std::vector<ServiceWorkerPtr>	stopped;
 		{
-			boost::mutex::scoped_lock sl(_mtx);
+			//boost::mutex::scoped_lock sl(_mtx);
 
 			while(_workers.size() > numThreads)
 			{
-				ServiceWorkerPtr &swp = _workers.back();
-				swp->_stop = true;
-				stopped.push_back(swp);
+				stopped.push_back(_workers.back());
 				_workers.pop_back();
+
 			}
 			while(_workers.size() < numThreads)
 			{
-				ServiceWorkerPtr swp(new ServiceWorker);
-				swp->_stop = false;
-				swp->_thread = boost::thread(boost::bind(&Service::workerProc, shared_from_this(), swp));
+				ServiceWorkerPtr swp(new ServiceWorker(shared_from_this()));
 				_workers.push_back(swp);
 			}
-			_work.reset();
 
-			if(_workers.empty())
+			if(!stopped.empty())
 			{
-				_io_service.stop();
+				_work.reset();
+				BOOST_FOREACH(ServiceWorkerPtr &swp, stopped)
+				{
+					swp.reset();
+				}
 			}
-		}
 
-		BOOST_FOREACH(ServiceWorkerPtr &swp, stopped)
-		{
-			swp->_thread.join();
-		}
-
-		{
-			boost::mutex::scoped_lock sl(_mtx);
-			if(_workers.empty())
+			if(!_workers.empty())
 			{
-				//выкачать остаток из этого потока
-				boost::system::error_code ec;
-				_io_service.reset();
-				_io_service.run(ec);
-			}
-			else
-			{
-				_io_service.reset();
 				_work.reset(new boost::asio::io_service::work(_io_service));
 			}
-
 		}
+
 		ILOG("balance done");
 	}
 
