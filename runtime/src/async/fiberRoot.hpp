@@ -12,6 +12,7 @@ namespace async
 		FiberRoot(ServiceWorker *worker);
 		~FiberRoot();
 	};
+	typedef boost::shared_ptr<FiberRoot> FiberRootPtr;
 }
 
 #endif

@@ -408,8 +408,8 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionPrepareds::ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service)
-		: ConnectionProcessor(pgcon, io_service)
+	ConnectionPrepareds::ConnectionPrepareds(PGconn *pgcon, async::IServicePtr asrv)
+		: ConnectionProcessor(pgcon, asrv)
 		, _inProcess(false)
 	{
 

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "connectionLow.hpp"
+#include "async/workerHandler.hpp"
 
 namespace pgc
 {
@@ -41,20 +42,58 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::waitSend(function<void(const system::error_code &)> ready)
 	{
-		_sock.async_send(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
+		_sock.async_send(asio::null_buffers(), _strand.wrap(async::wrapWorkerHandler(_asrv, bind(ready, _1))));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::waitRecv(function<void(const system::error_code &)> ready)
 	{
-		_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
+		_sock.async_receive(asio::null_buffers(), _strand.wrap(async::wrapWorkerHandler(_asrv, bind(ready, _1))));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionLow::ConnectionLow(PGconn *pgcon, asio::io_service &io_service)
+	system::error_code ConnectionLow::waitSend2()
+	{
+		//////////////////////////////////////////////////////////////////////////
+		плуг async переформировать в статическую библиотеку
+		высунуть в интерфейс фиберы, воркеры и службу
+
+		FiberPtr fiber = Fiber::current();
+		struct MyLocalHandler
+		{
+			system::error_code _ec;
+			FiberPtr _fiber;
+			MyLocalHandler(FiberPtr fiber)
+				: _fiber(fiber)
+			{
+			}
+			typedef void result_type;
+
+			void operator()(const system::error_code &ec)
+			{
+				_ec = ec;
+				fiber->ready();
+			}
+		} h(fiber);
+
+		_sock.async_send(asio::null_buffers(), _strand.wrap(async::wrapWorkerHandler(h, _1)));
+		fiber->yield();
+		return h._ec;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	system::error_code ConnectionLow::waitRecv2()
+	{
+
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	ConnectionLow::ConnectionLow(PGconn *pgcon, async::IServicePtr asrv)
 		: _pgcon(pgcon)
-		, _sock(io_service, PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
-		, _strand(io_service)
+		, _asrv(asrv)
+		, _sock(asrv->get_io_service(), PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
+		, _strand(asrv->get_io_service())
 		, _integerDatetimes(false)
 	{
 		PQsetnonblocking(_pgcon, 0);

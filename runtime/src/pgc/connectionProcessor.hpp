@@ -87,7 +87,7 @@ namespace pgc
 		virtual void queueEmpty();
 
 	public:
-		ConnectionProcessor(PGconn *pgcon, asio::io_service &io_service);
+		ConnectionProcessor(PGconn *pgcon, async::IServicePtr asrv);
 		~ConnectionProcessor();
 
 		void runQuery(

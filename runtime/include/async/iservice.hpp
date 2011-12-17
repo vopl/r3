@@ -20,6 +20,8 @@ namespace async
 		virtual void balance(size_t numThreads) =0;
 		virtual void stop() =0;
 
+		virtual void dispatch(boost::function<void()> handler) =0;
+
 		virtual boost::asio::io_service &get_io_service() =0;
 	};
 	typedef boost::shared_ptr<IService> IServicePtr;

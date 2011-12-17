@@ -6,6 +6,7 @@
 #include <libpq-fe.h>
 #include "pgc/iresult.hpp"
 #include "pgc/iconnection.hpp"
+#include "async/iservice.hpp"
 
 namespace pgc
 {
@@ -49,6 +50,8 @@ namespace pgc
 		asio::io_service::strand	_strand;
 		bool						_integerDatetimes;
 
+		async::IServicePtr			_asrv;
+
 	private:
 		//помогалки для инициализации постгресового сокета в asio
 		static int sockFamily(int sock);
@@ -58,8 +61,11 @@ namespace pgc
 		void waitSend(function<void(const system::error_code &)> ready);
 		void waitRecv(function<void(const system::error_code &)> ready);
 
+		system::error_code waitSend2();
+		system::error_code waitRecv2();
+
 	public:
-		ConnectionLow(PGconn *pgcon, asio::io_service &io_service);
+		ConnectionLow(PGconn *pgcon, async::IServicePtr asrv);
 		virtual ~ConnectionLow();
 
 		PGconn *pgcon();

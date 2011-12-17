@@ -23,32 +23,32 @@ namespace async
 
 	private:
 		typedef boost::function<void()> TTask;
-		typedef std::deque<TTask> TTasks;
-		TTasks _tasks;
 
 		//головной фибер, в нем исполняется цикл выкачивания событий проактора
-		FiberRoot		*_fiberRoot;
-
-		//все рабочие фиберы
-		std::deque<Fiber *> _fibers;
-
-		//рабочие фиберы без задачи
-		std::set<Fiber *> _fibersIdle;
+		FiberRootPtr	_fiberRoot;
 
 		//рабочие фиберы с задачей и готовые к исполнению
-		std::deque<Fiber *> _fibersReady;
+		std::deque<FiberPtr> _fibersReady;
 		boost::mutex	_fibersReadyMtx;
+
+		static ThreadLocalStorage<ServiceWorker *> _current;
 
 	private:
 		void threadProc();
 
 	public://для фиберов
 		void fiberExecuted(Fiber *fiber);
+		void fiberReady(Fiber *fiber);
+		void fiberYield(Fiber *fiber);
+
+	public://для врапера
+		void ready(TTask);
 
 	public:
 		ServiceWorker(ServicePtr service);
 		~ServiceWorker();
 
+		static ServiceWorker *current();
 	};
 	typedef boost::shared_ptr<ServiceWorker> ServiceWorkerPtr;
 }

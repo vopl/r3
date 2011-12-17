@@ -246,8 +246,8 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionProcessor::ConnectionProcessor(PGconn *pgcon, asio::io_service &io_service)
-		: ConnectionLow(pgcon, io_service)
+	ConnectionProcessor::ConnectionProcessor(PGconn *pgcon, async::IServicePtr asrv)
+		: ConnectionLow(pgcon, asrv)
 		, _inProcess(false)
 		, _done()
 		, _results()

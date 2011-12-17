@@ -98,7 +98,7 @@ namespace pgc
 // 							status = PQconnectPoll(pgcon);
 // 							status = PQconnectPoll(pgcon);
 
-						pcwStarted.reset(new ConnectionPrepareds(pgcon, _asrv->get_io_service()));
+						pcwStarted.reset(new ConnectionPrepareds(pgcon, _asrv));
 						_startConnections.insert(pcwStarted);
 					}
 					else

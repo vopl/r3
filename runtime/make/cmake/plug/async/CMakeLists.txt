@@ -2,6 +2,7 @@ PROJECT (plugasync)
 
 SET(INCLUDE
 	${INC_DIR}/async/iservice.hpp
+	${INC_DIR}/async/workerHandler.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -26,6 +27,7 @@ SET(SRC_HDR
 	${SRC_DIR}/async/pch.h
 	${SRC_DIR}/async/fiber.hpp
 	${SRC_DIR}/async/fiberRoot.hpp
+	${SRC_DIR}/async/threadLocalStorage.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 

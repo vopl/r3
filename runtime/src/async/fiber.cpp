@@ -38,6 +38,8 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void Fiber::execute(boost::function<void()> code)
 	{
+		assert(_current != this);
+
 		assert(!_code);
 		assert(code);
 		_code = code;
@@ -47,10 +49,24 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void Fiber::activate()
 	{
-		_current.reset(this);
+		assert(_current != this);
+		_current = this;
 		SwitchToFiber(_stack);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void Fiber::ready()
+	{
+		_worker->fiberReady(this);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void Fiber::yield()
+	{
+		_worker->fiberYield(this);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	VOID WINAPI Fiber::s_fiberProc(LPVOID lpFiberParameter)
 	{
 		((Fiber*)lpFiberParameter)->fiberProc();
@@ -69,7 +85,7 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::thread_specific_ptr<Fiber> Fiber::_current;
+	ThreadLocalStorage<Fiber *> Fiber::_current;
 
 }
 

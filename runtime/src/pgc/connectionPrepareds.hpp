@@ -143,7 +143,7 @@ namespace pgc
 		void requestTerminator(TDone done, IResultPtrs result);
 
 	public:
-		ConnectionPrepareds(PGconn *pgcon, asio::io_service &io_service);
+		ConnectionPrepareds(PGconn *pgcon, async::IServicePtr asrv);
 		~ConnectionPrepareds();
 
 		void beginWork();

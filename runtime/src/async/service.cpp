@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "service.hpp"
-
 #include <boost/foreach.hpp>
 
 namespace async
@@ -82,6 +81,12 @@ namespace async
 		balance(0);
 		_threadStart.swap(boost::function<void ()>());
 		_threadStop.swap(boost::function<void ()>());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Service::dispatch(boost::function<void()> handler)
+	{
+		ServiceWorker::current()->ready(handler);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
