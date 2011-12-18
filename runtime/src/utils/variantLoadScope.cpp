@@ -8,13 +8,11 @@ namespace utils
 {
 	//////////////////////////////////////////////////////////////////////////
 	VariantLoadScope::VariantLoadScope(
-		Variant *root, 
 		boost::filesystem::path fileName, 
 		const char *first,
 		const char *last,
 		std::string *errors)
-		: _root(root)
-		, _fileName(fileName)
+		: _fileName(fileName)
 		, _first(first)
 		, _last(last)
 		, _errors(errors)
@@ -26,15 +24,16 @@ namespace utils
 	//////////////////////////////////////////////////////////////////////////
 	VariantLoadScope::~VariantLoadScope()
 	{
-		if(!_errorWas)
-		{
-			assert(_stack.size() == 1);
-			if(_root && 1 == _stack.size())
-			{
-				_root->swap(_stack.back());
-			}
-		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Variant &VariantLoadScope::getValue()
+	{
+		assert(!_errorWas);
+		assert(_stack.size() == 1);
+		return _stack.back();
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	bool VariantLoadScope::errorWas()

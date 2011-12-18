@@ -13,7 +13,6 @@ SET(SRC
 	${SRC_DIR}/pgc/db.cpp
 	${SRC_DIR}/pgc/statement.cpp
 	${SRC_DIR}/pgc/result.cpp
-	${SRC_DIR}/pgc/result_extractor.cpp
 	${SRC_DIR}/pgc/connectionLow.cpp
 	${SRC_DIR}/pgc/connectionProcessor.cpp
 	${SRC_DIR}/pgc/connectionPrepareds.cpp

@@ -42,6 +42,7 @@ SET(SRC_HDR
 	${SRC_DIR}/utils/variantImpl.hpp
 	${SRC_DIR}/utils/variantLoadScope.hpp
 	${SRC_DIR}/utils/variantLoadGrammar.hpp
+	${SRC_DIR}/utils/variantConvertMatrix.hpp
 	${SRC_DIR}/utils/pch.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
