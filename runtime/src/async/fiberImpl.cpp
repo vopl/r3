@@ -6,18 +6,14 @@
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	FiberImpl::FiberImpl()
-		: _worker(NULL)
-		, _stack(NULL)
+	FiberImpl::FiberImpl(bool createStack)
+		: _stack(NULL)
 	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	FiberImpl::FiberImpl(WorkerImpl *worker)
-		: _worker(worker)
-	{
-		_stack = CreateFiber(0, &FiberImpl::s_fiberProc, this);
-		assert(_stack);
+		if(createStack)
+		{
+			_stack = CreateFiber(0, &FiberImpl::s_fiberProc, this);
+			assert(_stack);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -32,7 +28,8 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	FiberImplPtr FiberImpl::current()
 	{
-		return _current->shared_from_this();
+		FiberImplPtr fiber = _current->shared_from_this();
+		return fiber;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -49,6 +46,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::activate()
 	{
+		assert(_current != this);
 		if(_current != this)
 		{
 			_current = this;
@@ -59,13 +57,13 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::ready()
 	{
-		_worker->fiberReady(shared_from_this());
+		WorkerImpl::current()->fiberReady(shared_from_this());
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::yield()
 	{
-		_worker->fiberYield(shared_from_this());
+		WorkerImpl::current()->fiberYield(current());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -82,7 +80,7 @@ namespace async
 			assert(_code);
 			_code();
 			_code.swap(boost::function<void()>());
-			_worker->fiberExecuted(shared_from_this());
+			WorkerImpl::current()->fiberExecuted(shared_from_this());
 		}
 	}
 

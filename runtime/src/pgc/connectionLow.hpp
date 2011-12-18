@@ -47,7 +47,7 @@ namespace pgc
 		//////////////////////////////////////////////////////////////////////////
 		PGconn						*_pgcon;
 		PGSock						_sock;
-		asio::io_service::strand	_strand;
+		//asio::io_service::strand	_strand;
 		bool						_integerDatetimes;
 
 		async::IServicePtr			_asrv;

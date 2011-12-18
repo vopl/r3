@@ -44,6 +44,9 @@ namespace pgc
 	public:
 		void unwork(ConnectionPreparedsPtr pcw);
 
+	private:
+		void allocConnection_f(function<void (IConnectionPtr)> ready);
+
 	public:
 		Db();
 		~Db();

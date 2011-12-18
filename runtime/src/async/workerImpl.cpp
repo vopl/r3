@@ -15,9 +15,7 @@ namespace async
 		_current = this;
 
 		//наболтать головной фибер
-		_fiberRoot.reset(new FiberRootImpl(this));
-
-		FiberPtr c = Fiber::current();
+		_fiberRoot.reset(new FiberRootImpl());
 
 		if(_service->_threadStart)
 		{
@@ -52,19 +50,46 @@ namespace async
 	void WorkerImpl::fiberReady(FiberImplPtr fiber)
 	{
 		//boost::mutex::scoped_lock sl(_fibersReadyMtx);
-		_fibersReady.push_back(fiber);
+		assert(_fiberRoot != fiber);
+		assert(_fibersReady.end() == _fibersReady.find(fiber));
+		_fibersReady.insert(fiber);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::fiberYield(FiberImplPtr fiber)
 	{
-		_fiberRoot->activate();
+		assert(fiber != _fiberRoot);
+		if(fiber != _fiberRoot)
+		{
+			_fiberRoot->activate();
+		}
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
+	void WorkerImpl::processReadyFibers()
+	{
+		bool doWork = true;
+		while(doWork)
+		{
+			std::set<FiberImplPtr> fibersReady;
+			{
+				//boost::mutex::scoped_lock sl(_fibersReadyMtx);
+				fibersReady.swap(_fibersReady);
+			}
+
+			doWork = !fibersReady.empty();
+			BOOST_FOREACH(FiberImplPtr &fiber, fibersReady)
+			{
+				fiber->activate();
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::doComplete(TTask task)
 	{
+		assert(FiberImpl::current() == _fiberRoot);
 		if(FiberImpl::current() != _fiberRoot)
 		{
 			task();
@@ -73,51 +98,26 @@ namespace async
 		assert(FiberImpl::current() == _fiberRoot);
 
 		//сначала отработать все готовые
-		bool doWork = true;
-		while(doWork)
-		{
-			std::deque<FiberImplPtr> fibersReady;
-			{
-				//boost::mutex::scoped_lock sl(_fibersReadyMtx);
-				fibersReady.swap(_fibersReady);
-			}
-
-			doWork = !fibersReady.empty();
-			BOOST_FOREACH(FiberImplPtr &fiber, fibersReady)
-			{
-				fiber->activate();
-			}
-		}
+		processReadyFibers();
 
 		//потом входящую задачу
-		FiberImplPtr fiber;
-		if(_fibersIdle.size())
 		{
-			fiber = *_fibersIdle.begin();
-			_fibersIdle.erase(_fibersIdle.begin());
-		}
-		else
-		{
-			fiber.reset(new FiberImpl(this));
-		}
-		fiber->execute(task);
-
-
-		doWork = true;
-		while(doWork)
-		{
-			std::deque<FiberImplPtr> fibersReady;
+			FiberImplPtr fiber;
+			if(_fibersIdle.size())
 			{
-				//boost::mutex::scoped_lock sl(_fibersReadyMtx);
-				fibersReady.swap(_fibersReady);
+				fiber = *_fibersIdle.begin();
+				_fibersIdle.erase(_fibersIdle.begin());
 			}
-
-			doWork = !fibersReady.empty();
-			BOOST_FOREACH(FiberImplPtr &fiber, fibersReady)
+			else
 			{
-				fiber->activate();
+				fiber.reset(new FiberImpl());
 			}
+			fiber->execute(task);
 		}
+
+
+		//теперь снова готовые
+		processReadyFibers();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,7 @@ namespace async
 		: public FiberImpl
 	{
 	public:
-		FiberRootImpl(WorkerImpl *worker);
+		FiberRootImpl();
 		~FiberRootImpl();
 	};
 	typedef boost::shared_ptr<FiberRootImpl> FiberRootImplPtr;

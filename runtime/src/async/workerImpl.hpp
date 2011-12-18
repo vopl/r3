@@ -31,7 +31,7 @@ namespace async
 		std::set<FiberImplPtr> _fibersIdle;
 
 		//рабочие фиберы с задачей и готовые к исполнению
-		std::deque<FiberImplPtr> _fibersReady;
+		std::set<FiberImplPtr> _fibersReady;
 		//boost::mutex	_fibersReadyMtx;
 
 		static ThreadLocalStorage<WorkerImpl *> _current;
@@ -44,6 +44,8 @@ namespace async
 		void fiberReady(FiberImplPtr fiber);
 		void fiberYield(FiberImplPtr fiber);
 
+	private:
+		void processReadyFibers();
 	public://для врапера
 		void doComplete(TTask);
 

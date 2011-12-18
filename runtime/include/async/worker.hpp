@@ -19,30 +19,19 @@ namespace async
 		Worker(const Worker&);
 
 	public:
+		//принимает исполнение завершенной операции asio
+		//от asio_handler_invoke
 		void doComplete(boost::function<void()> handler);
 
 	public:
 		virtual ~Worker();
 
+		//получить экземпл€р текущего воркера
 		static Worker *current();
-
-		template <class Handler>
-		static WorkerHandler<Handler> wrap(const Handler &handler);
 	};
 }
 
 #include "workerHandler.hpp"
-
-namespace async
-{
-	template <class Handler>
-	WorkerHandler<Handler> Worker::wrap(const Handler& handler)
-	{
-		return WorkerHandler<Handler>(handler);
-	}
-
-}
-
 
 
 #endif

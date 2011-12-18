@@ -6,6 +6,8 @@
 #include <boost/function.hpp>
 #include <boost/asio/io_service.hpp>
 
+#include "workerHandler.hpp"
+
 namespace async
 {
 	struct ASYNC_API IService

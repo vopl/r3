@@ -17,11 +17,8 @@ namespace async
 		: public Fiber
 		, public boost::enable_shared_from_this<FiberImpl>
 	{
-	protected:
-		FiberImpl();
-
 	public:
-		FiberImpl(WorkerImpl *worker);
+		FiberImpl(bool createStack=true);
 		~FiberImpl();
 
 		static FiberImplPtr current();
@@ -29,13 +26,12 @@ namespace async
 		void execute(boost::function<void()> _code);
 		void activate();
 		void ready();
-		void yield();
+		static void yield();
 
 	private:
 		static VOID WINAPI s_fiberProc(LPVOID lpFiberParameter);
 		void fiberProc();
 	protected:
-		WorkerImpl *_worker;
 		void *_stack;
 		boost::function<void()> _code;
 

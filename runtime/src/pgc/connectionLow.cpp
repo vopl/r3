@@ -59,52 +59,39 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	struct MyLocalHandler
+	{
+		system::error_code _ec;
+		async::FiberPtr _fiber;
+		MyLocalHandler()
+			: _fiber(async::Fiber::current())
+		{
+		}
+		typedef void result_type;
+
+		void operator()(const system::error_code &ec)
+		{
+			_ec = ec;
+			_fiber->ready();
+		}
+	};
+
 	system::error_code ConnectionLow::waitSend2()
 	{
-		struct MyLocalHandler
-		{
-			system::error_code _ec;
-			async::FiberPtr _fiber;
-			MyLocalHandler()
-				: _fiber(async::Fiber::current())
-			{
-			}
-			typedef void result_type;
-
-			void operator()(const system::error_code &ec)
-			{
-				_ec = ec;
-				_fiber->ready();
-			}
-		} h;
-
-		_sock.async_send(asio::null_buffers(), _strand.wrap(bind(h, _1)));
-		h._fiber->yield();
+		MyLocalHandler h;
+		_sock.async_send(asio::null_buffers(), bind(h, _1));
+		async::Fiber::yield();
 		return h._ec;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	system::error_code ConnectionLow::waitRecv2()
 	{
-		struct MyLocalHandler
-		{
-			system::error_code _ec;
-			async::FiberPtr _fiber;
-			MyLocalHandler()
-				: _fiber(async::Fiber::current())
-			{
-			}
-			typedef void result_type;
+		MyLocalHandler h;
 
-			void operator()(const system::error_code &ec)
-			{
-				_ec = ec;
-				_fiber->ready();
-			}
-		} h;
-
-		_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(h, _1)));
-		h._fiber->yield();
+		//_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(h, _1)));
+		_sock.async_receive(asio::null_buffers(), bind(h, _1));
+		async::Fiber::yield();
 		return h._ec;
 	}
 
@@ -114,7 +101,7 @@ namespace pgc
 		: _pgcon(pgcon)
 		, _asrv(asrv)
 		, _sock(asrv->get_io_service(), PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
-		, _strand(asrv->get_io_service())
+//		, _strand(asrv->get_io_service())
 		, _integerDatetimes(false)
 	{
 		PQsetnonblocking(_pgcon, 0);
@@ -188,8 +175,9 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::dispatch(function<void()> action)
 	{
-		_strand.get_io_service().post(
-			_strand.wrap(action));
+// 		_strand.get_io_service().post(
+// 			_strand.wrap(action));
+		_sock.get_io_service().post(action);
 	}
 
 

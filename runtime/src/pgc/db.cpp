@@ -4,7 +4,6 @@
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 
-
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -288,7 +287,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::allocConnection(function<void (IConnectionPtr)> ready)
+	void Db::allocConnection_f(function<void (IConnectionPtr)> ready)
 	{
 		ConnectionPreparedsPtr pcw;
 
@@ -343,6 +342,11 @@ namespace pgc
 		}
 
 		balanceConnections();
+	}
+	//////////////////////////////////////////////////////////////////////////
+	void Db::allocConnection(function<void (IConnectionPtr)> ready)
+	{
+		_asrv->get_io_service().post(bind(&Db::allocConnection_f, shared_from_this(), ready));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -108,6 +108,11 @@ namespace server
 			return;
 		}
 		//TLOG("onConnection");
+		if(!s || (rand()%50)==25)
+		{
+			s = _pluma->create<pgc::IStatementProvider>();
+			s->setSql("SELECT '123.456789'::numeric");
+		}
 
 		c->query(s, //v,
 			bind(&ServiceVictim::onResult, shared_from_this(), _1));

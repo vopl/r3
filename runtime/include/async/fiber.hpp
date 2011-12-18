@@ -23,10 +23,15 @@ namespace async
 	public:
 		virtual ~Fiber();
 
+		//получить экземпл€р текущего фибера
 		static FiberPtr current();
 
-		void yield();
+		//оповестить воркера о готовности этого фибера к исполнению
 		void ready();
+
+		//зафиксировать исполнение текущего фибера в пользу корн€
+		static void yield();
+
 	};
 }
 
