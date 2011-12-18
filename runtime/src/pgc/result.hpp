@@ -16,39 +16,6 @@ namespace pgc
 	{
 		PGresult *_pgr;
 		ConnectionLowPtr _con;
-
-		typedef bool (Result::*MExtractor)(int rowIdx, int colIdx, Variant::EType typCpp, void *valCpp);
-
-		struct Extractor
-		{
-			MExtractor				_meth;
-			Variant::EType	_favorType;
-		};
-
-		typedef std::vector<Extractor> TVExtractors;
-		TVExtractors	_extractors;
-
-		bool extractor_int2			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_int4			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_int8			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_numeric		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_float4		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_float8		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_money		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_varchar		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_bytea		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_timestamp	(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_interval		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_date			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_time			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_bool			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_varbit		(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_oid			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_uuid			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_char			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-		bool extractor_null			(int colIdx, int rowIdx, Variant::EType typCpp, void *valCpp);
-
-		void initExtractors();
 	public:
 		Result(PGresult *pgr, ConnectionLowPtr con);
 		~Result();

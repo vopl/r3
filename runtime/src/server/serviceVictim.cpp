@@ -62,7 +62,7 @@ namespace server
 		if(!s || (rand()%50)==25)
 		{
 			s = _pluma->create<pgc::IStatementProvider>();
-			s->setSql("SELECT * FROM t_club");
+			s->setSql("SELECT '123.456789'::numeric");
 		}
 
 		c->query(s, //v,

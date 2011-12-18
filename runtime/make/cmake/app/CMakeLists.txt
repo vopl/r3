@@ -1,3 +1,4 @@
 ADD_SUBDIRECTORY(server)
 ADD_SUBDIRECTORY(clientqt)
+ADD_SUBDIRECTORY(victim)
 
