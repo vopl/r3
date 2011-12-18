@@ -32,7 +32,7 @@ namespace async
 
 		//рабочие фиберы с задачей и готовые к исполнению
 		std::deque<FiberImplPtr> _fibersReady;
-		boost::mutex	_fibersReadyMtx;
+		//boost::mutex	_fibersReadyMtx;
 
 		static ThreadLocalStorage<WorkerImpl *> _current;
 

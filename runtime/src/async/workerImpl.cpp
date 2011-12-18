@@ -51,7 +51,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::fiberReady(FiberImplPtr fiber)
 	{
-		boost::mutex::scoped_lock sl(_fibersReadyMtx);
+		//boost::mutex::scoped_lock sl(_fibersReadyMtx);
 		_fibersReady.push_back(fiber);
 	}
 	
@@ -78,7 +78,7 @@ namespace async
 		{
 			std::deque<FiberImplPtr> fibersReady;
 			{
-				boost::mutex::scoped_lock sl(_fibersReadyMtx);
+				//boost::mutex::scoped_lock sl(_fibersReadyMtx);
 				fibersReady.swap(_fibersReady);
 			}
 
@@ -108,7 +108,7 @@ namespace async
 		{
 			std::deque<FiberImplPtr> fibersReady;
 			{
-				boost::mutex::scoped_lock sl(_fibersReadyMtx);
+				//boost::mutex::scoped_lock sl(_fibersReadyMtx);
 				fibersReady.swap(_fibersReady);
 			}
 
