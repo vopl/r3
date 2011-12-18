@@ -35,10 +35,10 @@ namespace server
 			TLOG("onResult NULL");
 			return;
 		}
-		TLOG("onResult");
+		//TLOG("onResult");
 
 		cnt++;
-		if(!(cnt%100000))
+		if(!(cnt%1000))
 		{
 			pgc::EResultStatus s = r[0]->status();
 			const char *msg = r[0]->errorMsg();
@@ -60,7 +60,7 @@ namespace server
 				TLOG("onConnection NULL");
 				return;
 			}
-			TLOG("onConnection");
+			//TLOG("onConnection");
 			if(!s || (rand()%50)==25)
 			{
 				s = _pluma->create<pgc::IStatementProvider>();
@@ -91,7 +91,7 @@ namespace server
 				TLOG("onConnection2 NULL");
 				return;
 			}
-			TLOG("onConnection2");
+			//TLOG("onConnection2");
 			if(!s || (rand()%50)==25)
 			{
 				s = _pluma->create<pgc::IStatementProvider>();
@@ -140,7 +140,6 @@ namespace server
 		_db = hub->getServer()->getDb();
 
 		async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
-
 		async::Result<pgc::IConnectionPtr> cr2 = _db->allocConnection();
 
 
