@@ -11,8 +11,14 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	class ASYNC_API Event
 	{
-		FiberPtr	_fiber;
-		boost::shared_ptr<bool>	_ready;
+		struct State
+		{
+			FiberPtr	_fiber;
+			bool		_ready;
+
+			State():_ready(false){}
+		};
+		boost::shared_ptr<State> _state;
 
 	public:
 		Event();

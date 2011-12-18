@@ -53,51 +53,32 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::onConnection(pgc::IConnectionPtr c)
 	{
-		if(!c)
+		for(;;)
 		{
-			TLOG("onConnection NULL");
-			return;
-		}
-		TLOG("onConnection");
-		if(!s || (rand()%50)==25)
-		{
-			s = _pluma->create<pgc::IStatementProvider>();
-			s->setSql("SELECT '123.456789'::numeric");
-		}
+			if(!c)
+			{
+				TLOG("onConnection NULL");
+				return;
+			}
+			TLOG("onConnection");
+			if(!s || (rand()%50)==25)
+			{
+				s = _pluma->create<pgc::IStatementProvider>();
+				s->setSql("SELECT '123.456789'::numeric");
+			}
 
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+			c->query(s, //v,
+				bind(&ServiceVictim::onResult, shared_from_this(), _1));
+			c.reset();
 
-// 		boost::xtime xt;
-// 		boost::xtime_get(&xt, boost::TIME_UTC);
-// 		xt.sec += 1;
-// 		boost::thread::sleep(xt);
-
-		if(!_db)
-		{
-			return;
+			if(!_db)
+			{
+				return;
+			}
+			async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
+			cr.wait();
+			c = cr.data();
 		}
-		async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
-		cr.wait();
-		onConnection(cr.data());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -178,12 +159,12 @@ namespace server
 
 		async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
 
-		async::Result<pgc::IConnectionPtr> cr2 = _db->allocConnection();
+// 		async::Result<pgc::IConnectionPtr> cr2 = _db->allocConnection();
 
 		cr.wait();
 		onConnection(cr.data());
-		cr2.wait();
-		onConnection2(cr.data());
+// 		cr2.wait();
+// 		onConnection2(cr.data());
 
 		int k = 220;
 		//

@@ -12,15 +12,19 @@ namespace async
 		: public Event
 	{
 	public:
-		boost::shared_ptr<Data> _data;
+		struct State
+		{
+			Data	_data;
+		};
+		boost::shared_ptr<State> _state;
 	public:
 		Result()
-			: _data(new Data)
+			: _state(new State)
 		{
 		}
 		Data &data()
 		{
-			return *_data;
+			return _state->_data;
 		}
 	};
 }

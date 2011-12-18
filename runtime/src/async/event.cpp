@@ -5,7 +5,7 @@ namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
 	Event::Event()
-		: _ready(new bool(false))
+		: _state(new State())
 	{
 	}
 
@@ -13,31 +13,37 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void Event::ready()
 	{
-		assert(!*_ready);
-		if(!*_ready)
+		assert(!_state->_ready);
+		if(!_state->_ready)
 		{
-			*_ready = true;
-			assert(_fiber);
-			_fiber->ready();
-			_fiber.reset();
+			_state->_ready = true;
+			if(_state->_fiber)
+			{
+				_state->_fiber->ready();
+			}
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	bool Event::isReady()
 	{
-		return *_ready;
+		return _state->_ready;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Event::wait()
 	{
-		assert(!_fiber);
-		_fiber = Fiber::current();
-		assert(_fiber);
-		while(!*_ready)
+		assert(!_state->_fiber);
+
+		if(!_state->_ready)
 		{
-			Fiber::yield();
+			_state->_fiber = Fiber::current();
+			assert(_state->_fiber);
+			while(!_state->_ready)
+			{
+				Fiber::yield();
+			}
+			_state->_fiber.reset();
 		}
 	}
 }

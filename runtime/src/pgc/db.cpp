@@ -127,7 +127,7 @@ namespace pgc
 			{
 				c.reset(new ConnectionHolder(shared_from_this(), wp._con));
 			}
-			*wp._waiter._data = c;
+			wp._waiter._state->_data = c;
 			wp._waiter.ready();
 
 // 			if(wp._waiter)
@@ -319,7 +319,7 @@ namespace pgc
 				_readyConnections.erase(_readyConnections.begin());
 
 				IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
-				*res._data = c;
+				res._state->_data = c;
 				res.ready();
 				return;
 			}
@@ -339,7 +339,7 @@ namespace pgc
 					else
 					{
 						ELOG("alloc connection force NULL result");
-						*res._data = IConnectionPtr();
+						res._state->_data = IConnectionPtr();
 						res.ready();
 						//_asrv->get_io_service().post(bind(ready, IConnectionPtr()));
 					}
@@ -377,7 +377,7 @@ namespace pgc
 		}
 		BOOST_FOREACH(async::Result<IConnectionPtr> &w, waiters)
 		{
-			*w._data = IConnectionPtr();
+			w._state->_data = IConnectionPtr();
 			w.ready();
 		}
 
