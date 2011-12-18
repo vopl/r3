@@ -18,8 +18,7 @@ namespace async
 		Worker();
 		Worker(const Worker&);
 
-	private:
-		template <typename Handler> friend class WorkerHandler;
+	public:
 		void doComplete(boost::function<void()> handler);
 
 	public:

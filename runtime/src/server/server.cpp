@@ -165,7 +165,7 @@ namespace server
 			//boost::thread::hardware_concurrency()*2, 
 			1);
 
-		_async->get_io_service().post(async::Worker::current()->wrap(bind(&Server::startupServices, shared_from_this())));
+		_async->get_io_service().post(bind(&Server::startupServices, shared_from_this()));
 
 		return true;
 	}
@@ -175,7 +175,7 @@ namespace server
 	{
 		ILOG("stop");
 
-		_async->get_io_service().post(async::Worker::current()->wrap(bind(&Server::shutdownServices, shared_from_this())));
+		_async->get_io_service().post(bind(&Server::shutdownServices, shared_from_this()));
 
 		assert(_sessionManager);
 		_sessionManager->stop();

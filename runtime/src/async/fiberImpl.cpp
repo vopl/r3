@@ -17,7 +17,7 @@ namespace async
 	FiberImpl::FiberImpl(WorkerImpl *worker)
 		: _worker(worker)
 	{
-		_stack = CreateFiberEx(0, 0, FIBER_FLAG_FLOAT_SWITCH, &FiberImpl::s_fiberProc, this);
+		_stack = CreateFiber(0, &FiberImpl::s_fiberProc, this);
 		assert(_stack);
 	}
 
@@ -50,9 +50,11 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::activate()
 	{
-		assert(_current != this);
-		_current = this;
-		SwitchToFiber(_stack);
+		if(_current != this)
+		{
+			_current = this;
+			SwitchToFiber(_stack);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -76,7 +78,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::fiberProc()
 	{
-		//for(;;)
+		for(;;)
 		{
 			assert(_code);
 			_code();

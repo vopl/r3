@@ -78,7 +78,7 @@ namespace pgc
 			}
 		} h;
 
-		_sock.async_send(asio::null_buffers(), _strand.wrap(async::makeWorkerHandler(bind(h, _1))));
+		_sock.async_send(asio::null_buffers(), _strand.wrap(bind(h, _1)));
 		h._fiber->yield();
 		return h._ec;
 	}
@@ -103,7 +103,7 @@ namespace pgc
 			}
 		} h;
 
-		_sock.async_receive(asio::null_buffers(), _strand.wrap(async::makeWorkerHandler(bind(h, _1))));
+		_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(h, _1)));
 		h._fiber->yield();
 		return h._ec;
 	}
@@ -188,7 +188,8 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::dispatch(function<void()> action)
 	{
-		_strand.dispatch(async::makeWorkerHandler(action));
+		_strand.get_io_service().post(
+			_strand.wrap(action));
 	}
 
 

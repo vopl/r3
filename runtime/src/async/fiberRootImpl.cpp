@@ -9,7 +9,7 @@ namespace async
 		: FiberImpl()
 	{
 		_worker = worker;
-		ConvertThreadToFiberEx(NULL, FIBER_FLAG_FLOAT_SWITCH);
+		ConvertThreadToFiber(NULL);
 		_stack = GetCurrentFiber();
 		_current = this;
 	}

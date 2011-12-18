@@ -44,6 +44,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::fiberExecuted(FiberImplPtr fiber)
 	{
+		_fibersIdle.insert(fiber);
 		_fiberRoot->activate();
 	}
 
@@ -64,6 +65,11 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::doComplete(TTask task)
 	{
+		if(FiberImpl::current() != _fiberRoot)
+		{
+			task();
+			return;
+		}
 		assert(FiberImpl::current() == _fiberRoot);
 
 		//сначала отработать все готовые
@@ -84,7 +90,16 @@ namespace async
 		}
 
 		//потом входящую задачу
-		FiberImplPtr fiber(new FiberImpl(this));
+		FiberImplPtr fiber;
+		if(_fibersIdle.size())
+		{
+			fiber = *_fibersIdle.begin();
+			_fibersIdle.erase(_fibersIdle.begin());
+		}
+		else
+		{
+			fiber.reset(new FiberImpl(this));
+		}
 		fiber->execute(task);
 
 

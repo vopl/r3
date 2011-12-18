@@ -28,6 +28,7 @@ namespace async
 
 		//головной фибер, в нем исполняется цикл выкачивания событий проактора
 		FiberRootImplPtr	_fiberRoot;
+		std::set<FiberImplPtr> _fibersIdle;
 
 		//рабочие фиберы с задачей и готовые к исполнению
 		std::deque<FiberImplPtr> _fibersReady;
