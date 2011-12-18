@@ -4,6 +4,7 @@
 #include "async/iservice.hpp"
 #include "pgc/iconnection.hpp"
 #include "pluma/pluma.hpp"
+#include "async/result.hpp"
 
 
 namespace pgc
@@ -20,7 +21,8 @@ namespace pgc
 			boost::function<void (size_t)> connectionMade,
 			boost::function<void (size_t)> connectionLost) =0;
 
-		virtual void allocConnection(boost::function<void (IConnectionPtr)> ready) =0;
+		//virtual void allocConnection(boost::function<void (IConnectionPtr)> ready) =0;
+		virtual async::Result<IConnectionPtr> allocConnection()=0;
 
 		virtual void deinitialize() =0;
 	};

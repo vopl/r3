@@ -5,6 +5,9 @@ SET(INCLUDE
 	${INC_DIR}/async/fiber.hpp
 	${INC_DIR}/async/worker.hpp
 	${INC_DIR}/async/workerHandler.hpp
+
+	${INC_DIR}/async/event.hpp
+	${INC_DIR}/async/result.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -13,6 +16,7 @@ SET(SRC
 	${SRC_DIR}/async/plug.cpp
 	${SRC_DIR}/async/worker.cpp
 	${SRC_DIR}/async/fiber.cpp
+	${SRC_DIR}/async/event.cpp
 
 	${SRC_DIR}/async/workerImpl.cpp
 	${SRC_DIR}/async/fiberImpl.cpp
@@ -33,6 +37,7 @@ SET(SRC_HDR
 	${SRC_DIR}/async/fiberImpl.hpp
 	${SRC_DIR}/async/fiberRootImpl.hpp
 	${SRC_DIR}/async/threadLocalStorage.hpp
+	${SRC_DIR}/async/fiberPool.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 

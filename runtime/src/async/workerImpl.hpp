@@ -9,6 +9,8 @@
 #include <set>
 #include <deque>
 
+#include "fiberPool.hpp"
+
 namespace async
 {
 	class Service;
@@ -28,11 +30,8 @@ namespace async
 
 		//головной фибер, в нем исполняется цикл выкачивания событий проактора
 		FiberRootImplPtr	_fiberRoot;
-		std::set<FiberImplPtr> _fibersIdle;
 
-		//рабочие фиберы с задачей и готовые к исполнению
-		std::set<FiberImplPtr> _fibersReady;
-		//boost::mutex	_fibersReadyMtx;
+		FiberPoolPtr		_fiberPool;
 
 		static ThreadLocalStorage<WorkerImpl *> _current;
 
@@ -50,7 +49,7 @@ namespace async
 		void doComplete(TTask);
 
 	public:
-		WorkerImpl(ServicePtr service);
+		WorkerImpl(ServicePtr service, FiberPoolPtr	fiberPool);
 		~WorkerImpl();
 
 		static WorkerImpl *current();

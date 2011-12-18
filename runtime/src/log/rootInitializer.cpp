@@ -37,6 +37,7 @@ namespace
 			Logger::getRoot().removeAllAppenders();
 			Logger::getRoot().addAppender(conApp);
 			Logger::getRoot().addAppender(fileApp);
+			Logger::getRoot().setLogLevel(TRACE_LOG_LEVEL);
 		}
 	} static initializer;
 }

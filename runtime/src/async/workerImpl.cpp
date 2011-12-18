@@ -34,7 +34,7 @@ namespace async
 			_service->_threadStop();
 		}
 
-		assert(_fibersReady.empty());
+		//assert(_fibersReady.empty());
 		_fiberRoot.reset();
 		_current = NULL;
 	}
@@ -42,7 +42,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::fiberExecuted(FiberImplPtr fiber)
 	{
-		_fibersIdle.insert(fiber);
+		_fiberPool->_fibersIdle.insert(fiber);
 		_fiberRoot->activate();
 	}
 
@@ -51,8 +51,8 @@ namespace async
 	{
 		//boost::mutex::scoped_lock sl(_fibersReadyMtx);
 		assert(_fiberRoot != fiber);
-		assert(_fibersReady.end() == _fibersReady.find(fiber));
-		_fibersReady.insert(fiber);
+		//assert(_fibersReady.end() == _fibersReady.find(fiber));
+		_fiberPool->_fibersReady.insert(fiber);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ namespace async
 			std::set<FiberImplPtr> fibersReady;
 			{
 				//boost::mutex::scoped_lock sl(_fibersReadyMtx);
-				fibersReady.swap(_fibersReady);
+				fibersReady.swap(_fiberPool->_fibersReady);
 			}
 
 			doWork = !fibersReady.empty();
@@ -103,10 +103,10 @@ namespace async
 		//потом входящую задачу
 		{
 			FiberImplPtr fiber;
-			if(_fibersIdle.size())
+			if(_fiberPool->_fibersIdle.size())
 			{
-				fiber = *_fibersIdle.begin();
-				_fibersIdle.erase(_fibersIdle.begin());
+				fiber = *_fiberPool->_fibersIdle.begin();
+				_fiberPool->_fibersIdle.erase(_fiberPool->_fibersIdle.begin());
 			}
 			else
 			{
@@ -121,10 +121,11 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	WorkerImpl::WorkerImpl(ServicePtr service)
+	WorkerImpl::WorkerImpl(ServicePtr service, FiberPoolPtr	fiberPool)
 		: _service(service)
 		, _stop(false)
 		, _fiberRoot()
+		, _fiberPool(fiberPool)
 	{
 		_thread = boost::thread(boost::bind(&WorkerImpl::threadProc, this));
 	}
@@ -136,7 +137,7 @@ namespace async
 		_thread.join();
 
 		assert(!_fiberRoot);
-		assert(_fibersReady.empty());
+		//assert(_fibersReady.empty());
 	}
 
 	//////////////////////////////////////////////////////////////////////////

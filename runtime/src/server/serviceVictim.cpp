@@ -35,7 +35,7 @@ namespace server
 			TLOG("onResult NULL");
 			return;
 		}
-		//TLOG("onResult");
+		TLOG("onResult");
 
 		cnt++;
 		if(!(cnt%100000))
@@ -58,7 +58,7 @@ namespace server
 			TLOG("onConnection NULL");
 			return;
 		}
-		//TLOG("onConnection");
+		TLOG("onConnection");
 		if(!s || (rand()%50)==25)
 		{
 			s = _pluma->create<pgc::IStatementProvider>();
@@ -95,8 +95,9 @@ namespace server
 		{
 			return;
 		}
-		_db->allocConnection(
-			bind(&ServiceVictim::onConnection, shared_from_this(), _1));
+		async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
+		cr.wait();
+		onConnection(cr.data());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -107,33 +108,33 @@ namespace server
 			TLOG("onConnection2 NULL");
 			return;
 		}
-		//TLOG("onConnection");
+		TLOG("onConnection2");
 		if(!s || (rand()%50)==25)
 		{
 			s = _pluma->create<pgc::IStatementProvider>();
 			s->setSql("SELECT '123.456789'::numeric");
 		}
 
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
+// 		c->query(s, //v,
+// 			bind(&ServiceVictim::onResult, shared_from_this(), _1));
 
 // 		boost::xtime xt;
 // 		boost::xtime_get(&xt, boost::TIME_UTC);
@@ -144,8 +145,9 @@ namespace server
 		{
 			return;
 		}
-		_db->allocConnection(
-			bind(&ServiceVictim::onConnection2, shared_from_this(), _1));
+		async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
+		cr.wait();
+		onConnection2(cr.data());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -174,10 +176,14 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		_db->allocConnection(
-			bind(&ServiceVictim::onConnection, shared_from_this(), _1));
-		_db->allocConnection(
-			bind(&ServiceVictim::onConnection2, shared_from_this(), _1));
+		async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
+
+		async::Result<pgc::IConnectionPtr> cr2 = _db->allocConnection();
+
+		cr.wait();
+		onConnection(cr.data());
+		cr2.wait();
+		onConnection2(cr.data());
 
 		int k = 220;
 		//

@@ -18,6 +18,7 @@ namespace async
 		boost::shared_ptr<boost::asio::io_service::work>	_work;
 
 		std::vector<WorkerImplPtr>	_workers;
+		FiberPoolPtr				_fiberPool;
 
 		boost::function<void ()> _threadStart;
 		boost::function<void ()> _threadStop;

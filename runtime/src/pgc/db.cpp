@@ -22,7 +22,7 @@ namespace pgc
 		struct SWorkPair
 		{
 			ConnectionPreparedsPtr _con;
-			function<void (IConnectionPtr)>	_waiter;
+			async::Result<IConnectionPtr>	_waiter;
 		};
 		std::deque<SWorkPair> readyWaiters;
 		ConnectionPreparedsPtr pcwStarted;
@@ -127,10 +127,13 @@ namespace pgc
 			{
 				c.reset(new ConnectionHolder(shared_from_this(), wp._con));
 			}
-			if(wp._waiter)
-			{
-				_asrv->get_io_service().post(bind(wp._waiter, c));
-			}
+			*wp._waiter._data = c;
+			wp._waiter.ready();
+
+// 			if(wp._waiter)
+// 			{
+// 				_asrv->get_io_service().post(bind(wp._waiter, c));
+// 			}
 		}
 
 	}
@@ -287,7 +290,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::allocConnection_f(function<void (IConnectionPtr)> ready)
+	void Db::allocConnection_f(async::Result<IConnectionPtr> res)
 	{
 		ConnectionPreparedsPtr pcw;
 
@@ -316,7 +319,8 @@ namespace pgc
 				_readyConnections.erase(_readyConnections.begin());
 
 				IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
-				_asrv->get_io_service().post(bind(ready, c));
+				*res._data = c;
+				res.ready();
 				return;
 			}
 
@@ -324,18 +328,20 @@ namespace pgc
 			{
 				if(_maxConnections)
 				{
-					_waiters.push_back(ready);
+					_waiters.push_back(res);
 				}
 				else
 				{
 					if(_startConnections.size() + _workConnections.size())
 					{
-						_waiters.push_back(ready);
+						_waiters.push_back(res);
 					}
 					else
 					{
 						ELOG("alloc connection force NULL result");
-						_asrv->get_io_service().post(bind(ready, IConnectionPtr()));
+						*res._data = IConnectionPtr();
+						res.ready();
+						//_asrv->get_io_service().post(bind(ready, IConnectionPtr()));
 					}
 				}
 			}
@@ -344,16 +350,18 @@ namespace pgc
 		balanceConnections();
 	}
 	//////////////////////////////////////////////////////////////////////////
-	void Db::allocConnection(function<void (IConnectionPtr)> ready)
+	async::Result<IConnectionPtr> Db::allocConnection()
 	{
-		_asrv->get_io_service().post(bind(&Db::allocConnection_f, shared_from_this(), ready));
+		async::Result<IConnectionPtr> res;
+		_asrv->get_io_service().post(bind(&Db::allocConnection_f, shared_from_this(), res));
+		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Db::deinitialize()
 	{
 		ILOG("deinitialize");
-		std::deque<function<void (IConnectionPtr)> > waiters;
+		std::deque<async::Result<IConnectionPtr> > waiters;
 		{
 			mutex::scoped_lock sl(_mtx);
 
@@ -367,9 +375,10 @@ namespace pgc
 			_conninfo.clear();
 			waiters.swap(_waiters);
 		}
-		BOOST_FOREACH(function<void (IConnectionPtr)> &w, waiters)
+		BOOST_FOREACH(async::Result<IConnectionPtr> &w, waiters)
 		{
-			w(IConnectionPtr());
+			*w._data = IConnectionPtr();
+			w.ready();
 		}
 
 		bool doWait = true;

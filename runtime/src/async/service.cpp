@@ -10,6 +10,7 @@ namespace async
 		, _work()
 		, _threadStart()
 		, _threadStop()
+		, _fiberPool(new FiberPool)
 	{
 	}
 
@@ -52,7 +53,7 @@ namespace async
 			}
 			while(_workers.size() < numThreads)
 			{
-				WorkerImplPtr swp(new WorkerImpl(shared_from_this()));
+				WorkerImplPtr swp(new WorkerImpl(shared_from_this(), _fiberPool));
 				_workers.push_back(swp);
 			}
 
