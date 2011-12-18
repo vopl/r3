@@ -24,6 +24,7 @@ namespace async
 		}
 		Data &data()
 		{
+			wait();
 			return _state->_data;
 		}
 	};

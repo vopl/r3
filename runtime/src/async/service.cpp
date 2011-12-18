@@ -85,6 +85,13 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void Service::post(boost::function<void ()> handler)
+	{
+		_io_service.post(handler);
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	boost::asio::io_service &Service::get_io_service()
 	{
 		return _io_service;

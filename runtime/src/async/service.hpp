@@ -35,6 +35,8 @@ namespace async
 		virtual void balance(size_t numThreads);
 		virtual void stop();
 
+		virtual void post(boost::function<void ()> handler);
+
 		virtual boost::asio::io_service &get_io_service();
 	};
 }
