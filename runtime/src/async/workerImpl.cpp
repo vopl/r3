@@ -1,28 +1,28 @@
 #include "pch.h"
-#include "serviceWorker.hpp"
+#include "workerImpl.hpp"
 #include "service.hpp"
 #include <boost/bind.hpp>
 
 namespace async
 {
-#define FIBERS_ON_THREAD 10
 
 	//////////////////////////////////////////////////////////////////////////
-	ThreadLocalStorage<ServiceWorker *> ServiceWorker::_current;
+	ThreadLocalStorage<WorkerImpl *> WorkerImpl::_current;
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceWorker::threadProc()
+	void WorkerImpl::threadProc()
 	{
 		_current = this;
 
-		current();
+		//наболтать головной фибер
+		_fiberRoot.reset(new FiberRootImpl(this));
+
+		FiberPtr c = Fiber::current();
+
 		if(_service->_threadStart)
 		{
 			_service->_threadStart();
 		}
-
-		//наболтать головной фибер
-		_fiberRoot.reset(new FiberRoot(this));
 
 		while(!_stop)
 		{
@@ -42,61 +42,80 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceWorker::fiberExecuted(FiberPtr fiber)
+	void WorkerImpl::fiberExecuted(FiberImplPtr fiber)
 	{
 		_fiberRoot->activate();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceWorker::fiberReady(Fiber *fiber)
+	void WorkerImpl::fiberReady(FiberImplPtr fiber)
 	{
-		mutex::scoped_lock sl(_fibersReadyMtx);
-		_fibersReady.insert(fiber->shared_from_this());
+		boost::mutex::scoped_lock sl(_fibersReadyMtx);
+		_fibersReady.push_back(fiber);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceWorker::fiberYield(Fiber *fiber)
+	void WorkerImpl::fiberYield(FiberImplPtr fiber)
 	{
 		_fiberRoot->activate();
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceWorker::ready(TTask task)
+	void WorkerImpl::doComplete(TTask task)
 	{
+		assert(FiberImpl::current() == _fiberRoot);
+
 		//сначала отработать все готовые
 		bool doWork = true;
 		while(doWork)
 		{
-			std::deque<FiberPtr> fibersReady;
+			std::deque<FiberImplPtr> fibersReady;
 			{
 				boost::mutex::scoped_lock sl(_fibersReadyMtx);
 				fibersReady.swap(_fibersReady);
 			}
 
 			doWork = !fibersReady.empty();
-			BOOST_FOREACH(FiberPtr &fiber, fibersReady)
+			BOOST_FOREACH(FiberImplPtr &fiber, fibersReady)
 			{
 				fiber->activate();
 			}
 		}
 
 		//потом входящую задачу
-		FiberPtr fiber(new Fiber(this));
+		FiberImplPtr fiber(new FiberImpl(this));
 		fiber->execute(task);
+
+
+		doWork = true;
+		while(doWork)
+		{
+			std::deque<FiberImplPtr> fibersReady;
+			{
+				boost::mutex::scoped_lock sl(_fibersReadyMtx);
+				fibersReady.swap(_fibersReady);
+			}
+
+			doWork = !fibersReady.empty();
+			BOOST_FOREACH(FiberImplPtr &fiber, fibersReady)
+			{
+				fiber->activate();
+			}
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ServiceWorker::ServiceWorker(ServicePtr service)
+	WorkerImpl::WorkerImpl(ServicePtr service)
 		: _service(service)
 		, _stop(false)
 		, _fiberRoot()
 	{
-		_thread = boost::thread(boost::bind(&ServiceWorker::threadProc, this));
+		_thread = boost::thread(boost::bind(&WorkerImpl::threadProc, this));
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	ServiceWorker::~ServiceWorker()
+	WorkerImpl::~WorkerImpl()
 	{
 		_stop = true;
 		_thread.join();
@@ -106,7 +125,7 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ServiceWorker *ServiceWorker::current()
+	WorkerImpl *WorkerImpl::current()
 	{
 		return _current;
 	}

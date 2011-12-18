@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "connectionLow.hpp"
-#include "async/workerHandler.hpp"
+#include "async/worker.hpp"
+#include "async/fiber.hpp"
 
 namespace pgc
 {
@@ -42,29 +43,30 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::waitSend(function<void(const system::error_code &)> ready)
 	{
-		_sock.async_send(asio::null_buffers(), _strand.wrap(async::wrapWorkerHandler(_asrv, bind(ready, _1))));
+		//_sock.async_send(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
+
+		system::error_code ec = waitSend2();
+		ready(ec);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::waitRecv(function<void(const system::error_code &)> ready)
 	{
-		_sock.async_receive(asio::null_buffers(), _strand.wrap(async::wrapWorkerHandler(_asrv, bind(ready, _1))));
+		//_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(ready, _1)));
+
+		system::error_code ec = waitRecv2();
+		ready(ec);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	system::error_code ConnectionLow::waitSend2()
 	{
-		//////////////////////////////////////////////////////////////////////////
-		плуг async переформировать в статическую библиотеку
-		высунуть в интерфейс фиберы, воркеры и службу
-
-		FiberPtr fiber = Fiber::current();
 		struct MyLocalHandler
 		{
 			system::error_code _ec;
-			FiberPtr _fiber;
-			MyLocalHandler(FiberPtr fiber)
-				: _fiber(fiber)
+			async::FiberPtr _fiber;
+			MyLocalHandler()
+				: _fiber(async::Fiber::current())
 			{
 			}
 			typedef void result_type;
@@ -72,19 +74,38 @@ namespace pgc
 			void operator()(const system::error_code &ec)
 			{
 				_ec = ec;
-				fiber->ready();
+				_fiber->ready();
 			}
-		} h(fiber);
+		} h;
 
-		_sock.async_send(asio::null_buffers(), _strand.wrap(async::wrapWorkerHandler(h, _1)));
-		fiber->yield();
+		_sock.async_send(asio::null_buffers(), _strand.wrap(async::makeWorkerHandler(bind(h, _1))));
+		h._fiber->yield();
 		return h._ec;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	system::error_code ConnectionLow::waitRecv2()
 	{
+		struct MyLocalHandler
+		{
+			system::error_code _ec;
+			async::FiberPtr _fiber;
+			MyLocalHandler()
+				: _fiber(async::Fiber::current())
+			{
+			}
+			typedef void result_type;
 
+			void operator()(const system::error_code &ec)
+			{
+				_ec = ec;
+				_fiber->ready();
+			}
+		} h;
+
+		_sock.async_receive(asio::null_buffers(), _strand.wrap(async::makeWorkerHandler(bind(h, _1))));
+		h._fiber->yield();
+		return h._ec;
 	}
 
 
@@ -167,7 +188,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionLow::dispatch(function<void()> action)
 	{
-		_strand.dispatch(action);
+		_strand.dispatch(async::makeWorkerHandler(action));
 	}
 
 

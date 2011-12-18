@@ -1,91 +1,40 @@
 #include "pch.h"
-#include "fiber.hpp"
-#include "serviceWorker.hpp"
+#include "async/fiber.hpp"
+
+#include "fiberImpl.hpp"
 
 namespace async
 {
 
-	//////////////////////////////////////////////////////////////////////////
 	Fiber::Fiber()
-		: _worker(NULL)
-		, _stack(NULL)
 	{
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	Fiber::Fiber(ServiceWorker *worker)
-		: _worker(worker)
-	{
-		_stack = CreateFiberEx(0, 0, FIBER_FLAG_FLOAT_SWITCH, &Fiber::s_fiberProc, this);
-		assert(_stack);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Fiber::~Fiber()
 	{
-		if(_stack)
-		{
-			DeleteFiber(_stack);
-		}
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Fiber* Fiber::current()
+	FiberPtr Fiber::current()
 	{
-		return _current.get();
+		return FiberImpl::current();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Fiber::execute(boost::function<void()> code)
+	void Fiber::yield()
 	{
-		assert(_current != this);
-
-		assert(!_code);
-		assert(code);
-		_code = code;
-		activate();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Fiber::activate()
-	{
-		assert(_current != this);
-		_current = this;
-		SwitchToFiber(_stack);
+		return static_cast<FiberImpl*>(this)->yield();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Fiber::ready()
 	{
-		_worker->fiberReady(this);
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	void Fiber::yield()
-	{
-		_worker->fiberYield(this);
+		return static_cast<FiberImpl*>(this)->ready();
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	VOID WINAPI Fiber::s_fiberProc(LPVOID lpFiberParameter)
-	{
-		((Fiber*)lpFiberParameter)->fiberProc();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Fiber::fiberProc()
-	{
-		for(;;)
-		{
-			assert(_code);
-			_code();
-			_code.swap(boost::function<void()>());
-			_worker->fiberExecuted(this);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	ThreadLocalStorage<Fiber *> Fiber::_current;
 
 }
 

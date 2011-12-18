@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "fiberRoot.hpp"
+#include "fiberRootImpl.hpp"
 
 namespace async
 {
 
 	//////////////////////////////////////////////////////////////////////////
-	FiberRoot::FiberRoot(ServiceWorker *worker)
-		: Fiber()
+	FiberRootImpl::FiberRootImpl(WorkerImpl *worker)
+		: FiberImpl()
 	{
 		_worker = worker;
 		ConvertThreadToFiberEx(NULL, FIBER_FLAG_FLOAT_SWITCH);
@@ -15,7 +15,7 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	FiberRoot::~FiberRoot()
+	FiberRootImpl::~FiberRootImpl()
 	{
 		ConvertFiberToThread();
 		_stack = NULL;

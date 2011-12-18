@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "client.hpp"
-
+#include "../../src/async/service.hpp"
 
 
 namespace client
@@ -62,7 +62,7 @@ namespace client
 		{
 			//////////////////////////////////////////////////////////////////////////
 			//поднять асинхронный двиг
-			_async = _plugs->create<async::IServiceProvider>();
+			_async.reset(new async::Service);// = _plugs->create<async::IServiceProvider>();
 			assert(_async);
 
 			_asyncOwn = true;

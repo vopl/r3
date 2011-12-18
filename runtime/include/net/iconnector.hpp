@@ -1,6 +1,7 @@
 #ifndef _NET_ICONNECTOR_HPP_
 #define _NET_ICONNECTOR_HPP_
 
+#include "pluma/pluma.hpp"
 #include "async/iservice.hpp"
 #include "net/ichannel.hpp"
 

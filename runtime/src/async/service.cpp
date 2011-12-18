@@ -40,7 +40,7 @@ namespace async
 	{
 		ILOG("balance "<<numThreads);
 
-		std::vector<ServiceWorkerPtr>	stopped;
+		std::vector<WorkerImplPtr>	stopped;
 		{
 			//boost::mutex::scoped_lock sl(_mtx);
 
@@ -52,14 +52,14 @@ namespace async
 			}
 			while(_workers.size() < numThreads)
 			{
-				ServiceWorkerPtr swp(new ServiceWorker(shared_from_this()));
+				WorkerImplPtr swp(new WorkerImpl(shared_from_this()));
 				_workers.push_back(swp);
 			}
 
 			if(!stopped.empty())
 			{
 				_work.reset();
-				BOOST_FOREACH(ServiceWorkerPtr &swp, stopped)
+				BOOST_FOREACH(WorkerImplPtr &swp, stopped)
 				{
 					swp.reset();
 				}
@@ -81,12 +81,6 @@ namespace async
 		balance(0);
 		_threadStart.swap(boost::function<void ()>());
 		_threadStop.swap(boost::function<void ()>());
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Service::dispatch(boost::function<void()> handler)
-	{
-		ServiceWorker::current()->ready(handler);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

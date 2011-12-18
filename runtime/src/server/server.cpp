@@ -1,11 +1,44 @@
 #include "pch.h"
 #include "server.hpp"
 #include "async/iservice.hpp"
+#include "../../src/async/service.hpp"
 
 
 
 namespace server
 {
+
+	//////////////////////////////////////////////////////////////////////////
+	void Server::startupServices()
+	{
+		mutex::scoped_lock sl(_mtx);
+		_numThreads++;
+
+		if(1 == _numThreads)
+		{
+			//////////////////////////////////////////////////////////////////////////
+			//набавить службы
+			std::vector<IServicePtr> services;
+			_plugs->createAll<IServiceProvider>(services);
+			BOOST_FOREACH(IServicePtr &s, services)
+			{
+				_serviceHub->addService(s);
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Server::shutdownServices()
+	{
+		mutex::scoped_lock sl(_mtx);
+		_numThreads--;
+
+		if(0 == _numThreads)
+		{
+			assert(_serviceHub);
+			_serviceHub->delServices();
+		}
+	}
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -40,6 +73,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	Server::Server()
 		: _plugs(NULL)
+		, _numThreads(0)
 	{
 
 	}
@@ -60,7 +94,7 @@ namespace server
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять асинхронный двиг
-		_async = _plugs->create<async::IServiceProvider>();
+		_async.reset(new async::Service);
 		assert(_async);
 		if(!_async)
 		{
@@ -125,18 +159,13 @@ namespace server
 		}
 		_serviceHub->setServer(shared_from_this());
 
-		//////////////////////////////////////////////////////////////////////////
-		//набавить службы
-		std::vector<IServicePtr> services;
-		_plugs->createAll<IServiceProvider>(services);
-		BOOST_FOREACH(IServicePtr &s, services)
-		{
-			_serviceHub->addService(s);
-		}
-
 
 		//запускать асинхронный двиг
-		_async->start(boost::thread::hardware_concurrency()*2);
+		_async->start(
+			//boost::thread::hardware_concurrency()*2, 
+			1);
+
+		_async->get_io_service().post(async::Worker::current()->wrap(bind(&Server::startupServices, shared_from_this())));
 
 		return true;
 	}
@@ -145,8 +174,8 @@ namespace server
 	void Server::stop()
 	{
 		ILOG("stop");
-		assert(_serviceHub);
-		_serviceHub->delServices();
+
+		_async->get_io_service().post(async::Worker::current()->wrap(bind(&Server::shutdownServices, shared_from_this())));
 
 		assert(_sessionManager);
 		_sessionManager->stop();

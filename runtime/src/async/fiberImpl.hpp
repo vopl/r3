@@ -1,27 +1,30 @@
-#ifndef _ASYNC_FIBER_HPP_
-#define _ASYNC_FIBER_HPP_
+#ifndef _ASYNC_FIBERIMPL_HPP_
+#define _ASYNC_FIBERIMPL_HPP_
 
 #include "threadLocalStorage.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include <windows.h>
+#include "async/fiber.hpp"
 
 
 //////////////////////////////////////////////////////////////////////////
 namespace async
 {
-	class ServiceWorker;
+	class WorkerImpl;
+	class FiberImpl;
+	typedef boost::shared_ptr<FiberImpl> FiberImplPtr;
 
-	class Fiber
-		: public boost::enable_shared_from_this<Fiber>
+	class FiberImpl
+		: public Fiber
+		, public boost::enable_shared_from_this<FiberImpl>
 	{
 	protected:
-		Fiber();
+		FiberImpl();
 
 	public:
-		Fiber(ServiceWorker *worker);
-		~Fiber();
+		FiberImpl(WorkerImpl *worker);
+		~FiberImpl();
 
-		static Fiber *current();
+		static FiberImplPtr current();
 
 		void execute(boost::function<void()> _code);
 		void activate();
@@ -32,13 +35,12 @@ namespace async
 		static VOID WINAPI s_fiberProc(LPVOID lpFiberParameter);
 		void fiberProc();
 	protected:
-		ServiceWorker *_worker;
+		WorkerImpl *_worker;
 		void *_stack;
 		boost::function<void()> _code;
 
-		static ThreadLocalStorage<Fiber *> _current;
+		static ThreadLocalStorage<FiberImpl *> _current;
 	};
-	typedef boost::shared_ptr<Fiber> FiberPtr;
 }
 
 #endif

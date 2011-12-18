@@ -23,7 +23,13 @@ namespace server
 
 		pgc::IDbPtr			_db;
 
+		size_t				_numThreads;
+		boost::mutex		_mtx;
+
 	private:
+		void startupServices();
+		void shutdownServices();
+
 		void onSessionStart(ISessionPtr session);
 		void onSessionStop(ISessionPtr session);
 

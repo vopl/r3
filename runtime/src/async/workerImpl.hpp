@@ -3,8 +3,9 @@
 
 #include <boost/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include "fiber.hpp"
-#include "fiberRoot.hpp"
+#include "async/worker.hpp"
+#include "fiberImpl.hpp"
+#include "fiberRootImpl.hpp"
 #include <set>
 #include <deque>
 
@@ -14,8 +15,9 @@ namespace async
 	typedef boost::shared_ptr<Service> ServicePtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ServiceWorker
-		: public boost::enable_shared_from_this<ServiceWorker>
+	class WorkerImpl
+		: public Worker
+		, public boost::enable_shared_from_this<WorkerImpl>
 	{
 		ServicePtr		_service;
 		boost::thread	_thread;
@@ -25,32 +27,32 @@ namespace async
 		typedef boost::function<void()> TTask;
 
 		//головной фибер, в нем исполняется цикл выкачивания событий проактора
-		FiberRootPtr	_fiberRoot;
+		FiberRootImplPtr	_fiberRoot;
 
 		//рабочие фиберы с задачей и готовые к исполнению
-		std::deque<FiberPtr> _fibersReady;
+		std::deque<FiberImplPtr> _fibersReady;
 		boost::mutex	_fibersReadyMtx;
 
-		static ThreadLocalStorage<ServiceWorker *> _current;
+		static ThreadLocalStorage<WorkerImpl *> _current;
 
 	private:
 		void threadProc();
 
 	public://для фиберов
-		void fiberExecuted(Fiber *fiber);
-		void fiberReady(Fiber *fiber);
-		void fiberYield(Fiber *fiber);
+		void fiberExecuted(FiberImplPtr fiber);
+		void fiberReady(FiberImplPtr fiber);
+		void fiberYield(FiberImplPtr fiber);
 
 	public://для врапера
-		void ready(TTask);
+		void doComplete(TTask);
 
 	public:
-		ServiceWorker(ServicePtr service);
-		~ServiceWorker();
+		WorkerImpl(ServicePtr service);
+		~WorkerImpl();
 
-		static ServiceWorker *current();
+		static WorkerImpl *current();
 	};
-	typedef boost::shared_ptr<ServiceWorker> ServiceWorkerPtr;
+	typedef boost::shared_ptr<WorkerImpl> WorkerImplPtr;
 }
 
 #endif
