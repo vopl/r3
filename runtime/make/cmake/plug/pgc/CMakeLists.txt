@@ -13,9 +13,6 @@ SET(SRC
 	${SRC_DIR}/pgc/db.cpp
 	${SRC_DIR}/pgc/statement.cpp
 	${SRC_DIR}/pgc/result.cpp
-	${SRC_DIR}/pgc/connectionLow.cpp
-	${SRC_DIR}/pgc/connectionProcessor.cpp
-	${SRC_DIR}/pgc/connectionPrepareds.cpp
 	${SRC_DIR}/pgc/connectionHolder.cpp
 	${SRC_DIR}/pgc/connectionImpl.cpp
 	${SRC_DIR}/pgc/bindData.cpp
@@ -32,9 +29,6 @@ SET(SRC_HDR
 	${SRC_DIR}/pgc/db.hpp
 	${SRC_DIR}/pgc/statement.hpp
 	${SRC_DIR}/pgc/result.hpp
-	${SRC_DIR}/pgc/connectionLow.hpp
-	${SRC_DIR}/pgc/connectionProcessor.hpp
-	${SRC_DIR}/pgc/connectionPrepareds.hpp
 	${SRC_DIR}/pgc/connectionHolder.hpp
 	${SRC_DIR}/pgc/connectionImpl.hpp
 	${SRC_DIR}/pgc/bindData.hpp
