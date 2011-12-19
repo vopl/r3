@@ -45,6 +45,7 @@ namespace async
 		{
 			boost::mutex::scoped_lock sl(_fiberPool->_mtx);
 			_fiberPool->_fibersIdle.insert(fiber);
+			assert(_fiberPool->_fibersReady.end() == _fiberPool->_fibersReady.find(fiber));
 		}
 		_fiberRoot->activate();
 	}
@@ -54,7 +55,7 @@ namespace async
 	{
 		boost::mutex::scoped_lock sl(_fiberPool->_mtx);
 		assert(_fiberRoot != fiber);
-		//assert(_fibersReady.end() == _fibersReady.find(fiber));
+		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber));
 		_fiberPool->_fibersReady.insert(fiber);
 	}
 	

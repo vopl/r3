@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "fiberImpl.hpp"
+#include "fiberRootImpl.hpp"
 #include "workerImpl.hpp"
 #include <windows.h>
 
@@ -47,11 +48,38 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	boost::mutex g_emMtx2;
+	std::map<FiberImpl *, size_t> g_em2;
 	void FiberImpl::activate()
 	{
 		assert(_current != this);
 		if(_current != this)
 		{
+
+			//assert(_code);
+
+			{
+				boost::mutex::scoped_lock sl(g_emMtx2);
+				std::map<FiberImpl *, size_t> &e_em2 = g_em2;
+
+				FiberImpl *cur = _current.get();
+				if(dynamic_cast<FiberRootImpl *>(cur))
+				{
+					cur = 0;
+				}
+				FiberImpl *thi = this;
+				if(dynamic_cast<FiberRootImpl *>(thi))
+				{
+					thi = 0;
+				}
+				g_em2[cur];
+				g_em2[cur]--;
+				g_em2[thi]++;
+				assert(g_em2[thi]<2 || !thi);
+			}
+
+
+
 			_current = this;
 			SwitchToFiber(_stack);
 		}
@@ -83,27 +111,17 @@ namespace async
 		}
 	}
 
-	boost::mutex g_emMtx;
-	std::map<FiberImpl *, size_t> g_em;
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::fiberProc()
 	{
 		for(;;)
 		{
 			{
-				{
-					boost::mutex::scoped_lock sl(g_emMtx);
-					g_em[this]++;
-					assert(g_em[this]<2);
-				}
+
 				assert(_code);
 				_code();
+				assert(_code);
 				_code.swap(boost::function<void()>());
-				{
-					boost::mutex::scoped_lock sl(g_emMtx);
-					g_em[this]--;
-					assert(g_em[this]<1);
-				}
 			}
 			WorkerImpl::current()->fiberExecuted(shared_from_this());
 		}

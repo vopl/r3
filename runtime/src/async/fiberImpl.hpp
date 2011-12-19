@@ -19,7 +19,7 @@ namespace async
 	{
 	public:
 		FiberImpl(bool createStack=true);
-		~FiberImpl();
+		virtual ~FiberImpl();
 
 		static FiberImplPtr current();
 

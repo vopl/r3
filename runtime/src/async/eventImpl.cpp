@@ -31,31 +31,35 @@ namespace async
 			_ready = true;
 
 			waiters.swap(_waiters);
+
+			if(waiters.size()>1)
+			{
+				int k=220;
+			}
+			BOOST_FOREACH(FiberImplPtr &f, waiters)
+			{
+				f->ready();
+			}
 		}
 
-		BOOST_FOREACH(FiberImplPtr &f, waiters)
-		{
-			f->ready();
-		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	bool EventImpl::isReady()
 	{
-		boost::mutex::scoped_lock sl(_mtx);
 		return _ready;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void EventImpl::wait()
 	{
+		if(_ready)
+		{
+			return;
+		}
+
 		{
 			boost::mutex::scoped_lock sl(_mtx);
-
-			if(_ready)
-			{
-				return;
-			}
 			FiberImplPtr f = FiberImpl::current();
 			assert(f);
 			_waiters.push_back(f);
@@ -65,7 +69,7 @@ namespace async
 		{
 			FiberImpl::yield();
 		}
-		while(!isReady());
+		while(!_ready);
 	}
 
 }

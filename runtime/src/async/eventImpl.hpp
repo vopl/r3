@@ -10,7 +10,7 @@ namespace async
 	class EventImpl
 	{
 		boost::mutex				_mtx;
-		bool						_ready;
+		volatile bool				_ready;
 		std::deque<FiberImplPtr>	_waiters;
 	public:
 		EventImpl();

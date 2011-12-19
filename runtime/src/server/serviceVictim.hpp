@@ -25,7 +25,6 @@ namespace server
 
 		void onResult(pgc::IResultPtrs r);
 		void connectionLoop1();
-		void connectionLoop2();
 
 	public:
 		ServiceVictim();
