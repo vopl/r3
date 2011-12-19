@@ -148,6 +148,10 @@ namespace server
 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop2, shared_from_this()));
 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop2, shared_from_this()));
+		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop2, shared_from_this()));
+		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop2, shared_from_this()));
 
 		int k = 220;
 		//

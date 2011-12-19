@@ -163,7 +163,7 @@ namespace server
 		//запускать асинхронный двиг
 		_async->start(
 			//boost::thread::hardware_concurrency()*2, 
-			1);
+			4);
 
 		_async->get_io_service().post(bind(&Server::startupServices, shared_from_this()));
 

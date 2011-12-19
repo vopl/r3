@@ -173,20 +173,19 @@ namespace pgc
 				{
 					SRequestQuery *rd = static_cast<SRequestQuery *>(r.get());
 					runQuery_f(rd->_res, rd->_sql);
-					rd->_res.wait();
 				}
 				break;
 			case ertQueryWithPrepare:
 				{
 					SRequestQueryWithPrepare *rd = static_cast<SRequestQueryWithPrepare *>(r.get());
 					runQueryWithPrepare_f(rd->_res, rd->_s, rd->_data);
-					rd->_res.wait();
 				}
 				break;
 			default:
 				assert(!"unknown ert");
 				throw("unknown ert");
 			}
+			r->_res.wait();
 		}
 		_requestInProcess = false;
 	}

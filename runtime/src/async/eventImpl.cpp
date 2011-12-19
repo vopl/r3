@@ -22,13 +22,16 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void EventImpl::ready()
 	{
-		boost::mutex::scoped_lock sl(_mtx);
-
-		assert(!_ready);
-		_ready = true;
-
 		std::deque<FiberImplPtr> waiters;
-		waiters.swap(_waiters);
+
+		{
+			boost::mutex::scoped_lock sl(_mtx);
+
+			assert(!_ready);
+			_ready = true;
+
+			waiters.swap(_waiters);
+		}
 
 		BOOST_FOREACH(FiberImplPtr &f, waiters)
 		{
