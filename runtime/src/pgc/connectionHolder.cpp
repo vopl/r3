@@ -29,7 +29,7 @@ namespace pgc
 	async::Result<IResultPtrs> ConnectionHolder::query(const std::string &sql)
 	{
 		async::Result<IResultPtrs> res;
-		_impl->runQuery(res, sql);
+		_impl->dispatch(bind(&ConnectionImpl::runQuery, _impl, res, sql));
 		return res;
 	}
 
@@ -37,7 +37,7 @@ namespace pgc
 	async::Result<IResultPtrs> ConnectionHolder::query(IStatementPtr s)
 	{
 		async::Result<IResultPtrs> res;
-		_impl->runQueryWithPrepare(res, s, BindDataPtr());
+		_impl->dispatch(bind(&ConnectionImpl::runQueryWithPrepare, _impl, res, s, BindDataPtr()));
 		return res;
 	}
 
@@ -45,7 +45,7 @@ namespace pgc
 	async::Result<IResultPtrs> ConnectionHolder::query(IStatementPtr s, const utils::Variant &data)
 	{
 		async::Result<IResultPtrs> res;
-		_impl->runQueryWithPrepare(res, s, BindDataPtr(new BindData(data, _impl)));
+		_impl->dispatch(bind(&ConnectionImpl::runQueryWithPrepare, _impl, res, s, BindDataPtr(new BindData(data, _impl))));
 		return res;
 	}
 

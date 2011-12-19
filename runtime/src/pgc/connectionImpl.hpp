@@ -77,6 +77,42 @@ namespace pgc
 			> 
 		> TPrepareds;
 
+		//очередь входящих запросов
+		enum ERequestType
+		{
+			ertQuery,
+			ertQueryWithPrepare,
+		};
+		struct SRequest
+		{
+			ERequestType				_ert;
+			async::Result<IResultPtrs>	_res;
+			SRequest(ERequestType ert, async::Result<IResultPtrs> res)
+				: _ert(ert), _res(res)
+			{}
+		};
+		typedef boost::shared_ptr<SRequest> SRequestPtr;
+
+		struct SRequestQuery
+			: SRequest
+		{
+			std::string _sql;
+			SRequestQuery(async::Result<IResultPtrs> res, std::string sql)
+				: SRequest(ertQuery, res), _sql(sql)
+			{}
+		};
+		struct SRequestQueryWithPrepare
+			: SRequest
+		{
+			IStatementPtr	_s;
+			BindDataPtr		_data;
+			SRequestQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data)
+				: SRequest(ertQueryWithPrepare, res), _s(s), _data(data)
+			{}
+		};
+
+		typedef std::deque<SRequestPtr> TRequests;
+
 		typedef asio::basic_stream_socket<PGSockProtocol> PGSock;
 	private:
 		//////////////////////////////////////////////////////////////////////////
@@ -97,6 +133,9 @@ namespace pgc
 		//контейнер с запросами
 		TPrepareds			_prepareds;
 
+		TRequests			_requests;
+		bool				_requestInProcess;
+
 	private:
 		bool hasPrepared(IStatementWtr p);
 		std::string getPrid(IStatementWtr p);
@@ -109,8 +148,32 @@ namespace pgc
 		static int sockType(int sock);
 
 	private:
+		void processRequest();
+
+	private:
 		void processSingle(async::Result<IResultPtrs> res);
 		void processQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data);
+
+	private:
+		void runQuery_f(async::Result<IResultPtrs> res, const std::string &sql);
+
+		void runPrepare_f(
+			async::Result<IResultPtrs> res, 
+			const std::string &prid, 
+			const std::string &sql, 
+			BindDataPtr data);
+
+		void runQueryPrepared_f(
+			async::Result<IResultPtrs> res, 
+			const std::string &prid, 
+			BindDataPtr data);
+
+		//а так же всякие describe
+		//void runDescribePrepared...
+		//void runDescribePortal...
+
+	private:
+		void runQueryWithPrepare_f(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data);
 
 	public:
 		async::Result<system::error_code> send0();
@@ -129,26 +192,10 @@ namespace pgc
 		bool integerDatetimes();
 
 		void dispatch(function<void()> action);
+		void post(function<void()> action);
 
 	public:
 		void runQuery(async::Result<IResultPtrs> res, const std::string &sql);
-
-		void runPrepare(
-			async::Result<IResultPtrs> res, 
-			const std::string &prid, 
-			const std::string &sql, 
-			BindDataPtr data);
-
-		void runQueryPrepared(
-			async::Result<IResultPtrs> res, 
-			const std::string &prid, 
-			BindDataPtr data);
-
-		//а так же всякие describe
-		//void runDescribePrepared...
-		//void runDescribePortal...
-
-	public:
 		void runQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data);
 
 	public:

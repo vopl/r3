@@ -72,9 +72,11 @@ namespace server
 			}
 
 			async::Result<pgc::IResultPtrs> res = c->query(s);
+			async::Result<pgc::IResultPtrs> res2 = c->query(s);
 			c.reset();
 
 			onResult(res.data());
+			onResult(res2.data());
 
 			if(!_db)
 			{

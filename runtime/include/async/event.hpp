@@ -8,17 +8,13 @@
 //////////////////////////////////////////////////////////////////////////
 namespace async
 {
+	class EventImpl;
+	typedef boost::shared_ptr<EventImpl> EventImplPtr;
+
 	//////////////////////////////////////////////////////////////////////////
 	class ASYNC_API Event
 	{
-		struct State
-		{
-			FiberPtr	_fiber;
-			bool		_ready;
-
-			State():_ready(false){}
-		};
-		boost::shared_ptr<State> _state;
+		EventImplPtr	_impl;
 
 	public:
 		Event();

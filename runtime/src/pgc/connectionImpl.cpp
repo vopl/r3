@@ -154,6 +154,45 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::processRequest()
+	{
+		if(_requestInProcess)
+		{
+			return;
+		}
+
+		_requestInProcess = true;
+		while(!_requests.empty())
+		{
+			SRequestPtr r = *_requests.begin();
+			_requests.erase(_requests.begin());
+
+			switch(r->_ert)
+			{
+			case ertQuery:
+				{
+					SRequestQuery *rd = static_cast<SRequestQuery *>(r.get());
+					runQuery_f(rd->_res, rd->_sql);
+					rd->_res.wait();
+				}
+				break;
+			case ertQueryWithPrepare:
+				{
+					SRequestQueryWithPrepare *rd = static_cast<SRequestQueryWithPrepare *>(r.get());
+					runQueryWithPrepare_f(rd->_res, rd->_s, rd->_data);
+					rd->_res.wait();
+				}
+				break;
+			default:
+				assert(!"unknown ert");
+				throw("unknown ert");
+			}
+		}
+		_requestInProcess = false;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::processSingle(async::Result<IResultPtrs> res)
 	{
 		//слать
@@ -220,7 +259,7 @@ namespace pgc
 			if(inTrans)
 			{
 				async::Result<IResultPtrs> r1;
-				runQuery(r1, "SAVEPOINT pgcp"+getPrid(s));
+				runQuery_f(r1, "SAVEPOINT pgcp"+getPrid(s));
 				if(r1.data().size() != 1 || ersCommandOk != r1.data()[0]->status())
 				{
 					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
@@ -230,7 +269,7 @@ namespace pgc
 			}
 
 			async::Result<IResultPtrs> r2;
-			runPrepare(
+			runPrepare_f(
 				r2,
 				getPrid(s), 
 				s->getSql(), 
@@ -247,7 +286,7 @@ namespace pgc
 						genPrid(s);
 
 						async::Result<IResultPtrs> r3;
-						runQuery(r3, "ROLLBACK TO SAVEPOINT pgcp"+oldPrid);
+						runQuery_f(r3, "ROLLBACK TO SAVEPOINT pgcp"+oldPrid);
 						if(r3.data().size() != 1 || ersCommandOk != r3.data()[0]->status())
 						{
 							ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
@@ -271,7 +310,7 @@ namespace pgc
 		if(inTrans)
 		{
 			async::Result<IResultPtrs> r4;
-			runQuery(r4, "RELEASE SAVEPOINT pgcp"+getPrid(s));
+			runQuery_f(r4, "RELEASE SAVEPOINT pgcp"+getPrid(s));
 			if(r4.data().size() != 1 || ersCommandOk != r4.data()[0]->status())
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
@@ -281,7 +320,91 @@ namespace pgc
 		}
 
 
-		runQueryPrepared(res, getPrid(s), data);
+		runQueryPrepared_f(res, getPrid(s), data);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::runQuery_f(async::Result<IResultPtrs> res, const std::string &sql)
+	{
+		if(!PQsendQueryParams (
+			_pgcon, 
+			sql.c_str(), 
+			0, 
+			NULL, 
+			NULL, 
+			NULL, 
+			NULL, 
+			1))
+		{
+			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
+			res(IResultPtrs());
+			return;
+		};
+
+		processSingle(res);
+	}
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::runPrepare_f(
+		async::Result<IResultPtrs> res, 
+		const std::string &prid, 
+		const std::string &sql, 
+		BindDataPtr data)
+	{
+		int nParams = data?data->typ.size():0;
+		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
+		if(!PQsendPrepare(
+			_pgcon, 
+			prid.c_str(), 
+			sql.c_str(),
+			nParams,
+			paramTypes))
+		{
+			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
+			res(IResultPtrs());
+			return;
+		};
+
+		processSingle(res);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::runQueryPrepared_f(
+		async::Result<IResultPtrs> res, 
+		const std::string &prid, 
+		BindDataPtr data)
+	{
+		int nParams = data?data->typ.size():0;
+		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
+		const char * const *paramValues = nParams?&data->val[0]:NULL;
+		const int *paramLengths = nParams?&data->len[0]:NULL;
+		const int *paramFormats = nParams?&data->fmt[0]:NULL;
+		if(!PQsendQueryPrepared(
+			_pgcon, 
+			prid.c_str(),
+			nParams,
+			paramValues,
+			paramLengths,
+			paramFormats,
+			1))
+		{
+			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
+			res(IResultPtrs());
+			return;
+		};
+
+		processSingle(res);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::runQueryWithPrepare_f(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data)
+	{
+		if(hasPrepared(s))
+		{
+			runQueryPrepared_f(res, getPrid(s), data);
+			return;
+		}
+
+		ConnectionImpl::processQueryWithPrepare(res, s, data);
 	}
 
 
@@ -309,6 +432,7 @@ namespace pgc
 		, _sock(asrv->get_io_service(), PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
 		, _strand(asrv->get_io_service())
 		, _integerDatetimes(false)
+		, _requestInProcess(false)
 	{
 		PQsetnonblocking(_pgcon, 0);
 	}
@@ -381,91 +505,36 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::dispatch(function<void()> action)
 	{
-		_strand.get_io_service().post(
-			_strand.wrap(action));
+		_strand.dispatch(action);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::post(function<void()> action)
+	{
+		_strand.post(action);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runQuery(async::Result<IResultPtrs> res, const std::string &sql)
 	{
-		if(!PQsendQueryParams (
-			_pgcon, 
-			sql.c_str(), 
-			0, 
-			NULL, 
-			NULL, 
-			NULL, 
-			NULL, 
-			1))
+		SRequestPtr r(new SRequestQuery(res, sql));
+		_requests.push_back(r);
+		if(!_requestInProcess)
 		{
-			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-			res(IResultPtrs());
-			return;
-		};
-
-		dispatch(bind(&ConnectionImpl::processSingle, shared_from_this(), res));
-	}
-	//////////////////////////////////////////////////////////////////////////
-	void ConnectionImpl::runPrepare(
-		async::Result<IResultPtrs> res, 
-		const std::string &prid, 
-		const std::string &sql, 
-		BindDataPtr data)
-	{
-		int nParams = data?data->typ.size():0;
-		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
-		if(!PQsendPrepare(
-			_pgcon, 
-			prid.c_str(), 
-			sql.c_str(),
-			nParams,
-			paramTypes))
-		{
-			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-			res(IResultPtrs());
-			return;
-		};
-
-		dispatch(bind(&ConnectionImpl::processSingle, shared_from_this(), res));
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ConnectionImpl::runQueryPrepared(
-		async::Result<IResultPtrs> res, 
-		const std::string &prid, 
-		BindDataPtr data)
-	{
-		int nParams = data?data->typ.size():0;
-		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
-		const char * const *paramValues = nParams?&data->val[0]:NULL;
-		const int *paramLengths = nParams?&data->len[0]:NULL;
-		const int *paramFormats = nParams?&data->fmt[0]:NULL;
-		if(!PQsendQueryPrepared(
-			_pgcon, 
-			prid.c_str(),
-			nParams,
-			paramValues,
-			paramLengths,
-			paramFormats,
-			1))
-		{
-			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-			res(IResultPtrs());
-			return;
-		};
-
-		dispatch(bind(&ConnectionImpl::processSingle, shared_from_this(), res));
+			post(bind(&ConnectionImpl::processRequest, shared_from_this()));
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data)
 	{
-		if(hasPrepared(s))
-		{
-			return runQueryPrepared(res, getPrid(s), data);
-		}
+		SRequestPtr r(new SRequestQueryWithPrepare(res, s, data));
+		_requests.push_back(r);
 
-		dispatch(bind(&ConnectionImpl::processQueryWithPrepare, shared_from_this(), res, s, data));
+		if(!_requestInProcess)
+		{
+			post(bind(&ConnectionImpl::processRequest, shared_from_this()));
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -490,7 +559,7 @@ namespace pgc
 			timedIndex.erase(timedIndex.begin());
 
 			async::Result<IResultPtrs> r;
-			runQuery(r, "DEALLOCATE "+prid);
+			runQuery_f(r, "DEALLOCATE "+prid);
 			if(r.data().size()!=1 || ersCommandOk != r.data()[0]->status())
 			{
 				const char * errCode = r.data()[0]->errorCode();

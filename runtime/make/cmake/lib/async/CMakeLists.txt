@@ -21,6 +21,8 @@ SET(SRC
 	${SRC_DIR}/async/workerImpl.cpp
 	${SRC_DIR}/async/fiberImpl.cpp
 	${SRC_DIR}/async/fiberRootImpl.cpp
+
+	${SRC_DIR}/async/eventImpl.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -38,6 +40,8 @@ SET(SRC_HDR
 	${SRC_DIR}/async/fiberRootImpl.hpp
 	${SRC_DIR}/async/threadLocalStorage.hpp
 	${SRC_DIR}/async/fiberPool.hpp
+
+	${SRC_DIR}/async/eventImpl.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
