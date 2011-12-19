@@ -3,7 +3,7 @@
 
 #include "pgc/iconnection.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include "connectionPrepareds.hpp"
+#include "connectionImpl.hpp"
 #include "bindData.hpp"
 
 namespace pgc
@@ -20,26 +20,17 @@ namespace pgc
 		, public enable_shared_from_this<ConnectionHolder>
 	{
 		DbPtr _db;
-		ConnectionPreparedsPtr _con;
+		ConnectionImplPtr _impl;
 
-		typedef function<void (IResultPtrs)> TDone;
-		void keeper(TDone done, IResultPtrs result);
-
-		static void onEndWork(DbPtr db, ConnectionPreparedsPtr con, IResultPtrs result);
+// 		static void onEndWork(DbPtr db, ConnectionImplPtr impl, IResultPtrs result);
 
 	public:
-		ConnectionHolder(DbPtr db, ConnectionPreparedsPtr con);
+		ConnectionHolder(DbPtr db, ConnectionImplPtr impl);
 		~ConnectionHolder();
 
-		virtual void query(const std::string &sql,
-			TDone done);
-
-		virtual void query(IStatementPtr s,
-			TDone done);
-
-		virtual void query(IStatementPtr s,
-			const utils::Variant &data,
-			TDone done);
+		virtual async::Result<IResultPtrs> query(const std::string &sql);
+		virtual async::Result<IResultPtrs> query(IStatementPtr s);
+		virtual async::Result<IResultPtrs> query(IStatementPtr s, const utils::Variant &data);
 
 		virtual EConnectionStatus status();
 	};

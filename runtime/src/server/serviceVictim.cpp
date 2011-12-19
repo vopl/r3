@@ -38,7 +38,7 @@ namespace server
 		//TLOG("onResult");
 
 		cnt++;
-		if(!(cnt%1000))
+		if(!(cnt%10000))
 		{
 			pgc::EResultStatus s = r[0]->status();
 			const char *msg = r[0]->errorMsg();
@@ -51,66 +51,69 @@ namespace server
 	pgc::IStatementPtr s;
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onConnection(pgc::IConnectionPtr c)
+	void ServiceVictim::connectionLoop1()
 	{
 		for(;;)
 		{
+			async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
+			cr.wait();
+			pgc::IConnectionPtr c = cr.data();
+			
 			if(!c)
 			{
-				TLOG("onConnection NULL");
+				TLOG("connectionLoop1 NULL");
 				return;
 			}
-			//TLOG("onConnection");
+			//TLOG("connectionLoop1");
 			if(!s || (rand()%50)==25)
 			{
 				s = _pluma->create<pgc::IStatementProvider>();
 				s->setSql("SELECT '123.456789'::numeric");
 			}
 
-			c->query(s, //v,
-				bind(&ServiceVictim::onResult, shared_from_this(), _1));
+			async::Result<pgc::IResultPtrs> res = c->query("SELECT '123.456789'::numeric");
 			c.reset();
+
+			onResult(res.data());
 
 			if(!_db)
 			{
 				return;
 			}
-			async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
-			cr.wait();
-			c = cr.data();
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onConnection2(pgc::IConnectionPtr c)
+	void ServiceVictim::connectionLoop2()
 	{
 		for(;;)
 		{
+			async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
+			cr.wait();
+			pgc::IConnectionPtr c = cr.data();
+
 			if(!c)
 			{
-				TLOG("onConnection2 NULL");
+				TLOG("connectionLoop2 NULL");
 				return;
 			}
-			//TLOG("onConnection2");
+			//TLOG("connectionLoop2");
 			if(!s || (rand()%50)==25)
 			{
 				s = _pluma->create<pgc::IStatementProvider>();
 				s->setSql("SELECT '123.456789'::numeric");
 			}
 
-			c->query(s, //v,
-				bind(&ServiceVictim::onResult, shared_from_this(), _1));
+			async::Result<pgc::IResultPtrs> res = c->query("SELECT '123.456789'::numeric");
 			c.reset();
+
+			onResult(res.data());
 
 			if(!_db)
 			{
 				return;
 			}
-			async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
-			cr.wait();
-			c = cr.data();
 		}
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -139,12 +142,10 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
-		async::Result<pgc::IConnectionPtr> cr2 = _db->allocConnection();
-
-
-		hub->getServer()->getAsync()->post(bind(&ServiceVictim::onConnection, shared_from_this(), cr.data()));
-		hub->getServer()->getAsync()->post(bind(&ServiceVictim::onConnection2, shared_from_this(), cr2.data()));
+		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop2, shared_from_this()));
+		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop2, shared_from_this()));
 
 		int k = 220;
 		//

@@ -89,7 +89,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::doComplete(TTask task)
 	{
-		assert(FiberImpl::current() == _fiberRoot);
+		//assert(FiberImpl::current() == _fiberRoot);
 		if(FiberImpl::current() != _fiberRoot)
 		{
 			task();

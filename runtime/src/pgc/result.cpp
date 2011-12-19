@@ -352,7 +352,7 @@ namespace pgc
 // 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result::Result(PGresult *pgr, ConnectionLowPtr con)
+	Result::Result(PGresult *pgr, ConnectionImplPtr con)
 		: _pgr(pgr)
 		, _con(con)
 	{
@@ -609,7 +609,6 @@ namespace pgc
 		}
 
 		assert(1 == PQfformat(_pgr, colIdx));
-
 		if(PQgetisnull(_pgr, (int)rowIdx, (int)colIdx))
 		{
 			v.forceType(colType(colIdx));

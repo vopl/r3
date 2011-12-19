@@ -21,11 +21,11 @@ namespace pgc
 	{
 		struct SWorkPair
 		{
-			ConnectionPreparedsPtr _con;
+			ConnectionImplPtr _con;
 			async::Result<IConnectionPtr>	_waiter;
 		};
 		std::deque<SWorkPair> readyWaiters;
-		ConnectionPreparedsPtr pcwStarted;
+		ConnectionImplPtr pcwStarted;
 
 		{
 			mutex::scoped_lock sl(_mtx);
@@ -46,7 +46,7 @@ namespace pgc
 				if(!_maxConnections)
 				{
 					//больше выделять нельзя, освободить всех ожидающих нулями
-					SWorkPair swp = {ConnectionPreparedsPtr(), _waiters.front()};
+					SWorkPair swp = {ConnectionImplPtr(), _waiters.front()};
 					_waiters.erase(_waiters.begin());
 
 					readyWaiters.push_back(swp);
@@ -97,7 +97,7 @@ namespace pgc
 // 							status = PQconnectPoll(pgcon);
 // 							status = PQconnectPoll(pgcon);
 
-						pcwStarted.reset(new ConnectionPrepareds(pgcon, _asrv));
+						pcwStarted.reset(new ConnectionImpl(pgcon, _asrv));
 						_startConnections.insert(pcwStarted);
 					}
 					else
@@ -127,8 +127,7 @@ namespace pgc
 			{
 				c.reset(new ConnectionHolder(shared_from_this(), wp._con));
 			}
-			wp._waiter._state->_data = c;
-			wp._waiter.ready();
+			wp._waiter(c);
 
 // 			if(wp._waiter)
 // 			{
@@ -139,7 +138,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::makeConnection_poll(ConnectionPreparedsPtr pcw, system::error_code ec)
+	void Db::makeConnection_poll(ConnectionImplPtr pcw, system::error_code ec)
 	{
 		if(ec)
 		{
@@ -200,10 +199,16 @@ namespace pgc
 			}
 			return;
 		case PGRES_POLLING_READING:
-			pcw->waitRecv(bind(&Db::makeConnection_poll, shared_from_this(), pcw, _1));
+			{
+				async::Result<system::error_code> r = pcw->recv0();
+				makeConnection_poll(pcw, r.data());
+			}
 			return;
 		case PGRES_POLLING_WRITING:
-			pcw->waitSend(bind(&Db::makeConnection_poll, shared_from_this(), pcw, _1));
+			{
+				async::Result<system::error_code> r = pcw->send0();
+				makeConnection_poll(pcw, r.data());
+			}
 			return;
 		case PGRES_POLLING_OK:
 			{
@@ -243,7 +248,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::unwork(ConnectionPreparedsPtr pcw)
+	void Db::unwork(ConnectionImplPtr pcw)
 	{
 		if(ecsOk == pcw->status())
 		{
@@ -292,14 +297,14 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Db::allocConnection_f(async::Result<IConnectionPtr> res)
 	{
-		ConnectionPreparedsPtr pcw;
+		ConnectionImplPtr pcw;
 
 		bool unableAlloc = false;
 		{
 			mutex::scoped_lock sl(_mtx);
 			while(_readyConnections.size())
 			{
-				ConnectionPreparedsPtr pcw = *_readyConnections.begin();
+				ConnectionImplPtr pcw = *_readyConnections.begin();
 
 				if(ecsOk != pcw->status())
 				{
@@ -319,8 +324,7 @@ namespace pgc
 				_readyConnections.erase(_readyConnections.begin());
 
 				IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
-				res._state->_data = c;
-				res.ready();
+				res(c);
 				return;
 			}
 
@@ -339,8 +343,7 @@ namespace pgc
 					else
 					{
 						ELOG("alloc connection force NULL result");
-						res._state->_data = IConnectionPtr();
-						res.ready();
+						res(IConnectionPtr());
 						//_asrv->get_io_service().post(bind(ready, IConnectionPtr()));
 					}
 				}
@@ -377,8 +380,7 @@ namespace pgc
 		}
 		BOOST_FOREACH(async::Result<IConnectionPtr> &w, waiters)
 		{
-			w._state->_data = IConnectionPtr();
-			w.ready();
+			w(IConnectionPtr());
 		}
 
 		bool doWait = true;

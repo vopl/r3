@@ -4,6 +4,7 @@
 #include "pgc/istatement.hpp"
 #include "pgc/iresult.hpp"
 #include "utils/variant.hpp"
+#include "async/result.hpp"
 
 namespace pgc
 {
@@ -20,15 +21,9 @@ namespace pgc
 	{
 		virtual ~IConnection(){}
 
-		virtual void query(const std::string &sql,
-			boost::function<void (IResultPtrs)> done) =0;
-
-		virtual void query(IStatementPtr s,
-			boost::function<void (IResultPtrs)> done) =0;
-
-		virtual void query(IStatementPtr s,
-			const utils::Variant &data,
-			boost::function<void (IResultPtrs)> done) =0;
+		virtual async::Result<IResultPtrs> query(const std::string &sql) =0;
+		virtual async::Result<IResultPtrs> query(IStatementPtr s) =0;
+		virtual async::Result<IResultPtrs> query(IStatementPtr s, const utils::Variant &data) =0;
 
 		virtual EConnectionStatus status() =0;
 	};

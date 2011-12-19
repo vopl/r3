@@ -1,4 +1,6 @@
 #include "pch.h"
+
+#if 0
 #include "connectionPrepareds.hpp"
 
 namespace pgc
@@ -459,3 +461,4 @@ namespace pgc
 	}
 
 }
+#endif

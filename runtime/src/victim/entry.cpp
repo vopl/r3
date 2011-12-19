@@ -51,7 +51,11 @@ int main(int argc, char* argv[])
 // 		cout<<_sps[i]._name<<"\t";
 		for(size_t i(0); i<nTypes; i++)
 		{
+#ifdef _DEBUG
 			if(v.canConvert(_sps[i]._et))
+#else
+			if(true)
+#endif
 			{
 				count++;
 				cout<<"<>";

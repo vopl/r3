@@ -24,7 +24,7 @@ namespace pgc
 		function<void (size_t)> _onConnectionLost;
 
 	private:
-		typedef std::set<ConnectionPreparedsPtr> TSConnectins;
+		typedef std::set<ConnectionImplPtr> TSConnectins;
 		TSConnectins									_startConnections;
 		TSConnectins									_readyConnections;
 		TSConnectins									_workConnections;
@@ -36,13 +36,13 @@ namespace pgc
 
 	private:
 		void balanceConnections();
-		void makeConnection_poll(ConnectionPreparedsPtr pcw, system::error_code ec);
+		void makeConnection_poll(ConnectionImplPtr pcw, system::error_code ec);
 
 	private:
 		void onReconnectTimer();
 
 	public:
-		void unwork(ConnectionPreparedsPtr pcw);
+		void unwork(ConnectionImplPtr pcw);
 
 	private:
 		void allocConnection_f(async::Result<IConnectionPtr> res);

@@ -1,4 +1,7 @@
 #include "pch.h"
+
+#if 0
+
 #include "connectionProcessor.hpp"
 #include "result.hpp"
 #include "bindData.hpp"
@@ -301,3 +304,4 @@ namespace pgc
 	}
 
 }
+#endif
