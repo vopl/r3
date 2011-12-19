@@ -22,54 +22,44 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void EventImpl::ready()
 	{
-		std::deque<FiberImplPtr> waiters;
+		boost::mutex::scoped_lock sl(_mtx);
 
+		if(!_ready)
 		{
-			boost::mutex::scoped_lock sl(_mtx);
-
-			assert(!_ready);
-			_ready = true;
-
-			waiters.swap(_waiters);
-
-			if(waiters.size()>1)
+			BOOST_FOREACH(FiberImplPtr &f, _waiters)
 			{
-				int k=220;
-			}
-			BOOST_FOREACH(FiberImplPtr &f, waiters)
-			{
+				assert(f != FiberImpl::current());
 				f->ready();
 			}
+			_waiters.clear();
+			_ready = true;
 		}
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	bool EventImpl::isReady()
 	{
+		boost::mutex::scoped_lock sl(_mtx);
 		return _ready;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void EventImpl::wait()
 	{
-		if(_ready)
-		{
-			return;
-		}
-
 		{
 			boost::mutex::scoped_lock sl(_mtx);
+
+			if(_ready)
+			{
+				return;
+			}
+
 			FiberImplPtr f = FiberImpl::current();
 			assert(f);
 			_waiters.push_back(f);
 		}
 
-		do
-		{
-			FiberImpl::yield();
-		}
-		while(!_ready);
+		FiberImpl::yield();
 	}
 
 }
