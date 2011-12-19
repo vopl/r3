@@ -65,7 +65,7 @@ namespace server
 				return;
 			}
 			//TLOG("connectionLoop1");
-			if(!s || (rand()%50)==25)
+			if(!s || !(rand()%2))
 			{
 				s = _pluma->create<pgc::IStatementProvider>();
 				s->setSql("SELECT '123.456789'::numeric");
@@ -98,7 +98,7 @@ namespace server
 				return;
 			}
 			//TLOG("connectionLoop2");
-			if(!s || (rand()%50)==25)
+			if(!s || !(rand()%2))
 			{
 				s = _pluma->create<pgc::IStatementProvider>();
 				s->setSql("SELECT '123.456789'::numeric");

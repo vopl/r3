@@ -15,21 +15,14 @@ namespace pgc
 		: _db(db)
 		, _impl(impl)
 	{
-// 		_con->beginWork();
+ 		_impl->beginWork();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::~ConnectionHolder()
 	{
+		_impl->endWork();
 		_db->unwork(_impl);
-
-// 		TDone done = 
-// 			bind(&ConnectionHolder::onEndWork, 
-// 				_db, _con, _1);
-// 
-// 		_con->dispatch(
-// 			bind(&ConnectionPrepareds::endWork, _con, 
-// 				done));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

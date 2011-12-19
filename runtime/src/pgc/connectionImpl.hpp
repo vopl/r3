@@ -89,7 +89,7 @@ namespace pgc
 
 	private:
 		//ограничение на количество одновременно хранимых запросов
-		static const size_t	_max = 1000;
+		static const size_t	_max = 100;
 		//таймаут удаления по бездействию
 		static const size_t	_timeout = 1000*60*5;//millisec
 		//время на момент начала работы
@@ -150,6 +150,11 @@ namespace pgc
 
 	public:
 		void runQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data);
+
+	public:
+		void beginWork();
+		void endWork();
+
 
 	};
 	typedef shared_ptr<ConnectionImpl> ConnectionImplPtr;

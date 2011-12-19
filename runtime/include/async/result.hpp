@@ -29,6 +29,11 @@ namespace async
 			wait();
 			return _state->_data;
 		}
+		operator Data &()
+		{
+			wait();
+			return _state->_data;
+		}
 		Data &dataNoWait()
 		{
 			return _state->_data;

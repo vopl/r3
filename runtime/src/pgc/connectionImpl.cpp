@@ -159,7 +159,7 @@ namespace pgc
 		//слать
 		while(PQflush(_pgcon))
 		{
-			system::error_code ec = send0().data();
+			system::error_code ec = send0();
 			if(ec)
 			{
 				ELOG(__FUNCTION__<<", send, "<<ec<<", "<<PQerrorMessage(_pgcon));
@@ -173,7 +173,7 @@ namespace pgc
 		{
 			if(PQisBusy(_pgcon))
 			{
-				system::error_code ec = recv0().data();
+				system::error_code ec = recv0();
 				if(ec)
 				{
 					ELOG(__FUNCTION__<<", recv, "<<ec<<", "<<PQerrorMessage(_pgcon));
@@ -468,5 +468,44 @@ namespace pgc
 		dispatch(bind(&ConnectionImpl::processQueryWithPrepare, shared_from_this(), res, s, data));
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::beginWork()
+	{
+		_now = posix_time::microsec_clock::local_time();
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::endWork()
+	{
+		posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
 
+		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
+		while(
+			!timedIndex.empty() &&
+			(
+				timedIndex.size() > _max ||
+				boundATime > timedIndex.begin()->_accessTime)		)
+		{
+			std::string prid = timedIndex.begin()->_prid;
+			timedIndex.erase(timedIndex.begin());
+
+			async::Result<IResultPtrs> r;
+			runQuery(r, "DEALLOCATE "+prid);
+			if(r.data().size()!=1 || ersCommandOk != r.data()[0]->status())
+			{
+				const char * errCode = r.data()[0]->errorCode();
+				if(errCode && !strcmp("26000", errCode))
+				{
+					//ERROR:  prepared statement "XXX" does not exist
+				}
+				else
+				{
+					//другая ошибка - фатально
+					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
+					_prepareds.clear();
+					return;
+				}
+			}
+		}
+	}
 }
