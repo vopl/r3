@@ -71,7 +71,7 @@ namespace server
 				s->setSql("SELECT '123.456789'::numeric");
 			}
 
-			async::Result<pgc::IResultPtrs> res = c->query("SELECT '123.456789'::numeric");
+			async::Result<pgc::IResultPtrs> res = c->query(s);
 			c.reset();
 
 			onResult(res.data());
