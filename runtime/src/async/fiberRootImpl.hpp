@@ -11,6 +11,8 @@ namespace async
 	public:
 		FiberRootImpl();
 		~FiberRootImpl();
+
+		bool initialize();
 	};
 	typedef shared_ptr<FiberRootImpl> FiberRootImplPtr;
 }

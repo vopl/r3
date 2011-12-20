@@ -8,28 +8,10 @@
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	FiberImpl::FiberImpl(bool createStack)
+	FiberImpl::FiberImpl()
 		: _stack(NULL)
 		, _evt(NULL)
 	{
-		if(createStack)
-		{
-			_stack = CreateFiber(0, &FiberImpl::s_fiberProc, this);
-			assert(_stack);
-			if(!_stack)
-			{
-				FLOG(__FUNCTION__<<", CreateFiber failed, "<<GetLastError());
-				throw exception("CreateFiber failed");
-			}
-
-			_evt = CreateEvent(NULL, FALSE, TRUE, NULL);
-			assert(_evt);
-			if(!_evt)
-			{
-				FLOG(__FUNCTION__<<", CreateEvent failed, "<<GetLastError());
-				throw exception("CreateEvent failed");
-			}
-		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -39,6 +21,7 @@ namespace async
 		if(_stack)
 		{
 			DeleteFiber(_stack);
+			_stack = NULL;
 		}
 		if(_evt)
 		{
@@ -46,8 +29,44 @@ namespace async
 			{
 				WLOG(__FUNCTION__<<", CloseHandle failed, "<<GetLastError());
 			}
+			_evt = NULL;
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool FiberImpl::initialize()
+	{
+		if(!_stack)
+		{
+			_stack = CreateFiberEx(1024*128, 1024*128, 0, &FiberImpl::s_fiberProc, this);
+			if(!_stack)
+			{
+				FLOG(__FUNCTION__<<", CreateFiber failed, "<<GetLastError());
+				//throw exception("CreateFiber failed");
+				return false;
+			}
+		}
+
+		if(!_evt)
+		{
+			_evt = CreateEvent(NULL, FALSE, TRUE, NULL);
+			if(!_evt)
+			{
+				DeleteFiber(_stack);
+				_stack = NULL;
+
+				FLOG(__FUNCTION__<<", CreateEvent failed, "<<GetLastError());
+				//throw exception("CreateEvent failed");
+				return false;
+			}
+		}
+
+// 		static int cnt(0);
+// 		TLOG(__FUNCTION__<<", "<<cnt++);
+		return true;
+	}
+
+
 
 	//////////////////////////////////////////////////////////////////////////
 	FiberImpl *FiberImpl::current()
@@ -88,7 +107,6 @@ namespace async
 		if(_evt)
 		{
 			DWORD res = WaitForSingleObject(_evt, INFINITE);
-			assert(WAIT_OBJECT_0 == res);
 			if(WAIT_OBJECT_0 != res)
 			{
 				FLOG(__FUNCTION__<<", WaitForSingleObject failed, "<<GetLastError());
@@ -103,7 +121,6 @@ namespace async
 		if(_evt)
 		{
 			BOOL res = SetEvent(_evt);
-			assert(res);
 			if(!res)
 			{
 				FLOG(__FUNCTION__<<", SetEvent failed, "<<GetLastError());

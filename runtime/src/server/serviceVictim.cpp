@@ -111,8 +111,11 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
- 		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		for(size_t i(0); i<1000; i++)
+		{
+			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		}
+//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 //  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 //  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 

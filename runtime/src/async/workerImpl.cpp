@@ -16,6 +16,7 @@ namespace async
 
 		//наболтать головной фибер
 		_fiberRoot.reset(new FiberRootImpl());
+		_fiberRoot->initialize();
 
 		_service->onThreadStart();
 
@@ -104,22 +105,69 @@ namespace async
 		//сначала отработать все готовые
 		processReadyFibers();
 
+		//потом отложенные задачи
 		//потом входящую задачу
+		for(;;)
 		{
 			FiberImplPtr fiber;
+			TTask tasksFromQueue;
+
+			//////////////////////////////////////////////////////////////////////////
 			{
 				mutex::scoped_lock sl(_fiberPool->_mtx);
-				if(_fiberPool->_fibersIdle.size())
+
+				if(!_fiberPool->_tasks.empty())
 				{
-					fiber = *_fiberPool->_fibersIdle.begin();
+					tasksFromQueue.swap(*_fiberPool->_tasks.begin());
+					_fiberPool->_tasks.erase(_fiberPool->_tasks.begin());
+				}
+
+				if(!_fiberPool->_fibersIdle.empty())
+				{
+					fiber.swap(*_fiberPool->_fibersIdle.begin());
 					_fiberPool->_fibersIdle.erase(_fiberPool->_fibersIdle.begin());
 				}
 			}
+
+			//////////////////////////////////////////////////////////////////////////
 			if(!fiber)
 			{
-				fiber.reset(new FiberImpl());
+				try
+				{
+					fiber.reset(new FiberImpl());
+					if(!fiber->initialize())
+					{
+						fiber.reset();
+					}
+				}
+				catch(...)
+				{
+					fiber.reset();
+				}
 			}
-			fiber->execute(task);
+
+			if(fiber)
+			{
+				if(tasksFromQueue)
+				{
+					fiber->execute(tasksFromQueue);
+				}
+				else
+				{
+					fiber->execute(task);
+					break;
+				}
+			}
+			else
+			{
+				mutex::scoped_lock sl(_fiberPool->_mtx);
+				if(tasksFromQueue)
+				{
+					_fiberPool->_tasks.push_front(tasksFromQueue);
+				}
+				_fiberPool->_tasks.push_back(task);
+				break;
+			}
 		}
 
 		//теперь снова готовые

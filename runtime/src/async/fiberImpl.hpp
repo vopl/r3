@@ -16,9 +16,10 @@ namespace async
 		: public enable_shared_from_this<FiberImpl>
 	{
 	public:
-		FiberImpl(bool createStack=true);
+		FiberImpl();
 		virtual ~FiberImpl();
 
+		bool initialize();
 		static FiberImpl *current();
 
 		void execute(function<void()> _code);

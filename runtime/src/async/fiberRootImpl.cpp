@@ -6,12 +6,8 @@ namespace async
 
 	//////////////////////////////////////////////////////////////////////////
 	FiberRootImpl::FiberRootImpl()
-		: FiberImpl(false)
+		: FiberImpl()
 	{
-		ConvertThreadToFiber(NULL);
-		_stack = GetCurrentFiber();
-		_current = this;
-		enter();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -22,5 +18,16 @@ namespace async
 		assert(_current == this);
 		_current = NULL;
 		leave();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool FiberRootImpl::initialize()
+	{
+		ConvertThreadToFiber(NULL);
+		_stack = GetCurrentFiber();
+		assert(_stack);
+		_current = this;
+		enter();
+		return true;
 	}
 }
