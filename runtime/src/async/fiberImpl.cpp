@@ -66,28 +66,6 @@ namespace async
 			_current = this;
 			SwitchToFiber(_stack);
 			leave();
-
-
-			{
-				boost::mutex::scoped_lock sl(g_emMtx2);
-				std::map<FiberImpl *, size_t> &e_em2 = g_em2;
-
-				FiberImpl *cur = _current.get();
-				if(dynamic_cast<FiberRootImpl *>(cur))
-				{
-					cur = 0;
-				}
-				FiberImpl *thi = this;
-				if(dynamic_cast<FiberRootImpl *>(thi))
-				{
-					thi = 0;
-				}
-				g_em2[cur];
-				g_em2[cur]--;
-				g_em2[thi]++;
-				assert(g_em2[thi]<2 || !thi);
-			}
-
 		}
 	}
 
@@ -101,7 +79,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::yield()
 	{
-		WorkerImpl::current()->fiberYield(current());
+		WorkerImpl::current()->fiberYield();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -1,10 +1,7 @@
 PROJECT (libasync)
 
 SET(INCLUDE
-	${INC_DIR}/async/iservice.hpp
-	${INC_DIR}/async/fiber.hpp
-	${INC_DIR}/async/worker.hpp
-	${INC_DIR}/async/workerHandler.hpp
+	${INC_DIR}/async/service.hpp
 
 	${INC_DIR}/async/event.hpp
 	${INC_DIR}/async/result.hpp
@@ -13,11 +10,9 @@ SOURCE_GROUP(include FILES ${INCLUDE})
 
 SET(SRC
 	${SRC_DIR}/async/service.cpp
-	${SRC_DIR}/async/plug.cpp
-	${SRC_DIR}/async/worker.cpp
-	${SRC_DIR}/async/fiber.cpp
 	${SRC_DIR}/async/event.cpp
 
+	${SRC_DIR}/async/serviceImpl.cpp
 	${SRC_DIR}/async/workerImpl.cpp
 	${SRC_DIR}/async/fiberImpl.cpp
 	${SRC_DIR}/async/fiberRootImpl.cpp
@@ -32,9 +27,7 @@ SET(SRC_NOPCH
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
 SET(SRC_HDR
-	${SRC_DIR}/async/service.hpp
-	${SRC_DIR}/async/cmaHandler.hpp
-	${SRC_DIR}/async/pch.h
+	${SRC_DIR}/async/serviceImpl.hpp
 	${SRC_DIR}/async/workerImpl.hpp
 	${SRC_DIR}/async/fiberImpl.hpp
 	${SRC_DIR}/async/fiberRootImpl.hpp
@@ -42,6 +35,9 @@ SET(SRC_HDR
 	${SRC_DIR}/async/fiberPool.hpp
 
 	${SRC_DIR}/async/eventImpl.hpp
+
+	${SRC_DIR}/async/cmaHandler.hpp
+	${SRC_DIR}/async/pch.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 

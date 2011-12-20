@@ -3,6 +3,7 @@
 
 #include "client/iclient.hpp"
 #include "client/isession.hpp"
+#include "async/service.hpp"
 
 namespace client
 {
@@ -14,7 +15,7 @@ namespace client
 		, public boost::enable_shared_from_this<Client>
 	{
 		pluma::Pluma		*_plugs;
-		async::IServicePtr	_async;
+		async::ServicePtr	_async;
 		bool				_asyncOwn;
 		ISessionPtr			_session;
 
@@ -33,14 +34,12 @@ namespace client
 
 		virtual void start(
 			pluma::Pluma *plugs,
-			async::IServicePtr async,
 			boost::function<void (ISessionPtr)> onSessionStart,
 			boost::function<void (ISessionPtr)> onSessionStop,
 			boost::function<void (size_t numChannels, boost::system::error_code ec)> onChannelChange);
 
 		virtual void connect(const char *host, const char *service);
 		virtual pluma::Pluma * getPlugs();
-		virtual async::IServicePtr getAsync();
 		virtual void stop();
 	};
 	PLUMA_INHERIT_PROVIDER(Client, IClient);

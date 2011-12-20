@@ -3,7 +3,6 @@
 
 #include "threadLocalStorage.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include "async/fiber.hpp"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -14,8 +13,7 @@ namespace async
 	typedef boost::shared_ptr<FiberImpl> FiberImplPtr;
 
 	class FiberImpl
-		: public Fiber
-		, public boost::enable_shared_from_this<FiberImpl>
+		: public boost::enable_shared_from_this<FiberImpl>
 	{
 	public:
 		FiberImpl(bool createStack=true);

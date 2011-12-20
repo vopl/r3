@@ -1,7 +1,7 @@
 #ifndef _PGC_IDB_HPP_
 #define _PGC_IDB_HPP_
 
-#include "async/iservice.hpp"
+#include "async/service.hpp"
 #include "pgc/iconnection.hpp"
 #include "pluma/pluma.hpp"
 #include "async/result.hpp"
@@ -15,7 +15,6 @@ namespace pgc
 		virtual ~IDb(){}
 
 		virtual void initialize(
-			async::IServicePtr asrv,
 			const char *conninfo,
 			size_t maxConnections,
 			boost::function<void (size_t)> connectionMade,

@@ -4,8 +4,9 @@
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	EventImpl::EventImpl()
-		: _ready(false)
+	EventImpl::EventImpl(bool autoReset)
+		: _isSet(false)
+		, _autoReset(autoReset)
 	{
 	}
 
@@ -14,45 +15,56 @@ namespace async
 	{
 #ifdef _DEBUG
 		boost::mutex::scoped_lock sl(_mtx);
-		assert(_ready);
 		assert(_waiters.empty());
 #endif
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void EventImpl::ready()
+	void EventImpl::set()
 	{
-		boost::mutex::scoped_lock sl(_mtx);
-
-		if(!_ready)
+		if(!_isSet)
 		{
+			boost::mutex::scoped_lock sl(_mtx);
+
 			BOOST_FOREACH(FiberImplPtr &f, _waiters)
 			{
 				assert(f.get() != FiberImpl::current());
-				f->ready();
+				if(f.get() != FiberImpl::current())
+				{
+					f->ready();
+				}
 			}
 			_waiters.clear();
-			_ready = true;
+			_isSet = true;
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool EventImpl::isReady()
+	void EventImpl::reset()
 	{
-		boost::mutex::scoped_lock sl(_mtx);
-		return _ready;
+		if(_isSet)
+		{
+			boost::mutex::scoped_lock sl(_mtx);
+			_waiters.clear();
+			_isSet = false;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool EventImpl::isSet()
+	{
+		return _isSet;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void EventImpl::wait()
 	{
+		if(_isSet)
+		{
+			return;
+		}
 		{
 			boost::mutex::scoped_lock sl(_mtx);
-
-			if(_ready)
-			{
-				return;
-			}
 
 			FiberImpl *f = FiberImpl::current();
 			assert(f);

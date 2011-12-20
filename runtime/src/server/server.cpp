@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "server.hpp"
-#include "async/iservice.hpp"
-#include "../../src/async/service.hpp"
+#include "async/service.hpp"
 
 
 
@@ -94,7 +93,7 @@ namespace server
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять асинхронный двиг
-		_async.reset(new async::Service);
+		_async = async::createService();
 		assert(_async);
 		if(!_async)
 		{
@@ -115,7 +114,6 @@ namespace server
 		}
 
 		_db->initialize(
-			_async, 
 			"host=localhost port=5432 dbname=test user=test password=test",
 			4,
 			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
@@ -131,7 +129,7 @@ namespace server
 			return false;
 		}
 
-		connector->initialize(_async);
+		connector->initialize();
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять менеджер сессий
@@ -165,7 +163,7 @@ namespace server
 			//boost::thread::hardware_concurrency()*2, 
 			2);
 
-		_async->get_io_service().post(bind(&Server::startupServices, shared_from_this()));
+		async::spawn(bind(&Server::startupServices, shared_from_this()));
 
 		return true;
 	}
@@ -175,7 +173,7 @@ namespace server
 	{
 		ILOG("stop");
 
-		_async->get_io_service().post(bind(&Server::shutdownServices, shared_from_this()));
+		async::spawn(bind(&Server::shutdownServices, shared_from_this()));
 
 		assert(_sessionManager);
 		_sessionManager->stop();
@@ -184,12 +182,12 @@ namespace server
 		assert(_db);
 		_db->deinitialize();
 
-		_async->stop();
-
 
 		_serviceHub.reset();
 		_sessionManager.reset();
 		_db.reset();
+
+		_async->stop();
 		_async.reset();
 		
 		_plugs = NULL;
@@ -199,12 +197,6 @@ namespace server
 	pluma::Pluma *Server::getPlugs()
 	{
 		return _plugs;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	async::IServicePtr Server::getAsync()
-	{
-		return _async;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -201,7 +201,7 @@ namespace pgc
 			if(ec)
 			{
 				ELOG(__FUNCTION__<<", send, "<<ec<<", "<<PQerrorMessage(_pgcon));
-				res.ready();
+				res.set();
 				return;
 			}
 		}
@@ -215,7 +215,7 @@ namespace pgc
 				if(ec)
 				{
 					ELOG(__FUNCTION__<<", recv, "<<ec<<", "<<PQerrorMessage(_pgcon));
-					res.ready();
+					res.set();
 					return;
 				}
 			}
@@ -223,14 +223,14 @@ namespace pgc
 			if(!PQconsumeInput(_pgcon))
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				res.ready();
+				res.set();
 				return;
 			}
 
 			PGresult *pgr = PQgetResult(_pgcon);
 			if(!pgr)
 			{
-				res.ready();
+				res.set();
 				return;
 			}
 
@@ -427,11 +427,10 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionImpl::ConnectionImpl(PGconn *pgcon, async::IServicePtr asrv)
+	ConnectionImpl::ConnectionImpl(PGconn *pgcon)
 		: _pgcon(pgcon)
-		, _asrv(asrv)
-		, _sock(asrv->get_io_service(), PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
-		, _strand(asrv->get_io_service())
+		, _sock(async::io(), PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
+		, _strand(async::io())
 		, _integerDatetimes(false)
 		, _requestInProcess(false)
 	{

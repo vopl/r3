@@ -10,14 +10,16 @@ namespace async
 	class EventImpl
 	{
 		boost::mutex				_mtx;
-		volatile bool				_ready;
+		volatile bool				_isSet;
+		bool						_autoReset;
 		std::deque<FiberImplPtr>	_waiters;
 	public:
-		EventImpl();
+		EventImpl(bool autoReset);
 		~EventImpl();
 
-		void ready();
-		bool isReady();
+		void set();
+		void reset();
+		bool isSet();
 		void wait();
 	};
 	typedef boost::shared_ptr<EventImpl> EventImplPtr;

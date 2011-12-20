@@ -6,7 +6,7 @@
 #include <libpq-fe.h>
 #include "pgc/iresult.hpp"
 #include "pgc/iconnection.hpp"
-#include "async/iservice.hpp"
+#include "async/service.hpp"
 #include "async/result.hpp"
 
 #include <boost/multi_index_container.hpp>
@@ -121,8 +121,6 @@ namespace pgc
 		asio::io_service::strand	_strand;
 		bool						_integerDatetimes;
 
-		async::IServicePtr			_asrv;
-
 	private:
 		//ограничение на количество одновременно хранимых запросов
 		static const size_t	_max = 1000;
@@ -180,7 +178,7 @@ namespace pgc
 		async::Result<system::error_code> recv0();
 
 	public:
-		ConnectionImpl(PGconn *pgcon, async::IServicePtr asrv);
+		ConnectionImpl(PGconn *pgcon);
 		virtual ~ConnectionImpl();
 
 		PGconn *pgcon();

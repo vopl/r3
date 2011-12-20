@@ -37,7 +37,7 @@ namespace pgc
 				ILOG("close connection");
 				(*_readyConnections.begin())->close();
 				_readyConnections.erase(_readyConnections.begin());
-				_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+				async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
 			}
 
 			//распределение и открытие
@@ -92,7 +92,7 @@ namespace pgc
 
 					if(isOk)
 					{
-						pcwStarted.reset(new ConnectionImpl(pgcon, _asrv));
+						pcwStarted.reset(new ConnectionImpl(pgcon));
 						_startConnections.insert(pcwStarted);
 					}
 					else
@@ -100,7 +100,7 @@ namespace pgc
 						if(!_timeout)
 						{
 							ILOG("wait 1 second for reconnect");
-							_timeout.reset(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
+							_timeout.reset(new Timeout(async::io(), boost::posix_time::seconds(1)));
 							_timeout->async_wait(
 								bind(&Db::onReconnectTimer, shared_from_this()));
 						}
@@ -191,9 +191,9 @@ namespace pgc
 						assert(_startConnections.end() != _startConnections.find(pcw));
 						_startConnections.erase(pcw);
 						_readyConnections.insert(pcw);
-						_asrv->get_io_service().post(bind(_onConnectionMade, _readyConnections.size() + _workConnections.size()));
+						async::spawn(bind(_onConnectionMade, _readyConnections.size() + _workConnections.size()));
 					}
-					_asrv->get_io_service().post(bind(&Db::balanceConnections, shared_from_this()));
+					async::spawn(bind(&Db::balanceConnections, shared_from_this()));
 				}
 				break;
 			case esBad:
@@ -205,13 +205,13 @@ namespace pgc
 					if(!_maxConnections)
 					{
 						ILOG("connection mading abadoned");
-						_asrv->get_io_service().post(bind(&Db::balanceConnections, shared_from_this()));
+						async::spawn(bind(&Db::balanceConnections, shared_from_this()));
 						return;
 					}
 					if(!_timeout)
 					{
 						ILOG("wait 1 second for reconnect");
-						_timeout.reset(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
+						_timeout.reset(new Timeout(async::io(), boost::posix_time::seconds(1)));
 						_timeout->async_wait(
 							bind(&Db::onReconnectTimer, shared_from_this()));
 						return;
@@ -254,7 +254,7 @@ namespace pgc
 				mutex::scoped_lock sl(_mtx);
 				assert(_workConnections.end() != _workConnections.find(pcw));
 				_workConnections.erase(pcw);
-				_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+				async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
 			}
 		}
 
@@ -263,7 +263,6 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	void Db::initialize(
-		async::IServicePtr asrv,
 		const char *conninfo,
 		size_t maxConnections,
 		function<void (size_t)> connectionMade,
@@ -271,9 +270,6 @@ namespace pgc
 	{
 		ILOG("initialize");
 		mutex::scoped_lock sl(_mtx);
-		assert(!_asrv);
-		_asrv = asrv;
-		assert(_asrv);
 
 		_conninfo = conninfo;
 		_maxConnections = maxConnections;
@@ -299,7 +295,7 @@ namespace pgc
 					{
 						assert(_workConnections.end() != _workConnections.find(pcw));
 						_workConnections.erase(pcw);
-						_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+						async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
 					}
 					continue;
 				}
@@ -342,7 +338,7 @@ namespace pgc
 	async::Result<IConnectionPtr> Db::allocConnection()
 	{
 		async::Result<IConnectionPtr> res;
-		_asrv->get_io_service().post(bind(&Db::allocConnection_f, shared_from_this(), res));
+		async::spawn(bind(&Db::allocConnection_f, shared_from_this(), res));
 		return res;
 	}
 
@@ -389,7 +385,5 @@ namespace pgc
 
 		_onConnectionMade.swap(function<void (size_t)>());
 		_onConnectionLost.swap(function<void (size_t)>());
-
-		_asrv.reset();
 	}
 }

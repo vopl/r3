@@ -21,6 +21,7 @@ namespace async
 	public:
 		Result()
 			: _state(new State)
+			, Event(false)
 		{
 		}
 
@@ -45,7 +46,7 @@ namespace async
 		void operator()(const Data &data)
 		{
 			_state->_data = data;
-			ready();
+			set();
 		}
 	};
 
@@ -65,6 +66,7 @@ namespace async
 	public:
 		Result2()
 			: _state(new State)
+			, Event(false)
 		{
 		}
 

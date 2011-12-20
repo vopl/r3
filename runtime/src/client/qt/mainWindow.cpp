@@ -164,7 +164,6 @@ namespace client
 
 			_client->start(
 				&_plugins, 
-				async::IServicePtr(), 
 				boost::bind(&MainWindow::onSessionStart_, this, _1),
 				boost::bind(&MainWindow::onSessionStop_, this, _1),
 				boost::bind(&MainWindow::onChannelChange_, this, _1, _2));

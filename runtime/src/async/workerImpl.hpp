@@ -3,7 +3,6 @@
 
 #include <boost/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include "async/worker.hpp"
 #include "fiberImpl.hpp"
 #include "fiberRootImpl.hpp"
 #include <set>
@@ -13,15 +12,14 @@
 
 namespace async
 {
-	class Service;
-	typedef boost::shared_ptr<Service> ServicePtr;
+	class ServiceImpl;
+	typedef boost::shared_ptr<ServiceImpl> ServiceImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class WorkerImpl
-		: public Worker
-		, public boost::enable_shared_from_this<WorkerImpl>
+		: public boost::enable_shared_from_this<WorkerImpl>
 	{
-		ServicePtr		_service;
+		ServiceImplPtr	_service;
 		boost::thread	_thread;
 		volatile bool	_stop;
 
@@ -41,7 +39,7 @@ namespace async
 	public://для фиберов
 		void fiberExecuted(FiberImpl *fiber);
 		void fiberReady(FiberImpl *fiber);
-		void fiberYield(FiberImpl *fiber);
+		void fiberYield();
 
 	private:
 		void processReadyFibers();
@@ -49,7 +47,7 @@ namespace async
 		void doComplete(TTask);
 
 	public:
-		WorkerImpl(ServicePtr service, FiberPoolPtr	fiberPool);
+		WorkerImpl(ServiceImplPtr service, FiberPoolPtr	fiberPool);
 		~WorkerImpl();
 
 		static WorkerImpl *current();

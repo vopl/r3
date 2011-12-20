@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "workerImpl.hpp"
-#include "service.hpp"
+#include "serviceImpl.hpp"
 #include <boost/bind.hpp>
 
 namespace async
@@ -63,11 +63,10 @@ namespace async
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void WorkerImpl::fiberYield(FiberImpl *fiber)
+	void WorkerImpl::fiberYield()
 	{
-		assert(fiber != _fiberRoot.get());
-		assert(fiber == FiberImpl::current());
-		if(fiber != _fiberRoot.get())
+		assert(FiberImpl::current() != _fiberRoot.get());
+		if(FiberImpl::current() != _fiberRoot.get())
 		{
 			_fiberRoot->activate();
 		}
@@ -132,7 +131,7 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	WorkerImpl::WorkerImpl(ServicePtr service, FiberPoolPtr	fiberPool)
+	WorkerImpl::WorkerImpl(ServiceImplPtr service, FiberPoolPtr	fiberPool)
 		: _service(service)
 		, _stop(false)
 		, _fiberRoot()

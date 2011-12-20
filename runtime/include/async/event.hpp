@@ -2,7 +2,7 @@
 #define _ASYNC_EVENT_HPP_
 
 #include "async/api.h"
-#include "async/fiber.hpp"
+#include <boost/shared_ptr.hpp>
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -17,10 +17,11 @@ namespace async
 		EventImplPtr	_impl;
 
 	public:
-		Event();
+		Event(bool autoReset = false);
 
-		void ready();
-		bool isReady();
+		void set();
+		void reset();
+		bool isSet();
 		void wait();
 	};
 }

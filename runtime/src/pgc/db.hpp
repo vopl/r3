@@ -17,7 +17,6 @@ namespace pgc
 		, public enable_shared_from_this<Db>
 	{
 		mutex					_mtx;
-		async::IServicePtr		_asrv;
 		std::string				_conninfo;
 		size_t					_maxConnections;
 		function<void (size_t)> _onConnectionMade;
@@ -52,7 +51,6 @@ namespace pgc
 		~Db();
 
 		virtual void initialize(
-			async::IServicePtr asrv,
 			const char *conninfo,
 			size_t maxConnections,
 			function<void (size_t)> connectionMade,

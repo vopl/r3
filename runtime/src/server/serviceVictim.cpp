@@ -110,10 +110,10 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
- 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
- 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
- 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+ 		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+ 		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+ 		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 
 		int k = 220;
 		//
