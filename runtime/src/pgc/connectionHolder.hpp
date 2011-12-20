@@ -22,7 +22,7 @@ namespace pgc
 		DbPtr _db;
 		ConnectionImplPtr _impl;
 
-// 		static void onEndWork(DbPtr db, ConnectionImplPtr impl, IResultPtrs result);
+ 		static void endWork(DbPtr db, ConnectionImplPtr impl);
 
 	public:
 		ConnectionHolder(DbPtr db, ConnectionImplPtr impl);

@@ -412,6 +412,7 @@ namespace pgc
 	{
 		async::Result<system::error_code> h;
 		_sock.async_send(asio::null_buffers(), _strand.wrap(bind(h, _1)));
+		//_sock.async_send(asio::null_buffers(), bind(h, _1));
 		return h;
 	}
 
@@ -419,7 +420,8 @@ namespace pgc
 	async::Result<system::error_code> ConnectionImpl::recv0()
 	{
 		async::Result<system::error_code> h;
-		_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(h, _1)));
+		//_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(h, _1)));
+		_sock.async_receive(asio::null_buffers(), bind(h, _1));
 		return h;
 	}
 
@@ -505,12 +507,14 @@ namespace pgc
 	void ConnectionImpl::dispatch(function<void()> action)
 	{
 		_strand.dispatch(action);
+		//_asrv->get_io_service().dispatch(action);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::post(function<void()> action)
 	{
 		_strand.post(action);
+		//_asrv->get_io_service().post(action);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

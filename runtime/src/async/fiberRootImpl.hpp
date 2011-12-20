@@ -11,6 +11,10 @@ namespace async
 	public:
 		FiberRootImpl();
 		~FiberRootImpl();
+
+		virtual void enter(){}
+		virtual void leave(){}
+
 	};
 	typedef boost::shared_ptr<FiberRootImpl> FiberRootImplPtr;
 }

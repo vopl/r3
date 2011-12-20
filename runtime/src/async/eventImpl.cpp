@@ -28,7 +28,7 @@ namespace async
 		{
 			BOOST_FOREACH(FiberImplPtr &f, _waiters)
 			{
-				assert(f != FiberImpl::current());
+				assert(f.get() != FiberImpl::current());
 				f->ready();
 			}
 			_waiters.clear();
@@ -54,9 +54,9 @@ namespace async
 				return;
 			}
 
-			FiberImplPtr f = FiberImpl::current();
+			FiberImpl *f = FiberImpl::current();
 			assert(f);
-			_waiters.push_back(f);
+			_waiters.push_back(f->shared_from_this());
 		}
 
 		FiberImpl::yield();

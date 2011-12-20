@@ -40,30 +40,34 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WorkerImpl::fiberExecuted(FiberImplPtr fiber)
+	void WorkerImpl::fiberExecuted(FiberImpl *fiber)
 	{
+		assert(fiber != _fiberRoot.get());
+		assert(fiber == FiberImpl::current());
 		{
 			boost::mutex::scoped_lock sl(_fiberPool->_mtx);
-			_fiberPool->_fibersIdle.insert(fiber);
-			assert(_fiberPool->_fibersReady.end() == _fiberPool->_fibersReady.find(fiber));
+			_fiberPool->_fibersIdle.insert(fiber->shared_from_this());
+			assert(_fiberPool->_fibersReady.end() == _fiberPool->_fibersReady.find(fiber->shared_from_this()));
 		}
 		_fiberRoot->activate();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WorkerImpl::fiberReady(FiberImplPtr fiber)
+	void WorkerImpl::fiberReady(FiberImpl *fiber)
 	{
 		boost::mutex::scoped_lock sl(_fiberPool->_mtx);
-		assert(_fiberRoot != fiber);
-		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber));
-		_fiberPool->_fibersReady.insert(fiber);
+		assert(fiber != _fiberRoot.get());
+		assert(fiber != FiberImpl::current());
+		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber->shared_from_this()));
+		_fiberPool->_fibersReady.insert(fiber->shared_from_this());
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void WorkerImpl::fiberYield(FiberImplPtr fiber)
+	void WorkerImpl::fiberYield(FiberImpl *fiber)
 	{
-		assert(fiber != _fiberRoot);
-		if(fiber != _fiberRoot)
+		assert(fiber != _fiberRoot.get());
+		assert(fiber == FiberImpl::current());
+		if(fiber != _fiberRoot.get())
 		{
 			_fiberRoot->activate();
 		}
@@ -93,13 +97,13 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::doComplete(TTask task)
 	{
-		//assert(FiberImpl::current() == _fiberRoot);
-		if(FiberImpl::current() != _fiberRoot)
+		//assert(FiberImpl::current() == _fiberRoot.get());
+		if(FiberImpl::current() != _fiberRoot.get())
 		{
 			task();
 			return;
 		}
-		assert(FiberImpl::current() == _fiberRoot);
+		assert(FiberImpl::current() == _fiberRoot.get());
 
 		//сначала отработать все готовые
 		processReadyFibers();

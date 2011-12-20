@@ -4,11 +4,12 @@
 
 namespace pgc
 {
-// 	//////////////////////////////////////////////////////////////////////////
-// 	void ConnectionHolder::onEndWork(DbPtr db, ConnectionImplPtr impl, IResultPtrs /*result*/)
-// 	{
-// 		db->unwork(impl);
-// 	}
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionHolder::endWork(DbPtr db, ConnectionImplPtr impl)
+	{
+		impl->endWork();
+		db->unwork(impl);
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::ConnectionHolder(DbPtr db, ConnectionImplPtr impl)
@@ -21,15 +22,14 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::~ConnectionHolder()
 	{
-		_impl->endWork();
-		_db->unwork(_impl);
+		_impl->post(bind(&ConnectionHolder::endWork, _db, _impl));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	async::Result<IResultPtrs> ConnectionHolder::query(const std::string &sql)
 	{
 		async::Result<IResultPtrs> res;
-		_impl->dispatch(bind(&ConnectionImpl::runQuery, _impl, res, sql));
+		_impl->post(bind(&ConnectionImpl::runQuery, _impl, res, sql));
 		return res;
 	}
 
@@ -37,7 +37,7 @@ namespace pgc
 	async::Result<IResultPtrs> ConnectionHolder::query(IStatementPtr s)
 	{
 		async::Result<IResultPtrs> res;
-		_impl->dispatch(bind(&ConnectionImpl::runQueryWithPrepare, _impl, res, s, BindDataPtr()));
+		_impl->post(bind(&ConnectionImpl::runQueryWithPrepare, _impl, res, s, BindDataPtr()));
 		return res;
 	}
 
@@ -45,7 +45,7 @@ namespace pgc
 	async::Result<IResultPtrs> ConnectionHolder::query(IStatementPtr s, const utils::Variant &data)
 	{
 		async::Result<IResultPtrs> res;
-		_impl->dispatch(bind(&ConnectionImpl::runQueryWithPrepare, _impl, res, s, BindDataPtr(new BindData(data, _impl))));
+		_impl->post(bind(&ConnectionImpl::runQueryWithPrepare, _impl, res, s, BindDataPtr(new BindData(data, _impl))));
 		return res;
 	}
 

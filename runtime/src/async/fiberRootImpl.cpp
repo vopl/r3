@@ -11,6 +11,7 @@ namespace async
 		ConvertThreadToFiber(NULL);
 		_stack = GetCurrentFiber();
 		_current = this;
+		enter();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -20,5 +21,6 @@ namespace async
 		_stack = NULL;
 		assert(_current == this);
 		_current = NULL;
+		leave();
 	}
 }

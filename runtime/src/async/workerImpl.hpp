@@ -39,9 +39,9 @@ namespace async
 		void threadProc();
 
 	public://для фиберов
-		void fiberExecuted(FiberImplPtr fiber);
-		void fiberReady(FiberImplPtr fiber);
-		void fiberYield(FiberImplPtr fiber);
+		void fiberExecuted(FiberImpl *fiber);
+		void fiberReady(FiberImpl *fiber);
+		void fiberYield(FiberImpl *fiber);
 
 	private:
 		void processReadyFibers();

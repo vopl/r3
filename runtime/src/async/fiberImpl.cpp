@@ -15,6 +15,8 @@ namespace async
 			_stack = CreateFiber(0, &FiberImpl::s_fiberProc, this);
 			assert(_stack);
 		}
+		_evt = CreateEvent(NULL, FALSE, TRUE, NULL);
+		assert(_evt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -25,12 +27,13 @@ namespace async
 		{
 			DeleteFiber(_stack);
 		}
+		CloseHandle(_evt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	FiberImplPtr FiberImpl::current()
+	FiberImpl *FiberImpl::current()
 	{
-		FiberImplPtr fiber = _current->shared_from_this();
+		FiberImpl *fiber = _current;
 		return fiber;
 	}
 
@@ -52,11 +55,18 @@ namespace async
 	std::map<FiberImpl *, size_t> g_em2;
 	void FiberImpl::activate()
 	{
-		assert(_current != this);
-		if(_current != this)
+		FiberImpl *prev = _current.get();
+		assert(prev != this);
+		if(prev != this)
 		{
 
 			//assert(_code);
+
+			enter();
+			_current = this;
+			SwitchToFiber(_stack);
+			leave();
+
 
 			{
 				boost::mutex::scoped_lock sl(g_emMtx2);
@@ -78,10 +88,6 @@ namespace async
 				assert(g_em2[thi]<2 || !thi);
 			}
 
-
-
-			_current = this;
-			SwitchToFiber(_stack);
 		}
 	}
 
@@ -89,7 +95,7 @@ namespace async
 	void FiberImpl::ready()
 	{
 		assert(_current != this);
-		WorkerImpl::current()->fiberReady(shared_from_this());
+		WorkerImpl::current()->fiberReady(this);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
@@ -99,16 +105,24 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void FiberImpl::enter()
+	{
+		DWORD res = WaitForSingleObject(_evt, INFINITE);
+		assert(WAIT_OBJECT_0 == res);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void FiberImpl::leave()
+	{
+		BOOL res = SetEvent(_evt);
+		assert(res);
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	VOID WINAPI FiberImpl::s_fiberProc(LPVOID lpFiberImplParameter)
 	{
-		__try
-		{
-			((FiberImpl*)lpFiberImplParameter)->fiberProc();
-		}
-		__except(EXCEPTION_EXECUTE_HANDLER)
-		{
-			std::cout<<__FUNCTION__<<", seh"<<std::endl;
-		}
+		((FiberImpl*)lpFiberImplParameter)->fiberProc();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -123,7 +137,7 @@ namespace async
 				assert(_code);
 				_code.swap(boost::function<void()>());
 			}
-			WorkerImpl::current()->fiberExecuted(shared_from_this());
+			WorkerImpl::current()->fiberExecuted(this);
 		}
 	}
 

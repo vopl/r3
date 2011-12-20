@@ -48,11 +48,10 @@ namespace server
 		}
 	}
 
-	pgc::IStatementPtr s;
-
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::connectionLoop1()
 	{
+		pgc::IStatementPtr s;
 		for(;;)
 		{
 			async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
@@ -71,12 +70,12 @@ namespace server
 				s->setSql("SELECT '123.456789'::numeric");
 			}
 
-// 			async::Result<pgc::IResultPtrs> res = c->query(s);
-// 			async::Result<pgc::IResultPtrs> res2 = c->query(s);
+ 			async::Result<pgc::IResultPtrs> res = c->query(s);
+ 			async::Result<pgc::IResultPtrs> res2 = c->query(s);
 			c.reset();
 
-// 			onResult(res.data());
-// 			onResult(res2.data());
+ 			onResult(res.data());
+ 			onResult(res2.data());
 
 			if(!_db)
 			{
@@ -112,9 +111,9 @@ namespace server
 		_db = hub->getServer()->getDb();
 
 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-// 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-// 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-// 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+ 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+ 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+ 		hub->getServer()->getAsync()->post(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 
 		int k = 220;
 		//

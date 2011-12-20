@@ -21,19 +21,23 @@ namespace async
 		FiberImpl(bool createStack=true);
 		virtual ~FiberImpl();
 
-		static FiberImplPtr current();
+		static FiberImpl *current();
 
 		void execute(boost::function<void()> _code);
 		void activate();
 		void ready();
 		static void yield();
 
+		virtual void enter();
+		virtual void leave();
+
 	private:
 		static VOID WINAPI s_fiberProc(LPVOID lpFiberParameter);
 		void fiberProc();
 	protected:
-		void *_stack;
-		boost::function<void()> _code;
+		void					*_stack;
+		boost::function<void()>	_code;
+		HANDLE					_evt;
 
 		static ThreadLocalStorage<FiberImpl *> _current;
 	};
