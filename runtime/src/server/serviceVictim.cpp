@@ -60,7 +60,7 @@ namespace server
 			
 			if(!c)
 			{
-				TLOG("connectionLoop1 NULL");
+				TLOG("connectionLoop1 c NULL");
 				return;
 			}
 			//TLOG("connectionLoop1");
@@ -79,6 +79,7 @@ namespace server
 
 			if(!_db)
 			{
+				TLOG("connectionLoop1 db NULL");
 				return;
 			}
 		}
