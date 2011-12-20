@@ -11,29 +11,43 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	class ServiceImpl
 		: public Service
-		, public boost::enable_shared_from_this<ServiceImpl>
+		, public enable_shared_from_this<ServiceImpl>
 	{
-		friend class WorkerImpl;
-		boost::asio::io_service			_io_service;
-		boost::shared_ptr<boost::asio::io_service::work>	_work;
+		asio::io_service			_io;
+		shared_ptr<asio::io_service::work>
+									_work;
 
 		std::vector<WorkerImplPtr>	_workers;
 		FiberPoolPtr				_fiberPool;
 
-		boost::function<void ()> _threadStart;
-		boost::function<void ()> _threadStop;
+		function<void ()>			_threadStart;
+		function<void ()>			_threadStop;
+
+		mutex						_mtx;
+
+		static ThreadLocalStorage<ServiceImpl *>
+									_current;
 
 	public:
 		ServiceImpl();
 		~ServiceImpl();
 
-		virtual void start(
+		void start(
 			size_t numThreads,
-			const boost::function<void ()> &threadStart,
-			const boost::function<void ()> &threadStop);
+			const function<void ()> &threadStart,
+			const function<void ()> &threadStop);
 
-		virtual void balance(size_t numThreads);
-		virtual void stop();
+		void balance(size_t numThreads);
+		void stop();
+
+	public:
+		void onThreadStart();
+		void onThreadStop();
+
+	public:
+		void spawn(const boost::function<void ()> &code);
+		asio::io_service &io();
+		static ServiceImpl *current();
 	};
 }
 #endif

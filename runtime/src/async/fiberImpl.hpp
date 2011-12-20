@@ -10,10 +10,10 @@ namespace async
 {
 	class WorkerImpl;
 	class FiberImpl;
-	typedef boost::shared_ptr<FiberImpl> FiberImplPtr;
+	typedef shared_ptr<FiberImpl> FiberImplPtr;
 
 	class FiberImpl
-		: public boost::enable_shared_from_this<FiberImpl>
+		: public enable_shared_from_this<FiberImpl>
 	{
 	public:
 		FiberImpl(bool createStack=true);
@@ -21,7 +21,7 @@ namespace async
 
 		static FiberImpl *current();
 
-		void execute(boost::function<void()> _code);
+		void execute(function<void()> _code);
 		void activate();
 		void ready();
 		static void yield();
@@ -34,7 +34,7 @@ namespace async
 		void fiberProc();
 	protected:
 		void					*_stack;
-		boost::function<void()>	_code;
+		function<void()>	_code;
 		HANDLE					_evt;
 
 		static ThreadLocalStorage<FiberImpl *> _current;

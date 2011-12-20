@@ -27,6 +27,9 @@ namespace async
 
 		void balance(size_t numThreads);
 		void stop();
+
+		void spawn(const boost::function<void ()> &code);
+		boost::asio::io_service &io();
 	};
 	typedef boost::shared_ptr<Service> ServicePtr;
 

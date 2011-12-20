@@ -25,22 +25,34 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void Service::start(
 		size_t numThreads,
-		const boost::function<void ()> &onThreadStart,
-		const boost::function<void ()> &onThreadStop)
+		const function<void ()> &onThreadStart,
+		const function<void ()> &onThreadStop)
 	{
-		static_cast<ServiceImpl *>(this)->start(numThreads, onThreadStart, onThreadStop);
+		return static_cast<ServiceImpl *>(this)->start(numThreads, onThreadStart, onThreadStop);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Service::balance(size_t numThreads)
 	{
-		static_cast<ServiceImpl *>(this)->balance(numThreads);
+		return static_cast<ServiceImpl *>(this)->balance(numThreads);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Service::stop()
 	{
-		static_cast<ServiceImpl *>(this)->stop();
+		return static_cast<ServiceImpl *>(this)->stop();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Service::spawn(const boost::function<void ()> &code)
+	{
+		return static_cast<ServiceImpl *>(this)->spawn(code);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	boost::asio::io_service &Service::io()
+	{
+		return static_cast<ServiceImpl *>(this)->io();
 	}
 
 
@@ -51,35 +63,66 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	ASYNC_API ServicePtr createService()
 	{
-		assert(0);
-		return ServicePtr();
+		return ServicePtr(new ServiceImpl);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ASYNC_API void spawn(const boost::function<void ()> &code)
+	ASYNC_API void spawn(const function<void ()> &code)
 	{
-		assert(0);
+		ServiceImpl *service = ServiceImpl::current();
+		if(!service)
+		{
+			ELOG("spawn with empty service");
+			assert(0);
+			throw 220;
+			return;
+		}
+
+		return service->spawn(code);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ASYNC_API void exec(const boost::function<void ()> &code)
+	ASYNC_API void exec(const function<void ()> &code)
 	{
-		assert(0);
+		WorkerImpl *worker = WorkerImpl::current();
+		if(!worker)
+		{
+			ELOG("exec request with no current worker");
+			assert(0);
+			throw 220;
+			return;
+		}
+
+		return worker->exec(code);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ASYNC_API boost::asio::io_service &io()
+	ASYNC_API asio::io_service &io()
 	{
-		assert(0);
-		static boost::asio::io_service res;
-		return res;
+		ServiceImpl *service = ServiceImpl::current();
+		if(!service)
+		{
+			ELOG("io request with no current service");
+			assert(0);
+			throw 220;
+			static asio::io_service stub;
+			return stub;
+		}
+
+		return service->io();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ASYNC_API ServicePtr service()
 	{
-		assert(0);
-		return ServicePtr();
+		ServiceImpl *service = ServiceImpl::current();
+		if(!service)
+		{
+			ELOG("service request with no current service");
+			return ServicePtr();
+		}
+
+		return service->shared_from_this();
 	}
 
 }

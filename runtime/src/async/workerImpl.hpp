@@ -13,18 +13,18 @@
 namespace async
 {
 	class ServiceImpl;
-	typedef boost::shared_ptr<ServiceImpl> ServiceImplPtr;
+	typedef shared_ptr<ServiceImpl> ServiceImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class WorkerImpl
-		: public boost::enable_shared_from_this<WorkerImpl>
+		: public enable_shared_from_this<WorkerImpl>
 	{
 		ServiceImplPtr	_service;
-		boost::thread	_thread;
+		thread			_thread;
 		volatile bool	_stop;
 
 	private:
-		typedef boost::function<void()> TTask;
+		typedef function<void()> TTask;
 
 		//головной фибер, в нем исполняется цикл выкачивания событий проактора
 		FiberRootImplPtr	_fiberRoot;
@@ -43,16 +43,19 @@ namespace async
 
 	private:
 		void processReadyFibers();
-	public://для врапера
-		void doComplete(TTask);
+
+	public://для врапера asio
+		void exec(const TTask &);
 
 	public:
 		WorkerImpl(ServiceImplPtr service, FiberPoolPtr	fiberPool);
 		~WorkerImpl();
 
+		const ServiceImplPtr &service();
+
 		static WorkerImpl *current();
 	};
-	typedef boost::shared_ptr<WorkerImpl> WorkerImplPtr;
+	typedef shared_ptr<WorkerImpl> WorkerImplPtr;
 }
 
 #endif

@@ -38,7 +38,7 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void FiberImpl::execute(boost::function<void()> code)
+	void FiberImpl::execute(function<void()> code)
 	{
 		{
 			assert(_current != this);
@@ -51,7 +51,7 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::mutex g_emMtx2;
+	mutex g_emMtx2;
 	std::map<FiberImpl *, size_t> g_em2;
 	void FiberImpl::activate()
 	{
@@ -113,7 +113,7 @@ namespace async
 				assert(_code);
 				_code();
 				assert(_code);
-				_code.swap(boost::function<void()>());
+				_code.swap(function<void()>());
 			}
 			WorkerImpl::current()->fiberExecuted(this);
 		}

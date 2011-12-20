@@ -16,7 +16,7 @@ namespace async
 
 	template <class T>
 	class ThreadLocalStorageBase
-		: boost::noncopyable
+		: noncopyable
 	{
 	public:
 		ThreadLocalStorageBase()
@@ -38,7 +38,7 @@ namespace async
 #endif
 		}
 
-		typename boost::enable_if_c<sizeof(T) <= sizeof(void *)>::type set(const T &t)
+		typename enable_if_c<sizeof(T) <= sizeof(void *)>::type set(const T &t)
 		{
 #ifdef _WIN32
 			TlsSetValue(m_key, (LPVOID)t);

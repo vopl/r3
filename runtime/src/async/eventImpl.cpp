@@ -14,7 +14,7 @@ namespace async
 	EventImpl::~EventImpl()
 	{
 #ifdef _DEBUG
-		boost::mutex::scoped_lock sl(_mtx);
+		mutex::scoped_lock sl(_mtx);
 		assert(_waiters.empty());
 #endif
 	}
@@ -24,7 +24,7 @@ namespace async
 	{
 		if(!_isSet)
 		{
-			boost::mutex::scoped_lock sl(_mtx);
+			mutex::scoped_lock sl(_mtx);
 
 			BOOST_FOREACH(FiberImplPtr &f, _waiters)
 			{
@@ -44,7 +44,7 @@ namespace async
 	{
 		if(_isSet)
 		{
-			boost::mutex::scoped_lock sl(_mtx);
+			mutex::scoped_lock sl(_mtx);
 			_waiters.clear();
 			_isSet = false;
 		}
@@ -64,7 +64,7 @@ namespace async
 			return;
 		}
 		{
-			boost::mutex::scoped_lock sl(_mtx);
+			mutex::scoped_lock sl(_mtx);
 
 			FiberImpl *f = FiberImpl::current();
 			assert(f);

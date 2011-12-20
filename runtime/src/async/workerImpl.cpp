@@ -17,22 +17,16 @@ namespace async
 		//наболтать головной фибер
 		_fiberRoot.reset(new FiberRootImpl());
 
-		if(_service->_threadStart)
-		{
-			_service->_threadStart();
-		}
+		_service->onThreadStart();
 
 		while(!_stop)
 		{
-			boost::system::error_code ec;
-			size_t events = _service->_io_service.run(ec);
+			system::error_code ec;
+			size_t events = _service->io().run(ec);
 		}
 
 
-		if(_service->_threadStop)
-		{
-			_service->_threadStop();
-		}
+		_service->onThreadStop();
 
 		//assert(_fibersReady.empty());
 		_fiberRoot.reset();
@@ -45,7 +39,7 @@ namespace async
 		assert(fiber != _fiberRoot.get());
 		assert(fiber == FiberImpl::current());
 		{
-			boost::mutex::scoped_lock sl(_fiberPool->_mtx);
+			mutex::scoped_lock sl(_fiberPool->_mtx);
 			_fiberPool->_fibersIdle.insert(fiber->shared_from_this());
 			assert(_fiberPool->_fibersReady.end() == _fiberPool->_fibersReady.find(fiber->shared_from_this()));
 		}
@@ -55,7 +49,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::fiberReady(FiberImpl *fiber)
 	{
-		boost::mutex::scoped_lock sl(_fiberPool->_mtx);
+		mutex::scoped_lock sl(_fiberPool->_mtx);
 		assert(fiber != _fiberRoot.get());
 		assert(fiber != FiberImpl::current());
 		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber->shared_from_this()));
@@ -81,7 +75,7 @@ namespace async
 		{
 			std::set<FiberImplPtr> fibersReady;
 			{
-				boost::mutex::scoped_lock sl(_fiberPool->_mtx);
+				mutex::scoped_lock sl(_fiberPool->_mtx);
 				fibersReady.swap(_fiberPool->_fibersReady);
 			}
 
@@ -94,7 +88,7 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WorkerImpl::doComplete(TTask task)
+	void WorkerImpl::exec(const TTask &task)
 	{
 		//assert(FiberImpl::current() == _fiberRoot.get());
 		if(FiberImpl::current() != _fiberRoot.get())
@@ -111,7 +105,7 @@ namespace async
 		{
 			FiberImplPtr fiber;
 			{
-				boost::mutex::scoped_lock sl(_fiberPool->_mtx);
+				mutex::scoped_lock sl(_fiberPool->_mtx);
 				if(_fiberPool->_fibersIdle.size())
 				{
 					fiber = *_fiberPool->_fibersIdle.begin();
@@ -125,7 +119,6 @@ namespace async
 			fiber->execute(task);
 		}
 
-
 		//теперь снова готовые
 		processReadyFibers();
 	}
@@ -137,7 +130,7 @@ namespace async
 		, _fiberRoot()
 		, _fiberPool(fiberPool)
 	{
-		_thread = boost::thread(boost::bind(&WorkerImpl::threadProc, this));
+		_thread = thread(bind(&WorkerImpl::threadProc, this));
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
@@ -148,6 +141,12 @@ namespace async
 
 		assert(!_fiberRoot);
 		//assert(_fibersReady.empty());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	const ServiceImplPtr &WorkerImpl::service()
+	{
+		return _service;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

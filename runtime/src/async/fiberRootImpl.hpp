@@ -16,7 +16,7 @@ namespace async
 		virtual void leave(){}
 
 	};
-	typedef boost::shared_ptr<FiberRootImpl> FiberRootImplPtr;
+	typedef shared_ptr<FiberRootImpl> FiberRootImplPtr;
 }
 
 #endif

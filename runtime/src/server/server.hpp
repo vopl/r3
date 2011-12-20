@@ -26,9 +26,18 @@ namespace server
 		size_t				_numThreads;
 		boost::mutex		_mtx;
 
+
+		enum EState
+		{
+			esStop,
+			esStart,
+			esError,
+		}					_state;
+		condition_variable	_isStartedCvar;
+
 	private:
-		void startupServices();
-		void shutdownServices();
+		void startup(const char *host, const char *service);
+		void shutdown();
 
 		void onSessionStart(ISessionPtr session);
 		void onSessionStop(ISessionPtr session);

@@ -14,9 +14,9 @@ namespace async
 
 		//рабочие фиберы с задачей и готовые к исполнению
 		std::set<FiberImplPtr> _fibersReady;
-		boost::mutex			_mtx;
+		mutex					_mtx;
 	public:
 	};
-	typedef boost::shared_ptr<FiberPool> FiberPoolPtr;
+	typedef shared_ptr<FiberPool> FiberPoolPtr;
 }
 #endif
