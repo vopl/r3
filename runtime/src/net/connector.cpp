@@ -232,7 +232,6 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void Connector::initialize()
 	{
-		assert(!_asrv);
 		assert(!_sslContext);
 
 		_sslContext.reset(new TSslContext(async::io(), ssl::context::sslv23));
