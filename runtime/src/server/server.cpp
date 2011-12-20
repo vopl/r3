@@ -90,13 +90,26 @@ namespace server
 	void Server::shutdown()
 	{
 		mutex::scoped_lock sl(_mtx);
-		_numThreads--;
+		assert(esStart == _state);
 
-		if(0 == _numThreads)
-		{
-			assert(_serviceHub);
-			_serviceHub->delServices();
-		}
+		assert(_serviceHub);
+		_serviceHub->delServices();
+
+		assert(_sessionManager);
+		_sessionManager->stop();
+
+
+		assert(_db);
+		_db->deinitialize();
+
+
+		_serviceHub.reset();
+		_sessionManager.reset();
+		_db.reset();
+
+		_state = esStop;
+		_isStartedCvar.notify_one();
+
 	}
 
 
@@ -189,7 +202,7 @@ namespace server
 			return false;
 		}
 		assert(esStart == _state);
-		ILOG("start ok");
+		ILOG("start done");
 
 		return true;
 	}
@@ -197,27 +210,29 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void Server::stop()
 	{
-		assert(!"отработать стоп так же как старт");
+		mutex::scoped_lock sl(_mtx);
+		assert(esStart == _state || esStop == _state);
+		if(esStop == _state)
+		{
+			ILOG("stop when already stopped, ok");
+			return;
+		}
+
 		ILOG("stop");
 
-		async::spawn(bind(&Server::shutdown, shared_from_this()));
+		_async->spawn(bind(&Server::shutdown, shared_from_this()));
 
-		assert(_sessionManager);
-		_sessionManager->stop();
-
-
-		assert(_db);
-		_db->deinitialize();
-
-
-		_serviceHub.reset();
-		_sessionManager.reset();
-		_db.reset();
+		while(esStop != _state)
+		{
+			_isStartedCvar.wait(sl);
+		}
+		assert(esStop == _state);
 
 		_async->stop();
 		_async.reset();
-		
 		_plugs = NULL;
+
+		ILOG("stop done");
 	}
 
 	//////////////////////////////////////////////////////////////////////////

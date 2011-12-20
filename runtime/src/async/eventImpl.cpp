@@ -22,10 +22,9 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void EventImpl::set()
 	{
+		mutex::scoped_lock sl(_mtx);
 		if(!_isSet)
 		{
-			mutex::scoped_lock sl(_mtx);
-
 			BOOST_FOREACH(FiberImplPtr &f, _waiters)
 			{
 				assert(f.get() != FiberImpl::current());
@@ -42,9 +41,10 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void EventImpl::reset()
 	{
+		mutex::scoped_lock sl(_mtx);
 		if(_isSet)
 		{
-			mutex::scoped_lock sl(_mtx);
+			assert(_waiters.empty());
 			_waiters.clear();
 			_isSet = false;
 		}
@@ -59,12 +59,13 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void EventImpl::wait()
 	{
-		if(_isSet)
-		{
-			return;
-		}
 		{
 			mutex::scoped_lock sl(_mtx);
+
+			if(_isSet)
+			{
+				return;
+			}
 
 			FiberImpl *f = FiberImpl::current();
 			assert(f);

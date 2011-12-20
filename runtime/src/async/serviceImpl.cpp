@@ -39,6 +39,7 @@ namespace async
 			_threadStop = threadStop;
 		}
 		balance(numThreads);
+		ILOG("start done");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -92,6 +93,7 @@ namespace async
 			_threadStart.swap(function<void ()>());
 			_threadStop.swap(function<void ()>());
 		}
+		ILOG("stop done");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
