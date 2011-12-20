@@ -113,8 +113,8 @@ namespace server
 
 		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
- 		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
- 		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 
 		int k = 220;
 		//

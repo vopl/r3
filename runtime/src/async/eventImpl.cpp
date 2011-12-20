@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "eventImpl.hpp"
+#include "workerImpl.hpp"
 
 namespace async
 {
@@ -28,10 +29,7 @@ namespace async
 			BOOST_FOREACH(FiberImplPtr &f, _waiters)
 			{
 				assert(f.get() != FiberImpl::current());
-				if(f.get() != FiberImpl::current())
-				{
-					f->ready();
-				}
+				WorkerImpl::current()->fiberReady(f);
 			}
 			_waiters.clear();
 			_isSet = true;
@@ -72,7 +70,7 @@ namespace async
 			_waiters.push_back(f->shared_from_this());
 		}
 
-		FiberImpl::yield();
+		WorkerImpl::current()->fiberYield();
 	}
 
 }

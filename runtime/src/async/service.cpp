@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "async/service.hpp"
 #include "serviceImpl.hpp"
+#include "async/exception.hpp"
 
 namespace async
 {
@@ -72,9 +73,9 @@ namespace async
 		ServiceImpl *service = ServiceImpl::current();
 		if(!service)
 		{
-			ELOG("spawn with empty service");
 			assert(0);
-			throw 220;
+			ELOG("spawn with empty service");
+			throw exception("spawn with empty service");
 			return;
 		}
 
@@ -87,9 +88,9 @@ namespace async
 		WorkerImpl *worker = WorkerImpl::current();
 		if(!worker)
 		{
-			ELOG("exec request with no current worker");
 			assert(0);
-			throw 220;
+			ELOG("exec request with no current worker");
+			throw exception("exec request with no current worker");
 			return;
 		}
 
@@ -102,9 +103,9 @@ namespace async
 		ServiceImpl *service = ServiceImpl::current();
 		if(!service)
 		{
-			ELOG("io request with no current service");
 			assert(0);
-			throw 220;
+			ELOG("io request with no current service");
+			throw exception("io request with no current service");
 			static asio::io_service stub;
 			return stub;
 		}

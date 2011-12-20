@@ -29,20 +29,24 @@ namespace async
 		//головной фибер, в нем исполняется цикл выкачивания событий проактора
 		FiberRootImplPtr	_fiberRoot;
 
+		//шареный буфер с фиберами, в нем простаивающие без кода и готовые к исполнению
 		FiberPoolPtr		_fiberPool;
 
-		static ThreadLocalStorage<WorkerImpl *> _current;
+		static ThreadLocalStorage<WorkerImpl *>
+							_current;
 
 	private:
 		void threadProc();
 
-	public://для фиберов
-		void fiberExecuted(FiberImpl *fiber);
-		void fiberReady(FiberImpl *fiber);
-		void fiberYield();
-
 	private:
 		void processReadyFibers();
+
+	public://для фиберов
+
+		//не умный потому что этот метод будет вызываться из рабочей процедуры фибера и она не должна делать RAII чтобы не унести с собой объект фибера при разрушении
+		void fiberExecuted(FiberImpl *fiber);
+		void fiberReady(FiberImplPtr fiber);
+		void fiberYield();
 
 	public://для врапера asio
 		void exec(const TTask &);

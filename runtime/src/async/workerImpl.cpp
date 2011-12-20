@@ -22,13 +22,19 @@ namespace async
 		while(!_stop)
 		{
 			system::error_code ec;
-			size_t events = _service->io().run(ec);
-		}
+			try
+			{
+				_service->io().run(ec);
+			}
+			catch(...)
+			{
+				ELOG(__FUNCTION__<<", exception catched: "<<boost::current_exception_diagnostic_information());
+			}
 
+		}
 
 		_service->onThreadStop();
 
-		//assert(_fibersReady.empty());
 		_fiberRoot.reset();
 		_current = NULL;
 	}
@@ -47,23 +53,20 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WorkerImpl::fiberReady(FiberImpl *fiber)
+	void WorkerImpl::fiberReady(FiberImplPtr fiber)
 	{
 		mutex::scoped_lock sl(_fiberPool->_mtx);
-		assert(fiber != _fiberRoot.get());
-		assert(fiber != FiberImpl::current());
-		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber->shared_from_this()));
-		_fiberPool->_fibersReady.insert(fiber->shared_from_this());
+		assert(fiber != _fiberRoot);
+		assert(fiber.get() != FiberImpl::current());
+		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber));
+		_fiberPool->_fibersReady.insert(fiber);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::fiberYield()
 	{
 		assert(FiberImpl::current() != _fiberRoot.get());
-		if(FiberImpl::current() != _fiberRoot.get())
-		{
-			_fiberRoot->activate();
-		}
+		_fiberRoot->activate();
 	}
 
 
@@ -140,7 +143,6 @@ namespace async
 		_thread.join();
 
 		assert(!_fiberRoot);
-		//assert(_fibersReady.empty());
 	}
 
 	//////////////////////////////////////////////////////////////////////////

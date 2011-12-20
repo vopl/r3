@@ -3,20 +3,33 @@
 #include "fiberRootImpl.hpp"
 #include "workerImpl.hpp"
 #include <windows.h>
+#include "async/exception.hpp"
 
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
 	FiberImpl::FiberImpl(bool createStack)
 		: _stack(NULL)
+		, _evt(NULL)
 	{
 		if(createStack)
 		{
 			_stack = CreateFiber(0, &FiberImpl::s_fiberProc, this);
 			assert(_stack);
+			if(!_stack)
+			{
+				FLOG(__FUNCTION__<<", CreateFiber failed, "<<GetLastError());
+				throw exception("CreateFiber failed");
+			}
+
+			_evt = CreateEvent(NULL, FALSE, TRUE, NULL);
+			assert(_evt);
+			if(!_evt)
+			{
+				FLOG(__FUNCTION__<<", CreateEvent failed, "<<GetLastError());
+				throw exception("CreateEvent failed");
+			}
 		}
-		_evt = CreateEvent(NULL, FALSE, TRUE, NULL);
-		assert(_evt);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -27,7 +40,13 @@ namespace async
 		{
 			DeleteFiber(_stack);
 		}
-		CloseHandle(_evt);
+		if(_evt)
+		{
+			if(!CloseHandle(_evt))
+			{
+				WLOG(__FUNCTION__<<", CloseHandle failed, "<<GetLastError());
+			}
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -40,28 +59,22 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::execute(function<void()> code)
 	{
-		{
-			assert(_current != this);
+		assert(_current != this);
 
-			assert(!_code);
-			assert(code);
-			_code = code;
-		}
+		assert(!_code);
+		assert(code);
+		_code = code;
+
 		activate();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	mutex g_emMtx2;
-	std::map<FiberImpl *, size_t> g_em2;
 	void FiberImpl::activate()
 	{
 		FiberImpl *prev = _current.get();
 		assert(prev != this);
 		if(prev != this)
 		{
-
-			//assert(_code);
-
 			enter();
 			_current = this;
 			SwitchToFiber(_stack);
@@ -70,30 +83,33 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void FiberImpl::ready()
-	{
-		assert(_current != this);
-		WorkerImpl::current()->fiberReady(this);
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	void FiberImpl::yield()
-	{
-		WorkerImpl::current()->fiberYield();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::enter()
 	{
-		DWORD res = WaitForSingleObject(_evt, INFINITE);
-		assert(WAIT_OBJECT_0 == res);
+		if(_evt)
+		{
+			DWORD res = WaitForSingleObject(_evt, INFINITE);
+			assert(WAIT_OBJECT_0 == res);
+			if(WAIT_OBJECT_0 != res)
+			{
+				FLOG(__FUNCTION__<<", WaitForSingleObject failed, "<<GetLastError());
+				throw exception("WaitForSingleObject failed");
+			}
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::leave()
 	{
-		BOOL res = SetEvent(_evt);
-		assert(res);
+		if(_evt)
+		{
+			BOOL res = SetEvent(_evt);
+			assert(res);
+			if(!res)
+			{
+				FLOG(__FUNCTION__<<", SetEvent failed, "<<GetLastError());
+				throw exception("SetEvent failed");
+			}
+		}
 	}
 
 
@@ -108,13 +124,19 @@ namespace async
 	{
 		for(;;)
 		{
-			{
+			assert(_code);
 
-				assert(_code);
+			try
+			{
 				_code();
-				assert(_code);
-				_code.swap(function<void()>());
 			}
+			catch(...)
+			{
+				ELOG(__FUNCTION__<<", exception catched: "<<boost::current_exception_diagnostic_information());
+			}
+			assert(_code);
+			_code.swap(function<void()>());
+
 			WorkerImpl::current()->fiberExecuted(this);
 		}
 	}

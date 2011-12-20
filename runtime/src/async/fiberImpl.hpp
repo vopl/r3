@@ -23,21 +23,22 @@ namespace async
 
 		void execute(function<void()> _code);
 		void activate();
-		void ready();
-		static void yield();
-
-		virtual void enter();
-		virtual void leave();
 
 	private:
 		static VOID WINAPI s_fiberProc(LPVOID lpFiberParameter);
 		void fiberProc();
-	protected:
-		void					*_stack;
-		function<void()>	_code;
-		HANDLE					_evt;
 
-		static ThreadLocalStorage<FiberImpl *> _current;
+	protected:
+		void enter();
+		void leave();
+
+	protected:
+		void				*_stack;
+		function<void()>	_code;
+		HANDLE				_evt;
+
+		static ThreadLocalStorage<FiberImpl *>
+							_current;
 	};
 }
 

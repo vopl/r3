@@ -2,6 +2,7 @@ PROJECT (libasync)
 
 SET(INCLUDE
 	${INC_DIR}/async/service.hpp
+	${INC_DIR}/async/exception.hpp
 
 	${INC_DIR}/async/event.hpp
 	${INC_DIR}/async/result.hpp

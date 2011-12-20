@@ -2,6 +2,7 @@
 #define _ASYNC_SERVICE_HPP_
 
 #include "async/api.h"
+#include "async/exception.hpp"
 #include "async/event.hpp"
 #include "async/result.hpp"
 
