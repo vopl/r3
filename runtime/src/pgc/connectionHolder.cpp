@@ -5,15 +5,6 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::endWork(DbPtr db, ConnectionImplPtr impl)
-	{
-		async::Result<IResultPtrs> res;
-		impl->runEndWork(res);
-		res.wait();
-		db->unwork(impl);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::ConnectionHolder(DbPtr db, ConnectionImplPtr impl)
 		: _db(db)
 		, _impl(impl)
@@ -24,7 +15,10 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionHolder::~ConnectionHolder()
 	{
-		_impl->post(bind(&ConnectionHolder::endWork, _db, _impl));
+		async::Result<IResultPtrs> res;
+		_impl->runEndWork(res);
+		res.wait();
+		_db->unwork(_impl);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

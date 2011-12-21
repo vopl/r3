@@ -15,6 +15,12 @@ namespace async
 		struct State
 		{
 			Data	_data;
+			bool	_ready;
+
+			State()
+				: _ready(false)
+			{
+			}
 		};
 		boost::shared_ptr<State> _state;
 
@@ -27,12 +33,20 @@ namespace async
 
 		Data &data()
 		{
-			wait();
+			if(!_state->_ready)
+			{
+				wait();
+				_state->_ready = true;
+			}
 			return _state->_data;
 		}
 		operator Data &()
 		{
-			wait();
+			if(!_state->_ready)
+			{
+				wait();
+				_state->_ready = true;
+			}
 			return _state->_data;
 		}
 		Data &dataNoWait()
@@ -60,6 +74,12 @@ namespace async
 		{
 			Data1	_data1;
 			Data2	_data2;
+			bool	_ready;
+
+			State()
+				: _ready(false)
+			{
+			}
 		};
 		boost::shared_ptr<State> _state;
 
@@ -72,7 +92,11 @@ namespace async
 
 		Data1 &data1()
 		{
-			wait();
+			if(!_state->_ready)
+			{
+				wait();
+				_state->_ready = true;
+			}
 			return _state->_data1;
 		}
 		Data1 &data1NoWait()
@@ -82,7 +106,11 @@ namespace async
 
 		Data2 &data2()
 		{
-			wait();
+			if(!_state->_ready)
+			{
+				wait();
+				_state->_ready = true;
+			}
 			return _state->_data2;
 		}
 		Data2 &data2NoWait()
@@ -97,7 +125,7 @@ namespace async
 		{
 			_state->_data1 = data1;
 			_state->_data2 = data2;
-			ready();
+			set();
 		}
 
 	};

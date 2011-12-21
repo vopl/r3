@@ -22,8 +22,6 @@ namespace pgc
 		DbPtr _db;
 		ConnectionImplPtr _impl;
 
- 		static void endWork(DbPtr db, ConnectionImplPtr impl);
-
 	public:
 		ConnectionHolder(DbPtr db, ConnectionImplPtr impl);
 		~ConnectionHolder();

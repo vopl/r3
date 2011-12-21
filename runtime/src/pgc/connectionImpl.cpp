@@ -157,36 +157,43 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::processRequest()
 	{
-		if(_requestInProcess)
+		assert(_mtxProcess.isLocked());
+		assert(!_requestInProcess);
+		assert(!_requests.empty());
+
+		if(_requestInProcess || _requests.empty())
 		{
 			_mtxProcess.unlock();
 			return;
 		}
 
 		_requestInProcess = true;
-		while(!_requests.empty())
+		async::Result<IResultPtrs> result;
+		SRequestPtr request;
+
+		for(;;)
 		{
-			SRequestPtr r = _requests.front();
+			request = _requests.front();
 			_requests.erase(_requests.begin());
 
-			switch(r->_ert)
+			switch(request->_ert)
 			{
 			case ertQuery:
 				{
-					SRequestQuery *rd = static_cast<SRequestQuery *>(r.get());
-					runQuery_f(rd->_res, rd->_sql);
+					SRequestQuery *rd = static_cast<SRequestQuery *>(request.get());
+					runQuery_f(result, rd->_sql);
 				}
 				break;
 			case ertQueryWithPrepare:
 				{
-					SRequestQueryWithPrepare *rd = static_cast<SRequestQueryWithPrepare *>(r.get());
-					runQueryWithPrepare_f(rd->_res, rd->_s, rd->_data);
+					SRequestQueryWithPrepare *rd = static_cast<SRequestQueryWithPrepare *>(request.get());
+					runQueryWithPrepare_f(result, rd->_s, rd->_data);
 				}
 				break;
 			case ertQueryEndWork:
 				{
-					SRequestEndWork *rd = static_cast<SRequestEndWork *>(r.get());
-					runEndWork_f(rd->_res);
+					SRequestEndWork *rd = static_cast<SRequestEndWork *>(request.get());
+					runEndWork_f(result);
 				}
 				break;
 			default:
@@ -197,10 +204,24 @@ namespace pgc
 				throw("unknown ert");
 				return;
 			}
-			r->_res.wait();
+			result.wait();
+			if(_requests.empty())
+			{
+				//последний ответ отдать после разблокировки
+				break;
+			}
+			else
+			{
+				request->_res(result.data());
+			}
+			result = async::Result<IResultPtrs>();
 		}
+
+		assert(_requestInProcess);
+		assert(_mtxProcess.isLocked());
 		_requestInProcess = false;
 		_mtxProcess.unlock();
+		request->_res(result.data());
 	}
 
 
