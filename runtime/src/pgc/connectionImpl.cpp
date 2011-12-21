@@ -228,6 +228,10 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::processSingle(async::Result<IResultPtrs> res)
 	{
+		assert(_mtxProcess.isLocked());
+		assert(!_now.is_not_a_date_time());
+		assert(_requestInProcess);
+
 		//слать
 		while(PQflush(_pgcon))
 		{
@@ -275,6 +279,10 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::processQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data)
 	{
+		assert(_mtxProcess.isLocked());
+		assert(!_now.is_not_a_date_time());
+		assert(_requestInProcess);
+
 		bool inTrans = false;
 		PGTransactionStatusType tstatus = PQtransactionStatus(pgcon());
 		assert(PQTRANS_ACTIVE != tstatus);
@@ -359,6 +367,10 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runQuery_f(async::Result<IResultPtrs> res, const std::string &sql)
 	{
+		assert(_mtxProcess.isLocked());
+		assert(!_now.is_not_a_date_time());
+		assert(_requestInProcess);
+
 		if(!PQsendQueryParams (
 			_pgcon, 
 			sql.c_str(), 
@@ -383,6 +395,10 @@ namespace pgc
 		const std::string &sql, 
 		BindDataPtr data)
 	{
+		assert(_mtxProcess.isLocked());
+		assert(!_now.is_not_a_date_time());
+		assert(_requestInProcess);
+
 		int nParams = data?data->typ.size():0;
 		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
 		if(!PQsendPrepare(
@@ -406,6 +422,10 @@ namespace pgc
 		const std::string &prid, 
 		BindDataPtr data)
 	{
+		assert(_mtxProcess.isLocked());
+		assert(!_now.is_not_a_date_time());
+		assert(_requestInProcess);
+
 		int nParams = data?data->typ.size():0;
 		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
 		const char * const *paramValues = nParams?&data->val[0]:NULL;
@@ -431,18 +451,26 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runQueryWithPrepare_f(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data)
 	{
+		assert(_mtxProcess.isLocked());
+		assert(!_now.is_not_a_date_time());
+		assert(_requestInProcess);
+
 		if(hasPrepared(s))
 		{
 			runQueryPrepared_f(res, getPrid(s), data);
 			return;
 		}
 
-		ConnectionImpl::processQueryWithPrepare(res, s, data);
+		processQueryWithPrepare(res, s, data);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runEndWork_f(async::Result<IResultPtrs> res)
 	{
+		assert(_mtxProcess.isLocked());
+		assert(!_now.is_not_a_date_time());
+		assert(_requestInProcess);
+
 		posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
 
 		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
@@ -487,7 +515,6 @@ namespace pgc
 	async::Result<system::error_code> ConnectionImpl::send0()
 	{
 		async::Result<system::error_code> h;
-		//_sock.async_send(asio::null_buffers(), _strand.wrap(bind(h, _1)));
 		_sock.async_send(asio::null_buffers(), bind(h, _1));
 		return h;
 	}
@@ -496,7 +523,6 @@ namespace pgc
 	async::Result<system::error_code> ConnectionImpl::recv0()
 	{
 		async::Result<system::error_code> h;
-		//_sock.async_receive(asio::null_buffers(), _strand.wrap(bind(h, _1)));
 		_sock.async_receive(asio::null_buffers(), bind(h, _1));
 		return h;
 	}
@@ -506,7 +532,6 @@ namespace pgc
 	ConnectionImpl::ConnectionImpl(PGconn *pgcon)
 		: _pgcon(pgcon)
 		, _sock(async::io(), PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
-		//, _strand(async::io())
 		, _integerDatetimes(false)
 		, _requestInProcess(false)
 	{
@@ -517,6 +542,10 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	ConnectionImpl::~ConnectionImpl()
 	{
+		assert(!_mtxProcess.isLocked());
+		assert(_now.is_not_a_date_time());
+		assert(!_requestInProcess);
+
 		assert(ecsOk != status());
 		close();
 	}
@@ -550,6 +579,7 @@ namespace pgc
 	{
 		if(!_pgcon)
 		{
+			assert(0);
 			return ecsNull;
 		}
 		ConnStatusType status = PQstatus(_pgcon);
@@ -561,7 +591,7 @@ namespace pgc
 	{
 		if(_pgcon)
 		{
-			_mtxProcess.lock();
+			assert(!_mtxProcess.isLocked());
 			assert(_now.is_not_a_date_time());
 			assert(!_requestInProcess);
 			assert(_requests.empty());
@@ -575,8 +605,6 @@ namespace pgc
 // 				std::cerr<<ec.message()<<std::endl;
 // 			}
 			_integerDatetimes = false;
-
-			_mtxProcess.unlock();
 		}
 	}
 
@@ -584,22 +612,6 @@ namespace pgc
 	bool ConnectionImpl::integerDatetimes()
 	{
 		return _integerDatetimes;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ConnectionImpl::dispatch(function<void()> action)
-	{
-		//_strand.dispatch(action);
-		//_asrv->get_io_service().dispatch(action);
-		async::exec(action);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ConnectionImpl::post(function<void()> action)
-	{
-		//_strand.post(action);
-		//_asrv->get_io_service().post(action);
-		async::spawn(action);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -611,7 +623,7 @@ namespace pgc
 		SRequestPtr r(new SRequestQuery(res, sql));
 		_requests.push_back(r);
 
-		post(bind(&ConnectionImpl::processRequest, shared_from_this()));
+		async::spawn(bind(&ConnectionImpl::processRequest, shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -623,14 +635,16 @@ namespace pgc
 		SRequestPtr r(new SRequestQueryWithPrepare(res, s, data));
 		_requests.push_back(r);
 
-		post(bind(&ConnectionImpl::processRequest, shared_from_this()));
+		async::spawn(bind(&ConnectionImpl::processRequest, shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::beginWork()
 	{
 		assert(_pgcon);
+		assert(!_mtxProcess.isLocked());
 		assert(_now.is_not_a_date_time());
+		assert(!_requestInProcess);
 		_now = posix_time::microsec_clock::local_time();
 	}
 	
@@ -643,6 +657,6 @@ namespace pgc
 		SRequestPtr r(new SRequestEndWork(res));
 		_requests.push_back(r);
 
-		post(bind(&ConnectionImpl::processRequest, shared_from_this()));
+		async::spawn(bind(&ConnectionImpl::processRequest, shared_from_this()));
 	}
 }

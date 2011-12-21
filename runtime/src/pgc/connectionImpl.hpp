@@ -128,7 +128,6 @@ namespace pgc
 		//////////////////////////////////////////////////////////////////////////
 		PGconn						*_pgcon;
 		PGSock						_sock;
-		//asio::io_service::strand	_strand;
 		bool						_integerDatetimes;
 
 	private:
@@ -203,9 +202,6 @@ namespace pgc
 		void close();
 
 		bool integerDatetimes();
-
-		void dispatch(function<void()> action);
-		void post(function<void()> action);
 
 	public:
 		void runQuery(async::Result<IResultPtrs> res, const std::string &sql);
