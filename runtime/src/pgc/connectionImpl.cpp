@@ -579,7 +579,6 @@ namespace pgc
 	{
 		if(!_pgcon)
 		{
-			assert(0);
 			return ecsNull;
 		}
 		ConnStatusType status = PQstatus(_pgcon);

@@ -35,16 +35,15 @@ namespace pgc
 
 	private:
 		void balanceConnections();
+
+		void makeConnection();
 		void makeConnection_poll(ConnectionImplPtr pcw);
 
 	private:
-		void onReconnectTimer();
+		void onRebalanceTimer();
 
 	public:
 		void unwork(ConnectionImplPtr pcw);
-
-	private:
-		void allocConnection_f(async::Result<IConnectionPtr> res);
 
 	public:
 		Db();
