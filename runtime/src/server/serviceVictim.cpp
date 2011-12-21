@@ -70,16 +70,17 @@ namespace server
 
  			async::Result<pgc::IResultPtrs> res = c.data()->query(s);
  			async::Result<pgc::IResultPtrs> res2 = c.data()->query(s);
-			c = _db->allocConnection();
-
- 			onResult(res.data());
- 			onResult(res2.data());
 
 			if(!_db)
 			{
 				TLOG("connectionLoop1 db NULL");
 				return;
 			}
+			c = _db->allocConnection();
+
+ 			onResult(res.data());
+ 			onResult(res2.data());
+
 		}
 	}
 

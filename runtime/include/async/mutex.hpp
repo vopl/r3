@@ -12,6 +12,7 @@ namespace async
 	typedef boost::shared_ptr<MutexImpl> MutexImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
+	//мутекс над ресурсом
 	class ASYNC_API Mutex
 	{
 		MutexImplPtr	_impl;
@@ -22,7 +23,12 @@ namespace async
 		bool tryLock();
 		void lock();
 		bool isLocked();
+
+		//по фиберам
 		void unlock();
+
+		//по ресурсу, контролирует запуск фибера, поэтому немного медленнее
+		void unlockAny();
 	};
 }
 

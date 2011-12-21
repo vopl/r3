@@ -34,4 +34,10 @@ namespace async
 		return _impl->unlock();
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void Mutex::unlockAny()
+	{
+		return _impl->unlockAny();
+	}
+
 }

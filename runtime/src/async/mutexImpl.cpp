@@ -71,6 +71,41 @@ namespace async
 			return;
 		}
 
+		if(_owners.front().get() != FiberImpl::current())
+		{
+			ELOG("unlockStrict mutex which from alien fiber");
+			throw exception("unlockStrict mutex which from alien fiber");
+			return;
+		}
+
+		FiberImplPtr fiber = _owners.front();
+		_owners.erase(_owners.begin());
+
+		if(!_owners.empty())
+		{
+#ifdef _DEBUG
+			bool fired = WorkerImpl::current()->fiberReadyIfWait(_owners.front());
+			if(!fired)
+			{
+				assert("unlockStrict mutex for non-wait fiber");
+			}
+#else
+			WorkerImpl::current()->fiberReady(_owners.front());
+#endif
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void MutexImpl::unlockAny()
+	{
+		boost::mutex::scoped_lock scopeLock(_mtx);
+		if(_owners.empty())
+		{
+			ELOG("unlock mutex which is not locked");
+			throw exception("unlock mutex which is not locked");
+			return;
+		}
+
 		FiberImplPtr fiber = _owners.front();
 		_owners.erase(_owners.begin());
 

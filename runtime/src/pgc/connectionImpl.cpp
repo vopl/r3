@@ -159,7 +159,7 @@ namespace pgc
 	{
 		if(_requestInProcess)
 		{
-			_mtxProcess.unlock();
+			_mtxProcess.unlockAny();
 			return;
 		}
 
@@ -196,7 +196,7 @@ namespace pgc
 			r->_res.wait();
 		}
 		_requestInProcess = false;
-		_mtxProcess.unlock();
+		_mtxProcess.unlockAny();
 	}
 
 
@@ -574,7 +574,7 @@ namespace pgc
 
 		if(_requestInProcess)
 		{
-			_mtxProcess.unlock();
+			_mtxProcess.unlockAny();
 		}
 		else
 		{
@@ -592,7 +592,7 @@ namespace pgc
 
 		if(_requestInProcess)
 		{
-			_mtxProcess.unlock();
+			_mtxProcess.unlockAny();
 		}
 		else
 		{
@@ -616,7 +616,7 @@ namespace pgc
 
 		if(_requestInProcess)
 		{
-			_mtxProcess.unlock();
+			_mtxProcess.unlockAny();
 		}
 		else
 		{
