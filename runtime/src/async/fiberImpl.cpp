@@ -52,10 +52,11 @@ namespace async
 			_evt = CreateEvent(NULL, FALSE, TRUE, NULL);
 			if(!_evt)
 			{
+				FLOG(__FUNCTION__<<", CreateEvent failed, "<<GetLastError());
+
 				DeleteFiber(_stack);
 				_stack = NULL;
 
-				FLOG(__FUNCTION__<<", CreateEvent failed, "<<GetLastError());
 				//throw exception("CreateEvent failed");
 				return false;
 			}
