@@ -62,7 +62,22 @@ namespace async
 		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber));
 		_fiberPool->_fibersReady.insert(fiber);
 	}
-	
+
+	//////////////////////////////////////////////////////////////////////////
+	bool WorkerImpl::fiberReadyIfWait(FiberImplPtr fiber)
+	{
+		mutex::scoped_lock sl(_fiberPool->_mtx);
+		assert(fiber != _fiberRoot);
+		assert(fiber.get() != FiberImpl::current());
+
+		if(_fiberPool->_fibersIdle.end() != _fiberPool->_fibersIdle.find(fiber))
+		{
+			return false;
+		}
+		_fiberPool->_fibersReady.insert(fiber);
+		return true;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::fiberYield()
 	{

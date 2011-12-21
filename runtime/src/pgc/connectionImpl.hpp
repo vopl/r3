@@ -8,6 +8,7 @@
 #include "pgc/iconnection.hpp"
 #include "async/service.hpp"
 #include "async/result.hpp"
+#include "async/mutex.hpp"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -82,6 +83,7 @@ namespace pgc
 		{
 			ertQuery,
 			ertQueryWithPrepare,
+			ertQueryEndWork,
 		};
 		struct SRequest
 		{
@@ -111,6 +113,14 @@ namespace pgc
 			{}
 		};
 
+		struct SRequestEndWork
+			: SRequest
+		{
+			SRequestEndWork(async::Result<IResultPtrs> res)
+				: SRequest(ertQueryEndWork, res)
+			{}
+		};
+
 		typedef std::deque<SRequestPtr> TRequests;
 
 		typedef asio::basic_stream_socket<PGSockProtocol> PGSock;
@@ -118,7 +128,7 @@ namespace pgc
 		//////////////////////////////////////////////////////////////////////////
 		PGconn						*_pgcon;
 		PGSock						_sock;
-		asio::io_service::strand	_strand;
+		//asio::io_service::strand	_strand;
 		bool						_integerDatetimes;
 
 	private:
@@ -133,6 +143,8 @@ namespace pgc
 
 		TRequests			_requests;
 		bool				_requestInProcess;
+
+		async::Mutex		_mtxProcess;
 
 	private:
 		bool hasPrepared(IStatementWtr p);
@@ -173,6 +185,9 @@ namespace pgc
 	private:
 		void runQueryWithPrepare_f(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data);
 
+	private:
+		void runEndWork_f(async::Result<IResultPtrs> res);
+
 	public:
 		async::Result<system::error_code> send0();
 		async::Result<system::error_code> recv0();
@@ -198,7 +213,7 @@ namespace pgc
 
 	public:
 		void beginWork();
-		void endWork();
+		void runEndWork(async::Result<IResultPtrs> res);
 
 
 	};

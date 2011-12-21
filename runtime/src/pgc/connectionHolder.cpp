@@ -7,7 +7,9 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::endWork(DbPtr db, ConnectionImplPtr impl)
 	{
-		impl->endWork();
+		async::Result<IResultPtrs> res;
+		impl->runEndWork(res);
+		res.wait();
 		db->unwork(impl);
 	}
 

@@ -46,6 +46,7 @@ namespace async
 		//не умный потому что этот метод будет вызываться из рабочей процедуры фибера и она не должна делать RAII чтобы не унести с собой объект фибера при разрушении
 		void fiberExecuted(FiberImpl *fiber);
 		void fiberReady(FiberImplPtr fiber);
+		bool fiberReadyIfWait(FiberImplPtr fiber);
 		void fiberYield();
 
 	public://для врапера asio

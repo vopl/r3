@@ -52,17 +52,9 @@ namespace server
 	void ServiceVictim::connectionLoop1()
 	{
 		pgc::IStatementPtr s;
+		async::Result<pgc::IConnectionPtr> c=_db->allocConnection();
 		for(;;)
 		{
-			async::Result<pgc::IConnectionPtr> cr = _db->allocConnection();
-			cr.wait();
-			pgc::IConnectionPtr c = cr.data();
-			
-			if(!c)
-			{
-				TLOG("connectionLoop1 c NULL");
-				return;
-			}
 			//TLOG("connectionLoop1");
 			if(!s || !(rand()%2))
 			{
@@ -70,9 +62,15 @@ namespace server
 				s->setSql("SELECT '123.456789'::numeric");
 			}
 
- 			async::Result<pgc::IResultPtrs> res = c->query(s);
- 			async::Result<pgc::IResultPtrs> res2 = c->query(s);
-			c.reset();
+			if(!c.data())
+			{
+				TLOG("connectionLoop1 c NULL");
+				return;
+			}
+
+ 			async::Result<pgc::IResultPtrs> res = c.data()->query(s);
+ 			async::Result<pgc::IResultPtrs> res2 = c.data()->query(s);
+			c = _db->allocConnection();
 
  			onResult(res.data());
  			onResult(res2.data());
@@ -111,7 +109,7 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		for(size_t i(0); i<1000; i++)
+		for(size_t i(0); i<10; i++)
 		{
 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 		}

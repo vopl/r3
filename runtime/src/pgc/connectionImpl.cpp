@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "connectionImpl.hpp"
+#include "async/service.hpp"
 #include "async/result.hpp"
 
 #include "result.hpp"
@@ -158,6 +159,7 @@ namespace pgc
 	{
 		if(_requestInProcess)
 		{
+			_mtxProcess.unlock();
 			return;
 		}
 
@@ -181,6 +183,12 @@ namespace pgc
 					runQueryWithPrepare_f(rd->_res, rd->_s, rd->_data);
 				}
 				break;
+			case ertQueryEndWork:
+				{
+					SRequestEndWork *rd = static_cast<SRequestEndWork *>(r.get());
+					runEndWork_f(rd->_res);
+				}
+				break;
 			default:
 				assert(!"unknown ert");
 				throw("unknown ert");
@@ -188,6 +196,7 @@ namespace pgc
 			r->_res.wait();
 		}
 		_requestInProcess = false;
+		_mtxProcess.unlock();
 	}
 
 
@@ -406,13 +415,50 @@ namespace pgc
 		ConnectionImpl::processQueryWithPrepare(res, s, data);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ConnectionImpl::runEndWork_f(async::Result<IResultPtrs> res)
+	{
+		posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
+
+		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
+		while(
+			!timedIndex.empty() &&
+			(
+				timedIndex.size() > _max ||
+				boundATime > timedIndex.begin()->_accessTime)		)
+		{
+			std::string prid = timedIndex.begin()->_prid;
+			timedIndex.erase(timedIndex.begin());
+
+			async::Result<IResultPtrs> r;
+			runQuery_f(r, "DEALLOCATE "+prid);
+			if(r.data().size()!=1 || ersCommandOk != r.data()[0]->status())
+			{
+				const char * errCode = r.data()[0]->errorCode();
+				if(errCode && !strcmp("26000", errCode))
+				{
+					//ERROR:  prepared statement "XXX" does not exist
+				}
+				else
+				{
+					//другая ошибка - фатально
+					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
+					_prepareds.clear();
+					res.set();
+					return;
+				}
+			}
+		}
+		res.set();
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	async::Result<system::error_code> ConnectionImpl::send0()
 	{
 		async::Result<system::error_code> h;
-		_sock.async_send(asio::null_buffers(), _strand.wrap(bind(h, _1)));
-		//_sock.async_send(asio::null_buffers(), bind(h, _1));
+		//_sock.async_send(asio::null_buffers(), _strand.wrap(bind(h, _1)));
+		_sock.async_send(asio::null_buffers(), bind(h, _1));
 		return h;
 	}
 
@@ -430,7 +476,7 @@ namespace pgc
 	ConnectionImpl::ConnectionImpl(PGconn *pgcon)
 		: _pgcon(pgcon)
 		, _sock(async::io(), PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
-		, _strand(async::io())
+		//, _strand(async::io())
 		, _integerDatetimes(false)
 		, _requestInProcess(false)
 	{
@@ -505,23 +551,32 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::dispatch(function<void()> action)
 	{
-		_strand.dispatch(action);
+		//_strand.dispatch(action);
 		//_asrv->get_io_service().dispatch(action);
+		async::exec(action);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::post(function<void()> action)
 	{
-		_strand.post(action);
+		//_strand.post(action);
 		//_asrv->get_io_service().post(action);
+		async::spawn(action);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runQuery(async::Result<IResultPtrs> res, const std::string &sql)
 	{
+		_mtxProcess.lock();
+
 		SRequestPtr r(new SRequestQuery(res, sql));
 		_requests.push_back(r);
-		if(!_requestInProcess)
+
+		if(_requestInProcess)
+		{
+			_mtxProcess.unlock();
+		}
+		else
 		{
 			post(bind(&ConnectionImpl::processRequest, shared_from_this()));
 		}
@@ -530,10 +585,16 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data)
 	{
+		_mtxProcess.lock();
+
 		SRequestPtr r(new SRequestQueryWithPrepare(res, s, data));
 		_requests.push_back(r);
 
-		if(!_requestInProcess)
+		if(_requestInProcess)
+		{
+			_mtxProcess.unlock();
+		}
+		else
 		{
 			post(bind(&ConnectionImpl::processRequest, shared_from_this()));
 		}
@@ -546,37 +607,20 @@ namespace pgc
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionImpl::endWork()
+	void ConnectionImpl::runEndWork(async::Result<IResultPtrs> res)
 	{
-		posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
+		_mtxProcess.lock();
 
-		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
-		while(
-			!timedIndex.empty() &&
-			(
-				timedIndex.size() > _max ||
-				boundATime > timedIndex.begin()->_accessTime)		)
+		SRequestPtr r(new SRequestEndWork(res));
+		_requests.push_back(r);
+
+		if(_requestInProcess)
 		{
-			std::string prid = timedIndex.begin()->_prid;
-			timedIndex.erase(timedIndex.begin());
-
-			async::Result<IResultPtrs> r;
-			runQuery_f(r, "DEALLOCATE "+prid);
-			if(r.data().size()!=1 || ersCommandOk != r.data()[0]->status())
-			{
-				const char * errCode = r.data()[0]->errorCode();
-				if(errCode && !strcmp("26000", errCode))
-				{
-					//ERROR:  prepared statement "XXX" does not exist
-				}
-				else
-				{
-					//другая ошибка - фатально
-					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-					_prepareds.clear();
-					return;
-				}
-			}
+			_mtxProcess.unlock();
+		}
+		else
+		{
+			post(bind(&ConnectionImpl::processRequest, shared_from_this()));
 		}
 	}
 }

@@ -6,12 +6,14 @@ SET(INCLUDE
 
 	${INC_DIR}/async/event.hpp
 	${INC_DIR}/async/result.hpp
+	${INC_DIR}/async/mutex.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
 SET(SRC
 	${SRC_DIR}/async/service.cpp
 	${SRC_DIR}/async/event.cpp
+	${SRC_DIR}/async/mutex.cpp
 
 	${SRC_DIR}/async/serviceImpl.cpp
 	${SRC_DIR}/async/workerImpl.cpp
@@ -19,6 +21,7 @@ SET(SRC
 	${SRC_DIR}/async/fiberRootImpl.cpp
 
 	${SRC_DIR}/async/eventImpl.cpp
+	${SRC_DIR}/async/mutexImpl.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -36,6 +39,7 @@ SET(SRC_HDR
 	${SRC_DIR}/async/fiberPool.hpp
 
 	${SRC_DIR}/async/eventImpl.hpp
+	${SRC_DIR}/async/mutexImpl.hpp
 
 	${SRC_DIR}/async/cmaHandler.hpp
 	${SRC_DIR}/async/pch.h

@@ -14,10 +14,12 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	EventImpl::~EventImpl()
 	{
-#ifdef _DEBUG
 		mutex::scoped_lock sl(_mtx);
 		assert(_waiters.empty());
-#endif
+		BOOST_FOREACH(FiberImplPtr &fiber, _waiters)
+		{
+			WorkerImpl::current()->fiberReady(_waiters.front());
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -32,7 +34,11 @@ namespace async
 				WorkerImpl::current()->fiberReady(f);
 			}
 			_waiters.clear();
-			_isSet = true;
+
+			if(!_autoReset)
+			{
+				_isSet = true;
+			}
 		}
 	}
 
