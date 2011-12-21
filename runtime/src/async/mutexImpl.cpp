@@ -76,7 +76,8 @@ namespace async
 
 		if(!_owners.empty())
 		{
-			WorkerImpl::current()->fiberReadyIfWait(_owners.front());
+			bool fired = WorkerImpl::current()->fiberReadyIfWait(_owners.front());
+			(void)fired;
 		}
 	}
 
