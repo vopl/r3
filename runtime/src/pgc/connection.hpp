@@ -1,5 +1,5 @@
-#ifndef _PGC_CONNECTIONHOLDER_HPP_
-#define _PGC_CONNECTIONHOLDER_HPP_
+#ifndef _PGC_CONNECTION_HPP_
+#define _PGC_CONNECTION_HPP_
 
 #include "pgc/iconnection.hpp"
 #include <boost/enable_shared_from_this.hpp>
@@ -15,16 +15,16 @@ namespace pgc
 	typedef shared_ptr<Db> DbPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ConnectionHolder
+	class Connection
 		: public IConnection
-		, public enable_shared_from_this<ConnectionHolder>
+		, public enable_shared_from_this<Connection>
 	{
 		DbPtr _db;
 		ConnectionImplPtr _impl;
 
 	public:
-		ConnectionHolder(DbPtr db, ConnectionImplPtr impl);
-		~ConnectionHolder();
+		Connection(DbPtr db, ConnectionImplPtr impl);
+		~Connection();
 
 		virtual async::Result<IResultPtrs> query(const std::string &sql);
 		virtual async::Result<IResultPtrs> query(IStatementPtr s);
@@ -32,7 +32,7 @@ namespace pgc
 
 		virtual EConnectionStatus status();
 	};
-	typedef shared_ptr<ConnectionHolder> ConnectionHolderPtr;
+	typedef shared_ptr<Connection> ConnectionPtr;
 }
 
 #endif

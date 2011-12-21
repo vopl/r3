@@ -28,17 +28,28 @@ namespace async
 		mutex::scoped_lock sl(_mtx);
 		if(!_isSet)
 		{
-			BOOST_FOREACH(FiberImplPtr &f, _waiters)
-			{
-				assert(f.get() != FiberImpl::current());
-				WorkerImpl::current()->fiberReady(f);
-			}
-			_waiters.clear();
-
 			if(!_autoReset)
 			{
 				_isSet = true;
+				BOOST_FOREACH(FiberImplPtr &f, _waiters)
+				{
+					assert(f.get() != FiberImpl::current());
+					WorkerImpl::current()->fiberReady(f);
+				}
+				_waiters.clear();
+				return;
 			}
+
+			if(_waiters.empty())
+			{
+				_isSet = true;
+				return;
+			}
+
+			FiberImplPtr f;
+			f.swap(_waiters.front());
+			_waiters.pop_front();
+			WorkerImpl::current()->fiberReady(f);
 		}
 	}
 
@@ -68,6 +79,10 @@ namespace async
 
 			if(_isSet)
 			{
+				if(_autoReset)
+				{
+					_isSet = false;
+				}
 				return;
 			}
 

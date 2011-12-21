@@ -6,7 +6,7 @@
 #include <boost/thread/mutex.hpp>
 #include <set>
 #include <deque>
-#include "connectionHolder.hpp"
+#include "connection.hpp"
 
 namespace pgc
 {

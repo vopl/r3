@@ -43,7 +43,7 @@ namespace pgc
 					//есть готовые соединения
 
 					ConnectionImplPtr ci = *_readyConnections.begin();
-					IConnectionPtr c(new ConnectionHolder(shared_from_this(), ci));
+					IConnectionPtr c(new Connection(shared_from_this(), ci));
 					_waiters.front()(c);
 
 					_workConnections.insert(ci);
@@ -294,7 +294,7 @@ namespace pgc
 			ConnectionImplPtr ci = *_readyConnections.begin();
 			if(ecsOk == ci->status())
 			{
-				IConnectionPtr c(new ConnectionHolder(shared_from_this(), ci));
+				IConnectionPtr c(new Connection(shared_from_this(), ci));
 				res(c);
 
 				_workConnections.insert(ci);

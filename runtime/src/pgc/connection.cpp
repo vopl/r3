@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "connectionHolder.hpp"
+#include "connection.hpp"
 #include "db.hpp"
 
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionHolder::ConnectionHolder(DbPtr db, ConnectionImplPtr impl)
+	Connection::Connection(DbPtr db, ConnectionImplPtr impl)
 		: _db(db)
 		, _impl(impl)
 	{
@@ -13,7 +13,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ConnectionHolder::~ConnectionHolder()
+	Connection::~Connection()
 	{
 		async::Result<IResultPtrs> res;
 		_impl->runEndWork(res);
@@ -22,7 +22,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<IResultPtrs> ConnectionHolder::query(const std::string &sql)
+	async::Result<IResultPtrs> Connection::query(const std::string &sql)
 	{
 		async::Result<IResultPtrs> res;
 		_impl->runQuery(res, sql);
@@ -30,7 +30,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<IResultPtrs> ConnectionHolder::query(IStatementPtr s)
+	async::Result<IResultPtrs> Connection::query(IStatementPtr s)
 	{
 		async::Result<IResultPtrs> res;
 		_impl->runQueryWithPrepare(res, s, BindDataPtr());
@@ -38,7 +38,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<IResultPtrs> ConnectionHolder::query(IStatementPtr s, const utils::Variant &data)
+	async::Result<IResultPtrs> Connection::query(IStatementPtr s, const utils::Variant &data)
 	{
 		async::Result<IResultPtrs> res;
 		_impl->runQueryWithPrepare(res, s, BindDataPtr(new BindData(data, _impl)));
@@ -46,7 +46,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	EConnectionStatus ConnectionHolder::status()
+	EConnectionStatus Connection::status()
 	{
 		return _impl->status();
 	}
