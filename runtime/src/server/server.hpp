@@ -17,13 +17,28 @@ namespace server
 		, public boost::enable_shared_from_this<Server>
 	{
 		pluma::Pluma *_plugs;
-		async::IServicePtr	_async;
+		async::ServicePtr	_async;
 		ISessionManagerPtr	_sessionManager;
 		IServiceHubPtr		_serviceHub;
 
 		pgc::IDbPtr			_db;
 
+		size_t				_numThreads;
+		boost::mutex		_mtx;
+
+
+		enum EState
+		{
+			esStop,
+			esStart,
+			esError,
+		}					_state;
+		condition_variable	_isStartedCvar;
+
 	private:
+		void startup(const char *host, const char *service);
+		void shutdown();
+
 		void onSessionStart(ISessionPtr session);
 		void onSessionStop(ISessionPtr session);
 
@@ -37,7 +52,6 @@ namespace server
 		virtual bool start(pluma::Pluma *plugs, const char *host, const char *service);
 		virtual void stop();
 		virtual pluma::Pluma * getPlugs();
-		virtual async::IServicePtr getAsync();
 		virtual pgc::IDbPtr getDb();
 	};
 	PLUMA_INHERIT_PROVIDER(Server, IServer);

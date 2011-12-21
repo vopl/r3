@@ -2,7 +2,7 @@
 #define _NET_CONNECTOR_HPP_
 
 #include "net/iconnector.hpp"
-#include "async/iservice.hpp"
+#include "async/service.hpp"
 #include "channelSocket.hpp"
 
 namespace net
@@ -18,8 +18,6 @@ namespace net
 		: public IConnector
 		, public enable_shared_from_this<Connector>
 	{
-		async::IServicePtr _asrv;
-
 	private:
 		typedef shared_ptr<ip::tcp::resolver> TResolverPtr;
 		typedef shared_ptr<ip::tcp::acceptor> TAcceptorPtr;
@@ -97,7 +95,7 @@ namespace net
 		Connector();
 		~Connector();
 
-		virtual void initialize(async::IServicePtr asrv);
+		virtual void initialize();
 
 		void listen(
 			const char *host, const char *service,

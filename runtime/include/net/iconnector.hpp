@@ -1,7 +1,7 @@
 #ifndef _NET_ICONNECTOR_HPP_
 #define _NET_ICONNECTOR_HPP_
 
-#include "async/iservice.hpp"
+#include "pluma/pluma.hpp"
 #include "net/ichannel.hpp"
 
 namespace net
@@ -10,7 +10,7 @@ namespace net
 	{
 		virtual ~IConnector(){}
 
-		virtual void initialize(async::IServicePtr asrv) =0;
+		virtual void initialize() =0;
 
 		virtual void listen(
 			const char *host, const char *service,

@@ -2,7 +2,6 @@
 #include "client.hpp"
 
 
-
 namespace client
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -43,7 +42,6 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Client::start(
 		pluma::Pluma *plugs,
-		async::IServicePtr async,
 		boost::function<void (ISessionPtr)> onSessionStart,
 		boost::function<void (ISessionPtr)> onSessionStop,
 		boost::function<void (size_t numChannels, boost::system::error_code ec)> onChannelChange)
@@ -57,22 +55,24 @@ namespace client
 		_plugs = plugs;
 
 		assert(!_async);
-		_async = async;
+		_async = async::service();
 		if(!_async)
 		{
 			//////////////////////////////////////////////////////////////////////////
 			//подн€ть асинхронный двиг
-			_async = _plugs->create<async::IServiceProvider>();
+			_async = async::createService();
 			assert(_async);
 
 			_asyncOwn = true;
 
 			//запускать асинхронный двиг
 			_async->balance(1);
+			ILOG("client make own async service");
 		}
 		else
 		{
 			_asyncOwn = false;
+			ILOG("client use existing async service");
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace client
 		//подн€ть коннектор
 		net::IConnectorPtr connector = _plugs->create<net::IConnectorProvider>();
 		assert(connector);
-		connector->initialize(_async);
+		connector->initialize();
 
 		//////////////////////////////////////////////////////////////////////////
 		//подн€ть сессию
@@ -114,12 +114,6 @@ namespace client
 	pluma::Pluma *Client::getPlugs()
 	{
 		return _plugs;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	async::IServicePtr Client::getAsync()
-	{
-		return _async;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -13,7 +13,7 @@ namespace
 	public:
 		_static_root_log4cplus_initializer()
 		{
-			std::string logformat = "[%t] %d{%H:%M:%S.%q} %p %c: %m%n";
+			std::string logformat = "%d{%H:%M:%S.%q} %-5p [%-5t] %c: %m%n";
 			using namespace log4cplus;
 
 
@@ -37,6 +37,7 @@ namespace
 			Logger::getRoot().removeAllAppenders();
 			Logger::getRoot().addAppender(conApp);
 			Logger::getRoot().addAppender(fileApp);
+			Logger::getRoot().setLogLevel(TRACE_LOG_LEVEL);
 		}
 	} static initializer;
 }

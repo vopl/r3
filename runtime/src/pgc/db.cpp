@@ -4,7 +4,6 @@
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 
-
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -17,53 +16,53 @@ namespace pgc
 	{
 	}
 
+
+
 	//////////////////////////////////////////////////////////////////////////
 	void Db::balanceConnections()
 	{
-		struct SWorkPair
-		{
-			ConnectionPreparedsPtr _con;
-			function<void (IConnectionPtr)>	_waiter;
-		};
-		std::deque<SWorkPair> readyWaiters;
-		ConnectionPreparedsPtr pcwStarted;
 
 		{
 			mutex::scoped_lock sl(_mtx);
 
-			//закрытие
+			//закрытие лишних
 			while(	!_readyConnections.empty() &&
 				_readyConnections.size() + _workConnections.size() + _startConnections.size() > _maxConnections)
 			{
 				ILOG("close connection");
 				(*_readyConnections.begin())->close();
 				_readyConnections.erase(_readyConnections.begin());
-				_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+				async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
 			}
 
 			//распределение и открытие
 			while(!_waiters.empty())
 			{
-				if(!_maxConnections)
-				{
-					//больше выделять нельзя, освободить всех ожидающих нулями
-					SWorkPair swp = {ConnectionPreparedsPtr(), _waiters.front()};
-					_waiters.erase(_waiters.begin());
-
-					readyWaiters.push_back(swp);
-					continue;
-				}
-
 				if(!_readyConnections.empty())
 				{
 					//есть готовые соединения
-					SWorkPair swp = {*_readyConnections.begin(), _waiters.front()};
+
+					ConnectionImplPtr ci = *_readyConnections.begin();
+					IConnectionPtr c(new Connection(shared_from_this(), ci));
+					_waiters.front()(c);
+
+					_workConnections.insert(ci);
 					_readyConnections.erase(_readyConnections.begin());
-					_waiters.erase(_waiters.begin());
 
-					readyWaiters.push_back(swp);
-					_workConnections.insert(swp._con);
+					_waiters.pop_front();
+					continue;
+				}
 
+				if(!_maxConnections)
+				{
+					//больше выделять нельзя, освободить всех ожидающих нулями
+
+					BOOST_FOREACH(async::Result<IConnectionPtr> &res, _waiters)
+					{
+						WLOG("force null result on allocConnection");
+						res(IConnectionPtr());
+					}
+					_waiters.clear();
 					continue;
 				}
 
@@ -71,167 +70,166 @@ namespace pgc
 					_readyConnections.size() + _workConnections.size() < _maxConnections)
 				{
 					//готовых нет, стартующих нет, можно подключать новое
+					async::spawn(bind(&Db::makeConnection, shared_from_this()));
+				}
+				break;
+			}
+		}
+	}
 
-					ILOG("start connection");
-					PGconn *pgcon = PQconnectStart(_conninfo.c_str());
-					bool isOk = true;
-					if(pgcon)
-					{
-						ConnStatusType status = PQstatus(pgcon);
-						if(CONNECTION_BAD == status)
-						{
-							ILOG("start connection failed, bad status");
-							PQfinish(pgcon);
-							isOk = false;
-						}
-					}
-					else
-					{
-						ILOG("start connection failed, libpq has been unable to allocate a new PGconn structure");
-						isOk = false;
-					}
+	//////////////////////////////////////////////////////////////////////////
+	void Db::makeConnection()
+	{
+		ConnectionImplPtr pcw;
+		{
+			mutex::scoped_lock sl(_mtx);
 
-					if(isOk)
-					{
-// 							PostgresPollingStatusType status;
-// 							status = PQconnectPoll(pgcon);
-// 							status = PQconnectPoll(pgcon);
-// 							status = PQconnectPoll(pgcon);
+			if(!_startConnections.empty())
+			{
+				//уже происходит подключение, ничего не делать
+				return;
+			}
+			ILOG("start connection");
+			PGconn *pgcon = PQconnectStart(_conninfo.c_str());
+			bool isOk = true;
+			if(pgcon)
+			{
+				ConnStatusType status = PQstatus(pgcon);
+				if(CONNECTION_BAD == status)
+				{
+					ILOG("start connection failed, bad status");
+					PQfinish(pgcon);
+					isOk = false;
+				}
+			}
+			else
+			{
+				ILOG("start connection failed, libpq has been unable to allocate a new PGconn structure");
+				isOk = false;
+			}
 
-						pcwStarted.reset(new ConnectionPrepareds(pgcon, _asrv->get_io_service()));
-						_startConnections.insert(pcwStarted);
-					}
-					else
+			if(isOk)
+			{
+				pcw.reset(new ConnectionImpl(pgcon));
+				_startConnections.insert(pcw);
+			}
+			else
+			{
+				if(!_timeout)
+				{
+					ILOG("wait 1 second for rebalance connections");
+					_timeout.reset(new Timeout(async::io(), boost::posix_time::seconds(1)));
+					_timeout->async_wait(
+						bind(&Db::onRebalanceTimer, shared_from_this()));
+				}
+			}
+		}
+
+		if(pcw)
+		{
+			makeConnection_poll(pcw);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Db::makeConnection_poll(ConnectionImplPtr pcw)
+	{
+		enum EStatus
+		{
+			esContinue,
+			esOk,
+			esBad,
+		} es(esContinue);
+
+		while(esContinue == es)
+		{
+			switch(PQconnectPoll(pcw->pgcon()))
+			{
+			case PGRES_POLLING_FAILED:
+				ELOG("poll result FAILED: "<<PQerrorMessage(pcw->pgcon()));
+				es = esBad;
+				break;
+			case PGRES_POLLING_READING:
+				{
+					async::Result<system::error_code> r = pcw->recv0();
+					if(r.data())
 					{
-						if(!_timeout)
-						{
-							ILOG("wait 1 second for reconnect");
-							_timeout.reset(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
-							_timeout->async_wait(
-								bind(&Db::onReconnectTimer, shared_from_this()));
-						}
+						ILOG("poll with bad ec: "<<r.data()<<")");
+						es = esBad;
+					}
+				}
+				break;
+			case PGRES_POLLING_WRITING:
+				{
+					async::Result<system::error_code> r = pcw->send0();
+					if(r.data())
+					{
+						ILOG("poll with bad ec: "<<r.data()<<")");
+						es = esBad;
+					}
+				}
+				break;
+			case PGRES_POLLING_OK:
+				{
+					//ILOG("poll result OK");
+					es = esOk;
+				}
+				break;
+			default:
+				ELOG("poll result UNKNOWN");
+				{
+					assert(0);
+					int k=220;
+				}
+				break;
+			}
+
+			switch(es)
+			{
+			case esOk:
+				{
+					pcw->onOpen();
+					size_t numConnections=0;
+					{
+						mutex::scoped_lock sl(_mtx);
+						assert(_startConnections.end() != _startConnections.find(pcw));
+						_startConnections.erase(pcw);
+						_readyConnections.insert(pcw);
+						async::spawn(bind(_onConnectionMade, _readyConnections.size() + _workConnections.size()));
+					}
+					async::spawn(bind(&Db::balanceConnections, shared_from_this()));
+				}
+				break;
+			case esBad:
+				{
+					mutex::scoped_lock sl(_mtx);
+					assert(_startConnections.end() != _startConnections.find(pcw));
+					_startConnections.erase(pcw);
+
+					if(!_maxConnections)
+					{
+						ILOG("connection mading abadoned");
+						async::spawn(bind(&Db::balanceConnections, shared_from_this()));
+						return;
+					}
+					if(!_timeout)
+					{
+						ILOG("wait 1 second for reconnect");
+						_timeout.reset(new Timeout(async::io(), boost::posix_time::seconds(1)));
+						_timeout->async_wait(
+							bind(&Db::onRebalanceTimer, shared_from_this()));
+						return;
 					}
 				}
 				break;
 			}
 		}
-
-		if(pcwStarted)
-		{
-			makeConnection_poll(pcwStarted, system::errc::make_error_code(system::errc::success));
-		}
-
-		BOOST_FOREACH(SWorkPair &wp, readyWaiters)
-		{
-			IConnectionPtr c;
-			if(wp._con)
-			{
-				c.reset(new ConnectionHolder(shared_from_this(), wp._con));
-			}
-			if(wp._waiter)
-			{
-				_asrv->get_io_service().post(bind(wp._waiter, c));
-			}
-		}
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::makeConnection_poll(ConnectionPreparedsPtr pcw, system::error_code ec)
+	void Db::onRebalanceTimer()
 	{
-		if(ec)
-		{
-			ILOG("poll with bad ec: "<<ec.message()<<"("<<ec.value()<<")");
-		}
-
-// 		switch(PQstatus(pcw->pgcon()))
-// 		{
-// 		case CONNECTION_OK:
-// 			ILOG("poll status CONNECTION_OK");
-// 			break;
-// 		case CONNECTION_BAD:
-// 			ILOG("poll status CONNECTION_OK");
-// 			break;
-// 		case CONNECTION_STARTED:
-// 			ILOG("poll status CONNECTION_STARTED");
-// 			break;
-// 		case CONNECTION_MADE:
-// 			ILOG("poll status CONNECTION_MADE");
-// 			break;
-// 		case CONNECTION_AWAITING_RESPONSE:
-// 			ILOG("poll status CONNECTION_AWAITING_RESPONSE");
-// 			break;
-// 		case CONNECTION_AUTH_OK:
-// 			ILOG("poll status CONNECTION_AUTH_OK");
-// 			break;
-// 		case CONNECTION_SETENV:
-// 			ILOG("poll status CONNECTION_SETENV");
-// 			break;
-// 		case CONNECTION_SSL_STARTUP:
-// 			ILOG("poll status CONNECTION_SSL_STARTUP");
-// 			break;
-// 		case CONNECTION_NEEDED:
-// 			ILOG("poll status CONNECTION_NEEDED");
-// 			break;
-// 		default:
-// 			ILOG("poll status UNKNOWN");
-// 			break;
-// 		}
-
-
-		switch(PQconnectPoll(pcw->pgcon()))
-		{
-		case PGRES_POLLING_FAILED:
-			ELOG("poll result FAILED: "<<PQerrorMessage(pcw->pgcon()));
-			{
-				mutex::scoped_lock sl(_mtx);
-				assert(_startConnections.end() != _startConnections.find(pcw));
-				_startConnections.erase(pcw);
-
-				if(!_timeout)
-				{
-					ILOG("wait 1 second for reconnect");
-					_timeout.reset(new Timeout(_asrv->get_io_service(), boost::posix_time::seconds(1)));
-					_timeout->async_wait(
-						bind(&Db::onReconnectTimer, shared_from_this()));
-				}
-			}
-			return;
-		case PGRES_POLLING_READING:
-			pcw->waitRecv(bind(&Db::makeConnection_poll, shared_from_this(), pcw, _1));
-			return;
-		case PGRES_POLLING_WRITING:
-			pcw->waitSend(bind(&Db::makeConnection_poll, shared_from_this(), pcw, _1));
-			return;
-		case PGRES_POLLING_OK:
-			{
-				//ILOG("poll result OK");
-				pcw->onOpen();
-				size_t numConnections=0;
-				{
-					mutex::scoped_lock sl(_mtx);
-					assert(_startConnections.end() != _startConnections.find(pcw));
-					_startConnections.erase(pcw);
-					_readyConnections.insert(pcw);
-					_asrv->get_io_service().post(bind(_onConnectionMade, _readyConnections.size() + _workConnections.size()));
-				}
-				balanceConnections();
-			}
-			return;
-		default:
-			ELOG("poll result UNKNOWN");
-			{
-				assert(0);
-				int k=220;
-			}
-			break;
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Db::onReconnectTimer()
-	{
-		ILOG("reconnect timer now");
+		ILOG("rebalance timer now");
 		{
 			mutex::scoped_lock sl(_mtx);
 			_timeout.reset();
@@ -241,7 +239,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::unwork(ConnectionPreparedsPtr pcw)
+	void Db::unwork(ConnectionImplPtr pcw)
 	{
 		if(ecsOk == pcw->status())
 		{
@@ -260,7 +258,7 @@ namespace pgc
 				mutex::scoped_lock sl(_mtx);
 				assert(_workConnections.end() != _workConnections.find(pcw));
 				_workConnections.erase(pcw);
-				_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+				async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
 			}
 		}
 
@@ -269,7 +267,6 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	void Db::initialize(
-		async::IServicePtr asrv,
 		const char *conninfo,
 		size_t maxConnections,
 		function<void (size_t)> connectionMade,
@@ -277,9 +274,6 @@ namespace pgc
 	{
 		ILOG("initialize");
 		mutex::scoped_lock sl(_mtx);
-		assert(!_asrv);
-		_asrv = asrv;
-		assert(_asrv);
 
 		_conninfo = conninfo;
 		_maxConnections = maxConnections;
@@ -288,68 +282,39 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Db::allocConnection(function<void (IConnectionPtr)> ready)
+	async::Result<IConnectionPtr> Db::allocConnection()
 	{
-		ConnectionPreparedsPtr pcw;
+		mutex::scoped_lock sl(_mtx);
 
-		bool unableAlloc = false;
+		async::Result<IConnectionPtr> res;
+
+		//небольшая оптимизация - если есть готовые то отдать сразу, без балансировки
+		if(!_readyConnections.empty())
 		{
-			mutex::scoped_lock sl(_mtx);
-			while(_readyConnections.size())
+			ConnectionImplPtr ci = *_readyConnections.begin();
+			if(ecsOk == ci->status())
 			{
-				ConnectionPreparedsPtr pcw = *_readyConnections.begin();
+				IConnectionPtr c(new Connection(shared_from_this(), ci));
+				res(c);
 
-				if(ecsOk != pcw->status())
-				{
-					ELOG("bad connection detected");
-					{
-						mutex::scoped_lock sl(_mtx);
-						assert(_workConnections.end() != _workConnections.find(pcw));
-						_workConnections.erase(pcw);
-						_asrv->get_io_service().post(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
-					}
-					continue;
-				}
-
-				EConnectionStatus status = pcw->status();
-				assert(ecsOk == status);
-				_workConnections.insert(pcw);
+				_workConnections.insert(ci);
 				_readyConnections.erase(_readyConnections.begin());
-
-				IConnectionPtr c(new ConnectionHolder(shared_from_this(), pcw));
-				_asrv->get_io_service().post(bind(ready, c));
-				return;
-			}
-
-			//не удалось выделить из готовых
-			{
-				if(_maxConnections)
-				{
-					_waiters.push_back(ready);
-				}
-				else
-				{
-					if(_startConnections.size() + _workConnections.size())
-					{
-						_waiters.push_back(ready);
-					}
-					else
-					{
-						ELOG("alloc connection force NULL result");
-						_asrv->get_io_service().post(bind(ready, IConnectionPtr()));
-					}
-				}
+				return res;
 			}
 		}
 
-		balanceConnections();
+		//не повезло, делать балансировку
+		_waiters.push_back(res);
+		async::spawn(bind(&Db::balanceConnections, shared_from_this()));
+
+		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Db::deinitialize()
 	{
 		ILOG("deinitialize");
-		std::deque<function<void (IConnectionPtr)> > waiters;
+		std::deque<async::Result<IConnectionPtr> > waiters;
 		{
 			mutex::scoped_lock sl(_mtx);
 
@@ -363,7 +328,7 @@ namespace pgc
 			_conninfo.clear();
 			waiters.swap(_waiters);
 		}
-		BOOST_FOREACH(function<void (IConnectionPtr)> &w, waiters)
+		BOOST_FOREACH(async::Result<IConnectionPtr> &w, waiters)
 		{
 			w(IConnectionPtr());
 		}
@@ -388,7 +353,5 @@ namespace pgc
 
 		_onConnectionMade.swap(function<void (size_t)>());
 		_onConnectionLost.swap(function<void (size_t)>());
-
-		_asrv.reset();
 	}
 }

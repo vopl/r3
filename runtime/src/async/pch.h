@@ -5,3 +5,5 @@
 
 #define LOG_NAME async
 #include "log/client.hpp"
+
+using namespace boost;

@@ -24,8 +24,7 @@ namespace server
 		pgc::IDbPtr _db;
 
 		void onResult(pgc::IResultPtrs r);
-		void onConnection(pgc::IConnectionPtr c);
-		void onConnection2(pgc::IConnectionPtr c);
+		void connectionLoop1();
 
 	public:
 		ServiceVictim();

@@ -38,7 +38,7 @@ namespace server
 		//TLOG("onResult");
 
 		cnt++;
-		if(!(cnt%100000))
+		if(!(cnt%10000))
 		{
 			pgc::EResultStatus s = r[0]->status();
 			const char *msg = r[0]->errorMsg();
@@ -48,99 +48,40 @@ namespace server
 		}
 	}
 
-	pgc::IStatementPtr s;
-
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onConnection(pgc::IConnectionPtr c)
+	void ServiceVictim::connectionLoop1()
 	{
-		if(!c)
+		pgc::IStatementPtr s;
+		async::Result<pgc::IConnectionPtr> c=_db->allocConnection();
+		for(;;)
 		{
-			TLOG("onConnection NULL");
-			return;
+			//TLOG("connectionLoop1");
+			if(!s || !(rand()%2))
+			{
+				s = _pluma->create<pgc::IStatementProvider>();
+				s->setSql("SELECT '123.456789'::numeric");
+			}
+
+			if(!c.data())
+			{
+				TLOG("connectionLoop1 c NULL");
+				return;
+			}
+
+ 			async::Result<pgc::IResultPtrs> res = c.data()->query(s);
+ 			async::Result<pgc::IResultPtrs> res2 = c.data()->query(s);
+
+			if(!_db)
+			{
+				TLOG("connectionLoop1 db NULL");
+				return;
+			}
+			c = _db->allocConnection();
+
+ 			onResult(res.data());
+ 			onResult(res2.data());
+
 		}
-		//TLOG("onConnection");
-		if(!s || (rand()%50)==25)
-		{
-			s = _pluma->create<pgc::IStatementProvider>();
-			s->setSql("SELECT '123.456789'::numeric");
-		}
-
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-
-// 		boost::xtime xt;
-// 		boost::xtime_get(&xt, boost::TIME_UTC);
-// 		xt.sec += 1;
-// 		boost::thread::sleep(xt);
-
-		if(!_db)
-		{
-			return;
-		}
-		_db->allocConnection(
-			bind(&ServiceVictim::onConnection, shared_from_this(), _1));
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onConnection2(pgc::IConnectionPtr c)
-	{
-		if(!c)
-		{
-			TLOG("onConnection2 NULL");
-			return;
-		}
-		//TLOG("onConnection");
-
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-		c->query(s, //v,
-			bind(&ServiceVictim::onResult, shared_from_this(), _1));
-
-// 		boost::xtime xt;
-// 		boost::xtime_get(&xt, boost::TIME_UTC);
-// 		xt.sec += 1;
-// 		boost::thread::sleep(xt);
-
-		if(!_db)
-		{
-			return;
-		}
-		_db->allocConnection(
-			bind(&ServiceVictim::onConnection2, shared_from_this(), _1));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -169,10 +110,13 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		_db->allocConnection(
-			bind(&ServiceVictim::onConnection, shared_from_this(), _1));
-		_db->allocConnection(
-			bind(&ServiceVictim::onConnection2, shared_from_this(), _1));
+		for(size_t i(0); i<10; i++)
+		{
+			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		}
+//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 
 		int k = 220;
 		//

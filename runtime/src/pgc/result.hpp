@@ -3,7 +3,7 @@
 
 #include "pgc/iresult.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include "connectionLow.hpp"
+#include "connectionImpl.hpp"
 
 namespace pgc
 {
@@ -15,9 +15,9 @@ namespace pgc
 		, public enable_shared_from_this<Result>
 	{
 		PGresult *_pgr;
-		ConnectionLowPtr _con;
+		ConnectionImplPtr _con;
 	public:
-		Result(PGresult *pgr, ConnectionLowPtr con);
+		Result(PGresult *pgr, ConnectionImplPtr con);
 		~Result();
 
 		virtual EResultStatus status();

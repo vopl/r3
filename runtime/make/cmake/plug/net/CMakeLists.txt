@@ -39,7 +39,7 @@ CREATE_PCH(plugnet ${SRC_DIR}/net/pch.h ${SRC_PCH})
 USE_PCH(plugnet ${SRC_DIR}/net/pch.h ${SRC})
 SETUP_BIN_OUT(plugnet plug)
 
-TARGET_LINK_LIBRARIES(plugnet libheap libpluma libutils)
+TARGET_LINK_LIBRARIES(plugnet libheap libpluma libutils libasync)
 
 
 INCLUDE(FindOpenSSL.cmake)

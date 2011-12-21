@@ -6,7 +6,7 @@
 #include <boost/thread/mutex.hpp>
 #include <set>
 #include <deque>
-#include "connectionHolder.hpp"
+#include "connection.hpp"
 
 namespace pgc
 {
@@ -17,18 +17,17 @@ namespace pgc
 		, public enable_shared_from_this<Db>
 	{
 		mutex					_mtx;
-		async::IServicePtr		_asrv;
 		std::string				_conninfo;
 		size_t					_maxConnections;
 		function<void (size_t)> _onConnectionMade;
 		function<void (size_t)> _onConnectionLost;
 
 	private:
-		typedef std::set<ConnectionPreparedsPtr> TSConnectins;
+		typedef std::set<ConnectionImplPtr> TSConnectins;
 		TSConnectins									_startConnections;
 		TSConnectins									_readyConnections;
 		TSConnectins									_workConnections;
-		std::deque<function<void (IConnectionPtr)> >	_waiters;
+		std::deque<async::Result<IConnectionPtr> >		_waiters;
 
 		typedef asio::deadline_timer Timeout;
 		typedef boost::shared_ptr<Timeout> TimeoutPtr;
@@ -36,26 +35,28 @@ namespace pgc
 
 	private:
 		void balanceConnections();
-		void makeConnection_poll(ConnectionPreparedsPtr pcw, system::error_code ec);
+
+		void makeConnection();
+		void makeConnection_poll(ConnectionImplPtr pcw);
 
 	private:
-		void onReconnectTimer();
+		void onRebalanceTimer();
 
 	public:
-		void unwork(ConnectionPreparedsPtr pcw);
+		void unwork(ConnectionImplPtr pcw);
 
 	public:
 		Db();
 		~Db();
 
 		virtual void initialize(
-			async::IServicePtr asrv,
 			const char *conninfo,
 			size_t maxConnections,
 			function<void (size_t)> connectionMade,
 			function<void (size_t)> connectionLost);
 
-		virtual void allocConnection(function<void (IConnectionPtr)> ready);
+		//virtual void allocConnection(function<void (IConnectionPtr)> ready);
+		virtual async::Result<IConnectionPtr> allocConnection();
 
 		virtual void deinitialize();
 	};

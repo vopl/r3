@@ -13,10 +13,8 @@ SET(SRC
 	${SRC_DIR}/pgc/db.cpp
 	${SRC_DIR}/pgc/statement.cpp
 	${SRC_DIR}/pgc/result.cpp
-	${SRC_DIR}/pgc/connectionLow.cpp
-	${SRC_DIR}/pgc/connectionProcessor.cpp
-	${SRC_DIR}/pgc/connectionPrepareds.cpp
-	${SRC_DIR}/pgc/connectionHolder.cpp
+	${SRC_DIR}/pgc/connection.cpp
+	${SRC_DIR}/pgc/connectionImpl.cpp
 	${SRC_DIR}/pgc/bindData.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
@@ -31,10 +29,8 @@ SET(SRC_HDR
 	${SRC_DIR}/pgc/db.hpp
 	${SRC_DIR}/pgc/statement.hpp
 	${SRC_DIR}/pgc/result.hpp
-	${SRC_DIR}/pgc/connectionLow.hpp
-	${SRC_DIR}/pgc/connectionProcessor.hpp
-	${SRC_DIR}/pgc/connectionPrepareds.hpp
-	${SRC_DIR}/pgc/connectionHolder.hpp
+	${SRC_DIR}/pgc/connection.hpp
+	${SRC_DIR}/pgc/connectionImpl.hpp
 	${SRC_DIR}/pgc/bindData.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
@@ -65,5 +61,5 @@ CREATE_PCH(plugpgc ${SRC_DIR}/pgc/pch.h ${SRC_PCH})
 USE_PCH(plugpgc ${SRC_DIR}/pgc/pch.h ${SRC})
 SETUP_BIN_OUT(plugpgc plug)
 
-TARGET_LINK_LIBRARIES(plugpgc libheap libpluma libutils liblog)
+TARGET_LINK_LIBRARIES(plugpgc libheap libpluma libutils liblog libasync)
 TARGET_LINK_LIBRARIES(plugpgc ${PostgreSQL_LIBRARY})
