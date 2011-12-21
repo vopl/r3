@@ -3,7 +3,7 @@
 
 #include "async/api.h"
 #include <boost/shared_ptr.hpp>
-
+#include <deque>
 
 //////////////////////////////////////////////////////////////////////////
 namespace async
@@ -23,6 +23,10 @@ namespace async
 		void reset();
 		bool isSet();
 		void wait();
+
+	public:
+		typedef std::deque<Event *> Deque;
+		static Deque::iterator waitAny(Deque::iterator begin, Deque::iterator end);
 	};
 }
 

@@ -27,7 +27,7 @@ namespace server
 
 		_db->initialize(
 			"host=localhost port=5432 dbname=test user=test password=test",
-			20,
+			4,
 			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
 

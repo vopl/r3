@@ -7,6 +7,7 @@
 #include "serviceVictim.hpp"
 #include "server/iserviceHub.hpp"
 #include "server/iserver.hpp"
+#include "async/resultContainer.hpp"
 
 namespace server
 {
@@ -56,7 +57,7 @@ namespace server
 		for(;;)
 		{
 			//TLOG("connectionLoop1");
-			if(!s || !(rand()%2))
+			if(!s)// || !(rand()%2))
 			{
 				s = _pluma->create<pgc::IStatementProvider>();
 				s->setSql("SELECT '123.456789'::numeric");
@@ -68,8 +69,11 @@ namespace server
 				return;
 			}
 
- 			async::Result<pgc::IResultPtrs> res = c.data()->query(s);
- 			async::Result<pgc::IResultPtrs> res2 = c.data()->query(s);
+			async::ResultWaiter<pgc::IResultPtrs> results;
+			for(size_t i(0); i<20; i++)
+			{
+				results |= c.data()->query(s);
+			}
 
 			if(!_db)
 			{
@@ -78,8 +82,10 @@ namespace server
 			}
 			c = _db->allocConnection();
 
- 			onResult(res.data());
- 			onResult(res2.data());
+			while(results.wait())
+			{
+ 				onResult(results.current());
+			}
 
 		}
 	}
@@ -110,7 +116,7 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		for(size_t i(0); i<10; i++)
+		for(size_t i(0); i<1; i++)
 		{
 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 		}

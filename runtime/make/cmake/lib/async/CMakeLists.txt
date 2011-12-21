@@ -5,8 +5,10 @@ SET(INCLUDE
 	${INC_DIR}/async/exception.hpp
 
 	${INC_DIR}/async/event.hpp
-	${INC_DIR}/async/result.hpp
 	${INC_DIR}/async/mutex.hpp
+
+	${INC_DIR}/async/result.hpp
+	${INC_DIR}/async/resultContainer.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
