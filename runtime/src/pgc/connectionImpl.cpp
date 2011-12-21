@@ -585,6 +585,7 @@ namespace pgc
 	void ConnectionImpl::runQuery(async::Result<IResultPtrs> res, const std::string &sql)
 	{
 		_mtxProcess.lock();
+		assert(_pgcon);
 
 		SRequestPtr r(new SRequestQuery(res, sql));
 		_requests.push_back(r);
@@ -596,6 +597,7 @@ namespace pgc
 	void ConnectionImpl::runQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data)
 	{
 		_mtxProcess.lock();
+		assert(_pgcon);
 
 		SRequestPtr r(new SRequestQueryWithPrepare(res, s, data));
 		_requests.push_back(r);
@@ -615,6 +617,7 @@ namespace pgc
 	void ConnectionImpl::runEndWork(async::Result<IResultPtrs> res)
 	{
 		_mtxProcess.lock();
+		assert(_pgcon);
 
 		SRequestPtr r(new SRequestEndWork(res));
 		_requests.push_back(r);
