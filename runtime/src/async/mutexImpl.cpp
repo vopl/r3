@@ -71,14 +71,15 @@ namespace async
 			return;
 		}
 
-		if(_owners.front().get() != FiberImpl::current())
-		{
-			ELOG("unlockStrict mutex which from alien fiber");
-			throw exception("unlockStrict mutex which from alien fiber");
-			return;
-		}
+		//не важно, что текущий фибер не €вл€етс€ владельцем
+// 		if(_owners.front().get() != FiberImpl::current())
+// 		{
+// 			ELOG("unlockStrict mutex which from alien fiber");
+// 			throw exception("unlockStrict mutex which from alien fiber");
+// 			return;
+// 		}
 
-		FiberImplPtr fiber = _owners.front();
+
 		_owners.erase(_owners.begin());
 
 		if(!_owners.empty())
@@ -94,26 +95,4 @@ namespace async
 #endif
 		}
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void MutexImpl::unlockAny()
-	{
-		boost::mutex::scoped_lock scopeLock(_mtx);
-		if(_owners.empty())
-		{
-			ELOG("unlock mutex which is not locked");
-			throw exception("unlock mutex which is not locked");
-			return;
-		}
-
-		FiberImplPtr fiber = _owners.front();
-		_owners.erase(_owners.begin());
-
-		if(!_owners.empty())
-		{
-			bool fired = WorkerImpl::current()->fiberReadyIfWait(_owners.front());
-			(void)fired;
-		}
-	}
-
 }

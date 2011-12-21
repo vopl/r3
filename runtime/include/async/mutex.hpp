@@ -23,12 +23,7 @@ namespace async
 		bool tryLock();
 		void lock();
 		bool isLocked();
-
-		//по фиберам
 		void unlock();
-
-		//по ресурсу, контролирует запуск фибера, поэтому немного медленнее
-		void unlockAny();
 	};
 }
 

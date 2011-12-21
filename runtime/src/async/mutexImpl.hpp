@@ -19,7 +19,6 @@ namespace async
 		void lock();
 		bool isLocked();
 		void unlock();
-		void unlockAny();
 	};
 	typedef shared_ptr<MutexImpl> MutexImplPtr;
 }

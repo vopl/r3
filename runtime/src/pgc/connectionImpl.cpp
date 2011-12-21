@@ -159,14 +159,14 @@ namespace pgc
 	{
 		if(_requestInProcess)
 		{
-			_mtxProcess.unlockAny();
+			_mtxProcess.unlock();
 			return;
 		}
 
 		_requestInProcess = true;
 		while(!_requests.empty())
 		{
-			SRequestPtr r = *_requests.begin();
+			SRequestPtr r = _requests.front();
 			_requests.erase(_requests.begin());
 
 			switch(r->_ert)
@@ -190,13 +190,17 @@ namespace pgc
 				}
 				break;
 			default:
+				_requestInProcess = false;
+				_mtxProcess.unlock();
+
 				assert(!"unknown ert");
 				throw("unknown ert");
+				return;
 			}
 			r->_res.wait();
 		}
 		_requestInProcess = false;
-		_mtxProcess.unlockAny();
+		_mtxProcess.unlock();
 	}
 
 
@@ -449,6 +453,11 @@ namespace pgc
 				}
 			}
 		}
+
+		_now = posix_time::ptime();
+		assert(_mtxProcess.isLocked());
+		assert(_requestInProcess);
+		assert(_pgcon);
 		res.set();
 	}
 
@@ -480,6 +489,7 @@ namespace pgc
 		, _integerDatetimes(false)
 		, _requestInProcess(false)
 	{
+		assert(_pgcon);
 		PQsetnonblocking(_pgcon, 0);
 	}
 
@@ -530,6 +540,11 @@ namespace pgc
 	{
 		if(_pgcon)
 		{
+			_mtxProcess.lock();
+			assert(_now.is_not_a_date_time());
+			assert(!_requestInProcess);
+			assert(_requests.empty());
+
 			PQfinish(_pgcon);
 			_pgcon = NULL;
 			system::error_code ec;
@@ -539,6 +554,8 @@ namespace pgc
 // 				std::cerr<<ec.message()<<std::endl;
 // 			}
 			_integerDatetimes = false;
+
+			_mtxProcess.unlock();
 		}
 	}
 
@@ -572,14 +589,7 @@ namespace pgc
 		SRequestPtr r(new SRequestQuery(res, sql));
 		_requests.push_back(r);
 
-		if(_requestInProcess)
-		{
-			_mtxProcess.unlockAny();
-		}
-		else
-		{
-			post(bind(&ConnectionImpl::processRequest, shared_from_this()));
-		}
+		post(bind(&ConnectionImpl::processRequest, shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -590,19 +600,14 @@ namespace pgc
 		SRequestPtr r(new SRequestQueryWithPrepare(res, s, data));
 		_requests.push_back(r);
 
-		if(_requestInProcess)
-		{
-			_mtxProcess.unlockAny();
-		}
-		else
-		{
-			post(bind(&ConnectionImpl::processRequest, shared_from_this()));
-		}
+		post(bind(&ConnectionImpl::processRequest, shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::beginWork()
 	{
+		assert(_pgcon);
+		assert(_now.is_not_a_date_time());
 		_now = posix_time::microsec_clock::local_time();
 	}
 	
@@ -614,13 +619,6 @@ namespace pgc
 		SRequestPtr r(new SRequestEndWork(res));
 		_requests.push_back(r);
 
-		if(_requestInProcess)
-		{
-			_mtxProcess.unlockAny();
-		}
-		else
-		{
-			post(bind(&ConnectionImpl::processRequest, shared_from_this()));
-		}
+		post(bind(&ConnectionImpl::processRequest, shared_from_this()));
 	}
 }
