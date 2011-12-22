@@ -46,7 +46,7 @@ namespace async
 		assert(fiber != _fiberRoot.get());
 		assert(fiber == FiberImpl::current());
 		{
-			mutex::scoped_lock sl(_fiberPool->_mtx);
+			mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 			_fiberPool->_fibersIdle.insert(fiber->shared_from_this());
 			assert(_fiberPool->_fibersReady.end() == _fiberPool->_fibersReady.find(fiber->shared_from_this()));
 		}
@@ -56,7 +56,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::fiberReady(FiberImplPtr fiber)
 	{
-		mutex::scoped_lock sl(_fiberPool->_mtx);
+		mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 		assert(fiber != _fiberRoot);
 		assert(fiber.get() != FiberImpl::current());
 		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber));
@@ -66,7 +66,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	bool WorkerImpl::fiberReadyIfWait(FiberImplPtr fiber)
 	{
-		mutex::scoped_lock sl(_fiberPool->_mtx);
+		mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 		assert(fiber != _fiberRoot);
 		assert(fiber.get() != FiberImpl::current());
 
@@ -94,7 +94,7 @@ namespace async
 		{
 			std::set<FiberImplPtr> fibersReady;
 			{
-				mutex::scoped_lock sl(_fiberPool->_mtx);
+				mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 				fibersReady.swap(_fiberPool->_fibersReady);
 			}
 
@@ -129,14 +129,15 @@ namespace async
 
 			//////////////////////////////////////////////////////////////////////////
 			{
-				mutex::scoped_lock sl(_fiberPool->_mtx);
-
+				mutex::scoped_lock sl(_fiberPool->_mtxTasks);
 				if(!_fiberPool->_tasks.empty())
 				{
 					tasksFromQueue.swap(*_fiberPool->_tasks.begin());
 					_fiberPool->_tasks.erase(_fiberPool->_tasks.begin());
 				}
-
+			}
+			{
+				mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 				if(!_fiberPool->_fibersIdle.empty())
 				{
 					fiber.swap(*_fiberPool->_fibersIdle.begin());
@@ -175,7 +176,7 @@ namespace async
 			}
 			else
 			{
-				mutex::scoped_lock sl(_fiberPool->_mtx);
+				mutex::scoped_lock sl(_fiberPool->_mtxTasks);
 				if(tasksFromQueue)
 				{
 					_fiberPool->_tasks.push_front(tasksFromQueue);

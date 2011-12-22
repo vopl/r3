@@ -99,6 +99,17 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::spawn(const boost::function<void ()> &code)
 	{
+		{
+			mutex::scoped_lock sl(_fiberPool->_mtxTasks);
+			if(!_fiberPool->_tasks.empty())
+			{
+				//исполнение уже идет, воркер будет выгребать все задачи, подсунуть ему еще и эту
+				_fiberPool->_tasks.push_back(code);
+				return;
+			}
+		}
+
+		//небыло задач к исполнителю, надо инициировать воркера
 		_io.post(code);
 	}
 	

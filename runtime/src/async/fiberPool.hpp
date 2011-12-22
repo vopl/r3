@@ -11,14 +11,15 @@ namespace async
 	public:
 		//фиберы без задачи
 		std::set<FiberImplPtr>			_fibersIdle;
-
 		//рабочие фиберы с задачей и готовые к исполнению
 		std::set<FiberImplPtr>			_fibersReady;
+		mutex							_mtxFibers;
+
 
 		//очередь задач на которые не хватило фиберов
 		std::deque<function<void()> >	_tasks;
+		mutex							_mtxTasks;
 
-		mutex							_mtx;
 	public:
 	};
 	typedef shared_ptr<FiberPool> FiberPoolPtr;
