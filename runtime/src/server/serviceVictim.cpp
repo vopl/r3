@@ -39,7 +39,7 @@ namespace server
 		//TLOG("onResult");
 
 		cnt++;
-		if(!(cnt%1000))
+		if(!(cnt%10000))
 		{
 			pgc::EResultStatus s = r[0]->status();
 			const char *msg = r[0]->errorMsg();
@@ -69,7 +69,7 @@ namespace server
 			if(!s)// || !(rand()%2))
 			{
 				s = _pluma->create<pgc::IStatementProvider>();
-				s->setSql("SELECT pg_sleep($1)");
+				s->setSql("SELECT $1");
 			}
 
 			if(!c1.data() || !c2.data() || !c3.data() || !c4.data())
