@@ -136,29 +136,29 @@ namespace async
 	{
 		MultiNotifierPtr pmn(new MultiNotifier);
 		pmn->_ready = NULL;
+		pmn->_initiator = FiberImpl::current()->shared_from_this();
 
 		//старт
+		pmn->_mtx.lock();
 		Event *iter = begin;
+		size_t idx(0);
+		for(; iter!=end; iter++)
 		{
-			mutex::scoped_lock sl(pmn->_mtx);
-
-			size_t idx(0);
-			for(; iter!=end; iter++)
+			if(!iter->_impl->mnWait(pmn))
 			{
-				if(!iter->_impl->mnWait(pmn))
+				pmn->_ready = iter->_impl.get();
+				pmn->_mtx.unlock();
+				//готов, откатить установленные
+				for(Event *iterBack = begin; iterBack!=iter; iterBack++)
 				{
-					//готов, откатить установленные
-					for(Event *iterBack = begin; iterBack!=iter; iterBack++)
-					{
-						iterBack->_impl->mnCancel(pmn);
-					}
-
-					return iter;
+					iterBack->_impl->mnCancel(pmn);
 				}
-			}
 
-			pmn->_initiator = FiberImpl::current()->shared_from_this();
+				return iter;
+			}
 		}
+		pmn->_mtx.unlock();
+
 
 		//никто не сработал при старте, ждать
 		WorkerImpl::current()->fiberYield();
@@ -166,8 +166,6 @@ namespace async
 		//один сработал, отменить остальные
 		assert(pmn->_ready);
 		{
-			//mutex::scoped_lock sl(pmn->_mtx);
-
 			for(Event *iterBack = begin; iterBack!=end; iterBack++)
 			{
 				if(iterBack->_impl.get() == pmn->_ready)

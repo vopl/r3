@@ -36,10 +36,10 @@ namespace server
 			TLOG("onResult NULL");
 			return;
 		}
-		TLOG("onResult");
+		//TLOG("onResult");
 
 		cnt++;
-		if(!(cnt%10000))
+		if(!(cnt%1000))
 		{
 			pgc::EResultStatus s = r[0]->status();
 			const char *msg = r[0]->errorMsg();
@@ -79,12 +79,12 @@ namespace server
 			}
 
 			std::vector<async::Result<pgc::IResultPtrs> > vresults;
-			for(size_t i(0); i<4; i++)
+			for(size_t i(0); i<10; i++)
 			{
-				vresults.push_back(c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX)));
-				vresults.push_back(c2.data()->query(s, utils::Variant(double(rand())/RAND_MAX)));
-				vresults.push_back(c3.data()->query(s, utils::Variant(double(rand())/RAND_MAX)));
-				vresults.push_back(c4.data()->query(s, utils::Variant(double(rand())/RAND_MAX)));
+				vresults.push_back(c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10)));
+				vresults.push_back(c2.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10)));
+				vresults.push_back(c3.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10)));
+				vresults.push_back(c4.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10)));
 			}
 			std::random_shuffle(vresults.begin(), vresults.end());
 
