@@ -7,7 +7,7 @@
 #include "serviceVictim.hpp"
 #include "server/iserviceHub.hpp"
 #include "server/iserver.hpp"
-#include "async/resultContainer.hpp"
+#include "async/resultWaiter.hpp"
 
 namespace server
 {
@@ -78,21 +78,15 @@ namespace server
 				return;
 			}
 
-			std::vector<async::Result<pgc::IResultPtrs> > vresults;
+			async::ResultWaiter<pgc::IResultPtrs> results;
+			//async::EventWaiter<async::Result<pgc::IResultPtrs> > results;
+
 			for(size_t i(0); i<10; i++)
 			{
-				vresults.push_back(c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000)));
-				vresults.push_back(c2.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000)));
-				vresults.push_back(c3.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000)));
-				vresults.push_back(c4.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000)));
-			}
-			std::random_shuffle(vresults.begin(), vresults.end());
-
-			async::ResultWaiter<pgc::IResultPtrs> results;
-			BOOST_FOREACH(async::Result<pgc::IResultPtrs> r, vresults)
-			{
-				results |= r;
-
+				results |= c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results &= c2.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results = results | c3.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results = !results & c4.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
 			}
 
 
