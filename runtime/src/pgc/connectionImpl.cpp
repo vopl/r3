@@ -555,7 +555,14 @@ namespace pgc
 			return ecsNull;
 		}
 		ConnStatusType status = PQstatus(_pgcon);
-		return CONNECTION_BAD == status ? ecsLost : ecsOk;
+
+		switch(status)
+		{
+		case CONNECTION_OK:
+		case CONNECTION_MADE:
+			return ecsOk;
+		}
+		return ecsLost;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

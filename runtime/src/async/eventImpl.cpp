@@ -167,7 +167,6 @@ namespace async
 		}
 		pmn->_mtx.unlock();
 
-
 		//никто не сработал при старте, ждать
 		WorkerImpl::current()->fiberYield();
 
