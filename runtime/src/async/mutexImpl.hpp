@@ -2,7 +2,7 @@
 #define _ASYNC_MUTEXIMPL_HPP_
 
 #include "async/mutex.hpp"
-#include <deque>
+#include <vector>
 #include "fiberImpl.hpp"
 
 namespace async
@@ -10,7 +10,7 @@ namespace async
 	class MutexImpl
 	{
 		mutex						_mtx;
-		std::deque<FiberImplPtr>	_owners;
+		std::vector<FiberImplPtr>	_owners;
 	public:
 		MutexImpl();
 		~MutexImpl();

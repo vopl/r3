@@ -2,7 +2,7 @@
 #define _ASYNC_EVENTIMPL_HPP_
 
 #include "async/event.hpp"
-#include <deque>
+#include <vector>
 #include "fiberImpl.hpp"
 
 namespace async
@@ -12,18 +12,26 @@ namespace async
 		mutex						_mtx;
 		volatile bool				_isSet;
 		bool						_autoReset;
-		std::deque<FiberImplPtr>	_waiters;
+		std::vector<FiberImplPtr>	_waiters;
 
 		struct MultiNotifier
 		{
 			mutex						_mtx;
 			FiberImplPtr				_initiator;
-			EventImpl *					_ready;
+			void *						_readyKey;
 
-			bool notifyReady(EventImpl *who);
+			bool notifyReady(void *key);
 		};
 		typedef boost::shared_ptr<MultiNotifier> MultiNotifierPtr;
-		std::deque<MultiNotifierPtr>	_pmnWaiters;
+
+		struct MultiNotifierMarked
+		{
+			MultiNotifierPtr _pmn;
+			void *_key;
+
+			MultiNotifierMarked(const MultiNotifierPtr &pmn, void *key);
+		};
+		std::vector<MultiNotifierMarked>	_mnWaiters;
 	public:
 		EventImpl(bool autoReset);
 		~EventImpl();
@@ -35,8 +43,10 @@ namespace async
 
 	public:
 		static Event *waitAny(Event *begin, Event *end);
-		bool mnWait(MultiNotifierPtr pmn);
-		void mnCancel(MultiNotifierPtr pmn);
+
+	private:
+		bool mnWait(const MultiNotifierMarked &mn);
+		void mnCancel(const MultiNotifierPtr &pmn);
 
 	};
 	typedef shared_ptr<EventImpl> EventImplPtr;
