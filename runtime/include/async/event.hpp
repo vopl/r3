@@ -14,6 +14,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	class ASYNC_API Event
 	{
+		friend class EventImpl;
 		EventImplPtr	_impl;
 
 	public:
@@ -25,8 +26,7 @@ namespace async
 		void wait();
 
 	public:
-		typedef std::deque<Event *> Deque;
-		static Deque::iterator waitAny(Deque::iterator begin, Deque::iterator end);
+		static Event *waitAny(Event *begin, Event *end);
 	};
 }
 

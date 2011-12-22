@@ -34,5 +34,14 @@ namespace async
 	{
 		return _impl->wait();
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Event *Event::waitAny(Event *begin, Event *end)
+	{
+		return EventImpl::waitAny(begin, end);
+	}
+
+
+
 }
 

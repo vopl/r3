@@ -36,7 +36,7 @@ namespace server
 			TLOG("onResult NULL");
 			return;
 		}
-		//TLOG("onResult");
+		TLOG("onResult");
 
 		cnt++;
 		if(!(cnt%10000))
@@ -53,34 +53,48 @@ namespace server
 	void ServiceVictim::connectionLoop1()
 	{
 		pgc::IStatementPtr s;
-		async::Result<pgc::IConnectionPtr> c=_db->allocConnection();
 		for(;;)
 		{
-			//TLOG("connectionLoop1");
-			if(!s)// || !(rand()%2))
-			{
-				s = _pluma->create<pgc::IStatementProvider>();
-				s->setSql("SELECT '123.456789'::numeric");
-			}
-
-			if(!c.data())
-			{
-				TLOG("connectionLoop1 c NULL");
-				return;
-			}
-
-			async::ResultWaiter<pgc::IResultPtrs> results;
-			for(size_t i(0); i<20; i++)
-			{
-				results |= c.data()->query(s);
-			}
-
 			if(!_db)
 			{
 				TLOG("connectionLoop1 db NULL");
 				return;
 			}
-			c = _db->allocConnection();
+			async::Result<pgc::IConnectionPtr> c1=_db->allocConnection();
+			async::Result<pgc::IConnectionPtr> c2=_db->allocConnection();
+			async::Result<pgc::IConnectionPtr> c3=_db->allocConnection();
+			async::Result<pgc::IConnectionPtr> c4=_db->allocConnection();
+
+			//TLOG("connectionLoop1");
+			if(!s)// || !(rand()%2))
+			{
+				s = _pluma->create<pgc::IStatementProvider>();
+				s->setSql("SELECT pg_sleep($1)");
+			}
+
+			if(!c1.data() || !c2.data() || !c3.data() || !c4.data())
+			{
+				TLOG("connectionLoop1 c NULL");
+				return;
+			}
+
+			std::vector<async::Result<pgc::IResultPtrs> > vresults;
+			for(size_t i(0); i<4; i++)
+			{
+				vresults.push_back(c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX)));
+				vresults.push_back(c2.data()->query(s, utils::Variant(double(rand())/RAND_MAX)));
+				vresults.push_back(c3.data()->query(s, utils::Variant(double(rand())/RAND_MAX)));
+				vresults.push_back(c4.data()->query(s, utils::Variant(double(rand())/RAND_MAX)));
+			}
+			std::random_shuffle(vresults.begin(), vresults.end());
+
+			async::ResultWaiter<pgc::IResultPtrs> results;
+			BOOST_FOREACH(async::Result<pgc::IResultPtrs> r, vresults)
+			{
+				results |= r;
+
+			}
+
 
 			while(results.wait())
 			{
@@ -116,13 +130,10 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		for(size_t i(0); i<1; i++)
+		for(size_t i(0); i<20; i++)
 		{
 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 		}
-//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-//  		async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 
 		int k = 220;
 		//

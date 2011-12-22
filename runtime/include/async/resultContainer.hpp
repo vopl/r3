@@ -12,7 +12,7 @@ namespace async
 	{
 	private:
 		std::deque<CustomEvent>		_customs;
-		Event::Deque				_events;
+		std::vector<Event>			_events;
 		size_t						_current;
 		static const size_t			_wrongIndex = (size_t)-1;
 
@@ -31,7 +31,8 @@ namespace async
 		EventWaiter &operator |=(const CustomEvent &evt)
 		{
 			_customs.push_back(evt);
-			_events.push_back(static_cast<Event *>(&_customs.back()));
+			_events.push_back(evt);
+			return *this;
 		}
 
 		//ждать
@@ -46,14 +47,14 @@ namespace async
 				_current++;
 			}
 
-			if(_current > _events.size())
+			if(_current >= _events.size())
 			{
 				return false;
 			}
 
-			Event::Deque::iterator begin = _events.begin()+_current;
-			Event::Deque::iterator ready =
-				Event::waitAny(begin, _events.end());
+			Event *begin = &_events[0]+_current;
+			Event *ready =
+				Event::waitAny(begin, &_events.back()+1);
 
 			if(begin != ready)
 			{
@@ -61,6 +62,7 @@ namespace async
 				std::swap(*begin, *ready);
 				std::swap(_customs[_current], _customs[readyIdx]);
 			}
+			return true;
 		}
 		
 		CustomEvent &current()

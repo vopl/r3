@@ -157,71 +157,54 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::processRequest()
 	{
-		assert(_mtxProcess.isLocked());
-		assert(!_requestInProcess);
-		assert(!_requests.empty());
-
-		if(_requestInProcess || _requests.empty())
-		{
-			_mtxProcess.unlock();
-			return;
-		}
-
-		_requestInProcess = true;
-		async::Result<IResultPtrs> result;
-		SRequestPtr request;
+		_mtxProcess.lock();
 
 		for(;;)
 		{
-			request = _requests.front();
-			_requests.erase(_requests.begin());
+			SRequestPtr request;
+			{
+				mutex::scoped_lock sl(_mtx);
+
+				if(_requests.empty())
+				{
+					break;
+				}
+				request = _requests.front();
+				_requests.erase(_requests.begin());
+			}
 
 			switch(request->_ert)
 			{
 			case ertQuery:
 				{
 					SRequestQuery *rd = static_cast<SRequestQuery *>(request.get());
-					runQuery_f(result, rd->_sql);
+					runQuery_f(rd->_res, rd->_sql);
 				}
 				break;
 			case ertQueryWithPrepare:
 				{
 					SRequestQueryWithPrepare *rd = static_cast<SRequestQueryWithPrepare *>(request.get());
-					runQueryWithPrepare_f(result, rd->_s, rd->_data);
+					runQueryWithPrepare_f(rd->_res, rd->_s, rd->_data);
 				}
 				break;
 			case ertQueryEndWork:
 				{
 					SRequestEndWork *rd = static_cast<SRequestEndWork *>(request.get());
-					runEndWork_f(result);
+					runEndWork_f(rd->_res);
 				}
 				break;
 			default:
-				_requestInProcess = false;
 				_mtxProcess.unlock();
 
 				assert(!"unknown ert");
 				throw("unknown ert");
 				return;
 			}
-			result.wait();
-			if(_requests.empty())
-			{
-				//последний ответ отдать после разблокировки
-				break;
-			}
-			else
-			{
-				request->_res(result.data());
-			}
-			result = async::Result<IResultPtrs>();
+			request->_res.wait();
 		}
 
-		assert(_requestInProcess);
 		assert(_mtxProcess.isLocked());
-		_requestInProcess = false;
 		_mtxProcess.unlock();
-		request->_res(result.data());
 	}
 
 
@@ -230,7 +213,6 @@ namespace pgc
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
-		assert(_requestInProcess);
 
 		//слать
 		while(PQflush(_pgcon))
@@ -281,7 +263,6 @@ namespace pgc
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
-		assert(_requestInProcess);
 
 		bool inTrans = false;
 		PGTransactionStatusType tstatus = PQtransactionStatus(pgcon());
@@ -369,7 +350,6 @@ namespace pgc
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
-		assert(_requestInProcess);
 
 		if(!PQsendQueryParams (
 			_pgcon, 
@@ -397,7 +377,6 @@ namespace pgc
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
-		assert(_requestInProcess);
 
 		int nParams = data?data->typ.size():0;
 		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
@@ -424,7 +403,6 @@ namespace pgc
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
-		assert(_requestInProcess);
 
 		int nParams = data?data->typ.size():0;
 		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
@@ -453,7 +431,6 @@ namespace pgc
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
-		assert(_requestInProcess);
 
 		if(hasPrepared(s))
 		{
@@ -469,7 +446,6 @@ namespace pgc
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
-		assert(_requestInProcess);
 
 		posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
 
@@ -505,7 +481,6 @@ namespace pgc
 
 		_now = posix_time::ptime();
 		assert(_mtxProcess.isLocked());
-		assert(_requestInProcess);
 		assert(_pgcon);
 		res.set();
 	}
@@ -533,7 +508,6 @@ namespace pgc
 		: _pgcon(pgcon)
 		, _sock(async::io(), PGSockProtocol(sockFamily(PQsocket(_pgcon)), sockType(PQsocket(_pgcon)), IPPROTO_TCP), PQsocket(_pgcon))
 		, _integerDatetimes(false)
-		, _requestInProcess(false)
 	{
 		assert(_pgcon);
 		PQsetnonblocking(_pgcon, 0);
@@ -544,7 +518,6 @@ namespace pgc
 	{
 		assert(!_mtxProcess.isLocked());
 		assert(_now.is_not_a_date_time());
-		assert(!_requestInProcess);
 
 		assert(ecsOk != status());
 		close();
@@ -590,9 +563,7 @@ namespace pgc
 	{
 		if(_pgcon)
 		{
-			assert(!_mtxProcess.isLocked());
 			assert(_now.is_not_a_date_time());
-			assert(!_requestInProcess);
 			assert(_requests.empty());
 
 			PQfinish(_pgcon);
@@ -616,7 +587,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runQuery(async::Result<IResultPtrs> res, const std::string &sql)
 	{
-		_mtxProcess.lock();
+		mutex::scoped_lock sl(_mtx);
 		assert(_pgcon);
 
 		SRequestPtr r(new SRequestQuery(res, sql));
@@ -628,7 +599,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runQueryWithPrepare(async::Result<IResultPtrs> res, IStatementPtr s, BindDataPtr data)
 	{
-		_mtxProcess.lock();
+		mutex::scoped_lock sl(_mtx);
 		assert(_pgcon);
 
 		SRequestPtr r(new SRequestQueryWithPrepare(res, s, data));
@@ -641,16 +612,15 @@ namespace pgc
 	void ConnectionImpl::beginWork()
 	{
 		assert(_pgcon);
-		assert(!_mtxProcess.isLocked());
+		//assert(!_mtxProcess.isLocked());//может быть в холостом процессе
 		assert(_now.is_not_a_date_time());
-		assert(!_requestInProcess);
 		_now = posix_time::microsec_clock::local_time();
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionImpl::runEndWork(async::Result<IResultPtrs> res)
 	{
-		_mtxProcess.lock();
+		mutex::scoped_lock sl(_mtx);
 		assert(_pgcon);
 
 		SRequestPtr r(new SRequestEndWork(res));

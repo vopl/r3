@@ -141,7 +141,7 @@ namespace pgc
 		TPrepareds			_prepareds;
 
 		TRequests			_requests;
-		bool				_requestInProcess;
+		mutex				_mtx;
 
 		async::Mutex		_mtxProcess;
 
