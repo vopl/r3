@@ -39,7 +39,7 @@ namespace server
 		//TLOG("onResult");
 
 		cnt++;
-		if(!(cnt%10000))
+		if(!(cnt%1000))
 		{
 			pgc::EResultStatus s = r[0]->status();
 			const char *msg = r[0]->errorMsg();
@@ -78,21 +78,27 @@ namespace server
 				return;
 			}
 
-			async::ResultWaiter<pgc::IResultPtrs> results;
+			async::ResultWaiter<pgc::IResultPtrs> results(
+				c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000))
+				);
 			//async::EventWaiter<async::Result<pgc::IResultPtrs> > results;
 
 			for(size_t i(0); i<10; i++)
 			{
-				results |= c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
-				results &= c2.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
-				results = results | c3.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
-				results = !results & c4.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results << c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results << c2.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results << c3.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results << c4.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
 			}
 
 
-			while(results.wait())
+// 			while(results.wait())
+// 			{
+//  				onResult(results.current());
+// 			}
+			while(results)
 			{
- 				onResult(results.current());
+				onResult(results);
 			}
 
 		}
@@ -124,7 +130,7 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		for(size_t i(0); i<20; i++)
+		for(size_t i(0); i<200; i++)
 		{
 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 		}
