@@ -15,7 +15,6 @@ INCLUDE(Local.cmake)
 #INCLUDE(CMakeExportBuildSettings)
 #CMAKE_EXPORT_BUILD_SETTINGS(buildSettings.txt)
 
-INCLUDE(excludeDefBuild.txt OPTIONAL)
 
 
 
@@ -44,3 +43,4 @@ ADD_SUBDIRECTORY(lib)
 ADD_SUBDIRECTORY(plug)
 
 
+INCLUDE(excludeDefBuild.txt OPTIONAL)

@@ -2,6 +2,7 @@ PROJECT (plugnet)
 
 SET(INCLUDE
 	${INC_DIR}/net/ichannel.hpp
+	${INC_DIR}/net/iacceptor.hpp
 	${INC_DIR}/net/iconnector.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
@@ -9,6 +10,7 @@ SOURCE_GROUP(include FILES ${INCLUDE})
 SET(SRC
 	${SRC_DIR}/net/channelSocket.cpp
 	${SRC_DIR}/net/connector.cpp
+	${SRC_DIR}/net/acceptor.cpp
 	${SRC_DIR}/net/plug.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
@@ -20,6 +22,7 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
 SET(SRC_HDR
 	${SRC_DIR}/net/connector.hpp
+	${SRC_DIR}/net/acceptor.hpp
 	${SRC_DIR}/net/channelHub.hpp
 	${SRC_DIR}/net/channelSocket.hpp
 	${SRC_DIR}/net/pch.h

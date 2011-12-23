@@ -5,6 +5,7 @@
 #include <boost/shared_array.hpp>
 #include <boost/function.hpp>
 #include <boost/system/error_code.hpp>
+#include "async/result.hpp"
 
 namespace net
 {
@@ -31,14 +32,8 @@ namespace net
 	{
 		virtual ~IChannel(){}
 
-		virtual void receive(
-			boost::function<void (const SPacket &)> ok,
-			boost::function<void (boost::system::error_code)> fail = boost::function<void (boost::system::error_code)>()) =0;
-
-		virtual void send(
-			const SPacket &p,
-			boost::function<void ()> ok,
-			boost::function<void (boost::system::error_code)> fail = boost::function<void (boost::system::error_code)>()) =0;
+		virtual async::Result2<boost::system::error_code, SPacket> receive() =0;
+		virtual async::Result<boost::system::error_code> send(const SPacket &p) =0;
 
 		virtual void close() =0;
 	};

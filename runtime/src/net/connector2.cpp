@@ -1,23 +1,23 @@
 #include "pch.h"
-#include "connector.hpp"
+#include "connector2.hpp"
 
 namespace net
 {
 
 	//////////////////////////////////////////////////////////////////////////
-	Connector::Connector()
+	Connector2::Connector2()
 	{
 		assert(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Connector::~Connector()
+	Connector2::~Connector2()
 	{
 		assert(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result2<system::error_code, IChannelPtr> Connector::connect(const char *host, const char *service)
+	async::Result2<boost::system::error_code, IChannelPtr> Connector2::connect(const char *host, const char *service)
 	{
 		assert(0);
 		async::Result2<boost::system::error_code, IChannelPtr> res;

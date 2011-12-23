@@ -130,10 +130,10 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		for(size_t i(0); i<200; i++)
-		{
-			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-		}
+// 		for(size_t i(0); i<200; i++)
+// 		{
+// 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+// 		}
 
 		int k = 220;
 		//
