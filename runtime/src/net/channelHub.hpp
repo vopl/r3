@@ -172,14 +172,21 @@ namespace net
 
 		mutex::scoped_lock sl(_mtxReceives);
 
-		if(_received.empty())
+		if(_work)
 		{
-			_receives.push_back(res);
+			if(_received.empty())
+			{
+				_receives.push_back(res);
+			}
+			else
+			{
+				res = _received[0];
+				_received.erase(_received.begin());
+			}
 		}
 		else
 		{
-			res = _received[0];
-			_received.erase(_received.begin());
+			res(make_error_code(errc::operation_canceled), SPacket());
 		}
 		return res;
 	}
@@ -193,10 +200,17 @@ namespace net
 
 		mutex::scoped_lock sl(_mtxSends);
 
-		_sends.push_back(std::make_pair(res, p));
-		if(_sends.size()<2)
+		if(_work)
 		{
-			spawn(bind(&ChannelHub<Base>::balanceSends, shared_from_this()));
+			_sends.push_back(std::make_pair(res, p));
+			if(_sends.size()<2)
+			{
+				spawn(bind(&ChannelHub<Base>::balanceSends, shared_from_this()));
+			}
+		}
+		else
+		{
+			res(make_error_code(errc::operation_canceled));
 		}
 		return res;
 	}
@@ -208,13 +222,13 @@ namespace net
 		{
 			mutex::scoped_lock sl(_mtxChannels);
 
+			_work = false;
+
 			BOOST_FOREACH(const IChannelPtr &ch, _channels)
 			{
 				ch->close();
 			}
 			_channels.clear();
-
-			_work = false;
 		}
 	}
 
