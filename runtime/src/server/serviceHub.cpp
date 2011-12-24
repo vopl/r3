@@ -4,14 +4,33 @@
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onReceiveOk(ISessionPtr session, const net::SPacket &p)
+	void ServiceHub::receiveLoop(ISessionPtr session)
 	{
 
-		//слушать сессию дальше
-		Result2<system::error_code, net::SPacket> receiveRes = session->receive();
+		for(;;)
+		{
+			Result2<error_code, net::SPacket> receiveRes = session->receive();
+			error_code ec = receiveRes.data1();
+			if(ec)
+			{
+				if(ec.value() == errc::operation_not_permitted)
+				{
+					return;
+				}
 
+				//залогировать ошибку и по новой
+				assert(0);
+				WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
+				continue;
+			}
 
-		//а этот пакет просунуть в сервис
+			spawn(bind(&ServiceHub::dispatchPacket, shared_from_this(), session, receiveRes.data2()));
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceHub::dispatchPacket(ISessionPtr session, const net::SPacket &p)
+	{
 		server::TEndpoint serverEndpoint_;
 		client::TEndpoint clientEndpoint_;
 		utils::VariantPtr data_;
@@ -84,55 +103,10 @@ namespace server
 				net::SPacket p;
 				p._data = v.serialize(p._size);
 
-				//отослать
-				//spawn
-				Result<system::error_code> sendRes = session->send(p);
-
-				if(sendRes.data())
-				{
-					onSendFail(session, sendRes.data());
-				}
-				else
-				{
-					onSendOk(session);
-				}
+				//отослать без контроля
+				session->send(p);
 			}
 		}
-
-		if(receiveRes.data1())
-		{
-			onReceiveFail(session, receiveRes.data1());
-		}
-		else
-		{
-			onReceiveOk(session, receiveRes.data2());
-		}
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onSendOk(ISessionPtr session)
-	{
-		//ok
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onSendFail(ISessionPtr session, system::error_code ec)
-	{
-		//assert(!"log error?");
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onReceiveFail(ISessionPtr session, system::error_code ec)
-	{
-		//нештатная ситуация, что с сессией?
-		//если просто не осталось низких каналов - то ошибка не должна приходить, надо переработать хаб канала
-		//а если закрыта - то сначало должен был быть вызван delSession
-
-		//уже все закрыто
-		//session->close();
-		//delSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -171,15 +145,7 @@ namespace server
 			}
 		}
 
-		Result2<system::error_code, net::SPacket> receiveRes = session->receive();
-		if(receiveRes.data1())
-		{
-			onReceiveFail(session, receiveRes.data1());
-		}
-		else
-		{
-			onReceiveOk(session, receiveRes.data2());
-		}
+		spawn(bind(&ServiceHub::receiveLoop, shared_from_this(), session));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -195,7 +161,8 @@ namespace server
 				pair.second->onSessionDel(session);
 			}
 
- 			//надо отменить прослушивание, а как?
+ 			//надо отменить прослушивание, а как? да вот так
+			session->close();
 		}
 	}
 
@@ -261,13 +228,11 @@ namespace server
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::send(
+	async::Result<error_code> ServiceHub::send(
 		IServicePtr service,
 		ISessionPtr session,
 		const client::TEndpoint &endpoint,
-		utils::VariantPtr data,
-		boost::function<void ()> ok,
-		boost::function<void (boost::system::error_code)> fail)
+		utils::VariantPtr data)
 	{
 		//запаковать данные
 		utils::Variant v;
@@ -280,15 +245,6 @@ namespace server
 		p._data = v.serialize(p._size);
 
 		//отослать
-		Result<system::error_code> sendRes = session->send(p);
-
-		if(sendRes.data())
-		{
-			fail(sendRes.data());
-		}
-		else
-		{
-			ok();
-		}
+		return session->send(p);
 	}
 }

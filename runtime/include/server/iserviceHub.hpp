@@ -3,6 +3,7 @@
 
 #include "server/iservice.hpp"
 #include "server/endpoint.hpp"
+#include "async/result.hpp"
 
 namespace server
 {
@@ -26,13 +27,11 @@ namespace server
 		virtual void delService(IServicePtr service) =0;
 		virtual void delServices() =0;
 
-		virtual void send(
+		virtual async::Result<boost::system::error_code> send(
 			IServicePtr service,
 			ISessionPtr session,
 			const client::TEndpoint &endpoint,
-			utils::VariantPtr data,
-			boost::function<void ()> ok,
-			boost::function<void (boost::system::error_code)> fail) =0;
+			utils::VariantPtr data) =0;
 
 	};
 	typedef boost::shared_ptr<IServiceHub> IServiceHubPtr;

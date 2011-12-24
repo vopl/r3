@@ -38,7 +38,7 @@ namespace async
 	{
 		if(!_stack)
 		{
-			_stack = CreateFiberEx(1024*4, 1024*8, 0, &FiberImpl::s_fiberProc, this);
+			_stack = CreateFiberEx(1024*4, 1024*32, 0, &FiberImpl::s_fiberProc, this);
 			if(!_stack)
 			{
 				FLOG(__FUNCTION__<<", CreateFiber failed, "<<GetLastError());

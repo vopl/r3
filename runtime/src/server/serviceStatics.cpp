@@ -13,18 +13,6 @@ namespace server
 	const TEndpoint ServiceStatics::_endpoint = "statics";
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceStatics::onSendOk()
-	{
-		//
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceStatics::onSendFail(system::error_code ec)
-	{
-		//
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	ServiceStatics::ServiceStatics()
 		: _root("../statics")
 	{
@@ -79,9 +67,7 @@ namespace server
 			data.reset(new utils::Variant);
 			utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 			m["error"] = "badRequest";
-			hub->send(shared_from_this(), session, endpoint, data, 
-				bind(&ServiceStatics::onSendOk, shared_from_this()),
-				bind(&ServiceStatics::onSendFail, shared_from_this(), _1));
+			hub->send(shared_from_this(), session, endpoint, data);
 			return;
 		}
 
@@ -97,9 +83,7 @@ namespace server
 			data.reset(new utils::Variant);
 			utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 			m["error"] = "badRequest";
-			hub->send(shared_from_this(), session, endpoint, data, 
-				bind(&ServiceStatics::onSendOk, shared_from_this()),
-				bind(&ServiceStatics::onSendFail, shared_from_this(), _1));
+			hub->send(shared_from_this(), session, endpoint, data);
 			return;
 		}
 
@@ -111,9 +95,7 @@ namespace server
 			data.reset(new utils::Variant);
 			utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 			m["error"] = "notFound";
-			hub->send(shared_from_this(), session, endpoint, data, 
-				bind(&ServiceStatics::onSendOk, shared_from_this()),
-				bind(&ServiceStatics::onSendFail, shared_from_this(), _1));
+			hub->send(shared_from_this(), session, endpoint, data);
 			return;
 		}
 
@@ -133,16 +115,12 @@ namespace server
 				data.reset(new utils::Variant);
 				utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 				m["error"] = "notFound";
-				hub->send(shared_from_this(), session, endpoint, data, 
-					bind(&ServiceStatics::onSendOk, shared_from_this()),
-					bind(&ServiceStatics::onSendFail, shared_from_this(), _1));
+				hub->send(shared_from_this(), session, endpoint, data);
 				return;
 			}
 		}
 
 		ILOG("statics "<<path.as<utils::Variant::String>());
-		hub->send(shared_from_this(), session, endpoint, data, 
-			bind(&ServiceStatics::onSendOk, shared_from_this()),
-			bind(&ServiceStatics::onSendFail, shared_from_this(), _1));
+		hub->send(shared_from_this(), session, endpoint, data);
 	}
 }

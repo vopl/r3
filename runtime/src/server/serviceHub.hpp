@@ -23,11 +23,8 @@ namespace server
 		mutex		_mtx;
 
 	private:
-		void onSendOk(ISessionPtr session);
-		void onSendFail(ISessionPtr session, system::error_code ec);
-
-		void onReceiveOk(ISessionPtr session, const net::SPacket &p);
-		void onReceiveFail(ISessionPtr session, system::error_code ec);
+		void receiveLoop(ISessionPtr session);
+		void dispatchPacket(ISessionPtr session, const net::SPacket &p);
 
 
 	public:
@@ -45,13 +42,11 @@ namespace server
 		virtual void delService(IServicePtr service);
 		virtual void delServices();
 
-		virtual void send(
+		virtual async::Result<error_code> send(
 			IServicePtr service,
 			ISessionPtr session,
 			const client::TEndpoint &endpoint,
-			utils::VariantPtr data,
-			boost::function<void ()> ok,
-			boost::function<void (boost::system::error_code)> fail);
+			utils::VariantPtr data);
 	};
 	typedef boost::shared_ptr<ServiceHub> ServiceHubPtr;
 

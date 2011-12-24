@@ -37,23 +37,24 @@ namespace async
 			_state->_ready = false;
 			_state->_data = Data();
 		}
-
-		Data &data()
+		
+		void wait()
 		{
 			if(!_state->_ready)
 			{
-				wait();
+				Event::wait();
 				_state->_ready = true;
 			}
+		}
+
+		Data &data()
+		{
+			wait();
 			return _state->_data;
 		}
 		operator Data &()
 		{
-			if(!_state->_ready)
-			{
-				wait();
-				_state->_ready = true;
-			}
+			wait();
 			return _state->_data;
 		}
 		Data &dataNoWait()
@@ -105,13 +106,18 @@ namespace async
 			_state->_data2 = Data2();
 		}
 
-		Data1 &data1()
+		void wait()
 		{
 			if(!_state->_ready)
 			{
-				wait();
+				Event::wait();
 				_state->_ready = true;
 			}
+		}
+
+		Data1 &data1()
+		{
+			wait();
 			return _state->_data1;
 		}
 		Data1 &data1NoWait()
@@ -121,11 +127,7 @@ namespace async
 
 		Data2 &data2()
 		{
-			if(!_state->_ready)
-			{
-				wait();
-				_state->_ready = true;
-			}
+			wait();
 			return _state->_data2;
 		}
 		Data2 &data2NoWait()

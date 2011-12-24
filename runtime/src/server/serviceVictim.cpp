@@ -165,8 +165,17 @@ namespace server
 		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{
-		hub->send(shared_from_this(), session, endpoint, data, 
-			bind(&ServiceVictim::onSendOk, shared_from_this()),
-			bind(&ServiceVictim::onSendFail, shared_from_this(), _1));
+		async::Result<boost::system::error_code> res =
+		hub->send(shared_from_this(), session, endpoint, data);
+
+		res.wait();
+		if(res.data())
+		{
+			onSendFail(res.data());
+		}
+		else
+		{
+			onSendOk();
+		}
 	}
 }
