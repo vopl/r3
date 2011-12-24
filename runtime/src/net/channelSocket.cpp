@@ -11,8 +11,9 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelSocket::Sock::Sock(TSocketSslPtr socketSsl)
+	ChannelSocket::Sock::Sock(TSocketSslPtr socketSsl, TSslContextPtr sslContext)
 		: _socketSsl(socketSsl)
+		, _sslContext(sslContext)
 	{
 
 	}
@@ -61,36 +62,154 @@ namespace net
 		}
 	}
 
+
+
 	//////////////////////////////////////////////////////////////////////////
-	ChannelSocket::STransferStateSend::STransferStateSend(
-		const SPacket &packet, 
-		Result<error_code> res)
-		: _res(res)
+	void ChannelSocket::receive_f()
 	{
-		_packet = packet;
-		_header[0] = 0;
-		_transferedSize = 0;
+		for(;;)
+		{
+			Result2<error_code, SPacket> op;
+			{
+				mutex::scoped_lock sl(_mtxReceives);
+				if(_receives.empty())
+				{
+					return;
+				}
+				op = _receives[0];
+				_receives.erase(_receives.begin());
+			}
+
+			size_t				transferedSize = 0;
+			boost::uint32_t		header[1];
+			error_code			ec;
+
+
+			//заголовок
+			while(transferedSize < sizeof(header))
+			{
+				Result2<error_code, size_t> readRes;
+				_sock.read(
+					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
+					readRes);
+				ec = readRes.data1();
+
+				if(ec)
+				{
+					op(ec, SPacket());
+					return;
+				}
+				transferedSize += readRes.data2();
+			}
+			assert(transferedSize == sizeof(header));
+			transferedSize = 0;
+
+			//данные
+			SPacket				packet;
+			packet._size = utils::litEndian(header[0]);
+			if(packet._size)
+			{
+				packet._data.reset(new char[packet._size]);
+				while(transferedSize < packet._size)
+				{
+					Result2<error_code, size_t> readRes;
+					_sock.read(
+						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
+						readRes);
+					ec = readRes.data1();
+
+					if(ec)
+					{
+						op(ec, SPacket());
+						return;
+					}
+					transferedSize += readRes.data2();
+				}
+			}
+			assert(transferedSize == packet._size);
+			transferedSize = 0;
+
+			op(error_code(), packet);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelSocket::STransferStateReceive::STransferStateReceive(Result2<error_code, SPacket> res)
-		: _res(res)
+	void ChannelSocket::send_f()
 	{
-		_header[0] = 0;
-		_transferedSize = 0;
-	}
+		for(;;)
+		{
+			std::pair<Result<error_code>, SPacket> op;
+			{
+				mutex::scoped_lock sl(_mtxSends);
+				if(_sends.empty())
+				{
+					return;
+				}
+				op = _sends[0];
+				_sends.erase(_sends.begin());
+			}
 
-	//////////////////////////////////////////////////////////////////////////
-	ChannelSocket::ChannelSocket(TSocketSslPtr socket)
-		: _sock(socket)
-		, _strand(socket->get_io_service())
-	{
+			size_t				transferedSize = 0;
+			boost::uint32_t		header[1];
+			error_code			ec;
+
+
+			//заголовок
+			header[0] = utils::litEndian(op.second._size);
+			while(transferedSize < sizeof(header))
+			{
+				Result2<error_code, size_t> readRes;
+				_sock.write(
+					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
+					readRes);
+				ec = readRes.data1();
+
+				if(ec)
+				{
+					op.first(ec);
+					return;
+				}
+				transferedSize += readRes.data2();
+			}
+			assert(transferedSize == sizeof(header));
+			transferedSize = 0;
+
+			//данные
+			SPacket				&packet = op.second;
+			if(packet._size)
+			{
+				while(transferedSize < packet._size)
+				{
+					Result2<error_code, size_t> writeRes;
+					_sock.write(
+						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
+						writeRes);
+					ec = writeRes.data1();
+
+					if(ec)
+					{
+						op.first(ec);
+						return;
+					}
+					transferedSize += writeRes.data2();
+				}
+			}
+			assert(transferedSize == packet._size);
+			transferedSize = 0;
+
+			op.first(error_code());
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ChannelSocket::ChannelSocket(TSocketPtr socket)
 		: _sock(socket)
-		, _strand(socket->get_io_service())
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelSocket::ChannelSocket(TSocketSslPtr socket, TSslContextPtr sslContext)
+		: _sock(socket, sslContext)
 	{
 	}
 
@@ -105,13 +224,13 @@ namespace net
 	Result2<error_code, SPacket> ChannelSocket::receive()
 	{
 		Result2<error_code, SPacket> res;
-		STransferStateReceivePtr ts(new STransferStateReceive(res));
 
-		_strand.dispatch(
-			bind(&ChannelSocket::onReceive, shared_from_this(), 
-				ts, 
-				system::error_code(), 
-				size_t(0)));
+		mutex::scoped_lock sl(_mtxReceives);
+		_receives.push_back(res);
+		if(_receives.size() < 2)
+		{
+			spawn(bind(&ChannelSocket::receive_f, shared_from_this()));
+		}
 
 		return res;
 	}
@@ -122,144 +241,15 @@ namespace net
 	Result<error_code> ChannelSocket::send(const SPacket &p)
 	{
 		Result<error_code> res;
-		STransferStateSendPtr ts(new STransferStateSend(p, res));
-		ts->_header[0] = utils::litEndian(ts->_packet._size);
-		
-		_strand.dispatch(
-			bind(&ChannelSocket::onSend, shared_from_this(), 
-				ts, 
-				system::error_code(), 
-				size_t(0)));
+
+		mutex::scoped_lock sl(_mtxSends);
+		_sends.push_back(std::make_pair(res, p));
+		if(_sends.size() < 2)
+		{
+			spawn(bind(&ChannelSocket::send_f, shared_from_this()));
+		}
 
 		return res;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size)
-	{
-		if(ec)
-		{
-			ts->_res(ec, SPacket());
-			return;
-		}
-
-		ts->_transferedSize += size;
-		if(ts->_transferedSize < sizeof(ts->_header))
-		{
-			_sock.read(
-				buffer((char *)&ts->_header, sizeof(ts->_header)-ts->_transferedSize), 
-				_strand.wrap(
-					bind(
-						&ChannelSocket::onReceive, shared_from_this(),
-						ts, 
-						_1, _2
-					)
-				)
-			);
-			return;
-		}
-		else if(ts->_transferedSize == sizeof(ts->_header))
-		{
-			ts->_packet._size = utils::litEndian(ts->_header[0]);
-			if(ts->_packet._size)
-			{
-				ts->_packet._data.reset(new char[ts->_packet._size]);
-
-				_sock.read(
-					buffer(ts->_packet._data.get(), ts->_packet._size), 
-					_strand.wrap(
-						bind(
-							&ChannelSocket::onReceive, shared_from_this(),
-							ts, 
-							_1, _2
-						)
-					)
-				);
-				return;
-			}
-			else
-			{
-				ts->_packet._data.reset();
-			}
-		}
-		
-		if(ts->_transferedSize < sizeof(ts->_header)+ ts->_packet._size)
-		{
-			size_t dataTransferedSize = ts->_transferedSize-sizeof(ts->_header);
-
-			_sock.read(
-				buffer(
-					ts->_packet._data.get()+dataTransferedSize, 
-					ts->_packet._size-dataTransferedSize), 
-				_strand.wrap(
-					bind(
-						&ChannelSocket::onReceive, shared_from_this(),
-						ts, 
-						_1, _2
-					)
-				)
-			);
-		}
-		else
-		{
-			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
-			ts->_res(error_code(), ts->_packet);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::onSend(STransferStateSendPtr ts, system::error_code ec, size_t size)
-	{
-		if(ec)
-		{
-			ts->_res(ec);
-			return;
-		}
-
-		ts->_transferedSize += size;
-		if(ts->_transferedSize < sizeof(ts->_header))
-		{
-			boost::array<boost::asio::const_buffers_1, 2> packedData = 
-			{
-				const_buffers_1((char *)&ts->_header+ts->_transferedSize, sizeof(ts->_header)-ts->_transferedSize), 
-				const_buffers_1(ts->_packet._data.get(), ts->_packet._size), 
-			};
-
-			_sock.write(
-				packedData, 
-				_strand.wrap(
-					bind(
-						&ChannelSocket::onSend, shared_from_this(),
-						ts, 
-						_1, _2
-					)
-				)
-			);
-
-		}
-		else if(ts->_transferedSize < sizeof(ts->_header)+ts->_packet._size)
-		{
-			size_t dataTransferedSize = ts->_transferedSize-sizeof(ts->_header);
-			boost::asio::const_buffers_1 packedData(
-				ts->_packet._data.get()+dataTransferedSize, 
-				ts->_packet._size-dataTransferedSize);
-
-			_sock.write(
-				packedData, 
-				_strand.wrap(
-					bind(
-						&ChannelSocket::onSend, shared_from_this(),
-						ts, 
-						_1, _2
-					)
-				)
-			);
-		}
-		else
-		{
-			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
-			ts->_res(error_code());
-		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,7 @@
 #ifndef _NET_CHANNELSOCKET_HPP_
 #define _NET_CHANNELSOCKET_HPP_
 #include "net/ichannel.hpp"
+#include "async/service.hpp"
 
 namespace net
 {
@@ -11,6 +12,9 @@ namespace net
 
 	typedef ssl::stream<ip::tcp::socket> TSocketSsl;
 	typedef shared_ptr<TSocketSsl> TSocketSslPtr;
+
+	typedef ssl::context TSslContext;
+	typedef shared_ptr<TSslContext> TSslContextPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class ChannelSocket;
@@ -24,9 +28,10 @@ namespace net
 		{
 			TSocketPtr			_socket;
 			TSocketSslPtr		_socketSsl;
+			TSslContextPtr		_sslContext;
 
 			Sock(TSocketPtr socket);
-			Sock(TSocketSslPtr socketSsl);
+			Sock(TSocketSslPtr socketSsl, TSslContextPtr sslContext);
 
 			template <class Buffer, class Handler>
 			void read(Buffer b, Handler h);
@@ -36,43 +41,26 @@ namespace net
 
 			void close();
 		} _sock;
-		io_service::strand	_strand;
 
-		//////////////////////////////////////////////////////////////////////////
-		struct STransferState
-		{
-			SPacket									_packet;
-			boost::uint32_t							_header[1];
-			size_t									_transferedSize;
-		};
-
-		//////////////////////////////////////////////////////////////////////////
-		struct STransferStateSend
-			: STransferState
-		{
-			Result<error_code>	_res;
-			STransferStateSend(
-				const SPacket &packet, 
-				Result<error_code> res);
-		};
-		typedef shared_ptr<STransferStateSend> STransferStateSendPtr;
-
-		//////////////////////////////////////////////////////////////////////////
-		struct STransferStateReceive
-			: STransferState
-		{
-			Result2<error_code, SPacket>	_res;
-			STransferStateReceive(Result2<error_code, SPacket> res);
-		};
-		typedef shared_ptr<STransferStateReceive> STransferStateReceivePtr;
 
 	private:
-		void onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size);
-		void onSend(STransferStateSendPtr ts, system::error_code ec, size_t size);
+
+		typedef std::deque<Result2<error_code, SPacket> > TReceives;
+		typedef std::deque<std::pair<Result<error_code>, SPacket> > TSends;
+
+
+		mutex		_mtxReceives;
+		TReceives	_receives;
+		void receive_f();
+
+		mutex		_mtxSends;
+		TSends		_sends;
+		void send_f();
+
 
 	public:
-		ChannelSocket(TSocketSslPtr socket);
 		ChannelSocket(TSocketPtr socket);
+		ChannelSocket(TSocketSslPtr socket, TSslContextPtr sslContext);
 		~ChannelSocket();
 
 		virtual Result2<error_code, SPacket> receive();

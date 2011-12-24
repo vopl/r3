@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "acceptor.hpp"
-#include "channelSocket.hpp"
 
 namespace net
 {
@@ -12,9 +11,11 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	void Acceptor::listen_f(
-		async::Result<error_code> res,
+		Result<error_code> res,
+		const function<void(error_code, IChannelPtr)> &onAccept,
 		const std::string &host, const std::string &service, bool useSsl)
 	{
+		TAcceptorPtr acceptor;
 		{
 			mutex::scoped_lock sl(_mtx);
 			if(_inProcess)
@@ -27,18 +28,46 @@ namespace net
 			if(useSsl)
 			{
 				_sslContext.reset(new TSslContext(io(), ssl::context::sslv23));
+
+				error_code ec;
 				_sslContext->set_options(
 					ssl::context::default_workarounds
 					| ssl::context::no_sslv2
-					| ssl::context::single_dh_use);
+					| ssl::context::single_dh_use, ec);
+				assert(!ec);
+				if(ec)
+				{
+					res(ec);
+					return;
+				}
 
 				_sslContext->set_password_callback(bind(&Acceptor::onSslPassword, shared_from_this()));
-				error_code ec;
 				_sslContext->use_certificate_chain_file("server.pem", ec);
+				assert(!ec);
+				if(ec)
+				{
+					res(ec);
+					return;
+				}
+
 				_sslContext->use_private_key_file("server.pem", ssl::context::pem, ec);
+				assert(!ec);
+				if(ec)
+				{
+					res(ec);
+					return;
+				}
+
 				_sslContext->use_tmp_dh_file("dh512.pem", ec);
+				assert(!ec);
+				if(ec)
+				{
+					res(ec);
+					return;
+				}
 			}
-			_acceptor = TAcceptorPtr(new TAcceptor(io()));
+			_acceptor.reset(new TAcceptor(io()));
+			acceptor = _acceptor;
 		}
 
 		//резолвить адрес
@@ -63,43 +92,55 @@ namespace net
 		}
 
 		//зарядить акцептор asio
-		_acceptor->open(resolveRes.data2()->endpoint().protocol());
-		_acceptor->set_option(ip::tcp::acceptor::reuse_address(true));
-		_acceptor->set_option(socket_base::enable_connection_aborted(true));
-		_acceptor->bind(*resolveRes.data2());
-		_acceptor->listen();
+		acceptor->open(resolveRes.data2()->endpoint().protocol());
+		acceptor->set_option(ip::tcp::acceptor::reuse_address(true));
+		acceptor->set_option(socket_base::enable_connection_aborted(true));
+		acceptor->bind(*resolveRes.data2());
+		acceptor->listen();
 
-		res(error_code());
+
+		spawn(bind(res, error_code()));
+		accept_f(onAccept);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Acceptor::accept_f(Result2<error_code, IChannelPtr> res)
+	void Acceptor::accept_f(const function<void(error_code, IChannelPtr)> &onAccept)
 	{
-		TAcceptorPtr a;
+		TAcceptorPtr acceptor;
+		TSocketPtr sock;
+		TSocketSslPtr sockSsl;
+		TSslContextPtr	sslContext;
+		error_code ec;
+
 		{
 			mutex::scoped_lock sl(_mtx);
 			if(!_inProcess)
 			{
-				res(make_error_code(errc::operation_not_permitted), IChannelPtr());
+				onAccept(make_error_code(errc::operation_not_permitted), IChannelPtr());
 				return;
 			}
-
 			assert(_acceptor);
-			a = _acceptor;
-		}
+			acceptor = _acceptor;
+			sslContext = _sslContext;
 
-		error_code ec;
-		TSocketPtr sock = _sslContext?TSocketPtr():TSocketPtr(new TSocket(io()));
-		TSocketSslPtr sockSsl = _sslContext?TSocketSslPtr(new TSocketSsl(io(), *_sslContext)):TSocketSslPtr();
+			if(_sslContext)
+			{
+				sockSsl.reset(new TSocketSsl(io(), *sslContext));
+			}
+			else
+			{
+				sock.reset(new TSocket(io()));
+			}
+		}
 
 		Result<error_code> ecRes;
 		if(sockSsl)
 		{
-			a->async_accept(sockSsl->lowest_layer(), ecRes);
+			acceptor->async_accept(sockSsl->lowest_layer(), ecRes);
 		}
 		else
 		{
-			a->async_accept(*sock, ecRes);
+			acceptor->async_accept(*sock, ecRes);
 		}
 
 		ec = ecRes;
@@ -116,6 +157,7 @@ namespace net
 			WLOG("async_accept failed: "<<ec.message()<<"("<<ec.value()<<")");
 			return;
 		}
+		spawn(bind(&Acceptor::accept_f, shared_from_this(), onAccept));
 
 		if(sockSsl)
 		{
@@ -137,11 +179,11 @@ namespace net
 				return;
 			}
 
-			res(error_code(), IChannelPtr(new ChannelSocket(sockSsl)));
+			spawn(bind(onAccept, error_code(), IChannelPtr(new ChannelSocket(sockSsl, sslContext))));
 		}
 		else//if(_sslContext)
 		{
-			res(error_code(), IChannelPtr(new ChannelSocket(sock)));
+			spawn(bind(onAccept, error_code(), IChannelPtr(new ChannelSocket(sock))));
 		}
 	}
 
@@ -160,18 +202,12 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result<error_code> Acceptor::listen(const char *host, const char *service, bool useSsl)
+	Result<error_code> Acceptor::listen(
+		const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
+		const char *host, const char *service, bool useSsl)
 	{
 		Result<error_code> res;
-		spawn(bind(&Acceptor::listen_f, shared_from_this(), res, std::string(host), std::string(service), useSsl));
-		return res;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Result2<error_code, IChannelPtr> Acceptor::accept()
-	{
-		Result2<error_code, IChannelPtr> res;
-		spawn(bind(&Acceptor::accept_f, shared_from_this(), res));
+		spawn(bind(&Acceptor::listen_f, shared_from_this(), res, onAccept, std::string(host), std::string(service), useSsl));
 		return res;
 	}
 

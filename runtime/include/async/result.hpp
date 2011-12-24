@@ -31,6 +31,13 @@ namespace async
 		{
 		}
 
+		void reset()
+		{
+			Event::reset();
+			_state->_ready = false;
+			_state->_data = Data();
+		}
+
 		Data &data()
 		{
 			if(!_state->_ready)
@@ -88,6 +95,14 @@ namespace async
 			: _state(new State)
 			, Event(false)
 		{
+		}
+
+		void reset()
+		{
+			Event::reset();
+			_state->_ready = false;
+			_state->_data1 = Data1();
+			_state->_data2 = Data2();
 		}
 
 		Data1 &data1()

@@ -41,7 +41,7 @@ namespace server
 
 	private:
 		void listen_f(IAcceptorPtr acceptor);
-		void accept_f(IAcceptorPtr acceptor);
+		void onChannelAccept(const error_code &ec, IChannelPtr channel);
 		void initChannel_f(IChannelPtr channel);
 	public:
 		SessionManager();

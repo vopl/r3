@@ -27,7 +27,13 @@ namespace server
 		Result<error_code> res;
 		{
 			mutex::scoped_lock sl(_mtx);
-			res = acceptor->listen(_host.c_str(), _service.c_str());
+			if(!_isStarted)
+			{
+				return;
+			}
+			res = acceptor->listen(
+				bind(&SessionManager::onChannelAccept, shared_from_this(), _1, _2),
+				_host.c_str(), _service.c_str(), true);
 		}
 		error_code ec = res;
 
@@ -46,50 +52,32 @@ namespace server
 			spawn(bind(&SessionManager::listen_f, shared_from_this(), acceptor));
 			return;
 		}
-
-		spawn(bind(&SessionManager::accept_f, shared_from_this(), acceptor));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::accept_f(IAcceptorPtr acceptor)
+	void SessionManager::onChannelAccept(const error_code &ec, IChannelPtr channel)
 	{
-		error_code ec;
-		//принимать входящие соидинения
-		for(;;)
+		if(ec)
 		{
-			Result2<error_code, IChannelPtr> res = acceptor->accept();
-			ec = res.data1();
-			if(ec)
+			if(ec.value() == errc::operation_canceled)
 			{
-				if(ec.value() == errc::operation_canceled)
-				{
-					//отменено, менеджер остановлен
-					return;
-				}
-
-				//залогировать ошибку и по новой
-				WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
-				acceptor->unlisten();
-				spawn(bind(&SessionManager::listen_f, shared_from_this(), acceptor));
+				//отменено, менеджер остановлен
 				return;
 			}
 
-			//канал сформирован, инициировать его
-			IChannelPtr channel = res.data2();
-			assert(channel);
-			{
-				mutex::scoped_lock sl(_mtx);
-				if(!_isStarted)
-				{
-					channel->close();
-					return;
-				}
-
-				_channels.insert(channel);
-			}
-
-			spawn(bind(&SessionManager::initChannel_f, shared_from_this(), channel));
+			//залогировать ошибку и по новой
+			WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
+			return;
 		}
+
+		assert(channel);
+		{
+			mutex::scoped_lock sl(_mtx);
+			_channels.insert(channel);
+		}
+
+		//инициировать канал на сессию
+		initChannel_f(channel);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -150,7 +138,7 @@ namespace server
 					return;
 				}
 				TMSessions::iterator iter = _sessions.find(sid);
-				if(_sessions.end() == iter)
+				if(_sessions.end() != iter)
 				{
 					session = iter->second;
 				}

@@ -3,6 +3,7 @@
 
 #include "net/iacceptor.hpp"
 #include "async/service.hpp"
+#include "channelSocket.hpp"
 
 namespace net
 {
@@ -21,8 +22,6 @@ namespace net
 
 		typedef ip::tcp::acceptor TAcceptor;
 		typedef boost::shared_ptr<ip::tcp::acceptor> TAcceptorPtr;
-		typedef ssl::context TSslContext;
-		typedef shared_ptr<TSslContext> TSslContextPtr;
 
 		TAcceptorPtr	_acceptor;
 		TSslContextPtr	_sslContext;
@@ -32,16 +31,18 @@ namespace net
 
 	private:
 		void listen_f(Result<error_code> res,
+			const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
 			const std::string &host, const std::string &service, bool useSsl);
 
-		void accept_f(Result2<error_code, IChannelPtr> res);
+		void accept_f(const function<void(error_code, IChannelPtr)> &onAccept);
 
 	public:
 		Acceptor();
 		virtual ~Acceptor();
 
-		virtual Result<error_code> listen(const char *host, const char *service, bool useSsl);
-		virtual Result2<error_code, IChannelPtr> accept();
+		virtual Result<error_code> listen(
+			const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
+			const char *host, const char *service, bool useSsl);
 		virtual void unlisten();
 
 	};
