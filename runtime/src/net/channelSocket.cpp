@@ -140,12 +140,17 @@ namespace net
 			std::pair<Result<error_code>, SPacket> op;
 			{
 				mutex::scoped_lock sl(_mtxSends);
+				if(_sendInProcess)
+				{
+					return;
+				}
 				if(_sends.empty())
 				{
 					return;
 				}
 				op = _sends[0];
 				_sends.erase(_sends.begin());
+				_sendInProcess = true;
 			}
 
 			size_t				transferedSize = 0;
@@ -166,6 +171,8 @@ namespace net
 				if(ec)
 				{
 					op.first(ec);
+					mutex::scoped_lock sl(_mtxSends);
+					_sendInProcess = false;
 					return;
 				}
 				transferedSize += readRes.data2();
@@ -188,6 +195,8 @@ namespace net
 					if(ec)
 					{
 						op.first(ec);
+						mutex::scoped_lock sl(_mtxSends);
+						_sendInProcess = false;
 						return;
 					}
 					transferedSize += writeRes.data2();
@@ -197,6 +206,8 @@ namespace net
 			transferedSize = 0;
 
 			op.first(error_code());
+			mutex::scoped_lock sl(_mtxSends);
+			_sendInProcess = false;
 		}
 	}
 
@@ -209,6 +220,7 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	ChannelSocket::ChannelSocket(TSocketSslPtr socket, TSslContextPtr sslContext)
 		: _sock(socket, sslContext)
+		, _sendInProcess(false)
 	{
 	}
 

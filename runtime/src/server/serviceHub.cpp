@@ -13,7 +13,7 @@ namespace server
 			error_code ec = receiveRes.data1();
 			if(ec)
 			{
-				if(ec.value() == errc::operation_not_permitted)
+				if(ec.value() == errc::operation_canceled)
 				{
 					return;
 				}
@@ -160,10 +160,9 @@ namespace server
 			{
 				pair.second->onSessionDel(session);
 			}
-
- 			//надо отменить прослушивание, а как? да вот так
-			session->close();
 		}
+		//надо отменить прослушивание, а как? да вот так
+		session->close();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

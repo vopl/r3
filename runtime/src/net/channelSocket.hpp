@@ -55,6 +55,7 @@ namespace net
 
 		mutex		_mtxSends;
 		TSends		_sends;
+		bool		_sendInProcess;
 		void send_f();
 
 
