@@ -229,6 +229,24 @@ namespace net
 				ch->close();
 			}
 			_channels.clear();
+
+			mutex::scoped_lock sl2(_mtxReceives);
+			typedef Result2<error_code, SPacket> R2;
+			BOOST_FOREACH(R2 &r2, _receives)
+			{
+				r2(make_error_code(errc::operation_canceled), SPacket());
+			}
+			_receives.clear();
+			_received.clear();
+
+			mutex::scoped_lock sl3(_mtxSends);
+			typedef std::pair<Result<error_code>, SPacket> PR;
+			BOOST_FOREACH(PR &pr, _sends)
+			{
+				pr.first(make_error_code(errc::operation_canceled));
+			}
+			_sends.clear();
+
 		}
 	}
 

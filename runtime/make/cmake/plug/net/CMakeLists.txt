@@ -4,6 +4,7 @@ SET(INCLUDE
 	${INC_DIR}/net/ichannel.hpp
 	${INC_DIR}/net/iacceptor.hpp
 	${INC_DIR}/net/iconnector.hpp
+	${INC_DIR}/net/channelHub.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -23,7 +24,6 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 SET(SRC_HDR
 	${SRC_DIR}/net/connector.hpp
 	${SRC_DIR}/net/acceptor.hpp
-	${SRC_DIR}/net/channelHub.hpp
 	${SRC_DIR}/net/channelSocket.hpp
 	${SRC_DIR}/net/pch.h
 )
