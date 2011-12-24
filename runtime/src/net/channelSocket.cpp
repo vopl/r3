@@ -5,32 +5,91 @@
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
+	ChannelSocket::Sock::Sock(TSocketPtr socket)
+		: _socket(socket)
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelSocket::Sock::Sock(TSocketSslPtr socketSsl)
+		: _socketSsl(socketSsl)
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Buffer, class Handler>
+	void ChannelSocket::Sock::read(Buffer b, Handler h)
+	{
+		if(_socket)
+		{
+			_socket->async_read_some(b,h);
+		}
+		else
+		{
+			_socketSsl->async_read_some(b,h);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Buffer, class Handler>
+	void ChannelSocket::Sock::write(Buffer b, Handler h)
+	{
+		if(_socket)
+		{
+			_socket->async_write_some(b,h);
+		}
+		else
+		{
+			_socketSsl->async_write_some(b,h);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelSocket::Sock::close()
+	{
+		error_code ec;
+		if(_socket)
+		{
+			_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+			_socket->lowest_layer().close(ec);
+		}
+		else
+		{
+			_socketSsl->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+			_socketSsl->lowest_layer().close(ec);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	ChannelSocket::STransferStateSend::STransferStateSend(
 		const SPacket &packet, 
-		function<void ()> ok,
-		function<void (system::error_code)> fail)
-		: _ok(ok)
+		Result<error_code> res)
+		: _res(res)
 	{
 		_packet = packet;
 		_header[0] = 0;
 		_transferedSize = 0;
-		_fail = fail;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelSocket::STransferStateReceive::STransferStateReceive(
-		function<void (const SPacket &)> ok,
-		function<void (system::error_code)> fail)
-		: _ok(ok)
+	ChannelSocket::STransferStateReceive::STransferStateReceive(Result2<error_code, SPacket> res)
+		: _res(res)
 	{
 		_header[0] = 0;
 		_transferedSize = 0;
-		_fail = fail;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelSocket::ChannelSocket(TSocketSslPtr socket)
+		: _sock(socket)
+		, _strand(socket->get_io_service())
+	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ChannelSocket::ChannelSocket(TSocketPtr socket)
-		: _socket(socket)
+		: _sock(socket)
 		, _strand(socket->get_io_service())
 	{
 	}
@@ -43,28 +102,27 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::receive(
-		function<void (const SPacket &)> ok,
-		function<void (system::error_code)> fail)
+	Result2<error_code, SPacket> ChannelSocket::receive()
 	{
-		STransferStateReceivePtr ts(new STransferStateReceive(ok, fail));
+		Result2<error_code, SPacket> res;
+		STransferStateReceivePtr ts(new STransferStateReceive(res));
 
 		_strand.dispatch(
 			bind(&ChannelSocket::onReceive, shared_from_this(), 
 				ts, 
 				system::error_code(), 
 				size_t(0)));
+
+		return res;
 	}
 
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::send(
-		const SPacket &p,
-		function<void ()> ok,
-		function<void (system::error_code)> fail)
+	Result<error_code> ChannelSocket::send(const SPacket &p)
 	{
-		STransferStateSendPtr ts(new STransferStateSend(p, ok, fail));
+		Result<error_code> res;
+		STransferStateSendPtr ts(new STransferStateSend(p, res));
 		ts->_header[0] = utils::litEndian(ts->_packet._size);
 		
 		_strand.dispatch(
@@ -72,6 +130,8 @@ namespace net
 				ts, 
 				system::error_code(), 
 				size_t(0)));
+
+		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -79,17 +139,14 @@ namespace net
 	{
 		if(ec)
 		{
-			if(ts->_fail)
-			{
-				ts->_fail(ec);
-			}
+			ts->_res(ec, SPacket());
 			return;
 		}
 
 		ts->_transferedSize += size;
 		if(ts->_transferedSize < sizeof(ts->_header))
 		{
-			_socket->async_read_some(
+			_sock.read(
 				buffer((char *)&ts->_header, sizeof(ts->_header)-ts->_transferedSize), 
 				_strand.wrap(
 					bind(
@@ -108,7 +165,7 @@ namespace net
 			{
 				ts->_packet._data.reset(new char[ts->_packet._size]);
 
-				_socket->async_read_some(
+				_sock.read(
 					buffer(ts->_packet._data.get(), ts->_packet._size), 
 					_strand.wrap(
 						bind(
@@ -130,7 +187,7 @@ namespace net
 		{
 			size_t dataTransferedSize = ts->_transferedSize-sizeof(ts->_header);
 
-			_socket->async_read_some(
+			_sock.read(
 				buffer(
 					ts->_packet._data.get()+dataTransferedSize, 
 					ts->_packet._size-dataTransferedSize), 
@@ -146,7 +203,7 @@ namespace net
 		else
 		{
 			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
-			ts->_ok(ts->_packet);
+			ts->_res(error_code(), ts->_packet);
 		}
 	}
 
@@ -155,10 +212,7 @@ namespace net
 	{
 		if(ec)
 		{
-			if(ts->_fail)
-			{
-				ts->_fail(ec);
-			}
+			ts->_res(ec);
 			return;
 		}
 
@@ -171,7 +225,7 @@ namespace net
 				const_buffers_1(ts->_packet._data.get(), ts->_packet._size), 
 			};
 
-			_socket->async_write_some(
+			_sock.write(
 				packedData, 
 				_strand.wrap(
 					bind(
@@ -190,7 +244,7 @@ namespace net
 				ts->_packet._data.get()+dataTransferedSize, 
 				ts->_packet._size-dataTransferedSize);
 
-			_socket->async_write_some(
+			_sock.write(
 				packedData, 
 				_strand.wrap(
 					bind(
@@ -204,7 +258,7 @@ namespace net
 		else
 		{
 			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
-			ts->_ok();
+			ts->_res(error_code());
 		}
 	}
 
@@ -212,7 +266,6 @@ namespace net
 	void ChannelSocket::close()
 	{
 		boost::system::error_code ec;
-		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
-		_socket->lowest_layer().close(ec);
+		_sock.close();
 	}
 }

@@ -2,214 +2,13 @@
 #include "sessionManager.hpp"
 #include "utils/variant.hpp"
 
-//#define LF 		std::cerr<<__FUNCTION__ "\n";std::cerr.flush();
-#define LF
 
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::onAcceptOk(IChannelPtr channel)
-	{
-		LF;
-
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
-		{
-			channel->close();
-			return;
-		}
-
-		Result2<system::error_code, net::SPacket> res = channel->receive();
-
-		if(res.data1())
-		{
-			onReceiveSidFail(channel, res.data1());
-		}
-		else
-		{
-			onReceiveSidOk(channel, res.data2());
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::onAcceptFail(system::error_code ec)
-	{
-		LF;
-		{
-			mutex::scoped_lock sl(_mtx);
-			if(!_isStarted)
-			{
-				return;
-			}
-		}
-
-		//assert(!"log error?");
-		ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
-
-		Result<system::error_code> res = _acceptor->listen(
-			_host.c_str(), _service.c_str());
-
-		if(res.data())
-		{
-			onAcceptFail(res.data());
-		}
-		else
-		{
-			Result2<system::error_code, IChannelPtr> resa = _acceptor->accept();
-			if(resa.data1())
-			{
-				onAcceptFail(resa.data1());
-			}
-			else
-			{
-				onAcceptOk(resa.data2());
-			}
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::onReceiveSidOk(IChannelPtr channel, const SPacket &packet)
-	{
-		LF;
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
-		{
-			channel->close();
-			return;
-		}
-
-		utils::Variant v;
-		if(	!v.deserialize(packet._data, packet._size) || 
-			!v.is<utils::Variant::MapStringVariant>())
-		{
-			ELOG(__FUNCTION__<<", bad packet");
-
-			channel->close();
-			return;
-		}
-		v = utils::Variant(v.as<utils::Variant::MapStringVariant>()["sid"]);
-		if(	!v.is<TServerSid>())
-		{
-			ELOG(__FUNCTION__<<", bad packet");
-
-			channel->close();
-			return;
-		}
-		TServerSid sid = v.as<TServerSid>();
-
-		if(nullServerSid != sid)
-		{
-			TMSessions::iterator iter = _sessions.find(sid);
-			if(_sessions.end() == iter)
-			{
-				//запрошенная сессия НЕ существует
-				v.as<utils::Variant::MapStringVariant>(true)["badSid"] = true;
-
-				SPacket packet;
-				packet._data = v.serialize(packet._size);
-				Result<system::error_code> res = channel->send(packet);
-
-				if(res.data())
-				{
-					onAcceptFail(res.data());
-				}
-				else
-				{
-					onAcceptOk(channel);
-				}
-			}
-			else
-			{
-				//запрошенная сессия существует, привязать к ней
-				v.as<utils::Variant::MapStringVariant>(true)["sid"] = sid;
-
-				SPacket packet;
-				packet._data = v.serialize(packet._size);
-				Result<system::error_code> res = channel->send(packet);
-
-				if(res.data())
-				{
-					attach2SessionFail(channel);
-				}
-				else
-				{
-					attach2Session(iter->second, channel);
-				}
-			}
-		}
-		else
-		{
-			//сид был нулевой, создать новую сессию
-			TServerSid newSid = _sidGen();
-			while(_sessions.end() != _sessions.find(newSid))
-			{
-				newSid = _sidGen();
-			}
-			SessionPtr session(new Session(newSid));
-			_sessions[newSid] = session;
-
-
-			v.as<utils::Variant::MapStringVariant>(true)["sid"] = newSid;
-
-			SPacket packet;
-			packet._data = v.serialize(packet._size);
-			Result<system::error_code> res = channel->send(packet);
-			
-			if(res.data())
-			{
-				attach2SessionFail(channel);
-			}
-			else
-			{
-				attach2Session(session, channel);
-			}
-
-			_sstart(session);
-			session->listenStop(bind(&SessionManager::onSeessionStop, shared_from_this(), session));
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::onReceiveSidFail(IChannelPtr channel, system::error_code ec)
-	{
-		LF;
-		channel->close();
-
-		ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
-
-		{
-			mutex::scoped_lock sl(_mtx);
-			if(!_isStarted)
-			{
-				return;
-			}
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::attach2Session(SessionPtr session, IChannelPtr channel)
-	{
-		LF;
-		{
-			mutex::scoped_lock sl(_mtx);
-			if(_isStarted)
-			{
-				session->attachChannel(channel);
-			}
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::attach2SessionFail(IChannelPtr channel)
-	{
-		LF;
-		channel->close();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	void SessionManager::onSeessionStop(SessionPtr session)
 	{
-		boost::function<void (ISessionPtr)> sstop;
+		function<void (ISessionPtr)> sstop;
 		{
 			mutex::scoped_lock sl(_mtx);
 			_sessions.erase(session->sid());
@@ -221,10 +20,260 @@ namespace server
 		}
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void SessionManager::listen_f(IAcceptorPtr acceptor)
+	{
+		//поставить акцептор на прослушивание
+		Result<error_code> res;
+		{
+			mutex::scoped_lock sl(_mtx);
+			res = acceptor->listen(_host.c_str(), _service.c_str());
+		}
+		error_code ec = res;
+
+		if(ec)
+		{
+			//прослушивание не удалось
+			if(ec.value() == errc::operation_canceled)
+			{
+				//отменено, менеджер остановлен
+				return;
+			}
+
+			//залогировать ошибку и по новой
+			ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
+			acceptor->unlisten();
+			spawn(bind(&SessionManager::listen_f, shared_from_this(), acceptor));
+			return;
+		}
+
+		spawn(bind(&SessionManager::accept_f, shared_from_this(), acceptor));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void SessionManager::accept_f(IAcceptorPtr acceptor)
+	{
+		error_code ec;
+		//принимать входящие соидинения
+		for(;;)
+		{
+			Result2<error_code, IChannelPtr> res = acceptor->accept();
+			ec = res.data1();
+			if(ec)
+			{
+				if(ec.value() == errc::operation_canceled)
+				{
+					//отменено, менеджер остановлен
+					return;
+				}
+
+				//залогировать ошибку и по новой
+				WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
+				acceptor->unlisten();
+				spawn(bind(&SessionManager::listen_f, shared_from_this(), acceptor));
+				return;
+			}
+
+			//канал сформирован, инициировать его
+			IChannelPtr channel = res.data2();
+			assert(channel);
+			{
+				mutex::scoped_lock sl(_mtx);
+				if(!_isStarted)
+				{
+					channel->close();
+					return;
+				}
+
+				_channels.insert(channel);
+			}
+
+			spawn(bind(&SessionManager::initChannel_f, shared_from_this(), channel));
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void SessionManager::initChannel_f(IChannelPtr channel)
+	{
+		//теперь протокол, читать запрашиваемый sid
+		Result2<error_code, SPacket> res2 = channel->receive();
+		error_code ec = res2.data1();
+		if(ec)
+		{
+			//бросить канал
+			if(errc::operation_canceled != ec)
+			{
+				WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
+			}
+
+			mutex::scoped_lock sl(_mtx);
+			_channels.erase(channel);
+			channel->close();
+			return;
+		}
+
+		SPacket packet = res2.data2();
+
+		//парсить вариант
+		utils::Variant v;
+		if(	!v.deserialize(packet._data, packet._size) || 
+			!v.isMap())
+		{
+			WLOG(__FUNCTION__<<", bad packet");
+			mutex::scoped_lock sl(_mtx);
+			_channels.erase(channel);
+			channel->close();
+			return;
+		}
+
+		v = v["sid"];
+		if(	!v.is<TServerSid>())
+		{
+			ELOG(__FUNCTION__<<", bad packet");
+			mutex::scoped_lock sl(_mtx);
+			_channels.erase(channel);
+			channel->close();
+			return;
+		}
+		TServerSid sid = v.as<TServerSid>();
+
+		SessionPtr session;
+		if(nullServerSid != sid)
+		{
+			{
+				mutex::scoped_lock sl(_mtx);
+				if(!_isStarted)
+				{
+					mutex::scoped_lock sl(_mtx);
+					_channels.erase(channel);
+					channel->close();
+					return;
+				}
+				TMSessions::iterator iter = _sessions.find(sid);
+				if(_sessions.end() == iter)
+				{
+					session = iter->second;
+				}
+			}
+
+
+			if(!session)
+			{
+				//запрошенная сессия НЕ существует
+				v.as<utils::Variant::MapStringVariant>(true)["badSid"] = true;
+
+				SPacket packet;
+				packet._data = v.serialize(packet._size);
+				Result<error_code> res = channel->send(packet);
+
+				if(res.data())
+				{
+					mutex::scoped_lock sl(_mtx);
+					_channels.erase(channel);
+					channel->close();
+					return;
+				}
+				else
+				{
+					spawn(bind(&SessionManager::initChannel_f, shared_from_this(), channel));
+					return;
+				}
+			}
+			else
+			{
+				//запрошенная сессия существует, привязать к ней
+				v.as<utils::Variant::MapStringVariant>(true)["sid"] = session->sid();
+
+				SPacket packet;
+				packet._data = v.serialize(packet._size);
+				Result<error_code> res = channel->send(packet);
+
+				if(res.data())
+				{
+					mutex::scoped_lock sl(_mtx);
+					_channels.erase(channel);
+					channel->close();
+					return;
+				}
+				else
+				{
+					mutex::scoped_lock sl(_mtx);
+					if(!_isStarted)
+					{
+						mutex::scoped_lock sl(_mtx);
+						_channels.erase(channel);
+						channel->close();
+						return;
+					}
+					_sessions[session->sid()] = session;
+				}
+			}
+		}
+		else
+		{
+			//сид был нулевой, создать новую сессию
+			{
+				mutex::scoped_lock sl(_mtx);
+				if(!_isStarted)
+				{
+					mutex::scoped_lock sl(_mtx);
+					_channels.erase(channel);
+					channel->close();
+					return;
+				}
+				TServerSid newSid = _sidGen();
+				while(_sessions.end() != _sessions.find(newSid))
+				{
+					newSid = _sidGen();
+				}
+				session.reset(new Session(newSid));
+				_sessions[newSid] = session;
+			}
+
+
+			v.as<utils::Variant::MapStringVariant>(true)["sid"] = session->sid();
+
+			SPacket packet;
+			packet._data = v.serialize(packet._size);
+			Result<error_code> res = channel->send(packet);
+
+			if(res.data())
+			{
+				if(errc::operation_canceled != ec)
+				{
+					WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
+				}
+				mutex::scoped_lock sl(_mtx);
+				_channels.erase(channel);
+				channel->close();
+				return;
+			}
+			else
+			{
+				mutex::scoped_lock sl(_mtx);
+				if(!_isStarted)
+				{
+					mutex::scoped_lock sl(_mtx);
+					_channels.erase(channel);
+					channel->close();
+					return;
+				}
+				session->attachChannel(channel);
+				_sessions[session->sid()] = session;
+				_channels.erase(channel);
+			}
+
+			spawn(bind(_sstart, session));
+			session->listenStop(bind(&SessionManager::onSeessionStop, shared_from_this(), session));
+		}
+	}
+
+
+
 
 	//////////////////////////////////////////////////////////////////////////
 	SessionManager::SessionManager()
-		: _connector()
+		: _acceptor()
 		, _host()
 		, _service()
 		, _isStarted(false)
@@ -232,24 +281,22 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::start(
-		IConnectorPtr connector,
-		net::IAcceptorPtr acceptor, 
+	bool SessionManager::start(
+		IAcceptorPtr acceptor, 
 		const char *host, const char *service,
-		boost::function<void (ISessionPtr)> sstart,
-		boost::function<void (ISessionPtr)> sstop)
+		function<void (ISessionPtr)> sstart,
+		function<void (ISessionPtr)> sstop)
 	{
-		assert(!_connector && _host.empty() && _service.empty());
-		_connector = connector;
-		_acceptor = acceptor;
-		_host = host;
-		_service = service;
-
 		mutex::scoped_lock sl(_mtx);
 		if(_isStarted)
 		{
-			stop();
+			return false;
 		}
+
+		assert(!_acceptor && _host.empty() && _service.empty());
+		_acceptor = acceptor;
+		_host = host;
+		_service = service;
 
 		assert(!_sstart);
 		_sstart = sstart;
@@ -259,42 +306,31 @@ namespace server
 
 		_isStarted = true;
 
-		Result<error_code> res = _acceptor->listen(_host.c_str(), _service.c_str());
-
-		if(res.data())
-		{
-			onAcceptFail(res.data());
-		}
-		else
-		{
-			Result2<system::error_code, IChannelPtr> resa = _acceptor->accept();
-			if(resa.data1())
-			{
-				onAcceptFail(resa.data1());
-			}
-			else
-			{
-				onAcceptOk(resa.data2());
-			}
-		}
-
+		spawn(bind(&SessionManager::listen_f, shared_from_this(), _acceptor));
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void SessionManager::stop()
+	bool SessionManager::stop()
 	{
 		TMSessions sessions;
 		{
 			mutex::scoped_lock sl(_mtx);
 			if(!_isStarted)
 			{
-				return;
+				return false;
 			}
 			_acceptor->unlisten();
 
 			_sessions.swap(sessions);
 
 			_isStarted = false;
+
+			BOOST_FOREACH(IChannelPtr &ch, _channels)
+			{
+				ch->close();
+			}
+			_channels.clear();
 		}
 
 		BOOST_FOREACH(TMSessions::value_type &p, sessions)
@@ -306,13 +342,14 @@ namespace server
 		{
 			mutex::scoped_lock sl(_mtx);
 
-			boost::function<void (ISessionPtr)> nullSStart;
+			function<void (ISessionPtr)> nullSStart;
 			_sstart.swap(nullSStart);
 
-			boost::function<void (ISessionPtr)> nullSStop;
+			function<void (ISessionPtr)> nullSStop;
 			_sstop.swap(nullSStop);
 		}
 
+		return true;
 
 	}
 }

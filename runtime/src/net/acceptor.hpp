@@ -7,8 +7,6 @@
 namespace net
 {
 	using namespace async;
-	using namespace boost;
-	using namespace boost::asio;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Acceptor;
@@ -18,12 +16,32 @@ namespace net
 		: public IAcceptor
 		, public enable_shared_from_this<Acceptor>
 	{
+		mutex			_mtx;
+		bool			_inProcess;
+
+		typedef ip::tcp::acceptor TAcceptor;
+		typedef boost::shared_ptr<ip::tcp::acceptor> TAcceptorPtr;
+		typedef ssl::context TSslContext;
+		typedef shared_ptr<TSslContext> TSslContextPtr;
+
+		TAcceptorPtr	_acceptor;
+		TSslContextPtr	_sslContext;
+
+	private:
+		std::string onSslPassword();
+
+	private:
+		void listen_f(Result<error_code> res,
+			const std::string &host, const std::string &service, bool useSsl);
+
+		void accept_f(Result2<error_code, IChannelPtr> res);
+
 	public:
 		Acceptor();
 		virtual ~Acceptor();
 
-		virtual async::Result<boost::system::error_code> listen(const char *host, const char *service);
-		virtual async::Result2<boost::system::error_code, IChannelPtr> accept();
+		virtual Result<error_code> listen(const char *host, const char *service, bool useSsl);
+		virtual Result2<error_code, IChannelPtr> accept();
 		virtual void unlisten();
 
 	};

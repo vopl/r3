@@ -1,3 +1,6 @@
+#define LOG_NAME net
+#include "log/client.hpp"
+
 #include <iostream>
 #include <deque>
 #include <set>
@@ -12,3 +15,8 @@
 #include <boost/shared_array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+
+
+using namespace boost;
+using namespace boost::system;
+using namespace boost::asio;

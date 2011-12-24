@@ -12,7 +12,7 @@ namespace net
 	{
 		virtual ~IAcceptor(){}
 
-		virtual async::Result<boost::system::error_code> listen(const char *host, const char *service) =0;
+		virtual async::Result<boost::system::error_code> listen(const char *host, const char *service, bool useSsl=true) =0;
 		virtual async::Result2<boost::system::error_code, IChannelPtr> accept() =0;
 		virtual void unlisten() =0;
 	};

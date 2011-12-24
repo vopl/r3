@@ -4,11 +4,13 @@
 
 namespace net
 {
-	using namespace boost;
-	using namespace boost::asio;
+	using namespace async;
 
-	typedef ssl::stream<ip::tcp::socket> TSocket;
+	typedef ip::tcp::socket TSocket;
 	typedef shared_ptr<TSocket> TSocketPtr;
+
+	typedef ssl::stream<ip::tcp::socket> TSocketSsl;
+	typedef shared_ptr<TSocketSsl> TSocketSslPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class ChannelSocket;
@@ -18,8 +20,23 @@ namespace net
 		: public IChannel
 		, public enable_shared_from_this<ChannelSocket>
 	{
-		TSocketPtr _socket;
-		io_service::strand _strand;
+		struct Sock
+		{
+			TSocketPtr			_socket;
+			TSocketSslPtr		_socketSsl;
+
+			Sock(TSocketPtr socket);
+			Sock(TSocketSslPtr socketSsl);
+
+			template <class Buffer, class Handler>
+			void read(Buffer b, Handler h);
+
+			template <class Buffer, class Handler>
+			void write(Buffer b, Handler h);
+
+			void close();
+		} _sock;
+		io_service::strand	_strand;
 
 		//////////////////////////////////////////////////////////////////////////
 		struct STransferState
@@ -27,18 +44,16 @@ namespace net
 			SPacket									_packet;
 			boost::uint32_t							_header[1];
 			size_t									_transferedSize;
-			function<void (system::error_code)>		_fail;
 		};
 
 		//////////////////////////////////////////////////////////////////////////
 		struct STransferStateSend
 			: STransferState
 		{
-			function<void ()>						_ok;
+			Result<error_code>	_res;
 			STransferStateSend(
 				const SPacket &packet, 
-				function<void ()> ok,
-				function<void (system::error_code)> fail);
+				Result<error_code> res);
 		};
 		typedef shared_ptr<STransferStateSend> STransferStateSendPtr;
 
@@ -46,10 +61,8 @@ namespace net
 		struct STransferStateReceive
 			: STransferState
 		{
-			function<void (const SPacket &)>		_ok;
-			STransferStateReceive(
-				function<void (const SPacket &)> ok,
-				function<void (system::error_code)> fail);
+			Result2<error_code, SPacket>	_res;
+			STransferStateReceive(Result2<error_code, SPacket> res);
 		};
 		typedef shared_ptr<STransferStateReceive> STransferStateReceivePtr;
 
@@ -58,16 +71,12 @@ namespace net
 		void onSend(STransferStateSendPtr ts, system::error_code ec, size_t size);
 
 	public:
+		ChannelSocket(TSocketSslPtr socket);
 		ChannelSocket(TSocketPtr socket);
 		~ChannelSocket();
-		void receive(
-			function<void (const SPacket &)> ok,
-			function<void (system::error_code)> fail);
 
-		void send(
-			const SPacket &p,
-			function<void ()> ok,
-			function<void (system::error_code)> fail);
+		virtual Result2<error_code, SPacket> receive();
+		virtual Result<error_code> send(const SPacket &p);
 
 		void close();
 	};
