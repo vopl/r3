@@ -41,8 +41,15 @@ namespace server
 			_state = esError;
 			return;
 		}
+		net::IAcceptorPtr acceptor = _plugs->create<net::IAcceptorProvider>();
+		assert(acceptor);
+		if(!acceptor)
+		{
+			FLOG("failed to create net acceptor");
+			_state = esError;
+			return;
+		}
 
-		connector->initialize();
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять менеджер сессий
@@ -55,7 +62,7 @@ namespace server
 			_state = esError;
 			return;
 		}
-		_sessionManager->start(connector, host, service, 
+		_sessionManager->start(connector, acceptor, host, service, 
 			bind(&Server::onSessionStart, shared_from_this(), _1),
 			bind(&Server::onSessionStop, shared_from_this(), _1));
 

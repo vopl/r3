@@ -19,9 +19,16 @@ namespace server
 			return;
 		}
 
-		channel->receive(
-			bind(&SessionManager::onReceiveSidOk, shared_from_this(), channel, _1),
-			bind(&SessionManager::onReceiveSidFail, shared_from_this(), channel, _1));
+		Result2<system::error_code, net::SPacket> res = channel->receive();
+
+		if(res.data1())
+		{
+			onReceiveSidFail(channel, res.data1());
+		}
+		else
+		{
+			onReceiveSidOk(channel, res.data2());
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -39,10 +46,25 @@ namespace server
 		//assert(!"log error?");
 		ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 
-		_connector->listen(
-			_host.c_str(), _service.c_str(), 
-			bind(&SessionManager::onAcceptOk, shared_from_this(), _1),
-			bind(&SessionManager::onAcceptFail, shared_from_this(), _1));
+		Result<system::error_code> res = _acceptor->listen(
+			_host.c_str(), _service.c_str());
+
+		if(res.data())
+		{
+			onAcceptFail(res.data());
+		}
+		else
+		{
+			Result2<system::error_code, IChannelPtr> resa = _acceptor->accept();
+			if(resa.data1())
+			{
+				onAcceptFail(resa.data1());
+			}
+			else
+			{
+				onAcceptOk(resa.data2());
+			}
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -85,9 +107,16 @@ namespace server
 
 				SPacket packet;
 				packet._data = v.serialize(packet._size);
-				channel->send(packet, 
-					bind(&SessionManager::onAcceptOk, shared_from_this(), channel),
-					bind(&SessionManager::onAcceptFail, shared_from_this(), _1));
+				Result<system::error_code> res = channel->send(packet);
+
+				if(res.data())
+				{
+					onAcceptFail(res.data());
+				}
+				else
+				{
+					onAcceptOk(channel);
+				}
 			}
 			else
 			{
@@ -96,9 +125,16 @@ namespace server
 
 				SPacket packet;
 				packet._data = v.serialize(packet._size);
-				channel->send(packet, 
-					bind(&SessionManager::attach2Session, shared_from_this(), iter->second, channel),
-					bind(&SessionManager::attach2SessionFail, shared_from_this(), channel));
+				Result<system::error_code> res = channel->send(packet);
+
+				if(res.data())
+				{
+					attach2SessionFail(channel);
+				}
+				else
+				{
+					attach2Session(iter->second, channel);
+				}
 			}
 		}
 		else
@@ -117,9 +153,16 @@ namespace server
 
 			SPacket packet;
 			packet._data = v.serialize(packet._size);
-			channel->send(packet, 
-				bind(&SessionManager::attach2Session, shared_from_this(), session, channel),
-				bind(&SessionManager::attach2SessionFail, shared_from_this(), channel));
+			Result<system::error_code> res = channel->send(packet);
+			
+			if(res.data())
+			{
+				attach2SessionFail(channel);
+			}
+			else
+			{
+				attach2Session(session, channel);
+			}
 
 			_sstart(session);
 			session->listenStop(bind(&SessionManager::onSeessionStop, shared_from_this(), session));
@@ -191,12 +234,14 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void SessionManager::start(
 		IConnectorPtr connector,
+		net::IAcceptorPtr acceptor, 
 		const char *host, const char *service,
 		boost::function<void (ISessionPtr)> sstart,
 		boost::function<void (ISessionPtr)> sstop)
 	{
 		assert(!_connector && _host.empty() && _service.empty());
 		_connector = connector;
+		_acceptor = acceptor;
 		_host = host;
 		_service = service;
 
@@ -214,10 +259,25 @@ namespace server
 
 		_isStarted = true;
 
-		_connector->listen(
-			_host.c_str(), _service.c_str(), 
-			bind(&SessionManager::onAcceptOk, shared_from_this(), _1),
-			bind(&SessionManager::onAcceptFail, shared_from_this(), _1));
+		Result<error_code> res = _acceptor->listen(_host.c_str(), _service.c_str());
+
+		if(res.data())
+		{
+			onAcceptFail(res.data());
+		}
+		else
+		{
+			Result2<system::error_code, IChannelPtr> resa = _acceptor->accept();
+			if(resa.data1())
+			{
+				onAcceptFail(resa.data1());
+			}
+			else
+			{
+				onAcceptOk(resa.data2());
+			}
+		}
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -230,7 +290,7 @@ namespace server
 			{
 				return;
 			}
-			_connector->unlisten(_host.c_str(), _service.c_str());
+			_acceptor->unlisten();
 
 			_sessions.swap(sessions);
 

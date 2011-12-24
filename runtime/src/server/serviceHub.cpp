@@ -8,9 +8,8 @@ namespace server
 	{
 
 		//слушать сессию дальше
-		session->receive(
-			bind(&ServiceHub::onReceiveOk, shared_from_this(), session, _1),
-			bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
+		Result2<system::error_code, net::SPacket> receiveRes = session->receive();
+
 
 		//а этот пакет просунуть в сервис
 		server::TEndpoint serverEndpoint_;
@@ -86,11 +85,29 @@ namespace server
 				p._data = v.serialize(p._size);
 
 				//отослать
-				session->send(p, 
-					bind(&ServiceHub::onSendOk, shared_from_this(), session),
-					bind(&ServiceHub::onSendFail, shared_from_this(), session, _1));
+				//spawn
+				Result<system::error_code> sendRes = session->send(p);
+
+				if(sendRes.data())
+				{
+					onSendFail(session, sendRes.data());
+				}
+				else
+				{
+					onSendOk(session);
+				}
 			}
 		}
+
+		if(receiveRes.data1())
+		{
+			onReceiveFail(session, receiveRes.data1());
+		}
+		else
+		{
+			onReceiveOk(session, receiveRes.data2());
+		}
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -146,15 +163,22 @@ namespace server
 	{
 		{
 			mutex::scoped_lock sl(_mtx);
-			session->receive(
-				bind(&ServiceHub::onReceiveOk, shared_from_this(), session, _1),
-				bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
 
 			//оповестить службы
 			BOOST_FOREACH(TMServices::value_type &pair, _services)
 			{
 				pair.second->onSessionAdd(session);
 			}
+		}
+
+		Result2<system::error_code, net::SPacket> receiveRes = session->receive();
+		if(receiveRes.data1())
+		{
+			onReceiveFail(session, receiveRes.data1());
+		}
+		else
+		{
+			onReceiveOk(session, receiveRes.data2());
 		}
 	}
 
@@ -256,8 +280,15 @@ namespace server
 		p._data = v.serialize(p._size);
 
 		//отослать
-		session->send(p, 
-			ok,
-			fail);
+		Result<system::error_code> sendRes = session->send(p);
+
+		if(sendRes.data())
+		{
+			fail(sendRes.data());
+		}
+		else
+		{
+			ok();
+		}
 	}
 }

@@ -15,3 +15,9 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
+
+#include "async/service.hpp"
+using namespace async;
+
+using namespace boost;
+using namespace boost::system;

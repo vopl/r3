@@ -122,16 +122,30 @@ namespace net
 		ChannelHub();
 
 
-		//////////////////////////////////////////////////////////////////////////
-		virtual void receive(
-			function<void (const SPacket &)> ok,
-			function<void (system::error_code)> fail);
+// 		//////////////////////////////////////////////////////////////////////////
+// 		virtual void receive(
+// 			function<void (const SPacket &)> ok,
+// 			function<void (system::error_code)> fail);
+// 
+// 		//////////////////////////////////////////////////////////////////////////
+// 		virtual void send(
+// 			const SPacket &p,
+// 			function<void ()> ok,
+// 			function<void (system::error_code)> fail);
 
-		//////////////////////////////////////////////////////////////////////////
-		virtual void send(
-			const SPacket &p,
-			function<void ()> ok,
-			function<void (system::error_code)> fail);
+		virtual async::Result2<boost::system::error_code, SPacket> receive()
+		{
+			assert(0);
+			async::Result2<boost::system::error_code, SPacket> res;
+			return res;
+		}
+
+		virtual async::Result<boost::system::error_code> send(const SPacket &p)
+		{
+			assert(0);
+			async::Result<boost::system::error_code> res;
+			return res;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		virtual void close();
@@ -172,10 +186,16 @@ namespace net
 			SendWaiterPtr sw = _sendWaiters.front();
 			_sendWaiters.pop_front();
 
-			channel->send(
-				sw->_packet, 
-				bind(&ChannelHub::onSendOk, ChannelHub<Base>::shared_from_this(), channel, sw),
-				bind(&ChannelHub::onSendFail, ChannelHub<Base>::shared_from_this(), channel, sw, _1));
+			Result<error_code> res = channel->send(sw->_packet);
+
+			if(res.data())
+			{
+				onSendFail(channel, sw, res.data());
+			}
+			else
+			{
+				onSendOk(channel, sw);
+			}
 			_channelsSend.insert(channel);
 		}
 	}
@@ -271,9 +291,16 @@ namespace net
 			RecvCallbackPtr rc(new RecvCallback(rp->_packet, rw->_ok));
 			rcs.push_back(rc);
 
-			rp->_channel->receive(
-				bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), rp->_channel, _1),
-				bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), rp->_channel, _1));
+			Result2<error_code, net::SPacket> res = rp->_channel->receive();
+			if(res.data1())
+			{
+				onRecvOk(rp->_channel, res.data2());
+			}
+			else
+			{
+				onRecvFail(rp->_channel, res.data1());
+			}
+
 			_recvChannelsAmount++;
 		}
 	}
@@ -360,64 +387,64 @@ namespace net
 	}
 
 
-	//////////////////////////////////////////////////////////////////////////
-	template <class Base>
-	void ChannelHub<Base>::receive(
-		function<void (const SPacket &)> ok,
-		function<void (system::error_code)> fail)
-	{
-		RecvCallbacks rcs;
+// 	//////////////////////////////////////////////////////////////////////////
+// 	template <class Base>
+// 	void ChannelHub<Base>::receive(
+// 		function<void (const SPacket &)> ok,
+// 		function<void (system::error_code)> fail)
+// 	{
+// 		RecvCallbacks rcs;
+// 
+// 		bool isWork;
+// 		{
+// 			mutex::scoped_lock sl(_mtxRecv);
+// 			isWork = _work;
+// 
+// 			if(_work)
+// 			{
+// 				//положить в очередь на отправку
+// 				RecvWaiterPtr rp(new RecvWaiter(ok,fail));
+// 				_recvWaiters.push_back(rp);
+// 
+// 				balanceRecvs(rcs);
+// 			}
+// 		}
+// 
+// 		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
+// 		{
+// 			rc->_ok(rc->_packet);
+// 		}
+// 		if(!isWork)
+// 		{
+// 			fail(system::errc::make_error_code(system::errc::operation_canceled));
+// 		}
+// 
+// 	}
 
-		bool isWork;
-		{
-			mutex::scoped_lock sl(_mtxRecv);
-			isWork = _work;
-
-			if(_work)
-			{
-				//положить в очередь на отправку
-				RecvWaiterPtr rp(new RecvWaiter(ok,fail));
-				_recvWaiters.push_back(rp);
-
-				balanceRecvs(rcs);
-			}
-		}
-
-		BOOST_FOREACH(RecvCallbackPtr &rc, rcs)
-		{
-			rc->_ok(rc->_packet);
-		}
-		if(!isWork)
-		{
-			fail(system::errc::make_error_code(system::errc::operation_canceled));
-		}
-
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class Base>
-	void ChannelHub<Base>::send(
-		const SPacket &p,
-		function<void ()> ok,
-		function<void (system::error_code)> fail)
-	{
-		bool isWork;
-		{
-			mutex::scoped_lock sl(_mtxSend);
-			isWork = _work;
-
-			//положить в очередь на отправку
-			SendWaiterPtr sw(new SendWaiter(p,ok,fail));
-			_sendWaiters.push_back(sw);
-
-			balanceSends();
-		}
-
-		if(!isWork)
-		{
-			fail(system::errc::make_error_code(system::errc::operation_canceled));
-		}
-	}
+// 	//////////////////////////////////////////////////////////////////////////
+// 	template <class Base>
+// 	void ChannelHub<Base>::send(
+// 		const SPacket &p,
+// 		function<void ()> ok,
+// 		function<void (system::error_code)> fail)
+// 	{
+// 		bool isWork;
+// 		{
+// 			mutex::scoped_lock sl(_mtxSend);
+// 			isWork = _work;
+// 
+// 			//положить в очередь на отправку
+// 			SendWaiterPtr sw(new SendWaiter(p,ok,fail));
+// 			_sendWaiters.push_back(sw);
+// 
+// 			balanceSends();
+// 		}
+// 
+// 		if(!isWork)
+// 		{
+// 			fail(system::errc::make_error_code(system::errc::operation_canceled));
+// 		}
+// 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
@@ -471,9 +498,17 @@ namespace net
 		_channels.insert(channel);
 		_channelsSendNot.insert(channel);
 
-		channel->receive(
-			bind(&ChannelHub::onRecvOk, ChannelHub<Base>::shared_from_this(), channel, _1),
-			bind(&ChannelHub::onRecvFail, ChannelHub<Base>::shared_from_this(), channel, _1));
+		Result2<error_code, net::SPacket> res = channel->receive();
+		if(res.data1())
+		{
+			onRecvOk(channel, res.data2());
+		}
+		else
+		{
+			onRecvFail(channel, res.data1());
+		}
+
+
 		_recvChannelsAmount++;
 
 		_work = true;

@@ -3,6 +3,7 @@
 
 #include "server/isessionManager.hpp"
 #include "session.hpp"
+#include "net/iacceptor.hpp"
 
 namespace server
 {
@@ -18,6 +19,7 @@ namespace server
 		, public enable_shared_from_this<SessionManager>
 	{
 		IConnectorPtr	_connector;
+		IAcceptorPtr	_acceptor;
 		std::string		_host;
 		std::string		_service;
 
@@ -47,6 +49,7 @@ namespace server
 
 		virtual void start(
 			IConnectorPtr connector,
+			net::IAcceptorPtr acceptor, 
 			const char *host, const char *service,
 			boost::function<void (ISessionPtr)> sstart,
 			boost::function<void (ISessionPtr)> sstop);
