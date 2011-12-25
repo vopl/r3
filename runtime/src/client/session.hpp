@@ -2,7 +2,8 @@
 #define _CLIENT_SESSION_HPP_
 
 #include "client/isession.hpp"
-#include "../net/channelHub.hpp"
+#include "net/channelHub.hpp"
+#include "net/iconnector.hpp"
 
 namespace client
 {
@@ -15,63 +16,16 @@ namespace client
 	class Session
 		: public ChannelHub<ISession>
 	{
-		IConnectorPtr	_connector;
-		std::string		_host;
-		std::string		_service;
-
-		mutex				_mtx;
-		bool				_isStarted;
-		TClientSid			_sid;
-		TClientSid			_needSid;
-		size_t				_needNumChannels;
-
-		size_t					_waitConnections;
-		std::set<IChannelPtr>	_waitConnectionsChannels;
-
-		boost::function<void (size_t)>						_ready;
-		boost::function<void (size_t, system::error_code)>	_fail;
-
-	private:
-		void checkbalance();
-		void onConnectOk(IChannelPtr channel);
-		void onConnectError(system::error_code ec);
-
-		void onSendSidOk(IChannelPtr channel);
-		void onSendSidFail(IChannelPtr channel, system::error_code ec);
-
-		void onReceiveSidOk(IChannelPtr channel, const SPacket &packet);
-		void onReceiveSidFail(IChannelPtr channel, system::error_code ec);
-
-
-	public:
-		SessionPtr shared_from_this();
-
-	private:
-		virtual void onLowChannelSendFail(IChannelPtr channel, system::error_code ec);
-		virtual void onLowChannelRecvFail(IChannelPtr channel, system::error_code ec);
-
-
 	public:
 		Session();
+		~Session();
 
-	public://ISession
-		virtual void start(
-			IConnectorPtr connector,
-			const char *host, const char *service,
-			TClientSid sid, 
-			size_t numChannels,
-			boost::function<void (size_t)> ready,
-			boost::function<void (size_t, system::error_code)> fail);
-
-		virtual void stop();
-
+		virtual async::Result2<boost::system::error_code, size_t> watchState();
 		virtual void balance(size_t numChannels);
 		virtual TClientSid sid();
-
-	public://net::IChannel
+		virtual IAgentPtr allocAgent();
 		virtual void close();
 
 	};
-	PLUMA_INHERIT_PROVIDER(Session, ISession);
 }
 #endif

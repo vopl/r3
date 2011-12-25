@@ -3,6 +3,8 @@
 
 #include "utils/variant.hpp"
 #include "server/endpoint.hpp"
+#include "async/result.hpp"
+#include <boost/system/error_code.hpp>
 
 namespace client
 {
@@ -15,10 +17,11 @@ namespace client
 	{
 		virtual ~IAgent(){}
 
-		virtual void onReceive(
-			IAgentHubPtr hub,
+		virtual async::Result<boost::system::error_code> send(
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data) =0;
+
+		virtual async::Result3<boost::system::error_code, server::TEndpoint, utils::VariantPtr> receive() =0;
 	};
 	typedef boost::shared_ptr<IAgent> IAgentPtr;
 }

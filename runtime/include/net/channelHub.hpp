@@ -2,6 +2,7 @@
 #define _NET_CHANNELHUB_HPP_
 
 #include "net/ichannel.hpp"
+#include "async/service.hpp"
 
 namespace net
 {
