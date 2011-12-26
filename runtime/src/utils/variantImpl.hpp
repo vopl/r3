@@ -1,6 +1,7 @@
 #include "utils/streambufOnArray.hpp"
 #include "utils/serialization.hpp"
 #include "variantConvertMatrix.hpp"
+#include <boost/exception/all.hpp>
 
 //warning C4127: conditional expression is constant
 #pragma warning (push)
@@ -821,7 +822,7 @@ namespace utils
 		}
 		catch(...)
 		{
-			std::cerr<<"exception in "<<__FUNCTION__<<std::endl;
+			std::cerr<<"exception in "<<__FUNCTION__<<", "<<boost::current_exception_diagnostic_information()<<std::endl;
 		}
 
 		return false;

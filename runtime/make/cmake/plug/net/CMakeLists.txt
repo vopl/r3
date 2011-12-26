@@ -45,7 +45,7 @@ SETUP_BIN_OUT(plugnet plug)
 TARGET_LINK_LIBRARIES(plugnet libheap libpluma libutils libasync)
 
 
-INCLUDE(FindOpenSSL.cmake)
+INCLUDE(FindOpenSSL)
 IF(NOT OPENSSL_FOUND)
 	MESSAGE(FATAL_ERROR "OpenSSL required")
 ENDIF()

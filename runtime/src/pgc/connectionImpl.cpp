@@ -378,7 +378,7 @@ namespace pgc
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
 
-		int nParams = data?data->typ.size():0;
+		int nParams = data?(int)data->typ.size():0;
 		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
 		if(!PQsendPrepare(
 			_pgcon, 
@@ -404,7 +404,7 @@ namespace pgc
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
 
-		int nParams = data?data->typ.size():0;
+		int nParams = data?(int)data->typ.size():0;
 		const Oid *paramTypes = nParams?&data->typ[0]:NULL;
 		const char * const *paramValues = nParams?&data->val[0]:NULL;
 		const int *paramLengths = nParams?&data->len[0]:NULL;

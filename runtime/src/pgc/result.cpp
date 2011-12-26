@@ -254,103 +254,6 @@ namespace pgc
 		return true;
 	}
 
-
-// 	//////////////////////////////////////////////////////////////////////////
-// 	void Result::initExtractors()
-// 	{
-// 		int cols = PQnfields(_pgr);
-// 		_extractors.resize(cols);
-// 
-// 		for(int colIdx(0); colIdx<cols; colIdx++)
-// 		{
-// 			Oid typDb = PQftype(_pgr, colIdx);
-// 
-// 			switch(typDb)
-// 			{
-// 			case 21://int2
-// 				_extractors[colIdx]._meth = &Result::extractor_int2;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::int16_t>::et;
-// 				break;
-// 			case 23://int4
-// 				_extractors[colIdx]._meth = &Result::extractor_int4;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::int32_t>::et;
-// 				break;
-// 			case 20://int8
-// 				_extractors[colIdx]._meth = &Result::extractor_int8;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::int64_t>::et;
-// 				break;
-// 			case 1700://numeric
-// 				_extractors[colIdx]._meth = &Result::extractor_numeric;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
-// 				break;
-// 			case 700://float4
-// 				_extractors[colIdx]._meth = &Result::extractor_float4;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<float>::et;
-// 				break;
-// 			case 701://float8
-// 				_extractors[colIdx]._meth = &Result::extractor_float8;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<double>::et;
-// 				break;
-// 			case 790://money
-// 				_extractors[colIdx]._meth = &Result::extractor_money;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::uint64_t>::et;
-// 				break;
-// 			case 1043://varchar
-// 			case 1042://bpchar
-// 			case 25://text
-// 				_extractors[colIdx]._meth = &Result::extractor_varchar;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
-// 				break;
-// 			case 17://bytea
-// 				_extractors[colIdx]._meth = &Result::extractor_bytea;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
-// 				break;
-// 			case 1114://timestamp
-// 			case 1184://timestamptz
-// 				_extractors[colIdx]._meth = &Result::extractor_timestamp;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::posix_time::ptime>::et;
-// 				break;
-// 			case 1186://interval
-// 				_extractors[colIdx]._meth = &Result::extractor_interval;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::posix_time::time_duration>::et;
-// 				break;
-// 			case 1082://date
-// 				_extractors[colIdx]._meth = &Result::extractor_date;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::gregorian::date>::et;
-// 				break;
-// 			case 1083://time
-// 			case 1266://timetz
-// 				_extractors[colIdx]._meth = &Result::extractor_time;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::posix_time::time_duration>::et;
-// 				break;
-// 			case 16://bool
-// 				_extractors[colIdx]._meth = &Result::extractor_bool;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<bool>::et;
-// 				break;
-// 			case 1560://bit
-// 			case 1562://varbit
-// 				_extractors[colIdx]._meth = &Result::extractor_varbit;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
-// 				break;
-// 			case 26://oid
-// 				_extractors[colIdx]._meth = &Result::extractor_oid;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::uint32_t>::et;
-// 				break;
-// 			case 2950://uuid
-// 				_extractors[colIdx]._meth = &Result::extractor_uuid;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<boost::uuids::uuid>::et;
-// 				break;
-// 			case 18://char
-// 				_extractors[colIdx]._meth = &Result::extractor_char;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<char>::et;
-// 				break;
-// 			default:
-// 				_extractors[colIdx]._meth = &Result::extractor_null;
-// 				_extractors[colIdx]._favorType = Variant::Type2Enum<std::string>::et;
-// 			}
-// 		}
-// 	}
-
 	//////////////////////////////////////////////////////////////////////////
 	Result::Result(PGresult *pgr, ConnectionImplPtr con)
 		: _pgr(pgr)
@@ -437,8 +340,8 @@ namespace pgc
 			return Variant::etUnknown;
 		}
 
-		assert(1 == PQfformat(_pgr, colIdx));
-		switch(PQftype(_pgr, colIdx))
+		assert(1 == PQfformat(_pgr, (int)colIdx));
+		switch(PQftype(_pgr, (int)colIdx))
 		{
 		case 21://int2
 			return Variant::etInt16;
@@ -608,30 +511,30 @@ namespace pgc
 			return false;
 		}
 
-		assert(1 == PQfformat(_pgr, colIdx));
+		assert(1 == PQfformat(_pgr, (int)colIdx));
 		if(PQgetisnull(_pgr, (int)rowIdx, (int)colIdx))
 		{
 			v.forceType(colType(colIdx));
 			v.setNull(true);
 			return true;
 		}
-		Oid type = PQftype(_pgr, colIdx);
+		Oid type = PQftype(_pgr, (int)colIdx);
 		switch(type)
 		{
 		case 21://int2
-			v = bigEndian(*(boost::int16_t *)PQgetvalue(_pgr, rowIdx, colIdx));
+			v = bigEndian(*(boost::int16_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 			break;
 		case 23://int4
-			v = bigEndian(*(boost::int32_t *)PQgetvalue(_pgr, rowIdx, colIdx));
+			v = bigEndian(*(boost::int32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 			break;
 		case 20://int8
-			v = bigEndian(*(boost::int64_t *)PQgetvalue(_pgr, rowIdx, colIdx));
+			v = bigEndian(*(boost::int64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 			break;
 		case 1700://numeric
 			{
-				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
 				std::vector<unsigned char> buf(lenDb);
-				memcpy(&buf.front(), PQgetvalue(_pgr, rowIdx, colIdx), lenDb);
+				memcpy(&buf.front(), PQgetvalue(_pgr, (int)rowIdx, (int)colIdx), lenDb);
 				PG_NumericData &nd = *(PG_NumericData *)&buf.front();
 
 				nd.ndigits = bigEndian(nd.ndigits);
@@ -680,28 +583,28 @@ namespace pgc
 			}
 			break;
 		case 700://float4
-			v = bigEndian(*(float *)PQgetvalue(_pgr, rowIdx, colIdx));
+			v = bigEndian(*(float *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 			break;
 		case 701://float8
-			v = bigEndian(*(double *)PQgetvalue(_pgr, rowIdx, colIdx));
+			v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 			break;
 		case 790://money
-			v = bigEndian(*(boost::int64_t *)PQgetvalue(_pgr, rowIdx, colIdx));
+			v = bigEndian(*(boost::int64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 			break;
 		case 705://unknown
 		case 1043://varchar
 		case 1042://bpchar
 		case 25://text
 			{
-				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
-				char *valDb = PQgetvalue(_pgr, rowIdx, colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
+				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
 				v.as<Variant::String>(true).assign(valDb, valDb+lenDb);
 			}
 			break;
 		case 17://bytea
 			{
-				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
-				char *valDb = PQgetvalue(_pgr, rowIdx, colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
+				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
 				v.as<Variant::VectorChar>(true).assign(valDb, valDb+lenDb);
 			}
 			break;
@@ -711,11 +614,11 @@ namespace pgc
 				boost::uint64_t time;
 				if(_con->integerDatetimes())
 				{
-					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, rowIdx, colIdx));
+					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 				}
 				else
 				{
-					double v = bigEndian(*(double *)PQgetvalue(_pgr, rowIdx, colIdx));
+					double v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 					time = (boost::int64_t)v;
 					v -= time;
 					time *= 1000000;
@@ -751,7 +654,7 @@ namespace pgc
 		case 1186://interval
 			{
 				unsigned char buf[sizeof(PG_Interval)];
-				memcpy(buf, PQgetvalue(_pgr, rowIdx, colIdx), sizeof(PG_Interval));
+				memcpy(buf, PQgetvalue(_pgr, (int)rowIdx, (int)colIdx), sizeof(PG_Interval));
 				PG_Interval &i = *(PG_Interval *)buf;
 
 				//v.time = bigEndian(v.time);
@@ -785,7 +688,7 @@ namespace pgc
 			break;
 		case 1082://date
 			{
-				boost::int32_t jd = bigEndian(*(boost::int32_t *)PQgetvalue(_pgr, rowIdx, colIdx)) + POSTGRES_EPOCH_JDATE;
+				boost::int32_t jd = bigEndian(*(boost::int32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx)) + POSTGRES_EPOCH_JDATE;
 				int year, month, day;
 				j2date(jd, &year, &month, &day);
 
@@ -798,11 +701,11 @@ namespace pgc
 				boost::uint64_t time;
 				if(_con->integerDatetimes())
 				{
-					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, rowIdx, colIdx));
+					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 				}
 				else
 				{
-					double v = bigEndian(*(double *)PQgetvalue(_pgr, rowIdx, colIdx));
+					double v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 					time = (boost::int64_t)v;
 					v -= time;
 					time *= 1000000;
@@ -820,15 +723,15 @@ namespace pgc
 			}
 			break;
 		case 16://bool
-			v = (*(boost::int8_t *)PQgetvalue(_pgr, rowIdx, colIdx))?true:false;
+			v = (*(boost::int8_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx))?true:false;
 			break;
 		case 1560://bit
 		case 1562://varbit
 			{
 
-				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
 				std::vector<unsigned char> buf(lenDb);
-				memcpy(&buf.front(), PQgetvalue(_pgr, rowIdx, colIdx), lenDb);
+				memcpy(&buf.front(), PQgetvalue(_pgr, (int)rowIdx, (int)colIdx), lenDb);
 				PG_VarBit &vb = *(PG_VarBit *)&buf.front();
 
 				boost::uint32_t amount = bigEndian(vb.amount);
@@ -864,23 +767,23 @@ namespace pgc
 			}
 			break;
 		case 26://oid
-			v = bigEndian(*(boost::uint32_t *)PQgetvalue(_pgr, rowIdx, colIdx));
+			v = bigEndian(*(boost::uint32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 			break;
 		case 2950://uuid
 			{
-				int lenDb = PQgetlength(_pgr, rowIdx, colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
 				boost::uuids::uuid &u = v.as<Variant::Uuid>(true);
 				if(lenDb > (int)u.size())
 				{
-					lenDb = u.size();
+					lenDb = (int)u.size();
 				}
-				char *valDb = PQgetvalue(_pgr, rowIdx, colIdx);
+				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
 				std::copy((char *)valDb, (char *)valDb+lenDb, u.begin());
 
 			}
 			break;
 		case 18://char
-			v = *(char *)PQgetvalue(_pgr, rowIdx, colIdx);
+			v = *(char *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
 			break;
 		default:
 			v.setNull<Variant::Void>();

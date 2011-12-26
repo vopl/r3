@@ -60,6 +60,8 @@ namespace utils
 
 			//warning C4244: '=' : conversion from 'const utils::Variant::UInt16' to 'utils::Variant::UInt8', possible loss of data
 #pragma warning (disable: 4244)
+			//warning C4267: '=' : conversion from 'size_t' to 'utils::Variant::Int8', possible loss of data
+#pragma warning (disable: 4267)
 
 			//////////////////////////////////////////////////////////////////////////
 			//integer to integer
