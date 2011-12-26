@@ -117,12 +117,15 @@ ENUM_VARIANT_TYPES
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template<typename T> void setNull(bool n)
+	template<typename T> void Variant::setNull(bool n)
 	{
 		IMPL->validateType<T>();
 		IMPL->forceType<T>();
 		return IMPL->setNull(n);
 	}
+#define ENUM_VARIANT_TYPE(n) template void Variant::setNull<Variant::n>(bool n);
+	ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 
 	//////////////////////////////////////////////////////////////////////////
 	Variant::EType Variant::type() const
@@ -423,18 +426,6 @@ ENUM_VARIANT_TYPES
 	bool Variant::operator !=(const Variant &v) const
 	{
 		return !CIMPL->equal(v);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	boost::shared_array<char> Variant::serialize(boost::uint32_t &size) const
-	{
-		return CIMPL->serialize(size);
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	bool Variant::deserialize(boost::shared_array<char> data, boost::uint32_t size)
-	{
-		return IMPL->deserialize(data, size);
 	}
 }
 

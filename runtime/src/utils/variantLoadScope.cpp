@@ -3,6 +3,7 @@
 #include "utils/ntoa.hpp"
 #include "utils/aton.hpp"
 #include "utils/xton.hpp"
+#include "utils/fixEndian.hpp"
 
 namespace utils
 {

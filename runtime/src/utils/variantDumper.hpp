@@ -1,5 +1,6 @@
 #include <boost/foreach.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include "utils/fixEndian.hpp"
 
 namespace utils
 {
