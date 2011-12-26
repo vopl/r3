@@ -43,7 +43,6 @@ namespace client
 
 		//////////////////////////////////////////////////////////////////////////
 		void NetworkReply::onReceive(
-			IAgentHubPtr hub,
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data)
 		{
@@ -76,7 +75,8 @@ namespace client
 			m["cmd"] = "get";
 			m["path"] = url.path().toUtf8().constData();
 
-			send(url.host().toUtf8().constData(), v);
+			assert(0);
+			//send(url.host().toUtf8().constData(), v);
 		}
 
 		//////////////////////////////////////////////////////////////////////////

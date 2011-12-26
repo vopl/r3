@@ -2,7 +2,8 @@
 #define _CLIENT_QT_NETWORKREPLY_HPP_
 
 #include <QtNetwork/QNetworkReply>
-#include "agent.hpp"
+#include "utils/variant.hpp"
+#include "server/endpoint.hpp"
 
 namespace client
 {
@@ -11,7 +12,6 @@ namespace client
 
 		class NetworkReply
 			: public QNetworkReply
-			, Agent
 		{
 			Q_OBJECT
 
@@ -27,7 +27,6 @@ namespace client
 
 		protected:
 			virtual void onReceive(
-				IAgentHubPtr hub,
 				const server::TEndpoint &endpoint,
 				utils::VariantPtr data);
 

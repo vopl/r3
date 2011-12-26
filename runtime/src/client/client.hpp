@@ -8,6 +8,8 @@
 namespace client
 {
 	using namespace boost;
+	using namespace boost::system;
+	using namespace async;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Client
@@ -19,7 +21,7 @@ namespace client
 		~Client();
 
 		virtual void start(pluma::Pluma *plugs);
-		virtual async::Result2<boost::system::error_code, ISessionPtr> 
+		virtual Result2<error_code, ISessionPtr> 
 			createSession(const char *host, const char *service);
 		virtual pluma::Pluma * getPlugs();
 		virtual void stop();

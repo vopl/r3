@@ -9,16 +9,14 @@ namespace client
 	{
 		//////////////////////////////////////////////////////////////////////////
 		void DAgent::onReceive(
-			IAgentHubPtr hub,
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data)
 		{
-			emit onReceive_sig(hub, endpoint, data);
+			emit onReceive_sig(endpoint, data);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void DAgent::onReceive_slot(
-			IAgentHubPtr hub,
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data)
 		{
@@ -980,14 +978,14 @@ namespace client
 		DAgent::DAgent(QObject *parent)
 			: QObject(parent)
 		{
-			connect(
-				this, SIGNAL(onReceive_sig(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
-				this, SLOT(onReceive_slot(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
-				Qt::QueuedConnection);
-
-			connect(
-				(QObject *)_mainWindow, SIGNAL(onChannelChange(int)),
-				this, SLOT(onChannelChange_slot(int)));
+// 			connect(
+// 				this, SIGNAL(onReceive_sig(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
+// 				this, SLOT(onReceive_slot(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
+// 				Qt::QueuedConnection);
+// 
+// 			connect(
+// 				(QObject *)_mainWindow, SIGNAL(onChannelChange(int)),
+// 				this, SLOT(onChannelChange_slot(int)));
 		}
 
 	
@@ -1006,7 +1004,8 @@ namespace client
 
 			utils::VariantPtr pv(new utils::Variant);
 			variantCnvt(*pv, data);
-			_lowAgentHub->send(_lowAgent, std::string(service.toUtf8()), pv);
+			assert(0);
+//			_lowAgent->send(std::string(service.toUtf8()), pv);
 		}
 
 	}

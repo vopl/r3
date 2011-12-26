@@ -4,7 +4,6 @@
 #include <QtDeclarative/qdeclarative.h>
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeEngine>
-#include "agent.hpp"
 
 namespace client
 {
@@ -53,10 +52,8 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onSessionStart_slot(ISessionPtr session)
 		{
-			Agent::_mainWindow = this;
-			Agent::_lowAgentHub = _plugins.create<IAgentHubProvider>();
-			assert(Agent::_lowAgentHub);
-			Agent::_lowAgentHub->initialize(session);
+			assert(0);
+			//Agent::_mainWindow = this;
 
 			assert(!_view);
 			_view = new QDeclarativeView(this);
@@ -80,17 +77,11 @@ namespace client
 				_view = NULL;
 			}
 
-			if(Agent::_lowAgentHub)
-			{
-				Agent::_lowAgentHub->deinitialize();
-				Agent::_lowAgentHub.reset();
-			}
-
-			if(Agent::_mainWindow)
-			{
-				Agent::_mainWindow = NULL;
-			}
-
+			assert(0);
+// 			if(Agent::_mainWindow)
+// 			{
+// 				Agent::_mainWindow = NULL;
+// 			}
 		}
 
 
@@ -99,7 +90,8 @@ namespace client
 		{
 			_nd->setNumChannels(0);
 			_labelConnected->setNum(0);
-			_client->connect(host.toUtf8(), service.toUtf8());
+			assert(0);
+			//_client->connect(host.toUtf8(), service.toUtf8());
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -162,11 +154,12 @@ namespace client
 			_client = _plugins.create<client::IClientProvider>();
 			assert(_client);
 
-			_client->start(
-				&_plugins, 
-				boost::bind(&MainWindow::onSessionStart_, this, _1),
-				boost::bind(&MainWindow::onSessionStop_, this, _1),
-				boost::bind(&MainWindow::onChannelChange_, this, _1, _2));
+			assert(0);
+// 			_client->start(
+// 				&_plugins, 
+// 				boost::bind(&MainWindow::onSessionStart_, this, _1),
+// 				boost::bind(&MainWindow::onSessionStop_, this, _1),
+// 				boost::bind(&MainWindow::onChannelChange_, this, _1, _2));
 
 			onAddrChanged(_nd->getHost(), _nd->getService());
 		}

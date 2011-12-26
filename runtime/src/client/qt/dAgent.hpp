@@ -3,7 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
-#include "agent.hpp"
+#include "utils/variant.hpp"
+#include "server/endpoint.hpp"
 
 namespace client
 {
@@ -11,25 +12,21 @@ namespace client
 	{
 		class DAgent
 			: public QObject
-			, public Agent
 
 		{
 			Q_OBJECT
 
 		private:
 			virtual void onReceive(
-				IAgentHubPtr hub,
 				const server::TEndpoint &endpoint,
 				utils::VariantPtr data);
 
 		signals:
 			void onReceive_sig(
-				IAgentHubPtr hub,
 				const server::TEndpoint &endpoint,
 				utils::VariantPtr data);
 		private slots:
 			void onReceive_slot(
-				IAgentHubPtr hub,
 				const server::TEndpoint &endpoint,
 				utils::VariantPtr data);
 			void onChannelChange_slot(int numChannels);
@@ -48,7 +45,7 @@ namespace client
 			~DAgent();
 
 		public:
-			Q_PROPERTY(int numChannels READ getNumChannels);
+			//Q_PROPERTY(int numChannels READ getNumChannels);
 			Q_PROPERTY(QString service READ getService WRITE setService);
 			Q_INVOKABLE void send(QVariant data, QString service=QString(""));
 
