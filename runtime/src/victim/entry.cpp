@@ -95,17 +95,17 @@ int main(int argc, char* argv[])
 	m_["MapVariantVariant"].as<Variant::MapVariantVariant>(true)["c"] = "d";
 	
 	m_["MultimapStringVariant"].as<Variant::MultimapStringVariant>(true).insert(std::make_pair("a", 'a'));
-	m_["MultimapStringVariant"].as<Variant::MultimapStringVariant>(true).insert(std::make_pair("a", 'b'));
+	m_["MultimapStringVariant"].as<Variant::MultimapStringVariant>(true).insert(std::make_pair("a", 'a'));
 
 	m_["MultimapVariantVariant"].as<Variant::MultimapVariantVariant>(true).insert(std::make_pair("a", 'a'));
-	m_["MultimapVariantVariant"].as<Variant::MultimapVariantVariant>(true).insert(std::make_pair("a", 'b'));
+	m_["MultimapVariantVariant"].as<Variant::MultimapVariantVariant>(true).insert(std::make_pair("a", 'a'));
 
 	m_["SetVariant"].as<Variant::SetVariant>(true).insert(1);
-	m_["SetVariant"].as<Variant::SetVariant>(true).insert("2");
+	//m_["SetVariant"].as<Variant::SetVariant>(true).insert("2");
 
 	m_["MultisetVariant"].as<Variant::MultisetVariant>(true).insert("2");
 	m_["MultisetVariant"].as<Variant::MultisetVariant>(true).insert("2");
-	m_["MultisetVariant"].as<Variant::MultisetVariant>(true).insert(2);
+	//m_["MultisetVariant"].as<Variant::MultisetVariant>(true).insert(2);
 
 	m_["DequeVariant"].as<Variant::DequeVariant>(true).push_back("asdf1");
 	m_["DequeVariant"].as<Variant::DequeVariant>(true).push_back("asdf2");
@@ -118,8 +118,8 @@ int main(int argc, char* argv[])
 	m_["Char"] = 's';
 	m_["Uuid"] = uuids::uuid();
 	
-	m_["VariantPtr"] = VariantPtr(new Variant(22));
-	m_["MultisetVariant"].as<Variant::MultisetVariant>(true).insert(m_["VariantPtr"]);
+	//m_["VariantPtr"] = VariantPtr(new Variant(22));
+	//m_["MultisetVariant"].as<Variant::MultisetVariant>(true).insert(m_["VariantPtr"]);
 
 	size_t size;
 	boost::shared_array<char> data = v.serialize(size);

@@ -117,12 +117,15 @@ ENUM_VARIANT_TYPES
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template<typename T> void setNull(bool n)
+	template<typename T> void Variant::setNull(bool n)
 	{
 		IMPL->validateType<T>();
 		IMPL->forceType<T>();
 		return IMPL->setNull(n);
 	}
+#define ENUM_VARIANT_TYPE(n) template void Variant::setNull<Variant::n>(bool n);
+	ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
 
 	//////////////////////////////////////////////////////////////////////////
 	Variant::EType Variant::type() const

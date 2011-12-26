@@ -7,10 +7,14 @@ namespace utils
 	using namespace boost;
 	namespace
 	{
+		template <uint16_t signature>
 		class Serializer
 		{
-			typedef std::map<const VariantPtr, uint32_t> TMPtrKey;
+			typedef std::map<VariantPtr, uint32_t> TMPtrKey;
 			TMPtrKey _mPtrKey;
+
+			typedef std::map<uint32_t, VariantPtr> TMKeyPtr;
+			TMKeyPtr _mKeyPtr;
 
 #pragma pack (push, 1)
 			struct Header
@@ -43,17 +47,17 @@ namespace utils
 			shared_array<char> serialize(const Variant &v, uint32_t &size)
 			{
 				//первый проход, вычислить длину
-				size = calcSize(v);
+				uint32_t vsize = calcSize(v);
 				_mPtrKey.clear();
 
-				shared_array<char> data(new char[sizeof(Header) + size]);
+				shared_array<char> data(new char[sizeof(Header) + vsize]);
 
 				Header *ph = (Header *)data.get();
-				ph->_signature = 0x3F47;
-				ph->_size = size;
+				ph->_signature = litEndian(signature);
+				ph->_size = litEndian(vsize);
 
 				_bufIter = data.get() + sizeof(Header);
-				_bufEnd = _bufIter + size;
+				_bufEnd = _bufIter + vsize;
 				write(v);
 				_mPtrKey.clear();
 				assert(_bufIter == _bufEnd);
@@ -61,16 +65,59 @@ namespace utils
 				_bufEnd = NULL;
 
 				crc_16_type		crcCalculator;
-				crcCalculator.process_bytes(data.get()+4, size+4);
-				ph->_crc = crcCalculator.checksum();
+				crcCalculator.process_bytes(data.get()+4, vsize+4);
+				ph->_crc = litEndian(crcCalculator.checksum());
+				size = vsize+sizeof(Header);
+
 				return data;
 			}
 
 			//////////////////////////////////////////////////////////////////////////
 			bool deserialize(Variant &v, shared_array<char> data, uint32_t size)
 			{
-				assert(0);
-				return false;
+				if(size < sizeof(Header)+2)
+				{
+					assert(!"size mismatch");
+					return false;
+				}
+
+				Header *ph = (Header *)data.get();
+
+				if(litEndian(ph->_signature) != signature)
+				{
+					assert(!"signature mismatch");
+					return false;
+				}
+
+				uint32_t vsize = litEndian(ph->_size);
+				if(vsize != size - sizeof(Header))
+				{
+					assert(!"size mismatch");
+					return false;
+				}
+
+				crc_16_type		crcCalculator;
+				crcCalculator.process_bytes(data.get()+4, vsize+4);
+				if(litEndian(ph->_crc) != crcCalculator.checksum())
+				{
+					assert(!"crc mismatch");
+					return false;
+				}
+
+				_bufIter = data.get() + sizeof(Header);
+				_bufEnd = _bufIter + vsize;
+				assert(_mKeyPtr.empty());
+				read(v);
+				_mKeyPtr.clear();
+				if(_bufIter != _bufEnd)
+				{
+					assert(!"data corrupted");
+					return false;
+				}
+				_bufIter = NULL;
+				_bufEnd = NULL;
+
+				return true;
 			}
 
 		private:
@@ -92,6 +139,7 @@ namespace utils
 					switch(v.type())
 					{
 					case Variant::etUnknown:
+						assert(!"bad et");
 						break;
 					case Variant::etVoid:
 						break;
@@ -137,7 +185,7 @@ namespace utils
 						size += 4;
 						break;
 					case Variant::etDatetime:
-						size += 8;
+						size += 12;
 						break;
 					case Variant::etVectorVariant:
 						size += S;
@@ -188,10 +236,10 @@ namespace utils
 						size += 4;
 						break;
 					case Variant::etTimeDuration:
-						size += 4;
+						size += 8;
 						break;
 					case Variant::etDateTimeDuration:
-						size += 8;
+						size += 12;
 						break;
 					case Variant::etMapVariantVariant:
 						size += S;
@@ -379,6 +427,7 @@ namespace utils
 					switch(v.type())
 					{
 					case Variant::etUnknown:
+						assert(!"bad et");
 						break;
 					case Variant::etVoid:
 						break;
@@ -448,7 +497,7 @@ namespace utils
 								d.day();
 							writeIntegral(ui4_d);
 
-							writeIntegral((int32_t)td.total_microseconds());
+							writeIntegral((int64_t)td.total_microseconds());
 						}
 						break;
 					case Variant::etVectorVariant:
@@ -458,7 +507,7 @@ namespace utils
 						writeMap(v.as<Variant::MapStringVariant>());
 						break;
 					case Variant::etBool:
-						writeIntegral(v.as<Variant::Bool>());
+						writeIntegral((char)v.as<Variant::Bool>());
 						break;
 					case Variant::etTm:
 						{
@@ -500,13 +549,13 @@ namespace utils
 						writeIntegral((int32_t)v.as<Variant::DateDuration>().days());
 						break;
 					case Variant::etTimeDuration:
-						writeIntegral((int32_t)v.as<Variant::TimeDuration>().total_microseconds());
+						writeIntegral((int64_t)v.as<Variant::TimeDuration>().total_microseconds());
 						break;
 					case Variant::etDateTimeDuration:
 						{
 							const Variant::DateTimeDuration &raw = v.as<Variant::DateTimeDuration>();
 							writeIntegral((int32_t)raw._dd.days());
-							writeIntegral((int32_t)raw._td.total_microseconds());
+							writeIntegral((int64_t)raw._td.total_microseconds());
 						}
 						break;
 					case Variant::etMapVariantVariant:
@@ -572,13 +621,470 @@ namespace utils
 					}
 				}
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////
+			bool readBinary(char *data, uint32_t size)
+			{
+				if(_bufEnd-_bufIter < (int)size)
+				{
+					assert(0);
+					return false;
+				}
+
+				memcpy(data, _bufIter, size);
+				_bufIter += size;
+
+				return true;
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <class T>
+			bool readIntegral(T &value)
+			{
+				if(_bufEnd-_bufIter < (int)sizeof(T))
+				{
+					assert(0);
+					return false;
+				}
+
+				readBinary((char *)&value, sizeof(T));
+				value = litEndian(value);
+
+				return true;
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			bool read(std::string &value)
+			{
+				uint32_t size;
+				if(!readIntegral(size))
+				{
+					return false;
+				}
+				if(size)
+				{
+					value.resize(size);
+					if(!readBinary(const_cast<char *>(value.data()), size))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					value.clear();
+				}
+				return true;
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <size_t N>
+			bool readBitset(std::bitset<N> &value)
+			{
+				uint8_t buf[N/8];
+				if(!readBinary((char *)buf, N/8))
+				{
+					return false;
+				}
+
+				value.reset();
+				for(size_t i(0); i<N; i++)
+				{
+					if(buf[i/8] & 1<<(i%8))
+					{
+						value.set(i);
+					}
+				}
+
+				return true;
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <class Map>
+			bool readMap(Map &value)
+			{
+				value.clear();
+				uint32_t size;
+				if(!readIntegral(size))
+				{
+					return false;
+				}
+
+				while(size)
+				{
+					std::pair<typename Map::key_type, typename Map::mapped_type> el;
+					if(!read(el.first) || !read(el.second))
+					{
+						return false;
+					}
+
+					value.insert(el);
+					size--;
+				}
+				return true;
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			template <class Seq>
+			bool readSeq_insertable(Seq &value)
+			{
+				value.clear();
+				uint32_t size;
+				if(!readIntegral(size))
+				{
+					return false;
+				}
+				while(size)
+				{
+					typename Seq::iterator iter = value.insert(value.end(), Variant());
+					if(!read(*iter))
+					{
+						return false;
+					}
+					size--;
+				}
+
+				return true;
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			template <class Seq>
+			bool readSeq_indexable(Seq &value)
+			{
+				uint32_t size;
+				if(!readIntegral(size))
+				{
+					return false;
+				}
+
+				value.resize(size);
+				for(size_t i(0); i<size; i++)
+				{
+					if(!read(value[i]))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			bool read(Variant &v)
+			{
+				int16_t et;
+				if(!readIntegral(et))
+				{
+					return false;
+				}
+
+				if(et<0)
+				{
+					switch(-et)
+					{
+					case Variant::etVoid: v.setNull(); return true;
+#define ENUM_VARIANT_TYPE(T) case Variant::et##T: v.setNull<Variant::T>(); return true;
+						ENUM_VARIANT_TYPES
+#undef ENUM_VARIANT_TYPE
+					default:
+						assert(!"bad et");
+						return false;
+					}
+					return false;
+				}
+
+				switch(et)
+				{
+				case Variant::etUnknown:
+					assert(!"bad et");
+					return false;
+				case Variant::etVoid:
+					v.setNull<Variant::Void>(true);
+					return false;
+				case Variant::etString:
+					return read(v.as<Variant::String>(true));
+				case Variant::etFloat:
+					return readIntegral(v.as<Variant::Float>(true));
+				case Variant::etDouble:
+					return readIntegral(v.as<Variant::Double>(true));
+				case Variant::etInt8:
+					return readIntegral(v.as<Variant::Int8>(true));
+				case Variant::etInt16:
+					return readIntegral(v.as<Variant::Int16>(true));
+				case Variant::etInt32:
+					return readIntegral(v.as<Variant::Int32>(true));
+				case Variant::etInt64:
+					return readIntegral(v.as<Variant::Int64>(true));
+				case Variant::etUInt8:
+					return readIntegral(v.as<Variant::UInt8>(true));
+				case Variant::etUInt16:
+					return readIntegral(v.as<Variant::UInt16>(true));
+				case Variant::etUInt32:
+					return readIntegral(v.as<Variant::UInt32>(true));
+				case Variant::etUInt64:
+					return readIntegral(v.as<Variant::UInt64>(true));
+				case Variant::etVectorChar:
+					{
+						uint32_t size;
+						if(!readIntegral(size))
+						{
+							return false;
+						}
+						Variant::VectorChar &raw = v.as<Variant::VectorChar>(true);
+						raw.resize(size);
+						if(size)
+						{
+							if(!readBinary(&raw[0], size))
+							{
+								return false;
+							}
+						}
+					}
+					return true;
+				case Variant::etDate:
+					{
+						uint32_t ui4;
+						if(!readIntegral(ui4))
+						{
+							return false;
+						}
+
+						uint16_t y,m,d;
+						y = ui4/10000;
+						ui4 %= 10000;
+						m = ui4/100;
+						ui4 %= 100;
+						d = ui4;
+
+						try
+						{
+							v = Variant::Date(y,m,d);
+						}
+						catch(...)
+						{
+							return false;
+						}
+					}
+					return true;
+				case Variant::etDatetime:
+					{
+						uint32_t ui4_d;
+						int64_t i8_t;
+						if(!readIntegral(ui4_d) || !readIntegral(i8_t))
+						{
+							return false;
+						}
+
+						uint16_t y,m,d;
+						y = ui4_d/10000;
+						ui4_d %= 10000;
+						m = ui4_d/100;
+						ui4_d %= 100;
+						d = ui4_d;
+
+						try
+						{
+							v = Variant::Datetime(
+								Variant::Date(y,m,d), 
+								posix_time::microseconds(i8_t));
+						}
+						catch(...)
+						{
+							return false;
+						}
+					}
+					return true;
+				case Variant::etVectorVariant:
+					return readSeq_indexable(v.as<Variant::VectorVariant>(true));
+				case Variant::etMapStringVariant:
+					return readMap(v.as<Variant::MapStringVariant>(true));
+				case Variant::etBool:
+					{
+						char c;
+						if(!readIntegral(c))
+						{
+							return false;
+						}
+						v = c?true:false;
+					}
+					return true;
+				case Variant::etTm:
+					{
+						int32_t data[9];
+
+						if(
+							!readIntegral(data[0]) ||
+							!readIntegral(data[1]) ||
+							!readIntegral(data[2]) ||
+							!readIntegral(data[3]) ||
+							!readIntegral(data[4]) ||
+							!readIntegral(data[5]) ||
+							!readIntegral(data[6]) ||
+							!readIntegral(data[7]) ||
+							!readIntegral(data[8]))
+						{
+							return false;
+						}
+
+						Variant::Tm &raw = v.as<Variant::Tm>(true);
+						raw.tm_sec		= data[0];
+						raw.tm_min		= data[1];
+						raw.tm_hour		= data[2];
+						raw.tm_mday		= data[3];
+						raw.tm_mon		= data[4];
+						raw.tm_year		= data[5];
+						raw.tm_wday		= data[6];
+						raw.tm_yday		= data[7];
+						raw.tm_isdst	= data[8];
+					}
+					return true;
+				case Variant::etBitset8:
+					return readBitset(v.as<Variant::Bitset8>(true));
+				case Variant::etBitset16:
+					return readBitset(v.as<Variant::Bitset16>(true));
+				case Variant::etBitset32:
+					return readBitset(v.as<Variant::Bitset32>(true));
+				case Variant::etBitset64:
+					return readBitset(v.as<Variant::Bitset64>(true));
+				case Variant::etBitset128:
+					return readBitset(v.as<Variant::Bitset128>(true));
+				case Variant::etBitset256:
+					return readBitset(v.as<Variant::Bitset256>(true));
+				case Variant::etBitset512:
+					return readBitset(v.as<Variant::Bitset512>(true));
+				case Variant::etDateDuration:
+					{
+						int32_t i4;
+						if(!readIntegral(i4))
+						{
+							return false;
+						}
+						v = Variant::DateDuration(i4);
+					}
+					return true;
+				case Variant::etTimeDuration:
+					{
+						int64_t i8;
+						if(!readIntegral(i8))
+						{
+							return false;
+						}
+						v = posix_time::microseconds(i8);
+					}
+					return true;
+				case Variant::etDateTimeDuration:
+					{
+						int32_t i4_d;
+						int64_t i8_t;
+						if(!readIntegral(i4_d) || !readIntegral(i8_t))
+						{
+							return false;
+						}
+						Variant::DateTimeDuration &raw = v.as<Variant::DateTimeDuration>(true);
+
+						raw._dd = Variant::DateDuration(i4_d);
+						raw._td = posix_time::microseconds(i8_t);
+					}
+					return true;
+				case Variant::etMapVariantVariant:
+					return readMap(v.as<Variant::MapVariantVariant>(true));
+				case Variant::etMultimapStringVariant:
+					return readMap(v.as<Variant::MultimapStringVariant>(true));
+				case Variant::etMultimapVariantVariant:
+					return readMap(v.as<Variant::MultimapVariantVariant>(true));
+				case Variant::etSetVariant:
+					return readSeq_insertable(v.as<Variant::SetVariant>(true));
+				case Variant::etMultisetVariant:
+					return readSeq_insertable(v.as<Variant::MultisetVariant>(true));
+				case Variant::etDequeVariant:
+					return readSeq_indexable(v.as<Variant::DequeVariant>(true));
+				case Variant::etListVariant:
+					return readSeq_insertable(v.as<Variant::ListVariant>(true));
+				case Variant::etChar:
+					return readIntegral(v.as<Variant::Char>(true));
+				case Variant::etUuid:
+					{
+						Variant::Uuid &raw = v.as<Variant::Uuid>(true);
+						if(!readBinary((char *)raw.data, 16))
+						{
+							return false;
+						}
+					}
+					return true;
+				case Variant::etVariantPtr:
+					{
+						uint32_t key;
+						if(!readIntegral(key))
+						{
+							return false;
+						}
+
+						if(key)
+						{
+							TMKeyPtr::iterator iter = _mKeyPtr.find(key);
+							if(_mKeyPtr.end() == iter)
+							{
+								Variant::VariantPtr &p = v.as<Variant::VariantPtr>(true);
+								p.reset(new Variant);
+								_mKeyPtr.insert(std::make_pair(key, p));
+
+								if(!read(*p))
+								{
+									return false;
+								}
+							}
+							else
+							{
+								v.as<Variant::VariantPtr>(true) = iter->second;
+							}
+						}
+						else
+						{
+							v.as<Variant::VariantPtr>(true).reset();
+						}
+					}
+					return true;
+				default:
+					assert(!"bad et");
+					return false;
+				}
+
+				assert(!"never here");
+				return false;
+			}
 		};
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	shared_array<char> Variant::serialize(uint32_t &size) const
 	{
-		Serializer s;
+		Serializer<0x472e> s;
 		return s.serialize(*this, size);
 	}
 	
@@ -586,7 +1092,7 @@ namespace utils
 	bool Variant::deserialize(shared_array<char> data, uint32_t size)
 	{
 		Variant tmp;
-		Serializer s;
+		Serializer<0x472e> s;
 		if(!s.deserialize(tmp, data, size))
 		{
 			return false;
