@@ -572,18 +572,6 @@ namespace utils
 			}
 			dst.setNull();
 		}
-
-
-		//////////////////////////////////////////////////////////////////////////
-		boost::shared_array<char> serialize(boost::uint32_t &size) const;
-		bool deserialize(boost::shared_array<char> data, boost::uint32_t size);
-
-	private:
-		friend class boost::serialization::access;
-
-		template<class Archive> void save(Archive & ar, const unsigned int version) const;
-		template<class Archive> void load(Archive & ar, const unsigned int version);
-		BOOST_SERIALIZATION_SPLIT_MEMBER()
 	};
 	
 	
@@ -768,113 +756,6 @@ namespace utils
 		}
 	}
 	
-}
-
-//BOOST_CLASS_TRACKING(utils::VariantImpl, boost::serialization::track_always)
-
-//////////////////////////////////////////////////////////////////////////
-//utils::Variant 
-namespace boost 
-{
-	namespace serialization 
-	{
-		//////////////////////////////////////////////////////////////////////////
-		template<class Archive>
-		void serialize(Archive & ar, utils::Variant &x, const unsigned int /*version*/)
-		{
-			ar & static_cast<utils::VariantImpl &>(x);
-		}
-	} // namespace serialization
-} // namespace boost
-
-
-namespace utils
-{
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	boost::shared_array<char> VariantImpl::serialize(boost::uint32_t &size) const
-	{
-		utils::StreambufOnArray sbuf;
-		{
-			std::ostream os(&sbuf);
-			utils::serialization::polymorphic_binary_portable_oarchive oa(os, boost::archive::no_header|boost::archive::no_codecvt);
-
-			oa << *this;
-		}
-
-		size = (boost::uint32_t)sbuf.size();
-		return sbuf.data();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	bool VariantImpl::deserialize(boost::shared_array<char> data, boost::uint32_t size)
-	{
-		try
-		{
-			utils::StreambufOnArray sbuf(data, size);
-			{
-				std::istream is(&sbuf);
-				utils::serialization::polymorphic_binary_portable_iarchive ia(is, boost::archive::no_header|boost::archive::no_codecvt);
-
-				ia >> *this;
-			}
-			return true;
-		}
-		catch(...)
-		{
-			std::cerr<<"exception in "<<__FUNCTION__<<", "<<boost::current_exception_diagnostic_information()<<std::endl;
-		}
-
-		return false;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template<class Archive>
-	void VariantImpl::save(Archive & ar, const unsigned int /*version*/) const
-	{
-		ar & _et;
-
-		if(!isNull())
-		{
-			switch(_et)
-			{
-			case etVoid: break;
-#define ENUM_VARIANT_TYPE(n) case et ## n: ar & as<n>(); break;
-				ENUM_VARIANT_TYPES
-#undef ENUM_VARIANT_TYPE
-			default:
-				assert(!"bad et");
-				throw "bad et";
-			}
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template<class Archive>
-	void VariantImpl::load(Archive & ar, const unsigned int /*version*/)
-	{
-		boost::int16_t et;
-		ar & et;
-
-		if(et < 0)
-		{
-			destruct();
-			forceType((EType)-et);
-		}
-		else
-		{
-			switch(et)
-			{
-			case etVoid: destruct(); break;
-#define ENUM_VARIANT_TYPE(n) case et ## n: forceType<n>(); setNull(false); ar & as<n>(); break;
-				ENUM_VARIANT_TYPES
-#undef ENUM_VARIANT_TYPE
-			default:
-				assert(!"bad et");
-				throw "bad et";
-			}
-		}
-	}
 }
 
 #pragma warning (pop)

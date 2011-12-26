@@ -34,6 +34,7 @@ SET(SRC
 	${SRC_DIR}/utils/variantLoad.cpp
 	${SRC_DIR}/utils/variantLoadScope.cpp
 	${SRC_DIR}/utils/variantLoadGrammar.cpp
+	${SRC_DIR}/utils/variantSerialization.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 

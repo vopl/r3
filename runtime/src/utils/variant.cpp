@@ -424,18 +424,6 @@ ENUM_VARIANT_TYPES
 	{
 		return !CIMPL->equal(v);
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	boost::shared_array<char> Variant::serialize(boost::uint32_t &size) const
-	{
-		return CIMPL->serialize(size);
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	bool Variant::deserialize(boost::shared_array<char> data, boost::uint32_t size)
-	{
-		return IMPL->deserialize(data, size);
-	}
 }
 
 
