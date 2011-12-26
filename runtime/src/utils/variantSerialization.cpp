@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "utils/variant.hpp"
 #include <boost/crc.hpp>
+#include "utils/fixEndian.hpp"
 
 namespace utils
 {

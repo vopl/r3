@@ -1,5 +1,4 @@
 #include "utils/streambufOnArray.hpp"
-#include "utils/serialization.hpp"
 #include "variantConvertMatrix.hpp"
 #include <boost/exception/all.hpp>
 

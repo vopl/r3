@@ -121,13 +121,31 @@ int main(int argc, char* argv[])
 	//m_["VariantPtr"] = VariantPtr(new Variant(22));
 	//m_["MultisetVariant"].as<Variant::MultisetVariant>(true).insert(m_["VariantPtr"]);
 
-	size_t size;
-	boost::shared_array<char> data = v.serialize(size);
-	
-	Variant v2;
-	bool success = v2.deserialize(data, size);
+	FILETIME stub, kt, ut;
+	GetThreadTimes(GetCurrentThread(), &stub, &stub, &kt, &ut);
+	boost::uint64_t start = (((boost::uint64_t)kt.dwHighDateTime)<<32) + kt.dwLowDateTime;
+	start += (((boost::uint64_t)ut.dwHighDateTime)<<32) + ut.dwLowDateTime;
+	bool b = true;
+	size_t s(0);
 
-	std::cout<<"success: "<<success<<", "<<(v==v2)<<std::endl;
+	for(size_t i(0); i<10000; i++)
+	{
+		size_t size;
+		boost::shared_array<char> data = v.serialize(size);
+		s += size;
+
+// 		Variant v2;
+// 		bool success = v2.deserialize(data, size);
+// 		b &= success;
+	}
+
+	GetThreadTimes(GetCurrentThread(), &stub, &stub, &kt, &ut);
+	boost::uint64_t stop = (((boost::uint64_t)kt.dwHighDateTime)<<32) + kt.dwLowDateTime;
+	stop += (((boost::uint64_t)ut.dwHighDateTime)<<32) + ut.dwLowDateTime;
+
+	
+
+	std::cout<<s<<b<<", "<<double(stop-start)/1e7<<std::endl;
 
 	return EXIT_SUCCESS;
 }
