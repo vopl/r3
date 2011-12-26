@@ -3,7 +3,7 @@
 #include <QtGui/QApplication>
 #include <QtDeclarative/qdeclarative.h>
 #include "client/isession.hpp"
-#include "dAgent.hpp"
+#include "agent.hpp"
 
 Q_DECLARE_METATYPE(boost::system::error_code);
 Q_DECLARE_METATYPE(server::TEndpoint);
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	qRegisterMetaType<utils::VariantPtr>("utils::VariantPtr");
 	qRegisterMetaType<client::ISessionPtr>("ISessionPtr");
 
-	qmlRegisterType<client::qt::DAgent>("Client", 1,0, "Agent");
+	qmlRegisterType<client::qt::Agent>("Client", 1,0, "Agent");
 
 	QApplication a(argc, argv);
 	int res;

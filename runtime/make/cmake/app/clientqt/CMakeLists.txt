@@ -35,7 +35,7 @@ SOURCE_GROUP(src\\qt FILES ${SRC_HDR})
 SET(SRC_QT
 	${SRC_DIR}/client/qt/mainWindow.cpp
 	${SRC_DIR}/client/qt/networkDialog.cpp
-	${SRC_DIR}/client/qt/dAgent.cpp
+	${SRC_DIR}/client/qt/agent.cpp
 	${SRC_DIR}/client/qt/networkAccessManager.cpp
 	${SRC_DIR}/client/qt/networkReply.cpp
 )
@@ -45,7 +45,7 @@ SOURCE_GROUP(src\\qt FILES ${SRC_QT})
 SET(SRC_QT_HDR
 	${SRC_DIR}/client/qt/mainWindow.hpp
 	${SRC_DIR}/client/qt/networkDialog.hpp
-	${SRC_DIR}/client/qt/dAgent.hpp
+	${SRC_DIR}/client/qt/agent.hpp
 	${SRC_DIR}/client/qt/networkAccessManager.hpp
 	${SRC_DIR}/client/qt/networkReply.hpp
 )

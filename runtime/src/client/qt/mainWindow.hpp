@@ -28,25 +28,11 @@ namespace client
 			NetworkAccessManagerFactory _networkAccessManagerFactory;
 			QDeclarativeView	*_view;
 
-		private:
-			void onChannelChange_(size_t numChannels, boost::system::error_code ec);
-			void onSessionStart_(ISessionPtr session);
-			void onSessionStop_(ISessionPtr session);
-
-		signals:
-			void onChannelChange_sig(int numChannels, boost::system::error_code ec);
-			void onSessionStart_sig(ISessionPtr session);
-			void onSessionStop_sig(ISessionPtr session);
 		private slots:
-			void onChannelChange_slot(int numChannels, boost::system::error_code ec);
-			void onSessionStart_slot(ISessionPtr session);
-			void onSessionStop_slot(ISessionPtr session);
+			void onChannelChange(int numChannels, boost::system::error_code ec);
+			void onSessionStart(ISessionPtr session);
+			void onSessionStop(ISessionPtr session);
 			void onAddrChanged(QString host, QString service);
-
-		signals:
-			void onChannelChange(int numChannels);
-		public:
-			int getNumChannels();
 
 		private:
 			virtual void closeEvent(QCloseEvent *);

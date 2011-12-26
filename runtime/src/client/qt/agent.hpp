@@ -1,35 +1,23 @@
-#ifndef _CLIENT_QT_DAGENT_HPP_
-#define _CLIENT_QT_DAGENT_HPP_
+#ifndef _CLIENT_QT_AGENT_HPP_
+#define _CLIENT_QT_AGENT_HPP_
 
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 #include "utils/variant.hpp"
 #include "server/endpoint.hpp"
+#include "client/iagent.hpp"
 
 namespace client
 {
 	namespace qt
 	{
-		class DAgent
+		class Agent
 			: public QObject
 
 		{
 			Q_OBJECT
 
-		private:
-			virtual void onReceive(
-				const server::TEndpoint &endpoint,
-				utils::VariantPtr data);
-
-		signals:
-			void onReceive_sig(
-				const server::TEndpoint &endpoint,
-				utils::VariantPtr data);
-		private slots:
-			void onReceive_slot(
-				const server::TEndpoint &endpoint,
-				utils::VariantPtr data);
-			void onChannelChange_slot(int numChannels);
+			IAgentPtr	_agent;
 
 		private:
 			static void variantCnvt(utils::Variant &dst, const QVariant &src);
@@ -41,17 +29,15 @@ namespace client
 			void setService(QString service);
 
 		public:
-			DAgent(QObject *parent = 0);
-			~DAgent();
+			Agent(QObject *parent = 0);
+			~Agent();
 
 		public:
-			//Q_PROPERTY(int numChannels READ getNumChannels);
 			Q_PROPERTY(QString service READ getService WRITE setService);
 			Q_INVOKABLE void send(QVariant data, QString service=QString(""));
 
 		signals:
 			void receive(QVariant data, QString service);
-			void numChannelsChanged();
 		};
 	}
 }

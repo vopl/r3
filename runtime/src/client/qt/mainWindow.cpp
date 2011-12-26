@@ -10,25 +10,7 @@ namespace client
 	namespace qt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onChannelChange_(size_t numChannels, boost::system::error_code ec)
-		{
-			emit onChannelChange_sig((int)numChannels, ec);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onSessionStart_(ISessionPtr session)
-		{
-			emit onSessionStart_sig(session);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onSessionStop_(ISessionPtr session)
-		{
-			emit onSessionStop_sig(session);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onChannelChange_slot(int numChannels, boost::system::error_code ec)
+		void MainWindow::onChannelChange(int numChannels, boost::system::error_code ec)
 		{
 			if(ec)
 			{
@@ -41,16 +23,11 @@ namespace client
 
 			_nd->setNumChannels(numChannels);
 			_labelConnected->setNum(numChannels);
-
-			if(numChannels != _numChannels)
-			{
-				_numChannels = numChannels;
-				emit onChannelChange(numChannels);
-			}
+			_numChannels = numChannels;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onSessionStart_slot(ISessionPtr session)
+		void MainWindow::onSessionStart(ISessionPtr session)
 		{
 			assert(0);
 			//Agent::_mainWindow = this;
@@ -68,7 +45,7 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onSessionStop_slot(ISessionPtr session)
+		void MainWindow::onSessionStop(ISessionPtr session)
 		{
 			if(_view)
 			{
@@ -95,17 +72,11 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		int MainWindow::getNumChannels()
-		{
-			return _numChannels;
-		}
-
-		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::closeEvent(QCloseEvent *evt)
 		{
 			_client->stop();
 
-			onSessionStop_slot(ISessionPtr());
+			onSessionStop(ISessionPtr());
 
 			delete _nd;
 			_nd = NULL;
@@ -120,18 +91,6 @@ namespace client
 			, _view(NULL)
 			, _numChannels(0)
 		{
-			connect(
-				this, SIGNAL(onChannelChange_sig(int, boost::system::error_code)), 
-				this, SLOT(onChannelChange_slot(int, boost::system::error_code)), 
-				Qt::QueuedConnection);
-			connect(
-				this, SIGNAL(onSessionStart_sig(ISessionPtr)), 
-				this, SLOT(onSessionStart_slot(ISessionPtr)), 
-				Qt::QueuedConnection);
-			connect(
-				this, SIGNAL(onSessionStop_sig(ISessionPtr)), 
-				this, SLOT(onSessionStop_slot(ISessionPtr)), 
-				Qt::QueuedConnection);
 
 			ui.setupUi(this);
 			connect(

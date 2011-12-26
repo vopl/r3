@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "dAgent.hpp"
+#include "agent.hpp"
 #include <QtDeclarative/qdeclarative.h>
 #include "mainWindow.hpp"
 
@@ -7,33 +7,9 @@ namespace client
 {
 	namespace qt
 	{
-		//////////////////////////////////////////////////////////////////////////
-		void DAgent::onReceive(
-			const server::TEndpoint &endpoint,
-			utils::VariantPtr data)
-		{
-			emit onReceive_sig(endpoint, data);
-		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void DAgent::onReceive_slot(
-			const server::TEndpoint &endpoint,
-			utils::VariantPtr data)
-		{
-			QVariant qtv;
-			variantCnvt(qtv, *data);
-			emit receive(qtv, QString::fromUtf8(endpoint.data(), endpoint.size()));
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void DAgent::onChannelChange_slot(int numChannels)
-		{
-			emit numChannelsChanged();
-		}
-
-
-		//////////////////////////////////////////////////////////////////////////
-		void DAgent::variantCnvt(utils::Variant &dst, const QVariant &src)
+		void Agent::variantCnvt(utils::Variant &dst, const QVariant &src)
 		{
 			if(!src.isValid())
 			{
@@ -409,7 +385,7 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void DAgent::variantCnvt(QVariant &dst, const utils::Variant &src)
+		void Agent::variantCnvt(QVariant &dst, const utils::Variant &src)
 		{
 			bool isNull = src.isNull();
 
@@ -962,40 +938,32 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		QString DAgent::getService()
+		QString Agent::getService()
 		{
 			return _service;
 		}
 		
 		//////////////////////////////////////////////////////////////////////////
-		void DAgent::setService(QString service)
+		void Agent::setService(QString service)
 		{
 			_service = service;
 		}
 
 
 		//////////////////////////////////////////////////////////////////////////
-		DAgent::DAgent(QObject *parent)
+		Agent::Agent(QObject *parent)
 			: QObject(parent)
 		{
-// 			connect(
-// 				this, SIGNAL(onReceive_sig(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
-// 				this, SLOT(onReceive_slot(IAgentHubPtr, const server::TEndpoint &, utils::VariantPtr)),
-// 				Qt::QueuedConnection);
-// 
-// 			connect(
-// 				(QObject *)_mainWindow, SIGNAL(onChannelChange(int)),
-// 				this, SLOT(onChannelChange_slot(int)));
 		}
 
 	
 		//////////////////////////////////////////////////////////////////////////
-		DAgent::~DAgent()
+		Agent::~Agent()
 		{
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void DAgent::send(QVariant data, QString service)
+		void Agent::send(QVariant data, QString service)
 		{
 			if(service.isEmpty() || service.isNull())
 			{
