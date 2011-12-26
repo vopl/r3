@@ -136,6 +136,18 @@ public:
 		t = utils::litEndian(t);
 	}
 
+	template<class U, class Allocator>
+	void load(std::basic_string<U, Allocator> & t)
+	{
+		boost::uint32_t size;
+		load(size);
+		t.resize(size);
+		if(size)
+		{
+			load_binary(const_cast<U*>(t.data()), size*sizeof(U));
+		}
+	}
+
 };
 
 }

@@ -127,6 +127,17 @@ public:
 	{
 		boost::archive::basic_binary_oprimitive<Archive, Elem, Tr>::save(utils::litEndian(t));
 	}
+
+	template<class U, class Allocator>
+	void save(const std::basic_string<U, Allocator> & t)
+	{
+		boost::uint32_t size = (boost::uint32_t)t.size();
+		save(size);
+		if(size)
+		{
+			save_binary(t.data(), size*sizeof(U));
+		}
+	}
 };
 
 }
