@@ -48,6 +48,7 @@ namespace async
 	ASYNC_API boost::asio::io_service &io();
 
 	//текущий экземпляр службы
+	ASYNC_API bool serviceExists();
 	ASYNC_API ServicePtr service();
 }
 

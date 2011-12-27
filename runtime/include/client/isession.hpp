@@ -18,7 +18,7 @@ namespace client
 		virtual void balance(size_t numChannels) =0;
 		virtual TClientSid sid() =0;
 		virtual IAgentPtr allocAgent() =0;
-		virtual void close();
+		virtual void close() =0;
 	};
 	typedef boost::shared_ptr<ISession> ISessionPtr;
 }

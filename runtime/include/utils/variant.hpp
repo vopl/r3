@@ -280,7 +280,7 @@ namespace utils
 
 	protected:
 		//буфер
-		static const size_t _dataSize = sizeof(void *)<=12?12:sizeof(void *);
+		static const size_t _dataSize = sizeof(void *)<=4?12:24;
 		char _data[_dataSize];
 
 		//тип

@@ -15,21 +15,21 @@ namespace server
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять коннектор базы
-// 		assert(!_db);
-// 		_db = _plugs->create<pgc::IDbProvider>();
-// 		assert(_db);
-// 		if(!_db)
-// 		{
-// 			FLOG("failed to create db instance");
-// 			_state = esError;
-// 			return;
-// 		}
-// 
-// 		_db->initialize(
-// 			"host=localhost port=5432 dbname=test user=test password=test",
-// 			10,
-// 			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
-// 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
+		assert(!_db);
+		_db = _plugs->create<pgc::IDbProvider>();
+		assert(_db);
+		if(!_db)
+		{
+			FLOG("failed to create db instance");
+			_state = esError;
+			return;
+		}
+
+		_db->initialize(
+			"host=localhost port=5432 dbname=test user=test password=test",
+			10,
+			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
+			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять сетевой акцептор

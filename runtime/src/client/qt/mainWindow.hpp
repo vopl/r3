@@ -32,16 +32,16 @@ namespace client
 
 		private slots:
 			void onChannelChange(int numChannels, boost::system::error_code ec);
-			void onSessionStart(boost::system::error_code ec, ISessionPtr session);
-			void onSessionStop(ISessionPtr session);
+			void onStartSession(boost::system::error_code ec, ISessionPtr session);
 			void onAddrChanged(QString host, QString service);
 
 		signals:
-			void onSessionStart_proxySig(boost::system::error_code ec, ISessionPtr session);
+			void onStartSession_proxySig(boost::system::error_code ec, ISessionPtr session);
 		private:
 			virtual void closeEvent(QCloseEvent *);
 
 		private:
+			void closeSession();
 			void startSession_f(QString host, QString service);
 
 		public:

@@ -6,6 +6,7 @@
 #include <boost/function.hpp>
 #include <boost/system/error_code.hpp>
 #include "async/result.hpp"
+#include "utils/variant.hpp"
 
 namespace net
 {
@@ -24,6 +25,19 @@ namespace net
 			: _data(data)
 			, _size(size)
 		{
+		}
+
+		SPacket(const utils::Variant &v)
+			: _size(0)
+		{
+			_data = v.serialize(_size);
+		}
+
+		operator utils::Variant() const
+		{
+			utils::Variant res;
+			res.deserialize(_data, _size);
+			return res;
 		}
 	};
 

@@ -141,7 +141,7 @@ namespace net
 			if(sockSsl)
 			{
 				Result<error_code> hres;
-				sockSsl->async_handshake(ssl::stream_base::server, hres);
+				sockSsl->async_handshake(ssl::stream_base::client, hres);
 				ec = hres;
 
 				if(ec)

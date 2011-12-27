@@ -8,7 +8,9 @@
 namespace client
 {
 	using namespace boost;
+	using namespace boost::system;
 	using namespace net;
+	using namespace async;
 
 	class Session;
 	typedef boost::shared_ptr<Session> SessionPtr;
@@ -16,11 +18,12 @@ namespace client
 	class Session
 		: public ChannelHub<ISession>
 	{
+		TClientSid _sid;
 	public:
-		Session();
+		Session(const TClientSid sid);
 		~Session();
 
-		virtual async::Result2<boost::system::error_code, size_t> watchState();
+		virtual Result2<error_code, size_t> watchState();
 		virtual void balance(size_t numChannels);
 		virtual TClientSid sid();
 		virtual IAgentPtr allocAgent();

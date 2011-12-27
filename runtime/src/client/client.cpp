@@ -1,9 +1,12 @@
 #include "pch.h"
 #include "client.hpp"
-
+#include "utils/variant.hpp"
+#include "session.hpp"
 
 namespace client
 {
+	using namespace utils;
+
 	//////////////////////////////////////////////////////////////////////////
 	void Client::createSession_f(Result2<error_code, ISessionPtr> res, const std::string &host, const std::string &service)
 	{
@@ -18,7 +21,37 @@ namespace client
 			return;
 		}
 
-		assert(0);
+		IChannelPtr channel = cres.data2();
+		assert(channel);
+
+		Variant v;
+		v.as<Variant::MapStringVariant>(true)["sid"] = nullClientSid;
+		Result<error_code> sres = channel->send(v);
+
+		if(sres.data())
+		{
+			res(sres.data(), ISessionPtr());
+			return;
+		}
+		
+		Result2<error_code, SPacket> rres = channel->receive();
+
+		if(rres.data1())
+		{
+			res(rres.data1(), ISessionPtr());
+			return;
+		}
+
+		v = rres.data2();
+		TClientSid sid = v["sid"];
+		if(sid.is_nil())
+		{
+			res(make_error_code(errc::protocol_error), ISessionPtr());
+			return;
+		}
+
+		ISessionPtr session(new Session(sid));
+		res(error_code(), session);
 	}
 
 
@@ -66,10 +99,10 @@ namespace client
 		}
 		_plugs = plugs;
 
-		_asrv = service();
-		if(_asrv)
+		if(serviceExists())
 		{
 			ILOG("use existing async service");
+			_asrv = service();
 		}
 		else
 		{

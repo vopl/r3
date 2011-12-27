@@ -27,25 +27,26 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onSessionStart(boost::system::error_code ec, ISessionPtr session)
+		void MainWindow::onStartSession(boost::system::error_code ec, ISessionPtr session)
 		{
 			if(ec)
 			{
-				QString s;
-				s.sprintf(" (%d)", ec.value());
-				s = s.fromLocal8Bit(ec.message().c_str()) + s;
+				assert(!session);
 
-				_nd->logLowError(s);
+				if(_nd)
+				{
+					QString s;
+					s.sprintf(" (%d)", ec.value());
+					s = s.fromLocal8Bit(ec.message().c_str()) + s;
+
+					_nd->logLowError(s);
+				}
 				return;
 			}
 			
 			if(session)
 			{
-				if(_session)
-				{
-					_session->close();
-					_session.reset();
-				}
+				closeSession();
 
 				_session = session;
 
@@ -63,34 +64,12 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onSessionStop(ISessionPtr session)
-		{
-			if(_view)
-			{
-				setCentralWidget(NULL);
-				delete _view;
-				_view = NULL;
-			}
-
-			assert(0);
-// 			if(Agent::_mainWindow)
-// 			{
-// 				Agent::_mainWindow = NULL;
-// 			}
-		}
-
-
-		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onAddrChanged(QString host, QString service)
 		{
 			_nd->setNumChannels(0);
 			_labelConnected->setNum(0);
 
-			if(_session)
-			{
-				_session->close();
-				_session.reset();
-			}
+			closeSession();
 
 			if(_asrv)
 			{
@@ -104,11 +83,27 @@ namespace client
 			bool res = _client->stop();
 			(void)res;
 
-			onSessionStop(ISessionPtr());
+			closeSession();
 
 			delete _nd;
 			_nd = NULL;
 			QMainWindow::closeEvent(evt);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::closeSession()
+		{
+			if(_session)
+			{
+				_session->close();
+				_session.reset();
+			}
+			if(_view)
+			{
+				setCentralWidget(NULL);
+				delete _view;
+				_view = NULL;
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -118,7 +113,7 @@ namespace client
 				_client->createSession(host.toUtf8(), service.toUtf8());
 
 			res.wait();
-			emit onSessionStart_proxySig(res.data1(), res.data2());
+			emit onStartSession_proxySig(res.data1(), res.data2());
 		}
 
 
@@ -146,8 +141,8 @@ namespace client
 
 			//////////////////////////////////////////////////////////////////////////
 			connect(
-				this, SIGNAL(onSessionStart_proxySig(boost::system::error_code, ISessionPtr)), 
-				this, SLOT(onSessionStart(boost::system::error_code, ISessionPtr)));
+				this, SIGNAL(onStartSession_proxySig(boost::system::error_code, ISessionPtr)), 
+				this, SLOT(onStartSession(boost::system::error_code, ISessionPtr)));
 
 
 			//////////////////////////////////////////////////////////////////////////

@@ -1092,14 +1092,19 @@ namespace utils
 	//////////////////////////////////////////////////////////////////////////
 	bool Variant::deserialize(shared_array<char> data, uint32_t size)
 	{
-		Variant tmp;
-		Serializer<0x472e> s;
-		if(!s.deserialize(tmp, data, size))
+		if(data)
 		{
-			return false;
+			Variant tmp;
+			Serializer<0x472e> s;
+			if(!s.deserialize(tmp, data, size))
+			{
+				return false;
+			}
+			swap(tmp);
+			return true;
 		}
-		swap(tmp);
-		return true;
+
+		return false;
 	}
 
 }

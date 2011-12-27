@@ -114,6 +114,12 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	ASYNC_API bool serviceExists()
+	{
+		return ServiceImpl::current()?true:false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	ASYNC_API ServicePtr service()
 	{
 		ServiceImpl *service = ServiceImpl::current();
