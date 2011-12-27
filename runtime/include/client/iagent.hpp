@@ -9,6 +9,10 @@
 namespace client
 {
 	//////////////////////////////////////////////////////////////////////////
+	struct ISession;
+	typedef boost::shared_ptr<ISession> ISessionPtr;
+
+	//////////////////////////////////////////////////////////////////////////
 	struct IAgent
 	{
 		virtual ~IAgent(){}
@@ -18,6 +22,8 @@ namespace client
 			utils::VariantPtr data) =0;
 
 		virtual async::Result3<boost::system::error_code, server::TEndpoint, utils::VariantPtr> receive() =0;
+
+		virtual ISessionPtr getSession() =0;
 	};
 	typedef boost::shared_ptr<IAgent> IAgentPtr;
 }

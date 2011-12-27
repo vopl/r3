@@ -17,6 +17,11 @@ namespace client
 
 			if(url.scheme() == "client")
 			{
+				if(!async::serviceExists())
+				{
+					_asrv->set4ThisThread();
+				}
+
 				//url.host() - служба
 				return new NetworkReply(this, url, _session);
 			}
@@ -25,9 +30,13 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		NetworkAccessManager::NetworkAccessManager(QObject *parent, ISessionPtr session)
+		NetworkAccessManager::NetworkAccessManager(
+			QObject *parent, 
+			ISessionPtr session,
+			async::ServicePtr asrv)
 			: QNetworkAccessManager(parent)
 			, _session(session)
+			, _asrv(asrv)
 		{
 
 		}

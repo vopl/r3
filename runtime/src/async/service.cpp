@@ -56,6 +56,12 @@ namespace async
 		return static_cast<ServiceImpl *>(this)->io();
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void Service::set4ThisThread()
+	{
+		return static_cast<ServiceImpl *>(this)->set4ThisThread();
+	}
+
 
 
 

@@ -29,9 +29,8 @@ namespace client
 			qint64 readData(char *data, qint64 maxSize);
 
 		protected:
-			virtual void onReceive(
-				const server::TEndpoint &endpoint,
-				utils::VariantPtr data);
+			void onSend(async::Result<boost::system::error_code> res);
+			void onReceive(async::Result3<boost::system::error_code, server::TEndpoint, utils::VariantPtr> res);
 
 		public:
 			NetworkReply(QObject *parent, QUrl url, client::ISessionPtr session);

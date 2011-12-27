@@ -949,6 +949,11 @@ namespace client
 			_service = service;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		quint32 Agent::getNumChannels()
+		{
+			return _numChannels;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		Agent::Agent(QObject *parent)
@@ -972,9 +977,8 @@ namespace client
 
 			utils::VariantPtr pv(new utils::Variant);
 			variantCnvt(*pv, data);
-			assert(0);
-//			_lowAgent->send(std::string(service.toUtf8()), pv);
-		}
 
+			//_agent->send(service.toUtf8().data(), pv);
+		}
 	}
 }

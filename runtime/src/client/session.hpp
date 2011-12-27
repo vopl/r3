@@ -4,6 +4,8 @@
 #include "client/isession.hpp"
 #include "net/channelHub.hpp"
 #include "net/iconnector.hpp"
+#include "client/endpoint.hpp"
+#include "agent.hpp"
 
 namespace client
 {
@@ -18,7 +20,23 @@ namespace client
 	class Session
 		: public ChannelHub<ISession>
 	{
+		typedef ChannelHub<ISession> Base;
 		TClientSid _sid;
+
+		typedef std::map<TEndpoint, Agent *> TMAgents;
+
+		TMAgents	_agents;
+
+		boost::uuids::random_generator _endpointGenerator;
+		mutex	_mtx;
+		bool	_closed;
+
+	private:
+		SessionPtr shared_from_this();
+
+	private:
+		void receiveLoop_f();
+
 	public:
 		Session(const TClientSid sid);
 		~Session();
@@ -28,6 +46,11 @@ namespace client
 		virtual TClientSid sid();
 		virtual IAgentPtr allocAgent();
 		virtual void close();
+
+	public:
+		bool attachChannel(IChannelPtr channel);
+
+		void freeAgent(const TEndpoint &endpoint);
 
 	};
 }

@@ -50,7 +50,8 @@ namespace client
 			return;
 		}
 
-		ISessionPtr session(new Session(sid));
+		SessionPtr session(new Session(sid));
+		session->attachChannel(channel);
 		res(error_code(), session);
 	}
 

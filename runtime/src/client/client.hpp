@@ -20,8 +20,8 @@ namespace client
 	{
 		mutex				_mtx;
 		pluma::Pluma *		_plugs;
-		ServicePtr	_asrv;
-		IConnectorPtr	_connector;
+		ServicePtr			_asrv;
+		IConnectorPtr		_connector;
 
 	private:
 		void createSession_f(Result2<error_code, ISessionPtr> res, const std::string &host, const std::string &service);

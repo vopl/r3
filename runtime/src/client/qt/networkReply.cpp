@@ -1,10 +1,15 @@
 #include "pch.h"
 #include "networkReply.hpp"
+#include "async/service.hpp"
 
 namespace client
 {
 	namespace qt
 	{
+		using namespace async;
+		using namespace boost;
+		using namespace boost::system;
+
 		//////////////////////////////////////////////////////////////////////////
 		void NetworkReply::abort()
 		{
@@ -42,11 +47,20 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void NetworkReply::onReceive(
-			const server::TEndpoint &endpoint,
-			utils::VariantPtr data)
+		void NetworkReply::onSend(Result<error_code> res)
 		{
-			if(data->is<utils::Variant::VectorChar>())
+			res.wait();
+			assert(!res.data());
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void NetworkReply::onReceive(Result3<error_code, server::TEndpoint, utils::VariantPtr> res)
+		{
+			error_code ec = res.data1();
+			server::TEndpoint endpoint = res.data2();
+			utils::VariantPtr data = res.data3();
+
+			if(!ec && data->is<utils::Variant::VectorChar>())
 			{
 				_data = data;
 				_readPos = 0;
@@ -78,7 +92,13 @@ namespace client
 			m["path"] = url.path().toUtf8().constData();
 
 			server::TEndpoint endpoint = url.host().toUtf8().constData();
-			_agent->send(endpoint, v);
+
+			Result<error_code> sres = _agent->send(endpoint, v);
+			spawn(bind(&NetworkReply::onSend, this, sres));
+
+			Result3<error_code, server::TEndpoint, utils::VariantPtr> rres =
+				_agent->receive();
+			spawn(bind(&NetworkReply::onReceive, this, rres));
 		}
 
 		//////////////////////////////////////////////////////////////////////////

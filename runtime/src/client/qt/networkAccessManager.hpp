@@ -3,6 +3,7 @@
 
 #include <QtNetwork/QNetworkAccessManager>
 #include "client/isession.hpp"
+#include "async/service.hpp"
 
 namespace client
 {
@@ -14,14 +15,18 @@ namespace client
 		{
 			Q_OBJECT
 
-			ISessionPtr _session;
+			ISessionPtr			_session;
+			async::ServicePtr	_asrv;
 		private:
 			virtual QNetworkReply *createRequest(
 				Operation op, 
 				const QNetworkRequest &request,
 				QIODevice *outgoingData);
 		public:
-			NetworkAccessManager(QObject *parent, client::ISessionPtr session);
+			NetworkAccessManager(
+				QObject *parent, 
+				ISessionPtr session,
+				async::ServicePtr asrv);
 			~NetworkAccessManager();
 
 		};

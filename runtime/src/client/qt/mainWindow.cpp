@@ -51,7 +51,7 @@ namespace client
 				_session = session;
 
 				assert(!_networkAccessManagerFactory);
-				_networkAccessManagerFactory = new NetworkAccessManagerFactory(session);
+				_networkAccessManagerFactory = new NetworkAccessManagerFactory(session, _asrv);
 
 				assert(!_view);
 				_view = new QDeclarativeView(this);
@@ -165,6 +165,7 @@ namespace client
 				//QMessageBox()
 			}
 			_asrv = _client->getAsync();
+			_asrv->set4ThisThread();
 
 			onAddrChanged(_nd->getHost(), _nd->getService());
 		}

@@ -121,6 +121,17 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::set4ThisThread()
+	{
+		if(current())
+		{
+			throw exception("service already exists in this thread");
+			return;
+		}
+		_current = this;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	ServiceImpl *ServiceImpl::current()
 	{
 		return _current;

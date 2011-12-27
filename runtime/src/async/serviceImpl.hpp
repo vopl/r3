@@ -47,6 +47,7 @@ namespace async
 	public:
 		void spawn(const boost::function<void ()> &code);
 		asio::io_service &io();
+		void set4ThisThread();
 		static ServiceImpl *current();
 	};
 }

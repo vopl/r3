@@ -18,6 +18,7 @@ namespace client
 			Q_OBJECT
 
 			IAgentPtr	_agent;
+			quint32		_numChannels;
 
 		private:
 			static void variantCnvt(utils::Variant &dst, const QVariant &src);
@@ -28,16 +29,20 @@ namespace client
 			QString getService();
 			void setService(QString service);
 
+			quint32 getNumChannels();
+
 		public:
 			Agent(QObject *parent = 0);
 			~Agent();
 
 		public:
+			Q_PROPERTY(quint32 numChannels READ getNumChannels);
 			Q_PROPERTY(QString service READ getService WRITE setService);
 			Q_INVOKABLE void send(QVariant data, QString service=QString(""));
 
 		signals:
 			void receive(QVariant data, QString service);
+			void numChannelsChanged();
 		};
 	}
 }
