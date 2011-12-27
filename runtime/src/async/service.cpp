@@ -57,9 +57,9 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Service::set4ThisThread()
+	bool Service::setAsGlobal(bool force)
 	{
-		return static_cast<ServiceImpl *>(this)->set4ThisThread();
+		return static_cast<ServiceImpl *>(this)->setAsGlobal(force);
 	}
 
 

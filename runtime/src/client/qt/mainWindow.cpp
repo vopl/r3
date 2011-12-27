@@ -4,6 +4,7 @@
 #include <QtDeclarative/qdeclarative.h>
 #include <QtDeclarative/QDeclarativeView>
 #include <QtDeclarative/QDeclarativeEngine>
+#include "agent.hpp"
 
 namespace client
 {
@@ -49,6 +50,7 @@ namespace client
 				closeSession();
 
 				_session = session;
+				Agent::_staticSession = _session;
 
 				assert(!_networkAccessManagerFactory);
 				_networkAccessManagerFactory = new NetworkAccessManagerFactory(session, _asrv);
@@ -90,17 +92,16 @@ namespace client
 
 			delete _nd;
 			_nd = NULL;
+
+			_asrv->stop();
+			_asrv.reset();
+
 			QMainWindow::closeEvent(evt);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::closeSession()
 		{
-			if(_session)
-			{
-				_session->close();
-				_session.reset();
-			}
 			if(_view)
 			{
 				setCentralWidget(NULL);
@@ -112,6 +113,13 @@ namespace client
 				delete _networkAccessManagerFactory;
 				_networkAccessManagerFactory = NULL;
 			}
+
+			if(_session)
+			{
+				_asrv->spawn(bind(&ISession::close, _session));
+				_session.reset();
+			}
+			Agent::_staticSession.reset();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -165,7 +173,8 @@ namespace client
 				//QMessageBox()
 			}
 			_asrv = _client->getAsync();
-			_asrv->set4ThisThread();
+			bool b = _asrv->setAsGlobal(false);
+			assert(b);
 
 			onAddrChanged(_nd->getHost(), _nd->getService());
 		}

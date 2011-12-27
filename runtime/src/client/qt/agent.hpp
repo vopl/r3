@@ -20,9 +20,15 @@ namespace client
 			IAgentPtr	_agent;
 			quint32		_numChannels;
 
+			friend class MainWindow;
+			static		ISessionPtr	_staticSession;
+
 		private:
 			static void variantCnvt(utils::Variant &dst, const QVariant &src);
 			static void variantCnvt(QVariant &dst, const utils::Variant &src);
+
+		private:
+			void receiveLoop_f();
 
 		private:
 			QString	_service;

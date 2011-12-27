@@ -7,6 +7,7 @@ namespace client
 {
 	namespace qt
 	{
+		ISessionPtr	Agent::_staticSession;
 
 		//////////////////////////////////////////////////////////////////////////
 		void Agent::variantCnvt(utils::Variant &dst, const QVariant &src)
@@ -938,6 +939,35 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Agent::receiveLoop_f()
+		{
+			for(;;)
+			{
+				IAgentPtr agent = _agent;
+				if(!agent)
+				{
+					return;
+				}
+				async::Result3<boost::system::error_code, server::TEndpoint, utils::VariantPtr> res;
+				res = agent->receive();
+				res.wait();
+				if(res.data1())
+				{
+					assert(!_agent);
+					return;
+				}
+
+				QString service = 
+					QString::fromUtf8(res.data2().c_str(), res.data2().size());
+
+				QVariant data;
+				variantCnvt(data, res.data3());
+
+				emit receive(data, service);
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		QString Agent::getService()
 		{
 			return _service;
@@ -959,12 +989,16 @@ namespace client
 		Agent::Agent(QObject *parent)
 			: QObject(parent)
 		{
+			_agent = _staticSession->allocAgent();
+			assert(_agent);
+			async::spawn(boost::bind(&Agent::receiveLoop_f, this));
 		}
 
 	
 		//////////////////////////////////////////////////////////////////////////
 		Agent::~Agent()
 		{
+			_agent.reset();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -978,7 +1012,7 @@ namespace client
 			utils::VariantPtr pv(new utils::Variant);
 			variantCnvt(*pv, data);
 
-			//_agent->send(service.toUtf8().data(), pv);
+			_agent->send(service.toUtf8().data(), pv);
 		}
 	}
 }

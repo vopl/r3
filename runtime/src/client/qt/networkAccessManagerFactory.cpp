@@ -16,7 +16,7 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
 		{
-			return new NetworkAccessManager(parent, _session, _asrv);
+			return new NetworkAccessManager(parent, _session);
 		}
 
 	}

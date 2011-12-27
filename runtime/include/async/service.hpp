@@ -31,7 +31,7 @@ namespace async
 
 		void spawn(const boost::function<void ()> &code);
 		boost::asio::io_service &io();
-		void set4ThisThread();
+		bool setAsGlobal(bool force);
 	};
 	typedef boost::shared_ptr<Service> ServicePtr;
 

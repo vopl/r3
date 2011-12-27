@@ -7,6 +7,8 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	ThreadLocalStorage<ServiceImpl *> ServiceImpl::_current;
 
+	ServiceImpl *ServiceImpl::_global = NULL;
+
 	//////////////////////////////////////////////////////////////////////////
 	ServiceImpl::ServiceImpl()
 		: _io()
@@ -121,20 +123,25 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceImpl::set4ThisThread()
+	bool ServiceImpl::setAsGlobal(bool force)
 	{
-		if(current())
+		if(_global && !force)
 		{
-			throw exception("service already exists in this thread");
-			return;
+			return false;
 		}
-		_current = this;
+		_global = this;
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ServiceImpl *ServiceImpl::current()
 	{
-		return _current;
+		ServiceImpl *res = _current;
+		if(!res)
+		{
+			res = _global;
+		}
+		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

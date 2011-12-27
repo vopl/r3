@@ -21,7 +21,8 @@ namespace client
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data) =0;
 
-		virtual async::Result3<boost::system::error_code, server::TEndpoint, utils::VariantPtr> receive() =0;
+		virtual async::Result3<boost::system::error_code, server::TEndpoint, utils::VariantPtr> 
+			receive() =0;
 
 		virtual ISessionPtr getSession() =0;
 	};

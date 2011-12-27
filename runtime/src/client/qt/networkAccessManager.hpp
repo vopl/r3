@@ -16,7 +16,6 @@ namespace client
 			Q_OBJECT
 
 			ISessionPtr			_session;
-			async::ServicePtr	_asrv;
 		private:
 			virtual QNetworkReply *createRequest(
 				Operation op, 
@@ -25,8 +24,7 @@ namespace client
 		public:
 			NetworkAccessManager(
 				QObject *parent, 
-				ISessionPtr session,
-				async::ServicePtr asrv);
+				ISessionPtr session);
 			~NetworkAccessManager();
 
 		};
