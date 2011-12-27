@@ -70,10 +70,13 @@ namespace net
 		for(;;)
 		{
 			Result2<error_code, SPacket> res = channel->receive();
-			res.wait();
+			
+			error_code ec = res.data1();
 
-			if(res.data1())
+			if(ec)
 			{
+				WLOG("receiveLoop failed: "<<ec.message()<<"("<<ec.value()<<")");
+
 				mutex::scoped_lock sl(_mtxChannels);
 
 				channel->close();

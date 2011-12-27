@@ -105,11 +105,11 @@ namespace net
 
 
 		spawn(bind(res, error_code()));
-		accept_f(onAccept);
+		accept_f(onAccept, useSsl);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Acceptor::accept_f(const function<void(error_code, IChannelPtr)> &onAccept)
+	void Acceptor::accept_f(const function<void(error_code, IChannelPtr)> &onAccept, bool useSsl)
 	{
 		TAcceptorPtr acceptor;
 		TSocketPtr sock;
@@ -126,16 +126,20 @@ namespace net
 			}
 			assert(_acceptor);
 			acceptor = _acceptor;
-			sslContext = _sslContext;
+			if(useSsl)
+			{
+				sslContext = _sslContext;
+				assert(sslContext);
+			}
+		}
 
-			if(_sslContext)
-			{
-				sockSsl.reset(new TSocketSsl(io(), *sslContext));
-			}
-			else
-			{
-				sock.reset(new TSocket(io()));
-			}
+		if(sslContext)
+		{
+			sockSsl.reset(new TSocketSsl(io(), *sslContext));
+		}
+		else
+		{
+			sock.reset(new TSocket(io()));
 		}
 
 		Result<error_code> ecRes;
@@ -162,7 +166,7 @@ namespace net
 			WLOG("async_accept failed: "<<ec.message()<<"("<<ec.value()<<")");
 			return;
 		}
-		spawn(bind(&Acceptor::accept_f, shared_from_this(), onAccept));
+		spawn(bind(&Acceptor::accept_f, shared_from_this(), onAccept, useSsl));
 
 		if(sockSsl)
 		{
@@ -223,7 +227,6 @@ namespace net
 		if(_inProcess)
 		{
 			assert(_acceptor);
-			assert(_sslContext);
 
 			error_code ec;
 			_acceptor->close(ec);

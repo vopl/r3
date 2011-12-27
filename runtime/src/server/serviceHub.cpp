@@ -11,6 +11,7 @@ namespace server
 		{
 			Result2<error_code, net::SPacket> receiveRes = session->receive();
 			error_code ec = receiveRes.data1();
+
 			if(ec)
 			{
 				if(ec.value() == errc::operation_canceled)
@@ -89,7 +90,7 @@ namespace server
 		}
 		else
 		{
-			//assert(!"log error?");
+			assert(!"log error?");
 
 			if(clientEndpointExists && serverEndpointExists)
 			{

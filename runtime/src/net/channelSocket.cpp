@@ -214,6 +214,7 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	ChannelSocket::ChannelSocket(TSocketPtr socket)
 		: _sock(socket)
+		, _sendInProcess(false)
 	{
 	}
 

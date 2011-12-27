@@ -33,7 +33,7 @@ namespace server
 			}
 			res = acceptor->listen(
 				bind(&SessionManager::onChannelAccept, shared_from_this(), _1, _2),
-				_host.c_str(), _service.c_str(), true);
+				_host.c_str(), _service.c_str());
 		}
 		error_code ec = res;
 

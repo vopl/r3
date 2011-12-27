@@ -34,7 +34,7 @@ namespace net
 			const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
 			const std::string &host, const std::string &service, bool useSsl);
 
-		void accept_f(const function<void(error_code, IChannelPtr)> &onAccept);
+		void accept_f(const function<void(error_code, IChannelPtr)> &onAccept, bool useSsl);
 
 	public:
 		Acceptor();
