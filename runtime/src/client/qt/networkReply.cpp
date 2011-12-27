@@ -34,7 +34,7 @@ namespace client
 				return -1;
 			}
 
-			qint64 number = qMin(maxSize, (qint64)vc.size() - _readPos);
+			qint64 number = qMin(maxSize, (qint64)(vc.size() - _readPos));
 			memcpy(data, &vc[_readPos], number);
 			_readPos += number;
 

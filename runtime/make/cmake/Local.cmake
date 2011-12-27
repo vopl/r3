@@ -22,4 +22,10 @@ IF(WINDOWS)
 	ENDIF()
 
 	SET(ENV{PostgreSQL_ROOT} "C:/Program Files (x86)/PostgreSQL/9.1")
+
+
+	IF(CMAKE_SIZEOF_VOID_P MATCHES "8")
+		SET(QT_QMAKE_EXECUTABLE "P:/sdk/qt/x64/4.8.0/bin/qmake.exe")
+	ENDIF()
+
 ENDIF()

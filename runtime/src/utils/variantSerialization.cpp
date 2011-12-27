@@ -146,7 +146,7 @@ namespace utils
 						break;
 					case Variant::etString:
 						size += S;
-						size += v.as<Variant::String>().size();
+						size += (uint32_t)v.as<Variant::String>().size();
 						break;
 					case Variant::etFloat:
 						size += 4;
@@ -180,7 +180,7 @@ namespace utils
 						break;
 					case Variant::etVectorChar:
 						size += S;
-						size += v.as<Variant::VectorChar>().size();
+						size += (uint32_t)v.as<Variant::VectorChar>().size();
 						break;
 					case Variant::etDate:
 						size += 4;
@@ -201,7 +201,7 @@ namespace utils
 						{
 							//key
 							size += S;
-							size += el.first.size();
+							size += (uint32_t)el.first.size();
 							//value
 							size += calcSize(el.second);
 						}
@@ -258,7 +258,7 @@ namespace utils
 						{
 							//key
 							size += S;
-							size += el.first.size();
+							size += (uint32_t)el.first.size();
 							//value
 							size += calcSize(el.second);
 						}
@@ -317,7 +317,7 @@ namespace utils
 								if(_mPtrKey.end() == iter)
 								{
 									//сформировать новый ключ и запомнить его в карте
-									_mPtrKey.insert(std::make_pair(p, _mPtrKey.size()+1));
+									_mPtrKey.insert(std::make_pair(p, (uint32_t)_mPtrKey.size()+1));
 									size += calcSize(*p);
 								}
 								else
@@ -598,7 +598,7 @@ namespace utils
 								if(_mPtrKey.end() == iter)
 								{
 									//сформировать новый ключ и запомнить его в карте
-									uint32_t key = _mPtrKey.size()+1;
+									uint32_t key = (uint32_t)_mPtrKey.size()+1;
 									_mPtrKey.insert(std::make_pair(p,key));
 
 									writeIntegral(key);

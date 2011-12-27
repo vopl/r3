@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
 	for(size_t i(0); i<10000; i++)
 	{
-		size_t size;
+		boost::uint32_t size;
 		boost::shared_array<char> data = v.serialize(size);
 		s += size;
 

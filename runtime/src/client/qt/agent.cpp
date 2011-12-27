@@ -182,7 +182,7 @@ namespace client
 #define VAO(size)	if(srcSize <= size)																		\
 					{																						\
 						utils::Variant::Bitset##size &bs = dst.as<utils::Variant::Bitset##size>(true);		\
-						for(size_t i(0); i<size; i++) bs[i] = qba[i];										\
+						for(int i(0); i<size; i++) bs[i] = qba[i];										\
 					}	else																				//\
 
 					VAO(8)
@@ -194,7 +194,7 @@ namespace client
 					VAO(512)
 					{
 						utils::Variant::Bitset512 &bs = dst.as<utils::Variant::Bitset512>(true);\
-						for(size_t i(0); i<512; i++) bs[i] = qba[i];
+						for(int i(0); i<512; i++) bs[i] = qba[i];
 					}
 #undef VAO
 				}
@@ -539,7 +539,7 @@ namespace client
 					}
 					else
 					{
-						dst = QByteArray(&vc[0], vc.size());
+						dst = QByteArray(&vc[0], (int)vc.size());
 					}
 				}
 				break;
@@ -584,7 +584,7 @@ namespace client
 					const utils::Variant::VectorVariant &vv = src.as<utils::Variant::VectorVariant>();
 
 					QList<QVariant> qlv;
-					qlv.reserve(vv.size());
+					qlv.reserve((int)vv.size());
 					for(size_t i(0); i<vv.size(); i++)
 					{
 						QVariant qv;
@@ -652,9 +652,9 @@ namespace client
 				else
 				{
 					const utils::Variant::Bitset8 &bs = src.as<utils::Variant::Bitset8>();
-					QBitArray qba(bs.size());
+					QBitArray qba((int)bs.size());
 
-					for(size_t i(0); i<bs.size(); i++)
+					for(int i(0); i<(int)bs.size(); i++)
 					{
 						qba[i] = bs[i];
 					}
@@ -671,9 +671,9 @@ namespace client
 				else
 				{
 					const utils::Variant::Bitset16 &bs = src.as<utils::Variant::Bitset16>();
-					QBitArray qba(bs.size());
+					QBitArray qba((int)bs.size());
 
-					for(size_t i(0); i<bs.size(); i++)
+					for(int i(0); i<(int)bs.size(); i++)
 					{
 						qba[i] = bs[i];
 					}
@@ -690,9 +690,9 @@ namespace client
 				else
 				{
 					const utils::Variant::Bitset32 &bs = src.as<utils::Variant::Bitset32>();
-					QBitArray qba(bs.size());
+					QBitArray qba((int)bs.size());
 
-					for(size_t i(0); i<bs.size(); i++)
+					for(int i(0); i<(int)bs.size(); i++)
 					{
 						qba[i] = bs[i];
 					}
@@ -709,9 +709,9 @@ namespace client
 				else
 				{
 					const utils::Variant::Bitset64 &bs = src.as<utils::Variant::Bitset64>();
-					QBitArray qba(bs.size());
+					QBitArray qba((int)bs.size());
 
-					for(size_t i(0); i<bs.size(); i++)
+					for(int i(0); i<(int)bs.size(); i++)
 					{
 						qba[i] = bs[i];
 					}
@@ -728,9 +728,9 @@ namespace client
 				else
 				{
 					const utils::Variant::Bitset128 &bs = src.as<utils::Variant::Bitset128>();
-					QBitArray qba(bs.size());
+					QBitArray qba((int)bs.size());
 
-					for(size_t i(0); i<bs.size(); i++)
+					for(int i(0); i<(int)bs.size(); i++)
 					{
 						qba[i] = bs[i];
 					}
@@ -747,9 +747,9 @@ namespace client
 				else
 				{
 					const utils::Variant::Bitset256 &bs = src.as<utils::Variant::Bitset256>();
-					QBitArray qba(bs.size());
+					QBitArray qba((int)bs.size());
 
-					for(size_t i(0); i<bs.size(); i++)
+					for(int i(0); i<(int)bs.size(); i++)
 					{
 						qba[i] = bs[i];
 					}
@@ -766,9 +766,9 @@ namespace client
 				else
 				{
 					const utils::Variant::Bitset512 &bs = src.as<utils::Variant::Bitset512>();
-					QBitArray qba(bs.size());
+					QBitArray qba((int)bs.size());
 
-					for(size_t i(0); i<bs.size(); i++)
+					for(int i(0); i<(int)bs.size(); i++)
 					{
 						qba[i] = bs[i];
 					}
@@ -863,7 +863,7 @@ namespace client
 					const utils::Variant::DequeVariant &dv = src.as<utils::Variant::DequeVariant>();
 
 					QList<QVariant> qlv;
-					qlv.reserve(dv.size());
+					qlv.reserve((int)dv.size());
 					for(size_t i(0); i<dv.size(); i++)
 					{
 						QVariant qv;
@@ -884,7 +884,7 @@ namespace client
 					const utils::Variant::ListVariant &lv = src.as<utils::Variant::ListVariant>();
 
 					QList<QVariant> qlv;
-					qlv.reserve(lv.size());
+					qlv.reserve((int)lv.size());
 					utils::Variant::ListVariant::const_iterator iter = lv.begin();
 					for(size_t i(0); i<lv.size(); i++)
 					{
