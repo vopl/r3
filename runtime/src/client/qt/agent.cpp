@@ -958,7 +958,7 @@ namespace client
 				}
 
 				QString service = 
-					QString::fromUtf8(res.data2().c_str(), res.data2().size());
+					QString::fromUtf8(res.data2().c_str(), (int)res.data2().size());
 
 				QVariant data;
 				variantCnvt(data, res.data3());
