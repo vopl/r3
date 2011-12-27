@@ -3,12 +3,14 @@
 
 #include "net/iconnector.hpp"
 #include "async/service.hpp"
+#include "channelSocket.hpp"
 
 namespace net
 {
 	using namespace async;
 	using namespace boost;
 	using namespace boost::asio;
+	using namespace boost::system;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Connector;
@@ -18,11 +20,18 @@ namespace net
 		: public IConnector
 		, public enable_shared_from_this<Connector>
 	{
+		mutex			_mtx;
+		TSslContextPtr	_sslContext;
+
+		std::string onSslPassword();
+
+		void connect_f(Result2<error_code, IChannelPtr> res, const std::string &host, const std::string &service, bool useSsl);
+
 	public:
 		Connector();
 		virtual ~Connector();
 
-		virtual Result2<system::error_code, IChannelPtr> connect(const char *host, const char *service);
+		virtual Result2<error_code, IChannelPtr> connect(const char *host, const char *service, bool useSsl);
 	};
 
 	PLUMA_INHERIT_PROVIDER(Connector, IConnector);

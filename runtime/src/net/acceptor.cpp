@@ -27,6 +27,7 @@ namespace net
 
 			if(useSsl)
 			{
+				ILOG("create ssl context");
 				_sslContext.reset(new TSslContext(io(), ssl::context::sslv23));
 
 				error_code ec;
@@ -37,6 +38,7 @@ namespace net
 				assert(!ec);
 				if(ec)
 				{
+					WLOG("set_options failed: "<<ec.message()<<"("<<ec.value()<<")");
 					res(ec);
 					return;
 				}
@@ -46,6 +48,7 @@ namespace net
 				assert(!ec);
 				if(ec)
 				{
+					WLOG("use_certificate_chain_file failed: "<<ec.message()<<"("<<ec.value()<<")");
 					res(ec);
 					return;
 				}
@@ -54,6 +57,7 @@ namespace net
 				assert(!ec);
 				if(ec)
 				{
+					WLOG("use_private_key_file failed: "<<ec.message()<<"("<<ec.value()<<")");
 					res(ec);
 					return;
 				}
@@ -62,6 +66,7 @@ namespace net
 				assert(!ec);
 				if(ec)
 				{
+					WLOG("use_tmp_dh_file failed: "<<ec.message()<<"("<<ec.value()<<")");
 					res(ec);
 					return;
 				}

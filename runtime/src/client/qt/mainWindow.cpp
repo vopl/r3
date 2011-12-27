@@ -15,7 +15,7 @@ namespace client
 			if(ec)
 			{
 				QString s;
-				s.sprintf(" (0x%x)", ec.value());
+				s.sprintf(" (%d)", ec.value());
 				s = s.fromLocal8Bit(ec.message().c_str()) + s;
 
 				_nd->logLowError(s);
@@ -27,21 +27,39 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onSessionStart(ISessionPtr session)
+		void MainWindow::onSessionStart(boost::system::error_code ec, ISessionPtr session)
 		{
-			assert(0);
-			//Agent::_mainWindow = this;
+			if(ec)
+			{
+				QString s;
+				s.sprintf(" (%d)", ec.value());
+				s = s.fromLocal8Bit(ec.message().c_str()) + s;
 
-			assert(!_view);
-			_view = new QDeclarativeView(this);
-			setCentralWidget(_view);
-			_view->engine()->addImportPath(QString("../QmlModules/"));
+				_nd->logLowError(s);
+				return;
+			}
+			
+			if(session)
+			{
+				if(_session)
+				{
+					_session->close();
+					_session.reset();
+				}
 
-			_view->engine()->setNetworkAccessManagerFactory(&_networkAccessManagerFactory);
-			_view->engine()->setBaseUrl(QUrl("client://statics/"));
+				_session = session;
 
-			_view->setSource(QUrl("/clientqt/index.qml"));
-			_view->show();
+				assert(!_view);
+				_view = new QDeclarativeView(this);
+				setCentralWidget(_view);
+				_view->engine()->addImportPath(QString("../QmlModules/"));
+
+				_view->engine()->setNetworkAccessManagerFactory(&_networkAccessManagerFactory);
+				_view->engine()->setBaseUrl(QUrl("client://statics/"));
+
+				_view->setSource(QUrl("/clientqt/index.qml"));
+				_view->show();
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -67,20 +85,40 @@ namespace client
 		{
 			_nd->setNumChannels(0);
 			_labelConnected->setNum(0);
-			assert(0);
-			//_client->connect(host.toUtf8(), service.toUtf8());
+
+			if(_session)
+			{
+				_session->close();
+				_session.reset();
+			}
+
+			if(_asrv)
+			{
+				_asrv->spawn(boost::bind(&MainWindow::startSession_f, this, host, service));
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::closeEvent(QCloseEvent *evt)
 		{
-			_client->stop();
+			bool res = _client->stop();
+			(void)res;
 
 			onSessionStop(ISessionPtr());
 
 			delete _nd;
 			_nd = NULL;
 			QMainWindow::closeEvent(evt);
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::startSession_f(QString host, QString service)
+		{
+			async::Result2<boost::system::error_code, ISessionPtr> res =
+				_client->createSession(host.toUtf8(), service.toUtf8());
+
+			res.wait();
+			emit onSessionStart_proxySig(res.data1(), res.data2());
 		}
 
 
@@ -106,6 +144,11 @@ namespace client
 			_labelConnected->setNum(0);
 			statusBar()->addPermanentWidget(_labelConnected);
 
+			//////////////////////////////////////////////////////////////////////////
+			connect(
+				this, SIGNAL(onSessionStart_proxySig(boost::system::error_code, ISessionPtr)), 
+				this, SLOT(onSessionStart(boost::system::error_code, ISessionPtr)));
+
 
 			//////////////////////////////////////////////////////////////////////////
 			_plugins.loadFromFolder("../plug");
@@ -113,12 +156,11 @@ namespace client
 			_client = _plugins.create<client::IClientProvider>();
 			assert(_client);
 
-			assert(0);
-// 			_client->start(
-// 				&_plugins, 
-// 				boost::bind(&MainWindow::onSessionStart_, this, _1),
-// 				boost::bind(&MainWindow::onSessionStop_, this, _1),
-// 				boost::bind(&MainWindow::onChannelChange_, this, _1, _2));
+			if(!_client->start(&_plugins))
+			{
+				//QMessageBox()
+			}
+			_asrv = _client->getAsync();
 
 			onAddrChanged(_nd->getHost(), _nd->getService());
 		}

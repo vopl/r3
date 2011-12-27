@@ -2,7 +2,7 @@
 #define _CLIENT_ICLIENT_HPP_
 
 #include "client/isession.hpp"
-#include "async/result.hpp"
+#include "async/service.hpp"
 
 namespace client
 {
@@ -10,11 +10,12 @@ namespace client
 	{
 		virtual ~IClient(){}
 
-		virtual void start(pluma::Pluma *plugs) =0;
+		virtual bool start(pluma::Pluma *plugs) =0;
 		virtual async::Result2<boost::system::error_code, ISessionPtr> 
 			createSession(const char *host, const char *service) =0;
 		virtual pluma::Pluma * getPlugs() =0;
-		virtual void stop() =0;
+		virtual async::ServicePtr getAsync() =0;
+		virtual bool stop() =0;
 	};
 	typedef boost::shared_ptr<IClient> IClientPtr;
 

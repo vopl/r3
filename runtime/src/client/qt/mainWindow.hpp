@@ -20,6 +20,8 @@ namespace client
 		private:
 			pluma::Pluma		_plugins;
 			client::IClientPtr	_client;
+			async::ServicePtr	_asrv;
+			client::ISessionPtr	_session;
 			NetworkDialog		*_nd;
 			QLabel				*_labelConnected;
 
@@ -30,12 +32,17 @@ namespace client
 
 		private slots:
 			void onChannelChange(int numChannels, boost::system::error_code ec);
-			void onSessionStart(ISessionPtr session);
+			void onSessionStart(boost::system::error_code ec, ISessionPtr session);
 			void onSessionStop(ISessionPtr session);
 			void onAddrChanged(QString host, QString service);
 
+		signals:
+			void onSessionStart_proxySig(boost::system::error_code ec, ISessionPtr session);
 		private:
 			virtual void closeEvent(QCloseEvent *);
+
+		private:
+			void startSession_f(QString host, QString service);
 
 		public:
 			MainWindow(QWidget *parent = 0, Qt::WFlags flags = 0);
