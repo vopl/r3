@@ -67,16 +67,18 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		NetworkReply::NetworkReply(QObject *parent, QUrl url)
+		NetworkReply::NetworkReply(QObject *parent, QUrl url, ISessionPtr session)
 			: _readPos(0)
 		{
+			_agent = session->allocAgent();
+			assert(_agent);
 			utils::VariantPtr v(new utils::Variant);
 			utils::Variant::MapStringVariant &m = v->as<utils::Variant::MapStringVariant>(true);
 			m["cmd"] = "get";
 			m["path"] = url.path().toUtf8().constData();
 
-			assert(0);
-			//send(url.host().toUtf8().constData(), v);
+			server::TEndpoint endpoint = url.host().toUtf8().constData();
+			_agent->send(endpoint, v);
 		}
 
 		//////////////////////////////////////////////////////////////////////////

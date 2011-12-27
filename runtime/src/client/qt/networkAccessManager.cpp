@@ -18,15 +18,16 @@ namespace client
 			if(url.scheme() == "client")
 			{
 				//url.host() - служба
-				return new NetworkReply(this, url);
+				return new NetworkReply(this, url, _session);
 			}
 
 			return QNetworkAccessManager::createRequest(op, request, outgoingData);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		NetworkAccessManager::NetworkAccessManager(QObject *parent)
+		NetworkAccessManager::NetworkAccessManager(QObject *parent, ISessionPtr session)
 			: QNetworkAccessManager(parent)
+			, _session(session)
 		{
 
 		}

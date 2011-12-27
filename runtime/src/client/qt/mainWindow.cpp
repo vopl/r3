@@ -50,12 +50,15 @@ namespace client
 
 				_session = session;
 
+				assert(!_networkAccessManagerFactory);
+				_networkAccessManagerFactory = new NetworkAccessManagerFactory(session);
+
 				assert(!_view);
 				_view = new QDeclarativeView(this);
 				setCentralWidget(_view);
 				_view->engine()->addImportPath(QString("../QmlModules/"));
 
-				_view->engine()->setNetworkAccessManagerFactory(&_networkAccessManagerFactory);
+				_view->engine()->setNetworkAccessManagerFactory(_networkAccessManagerFactory);
 				_view->engine()->setBaseUrl(QUrl("client://statics/"));
 
 				_view->setSource(QUrl("/clientqt/index.qml"));
@@ -104,6 +107,11 @@ namespace client
 				delete _view;
 				_view = NULL;
 			}
+			if(_networkAccessManagerFactory)
+			{
+				delete _networkAccessManagerFactory;
+				_networkAccessManagerFactory = NULL;
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -121,6 +129,7 @@ namespace client
 		MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 			: QMainWindow(parent, flags)
 			, _nd(false)
+			, _networkAccessManagerFactory(NULL)
 			, _view(NULL)
 			, _numChannels(0)
 		{

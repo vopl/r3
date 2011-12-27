@@ -4,6 +4,8 @@
 #include <QtNetwork/QNetworkReply>
 #include "utils/variant.hpp"
 #include "server/endpoint.hpp"
+#include "client/iagent.hpp"
+#include "client/isession.hpp"
 
 namespace client
 {
@@ -16,6 +18,7 @@ namespace client
 			Q_OBJECT
 
 		private:
+			client::IAgentPtr	_agent;
 			utils::VariantPtr	_data;
 			size_t				_readPos;
 
@@ -31,7 +34,7 @@ namespace client
 				utils::VariantPtr data);
 
 		public:
-			NetworkReply(QObject *parent, QUrl url);
+			NetworkReply(QObject *parent, QUrl url, client::ISessionPtr session);
 			~NetworkReply();
 
 		};

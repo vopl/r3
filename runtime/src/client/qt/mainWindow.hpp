@@ -27,7 +27,7 @@ namespace client
 
 			int					_numChannels;
 
-			NetworkAccessManagerFactory _networkAccessManagerFactory;
+			NetworkAccessManagerFactory *_networkAccessManagerFactory;
 			QDeclarativeView	*_view;
 
 		private slots:

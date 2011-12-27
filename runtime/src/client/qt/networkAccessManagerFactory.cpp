@@ -6,9 +6,16 @@ namespace client
 {
 	namespace qt
 	{
+		//////////////////////////////////////////////////////////////////////////
+		NetworkAccessManagerFactory::NetworkAccessManagerFactory(ISessionPtr session)
+			: _session(session)
+		{
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
 		{
-			return new NetworkAccessManager(parent);
+			return new NetworkAccessManager(parent, _session);
 		}
 
 	}
