@@ -21,14 +21,13 @@ Item {
 	function start()
 	{
 		var ld = "very long";
-		//ld = [ld,ld,ld,ld,ld];
-		//ld = {a:ld,b:ld};
-		//ld = [ld,ld,ld,ld,ld];
-		//ld = [ld,ld,ld,ld,ld];
+		ld = [ld,ld,ld,ld,ld];
+		ld = {a:ld,b:ld};
+		ld = [ld,ld,ld,ld,ld];
+		ld = [ld,ld,ld,ld,ld];
 		//ld = [ld,ld,ld,ld,ld];
 		//ld = [ld,ld,ld,ld,ld];
 		agent.send({cnt:0,ld:ld}, "echo");
-		
 		agent.send({cnt:10,ld:ld}, "echo");
 		agent.send({cnt:20,ld:ld}, "echo");
 		agent.send({cnt:30,ld:ld}, "echo");
@@ -51,7 +50,7 @@ Item {
 		
 		function trata(data, service)
 		{
-			if(!(cnt % 10000))
+			if(!(cnt % 100))
 			{
 				label.text=cnt;
 			}

@@ -95,7 +95,12 @@ namespace net
 		TOnReceove onReceive;
 		{
 			mutex::scoped_lock sl(_mtxReceive);
-			assert(!_receives.empty());
+			if(_receives.empty())
+			{
+				//остановлен
+				return;
+			}
+
 			while(!_receives.front().second)
 			{
 				_receives.erase(_receives.begin());
@@ -186,7 +191,7 @@ namespace net
 		const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive,
 		size_t amount)
 	{
-		mutex::scoped_lock sl(_mtxChannels);
+		mutex::scoped_lock sl(_mtxReceive);
 		_receives.push_back(std::make_pair(onReceive, amount));
 	}
 

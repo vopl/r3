@@ -25,17 +25,14 @@ namespace client
 		}
 
 		TEndpoint endpoint = v["client::endpoint"];
-		Agent *agent = NULL;
 		{
 			mutex::scoped_lock sl(_mtx);
 			TMAgents::iterator iter = _agents.find(endpoint);
 			if(_agents.end() != iter)
 			{
-				agent = iter->second;
+				iter->second->onReceive(v["server::endpoint"], v["data"]);
 			}
 		}
-
-		agent->onReceive(v["server::endpoint"], v["data"]);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
