@@ -157,7 +157,7 @@ namespace net
 		if(ec)
 		{
 			//fail
-			if(errc::operation_canceled == ec.value() || error::operation_aborted == ec.value())
+			if(errc::operation_canceled == ec || error::operation_aborted == ec)
 			{
 				//ok
 				return;
@@ -178,7 +178,7 @@ namespace net
 			if(ec)
 			{
 				//fail
-				if(errc::operation_canceled == ec.value())
+				if(errc::operation_canceled == ec)
 				{
 					//ok
 					return;

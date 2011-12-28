@@ -40,7 +40,7 @@ namespace server
 		if(ec)
 		{
 			//прослушивание не удалось
-			if(ec.value() == errc::operation_canceled)
+			if(ec == errc::operation_canceled)
 			{
 				//отменено, менеджер остановлен
 				return;
@@ -59,7 +59,7 @@ namespace server
 	{
 		if(ec)
 		{
-			if(ec.value() == errc::operation_canceled)
+			if(ec == errc::operation_canceled)
 			{
 				//отменено, менеджер остановлен
 				return;

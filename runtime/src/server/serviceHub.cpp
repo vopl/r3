@@ -8,7 +8,7 @@ namespace server
 	{
 		if(ec)
 		{
-			if(ec.value() == errc::operation_canceled)
+			if(ec == errc::operation_canceled)
 			{
 				return;
 			}

@@ -131,7 +131,7 @@ namespace net
 
 				if(ec)
 				{
-					if(asio::error::operation_aborted == ec.value())
+					if(asio::error::operation_aborted == ec)
 					{
 						return;
 					}
