@@ -76,7 +76,7 @@ namespace server
 		}
 		else
 		{
-			assert(!"log error?");
+// 			assert(!"log error?");
 
 			if(clientEndpointExists && serverEndpointExists)
 			{

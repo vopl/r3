@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "channelSocket.hpp"
 #include "utils/fixEndian.hpp"
+#include <boost/bind.hpp>
 
 namespace net
 {
@@ -14,12 +15,13 @@ namespace net
 	ChannelSocket::Sock::Sock(TSocketSslPtr socketSsl, TSslContextPtr sslContext)
 		: _socketSsl(socketSsl)
 		, _sslContext(sslContext)
+		, _sslStrand(new TStrand(socketSsl->get_io_service()))
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Buffer, class Handler>
-	void ChannelSocket::Sock::read(Buffer b, Handler h)
+	void ChannelSocket::Sock::read(const Buffer &b, const Handler &h)
 	{
 		if(_socket)
 		{
@@ -27,13 +29,18 @@ namespace net
 		}
 		else
 		{
-			_socketSsl->async_read_some(b,h);
+			typedef boost::asio::detail::wrapped_handler<
+				asio::io_service::strand,
+				Handler> WrappedHandler;
+			_sslStrand->dispatch(
+				boost::bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+			
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Buffer, class Handler>
-	void ChannelSocket::Sock::write(Buffer b, Handler h)
+	void ChannelSocket::Sock::write(const Buffer &b, const Handler &h)
 	{
 		if(_socket)
 		{
@@ -41,7 +48,11 @@ namespace net
 		}
 		else
 		{
-			_socketSsl->async_write_some(b,h);
+			typedef boost::asio::detail::wrapped_handler<
+				asio::io_service::strand,
+				Handler> WrappedHandler;
+			_sslStrand->dispatch(
+				boost::bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
 		}
 	}
 
@@ -128,7 +139,10 @@ namespace net
 
 					if(ec)
 					{
-						assert(!"какой код при закрытии сокета? прервать цикл");
+						if(asio::error::operation_aborted == ec.value())
+						{
+							return;
+						}
 						spawn(bind(receive.first, ec, SPacket()));
 						return;
 					}

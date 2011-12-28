@@ -79,7 +79,7 @@ namespace net
 
 		if(ec)
 		{
-			WLOG("receiveLoop failed: "<<ec.message()<<"("<<ec.value()<<")");
+			WLOG("onReceive failed: "<<ec.message()<<"("<<ec.value()<<")");
 
 			mutex::scoped_lock sl(_mtxChannels);
 

@@ -30,14 +30,18 @@ namespace net
 			TSocketSslPtr		_socketSsl;
 			TSslContextPtr		_sslContext;
 
+			typedef asio::io_service::strand TStrand;
+			typedef boost::shared_ptr<TStrand> TStrandPtr;
+			TStrandPtr			_sslStrand;
+
 			Sock(TSocketPtr socket);
 			Sock(TSocketSslPtr socketSsl, TSslContextPtr sslContext);
 
 			template <class Buffer, class Handler>
-			void read(Buffer b, Handler h);
+			void read(const Buffer &b, const Handler &h);
 
 			template <class Buffer, class Handler>
-			void write(Buffer b, Handler h);
+			void write(const Buffer &b, const Handler &h);
 
 			void close();
 		} _sock;
