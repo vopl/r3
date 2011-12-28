@@ -13,6 +13,7 @@ Q_DECLARE_METATYPE(client::ISessionPtr);
 
 int main(int argc, char *argv[])
 {
+	qRegisterMetaType<size_t>("size_t");
 	qRegisterMetaType<boost::system::error_code>("boost::system::error_code");
 	qRegisterMetaType<server::TEndpoint>("server::TEndpoint");
 	qRegisterMetaType<utils::VariantPtr>("utils::VariantPtr");

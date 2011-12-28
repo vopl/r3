@@ -11,7 +11,7 @@ namespace client
 	namespace qt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onChannelChange(int numChannels, boost::system::error_code ec)
+		void MainWindow::onSessionState(boost::system::error_code ec, size_t numChannels)
 		{
 			if(ec)
 			{
@@ -22,13 +22,13 @@ namespace client
 				_nd->logLowError(s);
 			}
 
-			_nd->setNumChannels(numChannels);
-			_labelConnected->setNum(numChannels);
-			_numChannels = numChannels;
+			_nd->setNumChannels((quint32)numChannels);
+			_labelConnected->setNum((int)numChannels);
+			_numChannels = (quint32)numChannels;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void MainWindow::onStartSession(boost::system::error_code ec, ISessionPtr session)
+		void MainWindow::onSessionStart(boost::system::error_code ec, ISessionPtr session)
 		{
 			if(ec)
 			{
@@ -50,6 +50,9 @@ namespace client
 				closeSession();
 
 				_session = session;
+
+				_session->watchState(bind(&MainWindow::onSessionState_proxyCallback, this, _1, _2));
+
 				Agent::_staticSession = _session;
 
 				assert(!_networkAccessManagerFactory);
@@ -80,6 +83,12 @@ namespace client
 			{
 				_asrv->spawn(boost::bind(&MainWindow::startSession_f, this, host, service));
 			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::onSessionState_proxyCallback(const boost::system::error_code &ec, size_t numChannels)
+		{
+			emit onSessionState_proxySig(ec, numChannels);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -130,7 +139,7 @@ namespace client
 				_client->createSession(host.toUtf8(), service.toUtf8());
 
 			res.wait();
-			emit onStartSession_proxySig(res.data1(), res.data2());
+			emit onSessionStart_proxySig(res.data1(), res.data2());
 		}
 
 
@@ -159,9 +168,12 @@ namespace client
 
 			//////////////////////////////////////////////////////////////////////////
 			connect(
-				this, SIGNAL(onStartSession_proxySig(boost::system::error_code, ISessionPtr)), 
-				this, SLOT(onStartSession(boost::system::error_code, ISessionPtr)));
+				this, SIGNAL(onSessionStart_proxySig(boost::system::error_code, ISessionPtr)), 
+				this, SLOT(onSessionStart(boost::system::error_code, ISessionPtr)));
 
+			connect(
+				this, SIGNAL(onSessionState_proxySig(boost::system::error_code, size_t)), 
+				this, SLOT(onSessionState(boost::system::error_code, size_t)));
 
 			//////////////////////////////////////////////////////////////////////////
 			_plugins.loadFromFolder("../plug");

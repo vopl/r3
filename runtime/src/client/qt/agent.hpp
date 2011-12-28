@@ -48,7 +48,10 @@ namespace client
 
 		signals:
 			void receive(QVariant data, QString service);
-			void numChannelsChanged();
+			void numChannelsChanged(quint32 numChannels);
+
+		public slots:
+			void setNumChannels(quint32 numChannels);
 		};
 	}
 }

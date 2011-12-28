@@ -40,8 +40,9 @@ namespace client
 		Session(const TClientSid sid);
 		~Session();
 
-		virtual Result2<error_code, size_t> watchState();
+		virtual void watchState(const function<void(error_code, size_t)> &onStateChanged);
 		virtual void balance(size_t numChannels);
+		virtual size_t getNumChannels();
 		virtual TClientSid sid();
 		virtual IAgentPtr allocAgent();
 		virtual void close();

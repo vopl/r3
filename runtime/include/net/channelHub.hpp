@@ -22,6 +22,9 @@ namespace net
 		mutex			_mtxChannels;
 		TChannels		_channels;//все
 
+		boost::function<void(boost::system::error_code, size_t)> _onStateChanged;
+
+
 
 		mutex			_mtxSend;
 		typedef std::pair<Result<error_code>, SPacket> TSend;
@@ -60,6 +63,9 @@ namespace net
 
 		//////////////////////////////////////////////////////////////////////////
 		size_t getChannelsAmount();
+
+		//////////////////////////////////////////////////////////////////////////
+		void watchState(const boost::function<void(boost::system::error_code, size_t)> &onStateChanged);
 	};
 
 
@@ -79,8 +85,6 @@ namespace net
 
 		if(ec)
 		{
-			WLOG("onReceive failed: "<<ec.message()<<"("<<ec.value()<<")");
-
 			mutex::scoped_lock sl(_mtxChannels);
 
 			channel->close();
@@ -88,6 +92,10 @@ namespace net
 			if(_channels.end() != iter)
 			{
 				_channels.erase(iter);
+			}
+			if(_onStateChanged)
+			{
+				spawn(bind(_onStateChanged, ec, _channels.size()));
 			}
 			return;
 		}
@@ -157,6 +165,10 @@ namespace net
 				{
 					mutex::scoped_lock sl(_mtxChannels);
 					_channels.erase(channel);
+					if(_onStateChanged)
+					{
+						spawn(bind(_onStateChanged, lowRes.data(), _channels.size()));
+					}
 				}
 
 				{
@@ -266,6 +278,12 @@ namespace net
 		_work = true;
 
 		channel->listen(bind(&ChannelHub<Base>::onReceive, shared_from_this(), _1, _2, channel), (size_t)-1);
+
+		if(_onStateChanged)
+		{
+			spawn(bind(_onStateChanged, boost::system::error_code(), _channels.size()));
+		}
+
 		return true;
 	}
 
@@ -275,6 +293,15 @@ namespace net
 	{
 		mutex::scoped_lock sl(_mtxChannels);
 		return _channels.size();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	void ChannelHub<Base>::watchState(const boost::function<void(boost::system::error_code, size_t)> &onStateChanged)
+	{
+		mutex::scoped_lock sl(_mtxChannels);
+		assert(!_onStateChanged);
+		_onStateChanged = onStateChanged;
 	}
 
 }

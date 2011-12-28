@@ -48,11 +48,11 @@ namespace client
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result2<error_code, size_t> Session::watchState()
+	void Session::watchState(const function<void(error_code, size_t)> &onStateChanged)
 	{
-		assert(0);
-		Result2<error_code, size_t> res;
-		return res;
+		assert(_channelHub);
+		spawn(bind(onStateChanged, error_code(), _channelHub->getChannelsAmount()));
+		return _channelHub->watchState(onStateChanged);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -60,6 +60,13 @@ namespace client
 	{
 		assert(0);
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	size_t Session::getNumChannels()
+	{
+		return _channelHub->getChannelsAmount();
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	TClientSid Session::sid()

@@ -971,7 +971,9 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		Agent::Agent(QObject *parent)
 			: QObject(parent)
+			, _numChannels(0)
 		{
+			_numChannels = (quint32)_staticSession->getNumChannels();
 			_agent = _staticSession->allocAgent();
 			assert(_agent);
 			_agent->listen(boost::bind(&Agent::onReceive, this, _1, _2));
@@ -997,5 +999,13 @@ namespace client
 
 			_agent->send(service.toUtf8().data(), pv);
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void Agent::setNumChannels(quint32 numChannels)
+		{
+			_numChannels = numChannels;
+			emit numChannelsChanged(numChannels);
+		}
+
 	}
 }

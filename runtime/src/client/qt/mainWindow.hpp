@@ -25,18 +25,23 @@ namespace client
 			NetworkDialog		*_nd;
 			QLabel				*_labelConnected;
 
-			int					_numChannels;
+			quint32				_numChannels;
 
 			NetworkAccessManagerFactory *_networkAccessManagerFactory;
 			QDeclarativeView	*_view;
 
 		private slots:
-			void onChannelChange(int numChannels, boost::system::error_code ec);
-			void onStartSession(boost::system::error_code ec, ISessionPtr session);
+			void onSessionState(boost::system::error_code ec, size_t numChannels);
+			void onSessionStart(boost::system::error_code ec, ISessionPtr session);
 			void onAddrChanged(QString host, QString service);
 
 		signals:
-			void onStartSession_proxySig(boost::system::error_code ec, ISessionPtr session);
+			void onSessionState_proxySig(boost::system::error_code ec, size_t numChannels);
+			void onSessionStart_proxySig(boost::system::error_code ec, ISessionPtr session);
+
+		private:
+			void onSessionState_proxyCallback(const boost::system::error_code &ec, size_t numChannels);
+
 		private:
 			virtual void closeEvent(QCloseEvent *);
 

@@ -29,15 +29,11 @@ namespace net
 		}
 		else
 		{
-// 			typedef asio::detail::wrapped_handler<
-// 				asio::io_service::strand,
-// 				Handler> WrappedHandler;
-// 			_sslStrand->dispatch(
-// 				bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
-			
-			
-			_socketSsl->async_read_some(b, _sslStrand->wrap(h));
-			
+			typedef asio::detail::wrapped_handler<
+				asio::io_service::strand,
+				Handler> WrappedHandler;
+			_sslStrand->dispatch(
+				bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
 		}
 	}
 
@@ -51,13 +47,11 @@ namespace net
 		}
 		else
 		{
-// 			typedef asio::detail::wrapped_handler<
-// 				asio::io_service::strand,
-// 				Handler> WrappedHandler;
-// 			_sslStrand->dispatch(
-// 				bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+			typedef asio::detail::wrapped_handler<
+				asio::io_service::strand,
+				Handler> WrappedHandler;
 			_sslStrand->dispatch(
-				bind(&TSocketSsl::async_write_some<Buffer, Handler>, _socketSsl.get(), b, h));
+				bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
 		}
 	}
 

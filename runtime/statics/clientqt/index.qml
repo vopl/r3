@@ -61,7 +61,7 @@ Item {
 		onReceive: trata(data, service)
 		
 		
-		function trata2()
+		function trata2(numChannels)
 		{
 			if(!numChannelsWas && numChannels)
 			{
@@ -73,7 +73,7 @@ Item {
 				console.log("no connections")
 			}
 		}
-		onNumChannelsChanged: trata2()
+		onNumChannelsChanged: trata2(numChannels)
 	}
 	
 

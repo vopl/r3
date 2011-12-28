@@ -62,7 +62,7 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void NetworkDialog::setNumChannels(int numChannels)
+		void NetworkDialog::setNumChannels(quint32 numChannels)
 		{
 			if(_numChannels < numChannels)
 			{
@@ -70,7 +70,7 @@ namespace client
 			}
 			_numChannels = numChannels;
 
-			ui._numChannels->setNum(numChannels);
+			ui._numChannels->setNum((int)numChannels);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
