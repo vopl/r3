@@ -14,9 +14,15 @@ namespace client
 	using namespace net;
 	using namespace async;
 
+	//////////////////////////////////////////////////////////////////////////
 	class Session;
-	typedef boost::shared_ptr<Session> SessionPtr;
+	typedef shared_ptr<Session> SessionPtr;
 
+	//////////////////////////////////////////////////////////////////////////
+	class Client;
+	typedef shared_ptr<Client> ClientPtr;
+
+	//////////////////////////////////////////////////////////////////////////
 	class Session
 		: public ISession
 		, public enable_shared_from_this<Session>
@@ -28,16 +34,29 @@ namespace client
 
 		TMAgents	_agents;
 
-		boost::uuids::random_generator _endpointGenerator;
+		uuids::random_generator _endpointGenerator;
 		mutex	_mtx;
 
-		typedef boost::shared_ptr<ChannelHub<IChannel> > ChannelHubPtr;
+		typedef shared_ptr<ChannelHub<IChannel> > ChannelHubPtr;
 		ChannelHubPtr	_channelHub;
 
+		ClientPtr	_client;
+		std::string	_host;
+		std::string	_service;
+		size_t		_needNumChannels;
+		bool		_connectInProgress;
+
 	private:
-		void onReceive(const boost::system::error_code &ec, const SPacket &p);
+		void onReceive(const error_code &ec, const SPacket &p);
+
+		void balanceChannels();
+
 	public:
-		Session(const TClientSid sid);
+		Session(
+			const TClientSid sid, 
+			ClientPtr client, 
+			const std::string &host, 
+			const std::string &service);
 		~Session();
 
 		virtual void watchState(const function<void(error_code, size_t)> &onStateChanged);

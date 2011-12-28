@@ -5,6 +5,7 @@
 #include "client/isession.hpp"
 #include "async/service.hpp"
 #include "net/iconnector.hpp"
+#include "session.hpp"
 
 namespace client
 {
@@ -24,7 +25,10 @@ namespace client
 		IConnectorPtr		_connector;
 
 	private:
-		void createSession_f(Result2<error_code, ISessionPtr> res, const std::string &host, const std::string &service);
+		void connectSession_f(
+			Result2<error_code, ISessionPtr> res, 
+			const std::string &host, const std::string &service,
+			SessionPtr session);
 
 	public:
 		Client();
@@ -36,6 +40,10 @@ namespace client
 		virtual pluma::Pluma * getPlugs();
 		virtual ServicePtr getAsync();
 		virtual bool stop();
+
+	public:
+		Result2<error_code, ISessionPtr> 
+			connectSession(SessionPtr session, const std::string &host, const std::string &service);
 	};
 	PLUMA_INHERIT_PROVIDER(Client, IClient);
 }

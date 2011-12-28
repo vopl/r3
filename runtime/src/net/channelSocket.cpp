@@ -110,7 +110,7 @@ namespace net
 			receive.second--;
 
 			size_t				transferedSize = 0;
-			uint32_t			header[1];
+			uint32_t			header[1]={};
 			error_code			ec;
 
 

@@ -64,13 +64,16 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void NetworkDialog::setNumChannels(quint32 numChannels)
 		{
-			if(_numChannels < numChannels)
+			if(_numChannels != numChannels)
 			{
-				logLowError(QString("connection established"));
+				QString s;
+				s.sprintf("%d channels", numChannels);
+				logLowError(s);
 			}
-			_numChannels = numChannels;
 
+			_numChannels = numChannels;
 			ui._numChannels->setNum((int)numChannels);
+
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -91,6 +94,7 @@ namespace client
 				_host = host;
 				_service = service;
 				emit addrChanged(_host, _service);
+				logLowError("addr changed: "+_host+":"+_service);
 			}
 		}
 		

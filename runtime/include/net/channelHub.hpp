@@ -86,8 +86,12 @@ namespace net
 		if(ec)
 		{
 			mutex::scoped_lock sl(_mtxChannels);
-
 			channel->close();
+			if(!_work)
+			{
+				return;
+			}
+
 			TChannels::iterator iter = std::find(_channels.begin(), _channels.end(), channel);
 			if(_channels.end() != iter)
 			{
@@ -162,6 +166,10 @@ namespace net
 			if(lowRes.data())
 			{
 				channel->close();
+				if(!_work)
+				{
+					return;
+				}
 				{
 					mutex::scoped_lock sl(_mtxChannels);
 					_channels.erase(channel);
@@ -237,6 +245,13 @@ namespace net
 
 			_work = false;
 
+			if(_onStateChanged)
+			{
+				spawn(bind(_onStateChanged, boost::system::error_code(), 0));
+				_onStateChanged.swap(boost::function<void(boost::system::error_code, size_t)>());
+			}
+
+
 			BOOST_FOREACH(const IChannelPtr &ch, _channels)
 			{
 				ch->close();
@@ -257,6 +272,7 @@ namespace net
 				spawn(bind(pr.first, make_error_code(errc::operation_canceled)));
 			}
 			_sends.clear();
+			_channelsNotSend.clear();
 
 		}
 	}
@@ -300,7 +316,6 @@ namespace net
 	void ChannelHub<Base>::watchState(const boost::function<void(boost::system::error_code, size_t)> &onStateChanged)
 	{
 		mutex::scoped_lock sl(_mtxChannels);
-		assert(!_onStateChanged);
 		_onStateChanged = onStateChanged;
 	}
 

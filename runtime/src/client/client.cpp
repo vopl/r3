@@ -1,14 +1,16 @@
 #include "pch.h"
 #include "client.hpp"
 #include "utils/variant.hpp"
-#include "session.hpp"
 
 namespace client
 {
 	using namespace utils;
 
 	//////////////////////////////////////////////////////////////////////////
-	void Client::createSession_f(Result2<error_code, ISessionPtr> res, const std::string &host, const std::string &service)
+	void Client::connectSession_f(
+		Result2<error_code, ISessionPtr> res, 
+		const std::string &host, const std::string &service,
+		SessionPtr session)
 	{
 		Result2<error_code, IChannelPtr> cres =
 			_connector->connect(host.c_str(), service.c_str());
@@ -17,7 +19,7 @@ namespace client
 
 		if(cres.data1())
 		{
-			res(cres.data1(), ISessionPtr());
+			res(cres.data1(), session);
 			return;
 		}
 
@@ -25,12 +27,12 @@ namespace client
 		assert(channel);
 
 		Variant v;
-		v.as<Variant::MapStringVariant>(true)["sid"] = nullClientSid;
+		v.as<Variant::MapStringVariant>(true)["sid"] = session?session->sid():nullClientSid;
 		Result<error_code> sres = channel->send(v);
 
 		if(sres.data())
 		{
-			res(sres.data(), ISessionPtr());
+			res(sres.data(), session);
 			return;
 		}
 		
@@ -39,7 +41,7 @@ namespace client
 
 		if(rres.data1())
 		{
-			res(rres.data1(), ISessionPtr());
+			res(rres.data1(), session);
 			return;
 		}
 
@@ -47,11 +49,14 @@ namespace client
 		TClientSid sid = v["sid"];
 		if(sid.is_nil())
 		{
-			res(make_error_code(errc::protocol_error), ISessionPtr());
+			res(make_error_code(errc::protocol_error), session);
 			return;
 		}
 
-		SessionPtr session(new Session(sid));
+		if(!session)
+		{
+			session.reset(new Session(sid, shared_from_this(), host, service));
+		}
 		session->attachChannel(channel);
 		res(error_code(), session);
 	}
@@ -136,7 +141,7 @@ namespace client
 		Client::createSession(const char *host, const char *service)
 	{
 		Result2<error_code, ISessionPtr> res;
-		_asrv->spawn(bind(&Client::createSession_f, shared_from_this(), res, std::string(host), std::string(service)));
+		_asrv->spawn(bind(&Client::connectSession_f, shared_from_this(), res, std::string(host), std::string(service), SessionPtr()));
 		return res;
 	}
 
@@ -176,4 +181,14 @@ namespace client
 
 		return true;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Result2<error_code, ISessionPtr> 
+		Client::connectSession(SessionPtr session, const std::string &host, const std::string &service)
+	{
+		Result2<error_code, ISessionPtr> res;
+		_asrv->spawn(bind(&Client::connectSession_f, shared_from_this(), res, host, service, session));
+		return res;
+	}
+
 }

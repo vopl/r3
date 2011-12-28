@@ -13,16 +13,19 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::onSessionState(boost::system::error_code ec, size_t numChannels)
 		{
-			if(ec)
+			if(_nd)
 			{
-				QString s;
-				s.sprintf(" (%d)", ec.value());
-				s = s.fromLocal8Bit(ec.message().c_str()) + s;
+				if(ec)
+				{
+					QString s;
+					s.sprintf(" (%d)", ec.value());
+					s = s.fromLocal8Bit(ec.message().c_str()) + s;
 
-				_nd->logLowError(s);
+					_nd->logLowError(s);
+				}
+				_nd->setNumChannels((quint32)numChannels);
 			}
 
-			_nd->setNumChannels((quint32)numChannels);
 			_labelConnected->setNum((int)numChannels);
 			_numChannels = (quint32)numChannels;
 		}
@@ -52,6 +55,7 @@ namespace client
 				_session = session;
 
 				_session->watchState(bind(&MainWindow::onSessionState_proxyCallback, this, _1, _2));
+				_session->balance(2);
 
 				Agent::_staticSession = _session;
 

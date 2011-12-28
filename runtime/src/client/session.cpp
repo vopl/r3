@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "session.hpp"
+#include "client.hpp"
 
 namespace client
 {
@@ -36,8 +37,60 @@ namespace client
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Session::Session(const TClientSid sid)
+	void Session::balanceChannels()
+	{
+		bool doAdd;
+		{
+			mutex::scoped_lock sl(_mtx);
+			if(_connectInProgress)
+			{
+				return;
+			}
+			if(_channelHub->getChannelsAmount() == _needNumChannels)
+			{
+				return;
+			}
+
+			doAdd = _channelHub->getChannelsAmount() < _needNumChannels;
+
+			_connectInProgress = true;
+		}
+
+		if(doAdd)
+		{
+			Result2<error_code, ISessionPtr> res =
+				_client->connectSession(shared_from_this(), _host, _service);
+
+			if(res.data1())
+			{
+				mutex::scoped_lock sl(_mtx);
+				_connectInProgress = false;
+				spawn(bind(&Session::balanceChannels, shared_from_this()));
+				return;
+			}
+		}
+
+
+		{
+			mutex::scoped_lock sl(_mtx);
+			_connectInProgress = false;
+		}
+		spawn(bind(&Session::balanceChannels, shared_from_this()));
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	Session::Session(
+		const TClientSid sid, 
+		ClientPtr client, 
+		const std::string &host, 
+		const std::string &service)
 		: _sid(sid)
+		, _needNumChannels(1)
+		, _client(client)
+		, _host(host)
+		, _service(service)
+		, _connectInProgress(false)
 	{
 	}
 
@@ -58,12 +111,18 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Session::balance(size_t numChannels)
 	{
-		assert(0);
+		{
+			mutex::scoped_lock sl(_mtx);
+			_needNumChannels = numChannels;
+		}
+
+		spawn(bind(&Session::balanceChannels, shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	size_t Session::getNumChannels()
 	{
+		mutex::scoped_lock sl(_mtx);
 		return _channelHub->getChannelsAmount();
 	}
 
@@ -106,12 +165,14 @@ namespace client
 			_channelHub->close();
 			_channelHub.reset();
 			agents.swap(_agents);
+			_needNumChannels = 0;
 		}
 
 		BOOST_FOREACH(TMAgents::value_type &el, agents)
 		{
 			el.second->close();
 		}
+		_client.reset();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
