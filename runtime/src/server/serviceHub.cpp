@@ -4,34 +4,20 @@
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::receiveLoop(ISessionPtr session)
+	void ServiceHub::onReceive(const boost::system::error_code &ec, const net::SPacket &p, ISessionPtr session)
 	{
-
-		for(;;)
+		if(ec)
 		{
-			Result2<error_code, net::SPacket> receiveRes = session->receive();
-			error_code ec = receiveRes.data1();
-
-			if(ec)
+			if(ec.value() == errc::operation_canceled)
 			{
-				if(ec.value() == errc::operation_canceled)
-				{
-					return;
-				}
-
-				//залогировать ошибку и по новой
-				assert(0);
-				WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
-				continue;
+				return;
 			}
 
-			spawn(bind(&ServiceHub::dispatchPacket, shared_from_this(), session, receiveRes.data2()));
+			assert(0);
+			WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
+			return;
 		}
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::dispatchPacket(ISessionPtr session, const net::SPacket &p)
-	{
 		server::TEndpoint serverEndpoint_;
 		client::TEndpoint clientEndpoint_;
 		utils::VariantPtr data_;
@@ -146,7 +132,7 @@ namespace server
 			}
 		}
 
-		spawn(bind(&ServiceHub::receiveLoop, shared_from_this(), session));
+		session->listen(bind(&ServiceHub::onReceive, shared_from_this(), _1, _2, session));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

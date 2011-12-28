@@ -7,19 +7,16 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Agent::onReceive(const server::TEndpoint &endpoint, utils::VariantPtr data)
 	{
-		mutex::scoped_lock sl(_mtx);
-		if(!_receivesWait.empty())
+		boost::function<void(server::TEndpoint, utils::VariantPtr)> onReceive;
+
 		{
-			_receivesWait.front()(error_code(), endpoint, data);
-			_receivesWait.erase(_receivesWait.begin());
-			return;
+			mutex::scoped_lock sl(_mtx);
+			onReceive = _onReceive;
 		}
 
-		if(!_closed)
+		if(onReceive)
 		{
-			Result3<error_code, server::TEndpoint, utils::VariantPtr> res;
-			res(error_code(), endpoint, data);
-			_receivesReady.push_back(res);
+			_onReceive(endpoint, data);
 		}
 	}
 
@@ -28,12 +25,7 @@ namespace client
 	{
 		mutex::scoped_lock sl(_mtx);
 		_closed = true;
-		BOOST_FOREACH(TReceiveResult &res, _receivesWait)
-		{
-			res(make_error_code(errc::operation_canceled), server::TEndpoint(), utils::VariantPtr());
-		}
-		_receivesWait.clear();
-		assert(_receivesReady.empty());
+		_onReceive.swap(boost::function<void(server::TEndpoint, utils::VariantPtr)>());
 	}
 
 
@@ -51,10 +43,7 @@ namespace client
 	{
 		_session->freeAgent(_endpoint);
 		mutex::scoped_lock sl(_mtx);
-		BOOST_FOREACH(TReceiveResult &res, _receivesWait)
-		{
-			res(make_error_code(errc::operation_canceled), server::TEndpoint(), utils::VariantPtr());
-		}
+		_onReceive.swap(boost::function<void(server::TEndpoint, utils::VariantPtr)>());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -63,34 +52,24 @@ namespace client
 		utils::VariantPtr data)
 	{
 		utils::Variant v;
-		utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>(true);
-		m["server::endpoint"] = endpoint;
-		m["client::endpoint"] = _endpoint;
-		m["data"] = data;
+
+		{
+			mutex::scoped_lock sl(_mtx);
+			utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>(true);
+			m["server::endpoint"] = endpoint;
+			m["client::endpoint"] = _endpoint;
+			m["data"] = data;
+		}
 		return _session->send(v);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result3<error_code, server::TEndpoint, utils::VariantPtr> Agent::receive()
+	void Agent::listen(const boost::function<void(server::TEndpoint, utils::VariantPtr)> onReceive)
 	{
 		mutex::scoped_lock sl(_mtx);
-
-		Result3<error_code, server::TEndpoint, utils::VariantPtr> res;
-		if(_closed)
-		{
-			res(make_error_code(errc::operation_canceled), server::TEndpoint(), utils::VariantPtr());
-			return res;
-		}
-
-		if(!_receivesReady.empty())
-		{
-			res = _receivesReady.front();
-			_receivesReady.erase(_receivesReady.begin());
-			return res;
-		}
-		_receivesWait.push_back(res);
-		return res;
+		_onReceive = onReceive;
 	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	ISessionPtr Agent::getSession()

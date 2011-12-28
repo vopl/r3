@@ -23,8 +23,7 @@ namespace server
 		mutex		_mtx;
 
 	private:
-		void receiveLoop(ISessionPtr session);
-		void dispatchPacket(ISessionPtr session, const net::SPacket &p);
+		void onReceive(const boost::system::error_code &ec, const net::SPacket &p, ISessionPtr session);
 
 
 	public:

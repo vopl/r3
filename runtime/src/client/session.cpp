@@ -4,59 +4,43 @@
 namespace client
 {
 	//////////////////////////////////////////////////////////////////////////
-	SessionPtr Session::shared_from_this()
+	void Session::onReceive(const boost::system::error_code &ec, const SPacket &p)
 	{
-		return static_pointer_cast<Session>(Base::shared_from_this());
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::receiveLoop_f()
-	{
-		for(;;)
+		if(ec)
 		{
-			Result2<error_code, SPacket> res = Base::receive();
-			res.wait();
-
-			error_code ec = res.data1();
-			if(ec)
+			mutex::scoped_lock sl(_mtx);
+			if(!_channelHub)
 			{
-				mutex::scoped_lock sl(_mtx);
-				if(_closed)
-				{
-					return;
-				}
-				WLOG("receive failed: "<<ec.message()<<"("<<ec.value()<<")");
-				continue;
+				return;
 			}
-
-			utils::Variant v = res.data2();
-			if(!v["error"].isNull())
-			{
-				ELOG("error from service: "<<v["error"]);
-				continue;
-			}
-
-			TEndpoint endpoint = v["client::endpoint"];
-			Agent *agent = NULL;
-			{
-				mutex::scoped_lock sl(_mtx);
-				TMAgents::iterator iter = _agents.find(endpoint);
-				if(_agents.end() != iter)
-				{
-					agent = iter->second;
-				}
-			}
-
-			agent->onReceive(v["server::endpoint"], v["data"]);
-
-
+			WLOG("receive failed: "<<ec.message()<<"("<<ec.value()<<")");
+			return;
 		}
+
+		utils::Variant v = p;
+		if(!v["error"].isNull())
+		{
+			ELOG("error from service: "<<v["error"]);
+			return;
+		}
+
+		TEndpoint endpoint = v["client::endpoint"];
+		Agent *agent = NULL;
+		{
+			mutex::scoped_lock sl(_mtx);
+			TMAgents::iterator iter = _agents.find(endpoint);
+			if(_agents.end() != iter)
+			{
+				agent = iter->second;
+			}
+		}
+
+		agent->onReceive(v["server::endpoint"], v["data"]);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Session::Session(const TClientSid sid)
 		: _sid(sid)
-		, _closed(true)
 	{
 	}
 
@@ -91,7 +75,7 @@ namespace client
 	{
 		mutex::scoped_lock sl(_mtx);
 
-		if(_closed)
+		if(!_channelHub)
 		{
 			assert(0);
 			return IAgentPtr();
@@ -115,8 +99,8 @@ namespace client
 		TMAgents agents;
 		{
 			mutex::scoped_lock sl(_mtx);
-			_closed = true;
-			Base::close();
+			_channelHub->close();
+			_channelHub.reset();
 			agents.swap(_agents);
 		}
 
@@ -129,17 +113,19 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	bool Session::attachChannel(IChannelPtr channel)
 	{
-		bool res = Base::attachChannel(channel);
+		mutex::scoped_lock sl(_mtx);
+		if(!_channelHub)
+		{
+			_channelHub.reset(new ChannelHub<IChannel>);
+			_channelHub->listen(bind(&Session::onReceive, shared_from_this(), _1, _2));
+		}
+
+		bool res = _channelHub->attachChannel(channel);
 		if(!res)
 		{
 			return res;
 		}
-		mutex::scoped_lock sl(_mtx);
-		if(_closed)
-		{
-			_closed = false;
-			spawn(bind(&Session::receiveLoop_f, shared_from_this()));
-		}
+
 
 		return res;
 	}
@@ -156,5 +142,12 @@ namespace client
 			_agents.erase(iter);
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Result<error_code> Session::send(net::SPacket p)
+	{
+		return _channelHub->send(p);
+	}
+
 
 }

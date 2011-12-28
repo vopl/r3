@@ -34,7 +34,8 @@ namespace client
 			return;
 		}
 		
-		Result2<error_code, SPacket> rres = channel->receive();
+		Result2<error_code, SPacket> rres;
+		channel->listen(rres, 1);
 
 		if(rres.data1())
 		{

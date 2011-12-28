@@ -85,16 +85,17 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::closeEvent(QCloseEvent *evt)
 		{
-			bool res = _client->stop();
-			(void)res;
-
 			closeSession();
 
 			delete _nd;
 			_nd = NULL;
 
-			_asrv->stop();
 			_asrv.reset();
+
+			bool res = _client->stop();
+			(void)res;
+
+			_client.reset();
 
 			QMainWindow::closeEvent(evt);
 		}

@@ -939,32 +939,15 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void Agent::receiveLoop_f()
+		void Agent::onReceive(const server::TEndpoint &endpoint, utils::VariantPtr data)
 		{
-			for(;;)
-			{
-				IAgentPtr agent = _agent;
-				if(!agent)
-				{
-					return;
-				}
-				async::Result3<boost::system::error_code, server::TEndpoint, utils::VariantPtr> res;
-				res = agent->receive();
-				res.wait();
-				if(res.data1())
-				{
-					assert(!_agent);
-					return;
-				}
+			QString qendpoint = 
+				QString::fromUtf8(endpoint.c_str(), (int)endpoint.size());
 
-				QString service = 
-					QString::fromUtf8(res.data2().c_str(), (int)res.data2().size());
+			QVariant qdata;
+			variantCnvt(qdata, data);
 
-				QVariant data;
-				variantCnvt(data, res.data3());
-
-				emit receive(data, service);
-			}
+			emit receive(qdata, qendpoint);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -991,7 +974,7 @@ namespace client
 		{
 			_agent = _staticSession->allocAgent();
 			assert(_agent);
-			async::spawn(boost::bind(&Agent::receiveLoop_f, this));
+			_agent->listen(boost::bind(&Agent::onReceive, this, _1, _2));
 		}
 
 	

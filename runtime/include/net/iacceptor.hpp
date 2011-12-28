@@ -14,7 +14,7 @@ namespace net
 
 		virtual async::Result<boost::system::error_code> listen(
 				const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
-			const char *host, const char *service, bool useSsl=false) =0;
+			const char *host, const char *service, bool useSsl=true) =0;
 		virtual void unlisten() =0;
 	};
 	typedef boost::shared_ptr<IAcceptor> IAcceptorPtr;

@@ -18,7 +18,8 @@ namespace client
 	typedef boost::shared_ptr<Session> SessionPtr;
 
 	class Session
-		: public ChannelHub<ISession>
+		: public ISession
+		, public enable_shared_from_this<Session>
 	{
 		typedef ChannelHub<ISession> Base;
 		TClientSid _sid;
@@ -29,14 +30,12 @@ namespace client
 
 		boost::uuids::random_generator _endpointGenerator;
 		mutex	_mtx;
-		bool	_closed;
+
+		typedef boost::shared_ptr<ChannelHub<IChannel> > ChannelHubPtr;
+		ChannelHubPtr	_channelHub;
 
 	private:
-		SessionPtr shared_from_this();
-
-	private:
-		void receiveLoop_f();
-
+		void onReceive(const boost::system::error_code &ec, const SPacket &p);
 	public:
 		Session(const TClientSid sid);
 		~Session();
@@ -51,6 +50,7 @@ namespace client
 		bool attachChannel(IChannelPtr channel);
 
 		void freeAgent(const TEndpoint &endpoint);
+		Result<error_code> send(net::SPacket p);
 
 	};
 }

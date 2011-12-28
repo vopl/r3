@@ -5,6 +5,7 @@
 #include "server/endpoint.hpp"
 #include "async/result.hpp"
 #include <boost/system/error_code.hpp>
+#include <boost/function.hpp>
 
 namespace client
 {
@@ -21,8 +22,7 @@ namespace client
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data) =0;
 
-		virtual async::Result3<boost::system::error_code, server::TEndpoint, utils::VariantPtr> 
-			receive() =0;
+		virtual void listen(const boost::function<void(server::TEndpoint, utils::VariantPtr)> onReceive) =0;
 
 		virtual ISessionPtr getSession() =0;
 	};

@@ -64,20 +64,25 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::receive_f()
+	void ChannelSocket::receiveLoop_f()
 	{
+		TReceive receive;
+		receive.second = 0;
+
 		for(;;)
 		{
-			Result2<error_code, SPacket> op;
+			while(!receive.second)
 			{
-				mutex::scoped_lock sl(_mtxReceives);
+				mutex::scoped_lock sl(_mtxReceive);
 				if(_receives.empty())
 				{
 					return;
 				}
-				op = _receives[0];
+
+				receive.swap(_receives[0]);
 				_receives.erase(_receives.begin());
 			}
+			receive.second--;
 
 			size_t				transferedSize = 0;
 			boost::uint32_t		header[1];
@@ -95,7 +100,11 @@ namespace net
 
 				if(ec)
 				{
-					op(ec, SPacket());
+					if(asio::error::operation_aborted == ec.value())
+					{
+						return;
+					}
+					spawn(bind(receive.first, ec, SPacket()));
 					return;
 				}
 				transferedSize += readRes.data2();
@@ -119,7 +128,8 @@ namespace net
 
 					if(ec)
 					{
-						op(ec, SPacket());
+						assert(!"какой код при закрытии сокета? прервать цикл");
+						spawn(bind(receive.first, ec, SPacket()));
 						return;
 					}
 					transferedSize += readRes.data2();
@@ -128,7 +138,7 @@ namespace net
 			assert(transferedSize == packet._size);
 			transferedSize = 0;
 
-			op(error_code(), packet);
+			spawn(bind(receive.first, error_code(), packet));
 		}
 	}
 
@@ -233,21 +243,15 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	Result2<error_code, SPacket> ChannelSocket::receive()
+	void ChannelSocket::listen(const TOnReceive &onReceive, size_t amount)
 	{
-		Result2<error_code, SPacket> res;
-
-		mutex::scoped_lock sl(_mtxReceives);
-		_receives.push_back(res);
+		mutex::scoped_lock sl(_mtxReceive);
+		_receives.push_back(std::make_pair(onReceive, amount));
 		if(_receives.size() < 2)
 		{
-			spawn(bind(&ChannelSocket::receive_f, shared_from_this()));
+			spawn(bind(&ChannelSocket::receiveLoop_f, shared_from_this()));
 		}
-
-		return res;
 	}
-
-
 
 	//////////////////////////////////////////////////////////////////////////
 	Result<error_code> ChannelSocket::send(const SPacket &p)

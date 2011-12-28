@@ -28,7 +28,7 @@ namespace client
 			static void variantCnvt(QVariant &dst, const utils::Variant &src);
 
 		private:
-			void receiveLoop_f();
+			void onReceive(const server::TEndpoint &endpoint, utils::VariantPtr data);
 
 		private:
 			QString	_service;

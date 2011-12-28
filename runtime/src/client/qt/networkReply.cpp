@@ -47,20 +47,16 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void NetworkReply::onSend(Result<error_code> res)
+		void NetworkReply::processSend(Result<error_code> res)
 		{
 			res.wait();
 			assert(!res.data());
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void NetworkReply::onReceive(Result3<error_code, server::TEndpoint, utils::VariantPtr> res)
+		void NetworkReply::onReceive(server::TEndpoint endpoint, utils::VariantPtr data)
 		{
-			error_code ec = res.data1();
-			server::TEndpoint endpoint = res.data2();
-			utils::VariantPtr data = res.data3();
-
-			if(!ec && data->is<utils::Variant::VectorChar>())
+			if(data->is<utils::Variant::VectorChar>())
 			{
 				_data = data;
 				_readPos = 0;
@@ -94,11 +90,9 @@ namespace client
 			server::TEndpoint endpoint = url.host().toUtf8().constData();
 
 			Result<error_code> sres = _agent->send(endpoint, v);
-			spawn(bind(&NetworkReply::onSend, this, sres));
+			spawn(bind(&NetworkReply::processSend, this, sres));
 
-			Result3<error_code, server::TEndpoint, utils::VariantPtr> rres =
-				_agent->receive();
-			spawn(bind(&NetworkReply::onReceive, this, rres));
+			_agent->listen(bind(&NetworkReply::onReceive, this,  _1, _2));
 		}
 
 		//////////////////////////////////////////////////////////////////////////

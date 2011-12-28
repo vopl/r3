@@ -21,10 +21,8 @@ namespace client
 		SessionPtr	_session;
 		TEndpoint	_endpoint;
 
-		typedef Result3<error_code, server::TEndpoint, utils::VariantPtr> TReceiveResult;
-		typedef std::deque<TReceiveResult> TReceives;
-		TReceives	_receivesWait;
-		TReceives	_receivesReady;
+		boost::function<void(server::TEndpoint, utils::VariantPtr)> _onReceive;
+
 		mutex		_mtx;
 		bool		_closed;
 	public:
@@ -39,7 +37,7 @@ namespace client
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data);
 
-		virtual Result3<error_code, server::TEndpoint, utils::VariantPtr> receive();
+		void listen(const boost::function<void(server::TEndpoint, utils::VariantPtr)> onReceive);
 
 		virtual ISessionPtr getSession();
 	};

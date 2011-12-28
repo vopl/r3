@@ -46,7 +46,9 @@ namespace net
 	{
 		virtual ~IChannel(){}
 
-		virtual async::Result2<boost::system::error_code, SPacket> receive() =0;
+		virtual void listen(
+			const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive,
+			size_t amount=(size_t)-1) =0;
 		virtual async::Result<boost::system::error_code> send(const SPacket &p) =0;
 
 		virtual void close() =0;

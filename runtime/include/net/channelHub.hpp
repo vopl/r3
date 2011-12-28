@@ -16,30 +16,39 @@ namespace net
 		: public Base
 		, public enable_shared_from_this<ChannelHub<Base> >
 	{
-		typedef std::deque<IChannelPtr> TChannels;
+		typedef std::set<IChannelPtr> TChannels;
 
 		volatile bool	_work;
 		mutex			_mtxChannels;
 		TChannels		_channels;//все
 
 
-		mutex										_mtxReceives;
-		std::deque<Result2<error_code, SPacket> >	_receives;
-		std::deque<Result2<error_code, SPacket> >	_received;
+		mutex			_mtxSend;
+		typedef std::pair<Result<error_code>, SPacket> TSend;
+		typedef std::deque<TSend> TSends;
+		TSends			_sends;
+		TChannels		_channelsNotSend;
 
-		mutex												_mtxSends;
-		size_t												_next4send;
-		std::deque<std::pair<Result<error_code>, SPacket> >	_sends;
+
+		mutex			_mtxReceive;
+		typedef boost::function<void(const boost::system::error_code &ec, const SPacket &p)> TOnReceove;
+		typedef std::pair<
+			boost::function<void(const boost::system::error_code &ec, const SPacket &p)>,
+			size_t> TReceive;
+		typedef std::deque<TReceive> TReceives;
+		TReceives		_receives;
 
 	private:
-		void receiveLoop(IChannelPtr channel);
+		void onReceive(const boost::system::error_code &ec, const net::SPacket &p, IChannelPtr channel);
 		void balanceSends();
 
 	public:
 		//////////////////////////////////////////////////////////////////////////
 		ChannelHub();
 
-		virtual Result2<error_code, SPacket> receive();
+		virtual void listen(
+			const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive, 
+			size_t amount = (size_t)-1);
 		virtual Result<error_code> send(const SPacket &p);
 
 
@@ -65,40 +74,42 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	void ChannelHub<Base>::receiveLoop(IChannelPtr channel)
+	void ChannelHub<Base>::onReceive(const boost::system::error_code &ec, const net::SPacket &p, IChannelPtr channel)
 	{
-		for(;;)
+
+		if(ec)
 		{
-			Result2<error_code, SPacket> res = channel->receive();
-			
-			error_code ec = res.data1();
+			WLOG("receiveLoop failed: "<<ec.message()<<"("<<ec.value()<<")");
 
-			if(ec)
+			mutex::scoped_lock sl(_mtxChannels);
+
+			channel->close();
+			TChannels::iterator iter = std::find(_channels.begin(), _channels.end(), channel);
+			if(_channels.end() != iter)
 			{
-				WLOG("receiveLoop failed: "<<ec.message()<<"("<<ec.value()<<")");
-
-				mutex::scoped_lock sl(_mtxChannels);
-
-				channel->close();
-				TChannels::iterator iter = std::find(_channels.begin(), _channels.end(), channel);
-				if(_channels.end() != iter)
-				{
-					_channels.erase(iter);
-				}
-				return;
+				_channels.erase(iter);
 			}
+			return;
+		}
 
-			mutex::scoped_lock sl(_mtxReceives);
-			if(_receives.empty())
+		TOnReceove onReceive;
+		{
+			mutex::scoped_lock sl(_mtxReceive);
+			assert(!_receives.empty());
+			while(!_receives.front().second)
 			{
-				_received.push_back(res);
+				_receives.erase(_receives.begin());
 			}
-			else
+			onReceive = _receives.front().first;
+			_receives.front().second--;
+			while(!_receives.front().second)
 			{
-				_receives[0](res.data1(), res.data2());
 				_receives.erase(_receives.begin());
 			}
 		}
+
+		assert(onReceive);
+		onReceive(ec, p);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -111,7 +122,7 @@ namespace net
 			Result<error_code> res;
 			SPacket p;
 			{
-				mutex::scoped_lock sl(_mtxSends);
+				mutex::scoped_lock sl(_mtxSend);
 
 				if(_sends.empty())
 				{
@@ -119,40 +130,41 @@ namespace net
 					return;
 				}
 
-				res = _sends[0].first;
-				p = _sends[0].second;
-				_sends.erase(_sends.begin());
-			
-				mutex::scoped_lock sl2(_mtxChannels);
-				if(_channels.empty())
+				if(_channelsNotSend.empty())
 				{
-					//нет низких каналов
+					//нечем делать
 					return;
 				}
-				else
-				{
-					_next4send = (++_next4send) % _channels.size();
-					channel = _channels[_next4send];
-				}
+
+				res = _sends.begin()->first;
+				p = _sends.begin()->second;
+				_sends.erase(_sends.begin());
+			
+				channel = *_channelsNotSend.begin();
+				_channelsNotSend.erase(_channelsNotSend.begin());
 			}
 
 			Result<error_code> lowRes = channel->send(p);
 			lowRes.wait();
 			if(lowRes.data())
 			{
-				mutex::scoped_lock sl(_mtxSends);
-
 				channel->close();
-				TChannels::iterator iter = std::find(_channels.begin(), _channels.end(), channel);
-				if(_channels.end() != iter)
 				{
-					_channels.erase(iter);
+					mutex::scoped_lock sl(_mtxChannels);
+					_channels.erase(channel);
 				}
 
-				_sends.push_back(std::make_pair(res, p));
+				{
+					mutex::scoped_lock sl(_mtxSend);
+					_sends.push_back(std::make_pair(res, p));
+				}
 			}
 			else
 			{
+				mutex::scoped_lock sl(_mtxSend);
+				{
+					_channelsNotSend.insert(channel);
+				}
 				res(lowRes.data());
 			}
 		}
@@ -164,35 +176,18 @@ namespace net
 	template <class Base>
 	ChannelHub<Base>::ChannelHub()
 		: _work(true)
-		, _next4send(0)
 	{
 	}
 
+
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	Result2<error_code, SPacket> ChannelHub<Base>::receive()
+	void ChannelHub<Base>::listen(
+		const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive,
+		size_t amount)
 	{
-		Result2<error_code, SPacket> res;
-
-		mutex::scoped_lock sl(_mtxReceives);
-
-		if(_work)
-		{
-			if(_received.empty())
-			{
-				_receives.push_back(res);
-			}
-			else
-			{
-				res = _received[0];
-				_received.erase(_received.begin());
-			}
-		}
-		else
-		{
-			res(make_error_code(errc::operation_canceled), SPacket());
-		}
-		return res;
+		mutex::scoped_lock sl(_mtxChannels);
+		_receives.push_back(std::make_pair(onReceive, amount));
 	}
 
 
@@ -202,15 +197,12 @@ namespace net
 	{
 		Result<error_code> res;
 
-		mutex::scoped_lock sl(_mtxSends);
+		mutex::scoped_lock sl(_mtxSend);
 
 		if(_work)
 		{
 			_sends.push_back(std::make_pair(res, p));
-			if(_sends.size()<2)
-			{
-				spawn(bind(&ChannelHub<Base>::balanceSends, shared_from_this()));
-			}
+			spawn(bind(&ChannelHub<Base>::balanceSends, shared_from_this()));
 		}
 		else
 		{
@@ -234,20 +226,18 @@ namespace net
 			}
 			_channels.clear();
 
-			mutex::scoped_lock sl2(_mtxReceives);
-			typedef Result2<error_code, SPacket> R2;
-			BOOST_FOREACH(R2 &r2, _receives)
+			mutex::scoped_lock sl2(_mtxReceive);
+			BOOST_FOREACH(TReceive &r, _receives)
 			{
-				r2(make_error_code(errc::operation_canceled), SPacket());
+				spawn(bind(r.first, make_error_code(errc::operation_canceled), SPacket()));
 			}
 			_receives.clear();
-			_received.clear();
 
-			mutex::scoped_lock sl3(_mtxSends);
+			mutex::scoped_lock sl3(_mtxSend);
 			typedef std::pair<Result<error_code>, SPacket> PR;
 			BOOST_FOREACH(PR &pr, _sends)
 			{
-				pr.first(make_error_code(errc::operation_canceled));
+				spawn(bind(pr.first, make_error_code(errc::operation_canceled)));
 			}
 			_sends.clear();
 
@@ -259,17 +249,18 @@ namespace net
 	bool ChannelHub<Base>::attachChannel(IChannelPtr channel)
 	{
 		mutex::scoped_lock sl(_mtxChannels);
-		mutex::scoped_lock sl2(_mtxSends);
+		mutex::scoped_lock sl2(_mtxSend);
 
 		if(!_work)
 		{
 			return false;
 		}
-		_channels.push_back(channel);
+		_channels.insert(channel);
+		_channelsNotSend.insert(channel);
 
 		_work = true;
 
-		spawn(bind(&ChannelHub<Base>::receiveLoop, shared_from_this(), channel));
+		channel->listen(bind(&ChannelHub<Base>::onReceive, shared_from_this(), _1, _2, channel), (size_t)-1);
 		return true;
 	}
 

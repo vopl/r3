@@ -45,13 +45,15 @@ namespace net
 
 	private:
 
-		typedef std::deque<Result2<error_code, SPacket> > TReceives;
 		typedef std::deque<std::pair<Result<error_code>, SPacket> > TSends;
+		typedef function<void(const error_code &ec, const SPacket &p)> TOnReceive;
+		typedef std::pair<TOnReceive, size_t> TReceive;
+		typedef std::deque<TReceive> TReceives;
 
 
-		mutex		_mtxReceives;
+		void receiveLoop_f();
+		mutex		_mtxReceive;
 		TReceives	_receives;
-		void receive_f();
 
 		mutex		_mtxSends;
 		TSends		_sends;
@@ -64,7 +66,9 @@ namespace net
 		ChannelSocket(TSocketSslPtr socket, TSslContextPtr sslContext);
 		~ChannelSocket();
 
-		virtual Result2<error_code, SPacket> receive();
+		virtual void listen(
+			const TOnReceive &onReceive,
+			size_t amount);
 		virtual Result<error_code> send(const SPacket &p);
 
 		void close();
