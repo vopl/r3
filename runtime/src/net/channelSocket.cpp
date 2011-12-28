@@ -29,11 +29,14 @@ namespace net
 		}
 		else
 		{
-			typedef boost::asio::detail::wrapped_handler<
-				asio::io_service::strand,
-				Handler> WrappedHandler;
-			_sslStrand->dispatch(
-				boost::bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+// 			typedef asio::detail::wrapped_handler<
+// 				asio::io_service::strand,
+// 				Handler> WrappedHandler;
+// 			_sslStrand->dispatch(
+// 				bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+			
+			
+			_socketSsl->async_read_some(b, _sslStrand->wrap(h));
 			
 		}
 	}
@@ -48,11 +51,13 @@ namespace net
 		}
 		else
 		{
-			typedef boost::asio::detail::wrapped_handler<
-				asio::io_service::strand,
-				Handler> WrappedHandler;
+// 			typedef asio::detail::wrapped_handler<
+// 				asio::io_service::strand,
+// 				Handler> WrappedHandler;
+// 			_sslStrand->dispatch(
+// 				bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
 			_sslStrand->dispatch(
-				boost::bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+				bind(&TSocketSsl::async_write_some<Buffer, Handler>, _socketSsl.get(), b, h));
 		}
 	}
 
@@ -62,14 +67,29 @@ namespace net
 		error_code ec;
 		if(_socket)
 		{
-			_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
+			_socket->lowest_layer().shutdown(asio::socket_base::shutdown_both, ec);
 			_socket->lowest_layer().close(ec);
 		}
 		else
 		{
-			_socketSsl->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
-			_socketSsl->lowest_layer().close(ec);
+			typedef function<void(const error_code &)> TOnShutdown;
+			TOnShutdown onShutdown = boost::bind(&Sock::onSslShutdown, _1, _socketSsl, _sslContext);
+
+			_sslStrand->dispatch(
+				bind(&TSocketSsl::async_shutdown<TOnShutdown>, _socketSsl, onShutdown)
+				);
 		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelSocket::Sock::onSslShutdown(
+		const error_code &ec, 
+		TSocketSslPtr socketSsl,
+		TSslContextPtr sslContextHolder)
+	{
+		error_code ecl;
+		socketSsl->lowest_layer().shutdown(asio::socket_base::shutdown_both, ecl);
+		socketSsl->lowest_layer().close(ecl);
 	}
 
 
@@ -96,7 +116,7 @@ namespace net
 			receive.second--;
 
 			size_t				transferedSize = 0;
-			boost::uint32_t		header[1];
+			uint32_t			header[1];
 			error_code			ec;
 
 
@@ -178,7 +198,7 @@ namespace net
 			}
 
 			size_t				transferedSize = 0;
-			boost::uint32_t		header[1];
+			uint32_t			header[1];
 			error_code			ec;
 
 
@@ -285,7 +305,6 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelSocket::close()
 	{
-		boost::system::error_code ec;
 		_sock.close();
 	}
 }

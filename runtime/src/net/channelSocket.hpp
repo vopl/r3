@@ -18,7 +18,7 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	class ChannelSocket;
-	typedef boost::shared_ptr<ChannelSocket> ChannelSocketPtr;
+	typedef shared_ptr<ChannelSocket> ChannelSocketPtr;
 
 	class ChannelSocket
 		: public IChannel
@@ -31,7 +31,7 @@ namespace net
 			TSslContextPtr		_sslContext;
 
 			typedef asio::io_service::strand TStrand;
-			typedef boost::shared_ptr<TStrand> TStrandPtr;
+			typedef shared_ptr<TStrand> TStrandPtr;
 			TStrandPtr			_sslStrand;
 
 			Sock(TSocketPtr socket);
@@ -44,6 +44,12 @@ namespace net
 			void write(const Buffer &b, const Handler &h);
 
 			void close();
+
+		private:
+			static void onSslShutdown(
+				const error_code &ec, 
+				TSocketSslPtr socketSsl,
+				TSslContextPtr sslContextHolder);
 		} _sock;
 
 

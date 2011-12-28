@@ -21,10 +21,10 @@ Item {
 	function start()
 	{
 		var ld = "very long";
-		ld = [ld,ld,ld,ld,ld];
-		ld = {a:ld,b:ld};
-		ld = [ld,ld,ld,ld,ld];
-		ld = [ld,ld,ld,ld,ld];
+		//ld = [ld,ld,ld,ld,ld];
+		//ld = {a:ld,b:ld};
+		//ld = [ld,ld,ld,ld,ld];
+		//ld = [ld,ld,ld,ld,ld];
 		//ld = [ld,ld,ld,ld,ld];
 		//ld = [ld,ld,ld,ld,ld];
 		agent.send({cnt:0,ld:ld}, "echo");
