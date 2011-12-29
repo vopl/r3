@@ -85,12 +85,11 @@ namespace client
 			}
 		}
 
-
 		{
 			mutex::scoped_lock sl(_mtx);
 			_connectInProgress = false;
 		}
-		spawn(bind(&Session::balanceChannels, shared_from_this()));
+		//spawn(bind(&Session::balanceChannels, shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
