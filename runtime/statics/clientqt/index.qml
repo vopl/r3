@@ -42,13 +42,13 @@ Item {
 		console.log("start ping pong")
 	}
 
-	property int numChannelsWas:1
+	property int numChannelsWas:0
 	Agent
 	{
 		id: agent
 		property int cnt: 0
 		
-		function trata(data, service)
+		function _receive(data, service)
 		{
 			if(!(cnt % 100))
 			{
@@ -58,29 +58,29 @@ Item {
 			data.cnt++;
 			send(data, "echo");
 		}
-		onReceive: trata(data, service)
+		onReceive: _receive(data, service)
 		
 		
-		function trata2(numChannels)
+		function _channels(numChannels)
 		{
+			if(!(numChannels%100))
+			{
+				console.log("----------------- numChannels: "+numChannels);
+			}
 			if(!numChannelsWas && numChannels)
 			{
 				start();
 			}
 			numChannelsWas = numChannels;
-			if(!numChannels)
-			{
-				console.log("no connections")
-			}
 		}
-		onNumChannelsChanged: trata2(numChannels)
+		onNumChannelsChanged: _channels(numChannels)
 	}
 	
 
 	Component.onCompleted: 
 	{
 		console.log("Component.onCompleted")
-		start();
+		//start();
 	}
 	Component.onDestruction: console.log("Destruction Beginning!")
 }

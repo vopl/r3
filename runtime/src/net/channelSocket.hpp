@@ -36,6 +36,7 @@ namespace net
 
 			Sock(TSocketPtr socket);
 			Sock(TSocketSslPtr socketSsl, TSslContextPtr sslContext);
+			~Sock();
 
 			template <class Buffer, class Handler>
 			void read(const Buffer &b, const Handler &h);

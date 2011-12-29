@@ -46,6 +46,10 @@ namespace client
 			{
 				return;
 			}
+			if(!_channelHub)
+			{
+				return;
+			}
 			if(_channelHub->getChannelsAmount() == _needNumChannels)
 			{
 				return;
@@ -61,11 +65,22 @@ namespace client
 			Result2<error_code, ISessionPtr> res =
 				_client->connectSession(shared_from_this(), _host, _service);
 
-			if(res.data1())
+			error_code ec = res.data1();
+			if(ec)
 			{
+				if(ec == errc::owner_dead)
+				{
+					if(_onStateChanged)
+					{
+						spawn(bind(_onStateChanged, ec, _channelHub->getChannelsAmount()));
+					}
+					return;
+				}
+
 				mutex::scoped_lock sl(_mtx);
 				_connectInProgress = false;
 				spawn(bind(&Session::balanceChannels, shared_from_this()));
+
 				return;
 			}
 		}
@@ -77,6 +92,19 @@ namespace client
 		}
 		spawn(bind(&Session::balanceChannels, shared_from_this()));
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Session::onStateChanged(const error_code &ec, size_t numChannels)
+	{
+		spawn(bind(&Session::balanceChannels, shared_from_this()));
+
+		mutex::scoped_lock sl(_mtx);
+		if(_onStateChanged)
+		{
+			spawn(bind(_onStateChanged, ec, numChannels));
+		}
+	}
+
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -103,9 +131,10 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	void Session::watchState(const function<void(error_code, size_t)> &onStateChanged)
 	{
-		assert(_channelHub);
+		mutex::scoped_lock sl(_mtx);
+
+		_onStateChanged = onStateChanged;
 		spawn(bind(onStateChanged, error_code(), _channelHub->getChannelsAmount()));
-		return _channelHub->watchState(onStateChanged);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -183,6 +212,8 @@ namespace client
 		{
 			_channelHub.reset(new ChannelHub<IChannel>);
 			_channelHub->listen(bind(&Session::onReceive, shared_from_this(), _1, _2));
+			_channelHub->watchState(bind(&Session::onStateChanged, this, _1, _2));
+
 		}
 
 		bool res = _channelHub->attachChannel(channel);

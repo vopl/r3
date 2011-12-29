@@ -44,6 +44,7 @@ namespace client
 
 		private:
 			virtual void closeEvent(QCloseEvent *);
+			void onSessionLost();
 
 		private:
 			void closeSession();
@@ -52,6 +53,8 @@ namespace client
 		public:
 			MainWindow(QWidget *parent = 0, Qt::WFlags flags = 0);
 			~MainWindow();
+
+			ISessionPtr getSession();
 
 		public slots:
 			void showNetworkDialog();

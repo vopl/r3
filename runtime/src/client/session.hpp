@@ -46,10 +46,15 @@ namespace client
 		size_t		_needNumChannels;
 		bool		_connectInProgress;
 
+		boost::function<void(boost::system::error_code, size_t)> _onStateChanged;
+
+
 	private:
 		void onReceive(const error_code &ec, const SPacket &p);
 
 		void balanceChannels();
+
+		void onStateChanged(const error_code &ec, size_t numChannels);
 
 	public:
 		Session(

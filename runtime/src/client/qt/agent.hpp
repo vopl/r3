@@ -11,6 +11,9 @@ namespace client
 {
 	namespace qt
 	{
+		class MainWindow;
+
+		//////////////////////////////////////////////////////////////////////////
 		class Agent
 			: public QObject
 
@@ -21,7 +24,7 @@ namespace client
 			quint32		_numChannels;
 
 			friend class MainWindow;
-			static		ISessionPtr	_staticSession;
+			static		MainWindow	*_staticMainWindow;
 
 		private:
 			static void variantCnvt(utils::Variant &dst, const QVariant &src);
@@ -37,6 +40,9 @@ namespace client
 
 			quint32 getNumChannels();
 
+		private slots:
+			void onSessionState(boost::system::error_code ec, size_t numChannels);
+
 		public:
 			Agent(QObject *parent = 0);
 			~Agent();
@@ -50,8 +56,6 @@ namespace client
 			void receive(QVariant data, QString service);
 			void numChannelsChanged(quint32 numChannels);
 
-		public slots:
-			void setNumChannels(quint32 numChannels);
 		};
 	}
 }

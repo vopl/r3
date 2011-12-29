@@ -13,7 +13,7 @@ namespace net
 	//////////////////////////////////////////////////////////////////////////
 	void Connector::connect_f(Result2<error_code, IChannelPtr> res, const std::string &host, const std::string &service, bool useSsl)
 	{
-		ILOG("connect to "<<host<<":"<<service<<", ssl="<<useSsl);
+		//ILOG("connect to "<<host<<":"<<service<<", ssl="<<useSsl);
 		TSslContextPtr sslContext;
 
 		if(useSsl)
@@ -150,14 +150,14 @@ namespace net
 					continue;
 				}
 				//успех
-				WLOG("success");
+				//ILOG("success");
 				res(error_code(), IChannelPtr(new ChannelSocket(sockSsl, sslContext)));
 				return;
 			}
 			else
 			{
 				//успех
-				WLOG("success");
+				//ILOG("success");
 				res(error_code(), IChannelPtr(new ChannelSocket(sock)));
 				return;
 			}

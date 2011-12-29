@@ -28,6 +28,12 @@ namespace client
 
 			_labelConnected->setNum((int)numChannels);
 			_numChannels = (quint32)numChannels;
+
+			if(ec.value() == boost::system::errc::owner_dead)
+			{
+				onSessionLost();
+			}
+
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -55,9 +61,7 @@ namespace client
 				_session = session;
 
 				_session->watchState(bind(&MainWindow::onSessionState_proxyCallback, this, _1, _2));
-				_session->balance(2);
-
-				Agent::_staticSession = _session;
+				_session->balance(40000);
 
 				assert(!_networkAccessManagerFactory);
 				_networkAccessManagerFactory = new NetworkAccessManagerFactory(session, _asrv);
@@ -114,6 +118,24 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void MainWindow::onSessionLost()
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Session lost.");
+			msgBox.setIcon(QMessageBox::Critical);
+			msgBox.setInformativeText("Reset?");
+			msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+			msgBox.setDefaultButton(QMessageBox::Yes);
+			int ret = msgBox.exec();
+
+			if(QMessageBox::Yes == ret)
+			{
+				closeSession();
+				_asrv->spawn(boost::bind(&MainWindow::startSession_f, this, _nd->getHost(), _nd->getService()));
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::closeSession()
 		{
 			if(_view)
@@ -133,7 +155,6 @@ namespace client
 				_asrv->spawn(bind(&ISession::close, _session));
 				_session.reset();
 			}
-			Agent::_staticSession.reset();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -155,6 +176,7 @@ namespace client
 			, _view(NULL)
 			, _numChannels(0)
 		{
+			Agent::_staticMainWindow = this;
 
 			ui.setupUi(this);
 			connect(
@@ -196,9 +218,18 @@ namespace client
 			onAddrChanged(_nd->getHost(), _nd->getService());
 		}
 
+		//////////////////////////////////////////////////////////////////////////
 		MainWindow::~MainWindow()
 		{
+			Agent::_staticMainWindow = NULL;
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		ISessionPtr MainWindow::getSession()
+		{
+			return _session;
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::showNetworkDialog()

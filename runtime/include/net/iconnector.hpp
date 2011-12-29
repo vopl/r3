@@ -10,7 +10,7 @@ namespace net
 	struct IConnector
 	{
 		virtual ~IConnector(){}
-		virtual async::Result2<boost::system::error_code, IChannelPtr> connect(const char *host, const char *service, bool useSsl=true) =0;
+		virtual async::Result2<boost::system::error_code, IChannelPtr> connect(const char *host, const char *service, bool useSsl=false) =0;
 	};
 	typedef boost::shared_ptr<IConnector> IConnectorPtr;
 

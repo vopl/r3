@@ -7,7 +7,7 @@ namespace client
 {
 	namespace qt
 	{
-		ISessionPtr	Agent::_staticSession;
+		MainWindow *Agent::_staticMainWindow = NULL;
 
 		//////////////////////////////////////////////////////////////////////////
 		void Agent::variantCnvt(utils::Variant &dst, const QVariant &src)
@@ -969,14 +969,31 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		void Agent::onSessionState(boost::system::error_code ec, size_t numChannels)
+		{
+			if(_numChannels != (quint32)numChannels)
+			{
+				_numChannels = (quint32)numChannels;
+				emit numChannelsChanged(_numChannels);
+			}
+		}
+
+
+		//////////////////////////////////////////////////////////////////////////
 		Agent::Agent(QObject *parent)
 			: QObject(parent)
 			, _numChannels(0)
 		{
-			_numChannels = (quint32)_staticSession->getNumChannels();
-			_agent = _staticSession->allocAgent();
+			connect(
+				_staticMainWindow, SIGNAL(onSessionState_proxySig(boost::system::error_code, size_t)), 
+				this, SLOT(onSessionState(boost::system::error_code, size_t)));
+
+			ISessionPtr session = _staticMainWindow->getSession();
+			_agent = session->allocAgent();
 			assert(_agent);
 			_agent->listen(boost::bind(&Agent::onReceive, this, _1, _2));
+
+			_numChannels = (quint32)session->getNumChannels();
 		}
 
 	
@@ -998,13 +1015,6 @@ namespace client
 			variantCnvt(*pv, data);
 
 			_agent->send(service.toUtf8().data(), pv);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		void Agent::setNumChannels(quint32 numChannels)
-		{
-			_numChannels = numChannels;
-			emit numChannelsChanged(numChannels);
 		}
 
 	}

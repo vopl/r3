@@ -20,6 +20,12 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	ChannelSocket::Sock::~Sock()
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	template <class Buffer, class Handler>
 	void ChannelSocket::Sock::read(const Buffer &b, const Handler &h)
 	{
@@ -66,12 +72,15 @@ namespace net
 		}
 		else
 		{
-			typedef function<void(const error_code &)> TOnShutdown;
-			TOnShutdown onShutdown = boost::bind(&Sock::onSslShutdown, _1, _socketSsl, _sslContext);
+			_socketSsl->lowest_layer().shutdown(asio::socket_base::shutdown_both, ec);
+			_socketSsl->lowest_layer().close(ec);
 
-			_sslStrand->dispatch(
-				bind(&TSocketSsl::async_shutdown<TOnShutdown>, _socketSsl, onShutdown)
-				);
+// 			typedef function<void(const error_code &)> TOnShutdown;
+// 			TOnShutdown onShutdown = boost::bind(&Sock::onSslShutdown, _1, _socketSsl, _sslContext);
+// 
+// 			_sslStrand->dispatch(
+// 				bind(&TSocketSsl::async_shutdown<TOnShutdown>, _socketSsl, onShutdown)
+// 				);
 		}
 	}
 

@@ -46,16 +46,32 @@ namespace client
 		}
 
 		v = rres.data2();
-		TClientSid sid = v["sid"];
-		if(sid.is_nil())
+		if(!v["badSid"].isNull())
+		{
+			//сессия устарела
+			res(make_error_code(errc::owner_dead), session);
+			return;
+		}
+
+		if(!v["sid"].is<TClientSid>())
 		{
 			res(make_error_code(errc::protocol_error), session);
 			return;
 		}
 
+		TClientSid sid = v["sid"];
+
 		if(!session)
 		{
 			session.reset(new Session(sid, shared_from_this(), host, service));
+		}
+		else
+		{
+			if(sid != session->sid())
+			{
+				res(make_error_code(errc::protocol_error), session);
+				return;
+			}
 		}
 		session->attachChannel(channel);
 		res(error_code(), session);
