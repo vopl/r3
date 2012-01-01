@@ -1,53 +1,61 @@
 #ifndef _CLIENT_QT_AGENT_HPP_
 #define _CLIENT_QT_AGENT_HPP_
 
-#include <boost/enable_shared_from_this.hpp>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
+#include "utils/variant.hpp"
+#include "server/endpoint.hpp"
 #include "client/iagent.hpp"
-#include "client/iagentHub.hpp"
 
 namespace client
 {
 	namespace qt
 	{
-		class Agent
-		{
-		protected:
-			friend class MainWindow;
-			static IAgentHubPtr	_lowAgentHub;
-			static MainWindow	*_mainWindow;
+		class MainWindow;
 
+		//////////////////////////////////////////////////////////////////////////
+		class Agent
+			: public QObject
+
+		{
+			Q_OBJECT
+
+			IAgentPtr	_agent;
+			quint32		_numChannels;
+
+			friend class MainWindow;
+			static		MainWindow	*_staticMainWindow;
 
 		private:
-			class LowAgent
-				: public IAgent
-				, public boost::enable_shared_from_this<LowAgent>
-			{
-				Agent *_agent;
-				virtual void onReceive(
-					IAgentHubPtr hub,
-					const server::TEndpoint &endpoint,
-					utils::VariantPtr data);
-			public:
-				LowAgent(Agent *agent);
-			};
+			static void variantCnvt(utils::Variant &dst, const QVariant &src);
+			static void variantCnvt(QVariant &dst, const utils::Variant &src);
 
-		protected:
-			IAgentPtr		_lowAgent;
-			
-			virtual void onReceive(
-				IAgentHubPtr hub,
-				const server::TEndpoint &endpoint,
-				utils::VariantPtr data) =0;
+		private:
+			void onReceive(const server::TEndpoint &endpoint, utils::VariantPtr data);
+
+		private:
+			QString	_service;
+			QString getService();
+			void setService(QString service);
+
+			quint32 getNumChannels();
+
+		private slots:
+			void onSessionState(boost::system::error_code ec, size_t numChannels);
 
 		public:
-			Agent();
+			Agent(QObject *parent = 0);
 			~Agent();
 
-			void send(
-				const server::TEndpoint &endpoint,
-				utils::VariantPtr data);
+		public:
+			Q_PROPERTY(quint32 numChannels READ getNumChannels);
+			Q_PROPERTY(QString service READ getService WRITE setService);
+			Q_INVOKABLE void send(QVariant data, QString service=QString(""));
 
-			int getNumChannels();
+		signals:
+			void receive(QVariant data, QString service);
+			void numChannelsChanged(quint32 numChannels);
+
 		};
 	}
 }

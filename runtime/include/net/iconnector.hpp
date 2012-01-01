@@ -6,23 +6,11 @@
 
 namespace net
 {
+	//////////////////////////////////////////////////////////////////////////
 	struct IConnector
 	{
 		virtual ~IConnector(){}
-
-		virtual void initialize() =0;
-
-		virtual void listen(
-			const char *host, const char *service,
-			boost::function<void (IChannelPtr)> ok,
-			boost::function<void (boost::system::error_code)> fail) =0;
-
-		virtual bool unlisten(const char *host, const char *service) =0;
-
-		virtual void connect(
-			const char *host, const char *service,
-			boost::function<void (IChannelPtr)> ok,
-			boost::function<void (boost::system::error_code)> fail) =0;
+		virtual async::Result2<boost::system::error_code, IChannelPtr> connect(const char *host, const char *service, bool useSsl=false) =0;
 	};
 	typedef boost::shared_ptr<IConnector> IConnectorPtr;
 

@@ -2,13 +2,16 @@ PROJECT (plugnet)
 
 SET(INCLUDE
 	${INC_DIR}/net/ichannel.hpp
+	${INC_DIR}/net/iacceptor.hpp
 	${INC_DIR}/net/iconnector.hpp
+	${INC_DIR}/net/channelHub.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
 SET(SRC
 	${SRC_DIR}/net/channelSocket.cpp
 	${SRC_DIR}/net/connector.cpp
+	${SRC_DIR}/net/acceptor.cpp
 	${SRC_DIR}/net/plug.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
@@ -20,7 +23,7 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
 SET(SRC_HDR
 	${SRC_DIR}/net/connector.hpp
-	${SRC_DIR}/net/channelHub.hpp
+	${SRC_DIR}/net/acceptor.hpp
 	${SRC_DIR}/net/channelSocket.hpp
 	${SRC_DIR}/net/pch.h
 )
@@ -42,7 +45,7 @@ SETUP_BIN_OUT(plugnet plug)
 TARGET_LINK_LIBRARIES(plugnet libheap libpluma libutils libasync)
 
 
-INCLUDE(FindOpenSSL.cmake)
+INCLUDE(FindOpenSSL)
 IF(NOT OPENSSL_FOUND)
 	MESSAGE(FATAL_ERROR "OpenSSL required")
 ENDIF()

@@ -20,40 +20,41 @@ namespace client
 		private:
 			pluma::Pluma		_plugins;
 			client::IClientPtr	_client;
+			async::ServicePtr	_asrv;
+			client::ISessionPtr	_session;
 			NetworkDialog		*_nd;
 			QLabel				*_labelConnected;
 
-			int					_numChannels;
+			quint32				_numChannels;
 
-			NetworkAccessManagerFactory _networkAccessManagerFactory;
+			NetworkAccessManagerFactory *_networkAccessManagerFactory;
 			QDeclarativeView	*_view;
 
-		private:
-			void onChannelChange_(size_t numChannels, boost::system::error_code ec);
-			void onSessionStart_(ISessionPtr session);
-			void onSessionStop_(ISessionPtr session);
-
-		signals:
-			void onChannelChange_sig(int numChannels, boost::system::error_code ec);
-			void onSessionStart_sig(ISessionPtr session);
-			void onSessionStop_sig(ISessionPtr session);
 		private slots:
-			void onChannelChange_slot(int numChannels, boost::system::error_code ec);
-			void onSessionStart_slot(ISessionPtr session);
-			void onSessionStop_slot(ISessionPtr session);
+			void onSessionState(boost::system::error_code ec, size_t numChannels);
+			void onSessionStart(boost::system::error_code ec, ISessionPtr session);
 			void onAddrChanged(QString host, QString service);
 
 		signals:
-			void onChannelChange(int numChannels);
-		public:
-			int getNumChannels();
+			void onSessionState_proxySig(boost::system::error_code ec, size_t numChannels);
+			void onSessionStart_proxySig(boost::system::error_code ec, ISessionPtr session);
+
+		private:
+			void onSessionState_proxyCallback(const boost::system::error_code &ec, size_t numChannels);
 
 		private:
 			virtual void closeEvent(QCloseEvent *);
+			void onSessionLost();
+
+		private:
+			void closeSession();
+			void startSession_f(QString host, QString service);
 
 		public:
 			MainWindow(QWidget *parent = 0, Qt::WFlags flags = 0);
 			~MainWindow();
+
+			ISessionPtr getSession();
 
 		public slots:
 			void showNetworkDialog();

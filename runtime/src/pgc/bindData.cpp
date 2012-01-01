@@ -168,7 +168,7 @@ namespace pgc
 			fmt = 1;//binary
 			if(!v.isNull())
 			{
-				len = v.as<Variant::String>().size();
+				len = (int)v.as<Variant::String>().size();
 				val = new char[len];
 				std::copy(v.as<Variant::String>().begin(), v.as<Variant::String>().end(), val);
 				own = true;//own val wil be deleted later
@@ -596,7 +596,7 @@ namespace pgc
 				if(!v.isNull())
 				{
 					const std::vector<char> &vec = v.as<Variant::VectorChar>();
-					len = vec.size();
+					len = (int)vec.size();
 					val = new char[len];
 					std::copy(vec.begin(), vec.end(), val);
 					own = true;

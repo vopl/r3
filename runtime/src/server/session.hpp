@@ -2,7 +2,7 @@
 #define _SERVER_SESSION_HPP_
 
 #include "server/isession.hpp"
-#include "../net/channelHub.hpp"
+#include "net/channelHub.hpp"
 
 namespace server
 {

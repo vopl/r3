@@ -2,6 +2,9 @@
 #	define _WIN32_WINNT 0x0501
 #endif
 
+#define LOG_NAME clientqt
+#include "log/client.hpp"
+
 #include <QtGui>
 #include <QtCore>
 

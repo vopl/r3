@@ -2,8 +2,6 @@
 #define _UTILS_VARIANTLOADSCOPE_HPP_
 
 #include "utils/variant.hpp"
-#include <deque>
-#include <boost/filesystem.hpp>
 
 namespace utils
 {

@@ -17,8 +17,6 @@ namespace server
 		static const TEndpoint _endpoint;
 
 		boost::filesystem::path _root;
-		void onSendOk();
-		void onSendFail(system::error_code ec);
 
 	public:
 		ServiceStatics();

@@ -7,3 +7,6 @@ syntax: regexp
 ^runtime/plug
 ^runtime/log
 ^runtime/todo/backup/
+^runtime/doc/
+syntax: glob
+runtime/make/cmake/excludeDefBuild.txt

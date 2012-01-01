@@ -5,6 +5,8 @@
 #include <boost/shared_array.hpp>
 #include <boost/function.hpp>
 #include <boost/system/error_code.hpp>
+#include "async/result.hpp"
+#include "utils/variant.hpp"
 
 namespace net
 {
@@ -24,6 +26,19 @@ namespace net
 			, _size(size)
 		{
 		}
+
+		SPacket(const utils::Variant &v)
+			: _size(0)
+		{
+			_data = v.serialize(_size);
+		}
+
+		operator utils::Variant() const
+		{
+			utils::Variant res;
+			res.deserialize(_data, _size);
+			return res;
+		}
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -31,14 +46,10 @@ namespace net
 	{
 		virtual ~IChannel(){}
 
-		virtual void receive(
-			boost::function<void (const SPacket &)> ok,
-			boost::function<void (boost::system::error_code)> fail = boost::function<void (boost::system::error_code)>()) =0;
-
-		virtual void send(
-			const SPacket &p,
-			boost::function<void ()> ok,
-			boost::function<void (boost::system::error_code)> fail = boost::function<void (boost::system::error_code)>()) =0;
+		virtual void listen(
+			const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive,
+			size_t amount=(size_t)-1) =0;
+		virtual async::Result<boost::system::error_code> send(const SPacket &p) =0;
 
 		virtual void close() =0;
 	};

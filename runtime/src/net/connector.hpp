@@ -7,8 +7,10 @@
 
 namespace net
 {
+	using namespace async;
 	using namespace boost;
 	using namespace boost::asio;
+	using namespace boost::system;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Connector;
@@ -18,96 +20,18 @@ namespace net
 		: public IConnector
 		, public enable_shared_from_this<Connector>
 	{
-	private:
-		typedef shared_ptr<ip::tcp::resolver> TResolverPtr;
-		typedef shared_ptr<ip::tcp::acceptor> TAcceptorPtr;
-		typedef ssl::context TSslContext;
-		typedef shared_ptr<TSslContext> TSslContextPtr;
-
+		mutex			_mtx;
 		TSslContextPtr	_sslContext;
 
-	private:
-		typedef std::pair<std::string, std::string> TAddr;
-		struct SListenState
-		{
-			TAddr									_addr;
-			TResolverPtr							_resolver;
-			TAcceptorPtr							_acceptor;
-			function<void (IChannelPtr)>			_ok;
-			function<void (system::error_code)>		_fail;
-		};
-		typedef shared_ptr<SListenState> SListenStatePtr;
+		std::string onSslPassword();
 
-	private:
-		typedef std::set<SListenStatePtr> TSListens;
-		typedef std::map<TAddr, TSListens> TMAddrListens;
-		TMAddrListens _listens;
-		mutex _mtx;
-
-
-	private:
-
-		struct SConnectState
-		{
-			TResolverPtr							_resolver;
-			function<void (IChannelPtr)>			_ok;
-			function<void (system::error_code)>		_fail;
-		};
-		typedef shared_ptr<SConnectState> SConnectStatePtr;
-
-	private:
-		static std::string onSslPassword();
-		void onListenResolve(
-			SListenStatePtr ls, 
-			const system::error_code& ec,
-			ip::tcp::resolver::iterator iterator);
-
-		void onListenAccept(
-			SListenStatePtr ls, 
-			const system::error_code& ec,
-			TSocketPtr socket);
-
-		void onListenHandshake(
-			SListenStatePtr ls, 
-			const system::error_code& ec,
-			TSocketPtr socket);
-
-		void onConnectResolve(
-			SConnectStatePtr cs, 
-			const system::error_code& ec,
-			ip::tcp::resolver::iterator iterator);
-
-		void onConnect(
-			SConnectStatePtr cs, 
-			const system::error_code& ec,
-			TSocketPtr socket);
-
-		void onConnectHandshake(
-			SConnectStatePtr cs, 
-			const system::error_code& ec,
-			TSocketPtr socket);
-
-	private:
-		bool unlisten(const TAddr &addr, SListenStatePtr ls);
-
+		void connect_f(Result2<error_code, IChannelPtr> res, const std::string &host, const std::string &service, bool useSsl);
 
 	public:
 		Connector();
-		~Connector();
+		virtual ~Connector();
 
-		virtual void initialize();
-
-		void listen(
-			const char *host, const char *service,
-			function<void (IChannelPtr)> ok,
-			function<void (system::error_code)> fail);
-
-		bool unlisten(const char *host, const char *service);
-
-		void connect(
-			const char *host, const char *service,
-			function<void (IChannelPtr)> ok,
-			function<void (system::error_code)> fail);
+		virtual Result2<error_code, IChannelPtr> connect(const char *host, const char *service, bool useSsl);
 	};
 
 	PLUMA_INHERIT_PROVIDER(Connector, IConnector);

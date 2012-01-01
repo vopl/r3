@@ -32,17 +32,16 @@ namespace server
 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
 
 		//////////////////////////////////////////////////////////////////////////
-		//поднять сетевой коннектор
-		net::IConnectorPtr connector = _plugs->create<net::IConnectorProvider>();
-		assert(connector);
-		if(!connector)
+		//поднять сетевой акцептор
+		net::IAcceptorPtr acceptor = _plugs->create<net::IAcceptorProvider>();
+		assert(acceptor);
+		if(!acceptor)
 		{
-			FLOG("failed to create net connector");
+			FLOG("failed to create net acceptor");
 			_state = esError;
 			return;
 		}
 
-		connector->initialize();
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять менеджер сессий
@@ -55,7 +54,7 @@ namespace server
 			_state = esError;
 			return;
 		}
-		_sessionManager->start(connector, host, service, 
+		_sessionManager->start(acceptor, host, service, 
 			bind(&Server::onSessionStart, shared_from_this(), _1),
 			bind(&Server::onSessionStop, shared_from_this(), _1));
 

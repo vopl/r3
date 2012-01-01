@@ -130,10 +130,10 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		for(size_t i(0); i<200; i++)
-		{
-			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-		}
+// 		for(size_t i(0); i<200; i++)
+// 		{
+// 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+// 		}
 
 		int k = 220;
 		//
@@ -165,8 +165,17 @@ namespace server
 		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{
-		hub->send(shared_from_this(), session, endpoint, data, 
-			bind(&ServiceVictim::onSendOk, shared_from_this()),
-			bind(&ServiceVictim::onSendFail, shared_from_this(), _1));
+		async::Result<boost::system::error_code> res =
+		hub->send(shared_from_this(), session, endpoint, data);
+
+		res.wait();
+		if(res.data())
+		{
+			onSendFail(res.data());
+		}
+		else
+		{
+			onSendOk();
+		}
 	}
 }

@@ -15,7 +15,6 @@ INCLUDE(Local.cmake)
 #INCLUDE(CMakeExportBuildSettings)
 #CMAKE_EXPORT_BUILD_SETTINGS(buildSettings.txt)
 
-INCLUDE(excludeDefBuild.txt OPTIONAL)
 
 
 
@@ -25,17 +24,21 @@ INCLUDE(excludeDefBuild.txt OPTIONAL)
 
 ################### boost
 
-#SET(Boost_USE_STATIC_LIBS        ON)
+SET(Boost_USE_STATIC_LIBS        OFF)
 SET(Boost_USE_MULTITHREADED      ON)
-#SET(Boost_USE_STATIC_RUNTIME     ON)
+SET(Boost_USE_STATIC_RUNTIME     OFF)
 
-FIND_PACKAGE( Boost 1.42.0 COMPONENTS date_time filesystem system thread serialization)
+FIND_PACKAGE( Boost 1.42.0 COMPONENTS date_time filesystem system thread)
 IF(NOT Boost_FOUND)
 	MESSAGE(FATAL_ERROR "Boost 1.42.0 required")
 ENDIF()
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 #LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
+IF(WIN32)
+	ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK)
+	#ADD_DEFINITIONS(-DBOOST_LIB_DIAGNOSTIC)
+ENDIF(WIN32)
 
 
 
@@ -44,3 +47,4 @@ ADD_SUBDIRECTORY(lib)
 ADD_SUBDIRECTORY(plug)
 
 
+INCLUDE(excludeDefBuild.txt OPTIONAL)

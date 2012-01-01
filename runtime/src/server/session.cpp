@@ -22,8 +22,9 @@ namespace server
 		net::ChannelHub<ISession>::close();
 		if(_sstop)
 		{
-			_sstop();
-			_sstop.swap(function<void ()>());
+			function<void ()> sstop;
+			sstop.swap(_sstop);
+			sstop();
 		}
 	}
 

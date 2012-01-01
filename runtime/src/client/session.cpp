@@ -1,363 +1,264 @@
 #include "pch.h"
 #include "session.hpp"
-#include "utils/variant.hpp"
-
-//#define LF 		std::cerr<<__FUNCTION__ "\n";std::cerr.flush();
-#define LF
+#include "client.hpp"
 
 namespace client
 {
 	//////////////////////////////////////////////////////////////////////////
-	void Session::checkbalance()
+	void Session::onReceive(const boost::system::error_code &ec, const SPacket &p)
 	{
-		LF;
-		//уже заблокировано
-		//mutex::scoped_lock sl(_mtx);
-		assert(_isStarted);
-
-		if(_needNumChannels > getChannelsAmount() && !_waitConnections)
+		if(ec)
 		{
-			_connector->connect(
-				_host.c_str(), _service.c_str(), 
-				bind(&Session::onConnectOk, shared_from_this(), _1),
-				bind(&Session::onConnectError, shared_from_this(), _1));
-			_waitConnections++;
-		}
-
-		if(_needNumChannels < getChannelsAmount())
-		{
-			//закрыть один когда не будет трафика
-			assert(0);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::onConnectOk(IChannelPtr channel)
-	{
-		LF;
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
-		{
-			channel->close();
+			mutex::scoped_lock sl(_mtx);
+			if(!_channelHub)
+			{
+				return;
+			}
+			WLOG("receive failed: "<<ec.message()<<"("<<ec.value()<<")");
 			return;
 		}
 
-		utils::Variant v;
-		v.as<utils::Variant::MapStringVariant>(true)["sid"] = _needSid;
-
-		SPacket packet;
-		packet._data = v.serialize(packet._size);
-
-		//послать сид
-		channel->send(
-			packet, 
-			bind(&Session::onSendSidOk, shared_from_this(), channel),
-			bind(&Session::onSendSidFail, shared_from_this(), channel, _1));
-		
-		_waitConnectionsChannels.insert(channel);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::onConnectError(system::error_code ec)
-	{
-		LF;
+		utils::Variant v = p;
+		if(!v["error"].isNull())
 		{
-			mutex::scoped_lock sl(_mtx);
-			if(!_isStarted)
-			{
-				return;
-			}
-
-			_waitConnections--;
-			checkbalance();
-		}
-		_fail(getChannelsAmount(), ec);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::onSendSidOk(IChannelPtr channel)
-	{
-		LF;
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
-		{
-			channel->close();
+			ELOG("error from service: "<<v["error"]);
 			return;
 		}
-		//принять сид
-		channel->receive(
-			bind(&Session::onReceiveSidOk, shared_from_this(), channel, _1),
-			bind(&Session::onReceiveSidFail, shared_from_this(), channel, _1));
-	}
 
-	//////////////////////////////////////////////////////////////////////////
-	void Session::onSendSidFail(IChannelPtr channel, system::error_code ec)
-	{
-		LF;
-		channel->close();
-
+		TEndpoint endpoint = v["client::endpoint"];
 		{
 			mutex::scoped_lock sl(_mtx);
-			if(!_isStarted)
+			TMAgents::iterator iter = _agents.find(endpoint);
+			if(_agents.end() != iter)
 			{
-				return;
+				iter->second->onReceive(v["server::endpoint"], v["data"]);
 			}
-
-			_waitConnections--;
-			_waitConnectionsChannels.erase(channel);
-			channel->close();
-			checkbalance();
 		}
-		_fail(getChannelsAmount(), ec);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Session::onReceiveSidOk(IChannelPtr channel, const SPacket &packet)
+	void Session::balanceChannels()
 	{
-		LF;
-		bool oneMoreWithNullSid = false;
+		bool doAdd;
 		{
 			mutex::scoped_lock sl(_mtx);
-			if(!_isStarted)
+			if(_connectInProgress)
 			{
-				channel->close();
+				return;
+			}
+			if(!_channelHub || !_client)
+			{
+				return;
+			}
+			if(_channelHub->getChannelsAmount() == _needNumChannels)
+			{
 				return;
 			}
 
-			utils::Variant v;
-			if(	!v.deserialize(packet._data, packet._size) || 
-				!v.is<utils::Variant::MapStringVariant>())
+			doAdd = _channelHub->getChannelsAmount() < _needNumChannels;
+
+			_connectInProgress = true;
+		}
+
+		if(doAdd)
+		{
+			Result2<error_code, ISessionPtr> res =
+				_client->connectSession(shared_from_this(), _host, _service);
+
+			error_code ec = res.data1();
+			if(ec)
 			{
-				//bad packet
-				_fail(getChannelsAmount(), system::errc::make_error_code(system::errc::bad_message));
-
-				channel->close();
-
-				_waitConnectionsChannels.erase(channel);
-				_waitConnections--;
-				checkbalance();
-				return;
-			}
-
-			utils::Variant::MapStringVariant &msv = v.as<utils::Variant::MapStringVariant>();
-
-			if(msv.end() != msv.find("badSid"))
-			{
-				//сессия утеряня, поднять новую
-				//assert(!"sid lost!");
-				_needSid = nullClientSid;
-				_waitConnectionsChannels.erase(channel);
-				oneMoreWithNullSid = true;
-			}
-			else if(msv.end() != msv.find("sid") && msv["sid"].is<TClientSid>())
-			{
-				size_t channels;
+				if(ec == errc::owner_dead)
 				{
-					_sid = msv["sid"];
-					_needSid = _sid;
-
-					attachChannel(channel);
-					channels = getChannelsAmount();
-
-					_waitConnectionsChannels.erase(channel);
-					_waitConnections--;
-					checkbalance();
+					if(_onStateChanged)
+					{
+						spawn(bind(_onStateChanged, ec, _channelHub->getChannelsAmount()));
+					}
+					return;
 				}
-				_ready(channels);
-				return;
-			}
-			else
-			{
-				assert(!"packet out of format");
-				_waitConnectionsChannels.erase(channel);
-				channel->close();
-				_waitConnections--;
-				checkbalance();
+
+				mutex::scoped_lock sl(_mtx);
+				_connectInProgress = false;
+				spawn(bind(&Session::balanceChannels, shared_from_this()));
+
 				return;
 			}
 		}
 
-
-		if(oneMoreWithNullSid)
-		{
-			onConnectOk(channel);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::onReceiveSidFail(IChannelPtr channel, system::error_code ec)
-	{
-		LF;
-		channel->close();
-
 		{
 			mutex::scoped_lock sl(_mtx);
-			if(!_isStarted)
-			{
-				return;
-			}
-
-			_waitConnectionsChannels.erase(channel);
-			channel->close();
-			_waitConnections--;
-			checkbalance();
+			_connectInProgress = false;
 		}
-		_fail(getChannelsAmount(), ec);
-
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	SessionPtr Session::shared_from_this()
-	{
-		return static_pointer_cast<Session>(ChannelHub<ISession>::shared_from_this());
+		//spawn(bind(&Session::balanceChannels, shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Session::onLowChannelSendFail(IChannelPtr channel, system::error_code ec)
+	void Session::onStateChanged(const error_code &ec, size_t numChannels)
 	{
-		{
-			mutex::scoped_lock sl(_mtx);
-			if(_isStarted)
-			{
-				checkbalance();
-			}
-		}
-		_fail(getChannelsAmount(), ec);
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	void Session::onLowChannelRecvFail(IChannelPtr channel, system::error_code ec)
-	{
-		{
-			mutex::scoped_lock sl(_mtx);
-			if(_isStarted)
-			{
-				checkbalance();
-			}
-		}
-		_fail(getChannelsAmount(), ec);
-	}
-
-
-
-
-	//////////////////////////////////////////////////////////////////////////
-	Session::Session()
-		: _connector()
-		, _host()
-		, _service()
-		, _isStarted(false)
-		, _sid(nullClientSid)
-		, _needSid(nullClientSid)
-		, _needNumChannels(0)
-		, _waitConnections(0)
-	{
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void Session::start(
-		IConnectorPtr connector,
-		const char *host, const char *service,
-		TClientSid sid, 
-		size_t numChannels,
-		boost::function<void (size_t)> ready,
-		boost::function<void (size_t, system::error_code)> fail)
-	{
-		assert(!_connector && _host.empty() && _service.empty());
-		_connector = connector;
-		_host = host;
-		_service = service;
+		spawn(bind(&Session::balanceChannels, shared_from_this()));
 
 		mutex::scoped_lock sl(_mtx);
-		if(_isStarted)
+		if(_onStateChanged)
 		{
-			close();
+			spawn(bind(_onStateChanged, ec, numChannels));
 		}
+	}
 
-		assert(!getChannelsAmount());
 
-		assert(nullClientSid == _needSid);
-		_needSid = sid;
-		assert(nullClientSid == _sid);
 
+	//////////////////////////////////////////////////////////////////////////
+	Session::Session(
+		const TClientSid sid, 
+		ClientPtr client, 
+		const std::string &host, 
+		const std::string &service)
+		: _sid(sid)
+		, _needNumChannels(1)
+		, _client(client)
+		, _host(host)
+		, _service(service)
+		, _connectInProgress(false)
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Session::~Session()
+	{
+		assert(!_channelHub);
+		assert(!_client);
 		assert(!_needNumChannels);
-		_needNumChannels = numChannels;
+		assert(!_connectInProgress);
 
-		assert(!_ready);
-		_ready = ready;
-
-		assert(!_fail);
-		_fail = fail;
-
-		assert(!_isStarted);
-		_isStarted = true;
-
-		assert(!_waitConnections);
-		_waitConnections = 0;
-		assert(_waitConnectionsChannels.empty());
-		_waitConnectionsChannels.clear();
-
-		checkbalance();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Session::close()
+	void Session::watchState(const function<void(error_code, size_t)> &onStateChanged)
 	{
 		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
-		{
-			return;
-		}
 
-
-		_needSid = nullClientSid;
-		_sid = nullClientSid;
-
-		_needNumChannels = 0;
-
-		_ready = function<void (size_t)>();
-
-		_fail = function<void (size_t, system::error_code)>();
-
-		_isStarted = false;
-
-		_waitConnections = 0;
-		BOOST_FOREACH(const IChannelPtr &c, _waitConnectionsChannels)
-		{
-			c->close();
-		}
-		_waitConnectionsChannels.clear();
-		ChannelHub<ISession>::close();
-
-		_connector.reset();
-		_host.clear();
-		_service.clear();
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	void Session::stop()
-	{
-		return close();
+		_onStateChanged = onStateChanged;
+		spawn(bind(onStateChanged, error_code(), _channelHub->getChannelsAmount()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Session::balance(size_t numChannels)
 	{
-		mutex::scoped_lock sl(_mtx);
-		if(!_isStarted)
 		{
-			return;
+			mutex::scoped_lock sl(_mtx);
+			_needNumChannels = numChannels;
 		}
 
-		_needNumChannels = numChannels;
-		checkbalance();
+		spawn(bind(&Session::balanceChannels, shared_from_this()));
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	size_t Session::getNumChannels()
+	{
+		mutex::scoped_lock sl(_mtx);
+		return _channelHub->getChannelsAmount();
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	TClientSid Session::sid()
 	{
-		mutex::scoped_lock sl(_mtx);
 		return _sid;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	IAgentPtr Session::allocAgent()
+	{
+		mutex::scoped_lock sl(_mtx);
+
+		if(!_channelHub)
+		{
+			assert(0);
+			return IAgentPtr();
+		}
+
+		TEndpoint endpoint = _endpointGenerator();
+		while(_agents.end() != _agents.find(endpoint))
+		{
+			endpoint = _endpointGenerator();
+		}
+		AgentPtr agent(new Agent(shared_from_this(), endpoint));
+
+		_agents[endpoint] = agent.get();
+
+		return agent;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Session::close()
+	{
+		TMAgents agents;
+		{
+			mutex::scoped_lock sl(_mtx);
+			if(_channelHub)
+			{
+				_channelHub->close();
+				_channelHub.reset();
+			}
+			agents.swap(_agents);
+			_needNumChannels = 0;
+
+			_onStateChanged.swap(boost::function<void(boost::system::error_code, size_t)>());
+
+			_connectInProgress = false;
+			_client.reset();
+		}
+
+		BOOST_FOREACH(TMAgents::value_type &el, agents)
+		{
+			el.second->close();
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Session::attachChannel(IChannelPtr channel)
+	{
+		mutex::scoped_lock sl(_mtx);
+		if(!_client)
+		{
+			channel->close();
+			return false;
+		}
+
+		if(!_channelHub)
+		{
+			_channelHub.reset(new ChannelHub<IChannel>);
+			_channelHub->listen(bind(&Session::onReceive, shared_from_this(), _1, _2));
+			_channelHub->watchState(bind(&Session::onStateChanged, shared_from_this(), _1, _2));
+		}
+
+		bool res = _channelHub->attachChannel(channel);
+		if(!res)
+		{
+			return res;
+		}
+
+
+		return res;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Session::freeAgent(const TEndpoint &endpoint)
+	{
+		mutex::scoped_lock sl(_mtx);
+		TMAgents::iterator iter = _agents.find(endpoint);
+		assert(_agents.end() != iter);
+
+		if(_agents.end() != iter)
+		{
+			_agents.erase(iter);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Result<error_code> Session::send(net::SPacket p)
+	{
+		return _channelHub->send(p);
+	}
+
+
 }

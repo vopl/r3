@@ -1,10 +1,15 @@
 #include "pch.h"
 #include "networkReply.hpp"
+#include "async/service.hpp"
 
 namespace client
 {
 	namespace qt
 	{
+		using namespace async;
+		using namespace boost;
+		using namespace boost::system;
+
 		//////////////////////////////////////////////////////////////////////////
 		void NetworkReply::abort()
 		{
@@ -34,7 +39,7 @@ namespace client
 				return -1;
 			}
 
-			qint64 number = qMin(maxSize, (qint64)vc.size() - _readPos);
+			qint64 number = qMin(maxSize, (qint64)(vc.size() - _readPos));
 			memcpy(data, &vc[_readPos], number);
 			_readPos += number;
 
@@ -42,10 +47,14 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void NetworkReply::onReceive(
-			IAgentHubPtr hub,
-			const server::TEndpoint &endpoint,
-			utils::VariantPtr data)
+		void NetworkReply::processSend(Result<error_code> res)
+		{
+			res.wait();
+			assert(!res.data());
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		void NetworkReply::onReceive(server::TEndpoint endpoint, utils::VariantPtr data)
 		{
 			if(data->is<utils::Variant::VectorChar>())
 			{
@@ -68,15 +77,22 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		NetworkReply::NetworkReply(QObject *parent, QUrl url)
+		NetworkReply::NetworkReply(QObject *parent, QUrl url, ISessionPtr session)
 			: _readPos(0)
 		{
+			_agent = session->allocAgent();
+			assert(_agent);
 			utils::VariantPtr v(new utils::Variant);
 			utils::Variant::MapStringVariant &m = v->as<utils::Variant::MapStringVariant>(true);
 			m["cmd"] = "get";
 			m["path"] = url.path().toUtf8().constData();
 
-			send(url.host().toUtf8().constData(), v);
+			server::TEndpoint endpoint = url.host().toUtf8().constData();
+
+			Result<error_code> sres = _agent->send(endpoint, v);
+			spawn(bind(&NetworkReply::processSend, this, sres));
+
+			_agent->listen(bind(&NetworkReply::onReceive, this,  _1, _2));
 		}
 
 		//////////////////////////////////////////////////////////////////////////

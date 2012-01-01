@@ -56,6 +56,12 @@ namespace async
 		return static_cast<ServiceImpl *>(this)->io();
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool Service::setAsGlobal(bool force)
+	{
+		return static_cast<ServiceImpl *>(this)->setAsGlobal(force);
+	}
+
 
 
 
@@ -111,6 +117,12 @@ namespace async
 		}
 
 		return service->io();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ASYNC_API bool serviceExists()
+	{
+		return ServiceImpl::current()?true:false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -4,43 +4,46 @@
 #include "client/iclient.hpp"
 #include "client/isession.hpp"
 #include "async/service.hpp"
+#include "net/iconnector.hpp"
+#include "session.hpp"
 
 namespace client
 {
 	using namespace boost;
+	using namespace boost::system;
+	using namespace async;
+	using namespace net;
 
 	//////////////////////////////////////////////////////////////////////////
 	class Client
 		: public IClient
 		, public boost::enable_shared_from_this<Client>
 	{
-		pluma::Pluma		*_plugs;
-		async::ServicePtr	_async;
-		bool				_asyncOwn;
-		ISessionPtr			_session;
+		mutex				_mtx;
+		pluma::Pluma *		_plugs;
+		ServicePtr			_asrv;
+		IConnectorPtr		_connector;
 
-		bool	_onSessionStartCalled;
-		boost::function<void (ISessionPtr)> _onSessionStart;
-		boost::function<void (ISessionPtr)> _onSessionStop;
-		boost::function<void (size_t numChannels, boost::system::error_code ec)> _onChannelChange;
-
-	protected:
-		void onSOk(size_t numChannels);
-		void onSFail(size_t numChannels, system::error_code ec);
+	private:
+		void connectSession_f(
+			Result2<error_code, ISessionPtr> res, 
+			const std::string &host, const std::string &service,
+			SessionPtr session);
 
 	public:
 		Client();
 		~Client();
 
-		virtual void start(
-			pluma::Pluma *plugs,
-			boost::function<void (ISessionPtr)> onSessionStart,
-			boost::function<void (ISessionPtr)> onSessionStop,
-			boost::function<void (size_t numChannels, boost::system::error_code ec)> onChannelChange);
-
-		virtual void connect(const char *host, const char *service);
+		virtual bool start(pluma::Pluma *plugs);
+		virtual Result2<error_code, ISessionPtr> 
+			createSession(const char *host, const char *service);
 		virtual pluma::Pluma * getPlugs();
-		virtual void stop();
+		virtual ServicePtr getAsync();
+		virtual bool stop();
+
+	public:
+		Result2<error_code, ISessionPtr> 
+			connectSession(SessionPtr session, const std::string &host, const std::string &service);
 	};
 	PLUMA_INHERIT_PROVIDER(Client, IClient);
 }

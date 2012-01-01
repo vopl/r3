@@ -14,8 +14,6 @@ namespace server
 		, public enable_shared_from_this<ServiceEcho>
 	{
 		static const TEndpoint _endpoint;
-		void onSendOk();
-		void onSendFail(system::error_code ec);
 
 	public:
 

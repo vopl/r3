@@ -4,15 +4,20 @@
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onReceiveOk(ISessionPtr session, const net::SPacket &p)
+	void ServiceHub::onReceive(const boost::system::error_code &ec, const net::SPacket &p, ISessionPtr session)
 	{
+		if(ec)
+		{
+			if(ec == errc::operation_canceled)
+			{
+				return;
+			}
 
-		//слушать сессию дальше
-		session->receive(
-			bind(&ServiceHub::onReceiveOk, shared_from_this(), session, _1),
-			bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
+			assert(0);
+			WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
+			return;
+		}
 
-		//а этот пакет просунуть в сервис
 		server::TEndpoint serverEndpoint_;
 		client::TEndpoint clientEndpoint_;
 		utils::VariantPtr data_;
@@ -71,7 +76,7 @@ namespace server
 		}
 		else
 		{
-			//assert(!"log error?");
+// 			assert(!"log error?");
 
 			if(clientEndpointExists && serverEndpointExists)
 			{
@@ -85,37 +90,10 @@ namespace server
 				net::SPacket p;
 				p._data = v.serialize(p._size);
 
-				//отослать
-				session->send(p, 
-					bind(&ServiceHub::onSendOk, shared_from_this(), session),
-					bind(&ServiceHub::onSendFail, shared_from_this(), session, _1));
+				//отослать без контроля
+				session->send(p);
 			}
 		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onSendOk(ISessionPtr session)
-	{
-		//ok
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onSendFail(ISessionPtr session, system::error_code ec)
-	{
-		//assert(!"log error?");
-	}
-
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onReceiveFail(ISessionPtr session, system::error_code ec)
-	{
-		//нештатная ситуация, что с сессией?
-		//если просто не осталось низких каналов - то ошибка не должна приходить, надо переработать хаб канала
-		//а если закрыта - то сначало должен был быть вызван delSession
-
-		//уже все закрыто
-		//session->close();
-		//delSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -146,9 +124,6 @@ namespace server
 	{
 		{
 			mutex::scoped_lock sl(_mtx);
-			session->receive(
-				bind(&ServiceHub::onReceiveOk, shared_from_this(), session, _1),
-				bind(&ServiceHub::onReceiveFail, shared_from_this(), session, _1));
 
 			//оповестить службы
 			BOOST_FOREACH(TMServices::value_type &pair, _services)
@@ -156,6 +131,8 @@ namespace server
 				pair.second->onSessionAdd(session);
 			}
 		}
+
+		session->listen(bind(&ServiceHub::onReceive, shared_from_this(), _1, _2, session));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -170,9 +147,9 @@ namespace server
 			{
 				pair.second->onSessionDel(session);
 			}
-
- 			//надо отменить прослушивание, а как?
 		}
+		//надо отменить прослушивание, а как? да вот так
+		session->close();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -237,13 +214,11 @@ namespace server
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::send(
+	async::Result<error_code> ServiceHub::send(
 		IServicePtr service,
 		ISessionPtr session,
 		const client::TEndpoint &endpoint,
-		utils::VariantPtr data,
-		boost::function<void ()> ok,
-		boost::function<void (boost::system::error_code)> fail)
+		utils::VariantPtr data)
 	{
 		//запаковать данные
 		utils::Variant v;
@@ -256,8 +231,6 @@ namespace server
 		p._data = v.serialize(p._size);
 
 		//отослать
-		session->send(p, 
-			ok,
-			fail);
+		return session->send(p);
 	}
 }

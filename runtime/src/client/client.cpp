@@ -1,143 +1,210 @@
 #include "pch.h"
 #include "client.hpp"
-
+#include "utils/variant.hpp"
 
 namespace client
 {
+	using namespace utils;
+
 	//////////////////////////////////////////////////////////////////////////
-	void Client::onSOk(size_t numChannels)
+	void Client::connectSession_f(
+		Result2<error_code, ISessionPtr> res, 
+		const std::string &host, const std::string &service,
+		SessionPtr session)
 	{
-		if(!_onSessionStartCalled)
+		Result2<error_code, IChannelPtr> cres =
+			_connector->connect(host.c_str(), service.c_str());
+
+		cres.wait();
+
+		if(cres.data1())
 		{
-			_onSessionStart(_session);
-			_onSessionStartCalled = true;
+			res(cres.data1(), session);
+			return;
 		}
 
-		//std::cout<<__FUNCTION__<<": "<<numChannels<<std::endl;
-		_onChannelChange(numChannels, boost::system::errc::make_error_code(boost::system::errc::success));
+		IChannelPtr channel = cres.data2();
+		assert(channel);
+
+		Variant v;
+		v.as<Variant::MapStringVariant>(true)["sid"] = session?session->sid():nullClientSid;
+		Result<error_code> sres = channel->send(v);
+
+		if(sres.data())
+		{
+			res(sres.data(), session);
+			return;
+		}
+		
+		Result2<error_code, SPacket> rres;
+		channel->listen(rres, 1);
+
+		if(rres.data1())
+		{
+			res(rres.data1(), session);
+			return;
+		}
+
+		v = rres.data2();
+		if(!v["badSid"].isNull())
+		{
+			//сессия устарела
+			res(make_error_code(errc::owner_dead), session);
+			return;
+		}
+
+		if(!v["sid"].is<TClientSid>())
+		{
+			res(make_error_code(errc::protocol_error), session);
+			return;
+		}
+
+		TClientSid sid = v["sid"];
+
+		if(!session)
+		{
+			session.reset(new Session(sid, shared_from_this(), host, service));
+		}
+		else
+		{
+			if(sid != session->sid())
+			{
+				res(make_error_code(errc::protocol_error), session);
+				return;
+			}
+		}
+		session->attachChannel(channel);
+		res(error_code(), session);
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	void Client::onSFail(size_t numChannels, system::error_code ec)
-	{
-		//std::cout<<__FUNCTION__<<": "<<numChannels<<", "<<ec.message()<<std::endl;
-		_onChannelChange(numChannels, ec);
-	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Client::Client()
 		: _plugs(NULL)
-		, _asyncOwn(false)
-		, _onSessionStartCalled(false)
 	{
-
+		ILOG("constuct");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	Client::~Client()
 	{
+		ILOG("destuct");
+
+		ServicePtr asrv;
+
+		{
+			mutex::scoped_lock sl(_mtx);
+			assert(!_plugs);
+			assert(!_asrv);
+			assert(!_connector);
+
+			asrv = _asrv;
+		}
+
+		if(asrv)
+		{
+			asrv->stop();
+		}
+
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Client::start(
-		pluma::Pluma *plugs,
-		boost::function<void (ISessionPtr)> onSessionStart,
-		boost::function<void (ISessionPtr)> onSessionStop,
-		boost::function<void (size_t numChannels, boost::system::error_code ec)> onChannelChange)
+	bool Client::start(pluma::Pluma *plugs)
 	{
-		_onSessionStartCalled = false;
-		_onSessionStart = onSessionStart;
-		_onSessionStop = onSessionStop;
-		_onChannelChange = onChannelChange;
+		mutex::scoped_lock sl(_mtx);
+		ILOG("start");
 
-		assert(!_plugs);
+		if(_plugs)
+		{
+			WLOG("already started");
+			return false;
+		}
 		_plugs = plugs;
 
-		assert(!_async);
-		_async = async::service();
-		if(!_async)
+		if(serviceExists())
 		{
-			//////////////////////////////////////////////////////////////////////////
-			//поднять асинхронный двиг
-			_async = async::createService();
-			assert(_async);
-
-			_asyncOwn = true;
-
-			//запускать асинхронный двиг
-			_async->balance(1);
-			ILOG("client make own async service");
+			ILOG("use existing async service");
+			_asrv = service();
 		}
 		else
 		{
-			_asyncOwn = false;
-			ILOG("client use existing async service");
+			_asrv = createService();
+			if(!_asrv)
+			{
+				FLOG("async service creation failed");
+				_plugs = NULL;
+				return false;
+			}
+			ILOG("create new async service");
 		}
+		_asrv->start(1);
+
+		_connector = _plugs->create<IConnectorProvider>();
+		if(!_connector)
+		{
+			FLOG("network connector creation failed");
+			_plugs = NULL;
+			_asrv.reset();
+			return false;
+		}
+
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Client::connect(const char *host, const char *service)
+	Result2<error_code, ISessionPtr> 
+		Client::createSession(const char *host, const char *service)
 	{
-		if(_session)
-		{
-			if(_onSessionStartCalled)
-			{
-				_onSessionStop(_session);
-			}
-			_session->close();
-			_session->stop();
-			_session.reset();
-		}
-
-		_onSessionStartCalled = false;
-
-		//////////////////////////////////////////////////////////////////////////
-		//поднять коннектор
-		net::IConnectorPtr connector = _plugs->create<net::IConnectorProvider>();
-		assert(connector);
-		connector->initialize();
-
-		//////////////////////////////////////////////////////////////////////////
-		//поднять сессию
-		assert(!_session);
-		_session = _plugs->create<ISessionProvider>();
-		assert(_session);
-		_session->start(
-			connector, host, service, 
-			nullClientSid, 1,
-			bind(&Client::onSOk, shared_from_this(), _1),
-			bind(&Client::onSFail, shared_from_this(), _1, _2));
+		Result2<error_code, ISessionPtr> res;
+		_asrv->spawn(bind(&Client::connectSession_f, shared_from_this(), res, std::string(host), std::string(service), SessionPtr()));
+		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	pluma::Pluma *Client::getPlugs()
 	{
+		mutex::scoped_lock sl(_mtx);
 		return _plugs;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Client::stop()
+	ServicePtr Client::getAsync()
 	{
-		if(_session)
-		{
-			if(_onSessionStartCalled)
-			{
-				_onSessionStop(_session);
-			}
-			_session->close();
-			_session->stop();
-			_session.reset();
-		}
-
-		if(_asyncOwn)
-		{
-			_async->stop();
-		}
-		_async.reset();
-		_plugs = NULL;
-		boost::function<void (size_t numChannels, boost::system::error_code ec)>().swap(_onChannelChange);
+		mutex::scoped_lock sl(_mtx);
+		return _asrv;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	bool Client::stop()
+	{
+		ILOG("stop");
+
+		ServicePtr asrv;
+		{
+			mutex::scoped_lock sl(_mtx);
+
+			_connector.reset();
+			asrv = _asrv;
+			_asrv.reset();
+			_plugs = NULL;
+		}
+
+		if(asrv)
+		{
+			asrv->stop();
+		}
+
+		return true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Result2<error_code, ISessionPtr> 
+		Client::connectSession(SessionPtr session, const std::string &host, const std::string &service)
+	{
+		Result2<error_code, ISessionPtr> res;
+		_asrv->spawn(bind(&Client::connectSession_f, shared_from_this(), res, host, service, session));
+		return res;
+	}
 
 }

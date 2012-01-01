@@ -8,18 +8,6 @@ namespace server
 	const TEndpoint ServiceEcho::_endpoint = "echo";
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceEcho::onSendOk()
-	{
-		//
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceEcho::onSendFail(system::error_code ec)
-	{
-		//
-	}
-
-	//////////////////////////////////////////////////////////////////////////
 	const TEndpoint &ServiceEcho::getEndpoint()
 	{
 		return _endpoint;
@@ -56,8 +44,9 @@ namespace server
 		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{
-		hub->send(shared_from_this(), session, endpoint, data, 
-			bind(&ServiceEcho::onSendOk, shared_from_this()),
-			bind(&ServiceEcho::onSendFail, shared_from_this(), _1));
+		Result<error_code> res = hub->send(shared_from_this(), session, endpoint, data);
+
+// 		res.wait();
+// 		assert(!res.data());
 	}
 }

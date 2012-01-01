@@ -1,73 +1,86 @@
 #ifndef _NET_CHANNELSOCKET_HPP_
 #define _NET_CHANNELSOCKET_HPP_
 #include "net/ichannel.hpp"
+#include "async/service.hpp"
 
 namespace net
 {
-	using namespace boost;
-	using namespace boost::asio;
+	using namespace async;
 
-	typedef ssl::stream<ip::tcp::socket> TSocket;
+	typedef ip::tcp::socket TSocket;
 	typedef shared_ptr<TSocket> TSocketPtr;
+
+	typedef ssl::stream<ip::tcp::socket> TSocketSsl;
+	typedef shared_ptr<TSocketSsl> TSocketSslPtr;
+
+	typedef ssl::context TSslContext;
+	typedef shared_ptr<TSslContext> TSslContextPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	class ChannelSocket;
-	typedef boost::shared_ptr<ChannelSocket> ChannelSocketPtr;
+	typedef shared_ptr<ChannelSocket> ChannelSocketPtr;
 
 	class ChannelSocket
 		: public IChannel
 		, public enable_shared_from_this<ChannelSocket>
 	{
-		TSocketPtr _socket;
-		io_service::strand _strand;
-
-		//////////////////////////////////////////////////////////////////////////
-		struct STransferState
+		struct Sock
 		{
-			SPacket									_packet;
-			boost::uint32_t							_header[1];
-			size_t									_transferedSize;
-			function<void (system::error_code)>		_fail;
-		};
+			TSocketPtr			_socket;
+			TSocketSslPtr		_socketSsl;
+			TSslContextPtr		_sslContext;
 
-		//////////////////////////////////////////////////////////////////////////
-		struct STransferStateSend
-			: STransferState
-		{
-			function<void ()>						_ok;
-			STransferStateSend(
-				const SPacket &packet, 
-				function<void ()> ok,
-				function<void (system::error_code)> fail);
-		};
-		typedef shared_ptr<STransferStateSend> STransferStateSendPtr;
+			typedef asio::io_service::strand TStrand;
+			typedef shared_ptr<TStrand> TStrandPtr;
+			TStrandPtr			_sslStrand;
 
-		//////////////////////////////////////////////////////////////////////////
-		struct STransferStateReceive
-			: STransferState
-		{
-			function<void (const SPacket &)>		_ok;
-			STransferStateReceive(
-				function<void (const SPacket &)> ok,
-				function<void (system::error_code)> fail);
-		};
-		typedef shared_ptr<STransferStateReceive> STransferStateReceivePtr;
+			Sock(TSocketPtr socket);
+			Sock(TSocketSslPtr socketSsl, TSslContextPtr sslContext);
+			~Sock();
+
+			template <class Buffer, class Handler>
+			void read(const Buffer &b, const Handler &h);
+
+			template <class Buffer, class Handler>
+			void write(const Buffer &b, const Handler &h);
+
+			void close();
+
+		private:
+			static void onSslShutdown(
+				const error_code &ec, 
+				TSocketSslPtr socketSsl,
+				TSslContextPtr sslContextHolder);
+		} _sock;
+
 
 	private:
-		void onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size);
-		void onSend(STransferStateSendPtr ts, system::error_code ec, size_t size);
+
+		typedef std::deque<std::pair<Result<error_code>, SPacket> > TSends;
+		typedef function<void(const error_code &ec, const SPacket &p)> TOnReceive;
+		typedef std::pair<TOnReceive, size_t> TReceive;
+		typedef std::deque<TReceive> TReceives;
+
+
+		void receiveLoop_f();
+		mutex		_mtxReceive;
+		TReceives	_receives;
+
+		mutex		_mtxSends;
+		TSends		_sends;
+		bool		_sendInProcess;
+		void send_f();
+
 
 	public:
 		ChannelSocket(TSocketPtr socket);
+		ChannelSocket(TSocketSslPtr socket, TSslContextPtr sslContext);
 		~ChannelSocket();
-		void receive(
-			function<void (const SPacket &)> ok,
-			function<void (system::error_code)> fail);
 
-		void send(
-			const SPacket &p,
-			function<void ()> ok,
-			function<void (system::error_code)> fail);
+		virtual void listen(
+			const TOnReceive &onReceive,
+			size_t amount);
+		virtual Result<error_code> send(const SPacket &p);
 
 		void close();
 	};

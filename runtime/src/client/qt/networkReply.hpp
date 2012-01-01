@@ -2,7 +2,10 @@
 #define _CLIENT_QT_NETWORKREPLY_HPP_
 
 #include <QtNetwork/QNetworkReply>
-#include "agent.hpp"
+#include "utils/variant.hpp"
+#include "server/endpoint.hpp"
+#include "client/iagent.hpp"
+#include "client/isession.hpp"
 
 namespace client
 {
@@ -11,11 +14,11 @@ namespace client
 
 		class NetworkReply
 			: public QNetworkReply
-			, Agent
 		{
 			Q_OBJECT
 
 		private:
+			client::IAgentPtr	_agent;
 			utils::VariantPtr	_data;
 			size_t				_readPos;
 
@@ -26,13 +29,11 @@ namespace client
 			qint64 readData(char *data, qint64 maxSize);
 
 		protected:
-			virtual void onReceive(
-				IAgentHubPtr hub,
-				const server::TEndpoint &endpoint,
-				utils::VariantPtr data);
+			void processSend(async::Result<boost::system::error_code> res);
+			void onReceive(server::TEndpoint endpoint, utils::VariantPtr data);
 
 		public:
-			NetworkReply(QObject *parent, QUrl url);
+			NetworkReply(QObject *parent, QUrl url, client::ISessionPtr session);
 			~NetworkReply();
 
 		};

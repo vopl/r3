@@ -3,6 +3,7 @@
 
 #include "server/isessionManager.hpp"
 #include "session.hpp"
+#include "net/iacceptor.hpp"
 
 namespace server
 {
@@ -11,47 +12,47 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	class SessionManager;
-	typedef boost::shared_ptr<SessionManager> ServerSessionManagerPtr;
+	typedef shared_ptr<SessionManager> ServerSessionManagerPtr;
 
 	class SessionManager
 		: public ISessionManager
 		, public enable_shared_from_this<SessionManager>
 	{
-		IConnectorPtr	_connector;
+		IAcceptorPtr	_acceptor;
 		std::string		_host;
 		std::string		_service;
 
-		mutex _mtx;
-		bool										_isStarted;
-		boost::function<void (ISessionPtr)>			_sstart;
-		boost::function<void (ISessionPtr)>			_sstop;
-		boost::uuids::random_generator				_sidGen;
+		mutex	_mtx;
+
+		bool							_isStarted;
+		function<void (ISessionPtr)>	_sstart;
+		function<void (ISessionPtr)>	_sstop;
+		uuids::random_generator			_sidGen;
 
 		typedef std::map<TServerSid, SessionPtr> TMSessions;
-		TMSessions			_sessions;
+		TMSessions	_sessions;
+
+		//каналы в процессе инициации
+		typedef std::set<IChannelPtr> TSChannels;
+		TSChannels	_channels;
 
 	private:
-		void onAcceptOk(IChannelPtr channel);
-		void onAcceptFail(system::error_code ec);
-
-		void onReceiveSidOk(IChannelPtr channel, const SPacket &packet);
-		void onReceiveSidFail(IChannelPtr channel, system::error_code ec);
-
-		void attach2Session(SessionPtr session, IChannelPtr channel);
-		void attach2SessionFail(IChannelPtr channel);
-
 		void onSeessionStop(SessionPtr session);
 
+	private:
+		void listen_f(IAcceptorPtr acceptor);
+		void onChannelAccept(const error_code &ec, IChannelPtr channel);
+		void initChannel_f(IChannelPtr channel);
 	public:
 		SessionManager();
 
-		virtual void start(
-			IConnectorPtr connector,
+		virtual bool start(
+			IAcceptorPtr acceptor, 
 			const char *host, const char *service,
-			boost::function<void (ISessionPtr)> sstart,
-			boost::function<void (ISessionPtr)> sstop);
+			function<void (ISessionPtr)> sstart,
+			function<void (ISessionPtr)> sstop);
 
-		virtual void stop();
+		virtual bool stop();
 	};
 
 	PLUMA_INHERIT_PROVIDER(SessionManager, ISessionManager);

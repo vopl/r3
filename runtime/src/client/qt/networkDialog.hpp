@@ -17,7 +17,7 @@ namespace client
 			QString	_host;
 			QString	_service;
 			QString	_lastLowError;
-			int		_numChannels;
+			quint32	_numChannels;
 
 
 		public:
@@ -28,7 +28,7 @@ namespace client
 
 		public slots:
 			void logLowError(const QString &s);
-			void setNumChannels(int numChannels);
+			void setNumChannels(quint32 numChannels);
 
 		private slots:
 			void onOk();

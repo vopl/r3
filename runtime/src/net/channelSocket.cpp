@@ -1,37 +1,274 @@
 #include "pch.h"
 #include "channelSocket.hpp"
 #include "utils/fixEndian.hpp"
+#include <boost/bind.hpp>
 
 namespace net
 {
 	//////////////////////////////////////////////////////////////////////////
-	ChannelSocket::STransferStateSend::STransferStateSend(
-		const SPacket &packet, 
-		function<void ()> ok,
-		function<void (system::error_code)> fail)
-		: _ok(ok)
+	ChannelSocket::Sock::Sock(TSocketPtr socket)
+		: _socket(socket)
 	{
-		_packet = packet;
-		_header[0] = 0;
-		_transferedSize = 0;
-		_fail = fail;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ChannelSocket::STransferStateReceive::STransferStateReceive(
-		function<void (const SPacket &)> ok,
-		function<void (system::error_code)> fail)
-		: _ok(ok)
+	ChannelSocket::Sock::Sock(TSocketSslPtr socketSsl, TSslContextPtr sslContext)
+		: _socketSsl(socketSsl)
+		, _sslContext(sslContext)
+		, _sslStrand(new TStrand(socketSsl->get_io_service()))
 	{
-		_header[0] = 0;
-		_transferedSize = 0;
-		_fail = fail;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelSocket::Sock::~Sock()
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Buffer, class Handler>
+	void ChannelSocket::Sock::read(const Buffer &b, const Handler &h)
+	{
+		if(_socket)
+		{
+			_socket->async_read_some(b,h);
+		}
+		else
+		{
+			typedef asio::detail::wrapped_handler<
+				asio::io_service::strand,
+				Handler> WrappedHandler;
+			_sslStrand->dispatch(
+				bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	template <class Buffer, class Handler>
+	void ChannelSocket::Sock::write(const Buffer &b, const Handler &h)
+	{
+		if(_socket)
+		{
+			_socket->async_write_some(b,h);
+		}
+		else
+		{
+			typedef asio::detail::wrapped_handler<
+				asio::io_service::strand,
+				Handler> WrappedHandler;
+			_sslStrand->dispatch(
+				bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelSocket::Sock::close()
+	{
+		error_code ec;
+		if(_socket)
+		{
+			_socket->lowest_layer().shutdown(asio::socket_base::shutdown_both, ec);
+			_socket->lowest_layer().close(ec);
+		}
+		else
+		{
+			_socketSsl->lowest_layer().shutdown(asio::socket_base::shutdown_both, ec);
+			_socketSsl->lowest_layer().close(ec);
+
+// 			typedef function<void(const error_code &)> TOnShutdown;
+// 			TOnShutdown onShutdown = boost::bind(&Sock::onSslShutdown, _1, _socketSsl, _sslContext);
+// 
+// 			_sslStrand->dispatch(
+// 				bind(&TSocketSsl::async_shutdown<TOnShutdown>, _socketSsl, onShutdown)
+// 				);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelSocket::Sock::onSslShutdown(
+		const error_code &ec, 
+		TSocketSslPtr socketSsl,
+		TSslContextPtr sslContextHolder)
+	{
+		error_code ecl;
+		socketSsl->lowest_layer().shutdown(asio::socket_base::shutdown_both, ecl);
+		socketSsl->lowest_layer().close(ecl);
+	}
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelSocket::receiveLoop_f()
+	{
+		TReceive receive;
+		receive.second = 0;
+
+		for(;;)
+		{
+			while(!receive.second)
+			{
+				mutex::scoped_lock sl(_mtxReceive);
+				if(_receives.empty())
+				{
+					return;
+				}
+
+				receive.swap(_receives[0]);
+				_receives.erase(_receives.begin());
+			}
+			receive.second--;
+
+			size_t				transferedSize = 0;
+			uint32_t			header[1]={};
+			error_code			ec;
+
+
+			//заголовок
+			while(transferedSize < sizeof(header))
+			{
+				Result2<error_code, size_t> readRes;
+				_sock.read(
+					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
+					readRes);
+				ec = readRes.data1();
+
+				if(ec)
+				{
+					if(asio::error::operation_aborted == ec)
+					{
+						return;
+					}
+					spawn(bind(receive.first, ec, SPacket()));
+					return;
+				}
+				transferedSize += readRes.data2();
+			}
+			assert(transferedSize == sizeof(header));
+			transferedSize = 0;
+
+			//данные
+			SPacket				packet;
+			packet._size = utils::litEndian(header[0]);
+			if(packet._size)
+			{
+				packet._data.reset(new char[packet._size]);
+				while(transferedSize < packet._size)
+				{
+					Result2<error_code, size_t> readRes;
+					_sock.read(
+						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
+						readRes);
+					ec = readRes.data1();
+
+					if(ec)
+					{
+						if(asio::error::operation_aborted == ec.value())
+						{
+							return;
+						}
+						spawn(bind(receive.first, ec, SPacket()));
+						return;
+					}
+					transferedSize += readRes.data2();
+				}
+			}
+			assert(transferedSize == packet._size);
+			transferedSize = 0;
+
+			spawn(bind(receive.first, error_code(), packet));
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ChannelSocket::send_f()
+	{
+		for(;;)
+		{
+			std::pair<Result<error_code>, SPacket> op;
+			{
+				mutex::scoped_lock sl(_mtxSends);
+				if(_sendInProcess)
+				{
+					return;
+				}
+				if(_sends.empty())
+				{
+					return;
+				}
+				op = _sends[0];
+				_sends.erase(_sends.begin());
+				_sendInProcess = true;
+			}
+
+			size_t				transferedSize = 0;
+			uint32_t			header[1];
+			error_code			ec;
+
+
+			//заголовок
+			header[0] = utils::litEndian(op.second._size);
+			while(transferedSize < sizeof(header))
+			{
+				Result2<error_code, size_t> readRes;
+				_sock.write(
+					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
+					readRes);
+				ec = readRes.data1();
+
+				if(ec)
+				{
+					op.first(ec);
+					mutex::scoped_lock sl(_mtxSends);
+					_sendInProcess = false;
+					return;
+				}
+				transferedSize += readRes.data2();
+			}
+			assert(transferedSize == sizeof(header));
+			transferedSize = 0;
+
+			//данные
+			SPacket				&packet = op.second;
+			if(packet._size)
+			{
+				while(transferedSize < packet._size)
+				{
+					Result2<error_code, size_t> writeRes;
+					_sock.write(
+						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
+						writeRes);
+					ec = writeRes.data1();
+
+					if(ec)
+					{
+						op.first(ec);
+						mutex::scoped_lock sl(_mtxSends);
+						_sendInProcess = false;
+						return;
+					}
+					transferedSize += writeRes.data2();
+				}
+			}
+			assert(transferedSize == packet._size);
+			transferedSize = 0;
+
+			op.first(error_code());
+			mutex::scoped_lock sl(_mtxSends);
+			_sendInProcess = false;
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ChannelSocket::ChannelSocket(TSocketPtr socket)
-		: _socket(socket)
-		, _strand(socket->get_io_service())
+		: _sock(socket)
+		, _sendInProcess(false)
+	{
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ChannelSocket::ChannelSocket(TSocketSslPtr socket, TSslContextPtr sslContext)
+		: _sock(socket, sslContext)
+		, _sendInProcess(false)
 	{
 	}
 
@@ -43,176 +280,34 @@ namespace net
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::receive(
-		function<void (const SPacket &)> ok,
-		function<void (system::error_code)> fail)
+	void ChannelSocket::listen(const TOnReceive &onReceive, size_t amount)
 	{
-		STransferStateReceivePtr ts(new STransferStateReceive(ok, fail));
-
-		_strand.dispatch(
-			bind(&ChannelSocket::onReceive, shared_from_this(), 
-				ts, 
-				system::error_code(), 
-				size_t(0)));
-	}
-
-
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::send(
-		const SPacket &p,
-		function<void ()> ok,
-		function<void (system::error_code)> fail)
-	{
-		STransferStateSendPtr ts(new STransferStateSend(p, ok, fail));
-		ts->_header[0] = utils::litEndian(ts->_packet._size);
-		
-		_strand.dispatch(
-			bind(&ChannelSocket::onSend, shared_from_this(), 
-				ts, 
-				system::error_code(), 
-				size_t(0)));
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::onReceive(STransferStateReceivePtr ts, system::error_code ec, size_t size)
-	{
-		if(ec)
+		mutex::scoped_lock sl(_mtxReceive);
+		_receives.push_back(std::make_pair(onReceive, amount));
+		if(_receives.size() < 2)
 		{
-			if(ts->_fail)
-			{
-				ts->_fail(ec);
-			}
-			return;
-		}
-
-		ts->_transferedSize += size;
-		if(ts->_transferedSize < sizeof(ts->_header))
-		{
-			_socket->async_read_some(
-				buffer((char *)&ts->_header, sizeof(ts->_header)-ts->_transferedSize), 
-				_strand.wrap(
-					bind(
-						&ChannelSocket::onReceive, shared_from_this(),
-						ts, 
-						_1, _2
-					)
-				)
-			);
-			return;
-		}
-		else if(ts->_transferedSize == sizeof(ts->_header))
-		{
-			ts->_packet._size = utils::litEndian(ts->_header[0]);
-			if(ts->_packet._size)
-			{
-				ts->_packet._data.reset(new char[ts->_packet._size]);
-
-				_socket->async_read_some(
-					buffer(ts->_packet._data.get(), ts->_packet._size), 
-					_strand.wrap(
-						bind(
-							&ChannelSocket::onReceive, shared_from_this(),
-							ts, 
-							_1, _2
-						)
-					)
-				);
-				return;
-			}
-			else
-			{
-				ts->_packet._data.reset();
-			}
-		}
-		
-		if(ts->_transferedSize < sizeof(ts->_header)+ ts->_packet._size)
-		{
-			size_t dataTransferedSize = ts->_transferedSize-sizeof(ts->_header);
-
-			_socket->async_read_some(
-				buffer(
-					ts->_packet._data.get()+dataTransferedSize, 
-					ts->_packet._size-dataTransferedSize), 
-				_strand.wrap(
-					bind(
-						&ChannelSocket::onReceive, shared_from_this(),
-						ts, 
-						_1, _2
-					)
-				)
-			);
-		}
-		else
-		{
-			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
-			ts->_ok(ts->_packet);
+			spawn(bind(&ChannelSocket::receiveLoop_f, shared_from_this()));
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ChannelSocket::onSend(STransferStateSendPtr ts, system::error_code ec, size_t size)
+	Result<error_code> ChannelSocket::send(const SPacket &p)
 	{
-		if(ec)
+		Result<error_code> res;
+
+		mutex::scoped_lock sl(_mtxSends);
+		_sends.push_back(std::make_pair(res, p));
+		if(_sends.size() < 2)
 		{
-			if(ts->_fail)
-			{
-				ts->_fail(ec);
-			}
-			return;
+			spawn(bind(&ChannelSocket::send_f, shared_from_this()));
 		}
 
-		ts->_transferedSize += size;
-		if(ts->_transferedSize < sizeof(ts->_header))
-		{
-			boost::array<boost::asio::const_buffers_1, 2> packedData = 
-			{
-				const_buffers_1((char *)&ts->_header+ts->_transferedSize, sizeof(ts->_header)-ts->_transferedSize), 
-				const_buffers_1(ts->_packet._data.get(), ts->_packet._size), 
-			};
-
-			_socket->async_write_some(
-				packedData, 
-				_strand.wrap(
-					bind(
-						&ChannelSocket::onSend, shared_from_this(),
-						ts, 
-						_1, _2
-					)
-				)
-			);
-
-		}
-		else if(ts->_transferedSize < sizeof(ts->_header)+ts->_packet._size)
-		{
-			size_t dataTransferedSize = ts->_transferedSize-sizeof(ts->_header);
-			boost::asio::const_buffers_1 packedData(
-				ts->_packet._data.get()+dataTransferedSize, 
-				ts->_packet._size-dataTransferedSize);
-
-			_socket->async_write_some(
-				packedData, 
-				_strand.wrap(
-					bind(
-						&ChannelSocket::onSend, shared_from_this(),
-						ts, 
-						_1, _2
-					)
-				)
-			);
-		}
-		else
-		{
-			assert(ts->_transferedSize == sizeof(ts->_header)+ts->_packet._size);
-			ts->_ok();
-		}
+		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelSocket::close()
 	{
-		boost::system::error_code ec;
-		_socket->lowest_layer().shutdown(boost::asio::socket_base::shutdown_both, ec);
-		_socket->lowest_layer().close(ec);
+		_sock.close();
 	}
 }

@@ -3,6 +3,7 @@
 
 #include "server/isession.hpp"
 #include "net/iconnector.hpp"
+#include "net/iacceptor.hpp"
 
 namespace server
 {
@@ -10,13 +11,13 @@ namespace server
 	{
 		virtual ~ISessionManager(){}
 
-		virtual void start(
-			net::IConnectorPtr connector, 
+		virtual bool start(
+			net::IAcceptorPtr acceptor, 
 			const char *host, const char *service,
 			boost::function<void (ISessionPtr)> sstart,
 			boost::function<void (ISessionPtr)> sstop) =0;
 
-		virtual void stop() =0;
+		virtual bool stop() =0;
 	};
 	typedef boost::shared_ptr<ISessionManager> ISessionManagerPtr;
 

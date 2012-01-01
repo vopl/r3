@@ -5,6 +5,7 @@
 #include <boost/lexical_cast.hpp>
 #include "utils/ntoa.hpp"
 #include "utils/xton.hpp"
+#include "utils/fixEndian.hpp"
 
 namespace utils
 {
@@ -60,6 +61,10 @@ namespace utils
 
 			//warning C4244: '=' : conversion from 'const utils::Variant::UInt16' to 'utils::Variant::UInt8', possible loss of data
 #pragma warning (disable: 4244)
+			//warning C4267: '=' : conversion from 'size_t' to 'utils::Variant::Int8', possible loss of data
+#pragma warning (disable: 4267)
+			//warning C4800: 'const utils::Variant::Char' : forcing value to bool 'true' or 'false' (performance warning)
+#pragma warning (disable: 4800)
 
 			//////////////////////////////////////////////////////////////////////////
 			//integer to integer

@@ -27,6 +27,7 @@ namespace async
 
 		static ThreadLocalStorage<ServiceImpl *>
 									_current;
+		static ServiceImpl			*_global;
 
 	public:
 		ServiceImpl();
@@ -47,6 +48,7 @@ namespace async
 	public:
 		void spawn(const boost::function<void ()> &code);
 		asio::io_service &io();
+		bool setAsGlobal(bool force);
 		static ServiceImpl *current();
 	};
 }
