@@ -29,7 +29,7 @@ namespace client
 			_labelConnected->setNum((int)numChannels);
 			_numChannels = (quint32)numChannels;
 
-			if(ec.value() == boost::system::errc::owner_dead)
+			if(ec == boost::system::errc::owner_dead)
 			{
 				onSessionLost();
 			}
@@ -61,7 +61,7 @@ namespace client
 				_session = session;
 
 				_session->watchState(bind(&MainWindow::onSessionState_proxyCallback, this, _1, _2));
-				_session->balance(40000);
+				_session->balance(4);
 
 				assert(!_networkAccessManagerFactory);
 				_networkAccessManagerFactory = new NetworkAccessManagerFactory(session, _asrv);
