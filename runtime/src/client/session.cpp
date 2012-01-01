@@ -46,7 +46,7 @@ namespace client
 			{
 				return;
 			}
-			if(!_channelHub)
+			if(!_channelHub || !_client)
 			{
 				return;
 			}
@@ -124,6 +124,10 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	Session::~Session()
 	{
+		assert(!_channelHub);
+		assert(!_client);
+		assert(!_needNumChannels);
+		assert(!_connectInProgress);
 
 	}
 
@@ -190,29 +194,41 @@ namespace client
 		TMAgents agents;
 		{
 			mutex::scoped_lock sl(_mtx);
-			_channelHub->close();
-			_channelHub.reset();
+			if(_channelHub)
+			{
+				_channelHub->close();
+				_channelHub.reset();
+			}
 			agents.swap(_agents);
 			_needNumChannels = 0;
+
+			_onStateChanged.swap(boost::function<void(boost::system::error_code, size_t)>());
+
+			_connectInProgress = false;
+			_client.reset();
 		}
 
 		BOOST_FOREACH(TMAgents::value_type &el, agents)
 		{
 			el.second->close();
 		}
-		_client.reset();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	bool Session::attachChannel(IChannelPtr channel)
 	{
 		mutex::scoped_lock sl(_mtx);
+		if(!_client)
+		{
+			channel->close();
+			return false;
+		}
+
 		if(!_channelHub)
 		{
 			_channelHub.reset(new ChannelHub<IChannel>);
 			_channelHub->listen(bind(&Session::onReceive, shared_from_this(), _1, _2));
-			_channelHub->watchState(bind(&Session::onStateChanged, this, _1, _2));
-
+			_channelHub->watchState(bind(&Session::onStateChanged, shared_from_this(), _1, _2));
 		}
 
 		bool res = _channelHub->attachChannel(channel);
