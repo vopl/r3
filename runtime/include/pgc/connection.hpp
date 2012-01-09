@@ -21,7 +21,7 @@ namespace pgc
 	typedef boost::shared_ptr<ConnectionImpl> ConnectionImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class PGC_API Connection
+	class PG_API Connection
 	{
 	protected:
 		typedef ConnectionImplPtr ImplPtr;

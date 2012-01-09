@@ -13,7 +13,7 @@ namespace pgc
 	typedef boost::shared_ptr<DbImpl> DbImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class PGC_API Db
+	class PG_API Db
 	{
 	protected:
 		typedef DbImplPtr ImplPtr;

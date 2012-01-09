@@ -12,7 +12,7 @@ namespace pgc
 	typedef boost::shared_ptr<StatementImpl> StatementImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class PGC_API Statement
+	class PG_API Statement
 	{
 	protected:
 		typedef StatementImplPtr ImplPtr;

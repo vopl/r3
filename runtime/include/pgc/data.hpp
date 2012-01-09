@@ -19,7 +19,7 @@ namespace pgc
 	typedef boost::shared_ptr<DataImpl> DataImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class PGC_API Data
+	class PG_API Data
 	{
 
 	protected:

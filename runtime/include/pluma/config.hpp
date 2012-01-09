@@ -117,7 +117,7 @@
         // just work fine, and so the simplest way to get rid of this warning is to disable it
         #ifdef _MSC_VER
 
-            #pragma warning(disable : 4251)
+            //#pragma warning(disable : 4251)
 
         #endif
 
