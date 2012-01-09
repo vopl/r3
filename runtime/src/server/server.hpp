@@ -5,7 +5,7 @@
 #include "server/isessionManager.hpp"
 #include "server/iserviceHub.hpp"
 
-#include "pgc/idb.hpp"
+#include "pgc/db.hpp"
 
 namespace server
 {
@@ -21,7 +21,7 @@ namespace server
 		ISessionManagerPtr	_sessionManager;
 		IServiceHubPtr		_serviceHub;
 
-		pgc::IDbPtr			_db;
+		pgc::Db				_db;
 
 		size_t				_numThreads;
 		boost::mutex		_mtx;
@@ -52,7 +52,7 @@ namespace server
 		virtual bool start(pluma::Pluma *plugs, const char *host, const char *service);
 		virtual void stop();
 		virtual pluma::Pluma * getPlugs();
-		virtual pgc::IDbPtr getDb();
+		virtual pgc::Db getDb();
 	};
 	PLUMA_INHERIT_PROVIDER(Server, IServer);
 }

@@ -1,7 +1,6 @@
-#ifndef _PGC_RESULT_HPP_
-#define _PGC_RESULT_HPP_
+#ifndef _PGC_DATAIMPL_HPP_
+#define _PGC_DATAIMPL_HPP_
 
-#include "pgc/iresult.hpp"
 #include <boost/enable_shared_from_this.hpp>
 #include "connectionImpl.hpp"
 
@@ -10,53 +9,52 @@ namespace pgc
 	using namespace boost;
 	using namespace utils;
 
-	class Result
-		: public IResult
-		, public enable_shared_from_this<Result>
+	class DataImpl
+		: public enable_shared_from_this<DataImpl>
 	{
 		PGresult *_pgr;
-		ConnectionImplPtr _con;
+		ConnectionHolderPtr _con;
 	public:
-		Result(PGresult *pgr, ConnectionImplPtr con);
-		~Result();
+		DataImpl(PGresult *pgr, ConnectionHolderPtr con);
+		~DataImpl();
 
-		virtual EResultStatus status();
-		virtual const char *errorMsg();
-		virtual const char *errorCode();
+		EDataStatus status();
+		const char *errorMsg();
+		const char *errorCode();
 
-		virtual size_t cmdRows();
+		size_t cmdRows();
 
-		virtual size_t rows();
-		virtual size_t cols();
+		size_t rows();
+		size_t cols();
 
-		virtual size_t colIdx(const char *colName);
-		virtual const char *colName(size_t colIdx);
+		size_t colIdx(const char *colName);
+		const char *colName(size_t colIdx);
 
-		virtual bool isNull(size_t colIdx, size_t rowIdx);
-		virtual Variant::EType colType(size_t colIdx);
+		bool isNull(size_t colIdx, size_t rowIdx);
+		Variant::EType colType(size_t colIdx);
 
-		virtual bool fetch(Variant &v, size_t colIdx, size_t rowIdx);
-
-		//////////////////////////////////////////////////////////////////////////
-		virtual bool fetchRowList(Variant &v, size_t rowIdx=0);
-		virtual bool fetchRowMap(Variant &v, size_t rowIdx=0);
-
-		virtual bool fetchRowsList(Variant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
-		virtual bool fetchRowsMap(Variant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetch(Variant &v, size_t colIdx, size_t rowIdx);
 
 		//////////////////////////////////////////////////////////////////////////
-		virtual bool fetchRowList(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx=0);
-		virtual bool fetchRowMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx=0);
+		bool fetchRowList(Variant &v, size_t rowIdx=0);
+		bool fetchRowMap(Variant &v, size_t rowIdx=0);
 
-		virtual bool fetchRowsList(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
-		virtual bool fetchRowsMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
-
-		virtual bool fetchColumn(Variant &v, size_t colIdx, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchRowsList(Variant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchRowsMap(Variant &v, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 
 		//////////////////////////////////////////////////////////////////////////
-		virtual boost::int32_t fetchInt32(size_t colIdx, size_t rowIdx);
-		virtual boost::uint32_t fetchUInt32(size_t colIdx, size_t rowIdx);
-		virtual std::string fetchString(size_t colIdx, size_t rowIdx);
+		bool fetchRowList(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx=0);
+		bool fetchRowMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx=0);
+
+		bool fetchRowsList(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchRowsMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+
+		bool fetchColumn(Variant &v, size_t colIdx, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+
+		//////////////////////////////////////////////////////////////////////////
+		boost::int32_t fetchInt32(size_t colIdx, size_t rowIdx);
+		boost::uint32_t fetchUInt32(size_t colIdx, size_t rowIdx);
+		std::string fetchString(size_t colIdx, size_t rowIdx);
 
 	private:
 		//////////////////////////////////////////////////////////////////////////

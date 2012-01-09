@@ -3,8 +3,8 @@
 
 #include "server/iservice.hpp"
 #include <boost/enable_shared_from_this.hpp>
-#include "pgc/iconnection.hpp"
-#include "pgc/idb.hpp"
+#include "pgc/connection.hpp"
+#include "pgc/db.hpp"
 
 namespace server
 {
@@ -21,9 +21,9 @@ namespace server
 
 		pluma::Pluma *_pluma;
 
-		pgc::IDbPtr _db;
+		pgc::Db _db;
 
-		void onResult(pgc::IResultPtrs r);
+		void onResult(pgc::Datas r);
 		void connectionLoop1();
 
 	public:

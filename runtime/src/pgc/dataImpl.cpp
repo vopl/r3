@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "result.hpp"
+#include "dataImpl.hpp"
 #include <libpq-fe.h>
 #include "utils/aton.hpp"
 #include "utils/fixEndian.hpp"
@@ -16,7 +16,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class SequenceVariant>
-	bool Result::fetchRowList_(SequenceVariant &v, size_t rowIdx)
+	bool DataImpl::fetchRowList_(SequenceVariant &v, size_t rowIdx)
 	{
 		size_t columns = this->cols();
 		v.resize(columns);
@@ -36,9 +36,9 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowMap_(utils::Variant::MapStringVariant &v, size_t rowIdx)
+	bool DataImpl::fetchRowMap_(utils::Variant::MapStringVariant &v, size_t rowIdx)
 	{
-		size_t columns = Result::cols();
+		size_t columns = DataImpl::cols();
 		v.clear();
 
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
@@ -54,7 +54,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class SequenceVariant>
-	bool Result::fetchRowsList_(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchRowsList_(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t rows = this->rows();
 		if(rowEndIdx > rows) 
@@ -84,7 +84,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class SequenceVariant>
-	bool Result::fetchRowsMap_(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchRowsMap_(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t rows = this->rows();
 		if(rowEndIdx > rows)
@@ -126,7 +126,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	template <class SequenceVariant>
-	bool Result::fetchRowList_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	bool DataImpl::fetchRowList_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
 	{
 		size_t columns = colIndices.size();
 		v.resize(columns);
@@ -134,7 +134,7 @@ namespace pgc
 		SequenceVariant::iterator iter = v.begin();
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
-			assert(colIndices[colIdx] < Result::cols());
+			assert(colIndices[colIdx] < DataImpl::cols());
 			utils::Variant &rv = *iter;
 			if(!fetch(rv, colIndices[colIdx], rowIdx))
 			{
@@ -147,14 +147,14 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowMap_(utils::Variant::MapStringVariant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	bool DataImpl::fetchRowMap_(utils::Variant::MapStringVariant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
 	{
 		size_t columns = colIndices.size();
 		v.clear();
 
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
-			assert(colIndices[colIdx] < Result::cols());
+			assert(colIndices[colIdx] < DataImpl::cols());
 			if(!fetch(v[colName(colIndices[colIdx])], colIndices[colIdx], rowIdx))
 			{
 				return false;
@@ -166,7 +166,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class SequenceVariant>
-	bool Result::fetchRowsList_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchRowsList_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t rows = this->rows();
 		if(rowEndIdx > rows) 
@@ -196,7 +196,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class SequenceVariant>
-	bool Result::fetchRowsMap_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchRowsMap_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t rows = this->rows();
 		if(rowEndIdx > rows)
@@ -226,7 +226,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class SequenceVariant>
-	bool Result::fetchColumn_(SequenceVariant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchColumn_(SequenceVariant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t rows = this->rows();
 		if(rowEndIdx > rows)
@@ -255,7 +255,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result::Result(PGresult *pgr, ConnectionImplPtr con)
+	DataImpl::DataImpl(PGresult *pgr, ConnectionHolderPtr con)
 		: _pgr(pgr)
 		, _con(con)
 	{
@@ -263,13 +263,13 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result::~Result()
+	DataImpl::~DataImpl()
 	{
 		PQclear(_pgr);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	EResultStatus Result::status()
+	EDataStatus DataImpl::status()
 	{
 		switch(PQresultStatus(_pgr))
 		{
@@ -283,57 +283,57 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	const char *Result::errorMsg()
+	const char *DataImpl::errorMsg()
 	{
 		const char *res = PQresultErrorMessage(_pgr);
 		return res?res:"";
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	const char *Result::errorCode()
+	const char *DataImpl::errorCode()
 	{
 		const char *res = PQresultErrorField(_pgr, PG_DIAG_SQLSTATE);
 		return res?res:"";
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	size_t Result::cmdRows()
+	size_t DataImpl::cmdRows()
 	{
 		return _atost(PQcmdTuples(_pgr));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	size_t Result::rows()
+	size_t DataImpl::rows()
 	{
 		return (size_t)PQntuples(_pgr);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	size_t Result::cols()
+	size_t DataImpl::cols()
 	{
 		return (size_t)PQnfields(_pgr);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	size_t Result::colIdx(const char *colName)
+	size_t DataImpl::colIdx(const char *colName)
 	{
 		return (size_t)PQfnumber(_pgr, colName);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	const char *Result::colName(size_t colIdx)
+	const char *DataImpl::colName(size_t colIdx)
 	{
 		return PQfname(_pgr, (int)colIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::isNull(size_t colIdx, size_t rowIdx)
+	bool DataImpl::isNull(size_t colIdx, size_t rowIdx)
 	{
 		return PQgetisnull(_pgr, (int)rowIdx, (int)colIdx)?true:false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Variant::EType Result::colType(size_t colIdx)
+	Variant::EType DataImpl::colType(size_t colIdx)
 	{
 		if(colIdx >= (size_t)PQnfields(_pgr))
 		{
@@ -504,7 +504,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetch(Variant &v, size_t colIdx, size_t rowIdx)
+	bool DataImpl::fetch(Variant &v, size_t colIdx, size_t rowIdx)
 	{
 		if(colIdx >= (size_t)PQnfields(_pgr))
 		{
@@ -794,7 +794,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowList(Variant &v, size_t rowIdx)
+	bool DataImpl::fetchRowList(Variant &v, size_t rowIdx)
 	{
 		switch(v.type())
 		{
@@ -809,13 +809,13 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowMap(Variant &v, size_t rowIdx)
+	bool DataImpl::fetchRowMap(Variant &v, size_t rowIdx)
 	{
 		return fetchRowMap_(v.as<Variant::MapStringVariant>(true), rowIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowsList(Variant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchRowsList(Variant &v, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		switch(v.type())
 		{
@@ -830,7 +830,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowsMap(Variant &v, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchRowsMap(Variant &v, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		switch(v.type())
 		{
@@ -845,7 +845,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowList(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	bool DataImpl::fetchRowList(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
 	{
 		switch(v.type())
 		{
@@ -860,13 +860,13 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
+	bool DataImpl::fetchRowMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowIdx)
 	{
 		return fetchRowMap_(v.as<Variant::MapStringVariant>(true), colIndices, rowIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowsList(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchRowsList(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		switch(v.type())
 		{
@@ -881,7 +881,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchRowsMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchRowsMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		switch(v.type())
 		{
@@ -896,7 +896,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchColumn(Variant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
+	bool DataImpl::fetchColumn(Variant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		switch(v.type())
 		{
@@ -911,7 +911,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::int32_t Result::fetchInt32(size_t colIdx, size_t rowIdx)
+	boost::int32_t DataImpl::fetchInt32(size_t colIdx, size_t rowIdx)
 	{
 		Variant v;
 		v.as<boost::int32_t>(true);
@@ -923,7 +923,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::uint32_t Result::fetchUInt32(size_t colIdx, size_t rowIdx)
+	boost::uint32_t DataImpl::fetchUInt32(size_t colIdx, size_t rowIdx)
 	{
 		Variant v;
 		v.as<boost::uint32_t>(true);
@@ -935,7 +935,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Result::fetchString(size_t colIdx, size_t rowIdx)
+	std::string DataImpl::fetchString(size_t colIdx, size_t rowIdx)
 	{
 		Variant v;
 		v.as<std::string>(true);

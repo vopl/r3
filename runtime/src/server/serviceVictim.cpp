@@ -28,7 +28,7 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	static size_t cnt(0);
-	void ServiceVictim::onResult(pgc::IResultPtrs r)
+	void ServiceVictim::onResult(pgc::Datas r)
 	{
 		assert(r.size()<2);
 		if(r.empty())
@@ -41,10 +41,10 @@ namespace server
 		cnt++;
 		if(!(cnt%10000))
 		{
-			pgc::EResultStatus s = r[0]->status();
-			const char *msg = r[0]->errorMsg();
+			pgc::EDataStatus s = r[0].status();
+			const char *msg = r[0].errorMsg();
 			utils::Variant v;
-			r[0]->fetchRowsMap(v);
+			r[0].fetchRowsMap(v);
 			TLOG(cnt<<", "<<s<<", "<<msg<<", "<<v);
 		}
 	}
@@ -52,7 +52,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::connectionLoop1()
 	{
-		pgc::IStatementPtr s;
+		pgc::Statement s;
 		for(;;)
 		{
 			if(!_db)
@@ -60,16 +60,15 @@ namespace server
 				TLOG("connectionLoop1 db NULL");
 				return;
 			}
-			async::Result<pgc::IConnectionPtr> c1=_db->allocConnection();
-			async::Result<pgc::IConnectionPtr> c2=_db->allocConnection();
-			async::Result<pgc::IConnectionPtr> c3=_db->allocConnection();
-			async::Result<pgc::IConnectionPtr> c4=_db->allocConnection();
+			async::Result<pgc::Connection> c1=_db.allocConnection();
+			async::Result<pgc::Connection> c2=_db.allocConnection();
+			async::Result<pgc::Connection> c3=_db.allocConnection();
+			async::Result<pgc::Connection> c4=_db.allocConnection();
 
 			//TLOG("connectionLoop1");
-			if(!s)// || !(rand()%2))
+			if(!s || !(rand()%50))
 			{
-				s = _pluma->create<pgc::IStatementProvider>();
-				s->setSql("SELECT $1");
+				s = pgc::Statement("SELECT $1");
 			}
 
 			if(!c1.data() || !c2.data() || !c3.data() || !c4.data())
@@ -78,17 +77,17 @@ namespace server
 				return;
 			}
 
-			async::ResultWaiter<pgc::IResultPtrs> results(
-				c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000))
+			async::ResultWaiter<pgc::Datas> results(
+				c1.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000))
 				);
 			//async::EventWaiter<async::Result<pgc::IResultPtrs> > results;
 
 			for(size_t i(0); i<10; i++)
 			{
-				results << c1.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
-				results << c2.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
-				results << c3.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
-				results << c4.data()->query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results << c1.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results << c2.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results << c3.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000));
+				results << c4.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000));
 			}
 
 
@@ -130,10 +129,10 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-// 		for(size_t i(0); i<200; i++)
-// 		{
-// 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-// 		}
+		for(size_t i(0); i<20; i++)
+		{
+			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		}
 
 		int k = 220;
 		//
@@ -143,7 +142,7 @@ namespace server
 	void ServiceVictim::onHubDel(IServiceHubPtr hub)
 	{
 		TLOG("del from hub");
-		_db.reset();
+		_db = pgc::Db();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

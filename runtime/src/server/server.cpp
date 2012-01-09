@@ -16,16 +16,7 @@ namespace server
 		//////////////////////////////////////////////////////////////////////////
 		//поднять коннектор базы
 		assert(!_db);
-		_db = _plugs->create<pgc::IDbProvider>();
-		assert(_db);
-		if(!_db)
-		{
-			FLOG("failed to create db instance");
-			_state = esError;
-			return;
-		}
-
-		_db->initialize(
+		_db = pgc::Db(
 			"host=localhost port=5432 dbname=test user=test password=test",
 			10,
 			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
@@ -97,14 +88,11 @@ namespace server
 		assert(_sessionManager);
 		_sessionManager->stop();
 
-
 		assert(_db);
-		_db->deinitialize();
-
+		_db.reset();
 
 		_serviceHub.reset();
 		_sessionManager.reset();
-		_db.reset();
 
 		_state = esStop;
 		_isStartedCvar.notify_one();
@@ -241,7 +229,7 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	pgc::IDbPtr Server::getDb()
+	pgc::Db Server::getDb()
 	{
 		return _db;
 	}

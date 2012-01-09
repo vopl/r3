@@ -1,48 +1,41 @@
 #include "pch.h"
-#include "pgc/statement.hpp"
 #include "statementImpl.hpp"
 
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	Statement::Statement()
-		: _impl()
+	StatementImpl::StatementImpl(const char *sql)
+		: _sql(sql)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement::Statement(const char *sql)
-		: _impl(new StatementImpl(sql))
+	StatementImpl::StatementImpl(const std::string &sql)
+		: _sql(sql)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement::Statement(const std::string &sql)
-		: _impl(new StatementImpl(sql))
+	StatementImpl::~StatementImpl()
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement::~Statement()
+	const std::string &StatementImpl::getSql()
 	{
+		return _sql;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Statement::operator bool() const
+	const std::string &StatementImpl::getPreparedId()
 	{
-		return _impl?true:false;
+		return _preparedId;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Statement::operator!() const
+	void StatementImpl::setPreparedId(const char *csz)
 	{
-		return _impl?false:true;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	const std::string &Statement::getSql()
-	{
-		return _impl->getSql();
+		_preparedId = csz;
 	}
 
 }

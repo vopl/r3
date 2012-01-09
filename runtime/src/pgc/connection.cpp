@@ -1,54 +1,85 @@
 #include "pch.h"
-#include "connection.hpp"
-#include "db.hpp"
+#include "pgc/connection.hpp"
+#include "bindData.hpp"
+#include "connectionImpl.hpp"
 
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	Connection::Connection(DbPtr db, ConnectionImplPtr impl)
-		: _db(db)
-		, _impl(impl)
+	Connection::Connection()
+		: _impl()
 	{
- 		_impl->beginWork();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Connection::~Connection()
 	{
-		async::Result<IResultPtrs> res;
-		_impl->runEndWork(res);
-		res.wait();
-		_db->unwork(_impl);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<IResultPtrs> Connection::query(const std::string &sql)
+	Connection::operator bool() const
 	{
-		async::Result<IResultPtrs> res;
-		_impl->runQuery(res, sql);
+		return _impl?true:false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Connection::operator!() const
+	{
+		return _impl?false:true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	async::Result<Datas> Connection::query(const std::string &sql)
+	{
+		async::Result<Datas> res;
+		_impl->_holder->runQuery(res, sql, BindDataPtr());
 		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<IResultPtrs> Connection::query(IStatementPtr s)
+	async::Result<Datas> Connection::query(const std::string &sql, const utils::Variant &data)
 	{
-		async::Result<IResultPtrs> res;
-		_impl->runQueryWithPrepare(res, s, BindDataPtr());
+		async::Result<Datas> res;
+		_impl->_holder->runQuery(res, sql, BindDataPtr(new BindData(data, _impl->_holder)));
 		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<IResultPtrs> Connection::query(IStatementPtr s, const utils::Variant &data)
+	async::Result<Datas> Connection::query(Statement s, bool withPrepare)
 	{
-		async::Result<IResultPtrs> res;
-		_impl->runQueryWithPrepare(res, s, BindDataPtr(new BindData(data, _impl)));
+		async::Result<Datas> res;
+		if(withPrepare)
+		{
+			_impl->_holder->runQueryWithPrepare(res, s, BindDataPtr());
+		}
+		else
+		{
+			_impl->_holder->runQuery(res, s.getSql(), BindDataPtr());
+		}
+		return res;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	async::Result<Datas> Connection::query(Statement s, const utils::Variant &data, bool withPrepare)
+	{
+		async::Result<Datas> res;
+
+		BindDataPtr bindData(new BindData(data, _impl->_holder));
+		if(withPrepare)
+		{
+			_impl->_holder->runQueryWithPrepare(res, s, bindData);
+		}
+		else
+		{
+			_impl->_holder->runQuery(res, s.getSql(), bindData);
+		}
 		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	EConnectionStatus Connection::status()
 	{
-		return _impl->status();
+		return _impl?_impl->_holder->status():ecsNull;
 	}
 
 }

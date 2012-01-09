@@ -56,7 +56,7 @@ CREATE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC_PCH})
 USE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC})
 SETUP_BIN_OUT(plugserver plug)
 
-TARGET_LINK_LIBRARIES(plugserver libheap libpluma libutils liblog libasync)
+TARGET_LINK_LIBRARIES(plugserver libheap libpluma libutils liblog libasync libpgc)
 
 IF(LINUX)
 	SET(CMAKE_THREAD_PREFER_PTHREAD ON)
