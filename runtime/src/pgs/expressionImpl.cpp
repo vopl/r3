@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "expressionImpl.hpp"
-#include "implAccess.hpp"
+#include "utils/implAccess.hpp"
 #include "sdHelpers.hpp"
 
 namespace pgs
@@ -57,7 +57,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	void ExpressionImpl_list::push(const Expression &a)
 	{
-		_list.push_back(ImplAccess<pgs::Expression>(a));
+		_list.push_back(utils::ImplAccess<pgs::Expression>(a));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	ExpressionImpl_op1::ExpressionImpl_op1(const char *name, const Expression &a, bool isPre)
 		: _name(name)
-		, _a(ImplAccess<pgs::Expression>(a))
+		, _a(utils::ImplAccess<pgs::Expression>(a))
 		, _isPre(isPre)
 	{
 	}
@@ -119,8 +119,8 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	ExpressionImpl_op2::ExpressionImpl_op2(const char *name, const Expression &a, const Expression &b)
 		: _name(name)
-		, _a(ImplAccess<pgs::Expression>(a))
-		, _b(ImplAccess<pgs::Expression>(b))
+		, _a(utils::ImplAccess<pgs::Expression>(a))
+		, _b(utils::ImplAccess<pgs::Expression>(b))
 	{
 	}
 
@@ -186,7 +186,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	void ExpressionImpl_func::pushArg(const Expression &a)
 	{
-		_args.push_back(ImplAccess<Expression>(a));
+		_args.push_back(utils::ImplAccess<Expression>(a));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 #include "selectImpl.hpp"
 #include "pgs/meta/cluster.hpp"
 #include "sdHelpers.hpp"
-#include "implAccess.hpp"
+#include "utils/implAccess.hpp"
 
 namespace pgs
 {
@@ -148,7 +148,7 @@ namespace pgs
 			state._bindName2idx,
 			state._fetchName2idx));
 
-		stm->sql(sql);
+// 		stm->sql(sql);
 		return stm;
 	}
 

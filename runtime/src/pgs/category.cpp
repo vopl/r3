@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "pgs/category.hpp"
-#include "implAccess.hpp"
+#include "utils/implAccess.hpp"
 #include "categoryImpl.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Category::Category(pgs::meta::CategoryCPtr cat, const std::string &alias)
-		: Expression(ImplAccess<Expression>(ImplPtr(new CategoryImpl(cat, alias))))
+		: Expression(utils::ImplAccess<Expression>(ImplPtr(new CategoryImpl(cat, alias))))
 	{
 	}
 

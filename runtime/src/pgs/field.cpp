@@ -1,19 +1,19 @@
 #include "pch.h"
 #include "pgs/field.hpp"
-#include "implAccess.hpp"
+#include "utils/implAccess.hpp"
 #include "fieldImpl.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Field::Field(pgs::meta::FieldCPtr fld, const std::string &alias)
-		: Expression(ImplAccess<Expression>(ImplPtr(new FieldImpl(fld, alias))))
+		: Expression(utils::ImplAccess<Expression>(ImplPtr(new FieldImpl(fld, alias))))
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Field::Field(const std::string &srcAlias, pgs::meta::FieldCPtr fld, const std::string &alias)
-		: Expression(ImplAccess<Expression>(ImplPtr(new FieldImpl(srcAlias, fld, alias))))
+		: Expression(utils::ImplAccess<Expression>(ImplPtr(new FieldImpl(srcAlias, fld, alias))))
 	{
 
 	}

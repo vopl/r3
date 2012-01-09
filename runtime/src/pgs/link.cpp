@@ -1,19 +1,19 @@
 #include "pch.h"
 #include "pgs/link.hpp"
-#include "implAccess.hpp"
+#include "utils/implAccess.hpp"
 #include "linkImpl.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	Link::Link(pgs::meta::RelationEndCPtr re, const std::string &alias)
-		: Expression(ImplAccess<Expression>(ImplPtr(new LinkImpl(re, alias))))
+		: Expression(utils::ImplAccess<Expression>(ImplPtr(new LinkImpl(re, alias))))
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Link::Link(const std::string &srcAlias, pgs::meta::RelationEndCPtr re, const std::string &alias)
-		: Expression(ImplAccess<Expression>(ImplPtr(new LinkImpl(srcAlias, re, alias))))
+		: Expression(utils::ImplAccess<Expression>(ImplPtr(new LinkImpl(srcAlias, re, alias))))
 	{
 	}
 

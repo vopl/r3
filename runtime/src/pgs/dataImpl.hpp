@@ -1,5 +1,5 @@
-#ifndef _PGS_RESULTIMPL_HPP_
-#define _PGS_RESULTIMPL_HPP_
+#ifndef _PGS_DATAIMPL_HPP_
+#define _PGS_DATAIMPL_HPP_
 
 #include "fieldImpl.hpp"
 #include "categoryImpl.hpp"
@@ -10,18 +10,18 @@ namespace pgs
 	typedef boost::shared_ptr<StatementImpl> StatementImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class ResultImpl
+	class DataImpl
 	{
 		pgs::StatementImplPtr _stm;
 
 	public:
-		ResultImpl(const StatementImplPtr &stm, PGresult *pgres);
+		DataImpl(const StatementImplPtr &stm, PGresult *pgres);
 
 		bool fldIndex(size_t &res, const FieldImplPtr &fld);
 		bool fldIndices(std::deque<size_t> &res, const CategoryImplPtr &cat);
 
 	};
-	typedef boost::shared_ptr<ResultImpl> ResultImplPtr;
+	typedef boost::shared_ptr<DataImpl> DataImplPtr;
 }
 
 #endif

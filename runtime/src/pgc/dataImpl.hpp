@@ -13,7 +13,7 @@ namespace pgc
 		: public enable_shared_from_this<DataImpl>
 	{
 		PGresult *_pgr;
-		ConnectionHolderPtr _con;
+		bool _integerDatetimes;
 	public:
 		DataImpl(PGresult *pgr, ConnectionHolderPtr con);
 		~DataImpl();

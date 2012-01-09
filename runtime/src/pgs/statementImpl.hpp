@@ -1,14 +1,14 @@
-#ifndef _PGS_IMPL_STATEMENT_HPP_
-#define _PGS_IMPL_STATEMENT_HPP_
+#ifndef _PGS_STATEMENTIMPL_HPP_
+#define _PGS_STATEMENTIMPL_HPP_
 
-#include "../pgc/statementPrepImpl.hpp"
-#include "resultImpl.hpp"
+#include "pgc/statementImpl.hpp"
+#include "dataImpl.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	class StatementImpl
-		: public pgc::StatementPrepImpl
+		: public pgc::StatementImpl
 	{
 		typedef std::map<std::string, size_t>	TMName2idx;
 		TMName2idx _bindName2idx;

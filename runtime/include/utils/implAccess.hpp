@@ -13,7 +13,7 @@ namespace utils
 		ImplAccess(const typename Base::ImplPtr &impl);
 
 		typename Base::ImplPtr &impl();
-		operator typename Base::ImplPtr &();
+		operator typename Base::ImplPtr();
 	};
 
 
@@ -40,9 +40,9 @@ namespace utils
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	ImplAccess<Base>::operator typename Base::ImplPtr&()
+	ImplAccess<Base>::operator typename Base::ImplPtr()
 	{
-		return _impl;
+		return boost::dynamic_pointer_cast<typename Base::ImplPtr::value_type>(_impl);
 	}
 }
 

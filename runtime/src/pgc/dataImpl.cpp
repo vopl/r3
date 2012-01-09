@@ -257,7 +257,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	DataImpl::DataImpl(PGresult *pgr, ConnectionHolderPtr con)
 		: _pgr(pgr)
-		, _con(con)
+		, _integerDatetimes(con->integerDatetimes())
 	{
 		assert(_pgr);
 	}
@@ -612,7 +612,7 @@ namespace pgc
 		case 1184://timestamptz
 			{
 				boost::uint64_t time;
-				if(_con->integerDatetimes())
+				if(_integerDatetimes)
 				{
 					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 				}
@@ -662,7 +662,7 @@ namespace pgc
 				i.month = bigEndian(i.month);
 
 
-				if(_con->integerDatetimes())
+				if(_integerDatetimes)
 				{
 					i.time = bigEndian(i.time);
 				}
@@ -699,7 +699,7 @@ namespace pgc
 		case 1266://timetz
 			{
 				boost::uint64_t time;
-				if(_con->integerDatetimes())
+				if(_integerDatetimes)
 				{
 					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
 				}

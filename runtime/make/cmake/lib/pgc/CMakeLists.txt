@@ -170,6 +170,7 @@ INCLUDE_DIRECTORIES(${SRC_DIR}/pgs)
 
 
 
+INCLUDE_DIRECTORIES(${SRC_DIR})
 
 
 
@@ -196,6 +197,8 @@ ADD_LIBRARY(libpg SHARED
 	
 CREATE_PCH(libpg ${SRC_DIR}/pgc/pch.h ${SRC_PCH})
 USE_PCH(libpg ${SRC_DIR}/pgc/pch.h ${PGC_SRC})
+USE_PCH(libpg ${SRC_DIR}/pgc/pch.h ${PGS_SRC})
+USE_PCH(libpg ${SRC_DIR}/pgc/pch.h ${PGS_SRC_META})
 SETUP_BIN_OUT(libpg server)
 
 TARGET_LINK_LIBRARIES(libpg libheap libutils liblog libasync)
