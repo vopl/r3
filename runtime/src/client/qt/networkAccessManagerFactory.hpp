@@ -13,9 +13,9 @@ namespace client
 			: public QDeclarativeNetworkAccessManagerFactory
 		{
 			client::ISessionPtr	_session;
-			async::ServicePtr	_asrv;
+			async::Service		_asrv;
 		public:
-			NetworkAccessManagerFactory(client::ISessionPtr session, async::ServicePtr asrv);
+			NetworkAccessManagerFactory(client::ISessionPtr session, async::Service asrv);
 			virtual QNetworkAccessManager *create(QObject *parent);
 		};
 	}

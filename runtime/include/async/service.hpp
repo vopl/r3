@@ -12,14 +12,23 @@
 
 namespace async
 {
+	class ServiceImpl;
+	typedef boost::shared_ptr<ServiceImpl> ServiceImplPtr;
+
+	//////////////////////////////////////////////////////////////////////////
 	class ASYNC_API Service
 	{
-	protected:
-		Service();
-		Service(const Service&);
-
+		ServiceImplPtr _impl;
 	public:
-		virtual ~Service();
+		Service(bool isNull=true);
+		Service(ServiceImplPtr impl);
+		~Service();
+
+		//конструктор копировани€ и оператор присваивани€ встроенные
+
+		operator bool() const;
+		bool operator!() const;
+		void reset();
 
 		void start(
 			size_t numThreads,
@@ -33,11 +42,7 @@ namespace async
 		boost::asio::io_service &io();
 		bool setAsGlobal(bool force);
 	};
-	typedef boost::shared_ptr<Service> ServicePtr;
 
-
-	//////////////////////////////////////////////////////////////////////////
-	ASYNC_API ServicePtr createService();
 
 	//выполнить кусок кода асинхронно
 	ASYNC_API void spawn(const boost::function<void ()> &code);
@@ -50,7 +55,7 @@ namespace async
 
 	//текущий экземпл€р службы
 	ASYNC_API bool serviceExists();
-	ASYNC_API ServicePtr service();
+	ASYNC_API Service service();
 }
 
 

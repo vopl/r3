@@ -11,7 +11,6 @@ namespace client
 {
 	using namespace boost;
 	using namespace boost::system;
-	using namespace async;
 	using namespace net;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -21,7 +20,7 @@ namespace client
 	{
 		mutex				_mtx;
 		pluma::Pluma *		_plugs;
-		ServicePtr			_asrv;
+		async::Service		_asrv;
 		IConnectorPtr		_connector;
 
 	private:
@@ -38,7 +37,7 @@ namespace client
 		virtual Result2<error_code, ISessionPtr> 
 			createSession(const char *host, const char *service);
 		virtual pluma::Pluma * getPlugs();
-		virtual ServicePtr getAsync();
+		virtual Service getAsrv();
 		virtual bool stop();
 
 	public:

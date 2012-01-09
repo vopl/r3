@@ -175,20 +175,20 @@ namespace server
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять асинхронный двиг
-		_async = async::createService();
-		assert(_async);
-		if(!_async)
+		_asrv = async::Service(false);
+		assert(_asrv);
+		if(!_asrv)
 		{
 			FLOG("failed to create async instance");
 			return false;
 		}
 
 		//запускать асинхронный двиг
-		_async->start(
+		_asrv.start(
 			boost::thread::hardware_concurrency());
 
 		//родить запускалку в асинхронной среде
-		_async->spawn(bind(&Server::startup, shared_from_this(), host, service));
+		_asrv.spawn(bind(&Server::startup, shared_from_this(), host, service));
 
 		//ждать когда запускалка отработает
 		while(esStop == _state)
@@ -219,7 +219,7 @@ namespace server
 
 		ILOG("stop");
 
-		_async->spawn(bind(&Server::shutdown, shared_from_this()));
+		_asrv.spawn(bind(&Server::shutdown, shared_from_this()));
 
 		while(esStop != _state)
 		{
@@ -227,8 +227,8 @@ namespace server
 		}
 		assert(esStop == _state);
 
-		_async->stop();
-		_async.reset();
+		_asrv.stop();
+		_asrv.reset();
 		_plugs = NULL;
 
 		ILOG("stop done");

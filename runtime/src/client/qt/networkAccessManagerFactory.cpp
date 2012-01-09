@@ -7,7 +7,7 @@ namespace client
 	namespace qt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		NetworkAccessManagerFactory::NetworkAccessManagerFactory(ISessionPtr session, async::ServicePtr asrv)
+		NetworkAccessManagerFactory::NetworkAccessManagerFactory(ISessionPtr session, async::Service asrv)
 			: _session(session)
 			, _asrv(asrv)
 		{

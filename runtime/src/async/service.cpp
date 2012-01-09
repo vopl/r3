@@ -6,13 +6,17 @@
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	Service::Service()
+	Service::Service(bool isNull)
 	{
-
+		if(!isNull)
+		{
+			_impl.reset(new ServiceImpl);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Service::Service(const Service&)
+	Service::Service(ServiceImplPtr impl)
+		: _impl(impl)
 	{
 
 	}
@@ -20,8 +24,27 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	Service::~Service()
 	{
-
+		_impl.reset();
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	Service::operator bool() const
+	{
+		return _impl?true:false;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	bool Service::operator!() const
+	{
+		return _impl?false:true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Service::reset()
+	{
+		_impl.reset();
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	void Service::start(
@@ -29,49 +52,43 @@ namespace async
 		const function<void ()> &onThreadStart,
 		const function<void ()> &onThreadStop)
 	{
-		return static_cast<ServiceImpl *>(this)->start(numThreads, onThreadStart, onThreadStop);
+		return _impl->start(numThreads, onThreadStart, onThreadStop);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Service::balance(size_t numThreads)
 	{
-		return static_cast<ServiceImpl *>(this)->balance(numThreads);
+		return _impl->balance(numThreads);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Service::stop()
 	{
-		return static_cast<ServiceImpl *>(this)->stop();
+		return _impl->stop();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Service::spawn(const boost::function<void ()> &code)
 	{
-		return static_cast<ServiceImpl *>(this)->spawn(code);
+		return _impl->spawn(code);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	boost::asio::io_service &Service::io()
 	{
-		return static_cast<ServiceImpl *>(this)->io();
+		return _impl->io();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	bool Service::setAsGlobal(bool force)
 	{
-		return static_cast<ServiceImpl *>(this)->setAsGlobal(force);
+		return _impl->setAsGlobal(force);
 	}
 
 
 
 
 
-
-	//////////////////////////////////////////////////////////////////////////
-	ASYNC_API ServicePtr createService()
-	{
-		return ServicePtr(new ServiceImpl);
-	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ASYNC_API void spawn(const function<void ()> &code)
@@ -126,16 +143,17 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ASYNC_API ServicePtr service()
+	ASYNC_API Service service()
 	{
 		ServiceImpl *service = ServiceImpl::current();
 		if(!service)
 		{
 			ELOG("service request with no current service");
-			return ServicePtr();
+			throw exception("service request with no current service");
+			return Service();
 		}
 
-		return service->shared_from_this();
+		return Service(service->shared_from_this());
 	}
 
 }

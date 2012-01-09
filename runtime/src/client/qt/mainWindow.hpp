@@ -20,7 +20,7 @@ namespace client
 		private:
 			pluma::Pluma		_plugins;
 			client::IClientPtr	_client;
-			async::ServicePtr	_asrv;
+			async::Service		_asrv;
 			client::ISessionPtr	_session;
 			NetworkDialog		*_nd;
 			QLabel				*_labelConnected;

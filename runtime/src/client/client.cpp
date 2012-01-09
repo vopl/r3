@@ -90,7 +90,7 @@ namespace client
 	{
 		ILOG("destuct");
 
-		ServicePtr asrv;
+		Service asrv;
 
 		{
 			mutex::scoped_lock sl(_mtx);
@@ -103,7 +103,7 @@ namespace client
 
 		if(asrv)
 		{
-			asrv->stop();
+			asrv.stop();
 		}
 
 
@@ -129,7 +129,7 @@ namespace client
 		}
 		else
 		{
-			_asrv = createService();
+			_asrv = async::Service(false);
 			if(!_asrv)
 			{
 				FLOG("async service creation failed");
@@ -138,7 +138,7 @@ namespace client
 			}
 			ILOG("create new async service");
 		}
-		_asrv->start(1);
+		_asrv.start(1);
 
 		_connector = _plugs->create<IConnectorProvider>();
 		if(!_connector)
@@ -157,7 +157,7 @@ namespace client
 		Client::createSession(const char *host, const char *service)
 	{
 		Result2<error_code, ISessionPtr> res;
-		_asrv->spawn(bind(&Client::connectSession_f, shared_from_this(), res, std::string(host), std::string(service), SessionPtr()));
+		_asrv.spawn(bind(&Client::connectSession_f, shared_from_this(), res, std::string(host), std::string(service), SessionPtr()));
 		return res;
 	}
 
@@ -169,7 +169,7 @@ namespace client
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ServicePtr Client::getAsync()
+	Service Client::getAsrv()
 	{
 		mutex::scoped_lock sl(_mtx);
 		return _asrv;
@@ -180,7 +180,7 @@ namespace client
 	{
 		ILOG("stop");
 
-		ServicePtr asrv;
+		Service asrv;
 		{
 			mutex::scoped_lock sl(_mtx);
 
@@ -192,7 +192,7 @@ namespace client
 
 		if(asrv)
 		{
-			asrv->stop();
+			asrv.stop();
 		}
 
 		return true;
@@ -203,7 +203,7 @@ namespace client
 		Client::connectSession(SessionPtr session, const std::string &host, const std::string &service)
 	{
 		Result2<error_code, ISessionPtr> res;
-		_asrv->spawn(bind(&Client::connectSession_f, shared_from_this(), res, host, service, session));
+		_asrv.spawn(bind(&Client::connectSession_f, shared_from_this(), res, host, service, session));
 		return res;
 	}
 

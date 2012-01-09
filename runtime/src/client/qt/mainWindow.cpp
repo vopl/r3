@@ -89,7 +89,7 @@ namespace client
 
 			if(_asrv)
 			{
-				_asrv->spawn(boost::bind(&MainWindow::startSession_f, this, host, service));
+				_asrv.spawn(boost::bind(&MainWindow::startSession_f, this, host, service));
 			}
 		}
 
@@ -131,7 +131,7 @@ namespace client
 			if(QMessageBox::Yes == ret)
 			{
 				closeSession();
-				_asrv->spawn(boost::bind(&MainWindow::startSession_f, this, _nd->getHost(), _nd->getService()));
+				_asrv.spawn(boost::bind(&MainWindow::startSession_f, this, _nd->getHost(), _nd->getService()));
 			}
 		}
 
@@ -152,7 +152,7 @@ namespace client
 
 			if(_session)
 			{
-				_asrv->spawn(bind(&ISession::close, _session));
+				_asrv.spawn(bind(&ISession::close, _session));
 				_session.reset();
 			}
 		}
@@ -211,8 +211,8 @@ namespace client
 			{
 				//QMessageBox()
 			}
-			_asrv = _client->getAsync();
-			bool b = _asrv->setAsGlobal(false);
+			_asrv = _client->getAsrv();
+			bool b = _asrv.setAsGlobal(false);
 			assert(b);
 
 			onAddrChanged(_nd->getHost(), _nd->getService());

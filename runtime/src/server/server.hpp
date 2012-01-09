@@ -17,7 +17,7 @@ namespace server
 		, public boost::enable_shared_from_this<Server>
 	{
 		pluma::Pluma *_plugs;
-		async::ServicePtr	_async;
+		async::Service		_asrv;
 		ISessionManagerPtr	_sessionManager;
 		IServiceHubPtr		_serviceHub;
 
