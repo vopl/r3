@@ -115,14 +115,14 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void Server::onSessionStart(ISessionPtr session)
 	{
-		ILOG("sessin start");
+		ILOG("session start");
 		_serviceHub->addSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Server::onSessionStop(ISessionPtr session)
 	{
-		ILOG("sessin stop");
+		ILOG("session stop");
 		_serviceHub->delSession(session);
 	}
 
