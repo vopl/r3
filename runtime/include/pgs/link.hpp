@@ -10,7 +10,7 @@ namespace pgs
 	typedef boost::shared_ptr<LinkImpl> LinkImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Link
+	class PG_API Link
 		: public Expression
 	{
 

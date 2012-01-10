@@ -13,7 +13,7 @@ namespace pgs
 	typedef boost::shared_ptr<DataImpl> DataImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Data
+	class PG_API Data
 		: public pgc::Data
 	{
 	protected:
@@ -35,82 +35,16 @@ namespace pgs
 		using pgc::Data::fetchRowsMap;
 		using pgc::Data::fetchColumn;
 
-		template <class SequenceVariant>
-		bool fetchRowList(SequenceVariant &v, const pgs::Category &cat, size_t rowIdx=0);
-
-		bool fetchRowMap(utils::Variant::MapStringVariant &v, const pgs::Category &cat, size_t rowIdx=0);
-
-		template <class SequenceVariant>
-		bool fetchRowsList(SequenceVariant &v, const pgs::Category &cat, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
-
-		template <class SequenceVariant>
-		bool fetchRowsMap(SequenceVariant &v, const pgs::Category &cat, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchRowList(utils::Variant &v, const pgs::Category &cat, size_t rowIdx=0);
+		bool fetchRowMap(utils::Variant &v, const pgs::Category &cat, size_t rowIdx=0);
+		bool fetchRowsList(utils::Variant &v, const pgs::Category &cat, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchRowsMap(utils::Variant &v, const pgs::Category &cat, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 
 
 
 
 		bool fetch(utils::Variant &v, const pgs::Field &fld, size_t rowIdx=0);
-
-		template <class SequenceVariant>
-		bool fetchColumn(SequenceVariant &v, const pgs::Field &fld, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchColumn(utils::Variant &v, const pgs::Field &fld, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 	};
-
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class SequenceVariant>
-	bool Data::fetchRowList(SequenceVariant &v, const pgs::Category &cat, size_t rowIdx)
-	{
-		std::deque<size_t> indices;
-		if(!fldIndices(indices, cat))
-		{
-			throw std::invalid_argument("for Data::fetchRowList");
-			return false;
-		}
-
-		return fetchRowList(v, indices, rowIdx);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class SequenceVariant>
-	bool Data::fetchRowsList(SequenceVariant &v, const pgs::Category &cat, size_t rowBeginIdx, size_t rowEndIdx)
-	{
-		std::deque<size_t> indices;
-		if(!fldIndices(indices, cat))
-		{
-			throw std::invalid_argument("for Data::fetchRowsList");
-			return false;
-		}
-
-		return fetchRowsList(v, indices, rowBeginIdx, rowEndIdx);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class SequenceVariant>
-	bool Data::fetchRowsMap(SequenceVariant &v, const pgs::Category &cat, size_t rowBeginIdx, size_t rowEndIdx)
-	{
-		std::deque<size_t> indices;
-		if(!fldIndices(indices, cat))
-		{
-			throw std::invalid_argument("for Data::fetchRowsMap");
-			return false;
-		}
-
-		return fetchRowsMap(v, indices, rowBeginIdx, rowEndIdx);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	template <class SequenceVariant>
-	bool Data::fetchColumn(SequenceVariant &v, const pgs::Field &fld, size_t rowBeginIdx, size_t rowEndIdx)
-	{
-		size_t index;
-		if(!fldIndex(index, fld))
-		{
-			throw std::invalid_argument("for Data::fetchColumn");
-			return false;
-		}
-
-		return fetchColumn(v, index, rowBeginIdx, rowEndIdx);
-	}
-
 }
 #endif

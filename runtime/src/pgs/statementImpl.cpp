@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "statementImpl.hpp"
-#include "implAccess.hpp"
+#include "utils/implAccess.hpp"
 
 namespace pgs
 {
@@ -18,86 +18,25 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool StatementImpl::fldIndex(size_t &res, const std::string &name)
-	{
-		TMName2idx::iterator iter = _fetchName2idx.find(name);
-		if(_fetchName2idx.end() == iter)
-		{
-			assert(!"bad name");
-			throw "bad name";
-			return false;
-		}
-		res = iter->second;
-		return true;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	bool StatementImpl::fldIndex(size_t &res, const FieldImplPtr &fld)
-	{
-		std::string fldName;
-
-		fldName += _cluster->escapeName(fld->srcAlias());
-		fldName += ".";
-		fldName += _cluster->escapeName(fld->meta()->_name);
-
-		if(fld->alias().empty() && fld->alias() != fld->meta()->_name)
-		{
-			fldName += " AS ";
-			fldName += _cluster->escapeName(fld->alias());
-		}
-
-		return fldIndex(res, fldName);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	bool StatementImpl::fldIndices(std::deque<size_t> &res, const CategoryImplPtr &cat)
-	{
-		std::string categoryAlias = _cluster->escapeName(cat->alias());
-
-		//tableoid
-		std::string fldName = categoryAlias + ".tableoid";
-		size_t idx;
-		if(!fldIndex(idx, fldName))
-		{
-			return false;
-		}
-		res.push_back(idx);
-
-		//перебрать все поля
-		BOOST_FOREACH(meta::FieldCPtr mf, cat->meta()->_fields)
-		{
-			fldName = categoryAlias + "." + _cluster->escapeName(mf->_name);
-			if(!fldIndex(idx, fldName))
-			{
-				return false;
-			}
-			res.push_back(idx);
-		}
-
-		return true;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	StatementImpl::StatementImpl(
+	StatementImpl::StatementImpl(	const std::string &sql,
 									pgs::ClusterImplPtr cluster, 
-									const TMName2idx &bindName2idx,
-									const TMName2idx &fetchName2idx)
-		: pgc::StatementPrepImpl(ImplAccess<pgc::Connection>(cluster->con()).impl())
-		, _bindName2idx(bindName2idx)
-		, _fetchName2idx(fetchName2idx)
+									const TMName2idx &bindName2idx)
+ 		: pgc::StatementImpl(sql)
 		, _cluster(cluster)
+ 		, _bindName2idx(bindName2idx)
 	{
+		assert(0);
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	bool StatementImpl::bind(int typCpp, void const *valCpp, const char *name)
-	{
-		return pgc::StatementPrepImpl::bind(typCpp, valCpp, bindName2idx(name));
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void StatementImpl::unbind(const char *name)
-	{
-		pgc::StatementPrepImpl::unbind(bindName2idx(name));
-	}
+// 	//////////////////////////////////////////////////////////////////////////
+// 	bool StatementImpl::bind(int typCpp, void const *valCpp, const char *name)
+// 	{
+// 		return pgc::StatementPrepImpl::bind(typCpp, valCpp, bindName2idx(name));
+// 	}
+// 
+// 	//////////////////////////////////////////////////////////////////////////
+// 	void StatementImpl::unbind(const char *name)
+// 	{
+// 		pgc::StatementPrepImpl::unbind(bindName2idx(name));
+// 	}
 }

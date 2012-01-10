@@ -46,9 +46,6 @@ namespace pgs
 		//признак инициализированности
 		bool _isSynced;
 
-		//соединение с базой 
-		pgc::Connection _con;
-
 	public:
 		std::string escapeName	(const std::string &name, bool escape=true);
 

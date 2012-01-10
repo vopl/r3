@@ -17,7 +17,7 @@ namespace pgs
 	typedef boost::shared_ptr<ClusterImpl> ClusterImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Cluster
+	class PG_API Cluster
 	{
 	protected:
 		typedef ClusterImplPtr ImplPtr;

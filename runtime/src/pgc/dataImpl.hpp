@@ -15,7 +15,7 @@ namespace pgc
 		PGresult *_pgr;
 		bool _integerDatetimes;
 	public:
-		DataImpl(PGresult *pgr, ConnectionHolderPtr con);
+		DataImpl(PGresult *pgr, bool integerDatetimes);
 		~DataImpl();
 
 		EDataStatus status();

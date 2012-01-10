@@ -3,6 +3,7 @@
 
 #include "pgs/data.hpp"
 #include <boost/shared_ptr.hpp>
+#include "pgc/statement.hpp"
 
 namespace pgs
 {
@@ -11,7 +12,7 @@ namespace pgs
 	typedef boost::shared_ptr<StatementImpl> StatementImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Statement
+	class PG_API Statement
 		: public pgc::Statement
 	{
 	protected:
@@ -22,7 +23,7 @@ namespace pgs
 	public:
 
 
-		Data exec();
+		//Data exec();
 	};
 }
 #endif

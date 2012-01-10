@@ -144,11 +144,12 @@ namespace pgs
 
 		//////////////////////////////////////////////////////////////////////////
 		StatementImplPtr stm(new StatementImpl(
+			sql,
 			cluster, 
-			state._bindName2idx,
-			state._fetchName2idx));
+			state._bindName2idx));
 
-// 		stm->sql(sql);
+		//state._fetchName2idx
+
 		return stm;
 	}
 

@@ -10,7 +10,7 @@ namespace pgs
 	typedef boost::shared_ptr<CategoryImpl> CategoryImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Category
+	class PG_API Category
 		: public Expression
 	{
 	public:

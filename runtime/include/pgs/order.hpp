@@ -9,7 +9,7 @@ namespace pgs
 	typedef boost::shared_ptr<OrderImpl> OrderImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Order
+	class PG_API Order
 		: public Expression
 	{
 	public:

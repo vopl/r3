@@ -29,6 +29,18 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	async::Result<Datas> Connection::query(const char *sql)
+	{
+		return query(std::string(sql));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	async::Result<Datas> Connection::query(const char *sql, const utils::Variant &data)
+	{
+		return query(std::string(sql), data);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	async::Result<Datas> Connection::query(const std::string &sql)
 	{
 		async::Result<Datas> res;

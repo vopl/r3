@@ -10,7 +10,7 @@ namespace pgs
 	typedef boost::shared_ptr<FieldImpl> FieldImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Field
+	class PG_API Field
 		: public Expression
 	{
 	protected:

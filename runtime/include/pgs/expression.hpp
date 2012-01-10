@@ -2,6 +2,7 @@
 #define _PGS_EXPRESSION_HPP_
 
 #include <boost/shared_ptr.hpp>
+#include "pgc/api.h"
 
 namespace pgs
 {
@@ -10,7 +11,7 @@ namespace pgs
 	typedef boost::shared_ptr<ExpressionImpl> ExpressionImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Expression
+	class PG_API Expression
 	{
 	protected:
 		typedef ExpressionImplPtr ImplPtr;

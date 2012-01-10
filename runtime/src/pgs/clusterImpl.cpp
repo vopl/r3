@@ -173,21 +173,27 @@ namespace pgs
 
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::sync_schemaExistence(TSyncLog &log, pgs::meta::SchemaCPtr s, bool allowCreate)
+	bool ClusterImpl::sync_schemaExistence(pgc::Connection con, pgs::meta::SchemaCPtr s, bool allowCreate)
 	{
-		pgc::Result pgr = _con
-			.once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1")
-			.exec(schemaName(s, false, false))
-			.throwIfError();
+		pgc::Datas pgd = con.query(
+			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
+			utils::Variant(schemaName(s, false, false))).data();
 
-		if(!pgr.fetchInt32())
+		if(pgd.size()!= 1 || pgc::ersCommandOk != pgd[0].status() || !pgd[0].fetchInt32(0,0))
 		{
-			log.push_back(SyncLogLine("schema absent", schemaName(s, false, false)));
+			//log.push_back(SyncLogLine("schema absent", schemaName(s, false, false)));
+			WLOG("schema absent: "<<schemaName(s, false, false));
 
 			if(allowCreate)
 			{
-				_con.once("CREATE SCHEMA "+schemaName(s, true, true)).exec().throwIfError();
-				log.push_back(SyncLogLine("schema created", schemaName(s, false, false)));
+				pgd = con.query("CREATE SCHEMA "+schemaName(s, true, true)).data();
+				if(pgd.size()!= 1 || pgc::ersCommandOk != pgd[0].status())
+				{
+					return false;
+				}
+				//log.push_back(SyncLogLine("schema created", schemaName(s, false, false)));
+				ILOG("schema created: "<<schemaName(s, false, false));
+
 			}
 			else
 			{
@@ -197,21 +203,23 @@ namespace pgs
 		}
 
 		//oid
-		pgr = _con
-			.once("SELECT oid FROM pg_catalog.pg_namespace WHERE nspname=$1")
-			.exec(schemaName(s, false, false))
-			.throwIfError();
-		if(pgr.rows() != 1)
+		pgd = con.query(
+			"SELECT oid FROM pg_catalog.pg_namespace WHERE nspname=$1",
+			utils::Variant(schemaName(s, false, false))).data();
+		if(pgd.size()!= 1 || pgc::ersCommandOk != pgd[0].status() || !pgd[0].rows() != 1)
 		{
-			log.push_back(SyncLogLine("obtain schema oid failed", schemaName(s, false, false)));
+			//log.push_back(SyncLogLine("obtain schema oid failed", schemaName(s, false, false)));
+			WLOG("obtain schema oid failed: "<<schemaName(s, false, false));
 			return false;
 		}
-		TOid oid = pgr.fetchUInt32();
+		TOid oid = pgd[0].fetchUInt32(0,0);
 		_schema2oid[s] = oid;
 		_oid2schema[oid] = s;
 
 		//генератор идентификаторов объектов
-		pgr = _con.once("SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2").exec(schemaName(s, false, false), idGenName(s, false, false)).throwIfError();
+		pgd = con.query(
+			"SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2",
+			utils::Variant(schemaName(s, false, false), idGenName(s, false, false))).data();
 		if(!pgr.fetchInt32())
 		{
 			log.push_back(SyncLogLine("idGen absent", schemaName(s, false, false), idGenName(s, false, false)));
@@ -564,7 +572,7 @@ namespace pgs
 
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::sync(TSyncLog &log, bool allowCreate)
+	bool ClusterImpl::sync(pgc::Connection con, bool allowCreate)
 	{
 		_isSynced = false;
 
@@ -575,7 +583,8 @@ namespace pgs
 
 		if(!_metaCluster.isInitialized())
 		{
-			log.push_back(SyncLogLine("meta cluster is not initialized"));
+			//log.push_back(SyncLogLine("meta cluster is not initialized"));
+			WLOG("meta cluster is not initialized");
 			return false;
 		}
 
@@ -584,7 +593,7 @@ namespace pgs
 		//наличие схем
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
-			res &= sync_schemaExistence(log, s, allowCreate);
+			res &= sync_schemaExistence(con, s, allowCreate);
 		}
 		if(!res)
 		{
@@ -596,7 +605,7 @@ namespace pgs
 		{
 			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 			{
-				res &= sync_tableExistence(log, c, allowCreate);
+				res &= sync_tableExistence(con, c, allowCreate);
 			}
 		}
 		if(!res)
@@ -611,7 +620,7 @@ namespace pgs
 			{
 				BOOST_FOREACH(pgs::meta::FieldCPtr f, c->_fields)
 				{
-					res &= sync_columnExistence(log, f, allowCreate);
+					res &= sync_columnExistence(con, f, allowCreate);
 				}
 			}
 		}
@@ -627,7 +636,7 @@ namespace pgs
 			{
 				BOOST_FOREACH(pgs::meta::IndexCPtr i, c->_indices)
 				{
-					res &= sync_indexExistence(log, i, allowCreate);
+					res &= sync_indexExistence(con, i, allowCreate);
 				}
 			}
 		}
@@ -641,7 +650,7 @@ namespace pgs
 		{
 			BOOST_FOREACH(pgs::meta::RelationCPtr r, s->_relations)
 			{
-				res &= sync_crossExistence(log, r, allowCreate);
+				res &= sync_crossExistence(con, r, allowCreate);
 			}
 		}
 		if(!res)
@@ -654,7 +663,7 @@ namespace pgs
 		{
 			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
 			{
-				res &= sync_tableInherits(log, c, allowCreate);
+				res &= sync_tableInherits(con, c, allowCreate);
 			}
 		}
 		if(!res)
@@ -667,11 +676,12 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::drop(TSyncLog &log)
+	bool ClusterImpl::drop(pgc::Connection con)
 	{
 		if(!_metaCluster.isInitialized())
 		{
-			log.push_back(SyncLogLine("meta cluster is not initialized"));
+			//log.push_back(SyncLogLine("meta cluster is not initialized"));
+			ELOG("meta cluster is not initialized");
 			return false;
 		}
 
@@ -680,7 +690,7 @@ namespace pgs
 		//схемы
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
-			res &= drop_schemaExistence(log, s);
+			res &= drop_schemaExistence(con, s);
 		}
 		if(!res)
 		{

@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "pgs/statement.hpp"
 #include "statementImpl.hpp"
-#include "resultImpl.hpp"
+#include "dataImpl.hpp"
 
 namespace pgs
 {
@@ -9,42 +9,8 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	Statement::Statement(ImplPtr impl)
-		: pgc::Statement(impl)
+		: pgc::Statement("sql here")
 	{
+		assert(0);
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	bool Statement::bindNative(int typCpp, void const *valCpp, const char *name)
-	{
-		return boost::static_pointer_cast<StatementImpl>(_impl)->bind(typCpp, valCpp, name);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Statement &Statement::bind(const utils::Variant &v, const char *name)
-	{
-		if(!boost::static_pointer_cast<StatementImpl>(_impl)->bind(v.type(), v.data(), name))
-		{
-			throw std::invalid_argument("for Statement::bind");
-		}
-		return *this;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Statement &Statement::unbind(const char *name)
-	{
-		boost::static_pointer_cast<StatementImpl>(_impl)->unbind(name);
-		return *this;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	Result Statement::exec()
-	{
-		ResultImplPtr res(new ResultImpl(
-			boost::static_pointer_cast<StatementImpl>(_impl), 
-			_impl->exec()));
-		return Result(res);
-	}
-
-
-
 }

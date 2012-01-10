@@ -255,9 +255,9 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	DataImpl::DataImpl(PGresult *pgr, ConnectionHolderPtr con)
+	DataImpl::DataImpl(PGresult *pgr, bool integerDatetimes)
 		: _pgr(pgr)
-		, _integerDatetimes(con->integerDatetimes())
+		, _integerDatetimes(integerDatetimes)
 	{
 		assert(_pgr);
 	}

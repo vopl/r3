@@ -34,6 +34,8 @@ namespace pgc
 		operator bool() const;
 		bool operator!() const;
 
+		async::Result<Datas> query(const char *sql);
+		async::Result<Datas> query(const char *, const utils::Variant &data);
 		async::Result<Datas> query(const std::string &sql);
 		async::Result<Datas> query(const std::string &sql, const utils::Variant &data);
 		async::Result<Datas> query(Statement s, bool withPrepare=true);

@@ -17,7 +17,7 @@ namespace pgs
 	typedef boost::shared_ptr<SelectImpl> SelectImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class Select
+	class PG_API Select
 	{
 		typedef SelectImplPtr ImplPtr;
 		ImplPtr	_impl;

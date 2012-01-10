@@ -3,6 +3,7 @@
 
 #include "fieldImpl.hpp"
 #include "categoryImpl.hpp"
+#include "pgc/dataImpl.hpp"
 
 namespace pgs
 {
@@ -11,12 +12,20 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	class DataImpl
+		: pgc::DataImpl
 	{
-		pgs::StatementImplPtr _stm;
+		typedef std::map<std::string, size_t>	TMName2idx;
+		TMName2idx _fetchName2idx;
+		ClusterImplPtr _cluster;
+
 
 	public:
-		DataImpl(const StatementImplPtr &stm, PGresult *pgres);
+		DataImpl(	PGresult *pgres, 
+					bool integerDatetime,
+					ClusterImplPtr cluster,
+					const TMName2idx &fetchName2idx);
 
+		bool fldIndex(size_t &res, const std::string &name);
 		bool fldIndex(size_t &res, const FieldImplPtr &fld);
 		bool fldIndices(std::deque<size_t> &res, const CategoryImplPtr &cat);
 
