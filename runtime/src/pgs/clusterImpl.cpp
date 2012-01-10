@@ -177,7 +177,7 @@ namespace pgs
 	{
 		pgc::Datas pgd = con.query(
 			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
-			utils::Variant(schemaName(s, false, false))).data();
+			schemaName(s, false, false)).data();
 
 		if(pgd.size()!= 1 || pgc::ersCommandOk != pgd[0].status() || !pgd[0].fetchInt32(0,0))
 		{
@@ -205,7 +205,7 @@ namespace pgs
 		//oid
 		pgd = con.query(
 			"SELECT oid FROM pg_catalog.pg_namespace WHERE nspname=$1",
-			utils::Variant(schemaName(s, false, false))).data();
+			schemaName(s, false, false)).data();
 		if(pgd.size()!= 1 || pgc::ersCommandOk != pgd[0].status() || !pgd[0].rows() != 1)
 		{
 			//log.push_back(SyncLogLine("obtain schema oid failed", schemaName(s, false, false)));
@@ -219,7 +219,7 @@ namespace pgs
 		//генератор идентификаторов объектов
 		pgd = con.query(
 			"SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2",
-			utils::Variant(schemaName(s, false, false), idGenName(s, false, false))).data();
+			utils::MVA(schemaName(s, false, false), idGenName(s, false, false))).data();
 		if(!pgr.fetchInt32())
 		{
 			log.push_back(SyncLogLine("idGen absent", schemaName(s, false, false), idGenName(s, false, false)));
