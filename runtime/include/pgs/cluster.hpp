@@ -27,8 +27,6 @@ namespace pgs
 		Cluster(pgs::meta::Cluster metaCluster);
 
 		void setUnicators(const std::string &prefix, const std::string &suffix);
-		pgc::Connection con(pgc::Connection con);
-		pgc::Connection con();
 
 		bool sync(pgc::Connection con, bool allowCreate = false);
 		bool drop(pgc::Connection con);

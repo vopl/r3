@@ -9,6 +9,7 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <boost/uuid/random_generator.hpp>
+#include <boost/cstdint.hpp>
 
 #include <boost/random/random_device.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -22,3 +23,6 @@
 #include <iostream>
 
 #include <libpq-fe.h>
+
+#include "utils/variant.hpp"
+#include "async/service.hpp"

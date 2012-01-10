@@ -164,6 +164,9 @@ namespace pgc
 		static int sockType(int sock);
 
 	private:
+		void pushResultAndSet(async::Result<Datas> &res, bool success=false);
+
+	private:
 		void processRequest();
 
 	private:

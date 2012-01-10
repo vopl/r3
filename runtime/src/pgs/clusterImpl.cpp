@@ -5,6 +5,8 @@
 
 namespace pgs
 {
+	using namespace utils;
+
 	//////////////////////////////////////////////////////////////////////////
 	std::string ClusterImpl::escapeName(const std::string &name, bool escape)
 	{
@@ -175,19 +177,19 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	bool ClusterImpl::sync_schemaExistence(pgc::Connection con, pgs::meta::SchemaCPtr s, bool allowCreate)
 	{
-		pgc::Datas pgd = con.query(
+		pgc::Data pgr = con.query(
 			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
-			schemaName(s, false, false)).data();
+			schemaName(s, false, false)).data()[0];
 
-		if(pgd.size()!= 1 || pgc::ersCommandOk != pgd[0].status() || !pgd[0].fetchInt32(0,0))
+		if(pgc::ersCommandOk != pgr.status() || !pgr.fetchInt32(0,0))
 		{
 			//log.push_back(SyncLogLine("schema absent", schemaName(s, false, false)));
 			WLOG("schema absent: "<<schemaName(s, false, false));
 
 			if(allowCreate)
 			{
-				pgd = con.query("CREATE SCHEMA "+schemaName(s, true, true)).data();
-				if(pgd.size()!= 1 || pgc::ersCommandOk != pgd[0].status())
+				pgr = con.query("CREATE SCHEMA "+schemaName(s, true, true)).data()[0];
+				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
 				}
@@ -203,31 +205,37 @@ namespace pgs
 		}
 
 		//oid
-		pgd = con.query(
+		pgr = con.query(
 			"SELECT oid FROM pg_catalog.pg_namespace WHERE nspname=$1",
-			schemaName(s, false, false)).data();
-		if(pgd.size()!= 1 || pgc::ersCommandOk != pgd[0].status() || !pgd[0].rows() != 1)
+			schemaName(s, false, false)).data()[0];
+		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows() != 1)
 		{
 			//log.push_back(SyncLogLine("obtain schema oid failed", schemaName(s, false, false)));
 			WLOG("obtain schema oid failed: "<<schemaName(s, false, false));
 			return false;
 		}
-		TOid oid = pgd[0].fetchUInt32(0,0);
+		TOid oid = pgr.fetchUInt32(0,0);
 		_schema2oid[s] = oid;
 		_oid2schema[oid] = s;
 
 		//генератор идентификаторов объектов
-		pgd = con.query(
+		pgr = con.query(
 			"SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2",
-			utils::MVA(schemaName(s, false, false), idGenName(s, false, false))).data();
-		if(!pgr.fetchInt32())
+			MVA(schemaName(s, false, false), idGenName(s, false, false))).data()[0];
+		if(pgc::ersTuplesOk != pgr.status() || !pgr.fetchInt32(0,0))
 		{
-			log.push_back(SyncLogLine("idGen absent", schemaName(s, false, false), idGenName(s, false, false)));
+			//log.push_back(SyncLogLine("idGen absent", schemaName(s, false, false), idGenName(s, false, false)));
+			WLOG("idGen absent: "<<schemaName(s, false, false)<<", "<<idGenName(s, false, false));
 
 			if(allowCreate)
 			{
-				_con.once("CREATE SEQUENCE "+idGenName(s, true, true)).exec().throwIfError();
-				log.push_back(SyncLogLine("idGen created", schemaName(s, false, false), idGenName(s, false, false)));
+				pgr = con.query("CREATE SEQUENCE "+idGenName(s, true, true)).data()[0];
+				if(pgc::ersCommandOk != pgr.status())
+				{
+					return false;
+				}
+				//log.push_back(SyncLogLine("idGen created", schemaName(s, false, false), idGenName(s, false, false)));
+				ILOG("idGen created: "<<schemaName(s, false, false)<<", "<<idGenName(s, false, false));
 			}
 			else
 			{
@@ -239,16 +247,25 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::sync_tableExistence(TSyncLog &log, pgs::meta::CategoryCPtr c, bool allowCreate)
+	bool ClusterImpl::sync_tableExistence(pgc::Connection con, pgs::meta::CategoryCPtr c, bool allowCreate)
 	{
-		pgc::Result pgr = _con.once("SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2").exec(schemaName(c->_schema, false, false), tableName(c, false, false)).throwIfError();
-		if(!pgr.rows())
+		pgc::Data pgr = con.query(
+			"SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2",
+			MVA(schemaName(c->_schema, false, false), tableName(c, false, false))).data()[0];
+
+		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
 		{
-			log.push_back(SyncLogLine("table absent", schemaName(c->_schema, false, false), tableName(c, false, false)));
+			//log.push_back(SyncLogLine("table absent", schemaName(c->_schema, false, false), tableName(c, false, false)));
+			WLOG("table absent: "<<schemaName(c->_schema, false, false)<<", "<<tableName(c, false, false));
 			if(allowCreate)
 			{
-				_con.once("CREATE TABLE "+tableName(c, true, true)+"()").exec().throwIfError();
-				log.push_back(SyncLogLine("table created", schemaName(c->_schema, false, false), tableName(c, false, false)));
+				pgr = con.query("CREATE TABLE "+tableName(c, true, true)+"()").data()[0];
+				if(pgc::ersCommandOk != pgr.status())
+				{
+					return false;
+				}
+				//log.push_back(SyncLogLine("table created", schemaName(c->_schema, false, false), tableName(c, false, false)));
+				ILOG("table created: "<<schemaName(c->_schema, false, false)<<", "<<tableName(c, false, false));
 			}
 			else
 			{
@@ -257,16 +274,16 @@ namespace pgs
 		}
 
 		//oid
-		pgr = _con
-			.once("SELECT oid FROM pg_catalog.pg_class WHERE relname=$1 AND relnamespace=$2")
-			.exec(tableName(c, false, false), _schema2oid[c->_schema])
-			.throwIfError();
-		if(pgr.rows() != 1)
+		pgr = con.query(
+			"SELECT oid FROM pg_catalog.pg_class WHERE relname=$1 AND relnamespace=$2",
+			MVA(tableName(c, false, false), _schema2oid[c->_schema])).data()[0];
+		if(pgc::ersTuplesOk != pgr.status() || pgr.rows() != 1)
 		{
-			log.push_back(SyncLogLine("obtain table oid failed", schemaName(c->_schema, false, false), tableName(c, false, false)));
+			//log.push_back(SyncLogLine("obtain table oid failed", schemaName(c->_schema, false, false), tableName(c, false, false)));
+			WLOG("obtain table oid failed: "<<schemaName(c->_schema, false, false)<<", "<<tableName(c, false, false));
 			return false;
 		}
-		TOid oid = pgr.fetchUInt32();
+		TOid oid = pgr.fetchUInt32(0,0);
 		_cat2oid[c] = oid;
 		_oid2cat[oid] = c;
 
@@ -274,12 +291,15 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::sync_columnExistence(TSyncLog &log, pgs::meta::FieldCPtr f, bool allowCreate)
+	bool ClusterImpl::sync_columnExistence(pgc::Connection con, pgs::meta::FieldCPtr f, bool allowCreate)
 	{
-		pgc::Result pgr = _con.once("SELECT * FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2 AND column_name=$3").exec(schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)).throwIfError();
-		if(!pgr.rows())
+		pgc::Data pgr = con.query(
+			"SELECT * FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2 AND column_name=$3",
+			MVA(schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false))).data()[0];
+		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
 		{
-			log.push_back(SyncLogLine("column absent", schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)));
+			//log.push_back(SyncLogLine("column absent", schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)));
+			WLOG("column absent: "<<schemaName(f->_category->_schema, false, false)<<", "<<tableName(f->_category, false, false)<<", "<<columnName(f, false, false));
 			if(allowCreate)
 			{
 				std::string sql = "ALTER TABLE "+tableName(f->_category, true, true)+" ADD COLUMN "+columnName(f, true, false)+" "+columnType(f);
@@ -288,8 +308,13 @@ namespace pgs
 					sql += " DEFAULT nextval('"+idGenName(f->_category->_schema, true, true)+"'::regclass) PRIMARY KEY";
 				}
 
-				_con.once(sql).exec().throwIfError();
-				log.push_back(SyncLogLine("column created", schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)));
+				pgr = con.query(sql).data()[0];
+				if(pgc::ersCommandOk != pgr.status())
+				{
+					return false;
+				}
+				//log.push_back(SyncLogLine("column created", schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)));
+				ILOG("column created: "<<schemaName(f->_category->_schema, false, false)<<", "<<tableName(f->_category, false, false)<<", "<<columnName(f, false, false));
 			}
 			else
 			{
@@ -301,17 +326,23 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::sync_indexExistence(TSyncLog &log, pgs::meta::IndexCPtr i, bool allowCreate)
+	bool ClusterImpl::sync_indexExistence(pgc::Connection con, pgs::meta::IndexCPtr i, bool allowCreate)
 	{
 		if(i->_fields.empty())
 		{
 			return true;
 		}
 
-		pgc::Result pgr = _con.once("SELECT * FROM pg_catalog.pg_indexes WHERE schemaname=$1 AND tablename=$2 AND indexname=$3").exec(schemaName(i->_category->_schema, false, false), tableName(i->_category, false, false), indexName(i, false, false)).throwIfError();
-		if(!pgr.rows())
+		pgc::Data pgr = con.query(
+			"SELECT * FROM pg_catalog.pg_indexes WHERE schemaname=$1 AND tablename=$2 AND indexname=$3",
+			MVA(
+				schemaName(i->_category->_schema, false, false), 
+				tableName(i->_category, false, false), 
+				indexName(i, false, false))).data()[0];
+		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
 		{
-			log.push_back(SyncLogLine("index absent", schemaName(i->_category->_schema, false, false), indexName(i, false, false)));
+			//log.push_back(SyncLogLine("index absent", schemaName(i->_category->_schema, false, false), indexName(i, false, false)));
+			WLOG("index absent: "<<schemaName(i->_category->_schema, false, false)<<", "<<indexName(i, false, false));
 			if(allowCreate)
 			{
 				std::string sql = "CREATE INDEX "+indexName(i, true, false)+" ON "+tableName(i->_category, true, true)+" USING ";
@@ -342,8 +373,13 @@ namespace pgs
 					sql += columnName(f, true, false);
 				}
 				sql += ")";
-				_con.once(sql).exec().throwIfError();
-				log.push_back(SyncLogLine("index created", schemaName(i->_category->_schema, false, false), indexName(i, false, false)));
+				pgr = con.query(sql).data()[0];
+				if(pgc::ersCommandOk != pgr.status())
+				{
+					return false;
+				}
+				//log.push_back(SyncLogLine("index created", schemaName(i->_category->_schema, false, false), indexName(i, false, false)));
+				ILOG("index created: "<<schemaName(i->_category->_schema, false, false)<<", "<<indexName(i, false, false));
 			}
 			else
 			{
@@ -356,22 +392,30 @@ namespace pgs
 
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::sync_crossExistence(TSyncLog &log, pgs::meta::RelationCPtr r, bool allowCreate)
+	bool ClusterImpl::sync_crossExistence(pgc::Connection con, pgs::meta::RelationCPtr r, bool allowCreate)
 	{
-		pgc::Result pgr = _con.once("SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2").exec(schemaName(r->_schema, false, false), tableName(r, false, false)).throwIfError();
-		if(!pgr.rows())
+		pgc::Data pgr = con.query(
+			"SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2",
+			MVA(schemaName(r->_schema, false, false), tableName(r, false, false))).data()[0];
+		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
 		{
-			log.push_back(SyncLogLine("cross table absent", schemaName(r->_schema, false, false), tableName(r, false, false)));
+			//log.push_back(SyncLogLine("cross table absent", schemaName(r->_schema, false, false), tableName(r, false, false)));
+			WLOG("cross table absent: "<<schemaName(r->_schema, false, false)<<", "<<tableName(r, false, false));
 			if(allowCreate)
 			{
-				_con.once("CREATE TABLE "+tableName(r, true, true)+"("
+				pgr = con.query("CREATE TABLE "+tableName(r, true, true)+"("
 					" id BIGINT DEFAULT nextval('"+idGenName(r->_schema, true, true)+"'::regclass) PRIMARY KEY "
 					", input_id BIGINT"
-					", output_id BIGINT)").exec().throwIfError();
-				log.push_back(SyncLogLine("cross table created", schemaName(r->_schema, false, false), tableName(r, false, false)));
+					", output_id BIGINT)").data()[0];
+				if(pgc::ersCommandOk != pgr.status())
+				{
+					return false;
+				}
+				//log.push_back(SyncLogLine("cross table created", schemaName(r->_schema, false, false), tableName(r, false, false)));
+				ILOG("cross table created: "<<schemaName(r->_schema, false, false)<<", "<<tableName(r, false, false));
 
 				//тригер на добавление в кросс
-				_con.once(
+				pgr = con.query(
 					"CREATE OR REPLACE FUNCTION "+triggerFuncName(r, "ins_upd")+"()\n"
 					"	RETURNS trigger AS\n"
 					"	$BODY$\n"
@@ -386,32 +430,42 @@ namespace pgs
 					"	END\n"
 					"	$BODY$\n"
 					"	LANGUAGE plpgsql;\n"
-					).exec().throwIfError();
+					).data()[0];
+				if(pgc::ersCommandOk != pgr.status())
+				{
+					return false;
+				}
 
-				_con.once(
+				pgr = con.query(
 					"CREATE TRIGGER "+triggerName(r, "ins_upd")+"\n"
 					"	BEFORE INSERT OR UPDATE\n"
 					"	ON "+tableName(r, true, true)+"\n"
 					"	FOR EACH ROW\n"
 					"	EXECUTE PROCEDURE "+triggerFuncName(r, "ins_upd")+"();\n"
-					).exec().throwIfError();
+					).data()[0];
+				if(pgc::ersCommandOk != pgr.status())
+				{
+					return false;
+				}
 
 
 				BOOST_FOREACH(pgs::meta::CategoryCPtr c, r->_inputEnd->_categories)
 				{
 					pgs::meta::RelationEndCPtr re = c->_relationEnds[r->_inputEnd->_name];
-					if(!createTable2CrossTrigger(log, re, "in"))
+					if(!createTable2CrossTrigger(con, re, "in"))
 					{
-						log.push_back(SyncLogLine("table triggers creation failed", schemaName(r->_schema, false, false), tableName(c, false, false)));
+						//log.push_back(SyncLogLine("table triggers creation failed", schemaName(r->_schema, false, false), tableName(c, false, false)));
+						WLOG("table triggers creation failed: "<<schemaName(r->_schema, false, false)<<", "<<tableName(c, false, false));
 						return false;
 					}
 				}
 				BOOST_FOREACH(pgs::meta::CategoryCPtr c, r->_outputEnd->_categories)
 				{
 					pgs::meta::RelationEndCPtr re = c->_relationEnds[r->_outputEnd->_name];
-					if(!createTable2CrossTrigger(log, re, "out"))
+					if(!createTable2CrossTrigger(con, re, "out"))
 					{
-						log.push_back(SyncLogLine("table triggers creation failed", schemaName(r->_schema, false, false), tableName(c, false, false)));
+						//log.push_back(SyncLogLine("table triggers creation failed", schemaName(r->_schema, false, false), tableName(c, false, false)));
+						WLOG("table triggers creation failed: "<<schemaName(r->_schema, false, false)<<", "<<tableName(c, false, false));
 						return false;
 					}
 				}
@@ -427,17 +481,22 @@ namespace pgs
 
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::sync_tableInherits(TSyncLog &log, pgs::meta::CategoryCPtr c, bool allowCreate)
+	bool ClusterImpl::sync_tableInherits(pgc::Connection con, pgs::meta::CategoryCPtr c, bool allowCreate)
 	{
-		pgc::Result pgr = _con
-			.once("SELECT inhparent FROM pg_catalog.pg_inherits WHERE inhrelid=$1")
-			.exec(_cat2oid[c])
-			.throwIfError();
+		//todo: withPrepare срезать
+		pgc::Data pgr = con.query(
+			"SELECT inhparent FROM pg_catalog.pg_inherits WHERE inhrelid=$1",
+			Variant(_cat2oid[c])).data()[0];
+
+		if(pgc::ersTuplesOk != pgr.status())
+		{
+			return false;
+		}
 
 		std::set<TOid> baseOids;
 		for(size_t i(0); i<pgr.rows(); i++)
 		{
-			baseOids.insert(pgr.fetchUInt32(i));
+			baseOids.insert(pgr.fetchUInt32(0, i));
 		}
 
 
@@ -445,12 +504,18 @@ namespace pgs
 		{
 			if(baseOids.end() == baseOids.find(_cat2oid[b]))
 			{
-				log.push_back(SyncLogLine("inheritance absent", schemaName(c->_schema, false, false), tableName(c, false, false), tableName(b, false, false)));
+				//log.push_back(SyncLogLine("inheritance absent", schemaName(c->_schema, false, false), tableName(c, false, false), tableName(b, false, false)));
+				WLOG("inheritance absent: "<<schemaName(c->_schema, false, false)<<", "<<tableName(c, false, false)<<", "<<tableName(b, false, false));
 				if(allowCreate)
 				{
-					_con.once("ALTER TABLE "+tableName(c, true, true)+" INHERIT "+tableName(b, true, true)).exec().throwIfError();
+					pgr = con.query("ALTER TABLE "+tableName(c, true, true)+" INHERIT "+tableName(b, true, true)).data()[0];
+					if(pgc::ersCommandOk != pgr.status())
+					{
+						return false;
+					}
 					baseOids.insert(_cat2oid[b]);
-					log.push_back(SyncLogLine("inheritance created", schemaName(c->_schema, false, false), tableName(c, false, false), tableName(b, false, false)));
+					//log.push_back(SyncLogLine("inheritance created", schemaName(c->_schema, false, false), tableName(c, false, false), tableName(b, false, false)));
+					ILOG("inheritance created: "<<schemaName(c->_schema, false, false)<<", "<<tableName(c, false, false)<<", "<<tableName(b, false, false));
 				}
 				else
 				{
@@ -462,12 +527,11 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::createTable2CrossTrigger(TSyncLog &log, pgs::meta::RelationEndCPtr re, const std::string &who)
+	bool ClusterImpl::createTable2CrossTrigger(pgc::Connection con, pgs::meta::RelationEndCPtr re, const std::string &who)
 	{
-		(void)log;
 		//////////////////////////////////////////////////////////////////////////
 		//тригер на удаление
-		_con.once(
+		pgc::Data pgr = con.query(
 			"CREATE OR REPLACE FUNCTION "+triggerFuncName(re->_category, re->_name+"_del")+"()\n"
 			"	RETURNS trigger AS\n"
 			"	$BODY$\n"
@@ -479,18 +543,27 @@ namespace pgs
 			"	END\n"
 			"	$BODY$\n"
 			"	LANGUAGE plpgsql;\n"
-			).exec().throwIfError();
-		_con.once(
+			).data()[0];
+		if(pgc::ersCommandOk != pgr.status())
+		{
+			return false;
+		}
+
+		pgr = con.query(
 			"CREATE TRIGGER "+triggerName(re->_category, re->_name+"_del")+"\n"
 			"	BEFORE DELETE\n"
 			"	ON "+tableName(re->_category, true, true)+"\n"
 			"	FOR EACH ROW\n"
 			"	EXECUTE PROCEDURE "+triggerFuncName(re->_category, re->_name+"_del")+"();\n"
-			).exec().throwIfError();
+			).data()[0];
+		if(pgc::ersCommandOk != pgr.status())
+		{
+			return false;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		//на обновление
-		_con.once(
+		pgr = con.query(
 			"CREATE OR REPLACE FUNCTION "+triggerFuncName(re->_category, re->_name+"_upd")+"()\n"
 			"	RETURNS trigger AS\n"
 			"	$BODY$\n"
@@ -502,32 +575,50 @@ namespace pgs
 			"	END\n"
 			"	$BODY$\n"
 			"	LANGUAGE plpgsql;\n"
-			).exec().throwIfError();
-		_con.once(
+			).data()[0];
+		if(pgc::ersCommandOk != pgr.status())
+		{
+			return false;
+		}
+
+		pgr = con.query(
 			"CREATE TRIGGER "+triggerName(re->_category, re->_name+"_upd")+"\n"
 			"	BEFORE UPDATE\n"
 			"	ON "+tableName(re->_category, true, true)+"\n"
 			"	FOR EACH ROW\n"
 			"	EXECUTE PROCEDURE "+triggerFuncName(re->_category, re->_name+"_upd")+"();\n"
-			).exec().throwIfError();
+			).data()[0];
+		if(pgc::ersCommandOk != pgr.status())
+		{
+			return false;
+		}
 
 		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::drop_schemaExistence(TSyncLog &log, pgs::meta::SchemaCPtr s)
+	bool ClusterImpl::drop_schemaExistence(pgc::Connection con, pgs::meta::SchemaCPtr s)
 	{
-		pgc::Result pgr = _con
-			.once("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1")
-			.exec(schemaName(s, false, false))
-			.throwIfError();
-
-		if(pgr.fetchInt32())
+		pgc::Data pgr = con.query(
+			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
+			schemaName(s, false, false)).data()[0];
+		if(pgc::ersTuplesOk != pgr.status())
 		{
-			log.push_back(SyncLogLine("schema present", schemaName(s, false, false)));
+			return false;
+		}
 
-			_con.once("DROP SCHEMA "+schemaName(s, true, true)+" CASCADE").exec().throwIfError();
-			log.push_back(SyncLogLine("schema droppped", schemaName(s, false, false)));
+		if(pgr.fetchInt32(0,0))
+		{
+			//log.push_back(SyncLogLine("schema present", schemaName(s, false, false)));
+			ILOG("schema present: "<<schemaName(s, false, false));
+
+			pgr = con.query("DROP SCHEMA "+schemaName(s, true, true)+" CASCADE").data()[0];
+			if(pgc::ersCommandOk != pgr.status())
+			{
+				return false;
+			}
+			//log.push_back(SyncLogLine("schema droppped", schemaName(s, false, false)));
+			ILOG("schema droppped: "<<schemaName(s, false, false));
 		}
 
 		return true;
@@ -555,19 +646,6 @@ namespace pgs
 
 		_prefix = prefix;
 		_suffix = suffix;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	pgc::Connection  ClusterImpl::con(pgc::Connection con)
-	{
-		_con = con;
-		return _con;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	pgc::Connection  ClusterImpl::con()
-	{
-		return _con;
 	}
 
 

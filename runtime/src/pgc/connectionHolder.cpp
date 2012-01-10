@@ -158,6 +158,14 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ConnectionHolder::pushResultAndSet(async::Result<Datas> &res, bool success)
+	{
+		DataImplPtr di(new DataImpl(PQmakeEmptyPGresult(_pgcon, success?PGRES_COMMAND_OK:PGRES_FATAL_ERROR), shared_from_this()));
+		res.dataNoWait().push_back(utils::ImplAccess<Data>(di));
+		res.set();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::processRequest()
 	{
 		_mtxProcess.lock();
@@ -224,7 +232,7 @@ namespace pgc
 			if(ec)
 			{
 				ELOG(__FUNCTION__<<", send, "<<ec<<", "<<PQerrorMessage(_pgcon));
-				res.set();
+				pushResultAndSet(res);
 				return;
 			}
 		}
@@ -238,7 +246,7 @@ namespace pgc
 				if(ec)
 				{
 					ELOG(__FUNCTION__<<", recv, "<<ec<<", "<<PQerrorMessage(_pgcon));
-					res.set();
+					pushResultAndSet(res);
 					return;
 				}
 			}
@@ -246,7 +254,7 @@ namespace pgc
 			if(!PQconsumeInput(_pgcon))
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				res.set();
+				pushResultAndSet(res);
 				return;
 			}
 
@@ -286,10 +294,10 @@ namespace pgc
 			{
 				async::Result<Datas> r1;
 				runQuery_f(r1, "SAVEPOINT pgcp"+getPrid(s));
-				if(r1.data().size() != 1 || ersCommandOk != r1.data()[0].status())
+				if(ersCommandOk != r1.data()[0].status())
 				{
 					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-					res(Datas());
+					pushResultAndSet(res);
 					return;
 				}
 			}
@@ -300,7 +308,7 @@ namespace pgc
 				getPrid(s), 
 				s->getSql(), 
 				bindData);
-			if(r2.data().size() != 1 || ersCommandOk != r2.data()[0].status())
+			if(ersCommandOk != r2.data()[0].status())
 			{
 				const char *s4 = r2.data()[0].errorCode();
 
@@ -313,10 +321,10 @@ namespace pgc
 
 						async::Result<Datas> r3;
 						runQuery_f(r3, "ROLLBACK TO SAVEPOINT pgcp"+oldPrid);
-						if(r3.data().size() != 1 || ersCommandOk != r3.data()[0].status())
+						if(ersCommandOk != r3.data()[0].status())
 						{
 							ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-							res(Datas());
+							pushResultAndSet(res);
 							return;
 						}
 					}
@@ -326,7 +334,7 @@ namespace pgc
 				{
 					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
 					delPrepared(s);
-					res(Datas());
+					pushResultAndSet(res);
 					return;
 				}
 			}
@@ -337,10 +345,10 @@ namespace pgc
 		{
 			async::Result<Datas> r4;
 			runQuery_f(r4, "RELEASE SAVEPOINT pgcp"+getPrid(s));
-			if(r4.data().size() != 1 || ersCommandOk != r4.data()[0].status())
+			if(ersCommandOk != r4.data()[0].status())
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				res(Datas());
+				pushResultAndSet(res);
 				return;
 			}
 		}
@@ -375,7 +383,7 @@ namespace pgc
 				1))
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				res(Datas());
+				pushResultAndSet(res);
 				return;
 			};
 		}
@@ -392,7 +400,7 @@ namespace pgc
 				1))
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				res(Datas());
+				pushResultAndSet(res);
 				return;
 			};
 		}
@@ -419,7 +427,7 @@ namespace pgc
 			paramTypes))
 		{
 			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-			res(Datas());
+			pushResultAndSet(res);
 			return;
 		};
 
@@ -450,7 +458,7 @@ namespace pgc
 			1))
 		{
 			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-			res(Datas());
+			pushResultAndSet(res);
 			return;
 		};
 
@@ -492,7 +500,7 @@ namespace pgc
 
 			async::Result<Datas> r;
 			runQuery_f(r, "DEALLOCATE "+prid);
-			if(r.data().size()!=1 || ersCommandOk != r.data()[0].status())
+			if(ersCommandOk != r.data()[0].status())
 			{
 				const char * errCode = r.data()[0].errorCode();
 				if(errCode && !strcmp("26000", errCode))
@@ -504,7 +512,7 @@ namespace pgc
 					//другая ошибка - фатально
 					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
 					_prepareds.clear();
-					res.set();
+					pushResultAndSet(res);
 					return;
 				}
 			}
@@ -513,7 +521,7 @@ namespace pgc
 		_now = posix_time::ptime();
 		assert(_mtxProcess.isLocked());
 		assert(_pgcon);
-		res.set();
+		pushResultAndSet(res, true);
 	}
 
 
