@@ -1,5 +1,5 @@
-#ifndef R3META_BONDATA_H
-#define R3META_BONDATA_H
+#ifndef R3META_BONSCHEMA_H
+#define R3META_BONSCHEMA_H
 
 #include "R3MetaBonX.h"
 
@@ -7,9 +7,9 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   DataImpl
+//   C  L  A  S  S   SchemaImpl
 //*******************************************************************
-class DataImpl :
+class SchemaImpl :
 	  virtual public BON::ModelImpl
 {
 public:

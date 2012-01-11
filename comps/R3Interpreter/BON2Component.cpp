@@ -25,7 +25,7 @@
 
 #include "R3MetaBonX.h"
 
-#include "workers/wData.hpp"
+#include "workers/wSchema.hpp"
 
 
 namespace BON
@@ -119,7 +119,7 @@ void Component::invokeEx( Project& project, FCO& currentFCO, const std::set<FCO>
 	}
 
 	{
-		workers::WData w(genDir);
+		workers::WSchema w(genDir);
 		//w(roots);
 		w.mk(roots);
 	}

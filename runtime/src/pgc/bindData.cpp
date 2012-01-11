@@ -39,7 +39,20 @@ namespace pgc
 	template <class Sequence>
 	void BindData::bindSeq(const Sequence &v)
 	{
-		assert(0);
+		resizeArrays(v.size());
+
+		typename Sequence::const_iterator iter = v.begin();
+		typename Sequence::const_iterator end = v.end();
+
+		for(size_t idx(0); iter!=end; ++iter, ++idx)
+		{
+			if(!bindFiller(*iter, idx))
+			{
+				assert(0);
+				ELOG("bind seq element failed: "<<idx);
+				resizeArrays(0);
+			}
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

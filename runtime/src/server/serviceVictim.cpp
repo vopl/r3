@@ -9,6 +9,9 @@
 #include "server/iserver.hpp"
 #include "async/resultWaiter.hpp"
 
+#include "pgs/cluster.hpp"
+#include "pgs/meta/schemas/Staff_initializer.hpp"
+
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -104,6 +107,24 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	void ServiceVictim::syncPgs()
+	{
+		pgs::meta::Cluster mcl;
+		mcl.add<pgs::meta::schemas::Staff>();
+		mcl.initialize();
+		
+		pgs::Cluster cl(mcl);
+		cl.setUnicators("pre", "post");
+
+		pgc::Connection con = _db.allocConnection();
+
+		con.query("BEGIN");
+		cl.sync(con, true);
+		cl.drop(con);
+		con.query("COMMIT");
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	ServiceVictim::ServiceVictim()
 	{
 
@@ -129,10 +150,12 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-		for(size_t i(0); i<20; i++)
-		{
-			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-		}
+// 		for(size_t i(0); i<20; i++)
+// 		{
+// 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+// 		}
+
+		async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
 
 		int k = 220;
 		//

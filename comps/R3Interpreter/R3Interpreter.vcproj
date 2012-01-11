@@ -523,14 +523,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Data.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Data.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Date.cpp"
 					>
 				</File>
@@ -691,6 +683,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\BonX\R3Meta_BON\Schema.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Schema.h"
+					>
+				</File>
+				<File
 					RelativePath="..\BonX\R3Meta_BON\Set.cpp"
 					>
 				</File>
@@ -752,11 +752,11 @@
 			Name="workers"
 			>
 			<File
-				RelativePath=".\workers\wData.cpp"
+				RelativePath=".\workers\wSchema.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\workers\wData.hpp"
+				RelativePath=".\workers\wSchema.hpp"
 				>
 			</File>
 		</Filter>

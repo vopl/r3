@@ -45,7 +45,7 @@ IMPLEMENT_BONEXTENSION( R3Meta_BON::Timestamp, "Timestamp" );
 IMPLEMENT_ABSTRACT_BONEXTENSION( R3Meta_BON::CategoryOrReference );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::Category, "Category" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryReference, "CategoryReference" );
-IMPLEMENT_BONEXTENSION( R3Meta_BON::Data, "Data" );
+IMPLEMENT_BONEXTENSION( R3Meta_BON::Schema, "Schema" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::ScantyValue, "ScantyValue" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryInheritance, "CategoryInheritance" );
 IMPLEMENT_BONEXTENSION( R3Meta_BON::CategoryRelation, "CategoryRelation" );

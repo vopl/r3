@@ -5,7 +5,7 @@
 //********************************************************************************
 // 
 //********************************************************************************
-void R3Meta_BON::DataImpl::accept( BON::Visitor *pVisitor)
+void R3Meta_BON::SchemaImpl::accept( BON::Visitor *pVisitor)
 {
 	// visit the Model
 	pVisitor->visitModel( BON::Model( this));
@@ -16,7 +16,7 @@ void R3Meta_BON::DataImpl::accept( BON::Visitor *pVisitor)
 //********************************************************************************
 // getter for role "Category" among "CategoryOrReference"s and its descendants
 //********************************************************************************
-std::set<R3Meta_BON::Category> R3Meta_BON::DataImpl::getCategory()
+std::set<R3Meta_BON::Category> R3Meta_BON::SchemaImpl::getCategory()
 {
 	std::set<R3Meta_BON::Category> res;
 	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Category");
@@ -33,7 +33,7 @@ std::set<R3Meta_BON::Category> R3Meta_BON::DataImpl::getCategory()
 //********************************************************************************
 // getter for role "CategoryInheritance" among "R3Meta_BON::CategoryInheritance"s
 //********************************************************************************
-std::set<R3Meta_BON::CategoryInheritance> R3Meta_BON::DataImpl::getCategoryInheritance()
+std::set<R3Meta_BON::CategoryInheritance> R3Meta_BON::SchemaImpl::getCategoryInheritance()
 {
 	std::set<R3Meta_BON::CategoryInheritance> res;
 	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("CategoryInheritance");
@@ -50,7 +50,7 @@ std::set<R3Meta_BON::CategoryInheritance> R3Meta_BON::DataImpl::getCategoryInher
 //********************************************************************************
 // aggregated getter for role "R3Meta_BON::" among "R3Meta_BON::CategoryOrReference"s and its descendants
 //********************************************************************************
-std::set<R3Meta_BON::CategoryOrReference> R3Meta_BON::DataImpl::getCategoryOrReference()
+std::set<R3Meta_BON::CategoryOrReference> R3Meta_BON::SchemaImpl::getCategoryOrReference()
 {
 	std::set<R3Meta_BON::CategoryOrReference> res;
 	const int len = 2;
@@ -71,7 +71,7 @@ std::set<R3Meta_BON::CategoryOrReference> R3Meta_BON::DataImpl::getCategoryOrRef
 //********************************************************************************
 // getter for role "CategoryReference" among "CategoryOrReference"s and its descendants
 //********************************************************************************
-std::set<R3Meta_BON::CategoryReference> R3Meta_BON::DataImpl::getCategoryReference()
+std::set<R3Meta_BON::CategoryReference> R3Meta_BON::SchemaImpl::getCategoryReference()
 {
 	std::set<R3Meta_BON::CategoryReference> res;
 	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("CategoryReference");
@@ -88,7 +88,7 @@ std::set<R3Meta_BON::CategoryReference> R3Meta_BON::DataImpl::getCategoryReferen
 //********************************************************************************
 // getter for role "CategoryRelation" among "R3Meta_BON::CategoryRelation"s
 //********************************************************************************
-std::set<R3Meta_BON::CategoryRelation> R3Meta_BON::DataImpl::getCategoryRelation()
+std::set<R3Meta_BON::CategoryRelation> R3Meta_BON::SchemaImpl::getCategoryRelation()
 {
 	std::set<R3Meta_BON::CategoryRelation> res;
 	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("CategoryRelation");

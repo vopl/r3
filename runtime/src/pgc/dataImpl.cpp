@@ -919,7 +919,7 @@ namespace pgc
 		{
 			return 0;
 		}
-		return v.as<boost::int32_t>();
+		return v.to<boost::int32_t>();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -931,7 +931,7 @@ namespace pgc
 		{
 			return 0;
 		}
-		return v.as<boost::uint32_t>();
+		return v.to<boost::uint32_t>();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -943,7 +943,7 @@ namespace pgc
 		{
 			return 0;
 		}
-		return v.as<std::string>();
+		return v.to<std::string>();
 	}
 
 }

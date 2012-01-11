@@ -49,7 +49,7 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Atom, DateTimeValue, Tim
 namespace R3Meta_BON {      DECLARE_ABSTRACT_BONEXTENSION( BON::FCO, CategoryOrReferenceImpl, CategoryOrReference ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Model, CategoryOrReference, CategoryImpl, Category ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION2( BON::Reference, CategoryOrReference, CategoryReferenceImpl, CategoryReference ); }
-namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, DataImpl, Data ); }
+namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Model, SchemaImpl, Schema ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Atom, ScantyValueImpl, ScantyValue ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryInheritanceImpl, CategoryInheritance ); }
 namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryRelationImpl, CategoryRelation ); }
@@ -95,7 +95,7 @@ namespace R3Meta_BON {      DECLARE_BONEXTENSION( BON::Connection, CategoryRelat
 #include "R3Meta_BON/CategoryOrReference.h"
 #include "R3Meta_BON/Category.h"
 #include "R3Meta_BON/CategoryReference.h"
-#include "R3Meta_BON/Data.h"
+#include "R3Meta_BON/Schema.h"
 #include "R3Meta_BON/ScantyValue.h"
 #include "R3Meta_BON/CategoryInheritance.h"
 #include "R3Meta_BON/CategoryRelation.h"

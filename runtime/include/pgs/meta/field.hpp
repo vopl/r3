@@ -9,7 +9,6 @@ namespace pgs
 	{
 		enum EFieldType
 		{
-			eftAudio,
 			eftBinary,
 			eftBool,
 			eftDate,
@@ -17,7 +16,6 @@ namespace pgs
 			eftEnum,
 			eftFile,
 			eftId,
-			eftImage,
 			eftInt16,
 			eftInt32,
 			eftInt64,
@@ -29,7 +27,15 @@ namespace pgs
 			eftString,
 			eftTime,
 			eftTimestamp,
-			eftVideo,
+			eftUuid,
+			eftVariant,
+			eftBitset8,
+			eftBitset16,
+			eftBitset32,
+			eftBitset64,
+			eftBitset128,
+			eftBitset256,
+			eftBitset512,
 		};
 
 		//////////////////////////////////////////////////////////////////////////

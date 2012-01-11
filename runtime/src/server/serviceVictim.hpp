@@ -25,6 +25,7 @@ namespace server
 
 		void onResult(pgc::Datas r);
 		void connectionLoop1();
+		void syncPgs();
 
 	public:
 		ServiceVictim();

@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{CE183B13-D028-454C-BA47-8776A2C649C0}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{75800F4B-0532-4165-BCD7-D36A7F7BDBD0}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
 	<author></author>
 
-	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Data" >
+	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Schema" >
 		<attrdef name="Abstract" metaref = "1460" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="AllowNull" metaref = "1461" valuetype = "boolean" defvalue = "false">
@@ -959,9 +959,9 @@
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
 			<constraint name="UniqueCategoryNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[project.rootFolder()
-.models(Data)
+.models(Schema)
 ->forAll(
-  d:Data|
+  d:Schema|
     d.parts(Category)
     ->forAll(
       c:Category|
@@ -1030,20 +1030,6 @@
 				<part metaref = "1670" role = "Variant" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
-		<model name = "Data" metaref = "1541" >
-				<regnode name = "namePosition" value ="4"></regnode>
-				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<role name = "Category" metaref = "1542" kind = "Category"></role>
-			<role name = "CategoryInheritance" metaref = "1543" kind = "CategoryInheritance"></role>
-			<role name = "CategoryReference" metaref = "1591" kind = "CategoryReference"></role>
-			<role name = "CategoryRelation" metaref = "1545" kind = "CategoryRelation"></role>
-			<aspect name = "AspectCategories" metaref = "1546" >
-				<part metaref = "1547" role = "Category" primary = "yes" linked = "no"></part>
-				<part metaref = "1548" role = "CategoryInheritance" primary = "yes" linked = "no"></part>
-				<part metaref = "1592" role = "CategoryReference" primary = "yes" kindaspect = "AspectCategory" linked = "no"></part>
-				<part metaref = "1550" role = "CategoryRelation" primary = "yes" linked = "no"></part>
-			</aspect>
-		</model>
 		<model name = "Enum" metaref = "1551" attributes = "AllowNull" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -1078,6 +1064,20 @@
 			<role name = "ScantyValue" metaref = "1552" kind = "ScantyValue"></role>
 			<aspect name = "AspectScanty" metaref = "1168" attributes = "AllowNull" >
 				<part metaref = "1553" role = "ScantyValue" primary = "yes" linked = "no"></part>
+			</aspect>
+		</model>
+		<model name = "Schema" metaref = "1671" >
+				<regnode name = "namePosition" value ="4"></regnode>
+				<regnode name = "isTypeInfoShown" value ="true"></regnode>
+			<role name = "Category" metaref = "1672" kind = "Category"></role>
+			<role name = "CategoryInheritance" metaref = "1673" kind = "CategoryInheritance"></role>
+			<role name = "CategoryReference" metaref = "1674" kind = "CategoryReference"></role>
+			<role name = "CategoryRelation" metaref = "1675" kind = "CategoryRelation"></role>
+			<aspect name = "AspectCategories" metaref = "1676" >
+				<part metaref = "1677" role = "Category" primary = "yes" linked = "no"></part>
+				<part metaref = "1678" role = "CategoryInheritance" primary = "yes" linked = "no"></part>
+				<part metaref = "1679" role = "CategoryReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1680" role = "CategoryRelation" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Set" metaref = "1554" attributes = "AllowNull" >

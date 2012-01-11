@@ -1,5 +1,5 @@
-#ifndef _WORKERS_WDATA_HPP_
-#define _WORKERS_WDATA_HPP_
+#ifndef _WORKERS_WSCHEMA_HPP_
+#define _WORKERS_WSCHEMA_HPP_
 
 #include "BON.h"
 #include "BONImpl.h"
@@ -14,12 +14,12 @@ namespace workers
 	using namespace BON;
 	using namespace R3Meta_BON;
 
-	class WData
+	class WSchema
 	{
 		const boost::filesystem::path _path;
 	public:
-		WData(const boost::filesystem::path &path);
-		~WData();
+		WSchema(const boost::filesystem::path &path);
+		~WSchema();
 	private:
 		void collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive);
 		std::set<CategoryRelation> collectRelations(Category cat, bool in, bool out);
@@ -51,20 +51,20 @@ namespace workers
 	public:
 		void mk(const std::set<FCO> &roots);
 	private:
-		void mkSchema(const Data &data);
-		void mkSchemaTypes(out::File &hpp, const Data &data);
+		void mkSchema(const Schema &schema);
+		void mkSchemaTypes(out::File &hpp, const Schema &schema);
 
 		void mkCategoryClass(out::File &hpp, const Category &cat, bool fwd=false);
 		void mkFieldClass(out::File &hpp, const Field &fld, bool fwd=false);
 		void mkFieldClass(out::File &hpp, const Category &cat, const std::string &name, bool fwd=false);
 		void mkRelationClass(out::File &hpp, const CategoryRelation &rel, bool fwd=false);
 
-		void mkSchemaInitializer(out::File &hpp, const Data &data);
-		void mkSchemaInitializerPre(out::File &hpp, const Data &data);
-		void mkSchemaInitializerDeps(out::File &hpp, const Data &data);
-		void mkSchemaInitializerCreate(out::File &hpp, const Data &data);
-		void mkSchemaInitializerLinks(out::File &hpp, const Data &data);
-		void mkSchemaInitializerPost(out::File &hpp, const Data &data);
+		void mkSchemaInitializer(out::File &hpp, const Schema &schema);
+		void mkSchemaInitializerPre(out::File &hpp, const Schema &schema);
+		void mkSchemaInitializerDeps(out::File &hpp, const Schema &schema);
+		void mkSchemaInitializerCreate(out::File &hpp, const Schema &schema);
+		void mkSchemaInitializerLinks(out::File &hpp, const Schema &schema);
+		void mkSchemaInitializerPost(out::File &hpp, const Schema &schema);
 
 		std::string relEndName(const CategoryRelation &rel, bool src);
 
@@ -73,7 +73,7 @@ namespace workers
 		std::string relationClassName(const CategoryRelation &obj);
 		std::string relationName(const CategoryRelation &obj);
 		std::string categoryClassName(const Category &obj);
-		std::string schemaClassName(const Data &obj);
+		std::string schemaClassName(const Schema &obj);
 	};
 }
 #endif

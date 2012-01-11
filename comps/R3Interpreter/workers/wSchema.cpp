@@ -1,5 +1,5 @@
 #include "Stdafx.h"
-#include "workers/wData.hpp"
+#include "workers/wSchema.hpp"
 #include <Console.h>
 #include <direct.h>
 #include "out/styler.hpp"
@@ -9,12 +9,12 @@ namespace workers
 	using namespace GMEConsole;
 	using namespace std;
 
-	WData::WData(const boost::filesystem::path &path)
+	WSchema::WSchema(const boost::filesystem::path &path)
 		: _path(path)
 	{
 
 	}
-	WData::~WData()
+	WSchema::~WSchema()
 	{
 
 	}
@@ -23,7 +23,7 @@ namespace workers
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive)
+	void WSchema::collectInheriance(std::set<Category> &res, Category cat, bool bases, bool recursive)
 	{
 		if(res.end() != res.find(cat))
 		{
@@ -72,7 +72,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::set<CategoryRelation> WData::collectRelations(Category cat, bool in, bool out)
+	std::set<CategoryRelation> WSchema::collectRelations(Category cat, bool in, bool out)
 	{
 		std::set<Category> basesAndSelf;
 		collectInheriance(basesAndSelf, cat, true, true);
@@ -107,7 +107,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::vector<Field> WData::collectFields(Category cat)
+	std::vector<Field> WSchema::collectFields(Category cat)
 	{
 		std::set<Category> basesAndSelf;
 		collectInheriance(basesAndSelf, cat, true, true);
@@ -129,7 +129,7 @@ namespace workers
 
 
 	//////////////////////////////////////////////////////////////////////////
-	std::vector<Index> WData::collectIndices(Category cat)
+	std::vector<Index> WSchema::collectIndices(Category cat)
 	{
 		std::set<Category> basesAndSelf;
 		collectInheriance(basesAndSelf, cat, true, true);
@@ -158,31 +158,31 @@ namespace workers
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mk(const std::set<FCO> &roots)
+	void WSchema::mk(const std::set<FCO> &roots)
 	{
 		//собрать все категории и распредилить по схемам
 		BOOST_FOREACH(const FCO &fco, roots)
 		{
-			Data data(fco);
-			if(data)
+			Schema schema(fco);
+			if(schema)
 			{
-				mkSchema(data);
+				mkSchema(schema);
 			}
 		}
 	}
 
 	
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkSchema(const Data &data)
+	void WSchema::mkSchema(const Schema &schema)
 	{
-		Console::Out::WriteLine(("mkSchema: "+data->getName()).c_str());
+		Console::Out::WriteLine(("mkSchema: "+schema->getName()).c_str());
 		boost::filesystem::create_directories(_path/"schemas");
 
 		{
-			out::File hpp(_path / "schemas" / (data->getName()+".hpp"));
-			hpp<<"// data: "<<data->getName()<<endl;
-			hpp<<"#ifndef _PGS_META_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
-			hpp<<"#define _PGS_META_SCHEMAS_"<<data->getName()<<"_hpp"<<endl;
+			out::File hpp(_path / "schemas" / (schema->getName()+".hpp"));
+			hpp<<"// schema: "<<schema->getName()<<endl;
+			hpp<<"#ifndef _PGS_META_SCHEMAS_"<<schema->getName()<<"_hpp"<<endl;
+			hpp<<"#define _PGS_META_SCHEMAS_"<<schema->getName()<<"_hpp"<<endl;
 			hpp<<endl;
 			hpp<<"#include \"pgs/meta/schema.hpp\""<<endl;
 			hpp<<"#include \"pgs/meta/category.hpp\""<<endl;
@@ -193,7 +193,7 @@ namespace workers
 			hpp<<"#include \"pgs/meta/index.hpp\""<<endl;
 			hpp<<endl;
 
-			mkSchemaTypes(hpp, data);
+			mkSchemaTypes(hpp, schema);
 
 			hpp<<"#endif"<<endl;
 			hpp<<endl;
@@ -202,16 +202,16 @@ namespace workers
 		}
 
 		{
-			out::File hpp(_path / "schemas" / (data->getName()+"_initializer.hpp"));
-			hpp<<"// data: "<<data->getName()<<endl;
-			hpp<<"#ifndef _PGS_META_SCHEMAS_"<<data->getName()<<"_INITIALIZER_hpp"<<endl;
-			hpp<<"#define _PGS_META_SCHEMAS_"<<data->getName()<<"_INITIALIZER_hpp"<<endl;
+			out::File hpp(_path / "schemas" / (schema->getName()+"_initializer.hpp"));
+			hpp<<"// schema: "<<schema->getName()<<endl;
+			hpp<<"#ifndef _PGS_META_SCHEMAS_"<<schema->getName()<<"_INITIALIZER_hpp"<<endl;
+			hpp<<"#define _PGS_META_SCHEMAS_"<<schema->getName()<<"_INITIALIZER_hpp"<<endl;
 			hpp<<endl;
-			hpp<<"#include \"pgs/meta/schemas/"<<data->getName()<<".hpp\""<<endl;
+			hpp<<"#include \"pgs/meta/schemas/"<<schema->getName()<<".hpp\""<<endl;
 			hpp<<"#include \"pgs/meta/schemaInitializer.hpp\""<<endl;
 			hpp<<endl;
 
-			mkSchemaInitializer(hpp, data);
+			mkSchemaInitializer(hpp, schema);
 
 			hpp<<"#endif"<<endl;
 			hpp<<endl;
@@ -222,7 +222,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkSchemaTypes(out::File &hpp, const Data &data)
+	void WSchema::mkSchemaTypes(out::File &hpp, const Schema &schema)
 	{
 		//////////////////////////////////////////////////////////////////////////
 		hpp<<"namespace pgs\n{\nnamespace meta\n{"<<endl;
@@ -232,7 +232,7 @@ namespace workers
 		//собрать все поля, индексы, связи
 		std::set<Field> allFields;
 		std::set<Index> allIndices;
-		BOOST_FOREACH(const Category &cat, data->getCategory())
+		BOOST_FOREACH(const Category &cat, schema->getCategory())
 		{
 			std::set<FCO> fields = cat->getChildFCOs();
 			allFields.insert(fields.begin(), fields.end());
@@ -247,7 +247,7 @@ namespace workers
 		//предварительные объявления
 		//типы полей
 		hpp<<"namespace fields\n{"<<endl;
-		BOOST_FOREACH(const Category &cat, data->getCategory())
+		BOOST_FOREACH(const Category &cat, schema->getCategory())
 		{
 			mkFieldClass(hpp, cat, "id", true);
 		}
@@ -259,7 +259,7 @@ namespace workers
 
 		//типы категорий
 		hpp<<"namespace categories\n{"<<endl;
-		BOOST_FOREACH(const Category &cat, data->getCategory())
+		BOOST_FOREACH(const Category &cat, schema->getCategory())
 		{
 			mkCategoryClass(hpp, cat, true);
 		}
@@ -267,7 +267,7 @@ namespace workers
 
 		//типы связей
 		hpp<<"namespace relations\n{"<<endl;
-		BOOST_FOREACH(const CategoryRelation &rel, data->getCategoryRelation())
+		BOOST_FOREACH(const CategoryRelation &rel, schema->getCategoryRelation())
 		{
 			mkRelationClass(hpp, rel, true);
 		}
@@ -275,9 +275,9 @@ namespace workers
 
 		//предварительное объявление класса схемы
 		hpp<<"namespace schemas\n{"<<endl;
-		hpp<<"class "<<schemaClassName(data)<<";"<<endl;
-		hpp<<"typedef "<<schemaClassName(data)<<" *"<<schemaClassName(data)<<"Ptr;"<<endl;
-		hpp<<"typedef const "<<schemaClassName(data)<<" *"<<schemaClassName(data)<<"CPtr;"<<endl;
+		hpp<<"class "<<schemaClassName(schema)<<";"<<endl;
+		hpp<<"typedef "<<schemaClassName(schema)<<" *"<<schemaClassName(schema)<<"Ptr;"<<endl;
+		hpp<<"typedef const "<<schemaClassName(schema)<<" *"<<schemaClassName(schema)<<"CPtr;"<<endl;
 		hpp<<"}"<<endl;
 
 
@@ -287,7 +287,7 @@ namespace workers
 		//////////////////////////////////////////////////////////////////////////
 		//типы полей
 		hpp<<"namespace fields\n{"<<endl;
-		BOOST_FOREACH(const Category &cat, data->getCategory())
+		BOOST_FOREACH(const Category &cat, schema->getCategory())
 		{
 			mkFieldClass(hpp, cat, "id", false);
 		}
@@ -299,7 +299,7 @@ namespace workers
 
 		//типы категорий
 		hpp<<"namespace categories\n{"<<endl;
-		BOOST_FOREACH(const Category &cat, data->getCategory())
+		BOOST_FOREACH(const Category &cat, schema->getCategory())
 		{
 			mkCategoryClass(hpp, cat);
 		}
@@ -307,7 +307,7 @@ namespace workers
 
 		//типы связей
 		hpp<<"namespace relations\n{"<<endl;
-		BOOST_FOREACH(const CategoryRelation &rel, data->getCategoryRelation())
+		BOOST_FOREACH(const CategoryRelation &rel, schema->getCategoryRelation())
 		{
 			mkRelationClass(hpp, rel);
 		}
@@ -320,11 +320,11 @@ namespace workers
 		//////////////////////////////////////////////////////////////////////////
 		//класс схемы
 		hpp<<"namespace schemas\n{"<<endl;
-		hpp<<"class "<<schemaClassName(data)<<"\n	: public ::pgs::meta::Schema\n{"<<endl;
+		hpp<<"class "<<schemaClassName(schema)<<"\n	: public ::pgs::meta::Schema\n{"<<endl;
 
 		hpp<<"public:"<<endl;
 		//категории
-		BOOST_FOREACH(const Category &cat, data->getCategory())
+		BOOST_FOREACH(const Category &cat, schema->getCategory())
 		{
 			hpp<<"categories::"<<categoryClassName(cat)<<" *"
 				""<<cat->getName()<<";"<<endl;
@@ -342,7 +342,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkCategoryClass(out::File &hpp, const Category &cat, bool fwd)
+	void WSchema::mkCategoryClass(out::File &hpp, const Category &cat, bool fwd)
 	{
 		hpp<<"class "<<categoryClassName(cat);
 		if(fwd)
@@ -376,7 +376,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkFieldClass(out::File &hpp, const Field &fld, bool fwd)
+	void WSchema::mkFieldClass(out::File &hpp, const Field &fld, bool fwd)
 	{
 		hpp<<"class "<<fieldClassName(fld);
 		if(fwd)
@@ -402,7 +402,7 @@ namespace workers
 
 	//////////////////////////////////////////////////////////////////////////
 	
-	void WData::mkFieldClass(out::File &hpp, const Category &cat, const std::string &name, bool fwd)
+	void WSchema::mkFieldClass(out::File &hpp, const Category &cat, const std::string &name, bool fwd)
 	{
 		hpp<<"class "<<fieldClassName(cat, name);
 		if(fwd)
@@ -419,7 +419,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkRelationClass(out::File &hpp, const CategoryRelation &rel, bool fwd)
+	void WSchema::mkRelationClass(out::File &hpp, const CategoryRelation &rel, bool fwd)
 	{
 		hpp<<"class "<<relationClassName(rel);
 		if(fwd)
@@ -436,7 +436,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string WData::relEndName(const CategoryRelation &rel, bool src)
+	std::string WSchema::relEndName(const CategoryRelation &rel, bool src)
 	{
 		if(src)
 		{
@@ -447,13 +447,13 @@ namespace workers
 
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string WData::fieldClassName(const Field &obj)
+	std::string WSchema::fieldClassName(const Field &obj)
 	{
 		return fieldClassName(Category(obj->getParent()), obj->getName());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string WData::fieldClassName(const Category &obj, const std::string &name)
+	std::string WSchema::fieldClassName(const Category &obj, const std::string &name)
 	{
 		return 
 			obj->getParent()->getName()+"_"+
@@ -463,7 +463,7 @@ namespace workers
 
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string WData::relationClassName(const CategoryRelation &obj)
+	std::string WSchema::relationClassName(const CategoryRelation &obj)
 	{
 		return 
 			obj->getParent()->getName()+"_"+
@@ -476,7 +476,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string WData::relationName(const CategoryRelation &obj)
+	std::string WSchema::relationName(const CategoryRelation &obj)
 	{
 		return 
 			obj->getSrc()->getName()+"_"+
@@ -486,7 +486,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string WData::categoryClassName(const Category &obj)
+	std::string WSchema::categoryClassName(const Category &obj)
 	{
 		return 
 			obj->getParent()->getName()+"_"+
@@ -494,7 +494,7 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string WData::schemaClassName(const Data &obj)
+	std::string WSchema::schemaClassName(const Schema &obj)
 	{
 		return 
 			obj->getName();
@@ -520,31 +520,31 @@ namespace workers
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkSchemaInitializer(out::File &hpp, const Data &data)
+	void WSchema::mkSchemaInitializer(out::File &hpp, const Schema &schema)
 	{
 		//////////////////////////////////////////////////////////////////////////
 		hpp<<"namespace pgs\n{\nnamespace meta\n{"<<endl;
 
-		mkSchemaInitializerPre(hpp, data);
-		mkSchemaInitializerDeps(hpp, data);
-		mkSchemaInitializerCreate(hpp, data);
-		mkSchemaInitializerLinks(hpp, data);
-		mkSchemaInitializerPost(hpp, data);
+		mkSchemaInitializerPre(hpp, schema);
+		mkSchemaInitializerDeps(hpp, schema);
+		mkSchemaInitializerCreate(hpp, schema);
+		mkSchemaInitializerLinks(hpp, schema);
+		mkSchemaInitializerPost(hpp, schema);
 
 		hpp<<"}\n}"<<endl;
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkSchemaInitializerPre(out::File &hpp, const Data &data)
+	void WSchema::mkSchemaInitializerPre(out::File &hpp, const Schema &schema)
 	{
 		hpp<<"template <>\n"
-			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::preInit()\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(schema)<<">::preInit()\n"
 			"{\n"
-				"_schema->_name = \""<<data->getName()<<"\";\n"
+				"_schema->_name = \""<<schema->getName()<<"\";\n"
 				"if(_storage->_schemas[_schema->_name]) \n"
 				"{\n"
-					"assert(!\"duplicated category: "<<data->getName()<<"\");\n"
+					"assert(!\"duplicated category: "<<schema->getName()<<"\");\n"
 					"return false;\n"
 				"}\n"
 				"_schema->_storage = _storage;\n"
@@ -554,30 +554,30 @@ namespace workers
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkSchemaInitializerDeps(out::File &hpp, const Data &data)
+	void WSchema::mkSchemaInitializerDeps(out::File &hpp, const Schema &schema)
 	{
 
-		std::set<Data> aliens;
-		BOOST_FOREACH(CategoryReference ref, data->getCategoryReference())
+		std::set<Schema> aliens;
+		BOOST_FOREACH(CategoryReference ref, schema->getCategoryReference())
 		{
 			Category alienCat = ref->getCategory();
-			if(data != alienCat->getParent())
+			if(schema != alienCat->getParent())
 			{
-				aliens.insert(Data(alienCat->getParent()));
+				aliens.insert(Schema(alienCat->getParent()));
 			}
 		}
 
 
 		hpp<<"template <>\n"
-			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::checkDependencies()\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(schema)<<">::checkDependencies()\n"
 			"{\n";
 
 
-		BOOST_FOREACH(Data alien, aliens)
+		BOOST_FOREACH(Schema alien, aliens)
 		{
 			hpp<<"if(!_storage->_schemas[\""<<alien->getName()<<"\"])\n"
 			"{\n"
-				"assert(!\"dependency absent: "<<alien->getName()<<" for "<<data->getName()<<"\");\n"
+				"assert(!\"dependency absent: "<<alien->getName()<<" for "<<schema->getName()<<"\");\n"
 				"return false;\n"
 			"}\n";
 		}
@@ -589,13 +589,13 @@ namespace workers
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkSchemaInitializerCreate(out::File &hpp, const Data &data)
+	void WSchema::mkSchemaInitializerCreate(out::File &hpp, const Schema &schema)
 	{
 		hpp<<"template <>\n"
-			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::createObjects()\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(schema)<<">::createObjects()\n"
 			"{\n";
 
-			BOOST_FOREACH(Category cat, data->getCategory())
+			BOOST_FOREACH(Category cat, schema->getCategory())
 			{
 				hpp<<
 				"{\n"
@@ -705,7 +705,7 @@ namespace workers
 			}
 
 
-			BOOST_FOREACH(CategoryRelation rel, data->getCategoryRelation())
+			BOOST_FOREACH(CategoryRelation rel, schema->getCategoryRelation())
 			{
 				hpp<<
 					"{\n"
@@ -772,14 +772,14 @@ namespace workers
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkSchemaInitializerLinks(out::File &hpp, const Data &data)
+	void WSchema::mkSchemaInitializerLinks(out::File &hpp, const Schema &schema)
 	{
 		//теперь связывание
 		hpp<<"template <>\n"
-			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::linkObjects()\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(schema)<<">::linkObjects()\n"
 			"{\n";
 
-		BOOST_FOREACH(Category cat, data->getCategory())
+		BOOST_FOREACH(Category cat, schema->getCategory())
 		{
 			hpp<<"{\n";
 			hpp<<"CategoryPtr c = _schema->_categories[\""<<cat->getName()<<"\"];\n";
@@ -800,7 +800,7 @@ namespace workers
 			hpp<<"}\n";
 		}
 
-		BOOST_FOREACH(CategoryRelation rel, data->getCategoryRelation())
+		BOOST_FOREACH(CategoryRelation rel, schema->getCategoryRelation())
 		{
 			hpp<<"{\n";
 			Category catSrc = rel->getSrc();
@@ -830,15 +830,15 @@ namespace workers
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void WData::mkSchemaInitializerPost(out::File &hpp, const Data &data)
+	void WSchema::mkSchemaInitializerPost(out::File &hpp, const Schema &schema)
 	{
 		hpp<<"template <>\n"
-			"bool SchemaInitializer<schemas::"<<schemaClassName(data)<<">::postInit()\n"
+			"bool SchemaInitializer<schemas::"<<schemaClassName(schema)<<">::postInit()\n"
 			"{\n";
 
-			hpp<<"schemas::"<<schemaClassName(data)<<" *s = static_cast<schemas::"<<schemaClassName(data)<<" *>(_schema);\n";
+			hpp<<"schemas::"<<schemaClassName(schema)<<" *s = static_cast<schemas::"<<schemaClassName(schema)<<" *>(_schema);\n";
 
-		BOOST_FOREACH(Category cat, data->getCategory())
+		BOOST_FOREACH(Category cat, schema->getCategory())
 		{
 			hpp<<"{\n";
 			hpp<<"categories::"<<categoryClassName(cat)<<" *c = static_cast<categories::"<<categoryClassName(cat)<<" *>(_schema->_categories[\""<<cat->getName()<<"\"]);\n";
@@ -879,7 +879,7 @@ namespace workers
 
 
 		hpp<<"template <>\n"
-			"const std::string SchemaInitializer<schemas::"<<schemaClassName(data)<<">::_sname=\""<<data->getName()<<"\";\n";
+			"const std::string SchemaInitializer<schemas::"<<schemaClassName(schema)<<">::_sname=\""<<schema->getName()<<"\";\n";
 
 	}
 

@@ -100,8 +100,6 @@ namespace pgs
 	{
 		switch(f->_type)
 		{
-		case pgs::meta::eftAudio:
-			return "OID";
 		case pgs::meta::eftBinary:
 			return "BYTEA";
 		case pgs::meta::eftBool:
@@ -111,13 +109,11 @@ namespace pgs
 		case pgs::meta::eftDateTimeInterval:
 			return "INTERVAL";
 		case pgs::meta::eftEnum:
-			return "BYTEA";
+			return "SMALLINT";
 		case pgs::meta::eftFile:
 			return "OID";
 		case pgs::meta::eftId:
 			return "BIGINT";
-		case pgs::meta::eftImage:
-			return "OID";
 		case pgs::meta::eftInt16:
 			return "SMALLINT";
 		case pgs::meta::eftInt32:
@@ -133,15 +129,32 @@ namespace pgs
 		case pgs::meta::eftReal64:
 			return "DOUBLE PRECISION";
 		case pgs::meta::eftSet:
-			return "BYTEA";
+			assert(!"размер");
+			return "BITS(8)";
 		case pgs::meta::eftString:
 			return "VARCHAR";
 		case pgs::meta::eftTime:
-			return "TIME WITH TIME ZONE";
+			return "TIME WITHOUT TIME ZONE";
 		case pgs::meta::eftTimestamp:
-			return "TIMESTAMP WITH TIME ZONE";
-		case pgs::meta::eftVideo:
-			return "OID";
+			return "TIMESTAMP WITHOUT TIME ZONE";
+		case pgs::meta::eftUuid:
+			return "UUID";
+		case pgs::meta::eftVariant:
+			return "BYTEA";
+		case pgs::meta::eftBitset8:
+			return "BIT(8)";
+		case pgs::meta::eftBitset16:
+			return "BIT(16)";
+		case pgs::meta::eftBitset32:
+			return "BIT(32)";
+		case pgs::meta::eftBitset64:
+			return "BIT(64)";
+		case pgs::meta::eftBitset128:
+			return "BIT(128)";
+		case pgs::meta::eftBitset256:
+			return "BIT(256)";
+		case pgs::meta::eftBitset512:
+			return "BIT(512)";
 		default:
 			assert(!"unknown field type");
 			throw "unknown field type";
@@ -181,7 +194,7 @@ namespace pgs
 			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
 			schemaName(s, false, false)).data()[0];
 
-		if(pgc::ersCommandOk != pgr.status() || !pgr.fetchInt32(0,0))
+		if(pgc::ersTuplesOk != pgr.status() || !pgr.fetchInt32(0,0))
 		{
 			//log.push_back(SyncLogLine("schema absent", schemaName(s, false, false)));
 			WLOG("schema absent: "<<schemaName(s, false, false));
@@ -208,7 +221,7 @@ namespace pgs
 		pgr = con.query(
 			"SELECT oid FROM pg_catalog.pg_namespace WHERE nspname=$1",
 			schemaName(s, false, false)).data()[0];
-		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows() != 1)
+		if(pgc::ersTuplesOk != pgr.status() || 1 != pgr.rows())
 		{
 			//log.push_back(SyncLogLine("obtain schema oid failed", schemaName(s, false, false)));
 			WLOG("obtain schema oid failed: "<<schemaName(s, false, false));

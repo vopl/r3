@@ -1,6 +1,7 @@
 #ifndef _PGS_META_COMMON_HPP_
 #define _PGS_META_COMMON_HPP_
 
+#include "pgc/api.h"
 #include "pgs/meta/ptrContainer.hpp"
 
 namespace pgs
