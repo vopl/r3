@@ -10,5 +10,27 @@ syntax: regexp
 ^runtime/doc/include/
 ^runtime/doc/src/
 
+^comps/.*\.obj$
+^comps/.*\.pdb$
+^comps/.*\.exp$
+^comps/.*\.ilk$
+^comps/.*\.suo$
+^comps/.*\.ncb$
+^comps/.*\.htm$
+^comps/.*\.user$
+^comps/.*\.dll$
+^comps/.*\.lib$
+^comps/.*\.idb$
+^comps/.*\.manifest$
+^comps/.*\.res$
+^comps/.*\.pch$
+^comps/.*\.dep$
+^comps/.*\.cmd$
+
+
+^meta/.*\.mta$
+^meta/.*\.log$
+
+
 syntax: glob
 runtime/make/cmake/excludeDefBuild.txt
