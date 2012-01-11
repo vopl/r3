@@ -120,7 +120,7 @@ namespace server
 
 		con.query("BEGIN");
 		cl.sync(con, true);
-		cl.drop(con);
+		//cl.drop(con);
 		con.query("COMMIT");
 	}
 

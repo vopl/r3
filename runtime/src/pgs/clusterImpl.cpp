@@ -98,68 +98,105 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	std::string ClusterImpl::columnType(pgs::meta::FieldCPtr f)
 	{
+		std::string res;
 		switch(f->_type)
 		{
 		case pgs::meta::eftBinary:
-			return "BYTEA";
+			res = "BYTEA";
 		case pgs::meta::eftBool:
-			return "BOOLEAN";
+			res =  "BOOLEAN";
+			break;
 		case pgs::meta::eftDate:
-			return "DATE";
+			res =  "DATE";
+			break;
 		case pgs::meta::eftDateTimeInterval:
-			return "INTERVAL";
+			res =  "INTERVAL";
+			break;
 		case pgs::meta::eftEnum:
-			return "SMALLINT";
+			res =  "SMALLINT";
+			break;
 		case pgs::meta::eftFile:
-			return "OID";
+			res =  "OID";
+			break;
 		case pgs::meta::eftId:
-			return "BIGINT";
+			res =  "BIGINT";
+			break;
 		case pgs::meta::eftInt16:
-			return "SMALLINT";
+			res =  "SMALLINT";
+			break;
 		case pgs::meta::eftInt32:
-			return "INTEGER";
+			res =  "INTEGER";
+			break;
 		case pgs::meta::eftInt64:
-			return "BIGINT";
+			res =  "BIGINT";
+			break;
 		case pgs::meta::eftInt8:
-			return "SMALLINT";
+			res =  "SMALLINT";
+			break;
 		case pgs::meta::eftMoney:
-			return "MONEY";
+			res =  "MONEY";
+			break;
 		case pgs::meta::eftReal32:
-			return "REAL";
+			res =  "REAL";
+			break;
 		case pgs::meta::eftReal64:
-			return "DOUBLE PRECISION";
+			res =  "DOUBLE PRECISION";
+			break;
 		case pgs::meta::eftSet:
 			assert(!"размер");
-			return "BITS(8)";
+			res =  "BITS(8)";
+			break;
 		case pgs::meta::eftString:
-			return "VARCHAR";
+			res =  "VARCHAR";
+			break;
 		case pgs::meta::eftTime:
-			return "TIME WITHOUT TIME ZONE";
+			res =  "TIME WITHOUT TIME ZONE";
+			break;
 		case pgs::meta::eftTimestamp:
-			return "TIMESTAMP WITHOUT TIME ZONE";
+			res =  "TIMESTAMP WITHOUT TIME ZONE";
+			break;
 		case pgs::meta::eftUuid:
-			return "UUID";
+			res =  "UUID";
+			break;
 		case pgs::meta::eftVariant:
-			return "BYTEA";
+			res =  "BYTEA";
+			break;
 		case pgs::meta::eftBitset8:
-			return "BIT(8)";
+			res =  "BIT(8)";
+			break;
 		case pgs::meta::eftBitset16:
-			return "BIT(16)";
+			res =  "BIT(16)";
+			break;
 		case pgs::meta::eftBitset32:
-			return "BIT(32)";
+			res =  "BIT(32)";
+			break;
 		case pgs::meta::eftBitset64:
-			return "BIT(64)";
+			res =  "BIT(64)";
+			break;
 		case pgs::meta::eftBitset128:
-			return "BIT(128)";
+			res =  "BIT(128)";
+			break;
 		case pgs::meta::eftBitset256:
-			return "BIT(256)";
+			res =  "BIT(256)";
+			break;
 		case pgs::meta::eftBitset512:
-			return "BIT(512)";
+			res =  "BIT(512)";
+			break;
 		default:
 			assert(!"unknown field type");
 			throw "unknown field type";
 		}
-		return "";
+
+		if(f->_allowNull)
+		{
+			res += " NULL";
+		}
+		else
+		{
+			res += " NOT NULL";
+		}
+
+		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

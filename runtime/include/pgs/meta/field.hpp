@@ -46,6 +46,9 @@ namespace pgs
 			//наименование
 			std::string		_name;
 
+			//возможность пустого значения
+			bool			_allowNull;
+
 			//тип поля
 			EFieldType		_type;
 

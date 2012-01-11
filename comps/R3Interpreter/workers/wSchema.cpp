@@ -615,6 +615,7 @@ namespace workers
 						"{\n"
 						"	boost::shared_ptr<fields::"<<fieldClassName(cat, "id")<<"> f(new fields::"<<fieldClassName(cat, "id")<<");\n"
 						"	f->_name = \"id\";\n"
+						"	f->_allowNull = false;\n"
 						"	f->_type = eftId;\n"
 						"	f->_category = c.get();\n"
 						"	_storage->_fields_heap.push_back(f);\n"
@@ -631,6 +632,7 @@ namespace workers
 							"{\n"
 							"	boost::shared_ptr<fields::"<<fieldClassName(fld)<<"> f(new fields::"<<fieldClassName(fld)<<");\n"
 							"	f->_name = \""<<fld->getName()<<"\";\n"
+							"	f->_allowNull = "<<(fld->isAllowNull()?"true":"false")<<";\n"
 							"	f->_type = eft"<<fld->getFCOMeta().name()<<";\n"
 							"	f->_category = c.get();\n";
 							
