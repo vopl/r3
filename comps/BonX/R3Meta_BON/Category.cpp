@@ -32,23 +32,6 @@ void R3Meta_BON::CategoryImpl::setAbstract( bool val)
 
 
 //********************************************************************************
-// getter for role "Audio" among "CategoryMember"s and its descendants
-//********************************************************************************
-std::set<R3Meta_BON::Audio> R3Meta_BON::CategoryImpl::getAudio()
-{
-	std::set<R3Meta_BON::Audio> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Audio");
-	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
-	{
-		R3Meta_BON::Audio elem(*i);
-		ASSERT(elem);
-		res.insert(elem);
-	}
-	return res;
-}
-
-
-//********************************************************************************
 // getter for role "Binary" among "CategoryMember"s and its descendants
 //********************************************************************************
 std::set<R3Meta_BON::Binary> R3Meta_BON::CategoryImpl::getBinary()
@@ -58,6 +41,125 @@ std::set<R3Meta_BON::Binary> R3Meta_BON::CategoryImpl::getBinary()
 	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
 	{
 		R3Meta_BON::Binary elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Bitset128" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Bitset128> R3Meta_BON::CategoryImpl::getBitset128()
+{
+	std::set<R3Meta_BON::Bitset128> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Bitset128");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Bitset128 elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Bitset16" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Bitset16> R3Meta_BON::CategoryImpl::getBitset16()
+{
+	std::set<R3Meta_BON::Bitset16> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Bitset16");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Bitset16 elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Bitset256" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Bitset256> R3Meta_BON::CategoryImpl::getBitset256()
+{
+	std::set<R3Meta_BON::Bitset256> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Bitset256");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Bitset256 elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Bitset32" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Bitset32> R3Meta_BON::CategoryImpl::getBitset32()
+{
+	std::set<R3Meta_BON::Bitset32> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Bitset32");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Bitset32 elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Bitset512" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Bitset512> R3Meta_BON::CategoryImpl::getBitset512()
+{
+	std::set<R3Meta_BON::Bitset512> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Bitset512");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Bitset512 elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Bitset64" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Bitset64> R3Meta_BON::CategoryImpl::getBitset64()
+{
+	std::set<R3Meta_BON::Bitset64> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Bitset64");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Bitset64 elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Bitset8" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Bitset8> R3Meta_BON::CategoryImpl::getBitset8()
+{
+	std::set<R3Meta_BON::Bitset8> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Bitset8");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Bitset8 elem(*i);
 		ASSERT(elem);
 		res.insert(elem);
 	}
@@ -88,30 +190,36 @@ std::set<R3Meta_BON::Bool> R3Meta_BON::CategoryImpl::getBool()
 std::set<R3Meta_BON::CategoryMember> R3Meta_BON::CategoryImpl::getCategoryMember()
 {
 	std::set<R3Meta_BON::CategoryMember> res;
-	const int len = 22;
+	const int len = 28;
 	std::set<BON::FCO> roles_vec[ len];
-	roles_vec[0] = ModelImpl::getChildFCOsAs("Audio");
-	roles_vec[1] = ModelImpl::getChildFCOsAs("Binary");
-	roles_vec[2] = ModelImpl::getChildFCOsAs("Bool");
-	roles_vec[3] = ModelImpl::getChildFCOsAs("Date");
-	roles_vec[4] = ModelImpl::getChildFCOsAs("DateTimeInterval");
-	roles_vec[5] = ModelImpl::getChildFCOsAs("File");
-	roles_vec[6] = ModelImpl::getChildFCOsAs("Image");
-	roles_vec[7] = ModelImpl::getChildFCOsAs("Index");
-	roles_vec[8] = ModelImpl::getChildFCOsAs("Int16");
-	roles_vec[9] = ModelImpl::getChildFCOsAs("Int32");
-	roles_vec[10] = ModelImpl::getChildFCOsAs("Int64");
-	roles_vec[11] = ModelImpl::getChildFCOsAs("Int8");
-	roles_vec[12] = ModelImpl::getChildFCOsAs("Money");
-	roles_vec[13] = ModelImpl::getChildFCOsAs("Real32");
-	roles_vec[14] = ModelImpl::getChildFCOsAs("Real64");
-	roles_vec[15] = ModelImpl::getChildFCOsAs("String");
-	roles_vec[16] = ModelImpl::getChildFCOsAs("Time");
-	roles_vec[17] = ModelImpl::getChildFCOsAs("Timestamp");
-	roles_vec[18] = ModelImpl::getChildFCOsAs("Video");
-	roles_vec[19] = ModelImpl::getChildFCOsAs("Enum");
-	roles_vec[20] = ModelImpl::getChildFCOsAs("Set");
-	roles_vec[21] = ModelImpl::getChildFCOsAs("IndexOnCategoryField");
+	roles_vec[0] = ModelImpl::getChildFCOsAs("Binary");
+	roles_vec[1] = ModelImpl::getChildFCOsAs("Bitset128");
+	roles_vec[2] = ModelImpl::getChildFCOsAs("Bitset16");
+	roles_vec[3] = ModelImpl::getChildFCOsAs("Bitset256");
+	roles_vec[4] = ModelImpl::getChildFCOsAs("Bitset32");
+	roles_vec[5] = ModelImpl::getChildFCOsAs("Bitset512");
+	roles_vec[6] = ModelImpl::getChildFCOsAs("Bitset64");
+	roles_vec[7] = ModelImpl::getChildFCOsAs("Bitset8");
+	roles_vec[8] = ModelImpl::getChildFCOsAs("Bool");
+	roles_vec[9] = ModelImpl::getChildFCOsAs("Date");
+	roles_vec[10] = ModelImpl::getChildFCOsAs("DateTimeInterval");
+	roles_vec[11] = ModelImpl::getChildFCOsAs("File");
+	roles_vec[12] = ModelImpl::getChildFCOsAs("Index");
+	roles_vec[13] = ModelImpl::getChildFCOsAs("Int16");
+	roles_vec[14] = ModelImpl::getChildFCOsAs("Int32");
+	roles_vec[15] = ModelImpl::getChildFCOsAs("Int64");
+	roles_vec[16] = ModelImpl::getChildFCOsAs("Int8");
+	roles_vec[17] = ModelImpl::getChildFCOsAs("Money");
+	roles_vec[18] = ModelImpl::getChildFCOsAs("Real32");
+	roles_vec[19] = ModelImpl::getChildFCOsAs("Real64");
+	roles_vec[20] = ModelImpl::getChildFCOsAs("String");
+	roles_vec[21] = ModelImpl::getChildFCOsAs("Time");
+	roles_vec[22] = ModelImpl::getChildFCOsAs("Timestamp");
+	roles_vec[23] = ModelImpl::getChildFCOsAs("Uuid");
+	roles_vec[24] = ModelImpl::getChildFCOsAs("Variant");
+	roles_vec[25] = ModelImpl::getChildFCOsAs("Enum");
+	roles_vec[26] = ModelImpl::getChildFCOsAs("Set");
+	roles_vec[27] = ModelImpl::getChildFCOsAs("IndexOnCategoryField");
 	for( int k = 0; k < len; ++k)
 		for( std::set<BON::FCO>::iterator i = roles_vec[k].begin(); i != roles_vec[k].end(); ++i)
 		{
@@ -184,23 +292,6 @@ std::set<R3Meta_BON::File> R3Meta_BON::CategoryImpl::getFile()
 	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
 	{
 		R3Meta_BON::File elem(*i);
-		ASSERT(elem);
-		res.insert(elem);
-	}
-	return res;
-}
-
-
-//********************************************************************************
-// getter for role "Image" among "CategoryMember"s and its descendants
-//********************************************************************************
-std::set<R3Meta_BON::Image> R3Meta_BON::CategoryImpl::getImage()
-{
-	std::set<R3Meta_BON::Image> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Image");
-	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
-	{
-		R3Meta_BON::Image elem(*i);
 		ASSERT(elem);
 		res.insert(elem);
 	}
@@ -430,15 +521,32 @@ std::set<R3Meta_BON::Timestamp> R3Meta_BON::CategoryImpl::getTimestamp()
 
 
 //********************************************************************************
-// getter for role "Video" among "CategoryMember"s and its descendants
+// getter for role "Uuid" among "CategoryMember"s and its descendants
 //********************************************************************************
-std::set<R3Meta_BON::Video> R3Meta_BON::CategoryImpl::getVideo()
+std::set<R3Meta_BON::Uuid> R3Meta_BON::CategoryImpl::getUuid()
 {
-	std::set<R3Meta_BON::Video> res;
-	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Video");
+	std::set<R3Meta_BON::Uuid> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Uuid");
 	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
 	{
-		R3Meta_BON::Video elem(*i);
+		R3Meta_BON::Uuid elem(*i);
+		ASSERT(elem);
+		res.insert(elem);
+	}
+	return res;
+}
+
+
+//********************************************************************************
+// getter for role "Variant" among "CategoryMember"s and its descendants
+//********************************************************************************
+std::set<R3Meta_BON::Variant> R3Meta_BON::CategoryImpl::getVariant()
+{
+	std::set<R3Meta_BON::Variant> res;
+	std::set<BON::FCO> roles = ModelImpl::getChildFCOsAs("Variant");
+	for( std::set<BON::FCO>::iterator i = roles.begin(); i != roles.end(); ++i)
+	{
+		R3Meta_BON::Variant elem(*i);
 		ASSERT(elem);
 		res.insert(elem);
 	}

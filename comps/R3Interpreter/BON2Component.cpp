@@ -26,7 +26,6 @@
 #include "R3MetaBonX.h"
 
 #include "workers/wData.hpp"
-#include "workers/wProtocol.hpp"
 
 
 namespace BON

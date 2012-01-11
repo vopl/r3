@@ -1,5 +1,5 @@
-#ifndef R3META_BONFILE_H
-#define R3META_BONFILE_H
+#ifndef R3META_BONVARIANT_H
+#define R3META_BONVARIANT_H
 
 #include "R3MetaBonX.h"
 
@@ -7,9 +7,9 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   FileImpl
+//   C  L  A  S  S   VariantImpl
 //*******************************************************************
-class FileImpl :
+class VariantImpl :
 	  virtual public BON::AtomImpl
 	, public SimpleImpl
 {

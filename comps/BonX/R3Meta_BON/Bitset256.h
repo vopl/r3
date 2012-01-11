@@ -1,5 +1,5 @@
-#ifndef R3META_BONRIGHT4CONTEXT_H
-#define R3META_BONRIGHT4CONTEXT_H
+#ifndef R3META_BONBITSET256_H
+#define R3META_BONBITSET256_H
 
 #include "R3MetaBonX.h"
 
@@ -7,18 +7,14 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   Right4ContextImpl
+//   C  L  A  S  S   Bitset256Impl
 //*******************************************************************
-class Right4ContextImpl :
-	  virtual public BON::ConnectionImpl
+class Bitset256Impl :
+	  public BitsetImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);
 
-	//
-	// connectionEnd getters
-	virtual R3Meta_BON::Context             getDst();
-	virtual R3Meta_BON::Right               getSrc();
 
 	///BUP
 	// add your own members here

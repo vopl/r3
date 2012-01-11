@@ -1,5 +1,5 @@
-#ifndef R3META_BONAUDIO_H
-#define R3META_BONAUDIO_H
+#ifndef R3META_BONUUID_H
+#define R3META_BONUUID_H
 
 #include "R3MetaBonX.h"
 
@@ -7,10 +7,11 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   AudioImpl
+//   C  L  A  S  S   UuidImpl
 //*******************************************************************
-class AudioImpl :
-	  public FileImpl
+class UuidImpl :
+	  virtual public BON::AtomImpl
+	, public SimpleImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);

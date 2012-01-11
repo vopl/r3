@@ -1,5 +1,5 @@
-#ifndef R3META_BONPROTOCOL_H
-#define R3META_BONPROTOCOL_H
+#ifndef R3META_BONBITSET8_H
+#define R3META_BONBITSET8_H
 
 #include "R3MetaBonX.h"
 
@@ -7,17 +7,14 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   ProtocolImpl
+//   C  L  A  S  S   Bitset8Impl
 //*******************************************************************
-class ProtocolImpl :
-	  virtual public BON::ModelImpl
+class Bitset8Impl :
+	  public BitsetImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);
 
-	//
-	// kind and role getters
-	virtual std::set<R3Meta_BON::Context>   getContext();
 
 	///BUP
 	// add your own members here

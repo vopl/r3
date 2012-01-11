@@ -1,5 +1,5 @@
-#ifndef R3META_BONVIDEO_H
-#define R3META_BONVIDEO_H
+#ifndef R3META_BONBITSET32_H
+#define R3META_BONBITSET32_H
 
 #include "R3MetaBonX.h"
 
@@ -7,10 +7,10 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   VideoImpl
+//   C  L  A  S  S   Bitset32Impl
 //*******************************************************************
-class VideoImpl :
-	  public FileImpl
+class Bitset32Impl :
+	  public BitsetImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);

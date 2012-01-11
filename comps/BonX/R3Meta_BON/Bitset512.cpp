@@ -5,7 +5,7 @@
 //********************************************************************************
 // 
 //********************************************************************************
-void R3Meta_BON::VideoImpl::accept( BON::Visitor *pVisitor)
+void R3Meta_BON::Bitset512Impl::accept( BON::Visitor *pVisitor)
 {
 	// visit the Atom
 	pVisitor->visitAtom( BON::Atom( this));

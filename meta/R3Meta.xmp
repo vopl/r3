@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{4AEEAC64-6797-4CA9-B976-084F422EDCE7}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{32C65C7D-422C-4D61-BFC2-B351603F91A4}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -44,37 +44,6 @@
 		</attrdef>
 		<attrdef name="ShortDescription" metaref = "1471" valuetype = "string" defvalue = "">
 		</attrdef>
-		<atom name = "Audio" metaref = "1472"  attributes = "AllowNull">
-				<regnode name = "namePosition" value ="4"></regnode>
-			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
-				<![CDATA[self
-.parent().oclAsType(Category)
-.parts()
-    ->forAll(
-      f:Field|
-        f=self ||
-        f.name<>self.name
-    )]]>
-				<dispname>Field names in same category must be unique</dispname>
-			</constraint>
-			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
-				<![CDATA[self
-.parent().oclAsType(Category)
-.connectedFCOs(CategoryInheritance)
-->forAll(
-  c:Category|
-    c.parts()
-    ->forAll(
-      f:Field|
-        f=self ||
-        f.name<>self.name
-    )
-)]]>
-				<dispname>Field names in same and base categories must be unique</dispname>
-			</constraint>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-		</atom>
 		<atom name = "Binary" metaref = "1473"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
@@ -439,36 +408,6 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
 		<atom name = "File" metaref = "1477"  attributes = "AllowNull">
-				<regnode name = "namePosition" value ="4"></regnode>
-			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
-				<![CDATA[self
-.parent().oclAsType(Category)
-.parts()
-    ->forAll(
-      f:Field|
-        f=self ||
-        f.name<>self.name
-    )]]>
-				<dispname>Field names in same category must be unique</dispname>
-			</constraint>
-			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
-				<![CDATA[self
-.parent().oclAsType(Category)
-.connectedFCOs(CategoryInheritance)
-->forAll(
-  c:Category|
-    c.parts()
-    ->forAll(
-      f:Field|
-        f=self ||
-        f.name<>self.name
-    )
-)]]>
-				<dispname>Field names in same and base categories must be unique</dispname>
-			</constraint>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-		</atom>
-		<atom name = "Image" metaref = "1478"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -901,7 +840,7 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
-		<atom name = "Video" metaref = "1491"  attributes = "AllowNull">
+		<atom name = "Variant" metaref = "1668"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -975,7 +914,6 @@
 				<regnode name = "lineType" value ="dash"></regnode>
 			<connjoint>
 				<pointerspec name = "src">
-					<pointeritem desc = "Audio"></pointeritem>
 					<pointeritem desc = "Binary"></pointeritem>
 					<pointeritem desc = "Bitset128"></pointeritem>
 					<pointeritem desc = "Bitset16"></pointeritem>
@@ -989,7 +927,6 @@
 					<pointeritem desc = "DateTimeInterval"></pointeritem>
 					<pointeritem desc = "Enum"></pointeritem>
 					<pointeritem desc = "File"></pointeritem>
-					<pointeritem desc = "Image"></pointeritem>
 					<pointeritem desc = "Int16"></pointeritem>
 					<pointeritem desc = "Int32"></pointeritem>
 					<pointeritem desc = "Int64"></pointeritem>
@@ -1002,7 +939,7 @@
 					<pointeritem desc = "Time"></pointeritem>
 					<pointeritem desc = "Timestamp"></pointeritem>
 					<pointeritem desc = "Uuid"></pointeritem>
-					<pointeritem desc = "Video"></pointeritem>
+					<pointeritem desc = "Variant"></pointeritem>
 				</pointerspec>
 				<pointerspec name = "dst">
 					<pointeritem desc = "Index"></pointeritem>
@@ -1034,7 +971,6 @@
 )]]>
 				<dispname>Category names in same schema must be unique</dispname>
 			</constraint>
-			<role name = "Audio" metaref = "1497" kind = "Audio"></role>
 			<role name = "Binary" metaref = "1498" kind = "Binary"></role>
 			<role name = "Bitset128" metaref = "1651" kind = "Bitset128"></role>
 			<role name = "Bitset16" metaref = "1652" kind = "Bitset16"></role>
@@ -1048,7 +984,6 @@
 			<role name = "DateTimeInterval" metaref = "1501" kind = "DateTimeInterval"></role>
 			<role name = "Enum" metaref = "1502" kind = "Enum"></role>
 			<role name = "File" metaref = "1503" kind = "File"></role>
-			<role name = "Image" metaref = "1504" kind = "Image"></role>
 			<role name = "Index" metaref = "1505" kind = "Index"></role>
 			<role name = "IndexOnCategoryField" metaref = "1506" kind = "IndexOnCategoryField"></role>
 			<role name = "Int16" metaref = "1507" kind = "Int16"></role>
@@ -1063,9 +998,8 @@
 			<role name = "Time" metaref = "1516" kind = "Time"></role>
 			<role name = "Timestamp" metaref = "1517" kind = "Timestamp"></role>
 			<role name = "Uuid" metaref = "1658" kind = "Uuid"></role>
-			<role name = "Video" metaref = "1518" kind = "Video"></role>
+			<role name = "Variant" metaref = "1669" kind = "Variant"></role>
 			<aspect name = "AspectCategory" metaref = "1026" attributes = "Abstract" >
-				<part metaref = "1519" role = "Audio" primary = "yes" linked = "no"></part>
 				<part metaref = "1520" role = "Binary" primary = "yes" linked = "no"></part>
 				<part metaref = "1660" role = "Bitset128" primary = "yes" linked = "no"></part>
 				<part metaref = "1661" role = "Bitset16" primary = "yes" linked = "no"></part>
@@ -1079,7 +1013,6 @@
 				<part metaref = "1523" role = "DateTimeInterval" primary = "yes" linked = "no"></part>
 				<part metaref = "1524" role = "Enum" primary = "yes" linked = "no"></part>
 				<part metaref = "1525" role = "File" primary = "yes" linked = "no"></part>
-				<part metaref = "1526" role = "Image" primary = "yes" linked = "no"></part>
 				<part metaref = "1527" role = "Index" primary = "yes" linked = "no"></part>
 				<part metaref = "1528" role = "IndexOnCategoryField" primary = "yes" linked = "no"></part>
 				<part metaref = "1529" role = "Int16" primary = "yes" linked = "no"></part>
@@ -1094,7 +1027,7 @@
 				<part metaref = "1538" role = "Time" primary = "yes" linked = "no"></part>
 				<part metaref = "1539" role = "Timestamp" primary = "yes" linked = "no"></part>
 				<part metaref = "1667" role = "Uuid" primary = "yes" linked = "no"></part>
-				<part metaref = "1540" role = "Video" primary = "yes" linked = "no"></part>
+				<part metaref = "1670" role = "Variant" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Data" metaref = "1541" >

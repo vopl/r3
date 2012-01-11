@@ -1,5 +1,5 @@
-#ifndef R3META_BONFILE_H
-#define R3META_BONFILE_H
+#ifndef R3META_BONBITSET512_H
+#define R3META_BONBITSET512_H
 
 #include "R3MetaBonX.h"
 
@@ -7,11 +7,10 @@
 namespace R3Meta_BON
 {
 //*******************************************************************
-//   C  L  A  S  S   FileImpl
+//   C  L  A  S  S   Bitset512Impl
 //*******************************************************************
-class FileImpl :
-	  virtual public BON::AtomImpl
-	, public SimpleImpl
+class Bitset512Impl :
+	  public BitsetImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);
