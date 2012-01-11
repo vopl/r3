@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{32C65C7D-422C-4D61-BFC2-B351603F91A4}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{CE183B13-D028-454C-BA47-8776A2C649C0}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
@@ -10,7 +10,7 @@
 	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Data" >
 		<attrdef name="Abstract" metaref = "1460" valuetype = "boolean" defvalue = "false">
 		</attrdef>
-		<attrdef name="AllowNull" metaref = "1461" valuetype = "boolean" defvalue = "true">
+		<attrdef name="AllowNull" metaref = "1461" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="IndexType" metaref = "1462" valuetype = "enum" defvalue = "tree">
 			<enumitem dispname = "tree" value = "tree"></enumitem>
@@ -889,8 +889,8 @@
 		</connection>
 		<connection name = "CategoryRelation" metaref = "1493" attributes = "Name1 Multiplier1 Name2 Multiplier2" >
 				<regnode name = "color" value ="0x007700"></regnode>
-				<regnode name = "dstStyle" value ="empty diamond"></regnode>
-				<regnode name = "srcStyle" value ="empty diamond"></regnode>
+				<regnode name = "dstStyle" value ="empty bullet"></regnode>
+				<regnode name = "srcStyle" value ="empty bullet"></regnode>
 				<regnode name = "lineType" value ="solid"></regnode>
 				<regnode name= "srcLabel1" value="%Multiplier1%"/>
 				<regnode name= "srcLabel2" value="%Name1%"/>
