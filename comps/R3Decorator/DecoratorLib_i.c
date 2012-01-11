@@ -6,7 +6,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0500 */
-/* at Wed Jun 08 14:30:08 2011
+/* at Thu Jan 12 01:59:49 2012
  */
 /* Compiler settings for .\DecoratorLib.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)
