@@ -26,46 +26,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	DbImpl::~DbImpl()
 	{
-		ILOG("deinitialize");
-		std::deque<async::Result<Connection> > waiters;
-		{
-			mutex::scoped_lock sl(_mtx);
-
-			if(_timeout)
-			{
-				system::error_code ec;
-				_timeout->cancel(ec);
-			}
-
-			_maxConnections = 0;
-			_conninfo.clear();
-			waiters.swap(_waiters);
-		}
-		BOOST_FOREACH(async::Result<Connection> &w, waiters)
-		{
-			w(Connection());
-		}
-
-		bool doWait = true;
-		while(doWait)
-		{
-			{
-				mutex::scoped_lock sl(_mtx);
-				doWait = !(_startConnections.empty() && _readyConnections.empty() && _workConnections.empty());
-			}
-			if(doWait)
-			{
-				balanceConnections();
-
-				boost::xtime xt;
-				boost::xtime_get(&xt, boost::TIME_UTC);
-				xt.nsec += 100000000;
-				boost::thread::sleep(xt);
-			}
-		}
-
-		_onConnectionMade.swap(function<void (size_t)>());
-		_onConnectionLost.swap(function<void (size_t)>());
+		reset();
 	}
 
 
@@ -347,4 +308,50 @@ namespace pgc
 
 		return res;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void DbImpl::reset()
+	{
+		ILOG("deinitialize");
+		std::deque<async::Result<Connection> > waiters;
+		{
+			mutex::scoped_lock sl(_mtx);
+
+			if(_timeout)
+			{
+				system::error_code ec;
+				_timeout->cancel(ec);
+			}
+
+			_maxConnections = 0;
+			_conninfo.clear();
+			waiters.swap(_waiters);
+		}
+		BOOST_FOREACH(async::Result<Connection> &w, waiters)
+		{
+			w(Connection());
+		}
+
+		bool doWait = true;
+		while(doWait)
+		{
+			{
+				mutex::scoped_lock sl(_mtx);
+				doWait = !(_startConnections.empty() && _readyConnections.empty() && _workConnections.empty());
+			}
+			if(doWait)
+			{
+				balanceConnections();
+
+				boost::xtime xt;
+				boost::xtime_get(&xt, boost::TIME_UTC);
+				xt.nsec += 100000000;
+				boost::thread::sleep(xt);
+			}
+		}
+
+		_onConnectionMade.swap(function<void (size_t)>());
+		_onConnectionLost.swap(function<void (size_t)>());
+	}
+
 }

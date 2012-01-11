@@ -52,7 +52,9 @@ namespace pgc
 			function<void (size_t)> connectionLost);
 		~DbImpl();
 
-		virtual async::Result<Connection> allocConnection();
+		async::Result<Connection> allocConnection();
+
+		void reset();
 	};
 }
 
