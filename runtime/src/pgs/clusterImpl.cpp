@@ -2,6 +2,8 @@
 #include "pgs/cluster.hpp"
 #include "clusterImpl.hpp"
 #include <set>
+#include "async/service.hpp"
+#include <boost/bind.hpp>
 
 namespace pgs
 {
@@ -674,6 +676,145 @@ namespace pgs
 		return true;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	void ClusterImpl::sync_f(async::Result<bool> res, pgc::Connection con, bool allowCreate)
+	{
+		async::Mutex::ScopedLock sl(_mtx);
+
+		_isSynced = false;
+
+		_oid2schema.clear();
+		_schema2oid.clear();
+		_oid2cat.clear();
+		_cat2oid.clear();
+
+		if(!_metaCluster.isInitialized())
+		{
+			//log.push_back(SyncLogLine("meta cluster is not initialized"));
+			WLOG("meta cluster is not initialized");
+			res(false);
+			return;
+		}
+
+		//наличие схем
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
+		{
+			if(!sync_schemaExistence(con, s, allowCreate))
+			{
+				res(false);
+				return;
+			}
+		}
+
+		//наличие таблиц
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
+		{
+			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
+			{
+				if(!sync_tableExistence(con, c, allowCreate))
+				{
+					res(false);
+					return;
+				}
+			}
+		}
+
+		//наличие полей
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
+		{
+			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
+			{
+				BOOST_FOREACH(pgs::meta::FieldCPtr f, c->_fields)
+				{
+					if(!sync_columnExistence(con, f, allowCreate))
+					{
+						res(false);
+						return;
+					}
+				}
+			}
+		}
+
+		//наличие индексов
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
+		{
+			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
+			{
+				BOOST_FOREACH(pgs::meta::IndexCPtr i, c->_indices)
+				{
+					if(!sync_indexExistence(con, i, allowCreate))
+					{
+						res(false);
+						return;
+					}
+				}
+			}
+		}
+
+		//наличие таблиц связей
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
+		{
+			BOOST_FOREACH(pgs::meta::RelationCPtr r, s->_relations)
+			{
+				if(!sync_crossExistence(con, r, allowCreate))
+				{
+					res(false);
+					return;
+				}
+			}
+		}
+
+		//наследование
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
+		{
+			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
+			{
+				if(!sync_tableInherits(con, c, allowCreate))
+				{
+					res(false);
+					return;
+				}
+			}
+		}
+
+		_isSynced = true;
+		res(true);
+		return;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ClusterImpl::drop_f(async::Result<bool> res, pgc::Connection con)
+	{
+		async::Mutex::ScopedLock sl(_mtx);
+
+		if(!_metaCluster.isInitialized())
+		{
+			//log.push_back(SyncLogLine("meta cluster is not initialized"));
+			ELOG("meta cluster is not initialized");
+			res(false);
+			return;
+		}
+
+		//схемы
+		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
+		{
+			if(!drop_schemaExistence(con, s))
+			{
+				res(false);
+				return;
+			}
+		}
+
+		_isSynced = false;
+
+		_oid2schema.clear();
+		_schema2oid.clear();
+		_oid2cat.clear();
+		_cat2oid.clear();
+
+		res(true);
+		return;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	ClusterImpl::ClusterImpl(pgs::meta::Cluster metaCluster)
@@ -698,140 +839,22 @@ namespace pgs
 		_suffix = suffix;
 	}
 
-
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::sync(pgc::Connection con, bool allowCreate)
+	async::Result<bool> ClusterImpl::sync(pgc::Connection con, bool allowCreate)
 	{
-		_isSynced = false;
-
-		_oid2schema.clear();
-		_schema2oid.clear();
-		_oid2cat.clear();
-		_cat2oid.clear();
-
-		if(!_metaCluster.isInitialized())
-		{
-			//log.push_back(SyncLogLine("meta cluster is not initialized"));
-			WLOG("meta cluster is not initialized");
-			return false;
-		}
-
-		bool res = true;
-
-		//наличие схем
-		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
-		{
-			res &= sync_schemaExistence(con, s, allowCreate);
-		}
-		if(!res)
-		{
-			return res;
-		}
-
-		//наличие таблиц
-		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
-		{
-			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
-			{
-				res &= sync_tableExistence(con, c, allowCreate);
-			}
-		}
-		if(!res)
-		{
-			return res;
-		}
-
-		//наличие полей
-		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
-		{
-			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
-			{
-				BOOST_FOREACH(pgs::meta::FieldCPtr f, c->_fields)
-				{
-					res &= sync_columnExistence(con, f, allowCreate);
-				}
-			}
-		}
-		if(!res)
-		{
-			return res;
-		}
-
-		//наличие индексов
-		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
-		{
-			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
-			{
-				BOOST_FOREACH(pgs::meta::IndexCPtr i, c->_indices)
-				{
-					res &= sync_indexExistence(con, i, allowCreate);
-				}
-			}
-		}
-		if(!res)
-		{
-			return res;
-		}
-
-		//наличие таблиц связей
-		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
-		{
-			BOOST_FOREACH(pgs::meta::RelationCPtr r, s->_relations)
-			{
-				res &= sync_crossExistence(con, r, allowCreate);
-			}
-		}
-		if(!res)
-		{
-			return res;
-		}
-
-		//наследование
-		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
-		{
-			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
-			{
-				res &= sync_tableInherits(con, c, allowCreate);
-			}
-		}
-		if(!res)
-		{
-			return res;
-		}
-
-		_isSynced = true;
-		return true;
+		async::Result<bool> res;
+		async::spawn(boost::bind(&ClusterImpl::sync_f, shared_from_this(), res, con, allowCreate));
+		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ClusterImpl::drop(pgc::Connection con)
+	async::Result<bool> ClusterImpl::drop(pgc::Connection con)
 	{
-		if(!_metaCluster.isInitialized())
-		{
-			//log.push_back(SyncLogLine("meta cluster is not initialized"));
-			ELOG("meta cluster is not initialized");
-			return false;
-		}
-
-		bool res = true;
-
-		//схемы
-		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
-		{
-			res &= drop_schemaExistence(con, s);
-		}
-		if(!res)
-		{
-			return res;
-		}
-
-		_isSynced = false;
-
-		_oid2schema.clear();
-		_schema2oid.clear();
-		_oid2cat.clear();
-		_cat2oid.clear();
-
-		return true;
+		async::Result<bool> res;
+		async::spawn(boost::bind(&ClusterImpl::drop_f, shared_from_this(), res, con));
+		return res;
 	}
+
+
+
 }

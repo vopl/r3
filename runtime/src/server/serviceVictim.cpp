@@ -116,12 +116,26 @@ namespace server
 		pgs::Cluster cl(mcl);
 		cl.setUnicators("pre", "post");
 
-		pgc::Connection con = _db.allocConnection();
+		for(size_t i(0); i<50000; i++)
+		{
+			if(!_db)
+			{
+				return;
+			}
+			pgc::Connection con = _db.allocConnection();
+			if(!con)
+			{
+				return;
+			}
 
-		con.query("BEGIN");
-		cl.sync(con, true);
-		//cl.drop(con);
-		con.query("COMMIT");
+			con.query("BEGIN");
+			async::Result<bool> sar = cl.sync(con, true);
+			async::Result<bool> dar = cl.drop(con);
+
+			dar.wait();
+			assert(sar.isSet());
+			con.query("COMMIT");
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

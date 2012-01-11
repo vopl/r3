@@ -3,6 +3,7 @@
 
 #include "pgs/meta/cluster.hpp"
 #include "pgc/connection.hpp"
+#include "async/result.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -28,8 +29,8 @@ namespace pgs
 
 		void setUnicators(const std::string &prefix, const std::string &suffix);
 
-		bool sync(pgc::Connection con, bool allowCreate = false);
-		bool drop(pgc::Connection con);
+		async::Result<bool> sync(pgc::Connection con, bool allowCreate = false);
+		async::Result<bool> drop(pgc::Connection con);
 
 		// 	select
 		// 	insert
