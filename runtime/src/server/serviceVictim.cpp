@@ -12,6 +12,8 @@
 #include "pgs/cluster.hpp"
 #include "pgs/meta/schemas/Staff_initializer.hpp"
 
+#include "utils/ntoa.hpp"
+
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -69,7 +71,7 @@ namespace server
 			async::Result<pgc::Connection> c4=_db.allocConnection();
 
 			//TLOG("connectionLoop1");
-			if(!s || !(rand()%50))
+			if(!s || !(rand()%5))
 			{
 				s = pgc::Statement("SELECT $1");
 			}
@@ -114,7 +116,10 @@ namespace server
 		mcl.initialize();
 		
 		pgs::Cluster cl(mcl);
-		cl.setUnicators("pre", "post");
+
+		static volatile size_t k(0);
+		char tmp[64];
+		cl.setUnicators(std::string("pre_")+utils::_ntoa(k++, tmp), "post");
 
 		for(size_t i(0); i<50000; i++)
 		{
@@ -128,13 +133,13 @@ namespace server
 				return;
 			}
 
-			con.query("BEGIN");
+			con.query("BEGIN").wait();
 			async::Result<bool> sar = cl.sync(con, true);
 			async::Result<bool> dar = cl.drop(con);
 
+			sar.wait();
 			dar.wait();
-			assert(sar.isSet());
-			con.query("COMMIT");
+			con.query("COMMIT").wait();
 		}
 	}
 
@@ -164,12 +169,15 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
-// 		for(size_t i(0); i<20; i++)
-// 		{
-// 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-// 		}
+		for(size_t i(0); i<20; i++)
+		{
+			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+		}
 
-		async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
+		for(size_t i(0); i<2; i++)
+		{
+			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
+		}
 
 		int k = 220;
 		//
