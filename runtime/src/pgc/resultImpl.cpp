@@ -780,6 +780,9 @@ namespace pgc
 				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
 				std::copy((char *)valDb, (char *)valDb+lenDb, u.begin());
 
+				*(boost::uint32_t *)(u.begin()+0) = fixEndian(*(boost::uint32_t *)(u.begin()+0));
+				*(boost::uint16_t *)(u.begin()+4) = fixEndian(*(boost::uint16_t *)(u.begin()+4));
+				*(boost::uint16_t *)(u.begin()+6) = fixEndian(*(boost::uint16_t *)(u.begin()+6));
 			}
 			break;
 		case 18://char

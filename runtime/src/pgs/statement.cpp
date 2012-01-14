@@ -9,8 +9,8 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	Statement::Statement(ImplPtr impl)
-		: pgc::Statement("sql here")
+		: pgc::Statement(impl->getSql())
 	{
-		assert(0);
+		//assert(0);
 	}
 }

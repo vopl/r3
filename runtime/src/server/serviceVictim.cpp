@@ -114,7 +114,8 @@ namespace server
 		char tmp[64];
 		cl.setUnicators(std::string("pre_")+utils::_ntoa(k++, tmp), "post");
 
-		for(size_t i(0); i<50000; i++)
+		//for(size_t i(0); i<50000; i++)
+		for(;;)
 		{
 			if(!_db)
 			{
@@ -126,24 +127,31 @@ namespace server
 				return;
 			}
 
-			con.query("BEGIN").wait();
-			async::Future<bool> sar = cl.sync(con, true);
-			async::Future<bool> dar = cl.drop(con);
-
-			sar.wait();
-			dar.wait();
-
-// 			pgs::meta::schemas::StaffCPtr staff = mcl.get<pgs::meta::schemas::Staff>();
+// 			con.query("BEGIN").wait();
+// 			async::Future<bool> sar = cl.sync(con, true);
+// 			//async::Future<bool> dar = cl.drop(con);
 // 
-// 			pgs::Statement s = pgs::Select()
-// 				.whats(pgs::Category(staff->Right))
-// 				.from(staff->Right)
-// 				.links(staff->Right->values)
-// 				.orders(staff->Right->module)
-// 				.compile(cl);
+// 			sar.wait();
+// 			//dar.wait();
+// 			con.query("COMMIT").wait();
 
-			//con.query(s, sd);
-			con.query("COMMIT").wait();
+			pgs::meta::schemas::StaffCPtr staff = mcl.get<pgs::meta::schemas::Staff>();
+
+			static pgs::Statement s = pgs::Select()
+				.from(staff->Right)
+				.whats(pgs::Category(staff->Right))
+				.compile(cl);
+			//std::cout<<s.getSql()<<std::endl;
+			pgc::Result r = con.query(s, true);
+			utils::Variant v;
+			r.fetchRowsMap(v);
+
+			static size_t cnt(0);
+			if(!((cnt++)%10000))
+			{
+				std::cout<<v<<std::endl;
+			}
+
 		}
 	}
 
@@ -173,15 +181,15 @@ namespace server
 		_pluma = hub->getServer()->getPlugs();
 		_db = hub->getServer()->getDb();
 
+// 		for(size_t i(0); i<20; i++)
+// 		{
+// 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+// 		}
+
 		for(size_t i(0); i<20; i++)
 		{
-			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
 		}
-
-// 		for(size_t i(0); i<1; i++)
-// 		{
-// 			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
-// 		}
 
 		int k = 220;
 		//

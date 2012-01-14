@@ -25,7 +25,7 @@ namespace pgs
 		, _cluster(cluster)
  		, _bindName2idx(bindName2idx)
 	{
-		assert(0);
+		//assert(0);
 	}
 
 // 	//////////////////////////////////////////////////////////////////////////
