@@ -4,7 +4,7 @@
 #include "async/api.h"
 #include "async/exception.hpp"
 #include "async/event.hpp"
-#include "async/result.hpp"
+#include "async/future.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>

@@ -677,7 +677,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClusterImpl::sync_f(async::Result<bool> res, pgc::Connection con, bool allowCreate)
+	void ClusterImpl::sync_f(async::Future<bool> res, pgc::Connection con, bool allowCreate)
 	{
 		async::Mutex::ScopedLock sl(_mtx);
 
@@ -783,7 +783,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ClusterImpl::drop_f(async::Result<bool> res, pgc::Connection con)
+	void ClusterImpl::drop_f(async::Future<bool> res, pgc::Connection con)
 	{
 		async::Mutex::ScopedLock sl(_mtx);
 
@@ -840,17 +840,17 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<bool> ClusterImpl::sync(pgc::Connection con, bool allowCreate)
+	async::Future<bool> ClusterImpl::sync(pgc::Connection con, bool allowCreate)
 	{
-		async::Result<bool> res;
+		async::Future<bool> res;
 		async::spawn(boost::bind(&ClusterImpl::sync_f, shared_from_this(), res, con, allowCreate));
 		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<bool> ClusterImpl::drop(pgc::Connection con)
+	async::Future<bool> ClusterImpl::drop(pgc::Connection con)
 	{
-		async::Result<bool> res;
+		async::Future<bool> res;
 		async::spawn(boost::bind(&ClusterImpl::drop_f, shared_from_this(), res, con));
 		return res;
 	}

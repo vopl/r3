@@ -29,7 +29,7 @@ namespace client
 			qint64 readData(char *data, qint64 maxSize);
 
 		protected:
-			void processSend(async::Result<boost::system::error_code> res);
+			void processSend(async::Future<boost::system::error_code> res);
 			void onReceive(server::TEndpoint endpoint, utils::VariantPtr data);
 
 		public:

@@ -126,7 +126,7 @@ namespace net
 			//заголовок
 			while(transferedSize < sizeof(header))
 			{
-				Result2<error_code, size_t> readRes;
+				Future2<error_code, size_t> readRes;
 				_sock.read(
 					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
 					readRes);
@@ -154,7 +154,7 @@ namespace net
 				packet._data.reset(new char[packet._size]);
 				while(transferedSize < packet._size)
 				{
-					Result2<error_code, size_t> readRes;
+					Future2<error_code, size_t> readRes;
 					_sock.read(
 						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
 						readRes);
@@ -184,7 +184,7 @@ namespace net
 	{
 		for(;;)
 		{
-			std::pair<Result<error_code>, SPacket> op;
+			std::pair<Future<error_code>, SPacket> op;
 			{
 				mutex::scoped_lock sl(_mtxSends);
 				if(_sendInProcess)
@@ -209,7 +209,7 @@ namespace net
 			header[0] = utils::litEndian(op.second._size);
 			while(transferedSize < sizeof(header))
 			{
-				Result2<error_code, size_t> readRes;
+				Future2<error_code, size_t> readRes;
 				_sock.write(
 					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
 					readRes);
@@ -233,7 +233,7 @@ namespace net
 			{
 				while(transferedSize < packet._size)
 				{
-					Result2<error_code, size_t> writeRes;
+					Future2<error_code, size_t> writeRes;
 					_sock.write(
 						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
 						writeRes);
@@ -291,9 +291,9 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result<error_code> ChannelSocket::send(const SPacket &p)
+	Future<error_code> ChannelSocket::send(const SPacket &p)
 	{
-		Result<error_code> res;
+		Future<error_code> res;
 
 		mutex::scoped_lock sl(_mtxSends);
 		_sends.push_back(std::make_pair(res, p));

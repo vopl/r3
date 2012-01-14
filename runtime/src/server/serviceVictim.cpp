@@ -7,7 +7,7 @@
 #include "serviceVictim.hpp"
 #include "server/iserviceHub.hpp"
 #include "server/iserver.hpp"
-#include "async/resultWaiter.hpp"
+#include "async/futureWaiter.hpp"
 
 #include "pgs/cluster.hpp"
 #include "pgs/meta/schemas/Staff_initializer.hpp"
@@ -65,10 +65,10 @@ namespace server
 				TLOG("connectionLoop1 db NULL");
 				return;
 			}
-			async::Result<pgc::Connection> c1=_db.allocConnection();
-			async::Result<pgc::Connection> c2=_db.allocConnection();
-			async::Result<pgc::Connection> c3=_db.allocConnection();
-			async::Result<pgc::Connection> c4=_db.allocConnection();
+			async::Future<pgc::Connection> c1=_db.allocConnection();
+			async::Future<pgc::Connection> c2=_db.allocConnection();
+			async::Future<pgc::Connection> c3=_db.allocConnection();
+			async::Future<pgc::Connection> c4=_db.allocConnection();
 
 			//TLOG("connectionLoop1");
 			if(!s || !(rand()%5))
@@ -82,10 +82,10 @@ namespace server
 				return;
 			}
 
-			async::ResultWaiter<pgc::Datas> results(
+			async::FutureWaiter<pgc::Datas> results(
 				c1.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000))
 				);
-			//async::EventWaiter<async::Result<pgc::IResultPtrs> > results;
+			//async::EventWaiter<async::Future<pgc::IResultPtrs> > results;
 
 			for(size_t i(0); i<10; i++)
 			{
@@ -134,8 +134,8 @@ namespace server
 			}
 
 			con.query("BEGIN").wait();
-			async::Result<bool> sar = cl.sync(con, true);
-			async::Result<bool> dar = cl.drop(con);
+			async::Future<bool> sar = cl.sync(con, true);
+			async::Future<bool> dar = cl.drop(con);
 
 			sar.wait();
 			dar.wait();
@@ -209,7 +209,7 @@ namespace server
 		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{
-		async::Result<boost::system::error_code> res =
+		async::Future<boost::system::error_code> res =
 		hub->send(shared_from_this(), session, endpoint, data);
 
 		res.wait();

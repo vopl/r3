@@ -1,5 +1,5 @@
-#ifndef _ASYNC_RESULT_HPP_
-#define _ASYNC_RESULT_HPP_
+#ifndef _ASYNC_FUTURE_HPP_
+#define _ASYNC_FUTURE_HPP_
 
 #include "async/event.hpp"
 
@@ -8,7 +8,7 @@ namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
 	template <class Data>
-	class Result
+	class Future
 		: public Event
 	{
 	private:
@@ -25,7 +25,7 @@ namespace async
 		boost::shared_ptr<State> _state;
 
 	public:
-		Result()
+		Future()
 			: _state(new State)
 			, Event(false)
 		{
@@ -74,7 +74,7 @@ namespace async
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Data1, class Data2>
-	class Result2
+	class Future2
 		: public Event
 	{
 	private:
@@ -92,7 +92,7 @@ namespace async
 		boost::shared_ptr<State> _state;
 
 	public:
-		Result2()
+		Future2()
 			: _state(new State)
 			, Event(false)
 		{
@@ -150,7 +150,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	template <class Data1, class Data2, class Data3>
-	class Result3
+	class Future3
 		: public Event
 	{
 	private:
@@ -169,7 +169,7 @@ namespace async
 		boost::shared_ptr<State> _state;
 
 	public:
-		Result3()
+		Future3()
 			: _state(new State)
 			, Event(false)
 		{

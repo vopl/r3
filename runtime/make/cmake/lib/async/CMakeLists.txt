@@ -8,8 +8,8 @@ SET(INCLUDE
 	${INC_DIR}/async/eventWaiter.hpp
 	${INC_DIR}/async/mutex.hpp
 
-	${INC_DIR}/async/result.hpp
-	${INC_DIR}/async/resultWaiter.hpp
+	${INC_DIR}/async/future.hpp
+	${INC_DIR}/async/futureWaiter.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 

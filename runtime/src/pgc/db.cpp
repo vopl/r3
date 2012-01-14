@@ -49,7 +49,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<Connection> Db::allocConnection()
+	async::Future<Connection> Db::allocConnection()
 	{
 		return _impl->allocConnection();
 	}

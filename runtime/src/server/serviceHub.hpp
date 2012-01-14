@@ -41,7 +41,7 @@ namespace server
 		virtual void delService(IServicePtr service);
 		virtual void delServices();
 
-		virtual async::Result<error_code> send(
+		virtual async::Future<error_code> send(
 			IServicePtr service,
 			ISessionPtr session,
 			const client::TEndpoint &endpoint,

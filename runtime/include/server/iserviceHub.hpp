@@ -3,7 +3,7 @@
 
 #include "server/iservice.hpp"
 #include "server/endpoint.hpp"
-#include "async/result.hpp"
+#include "async/future.hpp"
 
 namespace server
 {
@@ -27,7 +27,7 @@ namespace server
 		virtual void delService(IServicePtr service) =0;
 		virtual void delServices() =0;
 
-		virtual async::Result<boost::system::error_code> send(
+		virtual async::Future<boost::system::error_code> send(
 			IServicePtr service,
 			ISessionPtr session,
 			const client::TEndpoint &endpoint,

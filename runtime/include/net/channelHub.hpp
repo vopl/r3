@@ -27,7 +27,7 @@ namespace net
 
 
 		mutex			_mtxSend;
-		typedef std::pair<Result<error_code>, SPacket> TSend;
+		typedef std::pair<Future<error_code>, SPacket> TSend;
 		typedef std::deque<TSend> TSends;
 		TSends			_sends;
 		TChannels		_channelsNotSend;
@@ -52,7 +52,7 @@ namespace net
 		virtual void listen(
 			const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive, 
 			size_t amount = (size_t)-1);
-		virtual Result<error_code> send(const SPacket &p);
+		virtual Future<error_code> send(const SPacket &p);
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ namespace net
 		for(;;)
 		{
 			IChannelPtr channel;
-			Result<error_code> res;
+			Future<error_code> res;
 			SPacket p;
 			{
 				mutex::scoped_lock sl(_mtxSend);
@@ -161,7 +161,7 @@ namespace net
 				_channelsNotSend.erase(_channelsNotSend.begin());
 			}
 
-			Result<error_code> lowRes = channel->send(p);
+			Future<error_code> lowRes = channel->send(p);
 			lowRes.wait();
 			if(lowRes.data())
 			{
@@ -218,9 +218,9 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	Result<error_code> ChannelHub<Base>::send(const SPacket &p)
+	Future<error_code> ChannelHub<Base>::send(const SPacket &p)
 	{
-		Result<error_code> res;
+		Future<error_code> res;
 
 		mutex::scoped_lock sl(_mtxSend);
 
@@ -266,7 +266,7 @@ namespace net
 			_receives.clear();
 
 			mutex::scoped_lock sl3(_mtxSend);
-			typedef std::pair<Result<error_code>, SPacket> PR;
+			typedef std::pair<Future<error_code>, SPacket> PR;
 			BOOST_FOREACH(PR &pr, _sends)
 			{
 				spawn(bind(pr.first, make_error_code(errc::operation_canceled)));

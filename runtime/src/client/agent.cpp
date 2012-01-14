@@ -47,7 +47,7 @@ namespace client
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result<error_code> Agent::send(
+	Future<error_code> Agent::send(
 		const server::TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{

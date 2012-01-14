@@ -160,7 +160,7 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::startSession_f(QString host, QString service)
 		{
-			async::Result2<boost::system::error_code, ISessionPtr> res =
+			async::Future2<boost::system::error_code, ISessionPtr> res =
 				_client->createSession(host.toUtf8(), service.toUtf8());
 
 			res.wait();

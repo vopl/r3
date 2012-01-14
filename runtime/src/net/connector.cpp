@@ -11,7 +11,7 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Connector::connect_f(Result2<error_code, IChannelPtr> res, const std::string &host, const std::string &service, bool useSsl)
+	void Connector::connect_f(Future2<error_code, IChannelPtr> res, const std::string &host, const std::string &service, bool useSsl)
 	{
 		//ILOG("connect to "<<host<<":"<<service<<", ssl="<<useSsl);
 		TSslContextPtr sslContext;
@@ -77,7 +77,7 @@ namespace net
 		//резолвить адрес
 		ip::tcp::resolver resolver(io());
 
-		Result2<error_code, ip::tcp::resolver::iterator> resolveRes;
+		Future2<error_code, ip::tcp::resolver::iterator> resolveRes;
 		resolver.async_resolve(
 			ip::tcp::resolver::query(host, service),
 			resolveRes);
@@ -112,7 +112,7 @@ namespace net
 		{
 			for(; riter!=rend; riter++)
 			{
-				Result<error_code> cres;
+				Future<error_code> cres;
 
 				if(sockSsl)
 				{
@@ -140,7 +140,7 @@ namespace net
 
 			if(sockSsl)
 			{
-				Result<error_code> hres;
+				Future<error_code> hres;
 				sockSsl->async_handshake(ssl::stream_base::client, hres);
 				ec = hres;
 
@@ -176,9 +176,9 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result2<error_code, IChannelPtr> Connector::connect(const char *host, const char *service, bool useSsl)
+	Future2<error_code, IChannelPtr> Connector::connect(const char *host, const char *service, bool useSsl)
 	{
-		async::Result2<error_code, IChannelPtr> res;
+		async::Future2<error_code, IChannelPtr> res;
 		spawn(bind(&Connector::connect_f, shared_from_this(), res, std::string(host), std::string(service), useSsl));
 		return res;
 	}

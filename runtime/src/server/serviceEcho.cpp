@@ -44,7 +44,7 @@ namespace server
 		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{
-		Result<error_code> res = hub->send(shared_from_this(), session, endpoint, data);
+		Future<error_code> res = hub->send(shared_from_this(), session, endpoint, data);
 
 // 		res.wait();
 // 		assert(!res.data());

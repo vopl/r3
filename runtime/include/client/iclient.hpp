@@ -11,7 +11,7 @@ namespace client
 		virtual ~IClient(){}
 
 		virtual bool start(pluma::Pluma *plugs) =0;
-		virtual async::Result2<boost::system::error_code, ISessionPtr> 
+		virtual async::Future2<boost::system::error_code, ISessionPtr> 
 			createSession(const char *host, const char *service) =0;
 		virtual pluma::Pluma * getPlugs() =0;
 		virtual async::Service getAsrv() =0;

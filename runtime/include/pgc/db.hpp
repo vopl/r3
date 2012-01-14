@@ -3,7 +3,7 @@
 
 #include "async/service.hpp"
 #include "pgc/connection.hpp"
-#include "async/result.hpp"
+#include "async/future.hpp"
 
 
 namespace pgc
@@ -31,7 +31,7 @@ namespace pgc
 		bool operator!() const;
 		void reset();
 
-		async::Result<Connection> allocConnection();
+		async::Future<Connection> allocConnection();
 	};
 }
 #endif

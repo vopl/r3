@@ -30,7 +30,7 @@ namespace net
 		std::string onSslPassword();
 
 	private:
-		void listen_f(Result<error_code> res,
+		void listen_f(Future<error_code> res,
 			const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
 			const std::string &host, const std::string &service, bool useSsl);
 
@@ -40,7 +40,7 @@ namespace net
 		Acceptor();
 		virtual ~Acceptor();
 
-		virtual Result<error_code> listen(
+		virtual Future<error_code> listen(
 			const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
 			const char *host, const char *service, bool useSsl);
 		virtual void unlisten();

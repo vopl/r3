@@ -24,7 +24,7 @@ namespace server
 	void SessionManager::listen_f(IAcceptorPtr acceptor)
 	{
 		//поставить акцептор на прослушивание
-		Result<error_code> res;
+		Future<error_code> res;
 		{
 			mutex::scoped_lock sl(_mtx);
 			if(!_isStarted)
@@ -84,7 +84,7 @@ namespace server
 	void SessionManager::initChannel_f(IChannelPtr channel)
 	{
 		//теперь протокол, читать запрашиваемый sid
-		Result2<error_code, SPacket> res2;
+		Future2<error_code, SPacket> res2;
 		channel->listen(res2, 1);
 		error_code ec = res2.data1();
 		if(ec)
@@ -153,7 +153,7 @@ namespace server
 
 				SPacket packet;
 				packet._data = v.serialize(packet._size);
-				Result<error_code> res = channel->send(packet);
+				Future<error_code> res = channel->send(packet);
 
 				if(res.data())
 				{
@@ -175,7 +175,7 @@ namespace server
 
 				SPacket packet;
 				packet._data = v.serialize(packet._size);
-				Result<error_code> res = channel->send(packet);
+				Future<error_code> res = channel->send(packet);
 
 				if(res.data())
 				{
@@ -224,7 +224,7 @@ namespace server
 
 			SPacket packet;
 			packet._data = v.serialize(packet._size);
-			Result<error_code> res = channel->send(packet);
+			Future<error_code> res = channel->send(packet);
 
 			if(res.data())
 			{

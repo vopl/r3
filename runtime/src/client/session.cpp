@@ -62,7 +62,7 @@ namespace client
 
 		if(doAdd)
 		{
-			Result2<error_code, ISessionPtr> res =
+			Future2<error_code, ISessionPtr> res =
 				_client->connectSession(shared_from_this(), _host, _service);
 
 			error_code ec = res.data1();
@@ -255,7 +255,7 @@ namespace client
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result<error_code> Session::send(net::SPacket p)
+	Future<error_code> Session::send(net::SPacket p)
 	{
 		return _channelHub->send(p);
 	}

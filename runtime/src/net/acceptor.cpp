@@ -11,7 +11,7 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	void Acceptor::listen_f(
-		Result<error_code> res,
+		Future<error_code> res,
 		const function<void(error_code, IChannelPtr)> &onAccept,
 		const std::string &host, const std::string &service, bool useSsl)
 	{
@@ -78,7 +78,7 @@ namespace net
 		//резолвить адрес
 		ip::tcp::resolver resolver(io());
 
-		Result2<error_code, ip::tcp::resolver::iterator> resolveRes;
+		Future2<error_code, ip::tcp::resolver::iterator> resolveRes;
 		resolver.async_resolve(
 			ip::tcp::resolver::query(host, service),
 			resolveRes);
@@ -142,7 +142,7 @@ namespace net
 			sock.reset(new TSocket(io()));
 		}
 
-		Result<error_code> ecRes;
+		Future<error_code> ecRes;
 		if(sockSsl)
 		{
 			acceptor->async_accept(sockSsl->lowest_layer(), ecRes);
@@ -211,11 +211,11 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result<error_code> Acceptor::listen(
+	Future<error_code> Acceptor::listen(
 		const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
 		const char *host, const char *service, bool useSsl)
 	{
-		Result<error_code> res;
+		Future<error_code> res;
 		spawn(bind(&Acceptor::listen_f, shared_from_this(), res, onAccept, std::string(host), std::string(service), useSsl));
 		return res;
 	}

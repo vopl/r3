@@ -71,7 +71,7 @@ namespace pgc
 				{
 					//больше выделять нельзя, освободить всех ожидающих нулями
 
-					BOOST_FOREACH(async::Result<Connection> &res, _waiters)
+					BOOST_FOREACH(async::Future<Connection> &res, _waiters)
 					{
 						WLOG("force null result on allocConnection");
 						res(Connection());
@@ -165,7 +165,7 @@ namespace pgc
 				break;
 			case PGRES_POLLING_READING:
 				{
-					async::Result<system::error_code> r = pch->recv0();
+					async::Future<system::error_code> r = pch->recv0();
 					if(r.data())
 					{
 						ILOG("poll with bad ec: "<<r.data()<<")");
@@ -175,7 +175,7 @@ namespace pgc
 				break;
 			case PGRES_POLLING_WRITING:
 				{
-					async::Result<system::error_code> r = pch->send0();
+					async::Future<system::error_code> r = pch->send0();
 					if(r.data())
 					{
 						ILOG("poll with bad ec: "<<r.data()<<")");
@@ -280,11 +280,11 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<Connection> DbImpl::allocConnection()
+	async::Future<Connection> DbImpl::allocConnection()
 	{
 		mutex::scoped_lock sl(_mtx);
 
-		async::Result<Connection> res;
+		async::Future<Connection> res;
 
 		//небольшая оптимизация - если есть готовые то отдать сразу, без балансировки
 		if(!_readyConnections.empty())
@@ -313,7 +313,7 @@ namespace pgc
 	void DbImpl::reset()
 	{
 		ILOG("deinitialize");
-		std::deque<async::Result<Connection> > waiters;
+		std::deque<async::Future<Connection> > waiters;
 		{
 			mutex::scoped_lock sl(_mtx);
 
@@ -327,7 +327,7 @@ namespace pgc
 			_conninfo.clear();
 			waiters.swap(_waiters);
 		}
-		BOOST_FOREACH(async::Result<Connection> &w, waiters)
+		BOOST_FOREACH(async::Future<Connection> &w, waiters)
 		{
 			w(Connection());
 		}

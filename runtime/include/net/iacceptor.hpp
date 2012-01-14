@@ -3,7 +3,7 @@
 
 #include "pluma/pluma.hpp"
 #include "net/ichannel.hpp"
-#include "async/result.hpp"
+#include "async/future.hpp"
 
 namespace net
 {
@@ -12,7 +12,7 @@ namespace net
 	{
 		virtual ~IAcceptor(){}
 
-		virtual async::Result<boost::system::error_code> listen(
+		virtual async::Future<boost::system::error_code> listen(
 				const boost::function<void(boost::system::error_code, IChannelPtr)> &onAccept,
 			const char *host, const char *service, bool useSsl=false) =0;
 		virtual void unlisten() =0;

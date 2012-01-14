@@ -33,7 +33,7 @@ namespace client
 		Agent(SessionPtr session, TEndpoint	endpoint);
 		~Agent();
 
-		virtual Result<error_code> send(
+		virtual Future<error_code> send(
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data);
 

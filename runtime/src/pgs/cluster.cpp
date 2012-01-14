@@ -17,13 +17,13 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<bool> Cluster::sync(pgc::Connection con, bool allowCreate)
+	async::Future<bool> Cluster::sync(pgc::Connection con, bool allowCreate)
 	{
 		return _impl->sync(con, allowCreate);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<bool> Cluster::drop(pgc::Connection con)
+	async::Future<bool> Cluster::drop(pgc::Connection con)
 	{
 		return _impl->drop(con);
 	}

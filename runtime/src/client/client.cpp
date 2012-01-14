@@ -8,11 +8,11 @@ namespace client
 
 	//////////////////////////////////////////////////////////////////////////
 	void Client::connectSession_f(
-		Result2<error_code, ISessionPtr> res, 
+		Future2<error_code, ISessionPtr> res, 
 		const std::string &host, const std::string &service,
 		SessionPtr session)
 	{
-		Result2<error_code, IChannelPtr> cres =
+		Future2<error_code, IChannelPtr> cres =
 			_connector->connect(host.c_str(), service.c_str());
 
 		cres.wait();
@@ -28,7 +28,7 @@ namespace client
 
 		Variant v;
 		v.as<Variant::MapStringVariant>(true)["sid"] = session?session->sid():nullClientSid;
-		Result<error_code> sres = channel->send(v);
+		Future<error_code> sres = channel->send(v);
 
 		if(sres.data())
 		{
@@ -36,7 +36,7 @@ namespace client
 			return;
 		}
 		
-		Result2<error_code, SPacket> rres;
+		Future2<error_code, SPacket> rres;
 		channel->listen(rres, 1);
 
 		if(rres.data1())
@@ -153,10 +153,10 @@ namespace client
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result2<error_code, ISessionPtr> 
+	Future2<error_code, ISessionPtr> 
 		Client::createSession(const char *host, const char *service)
 	{
-		Result2<error_code, ISessionPtr> res;
+		Future2<error_code, ISessionPtr> res;
 		_asrv.spawn(bind(&Client::connectSession_f, shared_from_this(), res, std::string(host), std::string(service), SessionPtr()));
 		return res;
 	}
@@ -199,10 +199,10 @@ namespace client
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result2<error_code, ISessionPtr> 
+	Future2<error_code, ISessionPtr> 
 		Client::connectSession(SessionPtr session, const std::string &host, const std::string &service)
 	{
-		Result2<error_code, ISessionPtr> res;
+		Future2<error_code, ISessionPtr> res;
 		_asrv.spawn(bind(&Client::connectSession_f, shared_from_this(), res, host, service, session));
 		return res;
 	}

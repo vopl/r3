@@ -1,7 +1,7 @@
-#ifndef _ASYNC_RESULTWAITER_HPP_
-#define _ASYNC_RESULTWAITER_HPP_
+#ifndef _ASYNC_FUTUREWAITER_HPP_
+#define _ASYNC_FUTUREWAITER_HPP_
 
-#include "async/result.hpp"
+#include "async/future.hpp"
 #include "async/eventWaiter.hpp"
 
 //////////////////////////////////////////////////////////////////////////
@@ -9,13 +9,13 @@ namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
 	template <class Data>
-	class ResultWaiter
-		: public EventWaiter<Result<Data> >
+	class FutureWaiter
+		: public EventWaiter<Future<Data> >
 	{
-		typedef EventWaiter<Result<Data> > Base;
+		typedef EventWaiter<Future<Data> > Base;
 	public:
-		ResultWaiter();
-		ResultWaiter(const Result<Data> &);
+		FutureWaiter();
+		FutureWaiter(const Future<Data> &);
 
 		operator Data &();
 
@@ -23,7 +23,7 @@ namespace async
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Data>
-	ResultWaiter<Data>::ResultWaiter()
+	FutureWaiter<Data>::FutureWaiter()
 		: Base()
 	{
 	}
@@ -31,14 +31,14 @@ namespace async
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Data>
-	ResultWaiter<Data>::ResultWaiter(const Result<Data> &event)
+	FutureWaiter<Data>::FutureWaiter(const Future<Data> &event)
 		: Base(event)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Data>
-	ResultWaiter<Data>::operator Data &()
+	FutureWaiter<Data>::operator Data &()
 	{
 		return current().data();
 	}

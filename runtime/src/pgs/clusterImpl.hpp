@@ -3,7 +3,7 @@
 
 #include "pgs/meta/cluster.hpp"
 #include "pgs/cluster.hpp"
-#include "async/result.hpp"
+#include "async/future.hpp"
 #include "async/mutex.hpp"
 
 #include <boost/shared_ptr.hpp>
@@ -80,8 +80,8 @@ namespace pgs
 		bool drop_schemaExistence(pgc::Connection con, pgs::meta::SchemaCPtr s);
 
 	private:
-		void sync_f(async::Result<bool> res, pgc::Connection con, bool allowCreate = false);
-		void drop_f(async::Result<bool> res, pgc::Connection con);
+		void sync_f(async::Future<bool> res, pgc::Connection con, bool allowCreate = false);
+		void drop_f(async::Future<bool> res, pgc::Connection con);
 
 
 	public:
@@ -89,8 +89,8 @@ namespace pgs
 
 		void setUnicators(const std::string &prefix, const std::string &suffix);
 
-		async::Result<bool> sync(pgc::Connection con, bool allowCreate = false);
-		async::Result<bool> drop(pgc::Connection con);
+		async::Future<bool> sync(pgc::Connection con, bool allowCreate = false);
+		async::Future<bool> drop(pgc::Connection con);
 
 		// 	select
 		// 	insert

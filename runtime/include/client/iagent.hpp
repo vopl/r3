@@ -3,7 +3,7 @@
 
 #include "utils/variant.hpp"
 #include "server/endpoint.hpp"
-#include "async/result.hpp"
+#include "async/future.hpp"
 #include <boost/system/error_code.hpp>
 #include <boost/function.hpp>
 
@@ -18,7 +18,7 @@ namespace client
 	{
 		virtual ~IAgent(){}
 
-		virtual async::Result<boost::system::error_code> send(
+		virtual async::Future<boost::system::error_code> send(
 			const server::TEndpoint &endpoint,
 			utils::VariantPtr data) =0;
 

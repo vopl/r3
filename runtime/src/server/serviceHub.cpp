@@ -214,7 +214,7 @@ namespace server
 
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<error_code> ServiceHub::send(
+	async::Future<error_code> ServiceHub::send(
 		IServicePtr service,
 		ISessionPtr session,
 		const client::TEndpoint &endpoint,
