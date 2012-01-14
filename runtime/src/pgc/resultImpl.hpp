@@ -9,16 +9,16 @@ namespace pgc
 	using namespace boost;
 	using namespace utils;
 
-	class DataImpl
-		: public enable_shared_from_this<DataImpl>
+	class ResultImpl
+		: public enable_shared_from_this<ResultImpl>
 	{
 		PGresult *_pgr;
 		bool _integerDatetimes;
 	public:
-		DataImpl(PGresult *pgr, bool integerDatetimes);
-		~DataImpl();
+		ResultImpl(PGresult *pgr, bool integerDatetimes);
+		~ResultImpl();
 
-		EDataStatus status();
+		EResultStatus status();
 		const char *errorMsg();
 		const char *errorCode();
 

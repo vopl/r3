@@ -2,7 +2,7 @@
 #define _PGS_STATEMENTIMPL_HPP_
 
 #include "pgc/statementImpl.hpp"
-#include "dataImpl.hpp"
+#include "resultImpl.hpp"
 
 namespace pgs
 {

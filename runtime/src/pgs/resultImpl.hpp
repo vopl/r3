@@ -3,7 +3,7 @@
 
 #include "fieldImpl.hpp"
 #include "categoryImpl.hpp"
-#include "pgc/dataImpl.hpp"
+#include "pgc/resultImpl.hpp"
 
 namespace pgs
 {
@@ -11,8 +11,8 @@ namespace pgs
 	typedef boost::shared_ptr<StatementImpl> StatementImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class DataImpl
-		: pgc::DataImpl
+	class ResultImpl
+		: pgc::ResultImpl
 	{
 		typedef std::map<std::string, size_t>	TMName2idx;
 		TMName2idx _fetchName2idx;
@@ -20,7 +20,7 @@ namespace pgs
 
 
 	public:
-		DataImpl(	PGresult *pgres, 
+		ResultImpl(	PGresult *pgres, 
 					bool integerDatetime,
 					ClusterImplPtr cluster,
 					const TMName2idx &fetchName2idx);
@@ -30,7 +30,7 @@ namespace pgs
 		bool fldIndices(std::deque<size_t> &res, const CategoryImplPtr &cat);
 
 	};
-	typedef boost::shared_ptr<DataImpl> DataImplPtr;
+	typedef boost::shared_ptr<ResultImpl> ResultImplPtr;
 }
 
 #endif

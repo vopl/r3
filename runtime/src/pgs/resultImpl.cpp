@@ -1,23 +1,23 @@
 #include "pch.h"
-#include "dataImpl.hpp"
+#include "resultImpl.hpp"
 #include "statementImpl.hpp"
 #include "pgc/connectionHolder.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	DataImpl::DataImpl(	PGresult *pgres, 
+	ResultImpl::ResultImpl(	PGresult *pgres, 
 		bool integerDatetime,
 		ClusterImplPtr cluster,
 		const TMName2idx &fetchName2idx)
-		: pgc::DataImpl(pgres, integerDatetime)
+		: pgc::ResultImpl(pgres, integerDatetime)
 		, _cluster(cluster)
 		, _fetchName2idx(fetchName2idx)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool DataImpl::fldIndex(size_t &res, const std::string &name)
+	bool ResultImpl::fldIndex(size_t &res, const std::string &name)
 	{
 		TMName2idx::iterator iter = _fetchName2idx.find(name);
 		if(_fetchName2idx.end() == iter)
@@ -31,7 +31,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool DataImpl::fldIndex(size_t &res, const pgs::FieldImplPtr &fld)
+	bool ResultImpl::fldIndex(size_t &res, const pgs::FieldImplPtr &fld)
 	{
 		std::string fldName;
 
@@ -48,7 +48,7 @@ namespace pgs
 		return fldIndex(res, fldName);
 	}
 
-	bool DataImpl::fldIndices(std::deque<size_t> &res, const pgs::CategoryImplPtr &cat)
+	bool ResultImpl::fldIndices(std::deque<size_t> &res, const pgs::CategoryImplPtr &cat)
 	{
 		std::string categoryAlias = _cluster->escapeName(cat->alias());
 

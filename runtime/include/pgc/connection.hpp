@@ -2,7 +2,7 @@
 #define _PGC_CONNECTION_HPP_
 
 #include "pgc/statement.hpp"
-#include "pgc/data.hpp"
+#include "pgc/result.hpp"
 #include "utils/variant.hpp"
 #include "async/future.hpp"
 
@@ -34,12 +34,12 @@ namespace pgc
 		operator bool() const;
 		bool operator!() const;
 
-		async::Future<Datas> query(const char *sql);
-		async::Future<Datas> query(const char *, const utils::Variant &data);
-		async::Future<Datas> query(const std::string &sql);
-		async::Future<Datas> query(const std::string &sql, const utils::Variant &data);
-		async::Future<Datas> query(Statement s, bool withPrepare=true);
-		async::Future<Datas> query(Statement s, const utils::Variant &data, bool withPrepare=true);
+		async::Future<Results> query(const char *sql);
+		async::Future<Results> query(const char *, const utils::Variant &data);
+		async::Future<Results> query(const std::string &sql);
+		async::Future<Results> query(const std::string &sql, const utils::Variant &data);
+		async::Future<Results> query(Statement s, bool withPrepare=true);
+		async::Future<Results> query(Statement s, const utils::Variant &data, bool withPrepare=true);
 
 		EConnectionStatus status();
 	};

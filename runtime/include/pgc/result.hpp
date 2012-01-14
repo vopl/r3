@@ -1,5 +1,5 @@
-#ifndef _PGC_DATA_HPP_
-#define _PGC_DATA_HPP_
+#ifndef _PGC_RESULT_HPP_
+#define _PGC_RESULT_HPP_
 
 #include "pgc/api.h"
 #include "utils/variant.hpp"
@@ -7,7 +7,7 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	enum EDataStatus
+	enum EResultStatus
 	{
 		ersCommandOk,
 		ersTuplesOk,
@@ -15,21 +15,21 @@ namespace pgc
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	class DataImpl;
-	typedef boost::shared_ptr<DataImpl> DataImplPtr;
+	class ResultImpl;
+	typedef boost::shared_ptr<ResultImpl> ResultImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class PG_API Data
+	class PG_API Result
 	{
 
 	protected:
-		typedef DataImplPtr ImplPtr;
+		typedef ResultImplPtr ImplPtr;
 		ImplPtr	_impl;
 
-		Data();
+		Result();
 
 	public:
-		EDataStatus status();
+		EResultStatus status();
 		const char *errorMsg();
 		const char *errorCode();
 
@@ -67,6 +67,6 @@ namespace pgc
 		boost::uint32_t fetchUInt32(size_t colIdx, size_t rowIdx);
 		std::string fetchString(size_t colIdx, size_t rowIdx);
 	};
-	typedef std::vector<Data> Datas;
+	typedef std::vector<Result> Results;
 }
 #endif

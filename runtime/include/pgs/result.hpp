@@ -1,26 +1,26 @@
-#ifndef _PGS_DATA_HPP_
-#define _PGS_DATA_HPP_
+#ifndef _PGS_RESULT_HPP_
+#define _PGS_RESULT_HPP_
 
 #include <boost/shared_ptr.hpp>
 #include "pgs/category.hpp"
 #include "pgs/field.hpp"
-#include "pgc/data.hpp"
+#include "pgc/result.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	class DataImpl;
-	typedef boost::shared_ptr<DataImpl> DataImplPtr;
+	class ResultImpl;
+	typedef boost::shared_ptr<ResultImpl> ResultImplPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	class PG_API Data
-		: public pgc::Data
+	class PG_API Result
+		: public pgc::Result
 	{
 	protected:
-		typedef DataImplPtr ImplPtr;
+		typedef ResultImplPtr ImplPtr;
 
 		friend class Statement;
-		Data(ImplPtr impl);
+		Result(ImplPtr impl);
 
 	protected:
 		bool fldIndex(size_t &res, const Field &fld);
@@ -28,12 +28,12 @@ namespace pgs
 
 	public:
 
-		using pgc::Data::fetch;
-		using pgc::Data::fetchRowList;
-		using pgc::Data::fetchRowMap;
-		using pgc::Data::fetchRowsList;
-		using pgc::Data::fetchRowsMap;
-		using pgc::Data::fetchColumn;
+		using pgc::Result::fetch;
+		using pgc::Result::fetchRowList;
+		using pgc::Result::fetchRowMap;
+		using pgc::Result::fetchRowsList;
+		using pgc::Result::fetchRowsMap;
+		using pgc::Result::fetchColumn;
 
 		bool fetchRowList(utils::Variant &v, const pgs::Category &cat, size_t rowIdx=0);
 		bool fetchRowMap(utils::Variant &v, const pgs::Category &cat, size_t rowIdx=0);

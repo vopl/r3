@@ -229,7 +229,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	bool ClusterImpl::sync_schemaExistence(pgc::Connection con, pgs::meta::SchemaCPtr s, bool allowCreate)
 	{
-		pgc::Data pgr = con.query(
+		pgc::Result pgr = con.query(
 			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
 			schemaName(s, false, false)).data()[0];
 
@@ -301,7 +301,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	bool ClusterImpl::sync_tableExistence(pgc::Connection con, pgs::meta::CategoryCPtr c, bool allowCreate)
 	{
-		pgc::Data pgr = con.query(
+		pgc::Result pgr = con.query(
 			"SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2",
 			MVA(schemaName(c->_schema, false, false), tableName(c, false, false))).data()[0];
 
@@ -345,7 +345,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	bool ClusterImpl::sync_columnExistence(pgc::Connection con, pgs::meta::FieldCPtr f, bool allowCreate)
 	{
-		pgc::Data pgr = con.query(
+		pgc::Result pgr = con.query(
 			"SELECT * FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2 AND column_name=$3",
 			MVA(schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false))).data()[0];
 		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
@@ -385,7 +385,7 @@ namespace pgs
 			return true;
 		}
 
-		pgc::Data pgr = con.query(
+		pgc::Result pgr = con.query(
 			"SELECT * FROM pg_catalog.pg_indexes WHERE schemaname=$1 AND tablename=$2 AND indexname=$3",
 			MVA(
 				schemaName(i->_category->_schema, false, false), 
@@ -446,7 +446,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	bool ClusterImpl::sync_crossExistence(pgc::Connection con, pgs::meta::RelationCPtr r, bool allowCreate)
 	{
-		pgc::Data pgr = con.query(
+		pgc::Result pgr = con.query(
 			"SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2",
 			MVA(schemaName(r->_schema, false, false), tableName(r, false, false))).data()[0];
 		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
@@ -536,7 +536,7 @@ namespace pgs
 	bool ClusterImpl::sync_tableInherits(pgc::Connection con, pgs::meta::CategoryCPtr c, bool allowCreate)
 	{
 		//todo: withPrepare срезать
-		pgc::Data pgr = con.query(
+		pgc::Result pgr = con.query(
 			"SELECT inhparent FROM pg_catalog.pg_inherits WHERE inhrelid=$1",
 			Variant(_cat2oid[c])).data()[0];
 
@@ -583,7 +583,7 @@ namespace pgs
 	{
 		//////////////////////////////////////////////////////////////////////////
 		//тригер на удаление
-		pgc::Data pgr = con.query(
+		pgc::Result pgr = con.query(
 			"CREATE OR REPLACE FUNCTION "+triggerFuncName(re->_category, re->_name+"_del")+"()\n"
 			"	RETURNS trigger AS\n"
 			"	$BODY$\n"
@@ -651,7 +651,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	bool ClusterImpl::drop_schemaExistence(pgc::Connection con, pgs::meta::SchemaCPtr s)
 	{
-		pgc::Data pgr = con.query(
+		pgc::Result pgr = con.query(
 			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
 			schemaName(s, false, false)).data()[0];
 		if(pgc::ersTuplesOk != pgr.status())

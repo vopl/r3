@@ -1,31 +1,31 @@
 #include "pch.h"
-#include "pgs/data.hpp"
-#include "dataImpl.hpp"
+#include "pgs/result.hpp"
+#include "resultImpl.hpp"
 #include "utils/implAccess.hpp"
 
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	bool Data::fldIndex(size_t &res, const Field &fld)
+	bool Result::fldIndex(size_t &res, const Field &fld)
 	{
-		return boost::static_pointer_cast<DataImpl>(_impl)->fldIndex(res, utils::ImplAccess<Field>(fld).impl());
+		return boost::static_pointer_cast<ResultImpl>(_impl)->fldIndex(res, utils::ImplAccess<Field>(fld).impl());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Data::fldIndices(std::deque<size_t> &res, const pgs::Category &cat)
+	bool Result::fldIndices(std::deque<size_t> &res, const pgs::Category &cat)
 	{
-		return boost::static_pointer_cast<DataImpl>(_impl)->fldIndices(res, utils::ImplAccess<Category>(cat).impl());
+		return boost::static_pointer_cast<ResultImpl>(_impl)->fldIndices(res, utils::ImplAccess<Category>(cat).impl());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Data::Data(ImplPtr impl)
+	Result::Result(ImplPtr impl)
 	//	: pgc::Data(impl)
 	{
 		assert(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Data::fetchRowList(utils::Variant &v, const pgs::Category &cat, size_t rowIdx)
+	bool Result::fetchRowList(utils::Variant &v, const pgs::Category &cat, size_t rowIdx)
 	{
 		std::deque<size_t> indices;
 		if(!fldIndices(indices, cat))
@@ -38,7 +38,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Data::fetchRowMap(utils::Variant &v, const pgs::Category &cat, size_t rowIdx)
+	bool Result::fetchRowMap(utils::Variant &v, const pgs::Category &cat, size_t rowIdx)
 	{
 		std::deque<size_t> indices;
 		if(!fldIndices(indices, cat))
@@ -51,7 +51,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Data::fetchRowsList(utils::Variant &v, const pgs::Category &cat, size_t rowBeginIdx, size_t rowEndIdx)
+	bool Result::fetchRowsList(utils::Variant &v, const pgs::Category &cat, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		std::deque<size_t> indices;
 		if(!fldIndices(indices, cat))
@@ -64,7 +64,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Data::fetchRowsMap(utils::Variant &v, const pgs::Category &cat, size_t rowBeginIdx, size_t rowEndIdx)
+	bool Result::fetchRowsMap(utils::Variant &v, const pgs::Category &cat, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		std::deque<size_t> indices;
 		if(!fldIndices(indices, cat))
@@ -77,7 +77,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Data::fetch(utils::Variant &v, const pgs::Field &fld, size_t rowIdx)
+	bool Result::fetch(utils::Variant &v, const pgs::Field &fld, size_t rowIdx)
 	{
 		size_t index;
 		if(!fldIndex(index, fld))
@@ -90,7 +90,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Data::fetchColumn(utils::Variant &v, const pgs::Field &fld, size_t rowBeginIdx, size_t rowEndIdx)
+	bool Result::fetchColumn(utils::Variant &v, const pgs::Field &fld, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t index;
 		if(!fldIndex(index, fld))

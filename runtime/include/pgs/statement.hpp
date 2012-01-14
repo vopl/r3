@@ -1,7 +1,7 @@
 #ifndef _PGS_STATEMENT_HPP_
 #define _PGS_STATEMENT_HPP_
 
-#include "pgs/data.hpp"
+#include "pgs/result.hpp"
 #include <boost/shared_ptr.hpp>
 #include "pgc/statement.hpp"
 

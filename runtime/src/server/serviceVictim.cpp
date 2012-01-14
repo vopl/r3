@@ -33,7 +33,7 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	static size_t cnt(0);
-	void ServiceVictim::onResult(pgc::Datas r)
+	void ServiceVictim::onResult(pgc::Results r)
 	{
 		assert(r.size()<2);
 		if(r.empty())
@@ -46,7 +46,7 @@ namespace server
 		cnt++;
 		if(!(cnt%10000))
 		{
-			pgc::EDataStatus s = r[0].status();
+			pgc::EResultStatus s = r[0].status();
 			const char *msg = r[0].errorMsg();
 			utils::Variant v;
 			r[0].fetchRowsMap(v);
@@ -82,7 +82,7 @@ namespace server
 				return;
 			}
 
-			async::FutureWaiter<pgc::Datas> results(
+			async::FutureWaiter<pgc::Results> results(
 				c1.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000))
 				);
 			//async::EventWaiter<async::Future<pgc::IResultPtrs> > results;

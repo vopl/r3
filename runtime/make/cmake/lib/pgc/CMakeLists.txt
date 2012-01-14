@@ -5,7 +5,7 @@ SET(PGC_INCLUDE
 	${INC_DIR}/pgc/db.hpp
 	${INC_DIR}/pgc/connection.hpp
 	${INC_DIR}/pgc/statement.hpp
-	${INC_DIR}/pgc/data.hpp
+	${INC_DIR}/pgc/result.hpp
 )
 SOURCE_GROUP(pgc\\include FILES ${PGC_INCLUDE})
 
@@ -14,8 +14,8 @@ SET(PGC_SRC
 	${SRC_DIR}/pgc/dbImpl.cpp
 	${SRC_DIR}/pgc/statement.cpp
 	${SRC_DIR}/pgc/statementImpl.cpp
-	${SRC_DIR}/pgc/data.cpp
-	${SRC_DIR}/pgc/dataImpl.cpp
+	${SRC_DIR}/pgc/result.cpp
+	${SRC_DIR}/pgc/resultImpl.cpp
 	${SRC_DIR}/pgc/connection.cpp
 	${SRC_DIR}/pgc/connectionHolder.cpp
 	${SRC_DIR}/pgc/connectionImpl.cpp
@@ -32,7 +32,7 @@ SOURCE_GROUP(src FILES ${SRC_NOPCH})
 SET(PGC_SRC_HDR
 	${SRC_DIR}/pgc/dbImpl.hpp
 	${SRC_DIR}/pgc/statementImpl.hpp
-	${SRC_DIR}/pgc/dataImpl.hpp
+	${SRC_DIR}/pgc/resultImpl.hpp
 	${SRC_DIR}/pgc/connectionHolder.hpp
 	${SRC_DIR}/pgc/connectionImpl.hpp
 	${SRC_DIR}/pgc/bindData.hpp
@@ -85,7 +85,7 @@ SET(PGS_INCLUDE
 	${INC_DIR}/pgs/field.hpp
 	${INC_DIR}/pgs/link.hpp
 	${INC_DIR}/pgs/order.hpp
-	${INC_DIR}/pgs/data.hpp
+	${INC_DIR}/pgs/result.hpp
 	${INC_DIR}/pgs/select.hpp
 	${INC_DIR}/pgs/value.hpp
 )
@@ -123,8 +123,8 @@ SET(PGS_SRC
 	${SRC_DIR}/pgs/linkImpl.cpp
 	${SRC_DIR}/pgs/order.cpp
 	${SRC_DIR}/pgs/orderImpl.cpp
-	${SRC_DIR}/pgs/data.cpp
-	${SRC_DIR}/pgs/dataImpl.cpp
+	${SRC_DIR}/pgs/result.cpp
+	${SRC_DIR}/pgs/resultImpl.cpp
 	${SRC_DIR}/pgs/select.cpp
 	${SRC_DIR}/pgs/selectImpl.cpp
 	${SRC_DIR}/pgs/value.cpp
@@ -148,7 +148,7 @@ SET(PGS_SRC_HDR
 	${SRC_DIR}/pgs/instantiate4pgctypes.hpp
 	${SRC_DIR}/pgs/linkImpl.hpp
 	${SRC_DIR}/pgs/orderImpl.hpp
-	${SRC_DIR}/pgs/dataImpl.hpp
+	${SRC_DIR}/pgs/resultImpl.hpp
 	${SRC_DIR}/pgs/sdHelpers.hpp
 	${SRC_DIR}/pgs/selectImpl.hpp
 	${SRC_DIR}/pgs/valueImpl.hpp
