@@ -93,8 +93,8 @@ namespace pgc
 		struct SRequest
 		{
 			ERequestType				_ert;
-			async::Future<Results>	_res;
-			SRequest(ERequestType ert, async::Future<Results> res)
+			async::Future<Result>	_res;
+			SRequest(ERequestType ert, async::Future<Result> res)
 				: _ert(ert), _res(res)
 			{}
 		};
@@ -105,7 +105,7 @@ namespace pgc
 		{
 			std::string	_sql;
 			BindDataPtr	_bindData;
-			SRequestQuery(async::Future<Results> res, std::string sql, BindDataPtr bindData)
+			SRequestQuery(async::Future<Result> res, std::string sql, BindDataPtr bindData)
 				: SRequest(ertQuery, res), _sql(sql), _bindData(bindData)
 			{}
 		};
@@ -114,7 +114,7 @@ namespace pgc
 		{
 			StatementImplPtr	_s;
 			BindDataPtr			_bindData;
-			SRequestQueryWithPrepare(async::Future<Results> res, StatementImplPtr s, BindDataPtr bindData)
+			SRequestQueryWithPrepare(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData)
 				: SRequest(ertQueryWithPrepare, res), _s(s), _bindData(bindData)
 			{}
 		};
@@ -122,7 +122,7 @@ namespace pgc
 		struct SRequestEndWork
 			: SRequest
 		{
-			SRequestEndWork(async::Future<Results> res)
+			SRequestEndWork(async::Future<Result> res)
 				: SRequest(ertQueryEndWork, res)
 			{}
 		};
@@ -164,26 +164,26 @@ namespace pgc
 		static int sockType(int sock);
 
 	private:
-		void pushResultAndSet(async::Future<Results> &res, bool success=false);
+		void setResult(async::Future<Result> &res, bool success=false);
 
 	private:
 		void processRequest();
 
 	private:
-		void processSingle(async::Future<Results> res);
-		void processQueryWithPrepare(async::Future<Results> res, StatementImplPtr s, BindDataPtr bindData);
+		void processSingle(async::Future<Result> res);
+		void processQueryWithPrepare(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData);
 
 	private:
-		void runQuery_f(async::Future<Results> res, const std::string &sql, BindDataPtr bindData = BindDataPtr());
+		void runQuery_f(async::Future<Result> res, const std::string &sql, BindDataPtr bindData = BindDataPtr());
 
 		void runPrepare_f(
-			async::Future<Results> res, 
+			async::Future<Result> res, 
 			const std::string &prid, 
 			const std::string &sql, 
 			BindDataPtr bindData);
 
 		void runQueryPrepared_f(
-			async::Future<Results> res, 
+			async::Future<Result> res, 
 			const std::string &prid, 
 			BindDataPtr bindData);
 
@@ -192,10 +192,10 @@ namespace pgc
 		//void runDescribePortal...
 
 	private:
-		void runQueryWithPrepare_f(async::Future<Results> res, StatementImplPtr s, BindDataPtr bindData);
+		void runQueryWithPrepare_f(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData);
 
 	private:
-		void runEndWork_f(async::Future<Results> res);
+		void runEndWork_f(async::Future<Result> res);
 
 	public:
 		async::Future<system::error_code> send0();
@@ -214,8 +214,8 @@ namespace pgc
 		bool integerDatetimes();
 
 	public:
-		void runQuery(async::Future<Results> res, const std::string &sql, BindDataPtr bindData);
-		void runQueryWithPrepare(async::Future<Results> res, Statement s, BindDataPtr bindData);
+		void runQuery(async::Future<Result> res, const std::string &sql, BindDataPtr bindData);
+		void runQueryWithPrepare(async::Future<Result> res, Statement s, BindDataPtr bindData);
 
 	public:
 		void beginWork();

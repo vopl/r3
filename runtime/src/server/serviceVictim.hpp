@@ -23,7 +23,7 @@ namespace server
 
 		pgc::Db _db;
 
-		void onResult(pgc::Results r);
+		void onResult(pgc::Result r);
 		void connectionLoop1();
 		void syncPgs();
 

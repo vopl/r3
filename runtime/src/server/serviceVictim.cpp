@@ -11,6 +11,7 @@
 
 #include "pgs/cluster.hpp"
 #include "pgs/meta/schemas/Staff_initializer.hpp"
+#include "pgs/select.hpp"
 
 #include "utils/ntoa.hpp"
 
@@ -33,23 +34,15 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	static size_t cnt(0);
-	void ServiceVictim::onResult(pgc::Results r)
+	void ServiceVictim::onResult(pgc::Result r)
 	{
-		assert(r.size()<2);
-		if(r.empty())
-		{
-			TLOG("onResult NULL");
-			return;
-		}
-		//TLOG("onResult");
-
 		cnt++;
 		if(!(cnt%10000))
 		{
-			pgc::EResultStatus s = r[0].status();
-			const char *msg = r[0].errorMsg();
+			pgc::EResultStatus s = r.status();
+			const char *msg = r.errorMsg();
 			utils::Variant v;
-			r[0].fetchRowsMap(v);
+			r.fetchRowsMap(v);
 			TLOG(cnt<<", "<<s<<", "<<msg<<", "<<v);
 		}
 	}
@@ -82,7 +75,7 @@ namespace server
 				return;
 			}
 
-			async::FutureWaiter<pgc::Results> results(
+			async::FutureWaiter<pgc::Result> results(
 				c1.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000))
 				);
 			//async::EventWaiter<async::Future<pgc::IResultPtrs> > results;
@@ -139,6 +132,17 @@ namespace server
 
 			sar.wait();
 			dar.wait();
+
+// 			pgs::meta::schemas::StaffCPtr staff = mcl.get<pgs::meta::schemas::Staff>();
+// 
+// 			pgs::Statement s = pgs::Select()
+// 				.whats(pgs::Category(staff->Right))
+// 				.from(staff->Right)
+// 				.links(staff->Right->values)
+// 				.orders(staff->Right->module)
+// 				.compile(cl);
+
+			//con.query(s, sd);
 			con.query("COMMIT").wait();
 		}
 	}
@@ -174,10 +178,10 @@ namespace server
 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 		}
 
-		for(size_t i(0); i<2; i++)
-		{
-			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
-		}
+// 		for(size_t i(0); i<1; i++)
+// 		{
+// 			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
+// 		}
 
 		int k = 220;
 		//

@@ -29,37 +29,37 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Future<Results> Connection::query(const char *sql)
+	async::Future<Result> Connection::query(const char *sql)
 	{
 		return query(std::string(sql));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Future<Results> Connection::query(const char *sql, const utils::Variant &data)
+	async::Future<Result> Connection::query(const char *sql, const utils::Variant &data)
 	{
 		return query(std::string(sql), data);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Future<Results> Connection::query(const std::string &sql)
+	async::Future<Result> Connection::query(const std::string &sql)
 	{
-		async::Future<Results> res;
+		async::Future<Result> res;
 		_impl->_holder->runQuery(res, sql, BindDataPtr());
 		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Future<Results> Connection::query(const std::string &sql, const utils::Variant &data)
+	async::Future<Result> Connection::query(const std::string &sql, const utils::Variant &data)
 	{
-		async::Future<Results> res;
+		async::Future<Result> res;
 		_impl->_holder->runQuery(res, sql, BindDataPtr(new BindData(data, _impl->_holder)));
 		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Future<Results> Connection::query(Statement s, bool withPrepare)
+	async::Future<Result> Connection::query(Statement s, bool withPrepare)
 	{
-		async::Future<Results> res;
+		async::Future<Result> res;
 		if(withPrepare)
 		{
 			_impl->_holder->runQueryWithPrepare(res, s, BindDataPtr());
@@ -72,9 +72,9 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Future<Results> Connection::query(Statement s, const utils::Variant &data, bool withPrepare)
+	async::Future<Result> Connection::query(Statement s, const utils::Variant &data, bool withPrepare)
 	{
-		async::Future<Results> res;
+		async::Future<Result> res;
 
 		BindDataPtr bindData(new BindData(data, _impl->_holder));
 		if(withPrepare)

@@ -231,7 +231,7 @@ namespace pgs
 	{
 		pgc::Result pgr = con.query(
 			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
-			schemaName(s, false, false)).data()[0];
+			schemaName(s, false, false));
 
 		if(pgc::ersTuplesOk != pgr.status() || !pgr.fetchInt32(0,0))
 		{
@@ -240,7 +240,7 @@ namespace pgs
 
 			if(allowCreate)
 			{
-				pgr = con.query("CREATE SCHEMA "+schemaName(s, true, true)).data()[0];
+				pgr = con.query("CREATE SCHEMA "+schemaName(s, true, true));
 				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
@@ -259,7 +259,7 @@ namespace pgs
 		//oid
 		pgr = con.query(
 			"SELECT oid FROM pg_catalog.pg_namespace WHERE nspname=$1",
-			schemaName(s, false, false)).data()[0];
+			schemaName(s, false, false));
 		if(pgc::ersTuplesOk != pgr.status() || 1 != pgr.rows())
 		{
 			//log.push_back(SyncLogLine("obtain schema oid failed", schemaName(s, false, false)));
@@ -273,7 +273,7 @@ namespace pgs
 		//генератор идентификаторов объектов
 		pgr = con.query(
 			"SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2",
-			MVA(schemaName(s, false, false), idGenName(s, false, false))).data()[0];
+			MVA(schemaName(s, false, false), idGenName(s, false, false)));
 		if(pgc::ersTuplesOk != pgr.status() || !pgr.fetchInt32(0,0))
 		{
 			//log.push_back(SyncLogLine("idGen absent", schemaName(s, false, false), idGenName(s, false, false)));
@@ -281,7 +281,7 @@ namespace pgs
 
 			if(allowCreate)
 			{
-				pgr = con.query("CREATE SEQUENCE "+idGenName(s, true, true)).data()[0];
+				pgr = con.query("CREATE SEQUENCE "+idGenName(s, true, true));
 				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
@@ -303,7 +303,7 @@ namespace pgs
 	{
 		pgc::Result pgr = con.query(
 			"SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2",
-			MVA(schemaName(c->_schema, false, false), tableName(c, false, false))).data()[0];
+			MVA(schemaName(c->_schema, false, false), tableName(c, false, false)));
 
 		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
 		{
@@ -311,7 +311,7 @@ namespace pgs
 			WLOG("table absent: "<<schemaName(c->_schema, false, false)<<", "<<tableName(c, false, false));
 			if(allowCreate)
 			{
-				pgr = con.query("CREATE TABLE "+tableName(c, true, true)+"()").data()[0];
+				pgr = con.query("CREATE TABLE "+tableName(c, true, true)+"()");
 				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
@@ -328,7 +328,7 @@ namespace pgs
 		//oid
 		pgr = con.query(
 			"SELECT oid FROM pg_catalog.pg_class WHERE relname=$1 AND relnamespace=$2",
-			MVA(tableName(c, false, false), _schema2oid[c->_schema])).data()[0];
+			MVA(tableName(c, false, false), _schema2oid[c->_schema]));
 		if(pgc::ersTuplesOk != pgr.status() || pgr.rows() != 1)
 		{
 			//log.push_back(SyncLogLine("obtain table oid failed", schemaName(c->_schema, false, false), tableName(c, false, false)));
@@ -347,7 +347,7 @@ namespace pgs
 	{
 		pgc::Result pgr = con.query(
 			"SELECT * FROM information_schema.columns WHERE table_schema=$1 AND table_name=$2 AND column_name=$3",
-			MVA(schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false))).data()[0];
+			MVA(schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)));
 		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
 		{
 			//log.push_back(SyncLogLine("column absent", schemaName(f->_category->_schema, false, false), tableName(f->_category, false, false), columnName(f, false, false)));
@@ -360,7 +360,7 @@ namespace pgs
 					sql += " DEFAULT nextval('"+idGenName(f->_category->_schema, true, true)+"'::regclass) PRIMARY KEY";
 				}
 
-				pgr = con.query(sql).data()[0];
+				pgr = con.query(sql);
 				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
@@ -390,7 +390,7 @@ namespace pgs
 			MVA(
 				schemaName(i->_category->_schema, false, false), 
 				tableName(i->_category, false, false), 
-				indexName(i, false, false))).data()[0];
+				indexName(i, false, false)));
 		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
 		{
 			//log.push_back(SyncLogLine("index absent", schemaName(i->_category->_schema, false, false), indexName(i, false, false)));
@@ -425,7 +425,7 @@ namespace pgs
 					sql += columnName(f, true, false);
 				}
 				sql += ")";
-				pgr = con.query(sql).data()[0];
+				pgr = con.query(sql);
 				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
@@ -448,7 +448,7 @@ namespace pgs
 	{
 		pgc::Result pgr = con.query(
 			"SELECT * FROM information_schema.tables WHERE table_schema=$1 AND table_name=$2",
-			MVA(schemaName(r->_schema, false, false), tableName(r, false, false))).data()[0];
+			MVA(schemaName(r->_schema, false, false), tableName(r, false, false)));
 		if(pgc::ersTuplesOk != pgr.status() || !pgr.rows())
 		{
 			//log.push_back(SyncLogLine("cross table absent", schemaName(r->_schema, false, false), tableName(r, false, false)));
@@ -458,7 +458,7 @@ namespace pgs
 				pgr = con.query("CREATE TABLE "+tableName(r, true, true)+"("
 					" id BIGINT DEFAULT nextval('"+idGenName(r->_schema, true, true)+"'::regclass) PRIMARY KEY "
 					", input_id BIGINT"
-					", output_id BIGINT)").data()[0];
+					", output_id BIGINT)");
 				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
@@ -482,7 +482,7 @@ namespace pgs
 					"	END\n"
 					"	$BODY$\n"
 					"	LANGUAGE plpgsql;\n"
-					).data()[0];
+					);
 				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
@@ -494,7 +494,7 @@ namespace pgs
 					"	ON "+tableName(r, true, true)+"\n"
 					"	FOR EACH ROW\n"
 					"	EXECUTE PROCEDURE "+triggerFuncName(r, "ins_upd")+"();\n"
-					).data()[0];
+					);
 				if(pgc::ersCommandOk != pgr.status())
 				{
 					return false;
@@ -538,7 +538,7 @@ namespace pgs
 		//todo: withPrepare срезать
 		pgc::Result pgr = con.query(
 			"SELECT inhparent FROM pg_catalog.pg_inherits WHERE inhrelid=$1",
-			Variant(_cat2oid[c])).data()[0];
+			Variant(_cat2oid[c]));
 
 		if(pgc::ersTuplesOk != pgr.status())
 		{
@@ -560,7 +560,7 @@ namespace pgs
 				WLOG("inheritance absent: "<<schemaName(c->_schema, false, false)<<", "<<tableName(c, false, false)<<", "<<tableName(b, false, false));
 				if(allowCreate)
 				{
-					pgr = con.query("ALTER TABLE "+tableName(c, true, true)+" INHERIT "+tableName(b, true, true)).data()[0];
+					pgr = con.query("ALTER TABLE "+tableName(c, true, true)+" INHERIT "+tableName(b, true, true));
 					if(pgc::ersCommandOk != pgr.status())
 					{
 						return false;
@@ -595,7 +595,7 @@ namespace pgs
 			"	END\n"
 			"	$BODY$\n"
 			"	LANGUAGE plpgsql;\n"
-			).data()[0];
+			);
 		if(pgc::ersCommandOk != pgr.status())
 		{
 			return false;
@@ -607,7 +607,7 @@ namespace pgs
 			"	ON "+tableName(re->_category, true, true)+"\n"
 			"	FOR EACH ROW\n"
 			"	EXECUTE PROCEDURE "+triggerFuncName(re->_category, re->_name+"_del")+"();\n"
-			).data()[0];
+			);
 		if(pgc::ersCommandOk != pgr.status())
 		{
 			return false;
@@ -627,7 +627,7 @@ namespace pgs
 			"	END\n"
 			"	$BODY$\n"
 			"	LANGUAGE plpgsql;\n"
-			).data()[0];
+			);
 		if(pgc::ersCommandOk != pgr.status())
 		{
 			return false;
@@ -639,7 +639,7 @@ namespace pgs
 			"	ON "+tableName(re->_category, true, true)+"\n"
 			"	FOR EACH ROW\n"
 			"	EXECUTE PROCEDURE "+triggerFuncName(re->_category, re->_name+"_upd")+"();\n"
-			).data()[0];
+			);
 		if(pgc::ersCommandOk != pgr.status())
 		{
 			return false;
@@ -653,7 +653,7 @@ namespace pgs
 	{
 		pgc::Result pgr = con.query(
 			"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=$1",
-			schemaName(s, false, false)).data()[0];
+			schemaName(s, false, false));
 		if(pgc::ersTuplesOk != pgr.status())
 		{
 			return false;
@@ -664,7 +664,7 @@ namespace pgs
 			//log.push_back(SyncLogLine("schema present", schemaName(s, false, false)));
 			ILOG("schema present: "<<schemaName(s, false, false));
 
-			pgr = con.query("DROP SCHEMA "+schemaName(s, true, true)+" CASCADE").data()[0];
+			pgr = con.query("DROP SCHEMA "+schemaName(s, true, true)+" CASCADE");
 			if(pgc::ersCommandOk != pgr.status())
 			{
 				return false;

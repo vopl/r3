@@ -26,9 +26,8 @@ namespace pgc
 		typedef ResultImplPtr ImplPtr;
 		ImplPtr	_impl;
 
-		Result();
-
 	public:
+		//Result();
 		EResultStatus status();
 		const char *errorMsg();
 		const char *errorCode();
@@ -67,6 +66,5 @@ namespace pgc
 		boost::uint32_t fetchUInt32(size_t colIdx, size_t rowIdx);
 		std::string fetchString(size_t colIdx, size_t rowIdx);
 	};
-	typedef std::vector<Result> Results;
 }
 #endif

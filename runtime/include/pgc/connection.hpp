@@ -34,12 +34,12 @@ namespace pgc
 		operator bool() const;
 		bool operator!() const;
 
-		async::Future<Results> query(const char *sql);
-		async::Future<Results> query(const char *, const utils::Variant &data);
-		async::Future<Results> query(const std::string &sql);
-		async::Future<Results> query(const std::string &sql, const utils::Variant &data);
-		async::Future<Results> query(Statement s, bool withPrepare=true);
-		async::Future<Results> query(Statement s, const utils::Variant &data, bool withPrepare=true);
+		async::Future<Result> query(const char *sql);
+		async::Future<Result> query(const char *, const utils::Variant &data);
+		async::Future<Result> query(const std::string &sql);
+		async::Future<Result> query(const std::string &sql, const utils::Variant &data);
+		async::Future<Result> query(Statement s, bool withPrepare=true);
+		async::Future<Result> query(Statement s, const utils::Variant &data, bool withPrepare=true);
 
 		EConnectionStatus status();
 	};

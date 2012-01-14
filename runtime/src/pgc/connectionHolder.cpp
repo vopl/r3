@@ -158,10 +158,10 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::pushResultAndSet(async::Future<Results> &res, bool success)
+	void ConnectionHolder::setResult(async::Future<Result> &res, bool success)
 	{
 		ResultImplPtr di(new ResultImpl(PQmakeEmptyPGresult(_pgcon, success?PGRES_COMMAND_OK:PGRES_FATAL_ERROR), shared_from_this()));
-		res.dataNoWait().push_back(utils::ImplAccess<Result>(di));
+		res.dataNoWait() = utils::ImplAccess<Result>(di);
 		res.set();
 	}
 
@@ -220,7 +220,7 @@ namespace pgc
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::processSingle(async::Future<Results> res)
+	void ConnectionHolder::processSingle(async::Future<Result> res)
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
@@ -232,12 +232,13 @@ namespace pgc
 			if(ec)
 			{
 				ELOG(__FUNCTION__<<", send, "<<ec<<", "<<PQerrorMessage(_pgcon));
-				pushResultAndSet(res);
+				setResult(res);
 				return;
 			}
 		}
 
 		//принимать
+		PGresult *pgr = NULL;
 		for(;;)
 		{
 			if(PQisBusy(_pgcon))
@@ -246,7 +247,7 @@ namespace pgc
 				if(ec)
 				{
 					ELOG(__FUNCTION__<<", recv, "<<ec<<", "<<PQerrorMessage(_pgcon));
-					pushResultAndSet(res);
+					setResult(res);
 					return;
 				}
 			}
@@ -254,24 +255,37 @@ namespace pgc
 			if(!PQconsumeInput(_pgcon))
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				pushResultAndSet(res);
+				setResult(res);
 				return;
 			}
 
-			PGresult *pgr = PQgetResult(_pgcon);
-			if(!pgr)
+			PGresult *pgrNext = PQgetResult(_pgcon);
+			if(!pgrNext)
 			{
-				res.set();
+				if(pgr)
+				{
+					ResultImplPtr di(new ResultImpl(pgr, shared_from_this()));
+					res.dataNoWait() = utils::ImplAccess<Result>(di);
+					res.set();
+				}
+				else
+				{
+					assert(0);
+					setResult(res, true);
+				}
 				return;
 			}
-
-			ResultImplPtr di(new ResultImpl(pgr, shared_from_this()));
-			res.dataNoWait().push_back(utils::ImplAccess<Result>(di));
+			if(pgr)
+			{
+				PQclear(pgr);
+				pgr = NULL;
+			}
+			pgr = pgrNext;
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::processQueryWithPrepare(async::Future<Results> res, StatementImplPtr s, BindDataPtr bindData)
+	void ConnectionHolder::processQueryWithPrepare(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData)
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
@@ -292,25 +306,25 @@ namespace pgc
 		{
 			if(inTrans)
 			{
-				async::Future<Results> r1;
+				async::Future<Result> r1;
 				runQuery_f(r1, "SAVEPOINT pgcp"+getPrid(s));
-				if(ersCommandOk != r1.data()[0].status())
+				if(ersCommandOk != r1.data().status())
 				{
 					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-					pushResultAndSet(res);
+					setResult(res);
 					return;
 				}
 			}
 
-			async::Future<Results> r2;
+			async::Future<Result> r2;
 			runPrepare_f(
 				r2,
 				getPrid(s), 
 				s->getSql(), 
 				bindData);
-			if(ersCommandOk != r2.data()[0].status())
+			if(ersCommandOk != r2.data().status())
 			{
-				const char *s4 = r2.data()[0].errorCode();
+				const char *s4 = r2.data().errorCode();
 
 				if(s4 && !strcmp(s4, "42P05"))//DUPLICATE PREPARED STATEMENT
 				{
@@ -319,12 +333,12 @@ namespace pgc
 						std::string oldPrid = getPrid(s);
 						genPrid(s);
 
-						async::Future<Results> r3;
+						async::Future<Result> r3;
 						runQuery_f(r3, "ROLLBACK TO SAVEPOINT pgcp"+oldPrid);
-						if(ersCommandOk != r3.data()[0].status())
+						if(ersCommandOk != r3.data().status())
 						{
 							ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-							pushResultAndSet(res);
+							setResult(res);
 							return;
 						}
 					}
@@ -334,7 +348,7 @@ namespace pgc
 				{
 					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
 					delPrepared(s);
-					pushResultAndSet(res);
+					setResult(res);
 					return;
 				}
 			}
@@ -343,12 +357,12 @@ namespace pgc
 
 		if(inTrans)
 		{
-			async::Future<Results> r4;
+			async::Future<Result> r4;
 			runQuery_f(r4, "RELEASE SAVEPOINT pgcp"+getPrid(s));
-			if(ersCommandOk != r4.data()[0].status())
+			if(ersCommandOk != r4.data().status())
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				pushResultAndSet(res);
+				setResult(res);
 				return;
 			}
 		}
@@ -358,7 +372,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::runQuery_f(async::Future<Results> res, const std::string &sql, BindDataPtr bindData)
+	void ConnectionHolder::runQuery_f(async::Future<Result> res, const std::string &sql, BindDataPtr bindData)
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
@@ -383,7 +397,7 @@ namespace pgc
 				1))
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				pushResultAndSet(res);
+				setResult(res);
 				return;
 			};
 		}
@@ -400,7 +414,7 @@ namespace pgc
 				1))
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-				pushResultAndSet(res);
+				setResult(res);
 				return;
 			};
 		}
@@ -409,7 +423,7 @@ namespace pgc
 	}
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::runPrepare_f(
-		async::Future<Results> res, 
+		async::Future<Result> res, 
 		const std::string &prid, 
 		const std::string &sql, 
 		BindDataPtr bindData)
@@ -427,7 +441,7 @@ namespace pgc
 			paramTypes))
 		{
 			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-			pushResultAndSet(res);
+			setResult(res);
 			return;
 		};
 
@@ -436,7 +450,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::runQueryPrepared_f(
-		async::Future<Results> res, 
+		async::Future<Result> res, 
 		const std::string &prid, 
 		BindDataPtr bindData)
 	{
@@ -458,7 +472,7 @@ namespace pgc
 			1))
 		{
 			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-			pushResultAndSet(res);
+			setResult(res);
 			return;
 		};
 
@@ -466,7 +480,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::runQueryWithPrepare_f(async::Future<Results> res, StatementImplPtr s, BindDataPtr bindData)
+	void ConnectionHolder::runQueryWithPrepare_f(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData)
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
@@ -481,7 +495,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::runEndWork_f(async::Future<Results> res)
+	void ConnectionHolder::runEndWork_f(async::Future<Result> res)
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
@@ -498,11 +512,11 @@ namespace pgc
 			std::string prid = timedIndex.begin()->_prid;
 			timedIndex.erase(timedIndex.begin());
 
-			async::Future<Results> r;
+			async::Future<Result> r;
 			runQuery_f(r, "DEALLOCATE "+prid);
-			if(ersCommandOk != r.data()[0].status())
+			if(ersCommandOk != r.data().status())
 			{
-				const char * errCode = r.data()[0].errorCode();
+				const char * errCode = r.data().errorCode();
 				if(errCode && !strcmp("26000", errCode))
 				{
 					//ERROR:  prepared statement "XXX" does not exist
@@ -512,7 +526,7 @@ namespace pgc
 					//другая ошибка - фатально
 					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
 					_prepareds.clear();
-					pushResultAndSet(res);
+					setResult(res);
 					return;
 				}
 			}
@@ -521,7 +535,7 @@ namespace pgc
 		_now = posix_time::ptime();
 		assert(_mtxProcess.isLocked());
 		assert(_pgcon);
-		pushResultAndSet(res, true);
+		setResult(res, true);
 	}
 
 
@@ -632,7 +646,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::runQuery(async::Future<Results> res, const std::string &sql, BindDataPtr bindData)
+	void ConnectionHolder::runQuery(async::Future<Result> res, const std::string &sql, BindDataPtr bindData)
 	{
 		mutex::scoped_lock sl(_mtx);
 		assert(_pgcon);
@@ -644,7 +658,7 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ConnectionHolder::runQueryWithPrepare(async::Future<Results> res, Statement s, BindDataPtr bindData)
+	void ConnectionHolder::runQueryWithPrepare(async::Future<Result> res, Statement s, BindDataPtr bindData)
 	{
 		mutex::scoped_lock sl(_mtx);
 		assert(_pgcon);
@@ -667,7 +681,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::endWork()
 	{
-		async::Future<Results> res;
+		async::Future<Result> res;
 		{
 			mutex::scoped_lock sl(_mtx);
 			assert(_pgcon);
