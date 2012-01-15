@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "server.hpp"
 #include "async/service.hpp"
-
+#include "server/inode.hpp"
 
 
 namespace server
@@ -51,25 +51,28 @@ namespace server
 
 		//////////////////////////////////////////////////////////////////////////
 		//поднять хаб служб
-		assert(!_serviceHub);
-		_serviceHub = _plugs->create<IServiceHubProvider>();
-		assert(_serviceHub);
-		if(!_serviceHub)
+		assert(!_nodeManager);
+		_nodeManager = _plugs->create<INodeManagerProvider>();
+		assert(_nodeManager);
+		if(!_nodeManager)
 		{
-			FLOG("failed to create service hub");
+			FLOG("failed to create node manager");
 			_state = esError;
 			return;
 		}
-		_serviceHub->setServer(shared_from_this());
+		_nodeManager->setServer(shared_from_this());
 
 		//////////////////////////////////////////////////////////////////////////
 		//набавить службы
-		std::vector<IServicePtr> services;
-		_plugs->createAll<IServiceProvider>(services);
-		BOOST_FOREACH(IServicePtr &s, services)
+		std::vector<INodePtr> nodes;
+		_plugs->createAll<INodeProvider>(nodes);
+		BOOST_FOREACH(INodePtr &n, nodes)
 		{
-			ILOG("add service "<<s->getEndpoint());
-			_serviceHub->addService(s);
+			if(enfService & n->getFlags())
+			{
+				ILOG("add service node: "<<n->getId());
+				_nodeManager->addNode(n);
+			}
 		}
 
 		_state = esStart;
@@ -82,8 +85,8 @@ namespace server
 		mutex::scoped_lock sl(_mtx);
 		assert(esStart == _state);
 
-		assert(_serviceHub);
-		_serviceHub->delServices();
+		assert(_nodeManager);
+		_nodeManager->delNodes();
 
 		assert(_sessionManager);
 		_sessionManager->stop();
@@ -91,7 +94,7 @@ namespace server
 		assert(_db);
 		_db.reset();
 
-		_serviceHub.reset();
+		_nodeManager.reset();
 		_sessionManager.reset();
 
 		_state = esStop;
@@ -104,14 +107,14 @@ namespace server
 	void Server::onSessionStart(ISessionPtr session)
 	{
 		ILOG("session start");
-		_serviceHub->addSession(session);
+		_nodeManager->addSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void Server::onSessionStop(ISessionPtr session)
 	{
 		ILOG("session stop");
-		_serviceHub->delSession(session);
+		_nodeManager->delSession(session);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

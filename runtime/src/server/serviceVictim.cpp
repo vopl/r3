@@ -5,7 +5,7 @@
 #include "log/client.hpp"
 
 #include "serviceVictim.hpp"
-#include "server/iserviceHub.hpp"
+#include "server/inodeManager.hpp"
 #include "server/iserver.hpp"
 #include "async/futureWaiter.hpp"
 
@@ -17,21 +17,6 @@
 
 namespace server
 {
-	//////////////////////////////////////////////////////////////////////////
-	const TEndpoint ServiceVictim::_endpoint = "victim";
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onSendOk()
-	{
-		//
-	}
-	
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onSendFail(system::error_code ec)
-	{
-		//
-	}
-
 	//////////////////////////////////////////////////////////////////////////
 	static size_t cnt(0);
 	void ServiceVictim::onResult(pgc::Result r)
@@ -157,6 +142,7 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	ServiceVictim::ServiceVictim()
+		: Base("victim")
 	{
 
 	}
@@ -169,17 +155,11 @@ namespace server
 
 
 	//////////////////////////////////////////////////////////////////////////
-	const TEndpoint &ServiceVictim::getEndpoint()
-	{
-		return _endpoint;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onHubAdd(IServiceHubPtr hub)
+	void ServiceVictim::onManagerAdd(INodeManagerPtr manager)
 	{
 		TLOG("add to hub");
-		_pluma = hub->getServer()->getPlugs();
-		_db = hub->getServer()->getDb();
+		_pluma = manager->getServer()->getPlugs();
+		_db = manager->getServer()->getDb();
 
 // 		for(size_t i(0); i<20; i++)
 // 		{
@@ -196,42 +176,10 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onHubDel(IServiceHubPtr hub)
+	void ServiceVictim::onManagerDel(INodeManagerPtr manager)
 	{
 		TLOG("del from hub");
 		_db = pgc::Db();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onSessionAdd(ISessionPtr session)
-	{
-		//
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onSessionDel(ISessionPtr session)
-	{
-		//
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceVictim::onReceive(
-		IServiceHubPtr hub,
-		ISessionPtr session,
-		const client::TEndpoint &endpoint,
-		utils::VariantPtr data)
-	{
-		async::Future<boost::system::error_code> res =
-		hub->send(shared_from_this(), session, endpoint, data);
-
-		res.wait();
-		if(res.data())
-		{
-			onSendFail(res.data());
-		}
-		else
-		{
-			onSendOk();
-		}
+		_pluma = NULL;
 	}
 }

@@ -3,7 +3,7 @@
 
 #include "server/iserver.hpp"
 #include "server/isessionManager.hpp"
-#include "server/iserviceHub.hpp"
+#include "server/inodeManager.hpp"
 
 #include "pgc/db.hpp"
 
@@ -19,7 +19,7 @@ namespace server
 		pluma::Pluma *_plugs;
 		async::Service		_asrv;
 		ISessionManagerPtr	_sessionManager;
-		IServiceHubPtr		_serviceHub;
+		INodeManagerPtr		_nodeManager;
 
 		pgc::Db				_db;
 

@@ -80,7 +80,7 @@ Item {
 	Component.onCompleted: 
 	{
 		console.log("Component.onCompleted")
-		//start();
+		start();
 	}
 	Component.onDestruction: console.log("Destruction Beginning!")
 }

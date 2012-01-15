@@ -1,8 +1,7 @@
 #ifndef _SERVER_SERVICEVICTIM_HPP_
 #define _SERVER_SERVICEVICTIM_HPP_
 
-#include "server/iservice.hpp"
-#include <boost/enable_shared_from_this.hpp>
+#include "server/nodeBase.hpp"
 #include "pgc/connection.hpp"
 #include "pgc/db.hpp"
 
@@ -12,13 +11,9 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	class ServiceVictim
-		: public IService
-		, public enable_shared_from_this<ServiceVictim>
+		: public NodeBase<ServiceVictim, false, false>
 	{
-		static const TEndpoint _endpoint;
-		void onSendOk();
-		void onSendFail(system::error_code ec);
-
+		typedef NodeBase<ServiceVictim, false, false> Base;
 		pluma::Pluma *_pluma;
 
 		pgc::Db _db;
@@ -31,23 +26,20 @@ namespace server
 		ServiceVictim();
 		~ServiceVictim();
 
-		virtual const TEndpoint &getEndpoint();
+	public://INode
+		virtual void onManagerAdd(INodeManagerPtr manager);
+		virtual void onManagerDel(INodeManagerPtr manager);
 
-		virtual void onHubAdd(IServiceHubPtr hub);
-		virtual void onHubDel(IServiceHubPtr hub);
-
-		virtual void onSessionAdd(ISessionPtr session);
-		virtual void onSessionDel(ISessionPtr session);
-
-		virtual void onReceive(
-			IServiceHubPtr hub,
-			ISessionPtr session,
-			const client::TEndpoint &endpoint,
-			utils::VariantPtr data);
+// 	public://ITask
+// 		virtual void call(
+// 			INodeManagerPtr manager,
+// 			ISessionPtr session,
+// 			const client::TEndpoint &endpoint,
+// 			utils::VariantPtr data);
 	};
 	typedef boost::shared_ptr<ServiceVictim> ServiceVictimPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_INHERIT_PROVIDER(ServiceVictim, IService);
+	PLUMA_INHERIT_PROVIDER(ServiceVictim, INode);
 }
 #endif

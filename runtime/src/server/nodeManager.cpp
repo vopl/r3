@@ -1,10 +1,28 @@
 #include "pch.h"
-#include "serviceHub.hpp"
+#include "nodeManager.hpp"
 
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::onReceive(const boost::system::error_code &ec, const net::SPacket &p, ISessionPtr session)
+	ITaskPtr NodeManager::findTask(const server::TEndpoint &endpoint)
+	{
+		TMNodes::iterator iter = _nodes.find(endpoint);
+		if(_nodes.end() == iter)
+		{
+			//запрошеный путь не найден среди нодов
+			return ITaskPtr();
+		}
+		INodePtr node = iter->second;
+		if(!(enfTask & node->getFlags()))
+		{
+			//нода не содержит задачу
+			return ITaskPtr();
+		}
+		return node->getTask();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void NodeManager::onReceive(const boost::system::error_code &ec, const net::SPacket &p, ISessionPtr session)
 	{
 		if(ec)
 		{
@@ -21,7 +39,7 @@ namespace server
 		server::TEndpoint serverEndpoint_;
 		client::TEndpoint clientEndpoint_;
 		utils::VariantPtr data_;
-		IServicePtr service_;
+		ITaskPtr task_;
 		bool serverEndpointExists = false;
 		bool clientEndpointExists = false;
 		bool dataExists = false;
@@ -41,11 +59,7 @@ namespace server
 					serverEndpointExists = true;
 					{
 						mutex::scoped_lock sl(_mtx);
-						TMServices::iterator iter = _services.find(serverEndpoint_);
-						if(_services.end() != iter)
-						{
-							service_ = iter->second;
-						}
+						task_ = findTask(serverEndpoint_);
 					}
 
 					utils::Variant clientEndpoint = m["client::endpoint"];
@@ -66,9 +80,9 @@ namespace server
 		}
 
 
-		if(service_ && dataExists && clientEndpointExists)
+		if(task_ && dataExists && clientEndpointExists)
 		{
-			service_->onReceive(
+			task_->call(
 				shared_from_this(),
 				session,
 				clientEndpoint_,
@@ -97,55 +111,107 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ServiceHub::ServiceHub()
+	void NodeManager::addNode(INodePtr node, const server::TEndpoint &base)
+	{
+		server::TEndpoint endpoint = (base.empty()?"":base + '.') + node->getId();
+		if(_nodes.end() == _nodes.find(endpoint))
+		{
+			_nodes[endpoint] = node;
+			_nodesBack[node] = endpoint;
+
+			node->onManagerAdd(shared_from_this());
+
+			BOOST_FOREACH(const INodePtr &child, node->getChilds())
+			{
+				addNode(child, endpoint);
+			}
+		}
+		else
+		{
+			assert(!"duplicate node id?");
+			WLOG("duplicate node id?: "<<node->getId());
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void NodeManager::delNode(INodePtr node, const server::TEndpoint &base)
+	{
+		server::TEndpoint endpoint = (base.empty()?"":base + '.') + node->getId();
+		TMNodes::iterator iter = _nodes.find(endpoint);
+		if(_nodes.end() == iter)
+		{
+			BOOST_FOREACH(const INodePtr &child, node->getChilds())
+			{
+				delNode(child, endpoint);
+			}
+
+			node->onManagerDel(shared_from_this());
+			_nodes.erase(iter);
+			_nodesBack.erase(node);
+		}
+		else
+		{
+			assert(!"duplicate node id?");
+		}
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	NodeManager::NodeManager()
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	ServiceHub::~ServiceHub()
+	NodeManager::~NodeManager()
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::setServer(IServerPtr server)
+	void NodeManager::setServer(IServerPtr server)
 	{
 		_server = server;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	IServerPtr ServiceHub::getServer()
+	IServerPtr NodeManager::getServer()
 	{
 		return _server;
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::addSession(ISessionPtr session)
+	void NodeManager::addSession(ISessionPtr session)
 	{
 		{
 			mutex::scoped_lock sl(_mtx);
 
 			//оповестить службы
-			BOOST_FOREACH(TMServices::value_type &pair, _services)
+			BOOST_FOREACH(TMNodes::value_type &pair, _nodes)
 			{
-				pair.second->onSessionAdd(session);
+				if(enfService & pair.second->getFlags())
+				{
+					pair.second->getService()->onSessionAdd(session);
+				}
 			}
 		}
 
-		session->listen(bind(&ServiceHub::onReceive, shared_from_this(), _1, _2, session));
+		session->listen(bind(&NodeManager::onReceive, shared_from_this(), _1, _2, session));
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::delSession(ISessionPtr session)
+	void NodeManager::delSession(ISessionPtr session)
 	{
 
 		{
 			mutex::scoped_lock sl(_mtx);
 
 			//оповестить службы
-			BOOST_FOREACH(TMServices::value_type &pair, _services)
+			BOOST_FOREACH(TMNodes::value_type &pair, _nodes)
 			{
-				pair.second->onSessionDel(session);
+				if(enfService & pair.second->getFlags())
+				{
+					pair.second->getService()->onSessionDel(session);
+				}
 			}
 		}
 		//надо отменить прослушивание, а как? да вот так
@@ -153,69 +219,35 @@ namespace server
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::addService(IServicePtr service)
-	{
-		bool isOk = false;
-		{
-			mutex::scoped_lock sl(_mtx);
-			if(_services.end() == _services.find(service->getEndpoint()))
-			{
-				_services[service->getEndpoint()] = service;
-				isOk = true;
-			}
-		}
-		if(isOk)
-		{
-			service->onHubAdd(shared_from_this());
-		}
-	}
-
-	IServicePtr ServiceHub::getService(const TEndpoint &endpoint)
+	void NodeManager::addNode(INodePtr node)
 	{
 		mutex::scoped_lock sl(_mtx);
-		TMServices::iterator iter = _services.find(endpoint);
-		if(_services.end() != iter)
-		{
-			return iter->second;
-		}
-		return IServicePtr();
+		addNode(node, "");
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::delService(IServicePtr service)
-	{
-		bool isOk = false;
-		{
-			mutex::scoped_lock sl(_mtx);
-			TMServices::iterator iter = _services.find(service->getEndpoint());
-			if(_services.end() != iter)
-			{
-				_services.erase(iter);
-				isOk = true;
-			}
-		}
-
-		if(isOk)
-		{
-			service->onHubDel(shared_from_this());
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceHub::delServices()
+	void NodeManager::delNode(INodePtr node)
 	{
 		mutex::scoped_lock sl(_mtx);
-		BOOST_FOREACH(TMServices::value_type &p, _services)
+		delNode(node, "");
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void NodeManager::delNodes()
+	{
+		mutex::scoped_lock sl(_mtx);
+		BOOST_FOREACH(TMNodes::value_type &p, _nodes)
 		{
-			p.second->onHubDel(shared_from_this());
+			p.second->onManagerDel(shared_from_this());
 		}
-		_services.clear();
+		_nodes.clear();
+		_nodesBack.clear();
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Future<error_code> ServiceHub::send(
-		IServicePtr service,
+	async::Future<error_code> NodeManager::send(
+		INodePtr node,
 		ISessionPtr session,
 		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
@@ -223,7 +255,11 @@ namespace server
 		//запаковать данные
 		utils::Variant v;
 		utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>(true);
-		m["server::endpoint"] = service->getEndpoint();
+		{
+			mutex::scoped_lock sl(_mtx);
+			assert(_nodesBack.end() != _nodesBack.find(node));
+			m["server::endpoint"] = _nodesBack.find(node)->second;
+		}
 		m["client::endpoint"] = endpoint;
 		m["data"] = data;
 

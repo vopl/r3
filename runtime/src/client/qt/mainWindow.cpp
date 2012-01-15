@@ -61,7 +61,7 @@ namespace client
 				_session = session;
 
 				_session->watchState(bind(&MainWindow::onSessionState_proxyCallback, this, _1, _2));
-				_session->balance(40000);
+				_session->balance(4);
 
 				assert(!_networkAccessManagerFactory);
 				_networkAccessManagerFactory = new NetworkAccessManagerFactory(session, _asrv);
