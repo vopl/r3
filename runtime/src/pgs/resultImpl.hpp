@@ -12,7 +12,7 @@ namespace pgs
 
 	//////////////////////////////////////////////////////////////////////////
 	class ResultImpl
-		: pgc::ResultImpl
+		: public pgc::ResultImpl
 	{
 		typedef std::map<std::string, size_t>	TMName2idx;
 		TMName2idx _fetchName2idx;
@@ -20,7 +20,7 @@ namespace pgs
 
 
 	public:
-		ResultImpl(	PGresult *pgres, 
+		ResultImpl(	PGresult *pgres,
 					bool integerDatetime,
 					ClusterImplPtr cluster,
 					const TMName2idx &fetchName2idx);

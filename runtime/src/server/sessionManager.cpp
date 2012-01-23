@@ -105,7 +105,7 @@ namespace server
 
 		//парсить вариант
 		utils::Variant v;
-		if(	!v.deserialize(packet._data, packet._size) || 
+		if(	!v.deserialize(packet._data, packet._size) ||
 			!v.isMap())
 		{
 			WLOG(__FUNCTION__<<", bad packet");
@@ -271,7 +271,7 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	bool SessionManager::start(
-		IAcceptorPtr acceptor, 
+		IAcceptorPtr acceptor,
 		const char *host, const char *service,
 		function<void (ISessionPtr)> sstart,
 		function<void (ISessionPtr)> sstop)
@@ -315,7 +315,7 @@ namespace server
 
 			_isStarted = false;
 
-			BOOST_FOREACH(IChannelPtr &ch, _channels)
+			BOOST_FOREACH(const IChannelPtr &ch, _channels)
 			{
 				ch->close();
 			}

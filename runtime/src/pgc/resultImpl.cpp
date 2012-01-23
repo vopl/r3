@@ -21,7 +21,7 @@ namespace pgc
 		size_t columns = this->cols();
 		v.resize(columns);
 
-		SequenceVariant::iterator iter = v.begin();
+		typename SequenceVariant::iterator iter = v.begin();
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
 			utils::Variant &rv = *iter;
@@ -57,7 +57,7 @@ namespace pgc
 	bool ResultImpl::fetchRowsList_(SequenceVariant &v, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t rows = this->rows();
-		if(rowEndIdx > rows) 
+		if(rowEndIdx > rows)
 		{
 			rowEndIdx = rows;
 		}
@@ -69,7 +69,7 @@ namespace pgc
 		}
 
 		v.resize(rowEndIdx - rowBeginIdx);
-		SequenceVariant::iterator iter = v.begin();
+		typename SequenceVariant::iterator iter = v.begin();
 		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
 		{
 			utils::Variant &rv = *iter;
@@ -99,7 +99,7 @@ namespace pgc
 		}
 
 		v.resize(rowEndIdx - rowBeginIdx);
-		SequenceVariant::iterator iter = v.begin();
+		typename SequenceVariant::iterator iter = v.begin();
 		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
 		{
 			utils::Variant &rv = *iter;
@@ -131,7 +131,7 @@ namespace pgc
 		size_t columns = colIndices.size();
 		v.resize(columns);
 
-		SequenceVariant::iterator iter = v.begin();
+		typename SequenceVariant::iterator iter = v.begin();
 		for(size_t colIdx(0); colIdx<columns; colIdx++)
 		{
 			assert(colIndices[colIdx] < ResultImpl::cols());
@@ -169,7 +169,7 @@ namespace pgc
 	bool ResultImpl::fetchRowsList_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t rows = this->rows();
-		if(rowEndIdx > rows) 
+		if(rowEndIdx > rows)
 		{
 			rowEndIdx = rows;
 		}
@@ -181,7 +181,7 @@ namespace pgc
 		}
 
 		v.resize(rowEndIdx - rowBeginIdx);
-		SequenceVariant::iterator iter = v.begin();
+		typename SequenceVariant::iterator iter = v.begin();
 		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
 		{
 			utils::Variant &rv = *iter;
@@ -211,7 +211,7 @@ namespace pgc
 		}
 
 		v.resize(rowEndIdx - rowBeginIdx);
-		SequenceVariant::iterator iter = v.begin();
+		typename SequenceVariant::iterator iter = v.begin();
 		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
 		{
 			utils::Variant &rv = *iter;
@@ -241,7 +241,7 @@ namespace pgc
 		}
 
 		v.resize(rowEndIdx - rowBeginIdx);
-		SequenceVariant::iterator iter = v.begin();
+		typename SequenceVariant::iterator iter = v.begin();
 		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
 		{
 			utils::Variant &rv = *iter;
@@ -643,7 +643,7 @@ namespace pgc
 
 				boost::int64_t fsecl = (boost::int64_t)fsec * USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
 
-				v = 
+				v =
 					boost::posix_time::ptime(
 						boost::gregorian::date(year, month, day),
 						boost::posix_time::time_duration(hour, min, sec, fsecl)
@@ -717,7 +717,7 @@ namespace pgc
 
 				boost::int64_t fsecl = (boost::int64_t)fsec * USECS_PER_SEC / boost::posix_time::time_duration::ticks_per_second();
 
-				v = 
+				v =
 					boost::posix_time::time_duration(hour, min, sec, fsecl);
 
 			}

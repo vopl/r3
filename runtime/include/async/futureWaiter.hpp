@@ -40,7 +40,7 @@ namespace async
 	template <class Data>
 	FutureWaiter<Data>::operator Data &()
 	{
-		return current().data();
+		return Base::current().data();
 	}
 
 }

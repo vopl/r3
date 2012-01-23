@@ -80,7 +80,7 @@ namespace pgc
 					continue;
 				}
 
-				if(	_startConnections.empty() && 
+				if(	_startConnections.empty() &&
 					_readyConnections.size() + _workConnections.size() < _maxConnections)
 				{
 					//готовых нет, стартующих нет, можно подключать новое
@@ -350,8 +350,8 @@ namespace pgc
 			}
 		}
 
-		_onConnectionMade.swap(function<void (size_t)>());
-		_onConnectionLost.swap(function<void (size_t)>());
+		function<void (size_t)>().swap(_onConnectionMade);
+		function<void (size_t)>().swap(_onConnectionLost);
 	}
 
 }

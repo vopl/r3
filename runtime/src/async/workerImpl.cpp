@@ -99,7 +99,7 @@ namespace async
 			}
 
 			doWork = !fibersReady.empty();
-			BOOST_FOREACH(FiberImplPtr &fiber, fibersReady)
+			BOOST_FOREACH(const FiberImplPtr &fiber, fibersReady)
 			{
 				fiber->activate();
 			}
@@ -140,7 +140,7 @@ namespace async
 				mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 				if(!_fiberPool->_fibersIdle.empty())
 				{
-					fiber.swap(*_fiberPool->_fibersIdle.begin());
+					fiber.swap((FiberImplPtr &)*_fiberPool->_fibersIdle.begin());
 					_fiberPool->_fibersIdle.erase(_fiberPool->_fibersIdle.begin());
 				}
 			}
@@ -199,7 +199,7 @@ namespace async
 	{
 		_thread = thread(bind(&WorkerImpl::threadProc, this));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	WorkerImpl::~WorkerImpl()
 	{

@@ -28,21 +28,21 @@ namespace utils
 	template <class Base>
 	ImplAccess<Base>::ImplAccess(const typename Base::ImplPtr &impl)
 	{
-		_impl = impl;
+		Base::_impl = impl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
 	typename Base::ImplPtr ImplAccess<Base>::impl()
 	{
-		return boost::dynamic_pointer_cast<typename Base::ImplPtr::value_type>(_impl);
+		return boost::dynamic_pointer_cast<typename Base::ImplPtr::value_type>(Base::_impl);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
 	ImplAccess<Base>::operator typename Base::ImplPtr()
 	{
-		return boost::dynamic_pointer_cast<typename Base::ImplPtr::value_type>(_impl);
+		return boost::dynamic_pointer_cast<typename Base::ImplPtr::value_type>(Base::_impl);
 	}
 }
 

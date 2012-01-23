@@ -28,7 +28,7 @@ SET(Boost_USE_STATIC_LIBS        OFF)
 SET(Boost_USE_MULTITHREADED      ON)
 SET(Boost_USE_STATIC_RUNTIME     OFF)
 
-FIND_PACKAGE( Boost 1.42.0 COMPONENTS date_time filesystem system thread)
+FIND_PACKAGE( Boost 1.42.0 COMPONENTS date_time filesystem system thread random)
 IF(NOT Boost_FOUND)
 	MESSAGE(FATAL_ERROR "Boost 1.42.0 required")
 ENDIF()

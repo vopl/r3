@@ -28,3 +28,7 @@ SETUP_BIN_OUT(victim server)
 
 TARGET_LINK_LIBRARIES(victim libheap libutils libpluma liblog)
 
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+	TARGET_LINK_LIBRARIES(victim ${Boost_LIBRARIES})
+ENDIF()

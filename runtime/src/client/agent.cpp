@@ -25,7 +25,7 @@ namespace client
 	{
 		mutex::scoped_lock sl(_mtx);
 		_closed = true;
-		_onReceive.swap(boost::function<void(server::TEndpoint, utils::VariantPtr)>());
+		boost::function<void(server::TEndpoint, utils::VariantPtr)>().swap(_onReceive);
 	}
 
 
@@ -43,7 +43,7 @@ namespace client
 	{
 		_session->freeAgent(_endpoint);
 		mutex::scoped_lock sl(_mtx);
-		_onReceive.swap(boost::function<void(server::TEndpoint, utils::VariantPtr)>());
+		boost::function<void(server::TEndpoint, utils::VariantPtr)>().swap(_onReceive);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

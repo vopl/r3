@@ -1,7 +1,8 @@
 #ifndef _ASYNC_EXCEPTION_HPP_
 #define _ASYNC_EXCEPTION_HPP_
 
-#include <exception>
+//#include <exception>
+#include <stdexcept>
 
 //////////////////////////////////////////////////////////////////////////
 namespace async

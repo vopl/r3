@@ -34,7 +34,7 @@ namespace utils
 			std::vector<char> buffer;
 			in.seekg(0, std::ios::end);
 			buffer.resize(in.tellg());
-			in.seekg(std::ios::beg, 0);
+			in.seekg(0, std::ios::beg);
 
 
 			const char *first;
@@ -54,7 +54,7 @@ namespace utils
 
 			VariantLoadScope scope(fileName, first, last, errors);
 			parseResult = qi::phrase_parse(
-				first, 
+				first,
 				last,
 				VariantLoadGrammar(scope),
 				SkipGrammar());

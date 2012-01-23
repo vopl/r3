@@ -77,7 +77,7 @@ namespace net
 
 // 			typedef function<void(const error_code &)> TOnShutdown;
 // 			TOnShutdown onShutdown = boost::bind(&Sock::onSslShutdown, _1, _socketSsl, _sslContext);
-// 
+//
 // 			_sslStrand->dispatch(
 // 				bind(&TSocketSsl::async_shutdown<TOnShutdown>, _socketSsl, onShutdown)
 // 				);
@@ -86,7 +86,7 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelSocket::Sock::onSslShutdown(
-		const error_code &ec, 
+		const error_code &ec,
 		TSocketSslPtr socketSsl,
 		TSslContextPtr sslContextHolder)
 	{
@@ -113,7 +113,7 @@ namespace net
 					return;
 				}
 
-				receive.swap(_receives[0]);
+				std::swap(receive, _receives[0]);
 				_receives.erase(_receives.begin());
 			}
 			receive.second--;
@@ -128,7 +128,7 @@ namespace net
 			{
 				Future2<error_code, size_t> readRes;
 				_sock.read(
-					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
+					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize),
 					readRes);
 				ec = readRes.data1();
 
@@ -156,7 +156,7 @@ namespace net
 				{
 					Future2<error_code, size_t> readRes;
 					_sock.read(
-						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
+						buffer(packet._data.get() + transferedSize, packet._size - transferedSize),
 						readRes);
 					ec = readRes.data1();
 
@@ -211,7 +211,7 @@ namespace net
 			{
 				Future2<error_code, size_t> readRes;
 				_sock.write(
-					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
+					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize),
 					readRes);
 				ec = readRes.data1();
 
@@ -235,7 +235,7 @@ namespace net
 				{
 					Future2<error_code, size_t> writeRes;
 					_sock.write(
-						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
+						buffer(packet._data.get() + transferedSize, packet._size - transferedSize),
 						writeRes);
 					ec = writeRes.data1();
 

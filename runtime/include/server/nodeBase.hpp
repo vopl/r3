@@ -32,8 +32,8 @@ namespace server
 		{
 			utils::Variant::MapStringVariant &mm = _meta.as<utils::Variant::MapStringVariant>(true);
 			mm["id"] = _id;
-			mm["hasTask"] = false;
-			mm["hasService"] = false;
+			//mm["hasTask"] = false;
+			//mm["hasService"] = false;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ namespace server
 		{
 			//nohing
 		}
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		virtual void onManagerDel(INodeManagerPtr manager)
 		{
@@ -98,12 +98,15 @@ namespace server
 		: public NodeBase<T, false, false>
 		, public ITask
 	{
+	    typedef NodeBase<T, false, false> Base;
+
 	public:
 		//////////////////////////////////////////////////////////////////////////
 		NodeBase(const std::string &id)
-			: NodeBase<T, false, false>(id)
+			: Base(id)
 		{
-			utils::Variant::MapStringVariant &mm = _meta.as<utils::Variant::MapStringVariant>();
+		    utils::Variant &meta = Base::_meta;
+			utils::Variant::MapStringVariant &mm = meta.as<utils::Variant::MapStringVariant>();
 			mm["hasTask"] = true;
 		}
 
@@ -126,7 +129,7 @@ namespace server
 		//////////////////////////////////////////////////////////////////////////
 		virtual ITaskPtr getTask()
 		{
-			return shared_from_this();
+			return Base::shared_from_this();
 		}
 	};
 
@@ -136,12 +139,15 @@ namespace server
 		: public NodeBase<T, false, false>
 		, public IService
 	{
+	    typedef NodeBase<T, false, false> Base;
+
 	public:
 		//////////////////////////////////////////////////////////////////////////
 		NodeBase(const std::string &id)
-			: NodeBase<T, false, false>(id)
+			: Base(id)
 		{
-			utils::Variant::MapStringVariant &mm = _meta.as<utils::Variant::MapStringVariant>();
+		    utils::Variant &meta = Base::_meta;
+			utils::Variant::MapStringVariant &mm = meta.as<utils::Variant::MapStringVariant>();
 			mm["hasService"] = true;
 		}
 
@@ -150,7 +156,7 @@ namespace server
 		{
 			//nothing
 		}
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		virtual void onSessionDel(ISessionPtr session)
 		{
@@ -166,7 +172,7 @@ namespace server
 		//////////////////////////////////////////////////////////////////////////
 		virtual IServicePtr getService()
 		{
-			return shared_from_this();
+			return Base::shared_from_this();
 		}
 	};
 
@@ -195,12 +201,15 @@ namespace server
 		, public ITask
 		, public IService
 	{
+	    typedef NodeBase<T, false, false> Base;
+
 	public:
 		//////////////////////////////////////////////////////////////////////////
 		NodeBase(const std::string &id)
 			: NodeBase<T, false, false>(id)
 		{
-			utils::Variant::MapStringVariant &mm = _meta.as<utils::Variant::MapStringVariant>();
+		    utils::Variant &meta = Base::_meta;
+			utils::Variant::MapStringVariant &mm = meta.as<utils::Variant::MapStringVariant>();
 			mm["hasTask"] = true;
 			mm["hasService"] = true;
 		}
@@ -236,13 +245,13 @@ namespace server
 		//////////////////////////////////////////////////////////////////////////
 		virtual ITaskPtr getTask()
 		{
-			return shared_from_this();
+			return Base::shared_from_this();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
 		virtual IServicePtr getService()
 		{
-			return shared_from_this();
+			return Base::shared_from_this();
 		}
 
 	};

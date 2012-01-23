@@ -108,9 +108,9 @@ namespace client
 
 	//////////////////////////////////////////////////////////////////////////
 	Session::Session(
-		const TClientSid sid, 
-		ClientPtr client, 
-		const std::string &host, 
+		const TClientSid sid,
+		ClientPtr client,
+		const std::string &host,
 		const std::string &service)
 		: _sid(sid)
 		, _needNumChannels(1)
@@ -202,7 +202,7 @@ namespace client
 			agents.swap(_agents);
 			_needNumChannels = 0;
 
-			_onStateChanged.swap(boost::function<void(boost::system::error_code, size_t)>());
+			boost::function<void(boost::system::error_code, size_t)>().swap(_onStateChanged);
 
 			_connectInProgress = false;
 			_client.reset();

@@ -169,7 +169,7 @@ namespace utils
 		typedef std::list<Variant> 					ListVariant;
 		typedef char 								Char;
 		typedef boost::uuids::uuid 					Uuid;
-		typedef VariantPtr 							VariantPtr;
+		typedef ::utils::VariantPtr 				VariantPtr;
 
 	public:
 		template <class T> struct Type2Enum				{ static const EType et = etUnknown;	};
@@ -330,15 +330,15 @@ namespace utils
 //генераторы вектора и карты
 /*
 	вектор использовать так:
-	MVA();//сформирует вариант типа etVectorVariant, не нул, пустой 
+	MVA();//сформирует вариант типа etVectorVariant, не нул, пустой
 	MVA(220);//с одним элементом типа int
 	MVA(220, "elem2", MVA(2,3));//вектор из трех элементов, последний сам вектор из двух
-	
+
 	MVA может принять до MVX_MAXELEMS аргументов
 
 
 	карту:
-	MVM();//сформирует вариант типа etMapStringVariant, не нул, пустой 
+	MVM();//сформирует вариант типа etMapStringVariant, не нул, пустой
 	MVM("220", 220);//с одной парой ключ "220", значение 220
 	MVM("elem2", 220, "complex", MVA(2,3));//
 
@@ -376,7 +376,7 @@ namespace utils
 {
 	inline Variant MVM()
 	{
-		Variant::MapStringVariant res; 
+		Variant::MapStringVariant res;
 		return res;
 	}
 	inline Variant MVA()

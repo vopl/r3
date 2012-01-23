@@ -13,7 +13,7 @@ namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
 	//различные помогаторы
-	namespace 
+	namespace
 	{
 		//////////////////////////////////////////////////////////////////////////
 		char pridGenChars[] = "abcdefghijklmnopqrstuvwxyz01234567890";
@@ -40,23 +40,9 @@ namespace pgc
 		return ptrIndex.end() != iter;
 	}
 
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 	std::string ConnectionHolder::getPrid(StatementImplWtr p)
 	{
-		struct ChangeAccessTime
-		{
-			ChangeAccessTime(const posix_time::ptime& accessTime):_accessTime(accessTime){}
-
-			void operator()(StatementPrepareState& e)
-			{
-				e._accessTime = _accessTime;
-			}
-
-		private:
-			posix_time::ptime _accessTime;
-		};
-
-
 		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
 		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);
 		if(ptrIndex.end() != iter)
@@ -65,10 +51,10 @@ namespace pgc
 			return iter->_prid;
 		}
 
-		StatementPrepareState sps = 
+		StatementPrepareState sps =
 		{
 			pridGenerator(),
-			p, 
+			p,
 			_now
 		};
 		_prepareds.insert(sps);
@@ -78,19 +64,6 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::genPrid(StatementImplWtr p)
 	{
-		struct ChangePrid
-		{
-			ChangePrid(const std::string& prid):_prid(prid){}
-
-			void operator()(StatementPrepareState& e)
-			{
-				e._prid = _prid;
-			}
-
-		private:
-			std::string _prid;
-		};
-
 		TPrepareds::nth_index<0>::type &ptrIndex = _prepareds.get<0>();
 		TPrepareds::nth_index<0>::type::iterator iter = ptrIndex.find(p);
 		if(ptrIndex.end() != iter)
@@ -99,10 +72,10 @@ namespace pgc
 			return;
 		}
 
-		StatementPrepareState sps = 
+		StatementPrepareState sps =
 		{
 			pridGenerator(),
-			p, 
+			p,
 			_now
 		};
 		_prepareds.insert(sps);
@@ -128,7 +101,7 @@ namespace pgc
 		sockaddr name;
 		socklen_t name_len = sizeof(name);
 		if(!getsockname(
-			sock, 
+			sock,
 			&name,
 			&name_len))
 		{
@@ -319,8 +292,8 @@ namespace pgc
 			async::Future<Result> r2;
 			runPrepare_f(
 				r2,
-				getPrid(s), 
-				s->getSql(), 
+				getPrid(s),
+				s->getSql(),
 				bindData);
 			if(ersCommandOk != r2.data().status())
 			{
@@ -387,8 +360,8 @@ namespace pgc
 			const int *paramFormats = nParams?&bindData->fmt[0]:NULL;
 
 			if(!PQsendQueryParams (
-				_pgcon, 
-				sql.c_str(), 
+				_pgcon,
+				sql.c_str(),
 				nParams,
 				paramTypes,
 				paramValues,
@@ -404,13 +377,13 @@ namespace pgc
 		else
 		{
 			if(!PQsendQueryParams (
-				_pgcon, 
-				sql.c_str(), 
-				0, 
-				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
+				_pgcon,
+				sql.c_str(),
+				0,
+				NULL,
+				NULL,
+				NULL,
+				NULL,
 				1))
 			{
 				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
@@ -423,9 +396,9 @@ namespace pgc
 	}
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::runPrepare_f(
-		async::Future<Result> res, 
-		const std::string &prid, 
-		const std::string &sql, 
+		async::Future<Result> res,
+		const std::string &prid,
+		const std::string &sql,
 		BindDataPtr bindData)
 	{
 		assert(_mtxProcess.isLocked());
@@ -434,8 +407,8 @@ namespace pgc
 		int nParams = bindData?(int)bindData->typ.size():0;
 		const Oid *paramTypes = nParams?&bindData->typ[0]:NULL;
 		if(!PQsendPrepare(
-			_pgcon, 
-			prid.c_str(), 
+			_pgcon,
+			prid.c_str(),
 			sql.c_str(),
 			nParams,
 			paramTypes))
@@ -450,8 +423,8 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::runQueryPrepared_f(
-		async::Future<Result> res, 
-		const std::string &prid, 
+		async::Future<Result> res,
+		const std::string &prid,
 		BindDataPtr bindData)
 	{
 		assert(_mtxProcess.isLocked());
@@ -463,7 +436,7 @@ namespace pgc
 		const int *paramLengths = nParams?&bindData->len[0]:NULL;
 		const int *paramFormats = nParams?&bindData->fmt[0]:NULL;
 		if(!PQsendQueryPrepared(
-			_pgcon, 
+			_pgcon,
 			prid.c_str(),
 			nParams,
 			paramValues,
@@ -677,7 +650,7 @@ namespace pgc
 		assert(_now.is_not_a_date_time());
 		_now = posix_time::microsec_clock::local_time();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::endWork()
 	{

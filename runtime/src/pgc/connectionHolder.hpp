@@ -68,20 +68,48 @@ namespace pgc
 			indexed_by<
 				ordered_unique<
 					member<
-						StatementPrepareState, 
+						StatementPrepareState,
 						StatementImplWtr,
 						&StatementPrepareState::_stm
 					>
 				>,
 				ordered_non_unique<
 					member<
-						StatementPrepareState, 
+						StatementPrepareState,
 						posix_time::ptime,
 						&StatementPrepareState::_accessTime
 					>
 				>
-			> 
+			>
 		> TPrepareds;
+
+		//помогалка для модификации 'времени доступа' внутри мультииндекса
+		struct ChangeAccessTime
+		{
+			ChangeAccessTime(const posix_time::ptime& accessTime):_accessTime(accessTime){}
+
+			void operator()(StatementPrepareState& e)
+			{
+				e._accessTime = _accessTime;
+			}
+
+		private:
+			posix_time::ptime _accessTime;
+		};
+
+		//помогалка для модификации 'идентификатора подготовленного запроса' внутри мультииндекса
+		struct ChangePrid
+		{
+			ChangePrid(const std::string& prid):_prid(prid){}
+
+			void operator()(StatementPrepareState& e)
+			{
+				e._prid = _prid;
+			}
+
+		private:
+			std::string _prid;
+		};
 
 		//очередь входящих запросов
 		enum ERequestType
@@ -177,14 +205,14 @@ namespace pgc
 		void runQuery_f(async::Future<Result> res, const std::string &sql, BindDataPtr bindData = BindDataPtr());
 
 		void runPrepare_f(
-			async::Future<Result> res, 
-			const std::string &prid, 
-			const std::string &sql, 
+			async::Future<Result> res,
+			const std::string &prid,
+			const std::string &sql,
 			BindDataPtr bindData);
 
 		void runQueryPrepared_f(
-			async::Future<Result> res, 
-			const std::string &prid, 
+			async::Future<Result> res,
+			const std::string &prid,
 			BindDataPtr bindData);
 
 		//а так же всякие describe

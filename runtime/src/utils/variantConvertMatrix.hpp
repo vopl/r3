@@ -52,8 +52,8 @@ namespace utils
 			template <class T>
 				typename boost::enable_if<
 					boost::mpl::not_<boost::is_same<Variant::VariantPtr, T> >
-					, bool>::type 
-				exec<>(T &dst, const T &src)
+					, bool>::type
+				exec(T &dst, const T &src)
 			{
 				dst = src;
 				return true;
@@ -75,7 +75,7 @@ namespace utils
 			//real to real
 			//integer to real
 			//real to integer
-#define ASSIGN(DST, SRC)	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){dst = src;return true;}
+#define ASSIGN(DST, SRC)	template <>	bool exec(Variant::DST &dst, const Variant::SRC &src){dst = src;return true;}
 
 #define MASSIGN(SRC)\
 	ASSIGN(Bool, SRC)\
@@ -106,7 +106,7 @@ namespace utils
 
 			//container to integer - size
 			//container to real - size
-#define CONTAINERSIZE(DST, SRC)	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){dst = src.size();return true;}
+#define CONTAINERSIZE(DST, SRC)	template <>	bool exec(Variant::DST &dst, const Variant::SRC &src){dst = src.size();return true;}
 #define MCONTAINERSIZE(SRC)\
 	CONTAINERSIZE(Bool, SRC)\
 	CONTAINERSIZE(Char, SRC)\
@@ -159,10 +159,10 @@ namespace utils
 				//bs < bs
 				//////////////////////////////////////////////////////////////////////////
 				template <size_t NDst, size_t NSrc>
-				static 
+				static
 					typename boost::enable_if_c<
 						(NDst == NSrc)
-						, bool>::type 
+						, bool>::type
 					bs2bs(std::bitset<NDst> &dst, const std::bitset<NSrc> &src)
 				{
 					dst = src;
@@ -171,10 +171,10 @@ namespace utils
 
 				//////////////////////////////////////////////////////////////////////////
 				template <size_t NDst, size_t NSrc>
-				static 
+				static
 					typename boost::enable_if_c<
 						(NDst < NSrc)
-						, bool>::type 
+						, bool>::type
 					bs2bs(std::bitset<NDst> &dst, const std::bitset<NSrc> &src)
 				{
 					for(size_t i(0); i<NDst; i++)
@@ -185,10 +185,10 @@ namespace utils
 				}
 				//////////////////////////////////////////////////////////////////////////
 				template <size_t NDst, size_t NSrc>
-				static 
+				static
 					typename boost::enable_if_c<
 						(NDst > NSrc)
-						, bool>::type 
+						, bool>::type
 					bs2bs(std::bitset<NDst> &dst, const std::bitset<NSrc> &src)
 				{
 					dst.reset();
@@ -257,10 +257,10 @@ namespace utils
 				}
 
 			};
-			
+
 
 			//bitset to bitset
-#define BITSET2BITSET(DST, SRC)	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){return BitsetHelper::bs2bs(dst, src);}
+#define BITSET2BITSET(DST, SRC)	template <>	bool exec(Variant::DST &dst, const Variant::SRC &src){return BitsetHelper::bs2bs(dst, src);}
 
 #define MBITSET2BITSET(SRC)\
 	BITSET2BITSET(Bitset8, SRC)\
@@ -282,8 +282,8 @@ namespace utils
 			//bitset to integer
 			//integer to bitset
 #define BITSET2INT(DST, SRC)\
-	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){return BitsetHelper::bs2int(dst, src);}\
-	template <>	bool exec<>(Variant::SRC &dst, const Variant::DST &src){return BitsetHelper::int2bs(dst, src);}\
+	template <>	bool exec(Variant::DST &dst, const Variant::SRC &src){return BitsetHelper::bs2int(dst, src);}\
+	template <>	bool exec(Variant::SRC &dst, const Variant::DST &src){return BitsetHelper::int2bs(dst, src);}\
 
 
 #define MBITSET2INT(DST)\
@@ -329,10 +329,10 @@ namespace utils
 			{
 				//////////////////////////////////////////////////////////////////////////
 				template <class Dst, class Src>
-				static 
+				static
 					typename boost::enable_if<
 						boost::is_same<Dst, Src>
-						, bool>::type 
+						, bool>::type
 					convert(Dst &dst, const Src &src)
 				{
 					dst = src;
@@ -341,7 +341,7 @@ namespace utils
 
 				//////////////////////////////////////////////////////////////////////////
 				template <class Dst, class Src>
-				static 
+				static
 					typename boost::enable_if<
 						boost::mpl::and_<
 							boost::mpl::not_<boost::is_same<Dst, Src> >,
@@ -352,7 +352,7 @@ namespace utils
 								>
 							>
 						>
-						, bool>::type 
+						, bool>::type
 					convert(Dst &dst, const Src &src)
 				{
 					dst.clear();
@@ -361,7 +361,7 @@ namespace utils
 				}
 				//////////////////////////////////////////////////////////////////////////
 				template <class Dst, class Src>
-				static 
+				static
 					typename boost::enable_if<
 						boost::mpl::and_<
 							boost::mpl::not_<boost::is_same<Dst, Src> >,
@@ -370,7 +370,7 @@ namespace utils
 								boost::is_same<Dst, Variant::MultisetVariant>
 							>
 						>
-						, bool>::type 
+						, bool>::type
 					convert(Dst &dst, const Src &src)
 				{
 					dst.clear();
@@ -380,7 +380,7 @@ namespace utils
 			};
 
 #define SEQUENCE2SEQUENCE(DST, SRC)\
-	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){return SequenceHelper::convert(dst, src);}\
+	template <>	bool exec(Variant::DST &dst, const Variant::SRC &src){return SequenceHelper::convert(dst, src);}\
 
 #define MSEQUENCE2SEQUENCE(SRC)\
 	SEQUENCE2SEQUENCE(SRC, VectorVariant)\
@@ -419,22 +419,22 @@ namespace utils
 			{
 				//////////////////////////////////////////////////////////////////////////
 				template <class Dst, class Src>
-				static 
+				static
 					typename boost::enable_if<
 						boost::is_same<Dst, Src>
-						, bool>::type 
+						, bool>::type
 					convert(Dst &dst, const Src &src)
 				{
 					dst = src;
 					return true;
 				}
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				template <class Dst, class Src>
-				static 
+				static
 					typename boost::enable_if<
 						boost::mpl::not_<boost::is_same<Dst, Src> >
-						, bool>::type 
+						, bool>::type
 					convert(Dst &dst, const Src &src)
 				{
 					dst.clear();
@@ -443,7 +443,7 @@ namespace utils
 				}
 			};
 #define ASSOC2ASSOC(DST, SRC)\
-	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){return AssocHelper::convert(dst, src);}\
+	template <>	bool exec(Variant::DST &dst, const Variant::SRC &src){return AssocHelper::convert(dst, src);}\
 
 #define MASSOC2ASSOC(SRC)\
 	ASSOC2ASSOC(MapStringVariant, SRC)\
@@ -487,7 +487,7 @@ namespace utils
 				static bool fwd(Dst &dst, const Src &src)
 				{
 					dst.clear();
-					std::transform(src.begin(), src.end(), 
+					std::transform(src.begin(), src.end(),
 						std::inserter(dst, dst.begin()),
 						boost::bind(&Src::value_type::second,_1));
 					return true;
@@ -499,7 +499,7 @@ namespace utils
 					dst.clear();
 
 					size_t idx(0);
-					BOOST_FOREACH(Src::const_reference s, src)
+					BOOST_FOREACH(typename Src::const_reference s, src)
 					{
 						char tmp[32];
 						dst.insert(std::make_pair(utils::_ntoa(idx++, tmp), s));
@@ -508,8 +508,8 @@ namespace utils
 				}
 			};
 #define ASSOC2SEQ(DST, SRC)\
-	template <>	bool exec<>(Variant::DST &dst, const Variant::SRC &src){return Assoc2SeqHelper::fwd(dst, src);}\
-	template <>	bool exec<>(Variant::SRC &dst, const Variant::DST &src){return Assoc2SeqHelper::bwd(dst, src);}\
+	template <>	bool exec(Variant::DST &dst, const Variant::SRC &src){return Assoc2SeqHelper::fwd(dst, src);}\
+	template <>	bool exec(Variant::SRC &dst, const Variant::DST &src){return Assoc2SeqHelper::bwd(dst, src);}\
 
 #define MASSOC2SEQ(SRC)\
 	ASSOC2SEQ(VectorVariant, SRC)\
@@ -537,11 +537,11 @@ namespace utils
 			//////////////////////////////////////////////////////////////////////////
 			//////////////////////////////////////////////////////////////////////////
 			//ptr to some
-			template <class Dst> 
+			template <class Dst>
 				typename boost::enable_if<
 					boost::mpl::not_<boost::is_same<Dst, Variant::VariantPtr> >
-					, bool>::type 
-				exec<>(Dst &dst, const Variant::VariantPtr &src)
+					, bool>::type
+				exec(Dst &dst, const Variant::VariantPtr &src)
 			{
 				if(src)
 				{
@@ -551,11 +551,11 @@ namespace utils
 				return false;
 			}
 			//some to ptr
-			template <class Src> 
+			template <class Src>
 				typename boost::enable_if<
 					boost::mpl::not_<boost::is_same<Variant::VariantPtr, Src> >
-					, bool>::type 
-				exec<>(Variant::VariantPtr &dst, const Src &src)
+					, bool>::type
+				exec(Variant::VariantPtr &dst, const Src &src)
 			{
 				if(dst)
 				{
@@ -608,12 +608,12 @@ namespace utils
 // 			Date;
 // 			Datetime;
 // 			Tm;
-// 
+//
 // 			DateDuration;
 // 			TimeDuration;
 // 			DateTimeDuration;
 
-#define CNVTCODE(DST, SRC, CODE) template <> bool exec<>(Variant::DST &dst, const Variant::SRC &src){CODE;return true;}
+#define CNVTCODE(DST, SRC, CODE) template <> bool exec(Variant::DST &dst, const Variant::SRC &src){CODE;return true;}
 			CNVTCODE(Date, Datetime, dst = src.date())
 			CNVTCODE(Date, Tm, try{dst = boost::gregorian::date_from_tm(src);}catch(const std::out_of_range &){dst=Variant::Date();})
 
@@ -642,8 +642,8 @@ namespace utils
 			//some to string
 			//string to some
 #define SOME2STRING(SRC)\
-	template <>	bool exec<>(Variant::String &dst, const Variant::SRC &src){try{dst = boost::lexical_cast<Variant::String>(src);}catch(const boost::bad_lexical_cast&){dst.clear();};return true;}\
-	template <>	bool exec<>(Variant::SRC &dst, const Variant::String &src){if(src.empty()){dst=Variant::SRC();return true;}try{dst = boost::lexical_cast<Variant::SRC>(src);}catch(const boost::bad_lexical_cast&){dst=Variant::SRC();};return true;}\
+	template <>	bool exec(Variant::String &dst, const Variant::SRC &src){try{dst = boost::lexical_cast<Variant::String>(src);}catch(const boost::bad_lexical_cast&){dst.clear();};return true;}\
+	template <>	bool exec(Variant::SRC &dst, const Variant::String &src){if(src.empty()){dst=Variant::SRC();return true;}try{dst = boost::lexical_cast<Variant::SRC>(src);}catch(const boost::bad_lexical_cast&){dst=Variant::SRC();};return true;}\
 
 			SOME2STRING(Char)
 			SOME2STRING(Int8)
@@ -672,7 +672,7 @@ namespace utils
 			//SOME2STRING(Uuid)
 
 			//dateTimeDuration
-			template <> bool exec<>(Variant::String &dst, const Variant::DateTimeDuration &src)
+			template <> bool exec(Variant::String &dst, const Variant::DateTimeDuration &src)
 			{
 				std::ostringstream os;
 				os<<src._dd<<" "<<src._td;
@@ -680,7 +680,7 @@ namespace utils
 				return true;
 			}
 
-			template <> bool exec<>(Variant::DateTimeDuration &dst, const Variant::String &src)
+			template <> bool exec(Variant::DateTimeDuration &dst, const Variant::String &src)
 			{
 				std::istringstream is(src);
 				is>>dst._dd>>dst._td;
@@ -688,14 +688,14 @@ namespace utils
 			}
 
 			//tm
-			template <> bool exec<>(Variant::String &dst, const Variant::Tm &src)
+			template <> bool exec(Variant::String &dst, const Variant::Tm &src)
 			{
 				Variant::Datetime dt;
 				exec(dt, src);
 				return exec(dst, dt);
 			}
 
-			template <> bool exec<>(Variant::Tm &dst, const Variant::String &src)
+			template <> bool exec(Variant::Tm &dst, const Variant::String &src)
 			{
 				Variant::Datetime dt;
 				exec(dt, src);
@@ -703,15 +703,15 @@ namespace utils
 			}
 
 			//uuid
-			template <> bool exec<>(Variant::String &dst, const Variant::Uuid &src)
+			template <> bool exec(Variant::String &dst, const Variant::Uuid &src)
 			{
 				boost::uint32_t time_low = litEndian(*(boost::uint32_t *)(src.begin()+0));
 				boost::uint16_t time_mid = litEndian(*(boost::uint16_t *)(src.begin()+4));
 				boost::uint16_t time_hi_and_version = litEndian(*(boost::uint16_t *)(src.begin()+6));
 
 				char buf[37];
-				sprintf(buf, "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-", 
-					time_low, time_mid, time_hi_and_version, 
+				sprintf(buf, "%8.8x-%4.4x-%4.4x-%2.2x%2.2x-",
+					time_low, time_mid, time_hi_and_version,
 					src.begin()[8], src.begin()[9]);
 
 				for(size_t i = 0; i < 6; i++)
@@ -722,7 +722,7 @@ namespace utils
 				return true;
 			}
 
-			template <> bool exec<>(Variant::Uuid &dst, const Variant::String &src)
+			template <> bool exec(Variant::Uuid &dst, const Variant::String &src)
 			{
 				Variant::Uuid u;
 				if(src.size() == 36)

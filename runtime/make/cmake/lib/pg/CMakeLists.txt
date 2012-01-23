@@ -203,3 +203,7 @@ SETUP_BIN_OUT(libpg server)
 
 TARGET_LINK_LIBRARIES(libpg libheap libutils liblog libasync)
 TARGET_LINK_LIBRARIES(libpg ${PostgreSQL_LIBRARY})
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+	TARGET_LINK_LIBRARIES(libpg ${Boost_LIBRARIES})
+ENDIF()

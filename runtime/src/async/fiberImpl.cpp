@@ -153,7 +153,7 @@ namespace async
 				ELOG(__FUNCTION__<<", exception catched: "<<boost::current_exception_diagnostic_information());
 			}
 			assert(_code);
-			_code.swap(function<void()>());
+			function<void()>().swap(_code);
 
 			WorkerImpl::current()->fiberExecuted(this);
 		}

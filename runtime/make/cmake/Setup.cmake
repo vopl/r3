@@ -102,9 +102,9 @@ IF(NOT WINDOWS)
 ENDIF(NOT WINDOWS)
 
 #######################################################################################
-IF(MSVC)
+IF(WINDOWS)
 	ADD_DEFINITIONS(-D_WIN32_WINNT=0x0501)
-ENDIF(MSVC)
+ENDIF(WINDOWS)
 
 
 
@@ -193,11 +193,11 @@ ENDIF(MSVC)
 
 
 #######################################################################################
-IF(CMAKE_COMPILER_IS_GNUCXX)
+IF(CMAKE_COMPILER_IS_GNUCXX AND NOT WINDOWS)
 	#need for correct resolving symbols with dlsym
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+ENDIF(CMAKE_COMPILER_IS_GNUCXX AND NOT WINDOWS)
 
 
 
@@ -242,11 +242,11 @@ ELSE(MSVC)
 
 
 	MACRO(PCH_KEY2FILENAME pchfile key header)
-		GET_FILENAME_COMPONENT(filename ${header} NAME_WE)
-		GET_FILENAME_COMPONENT(path ${header} PATH)
-		SET(pchfile "${path}/${filename}.h.gch")
+#		GET_FILENAME_COMPONENT(filename ${header} NAME_WE)
+#		GET_FILENAME_COMPONENT(path ${header} PATH)
+#		SET(pchfile "${path}/${filename}.h.gch")
 
-		GET_FILENAME_COMPONENT(key ${header} NAME)
+#		GET_FILENAME_COMPONENT(key ${header} NAME)
 	ENDMACRO(PCH_KEY2FILENAME)
 
 
@@ -256,31 +256,31 @@ ELSE(MSVC)
 
 	MACRO(CREATE_PCH target header srcfile)
 	
-		PCH_KEY2FILENAME(pchfile key ${header})
+#		PCH_KEY2FILENAME(pchfile key ${header})
 		
-		GET_DIRECTORY_PROPERTY(INCS INCLUDE_DIRECTORIES)
-		SET(IINCS "")
-		FOREACH(i ${INCS})
-			SET(IINCS "${IINCS} -I${i}")
-		ENDFOREACH(i)
+#		GET_DIRECTORY_PROPERTY(INCS INCLUDE_DIRECTORIES)
+#		SET(IINCS "")
+#		FOREACH(i ${INCS})
+#			SET(IINCS "${IINCS} -I${i}")
+#		ENDFOREACH(i)
 
-		GET_DIRECTORY_PROPERTY(DEFS DEFINITIONS)
+#		GET_DIRECTORY_PROPERTY(DEFS DEFINITIONS)
 
-		SET(PCH_BUILD_COMMAND "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${DEFS} ${header}")
+#		SET(PCH_BUILD_COMMAND "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${DEFS} ${header}")
 		
-		SET(target_pch ${target}_build_pch)
+#		SET(target_pch ${target}_build_pch)
 
-		ADD_CUSTOM_COMMAND(OUTPUT ${pchfile} COMMAND sh -c "${PCH_BUILD_COMMAND}" DEPENDS ${header})
+#		ADD_CUSTOM_COMMAND(OUTPUT ${pchfile} sh -c COMMAND "${PCH_BUILD_COMMAND}" DEPENDS ${header})
 
-		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch -fPIC" )
-		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES OBJECT_DEPENDS ${pchfile} )
+#		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch -fPIC" )
+#		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES OBJECT_DEPENDS ${pchfile} )
 	ENDMACRO(CREATE_PCH)
 
 	MACRO(USE_PCH target header srcfile)
-		PCH_KEY2FILENAME(pchfile key ${header})
+#		PCH_KEY2FILENAME(pchfile key ${header})
 		
-		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch -fPIC" )
-		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES OBJECT_DEPENDS ${pchfile} )
+#		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch -fPIC" )
+#		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES OBJECT_DEPENDS ${pchfile} )
 	ENDMACRO(USE_PCH)
 	
 	
@@ -363,6 +363,10 @@ IF(MSVC AND COPY_BIN_OUT)
 ELSE(MSVC AND COPY_BIN_OUT)
 	MACRO(PRESETUP_BIN_OUT src)
 	ENDMACRO(PRESETUP_BIN_OUT)
+	
+	MACRO(SETUP_BIN_OUT_RENAME target folder newname)
+	ENDMACRO(SETUP_BIN_OUT_RENAME)
+
 	MACRO(SETUP_BIN_OUT target)
 	ENDMACRO(SETUP_BIN_OUT)
 ENDIF(MSVC AND COPY_BIN_OUT)
