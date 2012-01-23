@@ -81,7 +81,7 @@ namespace net
 		Future2<error_code, ip::tcp::resolver::iterator> resolveRes;
 		resolver.async_resolve(
 			ip::tcp::resolver::query(host, service),
-			resolveRes);
+			async::bridge(resolveRes));
 		resolveRes.wait();
 
 		if(resolveRes.data1())
@@ -145,11 +145,11 @@ namespace net
 		Future<error_code> ecRes;
 		if(sockSsl)
 		{
-			acceptor->async_accept(sockSsl->lowest_layer(), ecRes);
+			acceptor->async_accept(sockSsl->lowest_layer(), async::bridge(ecRes));
 		}
 		else
 		{
-			acceptor->async_accept(*sock, ecRes);
+			acceptor->async_accept(*sock, async::bridge(ecRes));
 		}
 
 		ec = ecRes;
@@ -172,7 +172,7 @@ namespace net
 		{
 			//делать handshake
 			ecRes.reset();
-			sockSsl->async_handshake(ssl::stream_base::server, ecRes);
+			sockSsl->async_handshake(ssl::stream_base::server, async::bridge(ecRes));
 			ec = ecRes;
 
 			if(ec)

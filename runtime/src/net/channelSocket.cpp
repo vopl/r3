@@ -31,15 +31,15 @@ namespace net
 	{
 		if(_socket)
 		{
-			_socket->async_read_some(b,h);
+			_socket->async_read_some(b, async::bridge(h));
 		}
 		else
 		{
 			typedef asio::detail::wrapped_handler<
 				asio::io_service::strand,
-				Handler> WrappedHandler;
+				async::AsioBridge<Handler> > WrappedHandler;
 			_sslStrand->dispatch(
-				bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+				bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(async::bridge(h))));
 		}
 	}
 
@@ -49,15 +49,15 @@ namespace net
 	{
 		if(_socket)
 		{
-			_socket->async_write_some(b,h);
+			_socket->async_write_some(b, async::bridge(h));
 		}
 		else
 		{
 			typedef asio::detail::wrapped_handler<
 				asio::io_service::strand,
-				Handler> WrappedHandler;
+				async::AsioBridge<Handler> > WrappedHandler;
 			_sslStrand->dispatch(
-				bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+				bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(async::bridge(h))));
 		}
 	}
 

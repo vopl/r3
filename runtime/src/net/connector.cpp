@@ -80,7 +80,7 @@ namespace net
 		Future2<error_code, ip::tcp::resolver::iterator> resolveRes;
 		resolver.async_resolve(
 			ip::tcp::resolver::query(host, service),
-			resolveRes);
+			async::bridge(resolveRes));
 		ec = resolveRes.data1();
 
 		if(ec)
@@ -116,11 +116,11 @@ namespace net
 
 				if(sockSsl)
 				{
-					sockSsl->lowest_layer().async_connect(*riter, cres);
+					sockSsl->lowest_layer().async_connect(*riter, async::bridge(cres));
 				}
 				else
 				{
-					sock->async_connect(*riter, cres);
+					sock->async_connect(*riter, async::bridge(cres));
 				}
 
 				ec = cres;
@@ -141,7 +141,7 @@ namespace net
 			if(sockSsl)
 			{
 				Future<error_code> hres;
-				sockSsl->async_handshake(ssl::stream_base::client, hres);
+				sockSsl->async_handshake(ssl::stream_base::client, async::bridge(hres));
 				ec = hres;
 
 				if(ec)

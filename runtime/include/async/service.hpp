@@ -58,18 +58,16 @@ namespace async
 	ASYNC_API Service service();
 }
 
+#include "async/asioBridge.hpp"
 
 //////////////////////////////////////////////////////////////////////////
 //для asio мост в фиберы
-namespace boost
+namespace async
 {
-	namespace asio
-	{
-		template <typename Function, typename Any>
-		inline void asio_handler_invoke(Function &code, Any stub)
-		{
-			async::exec(code);
-		}
-	}
+    template <class Handler>
+    AsioBridge<Handler> bridge(const Handler &handler)
+    {
+		return AsioBridge<Handler>(handler);
+    }
 }
 #endif

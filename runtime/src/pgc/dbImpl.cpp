@@ -134,7 +134,7 @@ namespace pgc
 					ILOG("wait 1 second for rebalance connections");
 					_timeout.reset(new Timeout(async::io(), boost::posix_time::seconds(1)));
 					_timeout->async_wait(
-						bind(&DbImpl::onRebalanceTimer, shared_from_this()));
+						async::bridge(bind(&DbImpl::onRebalanceTimer, shared_from_this())));
 				}
 			}
 		}
@@ -231,7 +231,7 @@ namespace pgc
 						ILOG("wait 1 second for reconnect");
 						_timeout.reset(new Timeout(async::io(), boost::posix_time::seconds(1)));
 						_timeout->async_wait(
-							bind(&DbImpl::onRebalanceTimer, shared_from_this()));
+							async::bridge(bind(&DbImpl::onRebalanceTimer, shared_from_this())));
 						return;
 					}
 				}

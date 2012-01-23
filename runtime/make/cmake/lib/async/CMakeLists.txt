@@ -10,6 +10,9 @@ SET(INCLUDE
 
 	${INC_DIR}/async/future.hpp
 	${INC_DIR}/async/futureWaiter.hpp
+
+	${INC_DIR}/async/asioBridge.hpp
+
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 

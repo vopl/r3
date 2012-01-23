@@ -112,7 +112,7 @@ namespace async
 		}
 
 		//небыло задач к исполнителю, надо инициировать воркера
-		_io.post(code);
+		_io.post(bridge(code));
 	}
 
 

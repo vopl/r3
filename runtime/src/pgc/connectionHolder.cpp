@@ -516,7 +516,7 @@ namespace pgc
 	async::Future<system::error_code> ConnectionHolder::send0()
 	{
 		async::Future<system::error_code> h;
-		_sock.async_send(asio::null_buffers(), bind(h, _1));
+		_sock.async_send(asio::null_buffers(), async::bridge(boost::bind(h,_1)));
 		return h;
 	}
 
@@ -524,7 +524,7 @@ namespace pgc
 	async::Future<system::error_code> ConnectionHolder::recv0()
 	{
 		async::Future<system::error_code> h;
-		_sock.async_receive(asio::null_buffers(), bind(h, _1));
+		_sock.async_receive(asio::null_buffers(), async::bridge(boost::bind(h,_1)));
 		return h;
 	}
 
