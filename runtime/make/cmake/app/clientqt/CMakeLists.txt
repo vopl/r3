@@ -92,7 +92,6 @@ SOURCE_GROUP(src\\qt FILES ${SRC_PCH})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${SRC_DIR}/client/qt)
 
-PRESETUP_BIN_OUT(SRC_STUB)
 ADD_EXECUTABLE(clientqt
 	${SRC_STUB} ${SRC_NOPCH} ${SRC_PCH} ${SRC} ${SRC_HDR} 
 	${SRC_QT} ${SRC_QT_HDR} ${MOC_SOURCES} 
@@ -102,7 +101,10 @@ ADD_EXECUTABLE(clientqt
 CREATE_PCH(client ${SRC_DIR}/client/qt/pch.h ${SRC_PCH})
 USE_PCH(client ${SRC_DIR}/client/qt/pch.h ${SRC})
 USE_PCH(client ${SRC_QT_DIR}/client/qt/pch.h ${SRC_QT})
-SETUP_BIN_OUT_RENAME(clientqt client client)
+
+SET_TARGET_PROPERTIES(clientqt
+	PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+	${CLIENTBIN_DIR})
 
 TARGET_LINK_LIBRARIES(clientqt libheap libpluma libutils libasync)
 TARGET_LINK_LIBRARIES(clientqt ${QT_LIBRARIES})

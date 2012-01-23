@@ -56,11 +56,13 @@ SET(SRC_PCH
 SOURCE_GROUP(src FILES ${SRC_PCH})
 
 
-PRESETUP_BIN_OUT(SRC_STUB)
 ADD_LIBRARY(plugserver SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 CREATE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC_PCH})
 USE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC})
-SETUP_BIN_OUT(plugserver plug)
+
+SET_TARGET_PROPERTIES(plugserver PROPERTIES 
+	RUNTIME_OUTPUT_DIRECTORY ${PLUG_DIR}
+	LIBRARY_OUTPUT_DIRECTORY ${PLUG_DIR})
 
 TARGET_LINK_LIBRARIES(plugserver libheap libpluma libutils liblog libasync libpg)
 
