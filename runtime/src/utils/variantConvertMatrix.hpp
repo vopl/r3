@@ -18,6 +18,7 @@ namespace utils
 			template <class Dst, class Src>
 			bool exec(Dst &dst, const Src &src)
 			{
+			    assert(0);
 				return false;
 			}
 		}

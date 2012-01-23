@@ -11,9 +11,9 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	class ServiceVictim
-		: public NodeBase<ServiceVictim, false, false>
+		: public NodeBase<ServiceVictim, false, true>
 	{
-		typedef NodeBase<ServiceVictim, false, false> Base;
+		typedef NodeBase<ServiceVictim, false, true> Base;
 		pluma::Pluma *_pluma;
 
 		pgc::Db _db;

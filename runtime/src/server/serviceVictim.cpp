@@ -92,7 +92,7 @@ namespace server
 		pgs::meta::Cluster mcl;
 		mcl.add<pgs::meta::schemas::Staff>();
 		mcl.initialize();
-		
+
 		pgs::Cluster cl(mcl);
 
 		static volatile size_t k(0);
@@ -112,13 +112,13 @@ namespace server
 				return;
 			}
 
-// 			con.query("BEGIN").wait();
-// 			async::Future<bool> sar = cl.sync(con, true);
-// 			//async::Future<bool> dar = cl.drop(con);
-// 
-// 			sar.wait();
-// 			//dar.wait();
-// 			con.query("COMMIT").wait();
+ 			con.query("BEGIN").wait();
+ 			async::Future<bool> sar = cl.sync(con, true);
+ 			//async::Future<bool> dar = cl.drop(con);
+
+ 			sar.wait();
+ 			//dar.wait();
+ 			con.query("COMMIT").wait();
 
 			pgs::meta::schemas::StaffCPtr staff = mcl.get<pgs::meta::schemas::Staff>();
 
@@ -166,7 +166,7 @@ namespace server
 // 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
 // 		}
 
-		for(size_t i(0); i<20; i++)
+		for(size_t i(0); i<1; i++)
 		{
 			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
 		}
