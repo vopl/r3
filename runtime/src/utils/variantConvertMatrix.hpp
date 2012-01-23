@@ -22,13 +22,6 @@ namespace utils
 				return false;
 			}
 		}
-
-		//////////////////////////////////////////////////////////////////////////
-		template <class Dst, class Src>
-		bool variantConvertMatrix(Dst &dst, const Src &src)
-		{
-			return convertor::exec(dst, src);
-		}
 	}
 }
 
@@ -783,6 +776,20 @@ namespace utils
 
 
 
+		}
+	}
+}
+
+
+namespace utils
+{
+	namespace impl
+	{
+		//////////////////////////////////////////////////////////////////////////
+		template <class Dst, class Src>
+		bool variantConvertMatrix(Dst &dst, const Src &src)
+		{
+			return convertor::exec(dst, src);
 		}
 	}
 }

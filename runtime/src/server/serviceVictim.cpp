@@ -112,13 +112,13 @@ namespace server
 				return;
 			}
 
- 			con.query("BEGIN").wait();
- 			async::Future<bool> sar = cl.sync(con, true);
- 			//async::Future<bool> dar = cl.drop(con);
-
- 			sar.wait();
- 			//dar.wait();
- 			con.query("COMMIT").wait();
+// 			con.query("BEGIN").wait();
+// 			async::Future<bool> sar = cl.sync(con, true);
+// 			//async::Future<bool> dar = cl.drop(con);
+//
+// 			sar.wait();
+// 			//dar.wait();
+// 			con.query("COMMIT").wait();
 
 			pgs::meta::schemas::StaffCPtr staff = mcl.get<pgs::meta::schemas::Staff>();
 
@@ -161,12 +161,12 @@ namespace server
 		_pluma = manager->getServer()->getPlugs();
 		_db = manager->getServer()->getDb();
 
-// 		for(size_t i(0); i<20; i++)
-// 		{
-// 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
-// 		}
+ 		for(size_t i(0); i<20; i++)
+ 		{
+ 			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
+ 		}
 
-		for(size_t i(0); i<1; i++)
+		for(size_t i(0); i<10; i++)
 		{
 			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
 		}
