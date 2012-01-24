@@ -18,7 +18,7 @@ namespace async
 
 		BOOST_FOREACH(FiberImplPtr &fiber, _owners)
 		{
-			WorkerImpl::current()->fiberReady(_owners.front());
+			WorkerImpl::current()->fiberReady(fiber);
 		}
 	}
 
