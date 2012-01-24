@@ -33,7 +33,7 @@ SOURCE_GROUP(src FILES ${SRC})
 
 SET(SRC_NOPCH
 	${SRC_DIR}/heapNewDelete.cpp
-	${SRC_DIR}/async/ucontext.c
+#	${SRC_DIR}/async/ucontext.c
 )
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
@@ -51,7 +51,7 @@ SET(SRC_HDR
 	${SRC_DIR}/async/cmaHandler.hpp
 	${SRC_DIR}/async/pch.h
 
-	${SRC_DIR}/async/ucontext.h
+#	${SRC_DIR}/async/ucontext.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 

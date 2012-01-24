@@ -4,19 +4,14 @@
 #include "threadLocalStorage.hpp"
 #include <boost/enable_shared_from_this.hpp>
 
-//#include "config.h"
-#define HAVE_UCONTEXT_H 1
-/* #define HAVE_WINFIBER 1 */
+#include "config.h"
+//#define HAVE_UCONTEXT_H 1
+//#define HAVE_WINFIBER 1
 
 #if defined(HAVE_WINFIBER)
 #	include <windows.h>
 #elif defined(HAVE_UCONTEXT_H)
 #	include "ucontext.h"
-
-#	define DeleteFiber DeleteFiber_absent
-#	define CreateFiberEx CreateFiberEx_absent
-#	define SwitchToFiber SwitchToFiber_absent
-
 #else
 #   error Unknown context type for fibers
 #endif
