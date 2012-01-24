@@ -99,6 +99,8 @@ namespace server
 		char tmp[64];
 		cl.setUnicators(std::string("pre_")+utils::_ntoa(k++, tmp), "post");
 
+		pgs::Statement s;
+
 		//for(size_t i(0); i<50000; i++)
 		for(;;)
 		{
@@ -112,28 +114,31 @@ namespace server
 				return;
 			}
 
-			con.query("BEGIN").wait();
-			async::Future<bool> sar = cl.sync(con, true);
-			//async::Future<bool> dar = cl.drop(con);
-
-			sar.wait();
-			//dar.wait();
-			con.query("COMMIT").wait();
+// 			con.query("BEGIN").wait();
+// 			async::Future<bool> sar = cl.sync(con, true);
+// 			//async::Future<bool> dar = cl.drop(con);
+// 
+// 			sar.wait();
+// 			//dar.wait();
+// 			con.query("COMMIT").wait();
 
 			pgs::meta::schemas::StaffCPtr staff = mcl.get<pgs::meta::schemas::Staff>();
 
-			static pgs::Statement s = pgs::Select()
-				.from(staff->Right)
-				.whats(pgs::Category(staff->Right))
-				.compile(cl);
+			if(!s)
+			{
+				s = pgs::Select()
+					.from(staff->Right)
+					.whats(pgs::Category(staff->Right))
+					.compile(cl);
+			}
 			//std::cout<<s.getSql()<<std::endl;
 			pgc::Result r = con.query(s, true);
-			utils::Variant v;
-			r.fetchRowsMap(v);
 
 			static size_t cnt(0);
 			if(!((cnt++)%10000))
 			{
+				utils::Variant v;
+				r.fetchRowsMap(v);
 				std::cout<<v<<std::endl;
 			}
 

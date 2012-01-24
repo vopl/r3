@@ -22,6 +22,8 @@ namespace pgs
 		Statement(ImplPtr impl);
 	public:
 
+		Statement();
+
 
 		//Data exec();
 	};

@@ -50,7 +50,8 @@ namespace async
 			_fiberPool->_fibersIdle.insert(fiber->shared_from_this());
 			assert(_fiberPool->_fibersReady.end() == _fiberPool->_fibersReady.find(fiber->shared_from_this()));
 		}
-		_fiberRoot->activate();
+		bool b = _fiberRoot->activate();
+		assert(b);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -82,7 +83,8 @@ namespace async
 	void WorkerImpl::fiberYield()
 	{
 		assert(FiberImpl::current() != _fiberRoot.get());
-		_fiberRoot->activate();
+		bool b = _fiberRoot->activate();
+		assert(b);
 	}
 
 
@@ -98,11 +100,21 @@ namespace async
 				fibersReady.swap(_fiberPool->_fibersReady);
 			}
 
-			doWork = !fibersReady.empty();
+			size_t activatedAmount = 0;
 			BOOST_FOREACH(const FiberImplPtr &fiber, fibersReady)
 			{
-				fiber->activate();
+				if(fiber->activate())
+				{
+					activatedAmount++;
+				}
+				else
+				{
+					mutex::scoped_lock sl(_fiberPool->_mtxFibers);
+					_fiberPool->_fibersReady.insert(fiber);
+				}
 			}
+
+			doWork = activatedAmount?true:false;
 		}
 	}
 
@@ -122,6 +134,7 @@ namespace async
 
 		//потом отложенные задачи
 		//потом входящую задачу
+		std::set<FiberImplPtr>	fibersNotActavated;
 		for(;;)
 		{
 			FiberImplPtr fiber;
@@ -166,11 +179,19 @@ namespace async
 			{
 				if(tasksFromQueue)
 				{
-					fiber->execute(tasksFromQueue);
+					if(!fiber->execute(tasksFromQueue))
+					{
+						fibersNotActavated.insert(fiber);
+						continue;
+					}
 				}
 				else
 				{
-					fiber->execute(task);
+					if(!fiber->execute(task))
+					{
+						fibersNotActavated.insert(fiber);
+						continue;
+					}
 					break;
 				}
 			}
@@ -184,6 +205,12 @@ namespace async
 				_fiberPool->_tasks.push_back(task);
 				break;
 			}
+		}
+
+		if(!fibersNotActavated.empty())
+		{
+			mutex::scoped_lock sl(_fiberPool->_mtxFibers);
+			_fiberPool->_fibersIdle.insert(fibersNotActavated.begin(), fibersNotActavated.end());
 		}
 
 		//теперь снова готовые

@@ -16,7 +16,7 @@ namespace async
 #else
 #   error Unknown context type for fibers
 #endif
-		, _evt(NULL)
+		, _isLocked(false)
 	{
 #if defined(HAVE_WINFIBER)
 #elif defined(HAVE_UCONTEXT_H)
@@ -29,6 +29,7 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	FiberImpl::~FiberImpl()
 	{
+		assert(!_isLocked);
 		assert(_current != this);
 #if defined(HAVE_WINFIBER)
 		if(_context)
@@ -44,14 +45,6 @@ namespace async
 #else
 #   error Unknown context type for fibers
 #endif
-		if(_evt)
-		{
-			if(!CloseHandle(_evt))
-			{
-				WLOG(__FUNCTION__<<", CloseHandle failed, "<<GetLastError());
-			}
-			_evt = NULL;
-		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -95,27 +88,7 @@ namespace async
 #   error Unknown context type for fibers
 #endif
 
-		if(!_evt)
-		{
-			_evt = CreateEvent(NULL, FALSE, TRUE, NULL);
-			if(!_evt)
-			{
-				FLOG(__FUNCTION__<<", CreateEvent failed, "<<GetLastError());
-
-#if defined(HAVE_WINFIBER)
-				DeleteFiber(_context);
-				_context = NULL;
-#elif defined(HAVE_UCONTEXT_H)
-				free(_context.uc_stack.ss_sp);
-				memset(&_context, 0, sizeof(ucontext_t));
-#else
-#   error Unknown context type for fibers
-#endif
-
-				//throw exception("CreateEvent failed");
-				return false;
-			}
-		}
+		assert(!_isLocked);
 
 // 		static int cnt(0);
 // 		TLOG(__FUNCTION__<<", "<<cnt++);
@@ -132,73 +105,72 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void FiberImpl::execute(function<void()> code)
+	bool FiberImpl::execute(const function<void()> &code)
 	{
+		if(!enter())
+		{
+			return false;
+		}
+
 		assert(_current != this);
 
 		assert(!_code);
 		assert(code);
 		_code = code;
 
-		activate();
+
+		return activate(true);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void FiberImpl::activate()
+	bool FiberImpl::activate(bool alreadyLocked)
 	{
+		if(!alreadyLocked)
+		{
+			if(!enter())
+			{
+				return false;
+			}
+		}
+
 		FiberImpl *prev = _current.get();
 		assert(prev);
 		assert(prev != this);
-		if(prev != this)
-		{
-			enter();
-			_current = this;
+
+		_current = this;
 #if defined(HAVE_WINFIBER)
-			SwitchToFiber(_context);
+		SwitchToFiber(_context);
 #elif defined(HAVE_UCONTEXT_H)
-// 			if(setcontext(&_context))
-// 			{
-// 				FLOG(__FUNCTION__<<", setcontext failed");
-// 				throw exception("setcontext failed");
-// 			}
-			if(swapcontext(&prev->_context, &_context))
-			{
-				FLOG(__FUNCTION__<<", swapcontext failed");
-				throw exception("swapcontext failed");
-			}
+		if(swapcontext(&prev->_context, &_context))
+		{
+			FLOG(__FUNCTION__<<", swapcontext failed");
+			throw exception("swapcontext failed");
+		}
 #else
 #   error Unknown context type for fibers
 #endif
-			leave();
-		}
+		leave();
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void FiberImpl::enter()
+	bool FiberImpl::enter()
 	{
-		if(_evt)
+		mutex::scoped_lock sl(_mtx);
+		if(_isLocked)
 		{
-			DWORD res = WaitForSingleObject(_evt, INFINITE);
-			if(WAIT_OBJECT_0 != res)
-			{
-				FLOG(__FUNCTION__<<", WaitForSingleObject failed, "<<GetLastError());
-				throw exception("WaitForSingleObject failed");
-			}
+			return false;
 		}
+		_isLocked = true;
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::leave()
 	{
-		if(_evt)
-		{
-			BOOL res = SetEvent(_evt);
-			if(!res)
-			{
-				FLOG(__FUNCTION__<<", SetEvent failed, "<<GetLastError());
-				throw exception("SetEvent failed");
-			}
-		}
+		mutex::scoped_lock sl(_mtx);
+		assert(_isLocked);
+		_isLocked = false;
 	}
 
 

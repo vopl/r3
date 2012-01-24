@@ -24,7 +24,8 @@ namespace async
 
 		assert(_current == this);
 		_current = NULL;
-		leave();
+		
+// 		leave();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -46,7 +47,10 @@ namespace async
 #   error Unknown context type for fibers
 #endif
 		_current = this;
-		enter();
+		
+// 		bool b = enter();
+// 		assert(b);
+
 		return true;
 	}
 }

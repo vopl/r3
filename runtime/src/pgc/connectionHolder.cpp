@@ -621,6 +621,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::runQuery(async::Future<Result> res, const std::string &sql, BindDataPtr bindData)
 	{
+		assert(sql.size());
 		mutex::scoped_lock sl(_mtx);
 		assert(_pgcon);
 
@@ -633,6 +634,9 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::runQueryWithPrepare(async::Future<Result> res, Statement s, BindDataPtr bindData)
 	{
+		assert(s);
+		assert(s.getSql().size());
+
 		mutex::scoped_lock sl(_mtx);
 		assert(_pgcon);
 

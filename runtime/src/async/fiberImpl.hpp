@@ -29,14 +29,14 @@ namespace async
 		: public enable_shared_from_this<FiberImpl>
 	{
 	public:
-		FiberImpl(size_t stacksize = 1024*32);
+		FiberImpl(size_t stacksize = 1024*64);
 		virtual ~FiberImpl();
 
 		bool initialize();
 		static FiberImpl *current();
 
-		void execute(function<void()> _code);
-		void activate();
+		bool execute(const function<void()> &code);
+		bool activate(bool alreadyLocked = false);
 
 	private:
 #if defined(HAVE_WINFIBER)
@@ -49,8 +49,8 @@ namespace async
 		void fiberProc();
 
 	protected:
-		void enter();
-		void leave();
+		virtual bool enter();
+		virtual void leave();
 
 	protected:
 
@@ -64,7 +64,8 @@ namespace async
 #endif
 
 		function<void()>	_code;
-		HANDLE				_evt;
+		boost::mutex		_mtx;
+		bool				_isLocked;
 
 		static ThreadLocalStorage<FiberImpl *>
 							_current;
