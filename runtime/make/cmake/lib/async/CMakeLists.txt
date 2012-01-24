@@ -64,9 +64,8 @@ ADD_LIBRARY(libasync SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR
 CREATE_PCH(libasync ${SRC_DIR}/async/pch.h ${SRC_PCH})
 USE_PCH(libasync ${SRC_DIR}/async/pch.h ${SRC})
 
-SET_TARGET_PROPERTIES(libasync PROPERTIES 
-	RUNTIME_OUTPUT_DIRECTORY ${SERVERBIN_DIR}
-	LIBRARY_OUTPUT_DIRECTORY ${SERVERBIN_DIR})
+SETUP_BIN_OUT(libasync server)
+SETUP_BIN_OUT(libasync client)
 
 TARGET_LINK_LIBRARIES(libasync libheap libutils liblog)
 

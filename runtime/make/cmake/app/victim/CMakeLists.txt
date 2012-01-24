@@ -24,9 +24,7 @@ ADD_EXECUTABLE(victim ${SRC_STUB} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 CREATE_PCH(victim ${SRC_DIR}/victim/pch.h ${SRC_PCH})
 USE_PCH(victim ${SRC_DIR}/victim/pch.h ${SRC})
 
-SET_TARGET_PROPERTIES(victim
-	PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-	${SERVERBIN_DIR})
+SETUP_BIN_OUT(victim server)
 
 TARGET_LINK_LIBRARIES(victim libheap libutils libpluma liblog)
 

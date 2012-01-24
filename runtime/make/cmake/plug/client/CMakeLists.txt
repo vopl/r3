@@ -40,8 +40,6 @@ ADD_LIBRARY(plugclient SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_H
 CREATE_PCH(plugclient ${SRC_DIR}/client/pch.h ${SRC_PCH})
 USE_PCH(plugclient ${SRC_DIR}/client/pch.h ${SRC})
 
-SET_TARGET_PROPERTIES(plugclient PROPERTIES 
-	RUNTIME_OUTPUT_DIRECTORY ${PLUG_DIR}
-	LIBRARY_OUTPUT_DIRECTORY ${PLUG_DIR})
+SETUP_BIN_OUT(plugclient plug)
 
 TARGET_LINK_LIBRARIES(plugclient libheap libpluma libutils liblog libasync)

@@ -9,9 +9,7 @@ SOURCE_GROUP(src FILES ${SRC})
 
 ADD_EXECUTABLE(server ${SRC_STUB} ${SRC})
 
-SET_TARGET_PROPERTIES(server
-	PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-	${SERVERBIN_DIR})
+SETUP_BIN_OUT(server server)
 
 TARGET_LINK_LIBRARIES(server libheap libutils libpluma liblog)
 

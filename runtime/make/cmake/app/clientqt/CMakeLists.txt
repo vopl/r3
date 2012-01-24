@@ -102,9 +102,7 @@ CREATE_PCH(client ${SRC_DIR}/client/qt/pch.h ${SRC_PCH})
 USE_PCH(client ${SRC_DIR}/client/qt/pch.h ${SRC})
 USE_PCH(client ${SRC_QT_DIR}/client/qt/pch.h ${SRC_QT})
 
-SET_TARGET_PROPERTIES(clientqt
-	PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-	${CLIENTBIN_DIR})
+SETUP_BIN_OUT(clientqt client)
 
 TARGET_LINK_LIBRARIES(clientqt libheap libpluma libutils libasync)
 TARGET_LINK_LIBRARIES(clientqt ${QT_LIBRARIES})

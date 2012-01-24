@@ -112,13 +112,13 @@ namespace server
 				return;
 			}
 
-// 			con.query("BEGIN").wait();
-// 			async::Future<bool> sar = cl.sync(con, true);
-// 			//async::Future<bool> dar = cl.drop(con);
-//
-// 			sar.wait();
-// 			//dar.wait();
-// 			con.query("COMMIT").wait();
+			con.query("BEGIN").wait();
+			async::Future<bool> sar = cl.sync(con, true);
+			//async::Future<bool> dar = cl.drop(con);
+
+			sar.wait();
+			//dar.wait();
+			con.query("COMMIT").wait();
 
 			pgs::meta::schemas::StaffCPtr staff = mcl.get<pgs::meta::schemas::Staff>();
 

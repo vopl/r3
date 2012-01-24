@@ -40,9 +40,7 @@ ADD_LIBRARY(plugnet SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR}
 CREATE_PCH(plugnet ${SRC_DIR}/net/pch.h ${SRC_PCH})
 USE_PCH(plugnet ${SRC_DIR}/net/pch.h ${SRC})
 
-SET_TARGET_PROPERTIES(plugnet PROPERTIES 
-	RUNTIME_OUTPUT_DIRECTORY ${PLUG_DIR}
-	LIBRARY_OUTPUT_DIRECTORY ${PLUG_DIR})
+SETUP_BIN_OUT(plugnet plug)
 
 TARGET_LINK_LIBRARIES(plugnet libheap libpluma libutils libasync)
 
