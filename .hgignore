@@ -2,6 +2,7 @@ syntax: regexp
 ^runtime/include/pgs/meta/schemas
 ^runtime/make/vs9
 ^runtime/make/nb
+^runtime/make/cb
 ^runtime/lib
 ^runtime/client
 ^runtime/server

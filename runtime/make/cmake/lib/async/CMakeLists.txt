@@ -33,6 +33,7 @@ SOURCE_GROUP(src FILES ${SRC})
 
 SET(SRC_NOPCH
 	${SRC_DIR}/heapNewDelete.cpp
+	${SRC_DIR}/async/ucontext.c
 )
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
 
@@ -49,6 +50,8 @@ SET(SRC_HDR
 
 	${SRC_DIR}/async/cmaHandler.hpp
 	${SRC_DIR}/async/pch.h
+
+	${SRC_DIR}/async/ucontext.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
@@ -59,6 +62,31 @@ SET(SRC_PCH
 SOURCE_GROUP(src FILES ${SRC_PCH})
 
 
+
+
+
+
+
+INCLUDE(CheckFunctionExists)
+INCLUDE(CheckLibraryExists)
+INCLUDE(CheckIncludeFiles)
+INCLUDE(CheckPrototypeDefinition)
+
+CHECK_INCLUDE_FILES (ucontext.h HAVE_UCONTEXT_H)
+
+IF(WINDOWS)
+	CHECK_PROTOTYPE_DEFINITION(
+		CreateFiberEx 
+		"LPVOID WINAPI CreateFiberEx(SIZE_T dwStackCommitSize, SIZE_T dwStackReserveSize, DWORD dwFlags, LPFIBER_START_ROUTINE lpStartAddress, LPVOID lpParameter);"
+		"NULL"
+		windows.h
+		HAVE_WINFIBER)
+ENDIF()
+
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 ADD_LIBRARY(libasync SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 CREATE_PCH(libasync ${SRC_DIR}/async/pch.h ${SRC_PCH})

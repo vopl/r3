@@ -4,6 +4,24 @@
 #include "threadLocalStorage.hpp"
 #include <boost/enable_shared_from_this.hpp>
 
+//#include "config.h"
+#define HAVE_UCONTEXT_H 1
+/* #define HAVE_WINFIBER 1 */
+
+#if defined(HAVE_WINFIBER)
+#	include <windows.h>
+#elif defined(HAVE_UCONTEXT_H)
+#	include "ucontext.h"
+
+#	define DeleteFiber DeleteFiber_absent
+#	define CreateFiberEx CreateFiberEx_absent
+#	define SwitchToFiber SwitchToFiber_absent
+
+#else
+#   error Unknown context type for fibers
+#endif
+
+
 
 //////////////////////////////////////////////////////////////////////////
 namespace async
@@ -16,7 +34,7 @@ namespace async
 		: public enable_shared_from_this<FiberImpl>
 	{
 	public:
-		FiberImpl();
+		FiberImpl(size_t stacksize = 1024*32);
 		virtual ~FiberImpl();
 
 		bool initialize();
@@ -26,7 +44,13 @@ namespace async
 		void activate();
 
 	private:
-		static VOID WINAPI s_fiberProc(LPVOID lpFiberParameter);
+#if defined(HAVE_WINFIBER)
+		static VOID WINAPI s_fiberProc(LPVOID param);
+#elif defined(HAVE_UCONTEXT_H)
+		static void s_fiberProc(int param);
+#else
+#   error Unknown context type for fibers
+#endif
 		void fiberProc();
 
 	protected:
@@ -34,7 +58,16 @@ namespace async
 		void leave();
 
 	protected:
-		void				*_stack;
+
+		size_t _stacksize;
+#if defined(HAVE_WINFIBER)
+		LPVOID	_context;
+#elif defined(HAVE_UCONTEXT_H)
+		ucontext_t	_context;
+#else
+#   error Unknown context type for fibers
+#endif
+
 		function<void()>	_code;
 		HANDLE				_evt;
 

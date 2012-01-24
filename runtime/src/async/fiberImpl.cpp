@@ -2,27 +2,48 @@
 #include "fiberImpl.hpp"
 #include "fiberRootImpl.hpp"
 #include "workerImpl.hpp"
-#include <windows.h>
 #include "async/exception.hpp"
+
 
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
-	FiberImpl::FiberImpl()
-		: _stack(NULL)
+	FiberImpl::FiberImpl(size_t stacksize)
+		: _stacksize(stacksize)
+#if defined(HAVE_WINFIBER)
+		, _context(NULL)
+#elif defined(HAVE_UCONTEXT_H)
+#else
+#   error Unknown context type for fibers
+#endif
 		, _evt(NULL)
 	{
+#if defined(HAVE_WINFIBER)
+#elif defined(HAVE_UCONTEXT_H)
+		memset(&_context, 0, sizeof(ucontext_t));
+#else
+#   error Unknown context type for fibers
+#endif
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	FiberImpl::~FiberImpl()
 	{
 		assert(_current != this);
-		if(_stack)
+#if defined(HAVE_WINFIBER)
+		if(_context)
 		{
-			DeleteFiber(_stack);
-			_stack = NULL;
+			DeleteFiber(_context);
+			_context = NULL;
 		}
+#elif defined(HAVE_UCONTEXT_H)
+		if(_context.uc_stack.ss_sp)
+		{
+			free(_context.uc_stack.ss_sp);
+		}
+#else
+#   error Unknown context type for fibers
+#endif
 		if(_evt)
 		{
 			if(!CloseHandle(_evt))
@@ -36,16 +57,43 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	bool FiberImpl::initialize()
 	{
-		if(!_stack)
+#if defined(HAVE_WINFIBER)
+		assert(!_context);
+		if(!_context)
 		{
-			_stack = CreateFiberEx(1024*4, 1024*32, 0, &FiberImpl::s_fiberProc, this);
-			if(!_stack)
+			_context = CreateFiberEx(_stacksize, _stacksize, 0, &FiberImpl::s_fiberProc, this);
+			if(!_context)
 			{
-				FLOG(__FUNCTION__<<", CreateFiber failed, "<<GetLastError());
+				FLOG(__FUNCTION__<<", CreateFiberEx failed, "<<GetLastError());
 				//throw exception("CreateFiber failed");
 				return false;
 			}
 		}
+#elif defined(HAVE_UCONTEXT_H)
+		assert(!_context.uc_stack.ss_sp);
+		if(getcontext(&_context))
+		{
+			FLOG(__FUNCTION__<<", getcontext failed");
+			//throw exception("getcontext failed");
+			return false;
+		}
+		_context.uc_link = NULL;
+		_context.uc_stack.ss_sp = malloc(_stacksize);
+		_context.uc_stack.ss_size = _stacksize;
+
+		if(makecontext(&_context, (void (*)(void))&FiberImpl::s_fiberProc, 1, (int)this))
+		{
+			FLOG(__FUNCTION__<<", makecontext failed");
+
+			free(_context.uc_stack.ss_sp);
+			memset(&_context, 0, sizeof(ucontext_t));
+
+			//throw exception("makecontext failed");
+			return false;
+		}
+#else
+#   error Unknown context type for fibers
+#endif
 
 		if(!_evt)
 		{
@@ -54,8 +102,15 @@ namespace async
 			{
 				FLOG(__FUNCTION__<<", CreateEvent failed, "<<GetLastError());
 
-				DeleteFiber(_stack);
-				_stack = NULL;
+#if defined(HAVE_WINFIBER)
+				DeleteFiber(_context);
+				_context = NULL;
+#elif defined(HAVE_UCONTEXT_H)
+				free(_context.uc_stack.ss_sp);
+				memset(&_context, 0, sizeof(ucontext_t));
+#else
+#   error Unknown context type for fibers
+#endif
 
 				//throw exception("CreateEvent failed");
 				return false;
@@ -92,12 +147,28 @@ namespace async
 	void FiberImpl::activate()
 	{
 		FiberImpl *prev = _current.get();
+		assert(prev);
 		assert(prev != this);
 		if(prev != this)
 		{
 			enter();
 			_current = this;
-			SwitchToFiber(_stack);
+#if defined(HAVE_WINFIBER)
+			SwitchToFiber(_context);
+#elif defined(HAVE_UCONTEXT_H)
+// 			if(setcontext(&_context))
+// 			{
+// 				FLOG(__FUNCTION__<<", setcontext failed");
+// 				throw exception("setcontext failed");
+// 			}
+			if(swapcontext(&prev->_context, &_context))
+			{
+				FLOG(__FUNCTION__<<", swapcontext failed");
+				throw exception("swapcontext failed");
+			}
+#else
+#   error Unknown context type for fibers
+#endif
 			leave();
 		}
 	}
@@ -132,9 +203,15 @@ namespace async
 
 
 	//////////////////////////////////////////////////////////////////////////
-	VOID WINAPI FiberImpl::s_fiberProc(LPVOID lpFiberImplParameter)
+#if defined(HAVE_WINFIBER)
+	VOID WINAPI FiberImpl::s_fiberProc(LPVOID param)
+#elif defined(HAVE_UCONTEXT_H)
+	void FiberImpl::s_fiberProc(int param)
+#else
+#   error Unknown context type for fibers
+#endif
 	{
-		((FiberImpl*)lpFiberImplParameter)->fiberProc();
+		((FiberImpl*)param)->fiberProc();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -143,6 +220,7 @@ namespace async
 		for(;;)
 		{
 			assert(_code);
+			assert(FiberImpl::current() == this);
 
 			try
 			{
@@ -153,6 +231,8 @@ namespace async
 				ELOG(__FUNCTION__<<", exception catched: "<<boost::current_exception_diagnostic_information());
 			}
 			assert(_code);
+			assert(FiberImpl::current() == this);
+
 			function<void()>().swap(_code);
 
 			WorkerImpl::current()->fiberExecuted(this);
