@@ -1,3 +1,6 @@
+#ifndef _CLIENT_QT_PCH_H_
+#define _CLIENT_QT_PCH_H_
+
 #ifdef _WIN32
 #	define _WIN32_WINNT 0x0501
 #endif
@@ -25,3 +28,4 @@
 #include <boost/thread.hpp>
 #include <vector>
 
+#endif

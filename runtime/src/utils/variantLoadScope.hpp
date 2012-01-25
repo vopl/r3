@@ -3,6 +3,12 @@
 
 #include "utils/variant.hpp"
 
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/repository/include/qi_confix.hpp>
+#include <boost/spirit/include/phoenix.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/spirit/include/support_multi_pass.hpp>
+
 namespace utils
 {
 	class VariantLoadScope

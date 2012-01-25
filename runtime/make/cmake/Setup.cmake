@@ -231,16 +231,19 @@ IF(MSVC)
 #			MESSAGE("precompiled ${key} used in ${i}")
 		ENDFOREACH(i)
 	ENDMACRO(USE_PCH)
-ELSE(MSVC)
+ENDIF()
 
 
 
+IF(CMAKE_COMPILER_IS_GNUCXX)
 
 
 	MACRO(PCH_KEY2FILENAME pchfile key header)
 		GET_FILENAME_COMPONENT(filename ${header} NAME)
+
 		GET_FILENAME_COMPONENT(path ${header} PATH)
 		#SET(path ${CMAKE_CURRENT_BINARY_DIR})
+		
 		SET(pchfile "${path}/${filename}.gch")
 
 		#GET_FILENAME_COMPONENT(key ${header} NAME)
@@ -262,14 +265,28 @@ ELSE(MSVC)
 			LIST(APPEND IINCS "-I" ${i})
 		ENDFOREACH(i)
 
-		GET_DIRECTORY_PROPERTY(DEFS DEFINITIONS)
+
+
+		GET_DIRECTORY_PROPERTY(DEFS COMPILE_DEFINITIONS)
+		GET_DIRECTORY_PROPERTY(DEFSB COMPILE_DEFINITIONS_${BUILD_TYPE_UC})
+
+		SET(IDEFS)
+		FOREACH(i ${DEFS})
+			LIST(APPEND IDEFS "-D" ${i})
+		ENDFOREACH(i)
+		FOREACH(i ${DEFSB})
+			LIST(APPEND IDEFS "-D" ${i})
+		ENDFOREACH(i)
+
 
 		TO_NATIVE_PATH("${CMAKE_CXX_COMPILER}" cxx_compiler)
 		#FILE(TO_NATIVE_PATH "${CMAKE_CXX_COMPILER}" cxx_compiler)
 		#MESSAGE("${cxx_compiler}")
 
-		SET(cxx_args ${DEFS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${header} -o ${pchfile})
-		SEPARATE_ARGUMENTS(cxx_args)
+		#MESSAGE("${IDEFS}")
+
+		SET(cxx_args ${IDEFS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${header} -o ${pchfile})
+		#SEPARATE_ARGUMENTS(cxx_args)
 
 		SET(target_pch ${target}_build_pch)
 
@@ -288,6 +305,7 @@ ELSE(MSVC)
 
 		FOREACH(i ${ARGN})
 			SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES COMPILE_FLAGS "-Winvalid-pch -include ${header}" )
+			#SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES COMPILE_FLAGS "-Winvalid-pch" )
 			SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES OBJECT_DEPENDS ${pchfile} )
 #			MESSAGE("precompiled ${key} used in ${i}")
 		ENDFOREACH(i)
@@ -300,7 +318,7 @@ ELSE(MSVC)
 	
 	
 	
-ENDIF(MSVC)
+ENDIF()
 
 
 #######################################################################################

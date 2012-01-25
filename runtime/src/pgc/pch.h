@@ -1,3 +1,6 @@
+#ifndef _PGC_PCH_H_
+#define _PGC_PCH_H_
+
 #define LOG_NAME pg
 #include "log/client.hpp"
 
@@ -26,3 +29,5 @@
 
 #include "utils/variant.hpp"
 #include "async/service.hpp"
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef _VICTIM_PCH_H_
+#define _VICTIM_PCH_H_
+
 #define LOG_NAME victim
 #include "log/client.hpp"
 
@@ -15,3 +18,5 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
+
+#endif

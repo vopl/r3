@@ -100,7 +100,7 @@ ADD_EXECUTABLE(clientqt
 
 CREATE_PCH(clientqt ${SRC_DIR}/client/qt/pch.h ${SRC_PCH})
 USE_PCH(clientqt ${SRC_DIR}/client/qt/pch.h ${SRC})
-USE_PCH(clientqt ${SRC_QT_DIR}/client/qt/pch.h ${SRC_QT})
+USE_PCH(clientqt ${SRC_DIR}/client/qt/pch.h ${SRC_QT})
 
 SETUP_BIN_OUT(clientqt client)
 

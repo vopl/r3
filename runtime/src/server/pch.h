@@ -1,3 +1,6 @@
+#ifndef _SERVER_PCH_H_
+#define _SERVER_PCH_H_
+
 #define LOG_NAME server
 #include "log/client.hpp"
 
@@ -21,3 +24,5 @@ using namespace async;
 
 using namespace boost;
 using namespace boost::system;
+
+#endif

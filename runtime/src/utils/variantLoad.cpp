@@ -1,11 +1,9 @@
 #include "pch.h"
 #include "utils/variant.hpp"
-#include "variantLoadScope.hpp"
-#include "variantLoadGrammar.hpp"
 #include <fstream>
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
+#include "variantLoadScope.hpp"
+#include "variantLoadGrammar.hpp"
 
 namespace utils
 {
