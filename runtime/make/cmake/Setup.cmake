@@ -126,34 +126,6 @@ ENDIF(MSVC)
 #######################################################################################
 INCLUDE_DIRECTORIES(../../include)
 
-IF(WIN32)
-#	INCLUDE_DIRECTORIES(P:/sdk/boost_1_33_1/)
-#	LINK_DIRECTORIES(P:/sdk/boost_1_33_1/bin/)
-# 
-#	INCLUDE_DIRECTORIES(P:/sdk/iconv/include/)
-#	LINK_DIRECTORIES(P:/sdk/iconv/lib/)
-#
-#	INCLUDE_DIRECTORIES(P:/sdk/apache_1.3.33/src/include/)
-#	INCLUDE_DIRECTORIES(P:/sdk/apache_1.3.33/src/os/win32/)
-#	LINK_DIRECTORIES(P:/sdk/apache_1.3.33/libexec/)
-#
-#	INCLUDE_DIRECTORIES("C:/Program Files/PostgreSQL/8.0/include/")
-#	LINK_DIRECTORIES("C:/Program Files/PostgreSQL/8.0/lib/ms")
-#
-#	INCLUDE_DIRECTORIES(P:/sdk/php-5.2.4/)
-#	INCLUDE_DIRECTORIES(P:/sdk/php-5.2.4/TSRM/)
-#	INCLUDE_DIRECTORIES(P:/sdk/php-5.2.4/regex/)
-#	INCLUDE_DIRECTORIES(P:/sdk/php-5.2.4/main/)
-#	INCLUDE_DIRECTORIES(P:/sdk/php-5.2.4/Zend/)
-#	LINK_DIRECTORIES(P:/sdk/php-5.2.4/bin/dev/)
-ENDIF(WIN32)
-
-IF(NOT WIN32)
-#	INCLUDE_DIRECTORIES(/usr/local/include)
-#	LINK_DIRECTORIES(/usr/local/lib)
-#	INCLUDE_DIRECTORIES(/usr/include)
-#	LINK_DIRECTORIES(/usr/lib)
-ENDIF(NOT WIN32)
 
 
 
@@ -219,6 +191,22 @@ ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 STRING(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_UC)
 
+
+
+
+
+
+
+
+
+#######################################################################################
+MACRO(TO_NATIVE_PATH PATH OUT)
+	FILE(TO_NATIVE_PATH "${PATH}" "${OUT}")
+	IF(MINGW)
+		STRING(REPLACE "/" "\\" "${OUT}" "${${OUT}}")
+	ENDIF(MINGW)
+ENDMACRO(TO_NATIVE_PATH)
+
 #######################################################################################
 IF(MSVC)
 	MACRO(PCH_KEY2FILENAME pchfile key header)
@@ -250,11 +238,12 @@ ELSE(MSVC)
 
 
 	MACRO(PCH_KEY2FILENAME pchfile key header)
-#		GET_FILENAME_COMPONENT(filename ${header} NAME_WE)
-#		GET_FILENAME_COMPONENT(path ${header} PATH)
-#		SET(pchfile "${path}/${filename}.h.gch")
+		GET_FILENAME_COMPONENT(filename ${header} NAME)
+		GET_FILENAME_COMPONENT(path ${header} PATH)
+		#SET(path ${CMAKE_CURRENT_BINARY_DIR})
+		SET(pchfile "${path}/${filename}.gch")
 
-#		GET_FILENAME_COMPONENT(key ${header} NAME)
+		#GET_FILENAME_COMPONENT(key ${header} NAME)
 	ENDMACRO(PCH_KEY2FILENAME)
 
 
@@ -264,31 +253,44 @@ ELSE(MSVC)
 
 	MACRO(CREATE_PCH target header srcfile)
 	
-#		PCH_KEY2FILENAME(pchfile key ${header})
+		PCH_KEY2FILENAME(pchfile key ${header})
+		GET_FILENAME_COMPONENT(pchfile_path ${pchfile} PATH)
 		
-#		GET_DIRECTORY_PROPERTY(INCS INCLUDE_DIRECTORIES)
-#		SET(IINCS "")
-#		FOREACH(i ${INCS})
-#			SET(IINCS "${IINCS} -I${i}")
-#		ENDFOREACH(i)
+		GET_DIRECTORY_PROPERTY(INCS INCLUDE_DIRECTORIES)
+		SET(IINCS)
+		FOREACH(i ${INCS})
+			LIST(APPEND IINCS "-I" ${i})
+		ENDFOREACH(i)
 
-#		GET_DIRECTORY_PROPERTY(DEFS DEFINITIONS)
+		GET_DIRECTORY_PROPERTY(DEFS DEFINITIONS)
 
-#		SET(PCH_BUILD_COMMAND "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${DEFS} ${header}")
-		
-#		SET(target_pch ${target}_build_pch)
+		TO_NATIVE_PATH("${CMAKE_CXX_COMPILER}" cxx_compiler)
+		#FILE(TO_NATIVE_PATH "${CMAKE_CXX_COMPILER}" cxx_compiler)
+		#MESSAGE("${cxx_compiler}")
 
-#		ADD_CUSTOM_COMMAND(OUTPUT ${pchfile} sh -c COMMAND "${PCH_BUILD_COMMAND}" DEPENDS ${header})
+		SET(cxx_args ${DEFS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${header} -o ${pchfile})
+		SEPARATE_ARGUMENTS(cxx_args)
 
-#		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch -fPIC" )
-#		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES OBJECT_DEPENDS ${pchfile} )
+		SET(target_pch ${target}_build_pch)
+
+		ADD_CUSTOM_COMMAND(OUTPUT ${pchfile} 
+			COMMAND ${cxx_compiler} ${cxx_args}
+			DEPENDS ${header})
+
+		#SET(CMAKE_CXX_FLAGS_${BUILD_TYPE_UC} "-I${pchfile_path} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}}")
+
+#		MESSAGE("precompiled ${key} created by ${srcfile}")
 	ENDMACRO(CREATE_PCH)
 
-	MACRO(USE_PCH target header srcfile)
-#		PCH_KEY2FILENAME(pchfile key ${header})
-		
-#		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "-include ${header} -Winvalid-pch -fPIC" )
-#		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES OBJECT_DEPENDS ${pchfile} )
+	MACRO(USE_PCH target header)
+		PCH_KEY2FILENAME(pchfile key ${header})
+		GET_FILENAME_COMPONENT(pchfile_path ${pchfile} PATH)
+
+		FOREACH(i ${ARGN})
+			SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES COMPILE_FLAGS "-Winvalid-pch -include ${header}" )
+			SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES OBJECT_DEPENDS ${pchfile} )
+#			MESSAGE("precompiled ${key} used in ${i}")
+		ENDFOREACH(i)
 	ENDMACRO(USE_PCH)
 	
 	

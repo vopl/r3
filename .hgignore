@@ -12,6 +12,9 @@ syntax: regexp
 ^runtime/doc/include/
 ^runtime/doc/src/
 
+^runtime/src/.*\.h\.gch$
+^runtime/src/.*\.hpp\.gch$
+
 ^comps/.*\.obj$
 ^comps/.*\.pdb$
 ^comps/.*\.exp$

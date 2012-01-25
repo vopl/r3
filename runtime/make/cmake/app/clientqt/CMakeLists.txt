@@ -98,9 +98,9 @@ ADD_EXECUTABLE(clientqt
 	${UI_HEADERS}
 	${SRC_QT_RES_SRC} ${SRC_QT_RES_DATA})
 
-CREATE_PCH(client ${SRC_DIR}/client/qt/pch.h ${SRC_PCH})
-USE_PCH(client ${SRC_DIR}/client/qt/pch.h ${SRC})
-USE_PCH(client ${SRC_QT_DIR}/client/qt/pch.h ${SRC_QT})
+CREATE_PCH(clientqt ${SRC_DIR}/client/qt/pch.h ${SRC_PCH})
+USE_PCH(clientqt ${SRC_DIR}/client/qt/pch.h ${SRC})
+USE_PCH(clientqt ${SRC_QT_DIR}/client/qt/pch.h ${SRC_QT})
 
 SETUP_BIN_OUT(clientqt client)
 

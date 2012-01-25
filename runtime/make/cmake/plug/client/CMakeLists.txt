@@ -37,6 +37,8 @@ SOURCE_GROUP(src FILES ${SRC_PCH})
 
 
 ADD_LIBRARY(plugclient SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
+SET_TARGET_PROPERTIES(plugclient PROPERTIES PREFIX "" IMPORT_PREFIX "")
+
 CREATE_PCH(plugclient ${SRC_DIR}/client/pch.h ${SRC_PCH})
 USE_PCH(plugclient ${SRC_DIR}/client/pch.h ${SRC})
 
