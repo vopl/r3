@@ -3,7 +3,7 @@
 #include "selectImpl.hpp"
 #include "utils/implAccess.hpp"
 #include "statementImpl.hpp"
-#include "CategoryImpl.hpp"
+#include "categoryImpl.hpp"
 
 
 namespace pgs

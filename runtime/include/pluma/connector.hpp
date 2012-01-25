@@ -70,7 +70,27 @@
 #else
 
     // Other platforms don't need to define anything
-    #define PLUMA_CONNECTOR
+    //#define PLUMA_CONNECTOR
+    #ifndef PLUGIN_IMPORTS
+
+        // From DLL side, we must export
+        #ifdef __cplusplus
+           #define PLUMA_CONNECTOR extern "C"
+        #else
+           #define PLUMA_CONNECTOR
+        #endif
+
+    #else
+
+        // From client application side, we must import
+        #ifdef __cplusplus
+           #define PLUMA_CONNECTOR extern "C"
+        #else
+           #define PLUMA_CONNECTOR
+        #endif
+
+    #endif
+
 
 #endif
 

@@ -73,6 +73,7 @@ INCLUDE(CheckFunctionExists)
 INCLUDE(CheckLibraryExists)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(CheckPrototypeDefinition)
+INCLUDE (CheckTypeSize)
 
 CHECK_INCLUDE_FILES (ucontext.h HAVE_UCONTEXT_H)
 
@@ -84,6 +85,9 @@ IF(WINDOWS)
 		windows.h
 		HAVE_WINFIBER)
 ENDIF()
+
+CHECK_TYPE_SIZE("void *" PVOID_SIZE)
+ADD_DEFINITIONS(-D\"PVOID_SIZE=${PVOID_SIZE}\")
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 

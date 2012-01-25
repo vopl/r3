@@ -1,7 +1,7 @@
 SET(CMAKE_BUILD_TYPE "Debug")
 #SET(CMAKE_BUILD_TYPE "RelWithDebInfo")
 SET(CMAKE_VERBOSE_MAKEFILE "on")
-SET(CMAKE_USE_RELATIVE_PATH "TRUE")
+SET(CMAKE_USE_RELATIVE_PATHS TRUE)
 #SET(CMAKE_SKIP_RPATH "TRUE")
 
 
@@ -277,15 +277,19 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 		FOREACH(i ${DEFSB})
 			LIST(APPEND IDEFS "-D" ${i})
 		ENDFOREACH(i)
+		
+		#SET(IDEFS ${DEFS} ${DEFSB})
+		#MESSAGE(${IDEFS})
 
 
 		TO_NATIVE_PATH("${CMAKE_CXX_COMPILER}" cxx_compiler)
 		#FILE(TO_NATIVE_PATH "${CMAKE_CXX_COMPILER}" cxx_compiler)
 		#MESSAGE("${cxx_compiler}")
 
-		#MESSAGE("${IDEFS}")
+		SET(cxx_args "${CMAKE_CXX_FLAGS}")
+		SEPARATE_ARGUMENTS(cxx_args)
 
-		SET(cxx_args ${IDEFS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${header} -o ${pchfile})
+		SET(cxx_args ${IDEFS} ${cxx_args} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${header} -o ${pchfile})
 		#SEPARATE_ARGUMENTS(cxx_args)
 
 		SET(target_pch ${target}_build_pch)

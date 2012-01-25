@@ -118,7 +118,7 @@ namespace pgc
 	int ConnectionHolder::sockType(int sock)
 	{
 		int type;
-		int length = sizeof(type);
+		socklen_t length = sizeof(type);
 		if(!getsockopt(sock, SOL_SOCKET, SO_TYPE, (char *)&type, &length))
 		{
 			return type;

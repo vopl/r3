@@ -10,7 +10,7 @@
 #include "async/futureWaiter.hpp"
 
 #include "pgs/cluster.hpp"
-#include "pgs/meta/schemas/Staff_initializer.hpp"
+//#include "pgs/meta/schemas/Staff_initializer.hpp"
 #include "pgs/select.hpp"
 
 #include "utils/ntoa.hpp"
@@ -89,6 +89,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceVictim::syncPgs()
 	{
+/*
 		pgs::meta::Cluster mcl;
 		mcl.add<pgs::meta::schemas::Staff>();
 		mcl.initialize();
@@ -117,7 +118,7 @@ namespace server
 // 			con.query("BEGIN").wait();
 // 			async::Future<bool> sar = cl.sync(con, true);
 // 			//async::Future<bool> dar = cl.drop(con);
-// 
+//
 // 			sar.wait();
 // 			//dar.wait();
 // 			con.query("COMMIT").wait();
@@ -143,6 +144,7 @@ namespace server
 			}
 
 		}
+*/
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -74,8 +74,18 @@ namespace async
 		_context.uc_stack.ss_sp = malloc(_stacksize);
 		_context.uc_stack.ss_size = _stacksize;
 
-        assert(sizeof(this) == sizeof(int));
-		makecontext(&_context, (void (*)(void))&FiberImpl::s_fiberProc, 1, (int)this);
+#if PVOID_SIZE == 4
+        int ithis = static_cast<int>(this);
+		make c ontext(&_context, (void (*)(void))&FiberImpl::s_fiberProc, 1, ithis);
+#elif PVOID_SIZE == 8
+        boost::int64_t ithis = (boost::int64_t)(this);
+        int param1 = (int)(ithis&0xffffffff);
+        int param2 = (int)((ithis>>32)&0xffffffff);
+		makecontext(&_context, (void (*)(void))&FiberImpl::s_fiberProc, 2, param1, param2);
+#else
+		#error PVOID_SIZE not 4 or 8
+#endif
+
 #else
 #   error Unknown context type for fibers
 #endif
@@ -169,14 +179,30 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 #if defined(HAVE_WINFIBER)
 	VOID WINAPI FiberImpl::s_fiberProc(LPVOID param)
-#elif defined(HAVE_UCONTEXT_H)
-	void FiberImpl::s_fiberProc(int param)
-#else
-#   error Unknown context type for fibers
-#endif
 	{
 		((FiberImpl*)param)->fiberProc();
 	}
+#elif defined(HAVE_UCONTEXT_H)
+#   if PVOID_SIZE == 4
+	void FiberImpl::s_fiberProc(int param)
+	{
+		((FiberImpl*)param)->fiberProc();
+	}
+#   elif PVOID_SIZE == 8
+	void FiberImpl::s_fiberProc(int param1, int param2)
+	{
+        boost::int64_t ithis = param2;
+        ithis <<= 32;
+        ithis |= param1;
+
+		((FiberImpl*)ithis)->fiberProc();
+	}
+#   else
+		#error PVOID_SIZE not 4 or 8
+#   endif
+#else
+#   error Unknown context type for fibers
+#endif
 
 	//////////////////////////////////////////////////////////////////////////
 	void FiberImpl::fiberProc()
