@@ -1,6 +1,8 @@
 PROJECT (libasync)
 
 SET(INCLUDE
+	${INC_DIR}/async/api.h
+
 	${INC_DIR}/async/service.hpp
 	${INC_DIR}/async/exception.hpp
 
@@ -76,7 +78,7 @@ CHECK_INCLUDE_FILES (ucontext.h HAVE_UCONTEXT_H)
 
 IF(WINDOWS)
 	CHECK_PROTOTYPE_DEFINITION(
-		CreateFiberEx 
+		CreateFiberEx
 		"LPVOID WINAPI CreateFiberEx(SIZE_T dwStackCommitSize, SIZE_T dwStackReserveSize, DWORD dwFlags, LPFIBER_START_ROUTINE lpStartAddress, LPVOID lpParameter);"
 		"NULL"
 		windows.h

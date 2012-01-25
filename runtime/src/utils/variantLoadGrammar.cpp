@@ -171,7 +171,8 @@ namespace utils
 		_integer.name("integer");
 		_integer =
 			(
-				ascii::string("0x") >
+				//ascii::string("0x") > //непонятный баг в недрах спирита
+                ascii::string("0x") >>
 				+_hexDigit >>
 				-(char_('u') >>
 					-(ascii::string("8")|ascii::string("16")|ascii::string("32")|ascii::string("64")
@@ -193,7 +194,6 @@ namespace utils
 					)
 				)
 			);
-
 
 
 

@@ -221,7 +221,7 @@ namespace client
 				else
 				{
 					QTime qt = src.toTime();
-					dst.as<utils::Variant::TimeDuration>(true) = 
+					dst.as<utils::Variant::TimeDuration>(true) =
 						boost::posix_time::hours(qt.hour())+
 						boost::posix_time::minutes(qt.minute())+
 						boost::posix_time::seconds(qt.second())+
@@ -478,7 +478,7 @@ namespace client
 				}
 				else
 				{
-					dst = src.as<utils::Variant::Int64>();
+					dst = (qlonglong)src.as<utils::Variant::Int64>();
 				}
 				break;
 				//////////////////////////////////////////////////////////////////////////
@@ -522,7 +522,7 @@ namespace client
 				}
 				else
 				{
-					dst = src.as<utils::Variant::UInt64>();
+					dst = (qulonglong)src.as<utils::Variant::UInt64>();
 				}
 				break;
 				//////////////////////////////////////////////////////////////////////////
@@ -941,7 +941,7 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void Agent::onReceive(const server::TEndpoint &endpoint, utils::VariantPtr data)
 		{
-			QString qendpoint = 
+			QString qendpoint =
 				QString::fromUtf8(endpoint.c_str(), (int)endpoint.size());
 
 			QVariant qdata;
@@ -955,7 +955,7 @@ namespace client
 		{
 			return _service;
 		}
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		void Agent::setService(QString service)
 		{
@@ -985,7 +985,7 @@ namespace client
 			, _numChannels(0)
 		{
 			connect(
-				_staticMainWindow, SIGNAL(onSessionState_proxySig(boost::system::error_code, size_t)), 
+				_staticMainWindow, SIGNAL(onSessionState_proxySig(boost::system::error_code, size_t)),
 				this, SLOT(onSessionState(boost::system::error_code, size_t)));
 
 			ISessionPtr session = _staticMainWindow->getSession();
@@ -996,7 +996,7 @@ namespace client
 			_numChannels = (quint32)session->getNumChannels();
 		}
 
-	
+
 		//////////////////////////////////////////////////////////////////////////
 		Agent::~Agent()
 		{

@@ -74,16 +74,8 @@ namespace async
 		_context.uc_stack.ss_sp = malloc(_stacksize);
 		_context.uc_stack.ss_size = _stacksize;
 
-		if(makecontext(&_context, (void (*)(void))&FiberImpl::s_fiberProc, 1, (int)this))
-		{
-			FLOG(__FUNCTION__<<", makecontext failed");
-
-			free(_context.uc_stack.ss_sp);
-			memset(&_context, 0, sizeof(ucontext_t));
-
-			//throw exception("makecontext failed");
-			return false;
-		}
+        assert(sizeof(this) == sizeof(int));
+		makecontext(&_context, (void (*)(void))&FiberImpl::s_fiberProc, 1, (int)this);
 #else
 #   error Unknown context type for fibers
 #endif

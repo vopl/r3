@@ -11,7 +11,7 @@
 #if defined(HAVE_WINFIBER)
 #	include <windows.h>
 #elif defined(HAVE_UCONTEXT_H)
-#	include "ucontext.h"
+#	include <ucontext.h>
 #else
 #   error Unknown context type for fibers
 #endif
