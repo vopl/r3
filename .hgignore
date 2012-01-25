@@ -39,3 +39,4 @@ syntax: regexp
 
 syntax: glob
 runtime/make/cmake/excludeDefBuild.txt
+runtime/make/cmake/Local.cmake
