@@ -8,23 +8,10 @@ ENDIF(COMMAND cmake_policy)
 
 
 
+INCLUDE(Local.cmake OPTIONAL)
+
 SET(INSTALL_PDB 0)
 
-
-
-
-
-
-
-
-#логирование количества ссылок на msoi объекты
-#ADD_DEFINITIONS(-DADDREFRELEASE_DO_LOG)
-
-#логирование _new _delete
-#ADD_DEFINITIONS(-DNEWDELETE_DO_LOG)
-
-#использовать сенсоры метрик
-#ADD_DEFINITIONS(-DUSE_METRICS)
 
 
 
@@ -84,21 +71,6 @@ ENDIF(WINDOWS OR SOLARIS OR FREEBSD OR LINUX)
 
 
 
-IF(NOT WINDOWS)
-	#для watch окна msvc симулировать тип KDataNode для удобного наблюдения
-	#FIND_PROGRAM(gcc_cpp NAMES "g++44" "g++42" "g++")
-	#FIND_PROGRAM(gcc_c NAMES "gcc44" "gcc42" "gcc")
-
-
-	#IF(NOT "${gcc_cpp}" STREQUAL "gcc_cpp-NOTFOUND")
-	#	MESSAGE("-- cxx compiler: ${gcc_cpp}")
-	#	MESSAGE("-- c compiler: ${gcc_c}")
-	
-	#	SET(CMAKE_CXX_COMPILER ${gcc_cpp})
-	#	SET(CMAKE_C_COMPILER ${gcc_c})
-	#ENDIF(NOT "${gcc_cpp}" STREQUAL "gcc_cpp-NOTFOUND")
-ENDIF(NOT WINDOWS)
-
 #######################################################################################
 IF(WINDOWS)
 	ADD_DEFINITIONS(-D_WIN32_WINNT=0x0501)
@@ -130,28 +102,11 @@ INCLUDE_DIRECTORIES(../../include)
 
 #######################################################################################
 IF(MSVC)
-	#chose runtime library to multithreaded static
-	#SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
- 	#SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
- 	#SET(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /MT")
- 	#SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MT")
-ENDIF(MSVC)
-
-
-IF(MSVC)
  	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ot /Og /Oi /Ox /GL /Zi")
  	SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG")
  	SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG")
  	SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /DEBUG")
 ENDIF(MSVC)
-
-
-
-#SET_PROPERTY(DIRECTORY "." PROPERTY COMPILE_DEFINITIONS_DEBUG "${COMPILE_DEFINITIONS_DEBUG}")
-#SET_PROPERTY(DIRECTORY "." PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "${COMPILE_DEFINITIONS_RELWITHDEBINFO};LOG4CPLUS_DISABLE_DEBUG")
-#SET_PROPERTY(DIRECTORY "." PROPERTY COMPILE_DEFINITIONS_MINSIZEREL "${COMPILE_DEFINITIONS_MINSIZEREL};LOG4CPLUS_DISABLE_INFO")
-#SET_PROPERTY(DIRECTORY "." PROPERTY COMPILE_DEFINITIONS_RELEASE "${COMPILE_DEFINITIONS_RELEASE};LOG4CPLUS_DISABLE_INFO")
-
 
 
 
@@ -165,8 +120,8 @@ ENDIF(MSVC)
 #######################################################################################
 IF(CMAKE_COMPILER_IS_GNUCXX AND NOT WINDOWS)
 	#need for correct resolving symbols with dlsym
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+	SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -fPIC)
+	SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -fpermissive)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX AND NOT WINDOWS)
 
 
@@ -178,13 +133,6 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 
-IF(CMAKE_COMPILER_IS_GNUCXX)
-	#SET(CMAKE_SHARED_LIBRARY_PREFIX "")
-	#SET(CMAKE_IMPORT_LIBRARY_PREFIX "")
-	#SET(CMAKE_STATIC_LIBRARY_PREFIX "")
-	#SET(CMAKE_SHARED_MODULE_PREFIX "")
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
-
 
 STRING(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_UC)
 
@@ -194,180 +142,19 @@ STRING(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_UC)
 
 
 
-
+#######################################################################################
+INCLUDE(Pch.cmake)
 
 #######################################################################################
-MACRO(TO_NATIVE_PATH PATH OUT)
-	FILE(TO_NATIVE_PATH "${PATH}" "${OUT}")
-	IF(MINGW)
-		STRING(REPLACE "/" "\\" "${OUT}" "${${OUT}}")
-	ENDIF(MINGW)
-ENDMACRO(TO_NATIVE_PATH)
+INCLUDE(Logging.cmake)
 
 #######################################################################################
-IF(MSVC)
-	MACRO(PCH_KEY2FILENAME pchfile key header)
-		GET_FILENAME_COMPONENT(filename ${header} NAME_WE)
-		SET(pchfile "$(IntDir)/${filename}.pch")
-		GET_FILENAME_COMPONENT(key ${header} NAME)
-	ENDMACRO(PCH_KEY2FILENAME)
-
-
-	MACRO(CREATE_PCH target header srcfile)
-		PCH_KEY2FILENAME(pchfile key ${header})
-
-		SET_SOURCE_FILES_PROPERTIES(${srcfile} PROPERTIES COMPILE_FLAGS "/Yc${key} /Fp${pchfile}")
-#		MESSAGE("precompiled ${key} created by ${srcfile}")
-	ENDMACRO(CREATE_PCH)
-
-	MACRO(USE_PCH target header)
-		PCH_KEY2FILENAME(pchfile key ${header})
-	
-		FOREACH(i ${ARGN})
-			SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES COMPILE_FLAGS "/Yu${key} /Fp${pchfile}")
-#			MESSAGE("precompiled ${key} used in ${i}")
-		ENDFOREACH(i)
-	ENDMACRO(USE_PCH)
-ENDIF()
-
-
-
-IF(CMAKE_COMPILER_IS_GNUCXX)
-
-
-	MACRO(PCH_KEY2FILENAME pchfile key header)
-		GET_FILENAME_COMPONENT(filename ${header} NAME)
-
-		GET_FILENAME_COMPONENT(path ${header} PATH)
-		#SET(path ${CMAKE_CURRENT_BINARY_DIR})
-		
-		SET(pchfile "${path}/${filename}.gch")
-
-		#GET_FILENAME_COMPONENT(key ${header} NAME)
-	ENDMACRO(PCH_KEY2FILENAME)
-
-
-
-
-
-
-	MACRO(CREATE_PCH target header srcfile)
-	
-		PCH_KEY2FILENAME(pchfile key ${header})
-		GET_FILENAME_COMPONENT(pchfile_path ${pchfile} PATH)
-		
-		GET_DIRECTORY_PROPERTY(INCS INCLUDE_DIRECTORIES)
-		SET(IINCS)
-		FOREACH(i ${INCS})
-			LIST(APPEND IINCS "-I" ${i})
-		ENDFOREACH(i)
-
-
-
-		GET_DIRECTORY_PROPERTY(DEFS COMPILE_DEFINITIONS)
-		GET_DIRECTORY_PROPERTY(DEFSB COMPILE_DEFINITIONS_${BUILD_TYPE_UC})
-
-		SET(IDEFS)
-		FOREACH(i ${DEFS})
-			LIST(APPEND IDEFS "-D" ${i})
-		ENDFOREACH(i)
-		FOREACH(i ${DEFSB})
-			LIST(APPEND IDEFS "-D" ${i})
-		ENDFOREACH(i)
-		
-		#SET(IDEFS ${DEFS} ${DEFSB})
-		#MESSAGE(${IDEFS})
-
-
-		TO_NATIVE_PATH("${CMAKE_CXX_COMPILER}" cxx_compiler)
-		#FILE(TO_NATIVE_PATH "${CMAKE_CXX_COMPILER}" cxx_compiler)
-		#MESSAGE("${cxx_compiler}")
-
-		SET(cxx_args "${CMAKE_CXX_FLAGS}")
-		SEPARATE_ARGUMENTS(cxx_args)
-
-		SET(cxx_args ${IDEFS} ${cxx_args} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${header} -o ${pchfile})
-		#SEPARATE_ARGUMENTS(cxx_args)
-
-		SET(target_pch ${target}_build_pch)
-
-		ADD_CUSTOM_COMMAND(OUTPUT ${pchfile} 
-			COMMAND ${cxx_compiler} ${cxx_args}
-			DEPENDS ${header})
-
-		#SET(CMAKE_CXX_FLAGS_${BUILD_TYPE_UC} "-I${pchfile_path} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}}")
-
-#		MESSAGE("precompiled ${key} created by ${srcfile}")
-	ENDMACRO(CREATE_PCH)
-
-	MACRO(USE_PCH target header)
-		PCH_KEY2FILENAME(pchfile key ${header})
-		GET_FILENAME_COMPONENT(pchfile_path ${pchfile} PATH)
-
-		FOREACH(i ${ARGN})
-			SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES COMPILE_FLAGS "-Winvalid-pch -include ${header}" )
-			#SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES COMPILE_FLAGS "-Winvalid-pch" )
-			SET_SOURCE_FILES_PROPERTIES(${i} PROPERTIES OBJECT_DEPENDS ${pchfile} )
-#			MESSAGE("precompiled ${key} used in ${i}")
-		ENDFOREACH(i)
-	ENDMACRO(USE_PCH)
-	
-	
-	
-	
-	
-	
-	
-	
-ENDIF()
-
-
-#######################################################################################
-# SETUP_BIN_OUT
-
-MACRO(SETUP_BIN_OUT target dst)
-
-	GET_TARGET_PROPERTY(TARGET_LOCATION ${target} "LOCATION")
-
-	IF("${ARGV2}" STREQUAL "")
-		GET_FILENAME_COMPONENT(TARGET_NAME ${TARGET_LOCATION} NAME_WE)
-	ENDIF()
-
-	IF(NOT "${ARGV2}" STREQUAL "")
-		SET(TARGET_NAME ${ARGV2})
-	ENDIF()
-
-	GET_TARGET_PROPERTY(TARGET_LOCATION ${target} "LOCATION")
-	GET_FILENAME_COMPONENT(TARGET_EXT ${TARGET_LOCATION} EXT)
-
-	FILE(TO_NATIVE_PATH ${TARGET_LOCATION} FROM)
-	FILE(TO_NATIVE_PATH "${ROOT_DIR}/${dst}/${TARGET_NAME}${TARGET_EXT}" TO)
-
-	ADD_CUSTOM_COMMAND(
-		TARGET ${target}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy "${FROM}" "${TO}")
-
-	#ADD_CUSTOM_TARGET(
-	#	"${target}_${dst}_${TARGET_NAME}"
-	#	${CMAKE_COMMAND} -E copy "${FROM}" "${TO}"
-	#	DEPENDS ${target})
-ENDMACRO()
-
+INCLUDE(SetupBinOut.cmake)
 
 
 
 
 #######################################################################################
-IF(WINDOWS)
-	#SET(libboost_suffix "")
-ELSE(WINDOWS)
-    IF(SOLARIS)
-	#SET(libboost_suffix "-gcc34")
-    ENDIF(SOLARIS)
-ENDIF(WINDOWS)
-
-
 IF(SOLARIS)
     SET(CMAKE_CXX_CREATE_SHARED_LIBRARY
         "<CMAKE_CXX_COMPILER> <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS>  <CMAKE_SHARED_LIBRARY_SONAME_CXX_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
