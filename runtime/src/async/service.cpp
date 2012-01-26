@@ -121,6 +121,21 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	ASYNC_API void yield()
+	{
+		WorkerImpl *worker = WorkerImpl::current();
+		if(!worker)
+		{
+			assert(0);
+			ELOG("yield request with no current worker");
+			throw exception("yield request with no current worker");
+			return;
+		}
+
+		return worker->yield();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	ASYNC_API asio::io_service &io()
 	{
 		ServiceImpl *service = ServiceImpl::current();

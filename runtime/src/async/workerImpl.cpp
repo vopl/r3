@@ -48,7 +48,9 @@ namespace async
 		{
 			mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 			_fiberPool->_fibersIdle.insert(fiber->shared_from_this());
-			assert(_fiberPool->_fibersReady.end() == _fiberPool->_fibersReady.find(fiber->shared_from_this()));
+			assert(
+				_fiberPool->_fibersReady.end() == 
+				std::find(_fiberPool->_fibersReady.begin(), _fiberPool->_fibersReady.end(), fiber->shared_from_this()));
 		}
 		bool b = _fiberRoot->activate();
 		assert(b);
@@ -59,9 +61,9 @@ namespace async
 	{
 		mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 		assert(fiber != _fiberRoot);
-		assert(fiber.get() != FiberImpl::current());
+		//assert(fiber.get() != FiberImpl::current());
 		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber));
-		_fiberPool->_fibersReady.insert(fiber);
+		_fiberPool->_fibersReady.push_back(fiber);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -75,7 +77,7 @@ namespace async
 		{
 			return false;
 		}
-		_fiberPool->_fibersReady.insert(fiber);
+		_fiberPool->_fibersReady.push_back(fiber);
 		return true;
 	}
 
@@ -94,7 +96,7 @@ namespace async
 		bool doWork = true;
 		while(doWork)
 		{
-			std::set<FiberImplPtr> fibersReady;
+			std::deque<FiberImplPtr> fibersReady;
 			{
 				mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 				fibersReady.swap(_fiberPool->_fibersReady);
@@ -110,7 +112,7 @@ namespace async
 				else
 				{
 					mutex::scoped_lock sl(_fiberPool->_mtxFibers);
-					_fiberPool->_fibersReady.insert(fiber);
+					_fiberPool->_fibersReady.push_back(fiber);
 				}
 			}
 
@@ -215,6 +217,22 @@ namespace async
 
 		//теперь снова готовые
 		processReadyFibers();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WorkerImpl::yield()
+	{
+		assert(FiberImpl::current());
+
+		FiberImplPtr fiber = FiberImpl::current()->shared_from_this();
+		if(fiber == _fiberRoot)
+		{
+			assert(!"root fiber unable to yield");
+			return;
+		}
+
+		service()->io().post(bridge(bind(&WorkerImpl::fiberReady, shared_from_this(), fiber)));
+		fiberYield();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

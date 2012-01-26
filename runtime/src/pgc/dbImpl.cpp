@@ -332,21 +332,20 @@ namespace pgc
 			w(Connection());
 		}
 
-		bool doWait = true;
-		while(doWait)
+		for(;;)
 		{
+			bool doWait = true;
 			{
 				mutex::scoped_lock sl(_mtx);
 				doWait = !(_startConnections.empty() && _readyConnections.empty() && _workConnections.empty());
 			}
 			if(doWait)
 			{
-				balanceConnections();
-
-				boost::xtime xt;
-				boost::xtime_get(&xt, boost::TIME_UTC);
-				xt.nsec += 100000000;
-				boost::thread::sleep(xt);
+				async::yield();
+			}
+			else
+			{
+				break;
 			}
 		}
 

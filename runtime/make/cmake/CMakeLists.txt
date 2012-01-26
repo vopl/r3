@@ -6,8 +6,8 @@ endif(POLICY CMP0011)
 
 PROJECT(r3)
 
-INCLUDE(Setup.cmake)
 INCLUDE(Local.cmake OPTIONAL)
+INCLUDE(Setup.cmake)
 
 
 

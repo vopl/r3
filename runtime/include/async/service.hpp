@@ -50,6 +50,9 @@ namespace async
 	//выполнить кусок кода синхронно
 	ASYNC_API void exec(const boost::function<void ()> &code);
 
+	//прервать текущий фибер в пользу других, исполнение будет продолжено по очереди шедулера
+	ASYNC_API void yield();
+
 	//текущий экземпл€р проактора
 	ASYNC_API boost::asio::io_service &io();
 
