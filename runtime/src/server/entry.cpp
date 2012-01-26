@@ -16,8 +16,9 @@
 
 //////////////////////////////////////////////////////////////////////////
 volatile bool bStop = false;
-void onSignal(int /*sig*/)
+void onSignal(int sig)
 {
+	ILOG("signal: "<<sig);
 	//printf("signal %d\n", sig);
 	bStop = true;
 }
