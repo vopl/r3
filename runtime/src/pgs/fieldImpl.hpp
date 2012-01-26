@@ -14,8 +14,8 @@ namespace pgs
 		std::string				_srcAlias;
 		std::string				_alias;
 	public:
-		FieldImpl(pgs::meta::FieldCPtr fld, const std::string alias);
-		FieldImpl(const std::string srcAlias, pgs::meta::FieldCPtr fld, const std::string alias);
+		FieldImpl(pgs::meta::FieldCPtr fld, const std::string &alias);
+		FieldImpl(const std::string &srcAlias, pgs::meta::FieldCPtr fld, const std::string &alias);
 
 		pgs::meta::FieldCPtr meta() const;
 		const std::string &srcAlias() const;

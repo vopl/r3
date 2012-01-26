@@ -136,7 +136,7 @@ namespace utils
 	void VariantLoadScope::set_null()
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		_stack.back().setNull<void>(true);
 	}
@@ -145,7 +145,7 @@ namespace utils
 	void VariantLoadScope::set_string(const std::string &content)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		_stack.back() = content;
 	}
@@ -154,7 +154,7 @@ namespace utils
 	void VariantLoadScope::set_double(const double &content)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		_stack.back() = content;
 	}
@@ -163,7 +163,7 @@ namespace utils
 	void VariantLoadScope::set_float(const float &content)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		_stack.back() = content;
 	}
@@ -172,7 +172,7 @@ namespace utils
 	void VariantLoadScope::set_integer(const std::string &content)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		size_t size = content.size();
 		
@@ -303,7 +303,7 @@ namespace utils
 	void VariantLoadScope::set_bool(bool b)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		_stack.back() = b;
 	}
@@ -312,7 +312,7 @@ namespace utils
 	void VariantLoadScope::set_uuid(const std::string &content)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		assert(32 == content.size());
 
@@ -334,7 +334,7 @@ namespace utils
 	void VariantLoadScope::set_date(const SDate &d)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		boost::gregorian::date gd(d._year, d._month, d._day);
 
@@ -345,7 +345,7 @@ namespace utils
 	void VariantLoadScope::set_time(const STime &t)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		boost::posix_time::time_duration ptd(
 			t._hour, 
@@ -360,7 +360,7 @@ namespace utils
 	void VariantLoadScope::set_datetime(const SDateTime &dt)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		boost::gregorian::date gd(dt._year, dt._month, dt._day);
 
@@ -379,7 +379,7 @@ namespace utils
 	void VariantLoadScope::array_start()
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		_stack.back().as<Variant::DequeVariant>(true);
 		_stack.push_back(Variant());
@@ -389,7 +389,7 @@ namespace utils
 	void VariantLoadScope::array_push()
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 1);
+		assert(!_stack.empty());
 
 		Variant v;
 		v.swap(_stack.back());
@@ -400,7 +400,7 @@ namespace utils
 	void VariantLoadScope::array_stop()
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 1);
+		assert(!_stack.empty());
 
 		_stack.pop_back();
 	}
@@ -409,7 +409,7 @@ namespace utils
 	void VariantLoadScope::map_start()
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		_stack.back().as<Variant::MapStringVariant>(true);
 		_stack.push_back(Variant());
@@ -420,7 +420,8 @@ namespace utils
 	void VariantLoadScope::map_key(const std::string &content)
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 1);
+		assert(!_stack.empty());
+		
 		_mapKey = content;
 	}
 
@@ -428,7 +429,7 @@ namespace utils
 	void VariantLoadScope::map_push()
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 1);
+		assert(!_stack.empty());
 
 		_stack[_stack.size()-2].as<Variant::MapStringVariant>()[_mapKey].swap(_stack.back());
 		_stack.back().setNull<void>(true);
@@ -438,7 +439,7 @@ namespace utils
 	void VariantLoadScope::map_stop()
 	{
 		if(_errorWas) return;
-		assert(_stack.size() > 1);
+		assert(!_stack.empty());
 
 		_stack.pop_back();
 	}
@@ -447,7 +448,7 @@ namespace utils
 	bool VariantLoadScope::do_include(const std::string &path)
 	{
 		if(_errorWas) return false;
-		assert(_stack.size() > 0);
+		assert(!_stack.empty());
 
 		boost::filesystem::path bpath(path);
 		if(bpath.is_absolute())

@@ -37,7 +37,7 @@ namespace utils
 
 			const char *first;
 			const char *last;
-			if(buffer.size())
+			if(!buffer.empty())
 			{
 				in.read(&buffer[0], buffer.size());
 				in.close();

@@ -6,7 +6,7 @@
 namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
-	FieldImpl::FieldImpl(pgs::meta::FieldCPtr fld, const std::string alias)
+	FieldImpl::FieldImpl(pgs::meta::FieldCPtr fld, const std::string &alias)
 		: _srcAlias(fld->_category->_name)
 		, _metaField(fld)
 		, _alias(alias)
@@ -14,7 +14,7 @@ namespace pgs
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	FieldImpl::FieldImpl(const std::string srcAlias, pgs::meta::FieldCPtr fld, const std::string alias)
+	FieldImpl::FieldImpl(const std::string &srcAlias, pgs::meta::FieldCPtr fld, const std::string &alias)
 		: _srcAlias(srcAlias.empty()?fld->_category->_name:srcAlias)
 		, _metaField(fld)
 		, _alias(alias.empty()?fld->_name:alias)

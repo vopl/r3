@@ -110,7 +110,7 @@ namespace net
 		ec = error_code();
 		for(;;)
 		{
-			for(; riter!=rend; riter++)
+			for(; riter!=rend; ++riter)
 			{
 				Future<error_code> cres;
 

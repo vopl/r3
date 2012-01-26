@@ -177,9 +177,6 @@ namespace server
 		{
 			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
 		}
-
-		int k = 220;
-		//
 	}
 
 	//////////////////////////////////////////////////////////////////////////

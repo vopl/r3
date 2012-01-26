@@ -113,7 +113,7 @@ namespace client
 
 					QMap<QString,QVariant>::const_iterator iter = qm.begin();
 					QMap<QString,QVariant>::const_iterator end = qm.end();
-					for(; iter!=end; iter++)
+					for(; iter!=end; ++iter)
 					{
 						variantCnvt(m[iter.key().toUtf8().constData()], iter.value());
 					}
@@ -296,7 +296,7 @@ namespace client
 
 					QHash<QString,QVariant>::const_iterator iter = qm.begin();
 					QHash<QString,QVariant>::const_iterator end = qm.end();
-					for(; iter!=end; iter++)
+					for(; iter!=end; ++iter)
 					{
 						variantCnvt(m[iter.key().toUtf8().constData()], iter.value());
 					}
@@ -609,7 +609,7 @@ namespace client
 
 					utils::Variant::MapStringVariant::const_iterator iter = msv.begin();
 					utils::Variant::MapStringVariant::const_iterator end = msv.end();
-					for(; iter != end; iter++)
+					for(; iter != end; ++iter)
 					{
 						QVariant qv;
 						variantCnvt(qv, iter->second);
@@ -838,7 +838,7 @@ namespace client
 
 					utils::Variant::MultimapStringVariant::const_iterator iter = msv.begin();
 					utils::Variant::MultimapStringVariant::const_iterator end = msv.end();
-					for(; iter != end; iter++)
+					for(; iter != end; ++iter)
 					{
 						QVariant qv;
 						variantCnvt(qv, iter->second);

@@ -193,7 +193,6 @@ namespace pgc
 				ELOG("poll result UNKNOWN");
 				{
 					assert(0);
-					int k=220;
 				}
 				break;
 			}
@@ -203,7 +202,6 @@ namespace pgc
 			case esOk:
 				{
 					pch->onOpen();
-					size_t numConnections=0;
 					{
 						mutex::scoped_lock sl(_mtx);
 						assert(_startConnections.end() != _startConnections.find(pch));
