@@ -120,8 +120,8 @@ ENDIF(MSVC)
 #######################################################################################
 IF(CMAKE_COMPILER_IS_GNUCXX AND NOT WINDOWS)
 	#need for correct resolving symbols with dlsym
-	SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -fPIC)
-	SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -fpermissive)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX AND NOT WINDOWS)
 
 

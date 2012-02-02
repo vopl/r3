@@ -43,9 +43,9 @@ namespace async
         static VOID WINAPI s_fiberProc(LPVOID param);
 #elif defined(HAVE_UCONTEXT_H)
 #   if PVOID_SIZE == 4
-        static void s_fiberProc(int param);
+        static void s_fiberProc(unsigned int param);
 #   elif PVOID_SIZE == 8
-        static void s_fiberProc(int param1, int param2);
+        static void s_fiberProc(unsigned int param1, unsigned int param2);
 #   else
 		#error PVOID_SIZE not 4 or 8
 #   endif
