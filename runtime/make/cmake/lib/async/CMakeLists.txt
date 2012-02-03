@@ -73,7 +73,7 @@ INCLUDE(CheckFunctionExists)
 INCLUDE(CheckLibraryExists)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(CheckPrototypeDefinition)
-INCLUDE (CheckTypeSize)
+INCLUDE(CheckTypeSize)
 
 CHECK_INCLUDE_FILES (ucontext.h HAVE_UCONTEXT_H)
 
@@ -88,6 +88,9 @@ ENDIF()
 
 CHECK_TYPE_SIZE("void *" PVOID_SIZE)
 ADD_DEFINITIONS(-D\"PVOID_SIZE=${PVOID_SIZE}\")
+
+CHECK_TYPE_SIZE("int" INT_SIZE)
+ADD_DEFINITIONS(-D\"INT_SIZE=${INT_SIZE}\")
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 

@@ -40,17 +40,17 @@ namespace async
 
 	private:
 #if defined(HAVE_WINFIBER)
-        static VOID WINAPI s_fiberProc(LPVOID param);
+	static VOID WINAPI s_fiberProc(LPVOID param);
 #elif defined(HAVE_UCONTEXT_H)
-#   if PVOID_SIZE == 4
-        static void s_fiberProc(unsigned int param);
-#   elif PVOID_SIZE == 8
-        static void s_fiberProc(unsigned int param1, unsigned int param2);
-#   else
-		#error PVOID_SIZE not 4 or 8
-#   endif
+#	if PVOID_SIZE == INT_SIZE
+        static void s_fiberProc(int param);
+#	elif PVOID_SIZE == INT_SIZE*2
+        static void s_fiberProc(int param1, int param2);
+#	else
+#		error PVOID_SIZE not equal INT_SIZE or INT_SIZE*2
+#	endif
 #else
-#   error Unknown context type for fibers
+#	error Unknown context type for fibers
 #endif
 		void fiberProc();
 

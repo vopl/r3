@@ -3,6 +3,7 @@ syntax: regexp
 ^runtime/make/vs9
 ^runtime/make/nb
 ^runtime/make/cb
+^runtime/make/kdevelop
 ^runtime/lib
 ^runtime/client
 ^runtime/server
@@ -12,6 +13,8 @@ syntax: regexp
 ^runtime/doc/include/
 ^runtime/doc/src/
 
+
+^runtime/make/cmake/.*\.kdev4$
 ^runtime/src/.*\.h\.gch$
 ^runtime/src/.*\.hpp\.gch$
 
