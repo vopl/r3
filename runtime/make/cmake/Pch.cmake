@@ -90,7 +90,10 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 		SET(cxx_args "${CMAKE_CXX_FLAGS}")
 		SEPARATE_ARGUMENTS(cxx_args)
 
-		SET(cxx_args ${IDEFS} ${cxx_args} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}} ${IINCS} ${header} -o ${pchfile})
+		SET(cxx_args_bt ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UC}})
+		SEPARATE_ARGUMENTS(cxx_args_bt)
+
+		SET(cxx_args ${IDEFS} ${cxx_args} ${cxx_args_bt} ${IINCS} ${header} -o ${pchfile})
 		#SEPARATE_ARGUMENTS(cxx_args)
 
 		SET(target_pch ${target}_build_pch)
