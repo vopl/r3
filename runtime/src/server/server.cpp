@@ -18,7 +18,7 @@ namespace server
 		assert(!_db);
 		_db = pgc::Db(
 			"host=localhost port=5432 dbname=test user=test password=test",
-			10,
+			20,
 			bind(&Server::onDbConnectionMade, shared_from_this(), _1),
 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
 

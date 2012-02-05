@@ -344,11 +344,17 @@ namespace pgc
 			bool doWait = true;
 			{
 				mutex::scoped_lock sl(_mtx);
+				BOOST_FOREACH(const ConnectionHolderPtr &c, _readyConnections)
+				{
+					ILOG("close connection");
+					c->close();
+				}
+				_readyConnections.clear();
 				doWait = !(_startConnections.empty() && _readyConnections.empty() && _workConnections.empty());
 			}
 			if(doWait)
 			{
-				async::yield();
+				async::timeout(50).wait();
 			}
 			else
 			{

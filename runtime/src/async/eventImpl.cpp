@@ -98,6 +98,7 @@ namespace async
 		{
 			mutex::scoped_lock sl(_mtx);
 
+			assert(_waiters.size() < 200);
 			if(_isSet)
 			{
 				if(_autoReset)

@@ -65,7 +65,7 @@ namespace server
 				);
 			//async::EventWaiter<async::Future<pgc::IResultPtrs> > results;
 
-			for(size_t i(0); i<10; i++)
+			for(size_t i(0); i<2; i++)
 			{
 				results << c1.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000));
 				results << c2.data().query(s, utils::Variant(double(rand())/RAND_MAX/10000));
@@ -82,6 +82,8 @@ namespace server
 			{
 				onResult(results);
 			}
+
+			//async::yield();
 
 		}
 	}
@@ -168,15 +170,15 @@ namespace server
 		_pluma = manager->getServer()->getPlugs();
 		_db = manager->getServer()->getDb();
 
- 		for(size_t i(0); i<20; i++)
+ 		for(size_t i(0); i<4; i++)
  		{
  			async::spawn(bind(&ServiceVictim::connectionLoop1, shared_from_this()));
  		}
 
-		for(size_t i(0); i<10; i++)
-		{
-			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
-		}
+// 		for(size_t i(0); i<10; i++)
+// 		{
+// 			async::spawn(bind(&ServiceVictim::syncPgs, shared_from_this()));
+// 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -135,13 +135,17 @@ namespace pgc
 	{
 		ResultImplPtr di(new ResultImpl(PQmakeEmptyPGresult(_pgcon, success?PGRES_COMMAND_OK:PGRES_FATAL_ERROR), shared_from_this()));
 		res.dataNoWait() = utils::ImplAccess<Result>(di);
+		if(!success)
+		{
+			PQconsumeInput(_pgcon);
+		}
 		res.set();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::processRequest()
 	{
-		_mtxProcess.lock();
+		async::Mutex::ScopedLock sl(_mtxProcess);
 
 		for(;;)
 		{
@@ -152,6 +156,18 @@ namespace pgc
 				if(_requests.empty())
 				{
 					break;
+				}
+
+				if(ecsOk != status())
+				{
+					BOOST_FOREACH(const SRequestPtr &r, _requests)
+					{
+						ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
+						setResult(r->_res);
+					}
+					_requests.clear();
+
+					return;
 				}
 				request = _requests.front();
 				_requests.erase(_requests.begin());
@@ -178,17 +194,13 @@ namespace pgc
 				}
 				break;
 			default:
-				_mtxProcess.unlock();
-
 				assert(!"unknown ert");
 				throw("unknown ert");
+
 				return;
 			}
 			request->_res.wait();
 		}
-
-		assert(_mtxProcess.isLocked());
-		_mtxProcess.unlock();
 	}
 
 
@@ -263,9 +275,17 @@ namespace pgc
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
 
+		if(ecsOk != status())
+		{
+			ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
+			setResult(res);
+			return;
+		}
+
+
 		bool inTrans = false;
 		PGTransactionStatusType tstatus = PQtransactionStatus(pgcon());
-		assert(PQTRANS_ACTIVE != tstatus);
+//		assert(PQTRANS_ACTIVE != tstatus);
 		switch(tstatus)
 		{
 // 		case PQTRANS_ACTIVE:
@@ -544,7 +564,7 @@ namespace pgc
 	ConnectionHolder::~ConnectionHolder()
 	{
 		assert(!_mtxProcess.isLocked());
-		assert(_now.is_not_a_date_time());
+		//assert(_now.is_not_a_date_time());
 
 		//assert(ecsOk != status());
 		close();
@@ -597,7 +617,7 @@ namespace pgc
 	{
 		if(_pgcon)
 		{
-			assert(_now.is_not_a_date_time());
+			//assert(_now.is_not_a_date_time());
 			assert(_requests.empty());
 
 			PQfinish(_pgcon);
@@ -627,8 +647,10 @@ namespace pgc
 
 		SRequestPtr r(new SRequestQuery(res, sql, bindData));
 		_requests.push_back(r);
-
-		async::spawn(bind(&ConnectionHolder::processRequest, shared_from_this()));
+		if(_requests.size()<2)
+		{
+			async::spawn(bind(&ConnectionHolder::processRequest, shared_from_this()));
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -643,7 +665,10 @@ namespace pgc
 		SRequestPtr r(new SRequestQueryWithPrepare(res, utils::ImplAccess<Statement>(s), bindData));
 		_requests.push_back(r);
 
-		async::spawn(bind(&ConnectionHolder::processRequest, shared_from_this()));
+		if(_requests.size()<2)
+		{
+			async::spawn(bind(&ConnectionHolder::processRequest, shared_from_this()));
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -666,7 +691,10 @@ namespace pgc
 			SRequestPtr r(new SRequestEndWork(res));
 			_requests.push_back(r);
 
-			async::spawn(bind(&ConnectionHolder::processRequest, shared_from_this()));
+			//if(_requests.size()<2)
+			{
+				async::spawn(bind(&ConnectionHolder::processRequest, shared_from_this()));
+			}
 		}
 		res.wait();
 		_db->unwork(shared_from_this());

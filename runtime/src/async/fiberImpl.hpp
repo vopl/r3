@@ -29,7 +29,7 @@ namespace async
 		: public enable_shared_from_this<FiberImpl>
 	{
 	public:
-		FiberImpl(size_t stacksize = 1024*64);
+		FiberImpl(size_t stacksize = 1024*8);
 		virtual ~FiberImpl();
 
 		bool initialize();
