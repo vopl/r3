@@ -4,10 +4,12 @@ syntax: regexp
 ^runtime/make/nb
 ^runtime/make/cb
 ^runtime/make/kdevelop
-^runtime/lib
-^runtime/client
-^runtime/server
-^runtime/plug
+
+^runtime/Release/
+^runtime/Debug/
+^runtime/RelWithDebInfo/
+^runtime/MinSizeRel/
+
 ^runtime/log
 ^runtime/todo/backup/
 ^runtime/doc/include/
