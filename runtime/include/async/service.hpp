@@ -39,6 +39,10 @@ namespace async
 		void stop();
 
 		void spawn(const boost::function<void ()> &code);
+
+		Future<boost::system::error_code> timeout(size_t millisec);
+		void cancelAllTimeouts();
+
 		boost::asio::io_service &io();
 		bool setAsGlobal(bool force);
 	};
@@ -46,6 +50,8 @@ namespace async
 
 	//выполнить кусок кода асинхронно
 	ASYNC_API void spawn(const boost::function<void ()> &code);
+
+	ASYNC_API Future<boost::system::error_code> timeout(size_t millisec);
 
 	//выполнить кусок кода синхронно
 	ASYNC_API void exec(const boost::function<void ()> &code);

@@ -29,6 +29,13 @@ namespace async
 									_current;
 		static ServiceImpl			*_global;
 
+	private:
+		typedef shared_ptr<asio::deadline_timer> TTimerPtr;
+		typedef std::set<TTimerPtr> TSTimers;
+		TSTimers	_timers;
+		mutex		_mtxTimers;
+		void onTimer(const TTimerPtr &timer, const boost::system::error_code &ec, Future<boost::system::error_code> res);
+
 	public:
 		ServiceImpl();
 		~ServiceImpl();
@@ -47,6 +54,8 @@ namespace async
 
 	public:
 		void spawn(const boost::function<void ()> &code);
+		Future<boost::system::error_code> timeout(size_t millisec);
+		void cancelAllTimeouts();
 		asio::io_service &io();
 		bool setAsGlobal(bool force);
 		static ServiceImpl *current();

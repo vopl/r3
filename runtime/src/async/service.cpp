@@ -74,6 +74,18 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	Future<boost::system::error_code> Service::timeout(size_t millisec)
+	{
+		return _impl->timeout(millisec);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void Service::cancelAllTimeouts()
+	{
+		return _impl->cancelAllTimeouts();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	boost::asio::io_service &Service::io()
 	{
 		return _impl->io();
@@ -97,12 +109,29 @@ namespace async
 		if(!service)
 		{
 			assert(0);
-			ELOG("spawn with empty service");
-			throw exception("spawn with empty service");
+			ELOG("call spawn with empty service");
+			throw exception("call spawn with empty service");
 			return;
 		}
 
 		return service->spawn(code);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	ASYNC_API Future<boost::system::error_code> timeout(size_t millisec)
+	{
+		ServiceImpl *service = ServiceImpl::current();
+		if(!service)
+		{
+			assert(0);
+			ELOG("call timeout with empty service");
+			throw exception("call timeout with empty service");
+
+			Future<boost::system::error_code> stub;
+			return stub;
+		}
+
+		return service->timeout(millisec);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

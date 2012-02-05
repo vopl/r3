@@ -10,6 +10,16 @@ namespace async
 	ServiceImpl *ServiceImpl::_global = NULL;
 
 	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::onTimer(const TTimerPtr &timer, const boost::system::error_code &ec, Future<boost::system::error_code> res)
+	{
+		res(ec);
+
+		mutex::scoped_lock sl(_mtxTimers);
+		_timers.erase(timer);
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	ServiceImpl::ServiceImpl()
 		: _io()
 		, _work()
@@ -79,6 +89,10 @@ namespace async
 		{
 			_work.reset(new asio::io_service::work(_io));
 		}
+		else
+		{
+			cancelAllTimeouts();
+		}
 
 		ILOG("balance done");
 	}
@@ -115,6 +129,27 @@ namespace async
 		_io.post(bridge(code));
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	Future<boost::system::error_code> ServiceImpl::timeout(size_t millisec)
+	{
+		Future<boost::system::error_code> res;
+		mutex::scoped_lock sl(_mtxTimers);
+		TTimerPtr timer(new asio::deadline_timer(_io, posix_time::milliseconds(millisec)));
+		_timers.insert(timer);
+		timer->async_wait(bridge(bind(&ServiceImpl::onTimer, shared_from_this(), timer, _1, res)));
+
+		return res;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void ServiceImpl::cancelAllTimeouts()
+	{
+		mutex::scoped_lock sl(_mtxTimers);
+		BOOST_FOREACH(const TTimerPtr &timer, _timers)
+		{
+			timer->cancel();
+		}
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	asio::io_service &ServiceImpl::io()

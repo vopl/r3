@@ -5,6 +5,7 @@
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 #include "connectionImpl.hpp"
+#include "async/futureWaiter.hpp"
 
 namespace pgc
 {
@@ -165,20 +166,28 @@ namespace pgc
 				break;
 			case PGRES_POLLING_READING:
 				{
-					async::Future<system::error_code> r = pch->recv0();
-					if(r.data())
+					async::FutureWaiter<system::error_code> w(
+						pch->send0(),
+						async::timeout(2000));
+					w.wait();
+
+					if(w.current().data())
 					{
-						ILOG("poll with bad ec: "<<r.data()<<")");
+						ILOG("poll with bad ec: "<<w.current().data()<<")");
 						es = esBad;
 					}
 				}
 				break;
 			case PGRES_POLLING_WRITING:
 				{
-					async::Future<system::error_code> r = pch->send0();
-					if(r.data())
+					async::FutureWaiter<system::error_code> w(
+						pch->send0(),
+						async::timeout(2000));
+					w.wait();
+
+					if(w.current().data())
 					{
-						ILOG("poll with bad ec: "<<r.data()<<")");
+						ILOG("poll with bad ec: "<<w.current().data()<<")");
 						es = esBad;
 					}
 				}

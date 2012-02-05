@@ -85,21 +85,26 @@ namespace server
 		mutex::scoped_lock sl(_mtx);
 		assert(esStart == _state);
 
+		_asrv.cancelAllTimeouts();
+
 		assert(_nodeManager);
 		_nodeManager->delNodes();
 
+		_asrv.cancelAllTimeouts();
 		assert(_sessionManager);
 		_sessionManager->stop();
 
+		_asrv.cancelAllTimeouts();
 		assert(_db);
 		_db.reset();
 
+		_asrv.cancelAllTimeouts();
 		_nodeManager.reset();
 		_sessionManager.reset();
 
+		_asrv.cancelAllTimeouts();
 		_state = esStop;
 		_isStartedCvar.notify_one();
-
 	}
 
 

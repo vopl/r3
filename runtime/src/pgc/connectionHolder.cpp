@@ -546,7 +546,7 @@ namespace pgc
 		assert(!_mtxProcess.isLocked());
 		assert(_now.is_not_a_date_time());
 
-		assert(ecsOk != status());
+		//assert(ecsOk != status());
 		close();
 	}
 
