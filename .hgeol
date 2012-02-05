@@ -2,6 +2,12 @@
 
 **.sln = CRLF
 **.vcproj = CRLF
+**.vcxproj = CRLF
+**.vcxproj.files = CRLF
+
+**.xmp = BIN
+
+**.css = BIN
 **.html = BIN
 **.txt = BIN
 
