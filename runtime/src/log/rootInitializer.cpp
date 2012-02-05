@@ -1,3 +1,5 @@
+﻿#include "log/api.h"
+
 #include <log4cplus/logger.h>
 #include <log4cplus/layout.h>
 #include <log4cplus/helpers/pointer.h>
@@ -40,4 +42,11 @@ namespace
 			Logger::getRoot().setLogLevel(TRACE_LOG_LEVEL);
 		}
 	} static initializer;
+}
+
+namespace log_
+{
+	LOG_API void instanceInitialized(log4cplus::Logger &instance)
+	{
+	}
 }

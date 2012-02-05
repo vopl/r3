@@ -1,18 +1,26 @@
-
+#include "log/api.h"
 #include <log4cplus/logger.h>
 #include <log4cplus/layout.h>
 #include <log4cplus/helpers/pointer.h>
 #include <log4cplus/fileappender.h>
 
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+namespace log_
+{
+	//фиктивный экспорт, без него не генерируется архив импорта, не подгружается библиотека
+	LOG_API void instanceInitialized(log4cplus::Logger &instance);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 #ifndef LOG_NAME
 #define LOG_NAME main
 #endif
-
-
-
-
-
-
 
 #ifndef LOG_TOSTRING2
 #	define LOG_TOSTRING2(x) #x
@@ -63,6 +71,8 @@ namespace log_
 			result.addAppender(fileApp);
 
 			//result.setLogLevel(TRACE_LOG_LEVEL);
+
+			log_::instanceInitialized(result);
 			return result;
 		}
 
@@ -78,4 +88,6 @@ namespace log_
 #define ILOG(msg)	LOG4CPLUS_INFO(log_::LOG_CONCAT(StaticLoggerHolder, LOG_NAME)<true>::_instance, msg)
 #define DLOG(msg)	LOG4CPLUS_DEBUG(log_::LOG_CONCAT(StaticLoggerHolder, LOG_NAME)<true>::_instance, msg)
 #define TLOG(msg)	LOG4CPLUS_TRACE(log_::LOG_CONCAT(StaticLoggerHolder, LOG_NAME)<true>::_instance, msg)
+
+
 

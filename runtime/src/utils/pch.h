@@ -3,13 +3,20 @@
 
 #include <boost/foreach.hpp>
 
+#include <boost/preprocessor.hpp>
+
 #include <boost/shared_array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/uuid/uuid.hpp>
 
 #include <boost/filesystem.hpp>
 #include <boost/date_time.hpp>
+
+#include <boost/crc.hpp>
+
+
 
 /*
 // mingw g++ падает на слишком больших gch

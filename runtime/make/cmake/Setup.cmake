@@ -8,8 +8,6 @@ ENDIF(COMMAND cmake_policy)
 
 
 
-INCLUDE(Local.cmake OPTIONAL)
-
 SET(INSTALL_PDB 0)
 
 
@@ -69,11 +67,13 @@ ELSE(WINDOWS OR SOLARIS OR FREEBSD)
 ENDIF(WINDOWS OR SOLARIS OR FREEBSD OR LINUX)
 
 
+INCLUDE(Local.cmake OPTIONAL)
 
 
 #######################################################################################
 IF(WINDOWS)
 	ADD_DEFINITIONS(-D_WIN32_WINNT=0x0501)
+	ADD_DEFINITIONS(-DWIN32_LEAN_AND_MEAN)
 ENDIF(WINDOWS)
 
 
