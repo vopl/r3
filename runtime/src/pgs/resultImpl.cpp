@@ -61,7 +61,7 @@ namespace pgs
 		}
 		res.push_back(idx);
 
-		//ïåðåáðàòü âñå ïîëÿ
+		//Ð¿ÐµÑ€ÐµÐ±Ñ€Ð°Ñ‚ÑŒ Ð²ÑÐµ Ð¿Ð¾Ð»Ñ
 		BOOST_FOREACH(meta::FieldCPtr mf, cat->meta()->_fields)
 		{
 			fldName = categoryAlias + "." + _cluster->escapeName(mf->_name);

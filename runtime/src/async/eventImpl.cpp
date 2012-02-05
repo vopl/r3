@@ -146,7 +146,7 @@ namespace async
 		pmn->_readyKey = NULL;
 		pmn->_initiator = FiberImpl::current()->shared_from_this();
 
-		//ñòàðò
+		//ÑÑ‚Ð°Ñ€Ñ‚
 		pmn->_mtx.lock();
 		Event *iter = begin;
 		for(; iter!=end; iter++)
@@ -155,7 +155,7 @@ namespace async
 			{
 				pmn->_readyKey = iter->_impl.get();
 				pmn->_mtx.unlock();
-				//ãîòîâ, îòêàòèòü óñòàíîâëåííûå
+				//Ð³Ð¾Ñ‚Ð¾Ð², Ð¾Ñ‚ÐºÐ°Ñ‚Ð¸Ñ‚ÑŒ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ‹Ðµ
 				for(Event *iterBack = begin; iterBack!=iter; iterBack++)
 				{
 					iterBack->_impl->mnCancel(pmn);
@@ -166,10 +166,10 @@ namespace async
 		}
 		pmn->_mtx.unlock();
 
-		//íèêòî íå ñðàáîòàë ïðè ñòàðòå, æäàòü
+		//Ð½Ð¸ÐºÑ‚Ð¾ Ð½Ðµ ÑÑ€Ð°Ð±Ð¾Ñ‚Ð°Ð» Ð¿Ñ€Ð¸ ÑÑ‚Ð°Ñ€Ñ‚Ðµ, Ð¶Ð´Ð°Ñ‚ÑŒ
 		WorkerImpl::current()->fiberYield();
 
-		//îäèí ñðàáîòàë, îòìåíèòü îñòàëüíûå
+		//Ð¾Ð´Ð¸Ð½ ÑÑ€Ð°Ð±Ð¾Ñ‚Ð°Ð», Ð¾Ñ‚Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ
 		assert(pmn->_readyKey);
 		{
 			for(Event *iterBack = begin; iterBack!=end; iterBack++)

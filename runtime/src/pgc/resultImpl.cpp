@@ -405,7 +405,7 @@ namespace pgc
 			}
 			else
 			{
-				//POD больше
+				//POD Р±РѕР»СЊС€Рµ
 				memcpy(&pod, bits, amount/8);
 
 				switch(amount%8)

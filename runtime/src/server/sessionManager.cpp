@@ -23,7 +23,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	void SessionManager::listen_f(IAcceptorPtr acceptor)
 	{
-		//поставить акцептор на прослушивание
+		//РїРѕСЃС‚Р°РІРёС‚СЊ Р°РєС†РµРїС‚РѕСЂ РЅР° РїСЂРѕСЃР»СѓС€РёРІР°РЅРёРµ
 		Future<error_code> res;
 		{
 			mutex::scoped_lock sl(_mtx);
@@ -39,14 +39,14 @@ namespace server
 
 		if(ec)
 		{
-			//прослушивание не удалось
+			//РїСЂРѕСЃР»СѓС€РёРІР°РЅРёРµ РЅРµ СѓРґР°Р»РѕСЃСЊ
 			if(ec == errc::operation_canceled)
 			{
-				//отменено, менеджер остановлен
+				//РѕС‚РјРµРЅРµРЅРѕ, РјРµРЅРµРґР¶РµСЂ РѕСЃС‚Р°РЅРѕРІР»РµРЅ
 				return;
 			}
 
-			//залогировать ошибку и по новой
+			//Р·Р°Р»РѕРіРёСЂРѕРІР°С‚СЊ РѕС€РёР±РєСѓ Рё РїРѕ РЅРѕРІРѕР№
 			ELOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 			acceptor->unlisten();
 			spawn(bind(&SessionManager::listen_f, shared_from_this(), acceptor));
@@ -61,11 +61,11 @@ namespace server
 		{
 			if(ec == errc::operation_canceled)
 			{
-				//отменено, менеджер остановлен
+				//РѕС‚РјРµРЅРµРЅРѕ, РјРµРЅРµРґР¶РµСЂ РѕСЃС‚Р°РЅРѕРІР»РµРЅ
 				return;
 			}
 
-			//залогировать ошибку и по новой
+			//Р·Р°Р»РѕРіРёСЂРѕРІР°С‚СЊ РѕС€РёР±РєСѓ Рё РїРѕ РЅРѕРІРѕР№
 			WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
 			return;
 		}
@@ -76,20 +76,20 @@ namespace server
 			_channels.insert(channel);
 		}
 
-		//инициировать канал на сессию
+		//РёРЅРёС†РёРёСЂРѕРІР°С‚СЊ РєР°РЅР°Р» РЅР° СЃРµСЃСЃРёСЋ
 		initChannel_f(channel);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	void SessionManager::initChannel_f(IChannelPtr channel)
 	{
-		//теперь протокол, читать запрашиваемый sid
+		//С‚РµРїРµСЂСЊ РїСЂРѕС‚РѕРєРѕР», С‡РёС‚Р°С‚СЊ Р·Р°РїСЂР°С€РёРІР°РµРјС‹Р№ sid
 		Future2<error_code, SPacket> res2;
 		channel->listen(res2, 1);
 		error_code ec = res2.data1();
 		if(ec)
 		{
-			//бросить канал
+			//Р±СЂРѕСЃРёС‚СЊ РєР°РЅР°Р»
 			if(errc::operation_canceled != ec)
 			{
 				WLOG(__FUNCTION__<<", "<<ec.message()<<"("<<ec.value()<<")");
@@ -103,7 +103,7 @@ namespace server
 
 		SPacket packet = res2.data2();
 
-		//парсить вариант
+		//РїР°СЂСЃРёС‚СЊ РІР°СЂРёР°РЅС‚
 		utils::Variant v;
 		if(	!v.deserialize(packet._data, packet._size) ||
 			!v.isMap())
@@ -148,7 +148,7 @@ namespace server
 
 			if(!session)
 			{
-				//запрошенная сессия НЕ существует
+				//Р·Р°РїСЂРѕС€РµРЅРЅР°СЏ СЃРµСЃСЃРёСЏ РќР• СЃСѓС‰РµСЃС‚РІСѓРµС‚
 				v.as<utils::Variant::MapStringVariant>(true)["badSid"] = true;
 
 				SPacket packet;
@@ -170,7 +170,7 @@ namespace server
 			}
 			else
 			{
-				//запрошенная сессия существует, привязать к ней
+				//Р·Р°РїСЂРѕС€РµРЅРЅР°СЏ СЃРµСЃСЃРёСЏ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РїСЂРёРІСЏР·Р°С‚СЊ Рє РЅРµР№
 				v.as<utils::Variant::MapStringVariant>(true)["sid"] = session->sid();
 
 				SPacket packet;
@@ -200,7 +200,7 @@ namespace server
 		}
 		else
 		{
-			//сид был нулевой, создать новую сессию
+			//СЃРёРґ Р±С‹Р» РЅСѓР»РµРІРѕР№, СЃРѕР·РґР°С‚СЊ РЅРѕРІСѓСЋ СЃРµСЃСЃРёСЋ
 			{
 				mutex::scoped_lock sl(_mtx);
 				if(!_isStarted)

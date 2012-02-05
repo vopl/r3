@@ -21,7 +21,7 @@ namespace pgs
 			: public boost::enable_shared_from_this<ClusterImpl>
 			, private ClusterStorage
 		{
-			//инициализаторы
+			//РёРЅРёС†РёР°Р»РёР·Р°С‚РѕСЂС‹
 			typedef std::vector<boost::shared_ptr<SchemaInitializerBase> > TVSchemaInitializers;
 			TVSchemaInitializers _schemaInitializers;
 			bool _isInitialized;
@@ -32,10 +32,10 @@ namespace pgs
 		public:
 			ClusterImpl();
 
-			//добавить одну категорию по типу
+			//РґРѕР±Р°РІРёС‚СЊ РѕРґРЅСѓ РєР°С‚РµРіРѕСЂРёСЋ РїРѕ С‚РёРїСѓ
 			void add(boost::shared_ptr<Schema> schema, boost::shared_ptr<SchemaInitializerBase> schemaInitializer);
 
-			//после добавления нескольких типизированных необходима эта процедура
+			//РїРѕСЃР»Рµ РґРѕР±Р°РІР»РµРЅРёСЏ РЅРµСЃРєРѕР»СЊРєРёС… С‚РёРїРёР·РёСЂРѕРІР°РЅРЅС‹С… РЅРµРѕР±С…РѕРґРёРјР° СЌС‚Р° РїСЂРѕС†РµРґСѓСЂР°
 			void initialize();
 			bool isInitialized() const;
 

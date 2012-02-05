@@ -171,7 +171,7 @@ namespace utils
 		_integer.name("integer");
 		_integer =
 			(
-				ascii::string("0x") > //непонятный баг в недрах спирита (ubuntu64 10, gcc 4.6, boost 1.42)
+				ascii::string("0x") > //РЅРµРїРѕРЅСЏС‚РЅС‹Р№ Р±Р°Рі РІ РЅРµРґСЂР°С… СЃРїРёСЂРёС‚Р° (ubuntu64 10, gcc 4.6, boost 1.42)
                 //ascii::string("0x") >>
 				+_hexDigit >>
 				-(char_('u') >>

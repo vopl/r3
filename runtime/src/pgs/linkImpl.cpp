@@ -47,10 +47,10 @@ namespace pgs
 		{
 		case ecmSelectLink:
 			{
-				//ïðîâåðèòü íàëè÷èå srcAlias âî from èëè óæå ðåàëèçîâàíûõ link
+				//Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ srcAlias Ð²Ð¾ from Ð¸Ð»Ð¸ ÑƒÐ¶Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹Ñ… link
 				state.checkAliasExistence(_srcAlias, true);
 
-				//ïðîâåðèòü îòñóòñòâèå alias âî from èëè óæå ðåàëèçîâàíûõ link
+				//Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²Ð¸Ðµ alias Ð²Ð¾ from Ð¸Ð»Ð¸ ÑƒÐ¶Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹Ñ… link
 				state.checkAliasExistence(_alias, false);
 
 				std::string srcAlias = state._cluster->escapeName(_srcAlias);

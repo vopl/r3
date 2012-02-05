@@ -123,7 +123,7 @@ namespace net
 			error_code			ec;
 
 
-			//заголовок
+			//Р·Р°РіРѕР»РѕРІРѕРє
 			while(transferedSize < sizeof(header))
 			{
 				Future2<error_code, size_t> readRes;
@@ -146,7 +146,7 @@ namespace net
 			assert(transferedSize == sizeof(header));
 			transferedSize = 0;
 
-			//данные
+			//РґР°РЅРЅС‹Рµ
 			SPacket				packet;
 			packet._size = utils::litEndian(header[0]);
 			if(packet._size)
@@ -205,7 +205,7 @@ namespace net
 			error_code			ec;
 
 
-			//заголовок
+			//Р·Р°РіРѕР»РѕРІРѕРє
 			header[0] = utils::litEndian(op.second._size);
 			while(transferedSize < sizeof(header))
 			{
@@ -227,7 +227,7 @@ namespace net
 			assert(transferedSize == sizeof(header));
 			transferedSize = 0;
 
-			//данные
+			//РґР°РЅРЅС‹Рµ
 			SPacket				&packet = op.second;
 			if(packet._size)
 			{
