@@ -3,7 +3,7 @@
 **.sln = CRLF
 **.vcproj = CRLF
 **.vcxproj = CRLF
-**.vcxproj.files = CRLF
+**.vcxproj.filters = CRLF
 
 **.xmp = BIN
 
