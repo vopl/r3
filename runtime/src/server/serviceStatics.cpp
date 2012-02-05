@@ -12,7 +12,7 @@ namespace server
 	//////////////////////////////////////////////////////////////////////////
 	ServiceStatics::ServiceStatics()
 		: Base("statics")
-		, _root("../statics")
+		, _root("../../statics")
 	{
 
 	}

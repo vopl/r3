@@ -65,7 +65,7 @@ namespace log_
 
 			Logger result = Logger::getInstance(name);
 
-			SharedAppenderPtr fileApp(new DailyRollingFileAppender("../log/"+name, DAILY, true, 150));
+			SharedAppenderPtr fileApp(new DailyRollingFileAppender("../../log/"+name, DAILY, true, 150));
 			fileApp->setName("file");
 			fileApp->setLayout(std::auto_ptr<Layout>(new PatternLayout(logformat)));
 			result.addAppender(fileApp);

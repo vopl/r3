@@ -31,7 +31,7 @@ namespace
 
 
 
-			SharedAppenderPtr fileApp(new DailyRollingFileAppender("../log/root", DAILY, true, 150));
+			SharedAppenderPtr fileApp(new DailyRollingFileAppender("../../log/root", DAILY, true, 150));
 			fileApp->setName("file");
 			fileApp->setLayout(std::auto_ptr<Layout>(new PatternLayout(logformat)));
 			//fileApp->setThreshold(WARN_LOG_LEVEL);
