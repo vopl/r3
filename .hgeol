@@ -1,2 +1,8 @@
+[patterns]
+**.txt = BIN
+
+** = native
+.* = native
+
 [repository]
 native = LF
