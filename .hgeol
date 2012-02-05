@@ -5,6 +5,10 @@
 **.vcxproj = CRLF
 **.vcxproj.filters = CRLF
 
+**.rgs = CRLF
+**.rc = CRLF
+**.def = CRLF
+
 **.xmp = BIN
 
 **.css = BIN
