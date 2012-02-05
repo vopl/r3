@@ -24,9 +24,6 @@
 #include "parts/ScantyPart.h"
 #include "parts/ScantyValuePart.h"
 
-#include "parts/ContextPart.h"
-#include "parts/EventPart.h"
-
 static const unsigned int	CTX_MENU_ID_SAMPLE		= DECORATOR_CTX_MENU_MINID + 100;	// Should be unique
 static const char*			CTX_MENU_STR_SAMPLE		= "Decorator Ctx Menu Item";
 
@@ -103,9 +100,6 @@ void DecoratorCompositePart::InitializeEx(CComPtr<IMgaProject>& pProject, CComPt
 			}
 			else if(
 				   name == R3_FILE_NAME
-				|| name == R3_IMAGE_NAME
-				|| name == R3_AUDIO_NAME
-				|| name == R3_VIDEO_NAME
 				|| name == R3_REAL32_NAME
 				|| name == R3_REAL64_NAME
 				|| name == R3_BINARY_NAME
@@ -120,21 +114,23 @@ void DecoratorCompositePart::InitializeEx(CComPtr<IMgaProject>& pProject, CComPt
 				|| name == R3_TIME_NAME
 				|| name == R3_DATE_NAME
 				|| name == R3_TIMESTAMP_NAME
-				|| name == R3_DATETIMEINTERVAL_NAME)
+				|| name == R3_DATETIMEINTERVAL_NAME
+				|| name == R3_VARIANT_NAME
+				|| name == R3_UUID_NAME
+				|| name == R3_BITSET_X_NAME "8"
+				|| name == R3_BITSET_X_NAME "16"
+				|| name == R3_BITSET_X_NAME "32"
+				|| name == R3_BITSET_X_NAME "64"
+				|| name == R3_BITSET_X_NAME "128"
+				|| name == R3_BITSET_X_NAME "256"
+				|| name == R3_BITSET_X_NAME "512"
+				)
 			{
 				AddObjectPart(new FieldPart(this, m_eventSink));
 			}
 			else if(name == R3_SCANTYVALUE_NAME)
 			{
 				AddObjectPart(new ScantyValuePart(this, m_eventSink));
-			}
-			else if(name == R3_CONTEXT_NAME)
-			{
-				AddObjectPart(new ContextPart(this, m_eventSink));
-			}
-			else if(name == R3_EVENT_NAME)
-			{
-				AddObjectPart(new EventPart(this, m_eventSink));
 			}
 			else
 			{

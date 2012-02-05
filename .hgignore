@@ -1,6 +1,9 @@
 syntax: regexp
 ^runtime/include/pgs/meta/schemas
 ^runtime/make/vs9
+^runtime/make/nb
+^runtime/make/cb
+^runtime/make/kdevelop
 ^runtime/lib
 ^runtime/client
 ^runtime/server
@@ -10,5 +13,33 @@ syntax: regexp
 ^runtime/doc/include/
 ^runtime/doc/src/
 
+
+^runtime/make/cmake/.*\.kdev4$
+^runtime/src/.*\.h\.gch$
+^runtime/src/.*\.hpp\.gch$
+
+^comps/.*\.obj$
+^comps/.*\.pdb$
+^comps/.*\.exp$
+^comps/.*\.ilk$
+^comps/.*\.suo$
+^comps/.*\.ncb$
+^comps/.*\.htm$
+^comps/.*\.user$
+^comps/.*\.dll$
+^comps/.*\.lib$
+^comps/.*\.idb$
+^comps/.*\.manifest$
+^comps/.*\.res$
+^comps/.*\.pch$
+^comps/.*\.dep$
+^comps/.*\.cmd$
+
+
+^meta/.*\.mta$
+^meta/.*\.log$
+
+
 syntax: glob
 runtime/make/cmake/excludeDefBuild.txt
+runtime/make/cmake/Local.cmake

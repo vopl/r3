@@ -25,7 +25,7 @@ namespace client
 
 	private:
 		void connectSession_f(
-			Result2<error_code, ISessionPtr> res, 
+			Future2<error_code, ISessionPtr> res, 
 			const std::string &host, const std::string &service,
 			SessionPtr session);
 
@@ -34,14 +34,14 @@ namespace client
 		~Client();
 
 		virtual bool start(pluma::Pluma *plugs);
-		virtual Result2<error_code, ISessionPtr> 
+		virtual Future2<error_code, ISessionPtr> 
 			createSession(const char *host, const char *service);
 		virtual pluma::Pluma * getPlugs();
 		virtual Service getAsrv();
 		virtual bool stop();
 
 	public:
-		Result2<error_code, ISessionPtr> 
+		Future2<error_code, ISessionPtr> 
 			connectSession(SessionPtr session, const std::string &host, const std::string &service);
 	};
 	PLUMA_INHERIT_PROVIDER(Client, IClient);

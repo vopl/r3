@@ -1,3 +1,6 @@
+#ifndef _NET_PCH_H_
+#define _NET_PCH_H_
+
 #define LOG_NAME net
 #include "log/client.hpp"
 
@@ -20,3 +23,5 @@
 using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
+
+#endif

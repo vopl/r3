@@ -26,46 +26,7 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	DbImpl::~DbImpl()
 	{
-		ILOG("deinitialize");
-		std::deque<async::Result<Connection> > waiters;
-		{
-			mutex::scoped_lock sl(_mtx);
-
-			if(_timeout)
-			{
-				system::error_code ec;
-				_timeout->cancel(ec);
-			}
-
-			_maxConnections = 0;
-			_conninfo.clear();
-			waiters.swap(_waiters);
-		}
-		BOOST_FOREACH(async::Result<Connection> &w, waiters)
-		{
-			w(Connection());
-		}
-
-		bool doWait = true;
-		while(doWait)
-		{
-			{
-				mutex::scoped_lock sl(_mtx);
-				doWait = !(_startConnections.empty() && _readyConnections.empty() && _workConnections.empty());
-			}
-			if(doWait)
-			{
-				balanceConnections();
-
-				boost::xtime xt;
-				boost::xtime_get(&xt, boost::TIME_UTC);
-				xt.nsec += 100000000;
-				boost::thread::sleep(xt);
-			}
-		}
-
-		_onConnectionMade.swap(function<void (size_t)>());
-		_onConnectionLost.swap(function<void (size_t)>());
+		reset();
 	}
 
 
@@ -110,7 +71,7 @@ namespace pgc
 				{
 					//больше выдел€ть нельз€, освободить всех ожидающих нул€ми
 
-					BOOST_FOREACH(async::Result<Connection> &res, _waiters)
+					BOOST_FOREACH(async::Future<Connection> &res, _waiters)
 					{
 						WLOG("force null result on allocConnection");
 						res(Connection());
@@ -119,7 +80,7 @@ namespace pgc
 					continue;
 				}
 
-				if(	_startConnections.empty() && 
+				if(	_startConnections.empty() &&
 					_readyConnections.size() + _workConnections.size() < _maxConnections)
 				{
 					//готовых нет, стартующих нет, можно подключать новое
@@ -173,7 +134,7 @@ namespace pgc
 					ILOG("wait 1 second for rebalance connections");
 					_timeout.reset(new Timeout(async::io(), boost::posix_time::seconds(1)));
 					_timeout->async_wait(
-						bind(&DbImpl::onRebalanceTimer, shared_from_this()));
+						async::bridge(bind(&DbImpl::onRebalanceTimer, shared_from_this())));
 				}
 			}
 		}
@@ -204,7 +165,7 @@ namespace pgc
 				break;
 			case PGRES_POLLING_READING:
 				{
-					async::Result<system::error_code> r = pch->recv0();
+					async::Future<system::error_code> r = pch->recv0();
 					if(r.data())
 					{
 						ILOG("poll with bad ec: "<<r.data()<<")");
@@ -214,7 +175,7 @@ namespace pgc
 				break;
 			case PGRES_POLLING_WRITING:
 				{
-					async::Result<system::error_code> r = pch->send0();
+					async::Future<system::error_code> r = pch->send0();
 					if(r.data())
 					{
 						ILOG("poll with bad ec: "<<r.data()<<")");
@@ -232,7 +193,6 @@ namespace pgc
 				ELOG("poll result UNKNOWN");
 				{
 					assert(0);
-					int k=220;
 				}
 				break;
 			}
@@ -242,7 +202,6 @@ namespace pgc
 			case esOk:
 				{
 					pch->onOpen();
-					size_t numConnections=0;
 					{
 						mutex::scoped_lock sl(_mtx);
 						assert(_startConnections.end() != _startConnections.find(pch));
@@ -270,7 +229,7 @@ namespace pgc
 						ILOG("wait 1 second for reconnect");
 						_timeout.reset(new Timeout(async::io(), boost::posix_time::seconds(1)));
 						_timeout->async_wait(
-							bind(&DbImpl::onRebalanceTimer, shared_from_this()));
+							async::bridge(bind(&DbImpl::onRebalanceTimer, shared_from_this())));
 						return;
 					}
 				}
@@ -319,11 +278,11 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<Connection> DbImpl::allocConnection()
+	async::Future<Connection> DbImpl::allocConnection()
 	{
 		mutex::scoped_lock sl(_mtx);
 
-		async::Result<Connection> res;
+		async::Future<Connection> res;
 
 		//небольша€ оптимизаци€ - если есть готовые то отдать сразу, без балансировки
 		if(!_readyConnections.empty())
@@ -347,4 +306,49 @@ namespace pgc
 
 		return res;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void DbImpl::reset()
+	{
+		ILOG("deinitialize");
+		std::deque<async::Future<Connection> > waiters;
+		{
+			mutex::scoped_lock sl(_mtx);
+
+			if(_timeout)
+			{
+				system::error_code ec;
+				_timeout->cancel(ec);
+			}
+
+			_maxConnections = 0;
+			_conninfo.clear();
+			waiters.swap(_waiters);
+		}
+		BOOST_FOREACH(async::Future<Connection> &w, waiters)
+		{
+			w(Connection());
+		}
+
+		for(;;)
+		{
+			bool doWait = true;
+			{
+				mutex::scoped_lock sl(_mtx);
+				doWait = !(_startConnections.empty() && _readyConnections.empty() && _workConnections.empty());
+			}
+			if(doWait)
+			{
+				async::yield();
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		function<void (size_t)>().swap(_onConnectionMade);
+		function<void (size_t)>().swap(_onConnectionLost);
+	}
+
 }

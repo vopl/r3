@@ -11,7 +11,7 @@ namespace R3Meta_BON
 //*******************************************************************
 class FileImpl :
 	  virtual public BON::AtomImpl
-	, public FieldImpl
+	, public SimpleImpl
 {
 public:
 	virtual void        accept( BON::Visitor *pVisitor);

@@ -61,7 +61,7 @@ namespace client
 				_session = session;
 
 				_session->watchState(bind(&MainWindow::onSessionState_proxyCallback, this, _1, _2));
-				_session->balance(40000);
+				_session->balance(4);
 
 				assert(!_networkAccessManagerFactory);
 				_networkAccessManagerFactory = new NetworkAccessManagerFactory(session, _asrv);
@@ -160,7 +160,7 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		void MainWindow::startSession_f(QString host, QString service)
 		{
-			async::Result2<boost::system::error_code, ISessionPtr> res =
+			async::Future2<boost::system::error_code, ISessionPtr> res =
 				_client->createSession(host.toUtf8(), service.toUtf8());
 
 			res.wait();

@@ -27,9 +27,6 @@
 
 
 #define  R3_FILE_NAME		"File"
-#define  R3_IMAGE_NAME		"Image"
-#define  R3_AUDIO_NAME		"Audio"
-#define  R3_VIDEO_NAME		"Video"
 
 #define  R3_REAL32_NAME		"Real32"
 #define  R3_REAL64_NAME		"Real64"
@@ -60,9 +57,10 @@
 #define R3_INDEXLINK_NAME		"IndexOnCategoryField"
 
 
-#define R3_CONTEXT_NAME			"Context"
-#define R3_EVENT_NAME			"Event"
-#define R3_EVENT_DIRECTION_NAME	"Direction"
+#define  R3_VARIANT_NAME		"Variant"
+#define  R3_BITSET_X_NAME		"Bitset"
+#define  R3_UUID_NAME			"Uuid"
+
 
 //цвет текста унаследованного атрибута
 #define R3_CATEGORY_ATTRIBUTE_PART_COLOR_INH	RGB(0x80, 0x80, 0x80)
@@ -87,30 +85,6 @@
 #define R3_ENUM_ATTRIBUTE_PART_FONT				FONT_PORTNAME
 
 
-
-
-
-
-
-
-
-
-#define R3_CONTEXT_ATTRIBUTE_PART_COLOR_CTX	RGB(0x00, 0x00, 0x00)
-#define R3_CONTEXT_ATTRIBUTE_PART_FONT_CTX		FONT_PORTNAME
-
-#define R3_CONTEXT_ATTRIBUTE_PART_COLOR_EVT	RGB(0x40, 0x40, 0x40)
-#define R3_CONTEXT_ATTRIBUTE_PART_FONT_EVT		FONT_PORTNAME
-
-#define R3_CONTEXT_ATTRIBUTE_PART_COLOR_SEP	RGB(0x00, 0x00, 0x77)
-#define R3_CONTEXT_ATTRIBUTE_PART_FONT_SEP		FONT_TYPE
-
-
-
-
-
-
-#define R3_EVENT_ATTRIBUTE_PART_COLOR	RGB(0x00, 0x00, 0x00)
-#define R3_EVENT_ATTRIBUTE_PART_FONT		FONT_PORTNAME
 
 
 #endif

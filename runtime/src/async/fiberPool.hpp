@@ -12,7 +12,7 @@ namespace async
 		//фиберы без задачи
 		std::set<FiberImplPtr>			_fibersIdle;
 		//рабочие фиберы с задачей и готовые к исполнению
-		std::set<FiberImplPtr>			_fibersReady;
+		std::deque<FiberImplPtr>		_fibersReady;
 		mutex							_mtxFibers;
 
 

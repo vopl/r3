@@ -25,13 +25,13 @@ namespace net
 
 		std::string onSslPassword();
 
-		void connect_f(Result2<error_code, IChannelPtr> res, const std::string &host, const std::string &service, bool useSsl);
+		void connect_f(Future2<error_code, IChannelPtr> res, const std::string &host, const std::string &service, bool useSsl);
 
 	public:
 		Connector();
 		virtual ~Connector();
 
-		virtual Result2<error_code, IChannelPtr> connect(const char *host, const char *service, bool useSsl);
+		virtual Future2<error_code, IChannelPtr> connect(const char *host, const char *service, bool useSsl);
 	};
 
 	PLUMA_INHERIT_PROVIDER(Connector, IConnector);

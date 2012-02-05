@@ -14,6 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <boost/preprocessor.hpp>
 
 #include <vector>
 #include <map>
@@ -168,7 +169,7 @@ namespace utils
 		typedef std::list<Variant> 					ListVariant;
 		typedef char 								Char;
 		typedef boost::uuids::uuid 					Uuid;
-		typedef VariantPtr 							VariantPtr;
+		typedef ::utils::VariantPtr 				VariantPtr;
 
 	public:
 		template <class T> struct Type2Enum				{ static const EType et = etUnknown;	};
@@ -316,5 +317,85 @@ namespace utils
 	std::ostream &operator <<(std::ostream &ostr, const Variant::ListVariant &v);
 	std::ostream &operator <<(std::ostream &ostr, const Variant::VariantPtr &v);
 }
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//генераторы вектора и карты
+/*
+	вектор использовать так:
+	MVA();//сформирует вариант типа etVectorVariant, не нул, пустой
+	MVA(220);//с одним элементом типа int
+	MVA(220, "elem2", MVA(2,3));//вектор из трех элементов, последний сам вектор из двух
+
+	MVA может принять до MVX_MAXELEMS аргументов
+
+
+	карту:
+	MVM();//сформирует вариант типа etMapStringVariant, не нул, пустой
+	MVM("220", 220);//с одной парой ключ "220", значение 220
+	MVM("elem2", 220, "complex", MVA(2,3));//
+
+	MVM может принять до MVX_MAXELEMS пар ключ-значение
+*/
+#ifndef MVX_MAXELEMS
+#	define MVX_MAXELEMS 20
+#endif
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+#define declareMVASet(z, n, _) res.push_back(BOOST_PP_CAT(t,n));
+
+#define declareMVA(z, n, _) \
+	template <BOOST_PP_ENUM_PARAMS(n, class T)> \
+	inline Variant MVA(BOOST_PP_ENUM_BINARY_PARAMS(n, T, t)) \
+	{ \
+		Variant::VectorVariant res; \
+		BOOST_PP_REPEAT_FROM_TO(0, n, declareMVASet, _) \
+		return res; \
+	} \
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+#define declareMVMSet(z, n, _) res.insert(BOOST_PP_CAT(t, BOOST_PP_MUL(n, 2)), BOOST_PP_CAT(t, BOOST_PP_INC(BOOST_PP_MUL(n, 2))));
+
+#define declareMVM(z, n, _) \
+	template <BOOST_PP_ENUM_PARAMS(BOOST_PP_MUL(n, 2), class T)> \
+	inline Variant MVM(BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_MUL(n, 2), T, t)) \
+	{ \
+		Variant::MapStringVariant res; \
+		BOOST_PP_REPEAT_FROM_TO(0, n, declareMVMSet, _) \
+		return res; \
+	} \
+
+namespace utils
+{
+	inline Variant MVM()
+	{
+		Variant::MapStringVariant res;
+		return res;
+	}
+	inline Variant MVA()
+	{
+		Variant::VectorVariant res;
+		return res;
+	}
+
+
+	BOOST_PP_REPEAT_FROM_TO(1, MVX_MAXELEMS, declareMVM, _)
+
+	BOOST_PP_REPEAT_FROM_TO(1, MVX_MAXELEMS, declareMVA, _)
+
+}
+
+#undef declareMVASet
+#undef declareMVA
+#undef declareMVMSet
+#undef declareMVM
+
 
 #endif

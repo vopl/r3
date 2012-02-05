@@ -75,7 +75,7 @@ namespace client
 		bool attachChannel(IChannelPtr channel);
 
 		void freeAgent(const TEndpoint &endpoint);
-		Result<error_code> send(net::SPacket p);
+		Future<error_code> send(net::SPacket p);
 
 	};
 }

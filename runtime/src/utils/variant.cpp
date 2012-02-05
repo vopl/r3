@@ -126,6 +126,7 @@ ENUM_VARIANT_TYPES
 #define ENUM_VARIANT_TYPE(n) template void Variant::setNull<Variant::n>(bool n);
 	ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
+template void Variant::setNull<Variant::Void>(bool n);
 
 	//////////////////////////////////////////////////////////////////////////
 	Variant::EType Variant::type() const
@@ -149,7 +150,7 @@ ENUM_VARIANT_TYPES
 	template<typename T> T &Variant::as(bool forceType)
 	{
 		IMPL->validateType<T>();
-		
+
 		if(forceType)
 		{
 			IMPL->forceType<T>();

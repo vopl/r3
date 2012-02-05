@@ -56,7 +56,7 @@ namespace net
 
 	private:
 
-		typedef std::deque<std::pair<Result<error_code>, SPacket> > TSends;
+		typedef std::deque<std::pair<Future<error_code>, SPacket> > TSends;
 		typedef function<void(const error_code &ec, const SPacket &p)> TOnReceive;
 		typedef std::pair<TOnReceive, size_t> TReceive;
 		typedef std::deque<TReceive> TReceives;
@@ -80,7 +80,7 @@ namespace net
 		virtual void listen(
 			const TOnReceive &onReceive,
 			size_t amount);
-		virtual Result<error_code> send(const SPacket &p);
+		virtual Future<error_code> send(const SPacket &p);
 
 		void close();
 	};

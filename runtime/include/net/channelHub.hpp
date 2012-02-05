@@ -27,7 +27,7 @@ namespace net
 
 
 		mutex			_mtxSend;
-		typedef std::pair<Result<error_code>, SPacket> TSend;
+		typedef std::pair<Future<error_code>, SPacket> TSend;
 		typedef std::deque<TSend> TSends;
 		TSends			_sends;
 		TChannels		_channelsNotSend;
@@ -50,9 +50,9 @@ namespace net
 		ChannelHub();
 
 		virtual void listen(
-			const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive, 
+			const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive,
 			size_t amount = (size_t)-1);
-		virtual Result<error_code> send(const SPacket &p);
+		virtual Future<error_code> send(const SPacket &p);
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ namespace net
 		for(;;)
 		{
 			IChannelPtr channel;
-			Result<error_code> res;
+			Future<error_code> res;
 			SPacket p;
 			{
 				mutex::scoped_lock sl(_mtxSend);
@@ -156,12 +156,12 @@ namespace net
 				res = _sends.begin()->first;
 				p = _sends.begin()->second;
 				_sends.erase(_sends.begin());
-			
+
 				channel = *_channelsNotSend.begin();
 				_channelsNotSend.erase(_channelsNotSend.begin());
 			}
 
-			Result<error_code> lowRes = channel->send(p);
+			Future<error_code> lowRes = channel->send(p);
 			lowRes.wait();
 			if(lowRes.data())
 			{
@@ -218,16 +218,16 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>
-	Result<error_code> ChannelHub<Base>::send(const SPacket &p)
+	Future<error_code> ChannelHub<Base>::send(const SPacket &p)
 	{
-		Result<error_code> res;
+		Future<error_code> res;
 
 		mutex::scoped_lock sl(_mtxSend);
 
 		if(_work)
 		{
 			_sends.push_back(std::make_pair(res, p));
-			spawn(bind(&ChannelHub<Base>::balanceSends, shared_from_this()));
+			spawn(bind(&ChannelHub<Base>::balanceSends, ChannelHub<Base>::shared_from_this()));
 		}
 		else
 		{
@@ -248,7 +248,7 @@ namespace net
 			if(_onStateChanged)
 			{
 				spawn(bind(_onStateChanged, boost::system::error_code(), 0));
-				_onStateChanged.swap(boost::function<void(boost::system::error_code, size_t)>());
+				boost::function<void(boost::system::error_code, size_t)>().swap(_onStateChanged);
 			}
 
 
@@ -266,7 +266,7 @@ namespace net
 			_receives.clear();
 
 			mutex::scoped_lock sl3(_mtxSend);
-			typedef std::pair<Result<error_code>, SPacket> PR;
+			typedef std::pair<Future<error_code>, SPacket> PR;
 			BOOST_FOREACH(PR &pr, _sends)
 			{
 				spawn(bind(pr.first, make_error_code(errc::operation_canceled)));
@@ -293,7 +293,7 @@ namespace net
 
 		_work = true;
 
-		channel->listen(bind(&ChannelHub<Base>::onReceive, shared_from_this(), _1, _2, channel), (size_t)-1);
+		channel->listen(bind(&ChannelHub<Base>::onReceive, ChannelHub<Base>::shared_from_this(), _1, _2, channel), (size_t)-1);
 
 		if(_onStateChanged)
 		{

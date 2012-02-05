@@ -330,38 +330,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\parts\ContextAttributePart.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\parts\ContextAttributePart.h"
-				>
-			</File>
-			<File
-				RelativePath=".\parts\ContextPart.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\parts\ContextPart.h"
-				>
-			</File>
-			<File
-				RelativePath=".\parts\EventAttributePart.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\parts\EventAttributePart.h"
-				>
-			</File>
-			<File
-				RelativePath=".\parts\EventPart.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\parts\EventPart.h"
-				>
-			</File>
-			<File
 				RelativePath=".\parts\FieldPart.cpp"
 				>
 			</File>

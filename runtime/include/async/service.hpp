@@ -4,7 +4,7 @@
 #include "async/api.h"
 #include "async/exception.hpp"
 #include "async/event.hpp"
-#include "async/result.hpp"
+#include "async/future.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
@@ -50,6 +50,9 @@ namespace async
 	//выполнить кусок кода синхронно
 	ASYNC_API void exec(const boost::function<void ()> &code);
 
+	//прервать текущий фибер в пользу других, исполнение будет продолжено по очереди шедулера
+	ASYNC_API void yield();
+
 	//текущий экземпл€р проактора
 	ASYNC_API boost::asio::io_service &io();
 
@@ -58,18 +61,16 @@ namespace async
 	ASYNC_API Service service();
 }
 
+#include "async/asioBridge.hpp"
 
 //////////////////////////////////////////////////////////////////////////
 //дл€ asio мост в фиберы
-namespace boost
+namespace async
 {
-	namespace asio
-	{
-		template <typename Function, typename Any>
-		inline void asio_handler_invoke(Function &code, Any stub)
-		{
-			async::exec(code);
-		}
-	}
+    template <class Handler>
+    AsioBridge<Handler> bridge(const Handler &handler)
+    {
+		return AsioBridge<Handler>(handler);
+    }
 }
 #endif

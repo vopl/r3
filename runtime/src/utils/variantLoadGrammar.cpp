@@ -51,10 +51,10 @@ namespace utils
 		{
 			try
 			{
-				
+
 				boost::posix_time::time_duration ptd(
-					t._hour, 
-					t._minute, 
+					t._hour,
+					t._minute,
 					t._second);
 				ptd += boost::posix_time::microseconds(t._microsec);
 
@@ -75,8 +75,8 @@ namespace utils
 
 				boost::gregorian::date gd(dt._year, dt._month, dt._day);
 				boost::posix_time::time_duration ptd(
-					dt._hour, 
-					dt._minute, 
+					dt._hour,
+					dt._minute,
 					dt._second);
 				ptd += boost::posix_time::microseconds(dt._microsec);
 
@@ -116,18 +116,18 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_scalar.name("scalar");
-		_scalar = 
-			_null				[phx::bind(&VariantLoadScope::set_null, _scope)] | 
-			_string				[phx::bind(&VariantLoadScope::set_string, _scope, _1)] | 
+		_scalar =
+			_null				[phx::bind(&VariantLoadScope::set_null, _scope)] |
+			_string				[phx::bind(&VariantLoadScope::set_string, _scope, _1)] |
 			_uuid				[phx::bind(&VariantLoadScope::set_uuid, _scope, _1)] |
-			_bool				[phx::bind(&VariantLoadScope::set_bool, _scope, _1)] | 
+			_bool				[phx::bind(&VariantLoadScope::set_bool, _scope, _1)] |
 
-			_dateTimeScope		[phx::bind(&VariantLoadScope::set_datetime, _scope, _1)] | 
-			_dateScope			[phx::bind(&VariantLoadScope::set_date, _scope, _1)] | 
-			_timeScope			[phx::bind(&VariantLoadScope::set_time, _scope, _1)] | 
+			_dateTimeScope		[phx::bind(&VariantLoadScope::set_datetime, _scope, _1)] |
+			_dateScope			[phx::bind(&VariantLoadScope::set_date, _scope, _1)] |
+			_timeScope			[phx::bind(&VariantLoadScope::set_time, _scope, _1)] |
 
-			_float				[phx::bind(&VariantLoadScope::set_float, _scope, _1)] | 
-			_double				[phx::bind(&VariantLoadScope::set_double, _scope, _1)] | 
+			_float				[phx::bind(&VariantLoadScope::set_float, _scope, _1)] |
+			_double				[phx::bind(&VariantLoadScope::set_double, _scope, _1)] |
 			_integer			[phx::bind(&VariantLoadScope::set_integer, _scope, _1)]
 			;
 
@@ -159,19 +159,20 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_float.name("float");
-		_float = 
+		_float =
 			real_parser<float, strict_real_policies<float> >() >>lit('f');
 
 		//////////////////////////////////////////////////////////////////////////
 		_double.name("double");
-		_double = 
+		_double =
 			real_parser<double, strict_real_policies<double> >();
 
 		//////////////////////////////////////////////////////////////////////////
 		_integer.name("integer");
 		_integer =
 			(
-				ascii::string("0x") > 
+				ascii::string("0x") > //непонятный баг в недрах спирита (ubuntu64 10, gcc 4.6, boost 1.42)
+                //ascii::string("0x") >>
 				+_hexDigit >>
 				-(char_('u') >>
 					-(ascii::string("8")|ascii::string("16")|ascii::string("32")|ascii::string("64")
@@ -179,7 +180,7 @@ namespace utils
 				)
 			)|
 			(
-				+char_("0-9") >> 
+				+char_("0-9") >>
 				-((ascii::string("ui") | char_('u') | char_('i')) >>
 					-(ascii::string("8")|ascii::string("16")|ascii::string("32")|ascii::string("64")
 					)
@@ -187,7 +188,7 @@ namespace utils
 			)|
 			(
 				char_('-') >>
-				+char_("0-9") >> 
+				+char_("0-9") >>
 				-(char_('i') >>
 					-(ascii::string("8")|ascii::string("16")|ascii::string("32")|ascii::string("64")
 					)
@@ -203,15 +204,14 @@ namespace utils
 
 
 
-
 		//////////////////////////////////////////////////////////////////////////
 		_dateScope.name("dateScope");
-		_dateScope = 
-			_dateTemplate[_val = _1] > 
+		_dateScope =
+			_dateTemplate[_val = _1] >
 			_validDate(_val)[Checker()];
 
 		_dateTemplate.name("dateTemplate");
-		_dateTemplate = 
+		_dateTemplate =
 			uint_parser<unsigned, 10, 4, 4>()>> lit('-') >>
 			uint_parser<unsigned, 10, 2, 2>()>> lit('-') >>
 			uint_parser<unsigned, 10, 2, 2>();
@@ -230,22 +230,22 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_timeScope.name("timeScope");
-		_timeScope = 
-			_timeTemplate[_val = _1] > 
+		_timeScope =
+			_timeTemplate[_val = _1] >
 			_validTime(_val)[Checker()];
 
 		//////////////////////////////////////////////////////////////////////////
 		_timeTemplate.name("timeTemplate");
-		_timeTemplate = 
+		_timeTemplate =
 			int_parser<int, 10, 2, 2>()>> lit(':') >>
 			uint_parser<unsigned, 10, 2, 2>()>> lit(':') >>
-			uint_parser<unsigned, 10, 2, 2>()>> 
+			uint_parser<unsigned, 10, 2, 2>()>>
 			-(
 				lit('.') > _timeTemplate_microseconds
 			);
 
 		_timeTemplate_microseconds.name("microseconds(6 decimal digits)");
-		_timeTemplate_microseconds = 
+		_timeTemplate_microseconds =
 			uint_parser<unsigned, 10, 6, 6>();
 
 		_validTime.name("validTime");
@@ -257,13 +257,13 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_dateTimeScope.name("dateTimeScope");
-		_dateTimeScope = 
+		_dateTimeScope =
 			_dateTimeTemplate[_val = _1] >
 			_validDateTime(_val)[Checker()];
 
 
 		_dateTimeTemplate.name("dateTimeTemplate");
-		_dateTimeTemplate = 
+		_dateTimeTemplate =
 			_dateTemplate[_val=_1] >>
 			(lit(' ')|'T') >>
 			_timeTemplate[_val=_1];
@@ -296,13 +296,13 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_ident.name("ident");
-		_ident = 
+		_ident =
 			((alpha | char_('_')) >> *(alnum | char_('_')));
 
 
 
 		_hexDigit.name("hexDigit");
-		_hexDigit = 
+		_hexDigit =
 			char_("0-9a-fA-F");
 
 
@@ -311,36 +311,36 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_map.name("map");
-		_map = 
-			lit("{")[phx::bind(&VariantLoadScope::map_start, _scope)] > 
+		_map =
+			lit("{")[phx::bind(&VariantLoadScope::map_start, _scope)] >
 			-(
-				_mapPair >> 
-				*(lit(",") >> _mapPair) >> 
+				_mapPair >>
+				*(lit(",") >> _mapPair) >>
 				-lit(",")
-			) > 
+			) >
 			lit("}")[phx::bind(&VariantLoadScope::map_stop, _scope)];
 
 		_mapPair.name("mapPair");
-		_mapPair = 
+		_mapPair =
 			(_ident | _string)[phx::bind(&VariantLoadScope::map_key, _scope, _1)] >
 			(lit(':')|lit('=')) >
 			_variant[phx::bind(&VariantLoadScope::map_push, _scope)];
 
 		//////////////////////////////////////////////////////////////////////////
 		_array.name("array");
-		_array = 
-			lit("[")[phx::bind(&VariantLoadScope::array_start, _scope)] > 
+		_array =
+			lit("[")[phx::bind(&VariantLoadScope::array_start, _scope)] >
 			-(
-				_variant[phx::bind(&VariantLoadScope::array_push, _scope)] >> 
-				*(lit(",") >> _variant[phx::bind(&VariantLoadScope::array_push, _scope)]) >> 
+				_variant[phx::bind(&VariantLoadScope::array_push, _scope)] >>
+				*(lit(",") >> _variant[phx::bind(&VariantLoadScope::array_push, _scope)]) >>
 				-lit(",")
-			) > 
+			) >
 			lit("]")[phx::bind(&VariantLoadScope::array_stop, _scope)];
 
 		//////////////////////////////////////////////////////////////////////////
 		_include.name("include");
-		_include = 
-			lit("include") > 
+		_include =
+			lit("include") >
 			_includePath[CheckerInclude(_scope)];
 
 		_includePath.name("includePath");
@@ -349,10 +349,10 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		_variant.name("variant");
-		_variant = 
-			_map | 
-			_array | 
-			_include | 
+		_variant =
+			_map |
+			_array |
+			_include |
 			_scalar;
 
 		_start.name("variant");
@@ -362,7 +362,7 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		on_error<fail>
 		(
-			_start, 
+			_start,
 			phx::bind(&VariantLoadScope::error, _scope, _1, _2, _3, _4)
 		);
 

@@ -140,19 +140,21 @@ namespace utils
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	static const bool isLitEndian = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
+	static const bool isBigEndian = !isLitEndian;
+
+	//////////////////////////////////////////////////////////////////////////
 	template <class T>
 	inline T bigEndian(const T &v)
 	{
-		static const bool le = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
-		return impl::FixEndian<le>::call(v);
+		return impl::FixEndian<isLitEndian>::call(v);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class T>
 	inline T litEndian(const T &v)
 	{
-		static const bool le = ((boost::uint8_t)((boost::uint16_t)1)) ? true : false;
-		return impl::FixEndian<!le>::call(v);
+		return impl::FixEndian<!isLitEndian>::call(v);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

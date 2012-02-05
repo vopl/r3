@@ -31,15 +31,15 @@ namespace net
 	{
 		if(_socket)
 		{
-			_socket->async_read_some(b,h);
+			_socket->async_read_some(b, async::bridge(h));
 		}
 		else
 		{
 			typedef asio::detail::wrapped_handler<
 				asio::io_service::strand,
-				Handler> WrappedHandler;
+				async::AsioBridge<Handler> > WrappedHandler;
 			_sslStrand->dispatch(
-				bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+				bind(&TSocketSsl::async_read_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(async::bridge(h))));
 		}
 	}
 
@@ -49,15 +49,15 @@ namespace net
 	{
 		if(_socket)
 		{
-			_socket->async_write_some(b,h);
+			_socket->async_write_some(b, async::bridge(h));
 		}
 		else
 		{
 			typedef asio::detail::wrapped_handler<
 				asio::io_service::strand,
-				Handler> WrappedHandler;
+				async::AsioBridge<Handler> > WrappedHandler;
 			_sslStrand->dispatch(
-				bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(h)));
+				bind(&TSocketSsl::async_write_some<Buffer, WrappedHandler>, _socketSsl.get(), b, _sslStrand->wrap(async::bridge(h))));
 		}
 	}
 
@@ -77,7 +77,7 @@ namespace net
 
 // 			typedef function<void(const error_code &)> TOnShutdown;
 // 			TOnShutdown onShutdown = boost::bind(&Sock::onSslShutdown, _1, _socketSsl, _sslContext);
-// 
+//
 // 			_sslStrand->dispatch(
 // 				bind(&TSocketSsl::async_shutdown<TOnShutdown>, _socketSsl, onShutdown)
 // 				);
@@ -86,7 +86,7 @@ namespace net
 
 	//////////////////////////////////////////////////////////////////////////
 	void ChannelSocket::Sock::onSslShutdown(
-		const error_code &ec, 
+		const error_code &ec,
 		TSocketSslPtr socketSsl,
 		TSslContextPtr sslContextHolder)
 	{
@@ -113,7 +113,7 @@ namespace net
 					return;
 				}
 
-				receive.swap(_receives[0]);
+				std::swap(receive, _receives[0]);
 				_receives.erase(_receives.begin());
 			}
 			receive.second--;
@@ -126,9 +126,9 @@ namespace net
 			//заголовок
 			while(transferedSize < sizeof(header))
 			{
-				Result2<error_code, size_t> readRes;
+				Future2<error_code, size_t> readRes;
 				_sock.read(
-					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
+					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize),
 					readRes);
 				ec = readRes.data1();
 
@@ -154,9 +154,9 @@ namespace net
 				packet._data.reset(new char[packet._size]);
 				while(transferedSize < packet._size)
 				{
-					Result2<error_code, size_t> readRes;
+					Future2<error_code, size_t> readRes;
 					_sock.read(
-						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
+						buffer(packet._data.get() + transferedSize, packet._size - transferedSize),
 						readRes);
 					ec = readRes.data1();
 
@@ -184,7 +184,7 @@ namespace net
 	{
 		for(;;)
 		{
-			std::pair<Result<error_code>, SPacket> op;
+			std::pair<Future<error_code>, SPacket> op;
 			{
 				mutex::scoped_lock sl(_mtxSends);
 				if(_sendInProcess)
@@ -209,9 +209,9 @@ namespace net
 			header[0] = utils::litEndian(op.second._size);
 			while(transferedSize < sizeof(header))
 			{
-				Result2<error_code, size_t> readRes;
+				Future2<error_code, size_t> readRes;
 				_sock.write(
-					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize), 
+					buffer((char *)&header + transferedSize, sizeof(header) - transferedSize),
 					readRes);
 				ec = readRes.data1();
 
@@ -233,9 +233,9 @@ namespace net
 			{
 				while(transferedSize < packet._size)
 				{
-					Result2<error_code, size_t> writeRes;
+					Future2<error_code, size_t> writeRes;
 					_sock.write(
-						buffer(packet._data.get() + transferedSize, packet._size - transferedSize), 
+						buffer(packet._data.get() + transferedSize, packet._size - transferedSize),
 						writeRes);
 					ec = writeRes.data1();
 
@@ -291,9 +291,9 @@ namespace net
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Result<error_code> ChannelSocket::send(const SPacket &p)
+	Future<error_code> ChannelSocket::send(const SPacket &p)
 	{
-		Result<error_code> res;
+		Future<error_code> res;
 
 		mutex::scoped_lock sl(_mtxSends);
 		_sends.push_back(std::make_pair(res, p));

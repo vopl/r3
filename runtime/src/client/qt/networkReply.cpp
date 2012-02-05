@@ -47,7 +47,7 @@ namespace client
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		void NetworkReply::processSend(Result<error_code> res)
+		void NetworkReply::processSend(Future<error_code> res)
 		{
 			res.wait();
 			assert(!res.data());
@@ -89,7 +89,7 @@ namespace client
 
 			server::TEndpoint endpoint = url.host().toUtf8().constData();
 
-			Result<error_code> sres = _agent->send(endpoint, v);
+			Future<error_code> sres = _agent->send(endpoint, v);
 			spawn(bind(&NetworkReply::processSend, this, sres));
 
 			_agent->listen(bind(&NetworkReply::onReceive, this,  _1, _2));

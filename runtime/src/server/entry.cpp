@@ -16,8 +16,9 @@
 
 //////////////////////////////////////////////////////////////////////////
 volatile bool bStop = false;
-void onSignal(int /*sig*/)
+void onSignal(int sig)
 {
+	ILOG("signal: "<<sig);
 	//printf("signal %d\n", sig);
 	bStop = true;
 }
@@ -72,14 +73,14 @@ int main(int argc, char* argv[])
 #endif
 	do
 	{
-		char ch;
 #ifdef WIN32
 		if(_kbhit())
 		{
-			ch = (char)_getch();
+			char ch = (char)_getch();
 #else
 		if(0<poll(stdin_pfd,1,0))
 		{
+			char ch;
 			if(1 > read(0, &ch, 1))
 			{
 				break;

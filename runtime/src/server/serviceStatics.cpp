@@ -5,16 +5,14 @@
 #include "log/client.hpp"
 
 #include "serviceStatics.hpp"
-#include "server/iserviceHub.hpp"
+#include "server/inodeManager.hpp"
 
 namespace server
 {
 	//////////////////////////////////////////////////////////////////////////
-	const TEndpoint ServiceStatics::_endpoint = "statics";
-
-	//////////////////////////////////////////////////////////////////////////
 	ServiceStatics::ServiceStatics()
-		: _root("../statics")
+		: Base("statics")
+		, _root("../statics")
 	{
 
 	}
@@ -25,39 +23,10 @@ namespace server
 
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	const TEndpoint &ServiceStatics::getEndpoint()
-	{
-		return _endpoint;
-	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void ServiceStatics::onHubAdd(IServiceHubPtr hub)
-	{
-		//
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceStatics::onHubDel(IServiceHubPtr hub)
-	{
-		//
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceStatics::onSessionAdd(ISessionPtr session)
-	{
-		//
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceStatics::onSessionDel(ISessionPtr session)
-	{
-		//
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	void ServiceStatics::onReceive(
-		IServiceHubPtr hub,
+	void ServiceStatics::call(
+		INodeManagerPtr manager,
 		ISessionPtr session,
 		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
@@ -67,7 +36,7 @@ namespace server
 			data.reset(new utils::Variant);
 			utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 			m["error"] = "badRequest";
-			hub->send(shared_from_this(), session, endpoint, data);
+			manager->send(shared_from_this(), session, endpoint, data);
 			return;
 		}
 
@@ -83,7 +52,7 @@ namespace server
 			data.reset(new utils::Variant);
 			utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 			m["error"] = "badRequest";
-			hub->send(shared_from_this(), session, endpoint, data);
+			manager->send(shared_from_this(), session, endpoint, data);
 			return;
 		}
 
@@ -95,7 +64,7 @@ namespace server
 			data.reset(new utils::Variant);
 			utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 			m["error"] = "notFound";
-			hub->send(shared_from_this(), session, endpoint, data);
+			manager->send(shared_from_this(), session, endpoint, data);
 			return;
 		}
 
@@ -115,12 +84,12 @@ namespace server
 				data.reset(new utils::Variant);
 				utils::Variant::MapStringVariant &m = data->as<utils::Variant::MapStringVariant>(true);
 				m["error"] = "notFound";
-				hub->send(shared_from_this(), session, endpoint, data);
+				manager->send(shared_from_this(), session, endpoint, data);
 				return;
 			}
 		}
 
 		ILOG("statics "<<path.as<utils::Variant::String>());
-		hub->send(shared_from_this(), session, endpoint, data);
+		manager->send(shared_from_this(), session, endpoint, data);
 	}
 }

@@ -1,3 +1,6 @@
+#ifndef _CLIENT_PCH_H_
+#define _CLIENT_PCH_H_
+
 #define LOG_NAME client
 #include "log/client.hpp"
 
@@ -17,3 +20,4 @@
 #include <boost/foreach.hpp>
 
 
+#endif

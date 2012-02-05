@@ -22,15 +22,20 @@ public:
 	virtual void        setAbstract( bool val);
 	//
 	// kind and role getters
-	virtual std::set<R3Meta_BON::Audio>     getAudio();
 	virtual std::set<R3Meta_BON::Binary>    getBinary();
+	virtual std::set<R3Meta_BON::Bitset128> getBitset128();
+	virtual std::set<R3Meta_BON::Bitset16>  getBitset16();
+	virtual std::set<R3Meta_BON::Bitset256> getBitset256();
+	virtual std::set<R3Meta_BON::Bitset32>  getBitset32();
+	virtual std::set<R3Meta_BON::Bitset512> getBitset512();
+	virtual std::set<R3Meta_BON::Bitset64>  getBitset64();
+	virtual std::set<R3Meta_BON::Bitset8>   getBitset8();
 	virtual std::set<R3Meta_BON::Bool>      getBool();
 	virtual std::set<R3Meta_BON::CategoryMember>      getCategoryMember();
 	virtual std::set<R3Meta_BON::Date>      getDate();
 	virtual std::set<R3Meta_BON::DateTimeInterval>    getDateTimeInterval();
 	virtual std::set<R3Meta_BON::Enum>      getEnum();
 	virtual std::set<R3Meta_BON::File>      getFile();
-	virtual std::set<R3Meta_BON::Image>     getImage();
 	virtual std::set<R3Meta_BON::Index>     getIndex();
 	virtual std::set<R3Meta_BON::IndexOnCategoryField> getIndexOnCategoryField();
 	virtual std::set<R3Meta_BON::Int16>     getInt16();
@@ -44,7 +49,8 @@ public:
 	virtual std::set<R3Meta_BON::String>    getString();
 	virtual std::set<R3Meta_BON::Time>      getTime();
 	virtual std::set<R3Meta_BON::Timestamp> getTimestamp();
-	virtual std::set<R3Meta_BON::Video>     getVideo();
+	virtual std::set<R3Meta_BON::Uuid>      getUuid();
+	virtual std::set<R3Meta_BON::Variant>   getVariant();
 
 	///BUP
 	// add your own members here

@@ -24,7 +24,7 @@ namespace server
 	void SessionManager::listen_f(IAcceptorPtr acceptor)
 	{
 		//поставить акцептор на прослушивание
-		Result<error_code> res;
+		Future<error_code> res;
 		{
 			mutex::scoped_lock sl(_mtx);
 			if(!_isStarted)
@@ -84,7 +84,7 @@ namespace server
 	void SessionManager::initChannel_f(IChannelPtr channel)
 	{
 		//теперь протокол, читать запрашиваемый sid
-		Result2<error_code, SPacket> res2;
+		Future2<error_code, SPacket> res2;
 		channel->listen(res2, 1);
 		error_code ec = res2.data1();
 		if(ec)
@@ -105,7 +105,7 @@ namespace server
 
 		//парсить вариант
 		utils::Variant v;
-		if(	!v.deserialize(packet._data, packet._size) || 
+		if(	!v.deserialize(packet._data, packet._size) ||
 			!v.isMap())
 		{
 			WLOG(__FUNCTION__<<", bad packet");
@@ -153,7 +153,7 @@ namespace server
 
 				SPacket packet;
 				packet._data = v.serialize(packet._size);
-				Result<error_code> res = channel->send(packet);
+				Future<error_code> res = channel->send(packet);
 
 				if(res.data())
 				{
@@ -175,7 +175,7 @@ namespace server
 
 				SPacket packet;
 				packet._data = v.serialize(packet._size);
-				Result<error_code> res = channel->send(packet);
+				Future<error_code> res = channel->send(packet);
 
 				if(res.data())
 				{
@@ -224,7 +224,7 @@ namespace server
 
 			SPacket packet;
 			packet._data = v.serialize(packet._size);
-			Result<error_code> res = channel->send(packet);
+			Future<error_code> res = channel->send(packet);
 
 			if(res.data())
 			{
@@ -271,7 +271,7 @@ namespace server
 
 	//////////////////////////////////////////////////////////////////////////
 	bool SessionManager::start(
-		IAcceptorPtr acceptor, 
+		IAcceptorPtr acceptor,
 		const char *host, const char *service,
 		function<void (ISessionPtr)> sstart,
 		function<void (ISessionPtr)> sstop)
@@ -315,7 +315,7 @@ namespace server
 
 			_isStarted = false;
 
-			BOOST_FOREACH(IChannelPtr &ch, _channels)
+			BOOST_FOREACH(const IChannelPtr &ch, _channels)
 			{
 				ch->close();
 			}

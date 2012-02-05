@@ -149,7 +149,6 @@ namespace async
 		//старт
 		pmn->_mtx.lock();
 		Event *iter = begin;
-		size_t idx(0);
 		for(; iter!=end; iter++)
 		{
 			if(!iter->_impl->mnWait(MultiNotifierMarked(pmn, iter)))
@@ -211,7 +210,7 @@ namespace async
 
 		std::vector<MultiNotifierMarked>::iterator iter = _mnWaiters.begin();
 		std::vector<MultiNotifierMarked>::iterator end = _mnWaiters.end();
-		for(; iter!=end; iter++)
+		for(; iter!=end; ++iter)
 		{
 			if(pmn == iter->_pmn)
 			{

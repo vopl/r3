@@ -24,6 +24,46 @@ namespace async
 		void lock();
 		bool isLocked();
 		void unlock();
+
+	public:
+		struct ScopedLock
+		{
+		public:
+			ScopedLock(Mutex &mutex)
+				: _mutex(mutex)
+			{
+				_mutex.lock();
+				_locked = true;
+			}
+
+			~ScopedLock()
+			{
+				unlock();
+			}
+
+			void lock()
+			{
+				if (!_locked)
+				{
+					_mutex.lock();
+					_locked = true;
+				}
+			}
+
+			void unlock()
+			{
+				if (_locked)
+				{
+					_mutex.unlock();
+					_locked = false;
+				}
+			}
+
+		private:
+			Mutex &_mutex;
+			bool _locked;
+		};
+
 	};
 }
 

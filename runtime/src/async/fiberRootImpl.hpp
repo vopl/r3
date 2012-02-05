@@ -13,6 +13,9 @@ namespace async
 		~FiberRootImpl();
 
 		bool initialize();
+
+		virtual bool enter(){return true;}
+		virtual void leave(){}
 	};
 	typedef shared_ptr<FiberRootImpl> FiberRootImplPtr;
 }

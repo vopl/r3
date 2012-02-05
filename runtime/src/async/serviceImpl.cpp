@@ -92,8 +92,8 @@ namespace async
 		{
 			mutex::scoped_lock sl(_mtx);
 
-			_threadStart.swap(function<void ()>());
-			_threadStop.swap(function<void ()>());
+			function<void ()>().swap(_threadStart);
+			function<void ()>().swap(_threadStop);
 		}
 		ILOG("stop done");
 	}
@@ -112,9 +112,9 @@ namespace async
 		}
 
 		//небыло задач к исполнителю, надо инициировать воркера
-		_io.post(code);
+		_io.post(bridge(code));
 	}
-	
+
 
 	//////////////////////////////////////////////////////////////////////////
 	asio::io_service &ServiceImpl::io()
@@ -156,7 +156,7 @@ namespace async
 			}
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	void ServiceImpl::onThreadStop()
 	{

@@ -41,11 +41,15 @@ namespace pgc
 	//////////////////////////////////////////////////////////////////////////
 	void Db::reset()
 	{
+		if(_impl)
+		{
+			_impl->reset();
+		}
 		_impl.reset();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<Connection> Db::allocConnection()
+	async::Future<Connection> Db::allocConnection()
 	{
 		return _impl->allocConnection();
 	}

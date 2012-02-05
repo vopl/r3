@@ -479,9 +479,9 @@ namespace utils
 					case Variant::etDate:
 						{
 							const Variant::Date &raw = v.as<Variant::Date>();
-							uint32_t ui4 = 
-								raw.year()*10000 + 
-								raw.month()*100 + 
+							uint32_t ui4 =
+								raw.year()*10000 +
+								raw.month()*100 +
 								raw.day();
 							writeIntegral(ui4);
 						}
@@ -492,9 +492,9 @@ namespace utils
 							const Variant::Date d = raw.date();
 							const Variant::TimeDuration td = raw.time_of_day();
 
-							uint32_t ui4_d = 
-								d.year()*10000 + 
-								d.month()*100 + 
+							uint32_t ui4_d =
+								d.year()*10000 +
+								d.month()*100 +
 								d.day();
 							writeIntegral(ui4_d);
 
@@ -764,7 +764,7 @@ namespace utils
 				while(size)
 				{
 					typename Seq::iterator iter = value.insert(value.end(), Variant());
-					if(!read(*iter))
+					if(!read((Variant &)*iter))
 					{
 						return false;
 					}
@@ -912,7 +912,7 @@ namespace utils
 						try
 						{
 							v = Variant::Datetime(
-								Variant::Date(y,m,d), 
+								Variant::Date(y,m,d),
 								posix_time::microseconds(i8_t));
 						}
 						catch(...)
@@ -1088,7 +1088,7 @@ namespace utils
 		Serializer<0x472e> s;
 		return s.serialize(*this, size);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	bool Variant::deserialize(shared_array<char> data, uint32_t size)
 	{

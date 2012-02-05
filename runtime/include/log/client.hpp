@@ -1,3 +1,4 @@
+
 #include <log4cplus/logger.h>
 #include <log4cplus/layout.h>
 #include <log4cplus/helpers/pointer.h>
@@ -77,3 +78,4 @@ namespace log_
 #define ILOG(msg)	LOG4CPLUS_INFO(log_::LOG_CONCAT(StaticLoggerHolder, LOG_NAME)<true>::_instance, msg)
 #define DLOG(msg)	LOG4CPLUS_DEBUG(log_::LOG_CONCAT(StaticLoggerHolder, LOG_NAME)<true>::_instance, msg)
 #define TLOG(msg)	LOG4CPLUS_TRACE(log_::LOG_CONCAT(StaticLoggerHolder, LOG_NAME)<true>::_instance, msg)
+

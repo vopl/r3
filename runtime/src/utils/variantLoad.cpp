@@ -1,11 +1,9 @@
 #include "pch.h"
 #include "utils/variant.hpp"
-#include "variantLoadScope.hpp"
-#include "variantLoadGrammar.hpp"
 #include <fstream>
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
+#include "variantLoadScope.hpp"
+#include "variantLoadGrammar.hpp"
 
 namespace utils
 {
@@ -34,12 +32,12 @@ namespace utils
 			std::vector<char> buffer;
 			in.seekg(0, std::ios::end);
 			buffer.resize(in.tellg());
-			in.seekg(std::ios::beg, 0);
+			in.seekg(0, std::ios::beg);
 
 
 			const char *first;
 			const char *last;
-			if(buffer.size())
+			if(!buffer.empty())
 			{
 				in.read(&buffer[0], buffer.size());
 				in.close();
@@ -54,7 +52,7 @@ namespace utils
 
 			VariantLoadScope scope(fileName, first, last, errors);
 			parseResult = qi::phrase_parse(
-				first, 
+				first,
 				last,
 				VariantLoadGrammar(scope),
 				SkipGrammar());

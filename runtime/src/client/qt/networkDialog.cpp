@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "networkDialog.hpp"
-#include <QtCore/QDateTime.h>
+#include <QtCore/QDateTime>
 
 
 namespace client
@@ -82,7 +82,7 @@ namespace client
 			onApply();
 			hide();
 		}
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		void NetworkDialog::onApply()
 		{
@@ -97,7 +97,7 @@ namespace client
 				logLowError("addr changed: "+_host+":"+_service);
 			}
 		}
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		void NetworkDialog::onCancel()
 		{

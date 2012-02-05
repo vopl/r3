@@ -1,21 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE paradigm SYSTEM "edf.dtd">
 
-<paradigm name="R3Meta" guid="{B501FD88-8FB3-4134-A098-DA3C5920405C}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
+<paradigm name="R3Meta" guid="{2D56497C-21AA-45AD-8DFC-89AC0C49A918}" cdate="Tue May 03 23:03:42 2011" mdate="Tue May 03 23:03:42 2011" >
 
 	<comment></comment>
 
 	<author></author>
 
-	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Data Protocol" >
+	<folder name = "RootFolder" metaref = "1000"  rootobjects = "Schema" >
 		<attrdef name="Abstract" metaref = "1460" valuetype = "boolean" defvalue = "false">
 		</attrdef>
-		<attrdef name="AllowNull" metaref = "1461" valuetype = "boolean" defvalue = "true">
-		</attrdef>
-		<attrdef name="Direction" metaref = "1673" valuetype = "enum" defvalue = "s2c">
-			<enumitem dispname = "s2c" value = "s2c"></enumitem>
-			<enumitem dispname = "c2s" value = "c2s"></enumitem>
-			<enumitem dispname = "both" value = "both"></enumitem>
+		<attrdef name="AllowNull" metaref = "1461" valuetype = "boolean" defvalue = "false">
 		</attrdef>
 		<attrdef name="IndexType" metaref = "1462" valuetype = "enum" defvalue = "tree">
 			<enumitem dispname = "tree" value = "tree"></enumitem>
@@ -23,10 +18,6 @@
 		</attrdef>
 		<attrdef name="LongDescription" metaref = "1463" valuetype = "string" defvalue = "">
 			<regnode name="multiLine" value = "6"></regnode>
-		</attrdef>
-		<attrdef name="Mult" metaref = "1674" valuetype = "enum" defvalue = "one">
-			<enumitem dispname = "one" value = "one"></enumitem>
-			<enumitem dispname = "many" value = "many"></enumitem>
 		</attrdef>
 		<attrdef name="Multiplier" metaref = "1464" valuetype = "enum" defvalue = "one">
 			<enumitem dispname = "one" value = "one"></enumitem>
@@ -53,7 +44,7 @@
 		</attrdef>
 		<attrdef name="ShortDescription" metaref = "1471" valuetype = "string" defvalue = "">
 		</attrdef>
-		<atom name = "Audio" metaref = "1472"  attributes = "AllowNull">
+		<atom name = "Binary" metaref = "1473"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -84,7 +75,7 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
-		<atom name = "Binary" metaref = "1473"  attributes = "AllowNull">
+		<atom name = "Bitset128" metaref = "1642"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -112,6 +103,206 @@
 )]]>
 				<dispname>Field names in same and base categories must be unique</dispname>
 			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Bitset16" metaref = "1643"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Bitset256" metaref = "1644"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Bitset32" metaref = "1645"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Bitset512" metaref = "1646"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Bitset64" metaref = "1647"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Bitset8" metaref = "1648"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
@@ -217,36 +408,6 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
 		<atom name = "File" metaref = "1477"  attributes = "AllowNull">
-				<regnode name = "namePosition" value ="4"></regnode>
-			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
-				<![CDATA[self
-.parent().oclAsType(Category)
-.parts()
-    ->forAll(
-      f:Field|
-        f=self ||
-        f.name<>self.name
-    )]]>
-				<dispname>Field names in same category must be unique</dispname>
-			</constraint>
-			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
-				<![CDATA[self
-.parent().oclAsType(Category)
-.connectedFCOs(CategoryInheritance)
-->forAll(
-  c:Category|
-    c.parts()
-    ->forAll(
-      f:Field|
-        f=self ||
-        f.name<>self.name
-    )
-)]]>
-				<dispname>Field names in same and base categories must be unique</dispname>
-			</constraint>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-		</atom>
-		<atom name = "Image" metaref = "1478"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -539,10 +700,6 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
-		<atom name = "Right" metaref = "1641" >
-				<regnode name = "namePosition" value ="4"></regnode>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-		</atom>
 		<atom name = "ScantyValue" metaref = "1487"  attributes = "LongDescription ShortDescription ScantyValueKey">
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
@@ -652,7 +809,38 @@
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 		</atom>
-		<atom name = "Video" metaref = "1491"  attributes = "AllowNull">
+		<atom name = "Uuid" metaref = "1649"  attributes = "AllowNull">
+				<regnode name = "namePosition" value ="4"></regnode>
+			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )]]>
+				<dispname>Field names in same category must be unique</dispname>
+			</constraint>
+			<constraint name="UniqueFieldNamesForBases" eventmask = "0x0" depth = "1" priority = "2">
+				<![CDATA[self
+.parent().oclAsType(Category)
+.connectedFCOs(CategoryInheritance)
+->forAll(
+  c:Category|
+    c.parts()
+    ->forAll(
+      f:Field|
+        f=self ||
+        f.name<>self.name
+    )
+)]]>
+				<dispname>Field names in same and base categories must be unique</dispname>
+			</constraint>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
+		</atom>
+		<atom name = "Variant" metaref = "1668"  attributes = "AllowNull">
 				<regnode name = "namePosition" value ="4"></regnode>
 			<constraint name="UniqueFieldNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[self
@@ -701,8 +889,8 @@
 		</connection>
 		<connection name = "CategoryRelation" metaref = "1493" attributes = "Name1 Multiplier1 Name2 Multiplier2" >
 				<regnode name = "color" value ="0x007700"></regnode>
-				<regnode name = "dstStyle" value ="empty diamond"></regnode>
-				<regnode name = "srcStyle" value ="empty diamond"></regnode>
+				<regnode name = "dstStyle" value ="empty bullet"></regnode>
+				<regnode name = "srcStyle" value ="empty bullet"></regnode>
 				<regnode name = "lineType" value ="solid"></regnode>
 				<regnode name= "srcLabel1" value="%Multiplier1%"/>
 				<regnode name= "srcLabel2" value="%Name1%"/>
@@ -726,14 +914,19 @@
 				<regnode name = "lineType" value ="dash"></regnode>
 			<connjoint>
 				<pointerspec name = "src">
-					<pointeritem desc = "Audio"></pointeritem>
 					<pointeritem desc = "Binary"></pointeritem>
+					<pointeritem desc = "Bitset128"></pointeritem>
+					<pointeritem desc = "Bitset16"></pointeritem>
+					<pointeritem desc = "Bitset256"></pointeritem>
+					<pointeritem desc = "Bitset32"></pointeritem>
+					<pointeritem desc = "Bitset512"></pointeritem>
+					<pointeritem desc = "Bitset64"></pointeritem>
+					<pointeritem desc = "Bitset8"></pointeritem>
 					<pointeritem desc = "Bool"></pointeritem>
 					<pointeritem desc = "Date"></pointeritem>
 					<pointeritem desc = "DateTimeInterval"></pointeritem>
 					<pointeritem desc = "Enum"></pointeritem>
 					<pointeritem desc = "File"></pointeritem>
-					<pointeritem desc = "Image"></pointeritem>
 					<pointeritem desc = "Int16"></pointeritem>
 					<pointeritem desc = "Int32"></pointeritem>
 					<pointeritem desc = "Int64"></pointeritem>
@@ -745,38 +938,11 @@
 					<pointeritem desc = "String"></pointeritem>
 					<pointeritem desc = "Time"></pointeritem>
 					<pointeritem desc = "Timestamp"></pointeritem>
-					<pointeritem desc = "Video"></pointeritem>
+					<pointeritem desc = "Uuid"></pointeritem>
+					<pointeritem desc = "Variant"></pointeritem>
 				</pointerspec>
 				<pointerspec name = "dst">
 					<pointeritem desc = "Index"></pointeritem>
-				</pointerspec>
-			</connjoint>
-		</connection>
-		<connection name = "Right4Context" metaref = "1642" >
-				<regnode name = "color" value ="0x000000"></regnode>
-				<regnode name = "dstStyle" value ="arrow"></regnode>
-				<regnode name = "srcStyle" value ="butt"></regnode>
-				<regnode name = "lineType" value ="solid"></regnode>
-			<connjoint>
-				<pointerspec name = "src">
-					<pointeritem desc = "Right"></pointeritem>
-				</pointerspec>
-				<pointerspec name = "dst">
-					<pointeritem desc = "Context"></pointeritem>
-				</pointerspec>
-			</connjoint>
-		</connection>
-		<connection name = "Right4Event" metaref = "1643" >
-				<regnode name = "color" value ="0x000000"></regnode>
-				<regnode name = "dstStyle" value ="arrow"></regnode>
-				<regnode name = "srcStyle" value ="butt"></regnode>
-				<regnode name = "lineType" value ="solid"></regnode>
-			<connjoint>
-				<pointerspec name = "src">
-					<pointeritem desc = "Right"></pointeritem>
-				</pointerspec>
-				<pointerspec name = "dst">
-					<pointeritem desc = "Event"></pointeritem>
 				</pointerspec>
 			</connjoint>
 		</connection>
@@ -787,22 +953,15 @@
 				<pointeritem desc = "Category"></pointeritem>
 			</pointerspec>
 		</reference>
-		<reference name = "EventReference" metaref = "1645">
-				<regnode name = "namePosition" value ="4"></regnode>
-			<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-			<pointerspec name = "ref">
-				<pointeritem desc = "Event"></pointeritem>
-			</pointerspec>
-		</reference>
 		<model name = "Category" metaref = "1496" attributes = "Abstract" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
 			<constraint name="UniqueCategoryNames" eventmask = "0x0" depth = "1" priority = "2">
 				<![CDATA[project.rootFolder()
-.models(Data)
+.models(Schema)
 ->forAll(
-  d:Data|
+  d:Schema|
     d.parts(Category)
     ->forAll(
       c:Category|
@@ -812,14 +971,19 @@
 )]]>
 				<dispname>Category names in same schema must be unique</dispname>
 			</constraint>
-			<role name = "Audio" metaref = "1497" kind = "Audio"></role>
 			<role name = "Binary" metaref = "1498" kind = "Binary"></role>
+			<role name = "Bitset128" metaref = "1651" kind = "Bitset128"></role>
+			<role name = "Bitset16" metaref = "1652" kind = "Bitset16"></role>
+			<role name = "Bitset256" metaref = "1653" kind = "Bitset256"></role>
+			<role name = "Bitset32" metaref = "1654" kind = "Bitset32"></role>
+			<role name = "Bitset512" metaref = "1655" kind = "Bitset512"></role>
+			<role name = "Bitset64" metaref = "1656" kind = "Bitset64"></role>
+			<role name = "Bitset8" metaref = "1657" kind = "Bitset8"></role>
 			<role name = "Bool" metaref = "1499" kind = "Bool"></role>
 			<role name = "Date" metaref = "1500" kind = "Date"></role>
 			<role name = "DateTimeInterval" metaref = "1501" kind = "DateTimeInterval"></role>
 			<role name = "Enum" metaref = "1502" kind = "Enum"></role>
 			<role name = "File" metaref = "1503" kind = "File"></role>
-			<role name = "Image" metaref = "1504" kind = "Image"></role>
 			<role name = "Index" metaref = "1505" kind = "Index"></role>
 			<role name = "IndexOnCategoryField" metaref = "1506" kind = "IndexOnCategoryField"></role>
 			<role name = "Int16" metaref = "1507" kind = "Int16"></role>
@@ -833,16 +997,22 @@
 			<role name = "String" metaref = "1515" kind = "String"></role>
 			<role name = "Time" metaref = "1516" kind = "Time"></role>
 			<role name = "Timestamp" metaref = "1517" kind = "Timestamp"></role>
-			<role name = "Video" metaref = "1518" kind = "Video"></role>
+			<role name = "Uuid" metaref = "1658" kind = "Uuid"></role>
+			<role name = "Variant" metaref = "1669" kind = "Variant"></role>
 			<aspect name = "AspectCategory" metaref = "1026" attributes = "Abstract" >
-				<part metaref = "1519" role = "Audio" primary = "yes" linked = "no"></part>
 				<part metaref = "1520" role = "Binary" primary = "yes" linked = "no"></part>
+				<part metaref = "1660" role = "Bitset128" primary = "yes" linked = "no"></part>
+				<part metaref = "1661" role = "Bitset16" primary = "yes" linked = "no"></part>
+				<part metaref = "1662" role = "Bitset256" primary = "yes" linked = "no"></part>
+				<part metaref = "1663" role = "Bitset32" primary = "yes" linked = "no"></part>
+				<part metaref = "1664" role = "Bitset512" primary = "yes" linked = "no"></part>
+				<part metaref = "1665" role = "Bitset64" primary = "yes" linked = "no"></part>
+				<part metaref = "1666" role = "Bitset8" primary = "yes" linked = "no"></part>
 				<part metaref = "1521" role = "Bool" primary = "yes" linked = "no"></part>
 				<part metaref = "1522" role = "Date" primary = "yes" linked = "no"></part>
 				<part metaref = "1523" role = "DateTimeInterval" primary = "yes" linked = "no"></part>
 				<part metaref = "1524" role = "Enum" primary = "yes" linked = "no"></part>
 				<part metaref = "1525" role = "File" primary = "yes" linked = "no"></part>
-				<part metaref = "1526" role = "Image" primary = "yes" linked = "no"></part>
 				<part metaref = "1527" role = "Index" primary = "yes" linked = "no"></part>
 				<part metaref = "1528" role = "IndexOnCategoryField" primary = "yes" linked = "no"></part>
 				<part metaref = "1529" role = "Int16" primary = "yes" linked = "no"></part>
@@ -856,38 +1026,8 @@
 				<part metaref = "1537" role = "String" primary = "yes" linked = "no"></part>
 				<part metaref = "1538" role = "Time" primary = "yes" linked = "no"></part>
 				<part metaref = "1539" role = "Timestamp" primary = "yes" linked = "no"></part>
-				<part metaref = "1540" role = "Video" primary = "yes" linked = "no"></part>
-			</aspect>
-		</model>
-		<model name = "Context" metaref = "1646" attributes = "Mult" >
-				<regnode name = "namePosition" value ="4"></regnode>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<role name = "Context" metaref = "1647" kind = "Context"></role>
-			<role name = "Event" metaref = "1649" kind = "Event"></role>
-			<role name = "Right" metaref = "1650" kind = "Right"></role>
-			<role name = "Right4Context" metaref = "1651" kind = "Right4Context"></role>
-			<role name = "Right4Event" metaref = "1652" kind = "Right4Event"></role>
-			<aspect name = "AspectContext" metaref = "1420" attributes = "Mult" >
-				<part metaref = "1653" role = "Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1655" role = "Event" primary = "yes" linked = "no"></part>
-				<part metaref = "1656" role = "Right" primary = "yes" linked = "no"></part>
-				<part metaref = "1657" role = "Right4Context" primary = "yes" linked = "no"></part>
-				<part metaref = "1658" role = "Right4Event" primary = "yes" linked = "no"></part>
-			</aspect>
-		</model>
-		<model name = "Data" metaref = "1541" >
-				<regnode name = "namePosition" value ="4"></regnode>
-				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<role name = "Category" metaref = "1542" kind = "Category"></role>
-			<role name = "CategoryInheritance" metaref = "1543" kind = "CategoryInheritance"></role>
-			<role name = "CategoryReference" metaref = "1591" kind = "CategoryReference"></role>
-			<role name = "CategoryRelation" metaref = "1545" kind = "CategoryRelation"></role>
-			<aspect name = "AspectCategories" metaref = "1546" >
-				<part metaref = "1547" role = "Category" primary = "yes" linked = "no"></part>
-				<part metaref = "1548" role = "CategoryInheritance" primary = "yes" linked = "no"></part>
-				<part metaref = "1592" role = "CategoryReference" primary = "yes" kindaspect = "AspectCategory" linked = "no"></part>
-				<part metaref = "1550" role = "CategoryRelation" primary = "yes" linked = "no"></part>
+				<part metaref = "1667" role = "Uuid" primary = "yes" linked = "no"></part>
+				<part metaref = "1670" role = "Variant" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Enum" metaref = "1551" attributes = "AllowNull" >
@@ -926,61 +1066,18 @@
 				<part metaref = "1553" role = "ScantyValue" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
-		<model name = "Event" metaref = "1659" attributes = "Direction" >
-				<regnode name = "namePosition" value ="4"></regnode>
-				<regnode name = "decorator" value ="MGA.Decorator.R3Decorator"></regnode>
-				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<role name = "Audio" metaref = "1594" kind = "Audio"></role>
-			<role name = "Binary" metaref = "1595" kind = "Binary"></role>
-			<role name = "Bool" metaref = "1596" kind = "Bool"></role>
-			<role name = "CategoryReference" metaref = "1597" kind = "CategoryReference"></role>
-			<role name = "Date" metaref = "1598" kind = "Date"></role>
-			<role name = "DateTimeInterval" metaref = "1599" kind = "DateTimeInterval"></role>
-			<role name = "Enum" metaref = "1600" kind = "Enum"></role>
-			<role name = "File" metaref = "1603" kind = "File"></role>
-			<role name = "Image" metaref = "1604" kind = "Image"></role>
-			<role name = "Int16" metaref = "1605" kind = "Int16"></role>
-			<role name = "Int32" metaref = "1606" kind = "Int32"></role>
-			<role name = "Int64" metaref = "1607" kind = "Int64"></role>
-			<role name = "Int8" metaref = "1608" kind = "Int8"></role>
-			<role name = "Money" metaref = "1609" kind = "Money"></role>
-			<role name = "Real32" metaref = "1610" kind = "Real32"></role>
-			<role name = "Real64" metaref = "1611" kind = "Real64"></role>
-			<role name = "Set" metaref = "1612" kind = "Set"></role>
-			<role name = "String" metaref = "1613" kind = "String"></role>
-			<role name = "Time" metaref = "1614" kind = "Time"></role>
-			<role name = "Timestamp" metaref = "1615" kind = "Timestamp"></role>
-			<role name = "Video" metaref = "1616" kind = "Video"></role>
-			<aspect name = "AspectEvent" metaref = "1617" attributes = "Direction" >
-				<part metaref = "1618" role = "Audio" primary = "yes" linked = "no"></part>
-				<part metaref = "1619" role = "Binary" primary = "yes" linked = "no"></part>
-				<part metaref = "1620" role = "Bool" primary = "yes" linked = "no"></part>
-				<part metaref = "1621" role = "CategoryReference" primary = "yes" kindaspect = "AspectCategory" linked = "no"></part>
-				<part metaref = "1622" role = "Date" primary = "yes" linked = "no"></part>
-				<part metaref = "1623" role = "DateTimeInterval" primary = "yes" linked = "no"></part>
-				<part metaref = "1624" role = "Enum" primary = "yes" linked = "no"></part>
-				<part metaref = "1627" role = "File" primary = "yes" linked = "no"></part>
-				<part metaref = "1628" role = "Image" primary = "yes" linked = "no"></part>
-				<part metaref = "1629" role = "Int16" primary = "yes" linked = "no"></part>
-				<part metaref = "1630" role = "Int32" primary = "yes" linked = "no"></part>
-				<part metaref = "1631" role = "Int64" primary = "yes" linked = "no"></part>
-				<part metaref = "1632" role = "Int8" primary = "yes" linked = "no"></part>
-				<part metaref = "1633" role = "Money" primary = "yes" linked = "no"></part>
-				<part metaref = "1634" role = "Real32" primary = "yes" linked = "no"></part>
-				<part metaref = "1635" role = "Real64" primary = "yes" linked = "no"></part>
-				<part metaref = "1636" role = "Set" primary = "yes" linked = "no"></part>
-				<part metaref = "1637" role = "String" primary = "yes" linked = "no"></part>
-				<part metaref = "1638" role = "Time" primary = "yes" linked = "no"></part>
-				<part metaref = "1639" role = "Timestamp" primary = "yes" linked = "no"></part>
-				<part metaref = "1640" role = "Video" primary = "yes" linked = "no"></part>
-			</aspect>
-		</model>
-		<model name = "Protocol" metaref = "1664" >
+		<model name = "Schema" metaref = "1671" >
 				<regnode name = "namePosition" value ="4"></regnode>
 				<regnode name = "isTypeInfoShown" value ="true"></regnode>
-			<role name = "Context" metaref = "1665" kind = "Context"></role>
-			<aspect name = "AspectProtocol" metaref = "1670" >
-				<part metaref = "1671" role = "Context" primary = "yes" linked = "no"></part>
+			<role name = "Category" metaref = "1672" kind = "Category"></role>
+			<role name = "CategoryInheritance" metaref = "1673" kind = "CategoryInheritance"></role>
+			<role name = "CategoryReference" metaref = "1674" kind = "CategoryReference"></role>
+			<role name = "CategoryRelation" metaref = "1675" kind = "CategoryRelation"></role>
+			<aspect name = "AspectCategories" metaref = "1676" >
+				<part metaref = "1677" role = "Category" primary = "yes" linked = "no"></part>
+				<part metaref = "1678" role = "CategoryInheritance" primary = "yes" linked = "no"></part>
+				<part metaref = "1679" role = "CategoryReference" primary = "yes" linked = "no"></part>
+				<part metaref = "1680" role = "CategoryRelation" primary = "yes" linked = "no"></part>
 			</aspect>
 		</model>
 		<model name = "Set" metaref = "1554" attributes = "AllowNull" >

@@ -48,9 +48,12 @@ namespace async
 		{
 			mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 			_fiberPool->_fibersIdle.insert(fiber->shared_from_this());
-			assert(_fiberPool->_fibersReady.end() == _fiberPool->_fibersReady.find(fiber->shared_from_this()));
+			assert(
+				_fiberPool->_fibersReady.end() == 
+				std::find(_fiberPool->_fibersReady.begin(), _fiberPool->_fibersReady.end(), fiber->shared_from_this()));
 		}
-		_fiberRoot->activate();
+		bool b = _fiberRoot->activate();
+		assert(b);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -58,9 +61,9 @@ namespace async
 	{
 		mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 		assert(fiber != _fiberRoot);
-		assert(fiber.get() != FiberImpl::current());
+		//assert(fiber.get() != FiberImpl::current());
 		assert(_fiberPool->_fibersIdle.end() == _fiberPool->_fibersIdle.find(fiber));
-		_fiberPool->_fibersReady.insert(fiber);
+		_fiberPool->_fibersReady.push_back(fiber);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -74,7 +77,7 @@ namespace async
 		{
 			return false;
 		}
-		_fiberPool->_fibersReady.insert(fiber);
+		_fiberPool->_fibersReady.push_back(fiber);
 		return true;
 	}
 
@@ -82,7 +85,8 @@ namespace async
 	void WorkerImpl::fiberYield()
 	{
 		assert(FiberImpl::current() != _fiberRoot.get());
-		_fiberRoot->activate();
+		bool b = _fiberRoot->activate();
+		assert(b);
 	}
 
 
@@ -92,17 +96,27 @@ namespace async
 		bool doWork = true;
 		while(doWork)
 		{
-			std::set<FiberImplPtr> fibersReady;
+			std::deque<FiberImplPtr> fibersReady;
 			{
 				mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 				fibersReady.swap(_fiberPool->_fibersReady);
 			}
 
-			doWork = !fibersReady.empty();
-			BOOST_FOREACH(FiberImplPtr &fiber, fibersReady)
+			size_t activatedAmount = 0;
+			BOOST_FOREACH(const FiberImplPtr &fiber, fibersReady)
 			{
-				fiber->activate();
+				if(fiber->activate())
+				{
+					activatedAmount++;
+				}
+				else
+				{
+					mutex::scoped_lock sl(_fiberPool->_mtxFibers);
+					_fiberPool->_fibersReady.push_back(fiber);
+				}
 			}
+
+			doWork = activatedAmount?true:false;
 		}
 	}
 
@@ -122,6 +136,7 @@ namespace async
 
 		//потом отложенные задачи
 		//потом входящую задачу
+		std::set<FiberImplPtr>	fibersNotActavated;
 		for(;;)
 		{
 			FiberImplPtr fiber;
@@ -140,7 +155,7 @@ namespace async
 				mutex::scoped_lock sl(_fiberPool->_mtxFibers);
 				if(!_fiberPool->_fibersIdle.empty())
 				{
-					fiber.swap(*_fiberPool->_fibersIdle.begin());
+					fiber.swap((FiberImplPtr &)*_fiberPool->_fibersIdle.begin());
 					_fiberPool->_fibersIdle.erase(_fiberPool->_fibersIdle.begin());
 				}
 			}
@@ -166,11 +181,19 @@ namespace async
 			{
 				if(tasksFromQueue)
 				{
-					fiber->execute(tasksFromQueue);
+					if(!fiber->execute(tasksFromQueue))
+					{
+						fibersNotActavated.insert(fiber);
+						continue;
+					}
 				}
 				else
 				{
-					fiber->execute(task);
+					if(!fiber->execute(task))
+					{
+						fibersNotActavated.insert(fiber);
+						continue;
+					}
 					break;
 				}
 			}
@@ -186,8 +209,30 @@ namespace async
 			}
 		}
 
+		if(!fibersNotActavated.empty())
+		{
+			mutex::scoped_lock sl(_fiberPool->_mtxFibers);
+			_fiberPool->_fibersIdle.insert(fibersNotActavated.begin(), fibersNotActavated.end());
+		}
+
 		//теперь снова готовые
 		processReadyFibers();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	void WorkerImpl::yield()
+	{
+		assert(FiberImpl::current());
+
+		FiberImplPtr fiber = FiberImpl::current()->shared_from_this();
+		if(fiber == _fiberRoot)
+		{
+			assert(!"root fiber unable to yield");
+			return;
+		}
+
+		service()->io().post(bridge(bind(&WorkerImpl::fiberReady, shared_from_this(), fiber)));
+		fiberYield();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -199,7 +244,7 @@ namespace async
 	{
 		_thread = thread(bind(&WorkerImpl::threadProc, this));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	WorkerImpl::~WorkerImpl()
 	{

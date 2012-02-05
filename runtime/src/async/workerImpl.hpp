@@ -51,6 +51,7 @@ namespace async
 
 	public://для врапера asio
 		void exec(const TTask &);
+		void yield();
 
 	public:
 		WorkerImpl(ServiceImplPtr service, FiberPoolPtr	fiberPool);

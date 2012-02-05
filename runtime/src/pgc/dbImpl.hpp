@@ -27,7 +27,7 @@ namespace pgc
 		TSConnectins							_startConnections;
 		TSConnectins							_readyConnections;
 		TSConnectins							_workConnections;
-		std::deque<async::Result<Connection> >	_waiters;
+		std::deque<async::Future<Connection> >	_waiters;
 
 		typedef asio::deadline_timer Timeout;
 		typedef boost::shared_ptr<Timeout> TimeoutPtr;
@@ -52,7 +52,9 @@ namespace pgc
 			function<void (size_t)> connectionLost);
 		~DbImpl();
 
-		virtual async::Result<Connection> allocConnection();
+		async::Future<Connection> allocConnection();
+
+		void reset();
 	};
 }
 

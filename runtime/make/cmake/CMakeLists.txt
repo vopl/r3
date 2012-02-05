@@ -7,7 +7,6 @@ endif(POLICY CMP0011)
 PROJECT(r3)
 
 INCLUDE(Setup.cmake)
-INCLUDE(Local.cmake)
 
 
 
@@ -28,12 +27,14 @@ SET(Boost_USE_STATIC_LIBS        OFF)
 SET(Boost_USE_MULTITHREADED      ON)
 SET(Boost_USE_STATIC_RUNTIME     OFF)
 
-FIND_PACKAGE( Boost 1.42.0 COMPONENTS date_time filesystem system thread)
+FIND_PACKAGE( Boost 1.48.0 COMPONENTS date_time filesystem system thread random)
 IF(NOT Boost_FOUND)
-	MESSAGE(FATAL_ERROR "Boost 1.42.0 required")
+	MESSAGE(FATAL_ERROR "Boost 1.48.0 required")
 ENDIF()
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-#LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+
+#MESSAGE(${Boost_LIBRARIES})
 
 IF(WIN32)
 	ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK)

@@ -1,6 +1,10 @@
 
-#ifdef libpgc_EXPORTS
-#	define PGC_API __declspec(dllexport)
+#if defined OS_WINDOWS
+#   ifdef libpg_EXPORTS
+#	    define PG_API __declspec(dllexport)
+#   else
+#	    define PG_API __declspec(dllimport)
+#   endif
 #else
-#	define PGC_API __declspec(dllimport)
+#   define PG_API
 #endif

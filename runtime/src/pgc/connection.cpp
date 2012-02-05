@@ -29,25 +29,37 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<Datas> Connection::query(const std::string &sql)
+	async::Future<Result> Connection::query(const char *sql)
 	{
-		async::Result<Datas> res;
+		return query(std::string(sql));
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	async::Future<Result> Connection::query(const char *sql, const utils::Variant &data)
+	{
+		return query(std::string(sql), data);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	async::Future<Result> Connection::query(const std::string &sql)
+	{
+		async::Future<Result> res;
 		_impl->_holder->runQuery(res, sql, BindDataPtr());
 		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<Datas> Connection::query(const std::string &sql, const utils::Variant &data)
+	async::Future<Result> Connection::query(const std::string &sql, const utils::Variant &data)
 	{
-		async::Result<Datas> res;
+		async::Future<Result> res;
 		_impl->_holder->runQuery(res, sql, BindDataPtr(new BindData(data, _impl->_holder)));
 		return res;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<Datas> Connection::query(Statement s, bool withPrepare)
+	async::Future<Result> Connection::query(Statement s, bool withPrepare)
 	{
-		async::Result<Datas> res;
+		async::Future<Result> res;
 		if(withPrepare)
 		{
 			_impl->_holder->runQueryWithPrepare(res, s, BindDataPtr());
@@ -60,9 +72,9 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	async::Result<Datas> Connection::query(Statement s, const utils::Variant &data, bool withPrepare)
+	async::Future<Result> Connection::query(Statement s, const utils::Variant &data, bool withPrepare)
 	{
-		async::Result<Datas> res;
+		async::Future<Result> res;
 
 		BindDataPtr bindData(new BindData(data, _impl->_holder));
 		if(withPrepare)

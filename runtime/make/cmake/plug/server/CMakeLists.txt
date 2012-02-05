@@ -6,9 +6,15 @@ SET(INCLUDE
 	${INC_DIR}/server/isessionManager.hpp
 
 	${INC_DIR}/server/iservice.hpp
-	${INC_DIR}/server/iserviceHub.hpp
+	${INC_DIR}/server/inodeManager.hpp
+
+	${INC_DIR}/server/inode.hpp
+	${INC_DIR}/server/iright.hpp
+	${INC_DIR}/server/itask.hpp
 
 	${INC_DIR}/server/endpoint.hpp
+
+	${INC_DIR}/server/nodeBase.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
@@ -17,7 +23,7 @@ SET(SRC
 	${SRC_DIR}/server/plug.cpp
 	${SRC_DIR}/server/session.cpp
 	${SRC_DIR}/server/sessionManager.cpp
-	${SRC_DIR}/server/serviceHub.cpp
+	${SRC_DIR}/server/nodeManager.cpp
 
 	${SRC_DIR}/server/serviceEcho.cpp
 	${SRC_DIR}/server/serviceStatics.cpp
@@ -34,7 +40,7 @@ SET(SRC_HDR
 	${SRC_DIR}/server/server.hpp
 	${SRC_DIR}/server/session.hpp
 	${SRC_DIR}/server/sessionManager.hpp
-	${SRC_DIR}/server/serviceHub.hpp
+	${SRC_DIR}/server/nodeManager.hpp
 	${SRC_DIR}/server/pch.h
 	
 	${SRC_DIR}/server/serviceEcho.hpp
@@ -50,13 +56,15 @@ SET(SRC_PCH
 SOURCE_GROUP(src FILES ${SRC_PCH})
 
 
-PRESETUP_BIN_OUT(SRC_STUB)
 ADD_LIBRARY(plugserver SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
+SET_TARGET_PROPERTIES(plugserver PROPERTIES PREFIX "" IMPORT_PREFIX "")
+
 CREATE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC_PCH})
 USE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC})
+
 SETUP_BIN_OUT(plugserver plug)
 
-TARGET_LINK_LIBRARIES(plugserver libheap libpluma libutils liblog libasync libpgc)
+TARGET_LINK_LIBRARIES(plugserver libheap libpluma libutils liblog libasync libpg)
 
 IF(LINUX)
 	SET(CMAKE_THREAD_PREFER_PTHREAD ON)

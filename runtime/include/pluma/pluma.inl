@@ -59,7 +59,7 @@ typename ProviderType::ITypePtr Pluma::create()
 	getProviders(providers);
 	if(providers.empty())
 	{
-		return ProviderType::ITypePtr();
+		return typename ProviderType::ITypePtr();
 	}
 	return providers.front()->create();
 }

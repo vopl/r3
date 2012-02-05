@@ -7,9 +7,12 @@ SET(SRC
 )
 SOURCE_GROUP(src FILES ${SRC})
 
-PRESETUP_BIN_OUT(SRC_STUB)
 ADD_EXECUTABLE(server ${SRC_STUB} ${SRC})
+
 SETUP_BIN_OUT(server server)
 
 TARGET_LINK_LIBRARIES(server libheap libutils libpluma liblog)
 
+IF(CMAKE_COMPILER_IS_GNUCXX)
+	TARGET_LINK_LIBRARIES(server ${Boost_LIBRARIES})
+ENDIF()

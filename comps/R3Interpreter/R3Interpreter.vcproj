@@ -395,19 +395,75 @@
 				Name="R3Meta_BON"
 				>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Audio.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Audio.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Binary.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\Binary.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset128.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset128.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset16.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset16.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset256.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset256.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset32.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset512.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset512.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset64.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset64.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset8.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Bitset8.h"
 					>
 				</File>
 				<File
@@ -467,22 +523,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Context.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Context.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Data.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Data.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Date.cpp"
 					>
 				</File>
@@ -523,30 +563,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Event.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Event.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\EventOrReference.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\EventOrReference.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\EventReference.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\EventReference.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Field.cpp"
 					>
 				</File>
@@ -560,14 +576,6 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\File.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Image.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Image.h"
 					>
 				</File>
 				<File
@@ -635,14 +643,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Protocol.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Protocol.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Real.cpp"
 					>
 				</File>
@@ -667,30 +667,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Right.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Right.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Right4Context.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Right4Context.h"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Right4Event.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\BonX\R3Meta_BON\Right4Event.h"
-					>
-				</File>
-				<File
 					RelativePath="..\BonX\R3Meta_BON\Scanty.cpp"
 					>
 				</File>
@@ -704,6 +680,14 @@
 				</File>
 				<File
 					RelativePath="..\BonX\R3Meta_BON\ScantyValue.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Schema.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Schema.h"
 					>
 				</File>
 				<File
@@ -747,11 +731,19 @@
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Video.cpp"
+					RelativePath="..\BonX\R3Meta_BON\Uuid.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\BonX\R3Meta_BON\Video.h"
+					RelativePath="..\BonX\R3Meta_BON\Uuid.h"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Variant.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\BonX\R3Meta_BON\Variant.h"
 					>
 				</File>
 			</Filter>
@@ -760,19 +752,11 @@
 			Name="workers"
 			>
 			<File
-				RelativePath=".\workers\wData.cpp"
+				RelativePath=".\workers\wSchema.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\workers\wData.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\workers\wProtocol.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\workers\wProtocol.hpp"
+				RelativePath=".\workers\wSchema.hpp"
 				>
 			</File>
 		</Filter>

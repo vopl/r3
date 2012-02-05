@@ -5,7 +5,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <libpq-fe.h>
 #include "async/service.hpp"
-#include "async/result.hpp"
+#include "async/future.hpp"
 #include "async/mutex.hpp"
 
 #include <boost/multi_index_container.hpp>
@@ -13,7 +13,7 @@
 #include <boost/multi_index/member.hpp>
 
 #include "statementImpl.hpp"
-#include "pgc/data.hpp"
+#include "pgc/result.hpp"
 #include "pgc/connection.hpp"
 
 namespace pgc
@@ -68,20 +68,48 @@ namespace pgc
 			indexed_by<
 				ordered_unique<
 					member<
-						StatementPrepareState, 
+						StatementPrepareState,
 						StatementImplWtr,
 						&StatementPrepareState::_stm
 					>
 				>,
 				ordered_non_unique<
 					member<
-						StatementPrepareState, 
+						StatementPrepareState,
 						posix_time::ptime,
 						&StatementPrepareState::_accessTime
 					>
 				>
-			> 
+			>
 		> TPrepareds;
+
+		//помогалка для модификации 'времени доступа' внутри мультииндекса
+		struct ChangeAccessTime
+		{
+			ChangeAccessTime(const posix_time::ptime& accessTime):_accessTime(accessTime){}
+
+			void operator()(StatementPrepareState& e)
+			{
+				e._accessTime = _accessTime;
+			}
+
+		private:
+			posix_time::ptime _accessTime;
+		};
+
+		//помогалка для модификации 'идентификатора подготовленного запроса' внутри мультииндекса
+		struct ChangePrid
+		{
+			ChangePrid(const std::string& prid):_prid(prid){}
+
+			void operator()(StatementPrepareState& e)
+			{
+				e._prid = _prid;
+			}
+
+		private:
+			std::string _prid;
+		};
 
 		//очередь входящих запросов
 		enum ERequestType
@@ -93,8 +121,8 @@ namespace pgc
 		struct SRequest
 		{
 			ERequestType				_ert;
-			async::Result<Datas>	_res;
-			SRequest(ERequestType ert, async::Result<Datas> res)
+			async::Future<Result>	_res;
+			SRequest(ERequestType ert, async::Future<Result> res)
 				: _ert(ert), _res(res)
 			{}
 		};
@@ -105,7 +133,7 @@ namespace pgc
 		{
 			std::string	_sql;
 			BindDataPtr	_bindData;
-			SRequestQuery(async::Result<Datas> res, std::string sql, BindDataPtr bindData)
+			SRequestQuery(async::Future<Result> res, std::string sql, BindDataPtr bindData)
 				: SRequest(ertQuery, res), _sql(sql), _bindData(bindData)
 			{}
 		};
@@ -114,7 +142,7 @@ namespace pgc
 		{
 			StatementImplPtr	_s;
 			BindDataPtr			_bindData;
-			SRequestQueryWithPrepare(async::Result<Datas> res, StatementImplPtr s, BindDataPtr bindData)
+			SRequestQueryWithPrepare(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData)
 				: SRequest(ertQueryWithPrepare, res), _s(s), _bindData(bindData)
 			{}
 		};
@@ -122,7 +150,7 @@ namespace pgc
 		struct SRequestEndWork
 			: SRequest
 		{
-			SRequestEndWork(async::Result<Datas> res)
+			SRequestEndWork(async::Future<Result> res)
 				: SRequest(ertQueryEndWork, res)
 			{}
 		};
@@ -164,24 +192,27 @@ namespace pgc
 		static int sockType(int sock);
 
 	private:
+		void setResult(async::Future<Result> &res, bool success=false);
+
+	private:
 		void processRequest();
 
 	private:
-		void processSingle(async::Result<Datas> res);
-		void processQueryWithPrepare(async::Result<Datas> res, StatementImplPtr s, BindDataPtr bindData);
+		void processSingle(async::Future<Result> res);
+		void processQueryWithPrepare(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData);
 
 	private:
-		void runQuery_f(async::Result<Datas> res, const std::string &sql, BindDataPtr bindData = BindDataPtr());
+		void runQuery_f(async::Future<Result> res, const std::string &sql, BindDataPtr bindData = BindDataPtr());
 
 		void runPrepare_f(
-			async::Result<Datas> res, 
-			const std::string &prid, 
-			const std::string &sql, 
+			async::Future<Result> res,
+			const std::string &prid,
+			const std::string &sql,
 			BindDataPtr bindData);
 
 		void runQueryPrepared_f(
-			async::Result<Datas> res, 
-			const std::string &prid, 
+			async::Future<Result> res,
+			const std::string &prid,
 			BindDataPtr bindData);
 
 		//а так же всякие describe
@@ -189,14 +220,14 @@ namespace pgc
 		//void runDescribePortal...
 
 	private:
-		void runQueryWithPrepare_f(async::Result<Datas> res, StatementImplPtr s, BindDataPtr bindData);
+		void runQueryWithPrepare_f(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData);
 
 	private:
-		void runEndWork_f(async::Result<Datas> res);
+		void runEndWork_f(async::Future<Result> res);
 
 	public:
-		async::Result<system::error_code> send0();
-		async::Result<system::error_code> recv0();
+		async::Future<system::error_code> send0();
+		async::Future<system::error_code> recv0();
 
 	public:
 		ConnectionHolder(DbImplPtr db, PGconn *pgcon);
@@ -211,8 +242,8 @@ namespace pgc
 		bool integerDatetimes();
 
 	public:
-		void runQuery(async::Result<Datas> res, const std::string &sql, BindDataPtr bindData);
-		void runQueryWithPrepare(async::Result<Datas> res, Statement s, BindDataPtr bindData);
+		void runQuery(async::Future<Result> res, const std::string &sql, BindDataPtr bindData);
+		void runQueryWithPrepare(async::Future<Result> res, Statement s, BindDataPtr bindData);
 
 	public:
 		void beginWork();
