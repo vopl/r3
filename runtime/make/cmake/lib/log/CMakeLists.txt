@@ -28,6 +28,7 @@ IF("l4cpl-NOTFOUND" STREQUAL "${l4cpl}")
 ENDIF()
 
 IF("l4cpld-NOTFOUND" STREQUAL "${l4cpld}")
+	MESSAGE("log4cplus library not found in debug mode, will use release")
 	SET(l4cpld ${l4cpl})
 ENDIF()
 

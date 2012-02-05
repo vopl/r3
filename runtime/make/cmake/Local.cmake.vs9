@@ -43,4 +43,10 @@ IF(WINDOWS)
 		SET(QT_QMAKE_EXECUTABLE "C:/QtSDK/Desktop/Qt/4.7.4/msvc2008/bin/qmake.exe")
 	ENDIF()
 
+	INCLUDE_DIRECTORIES("P:/sdk/log4cplus-1.0.4/include")
+	SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "P:/sdk/log4cplus-1.0.4/include")
+	SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "P:/sdk/log4cplus-1.0.4/Debug")
+	SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "P:/sdk/log4cplus-1.0.4/Release")
+	
+
 ENDIF()
