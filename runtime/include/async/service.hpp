@@ -72,5 +72,5 @@ namespace async
     {
 		return AsioBridge<Handler>(handler);
     }
-}
+}
 #endif
