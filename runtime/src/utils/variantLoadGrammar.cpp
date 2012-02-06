@@ -1,10 +1,16 @@
 #include "pch.h"
 #include "variantLoadGrammar.hpp"
 
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/spirit/include/phoenix.hpp>
+
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
+
+namespace phx = boost::phoenix;
 
 BOOST_FUSION_ADAPT_STRUCT(
 	utils::VariantLoadScope::SDate,

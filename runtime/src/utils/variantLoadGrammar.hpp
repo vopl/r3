@@ -3,11 +3,13 @@
 
 #include "variantLoadScope.hpp"
 
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/repository/include/qi_confix.hpp>
+
 
 namespace utils
 {
 	namespace spirit = boost::spirit;
-	namespace phx = boost::phoenix;
 	namespace qi = boost::spirit::qi;
 
 
