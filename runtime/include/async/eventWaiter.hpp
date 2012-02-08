@@ -399,15 +399,13 @@ namespace async
 		{
 			assert("need call 'wait' first");
 			throw exception("need call 'wait' first");
-			static CustomEvent stub;
-			return stub;
+			return _wrongIndex;
 		}
 		if(_current > _events.size() || _wrongIndex==_current)
 		{
 			assert("no more event in waiter");
 			throw exception("no more event in waiter");
-			static CustomEvent stub;
-			return stub;
+			return _wrongIndex;
 		}
 
 		return _customs[_current]._originalIndex;

@@ -1,4 +1,4 @@
-#ifndef _ASYNC_FUTUREWAITER_HPP_
+﻿#ifndef _ASYNC_FUTUREWAITER_HPP_
 #define _ASYNC_FUTUREWAITER_HPP_
 
 #include "async/future.hpp"
@@ -8,6 +8,11 @@
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
+	/*!	\ingroup async
+		\brief Групповое ожидание Future
+
+		Поведение аналогично \ref EventWaiter, тип события Future<Data>
+	*/
 	template <class Data>
 	class FutureWaiter
 		: public EventWaiter<Future<Data> >
