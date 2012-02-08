@@ -67,9 +67,9 @@ namespace async
 				\endcode
 				или так
 				\code
-					while(results)//operator bool -> wait
+					while(results)//используется operator bool
 					{
-						processResult(results);//operator CustomEvent& -> current
+						processResult(results);//используется operator CustomEvent&
 					}
 				\endcode
 
@@ -104,19 +104,23 @@ namespace async
 			
 			\param event добавляемое событие
 			\return ссылку на себя, просто для удобства последовательного добавления\n
-				\code
+			
+			\code
 				myWaiter<<evt1<<evt2;
-				\endcode
+			\endcode
 		*/
 		EventWaiter &operator <<(const CustomEvent &event);
 
 		/*!	\brief Ожидание очередного события из набора, заданного через конструктор и/или EventWaiter::operator<<
 
-			\return true если произошло одно из событий\n
-				false если набор событий пуст или уже переработаны все события
+			\retval true если произошло одно из событий
+			\retval false если набор событий пуст или уже переработаны все события
 
 			после того как wait вернул истину - сработавшее событие помечается как "текущее"
 			его можно получить через метод \ref current, а его индекс - через \ref currentIndex
+
+			\post текущее событие может быть получено вызовом \ref current
+			\post индекс текущего события может быть получен вызовом \ref currentIndex
 		*/
 		bool wait();
 
@@ -139,7 +143,9 @@ namespace async
 			текущее событие - это то, которое произошло на момент последнего wait
 			существует только если wait вернул истину
 
-			если wait вернул ложь или вообще не вызывался - будет выброшено исключение 
+			\pre \ref wait вернул true
+
+			если \ref wait вернул ложь или вообще не вызывался - то при вызове этого метода будет выброшено исключение 
 			\ref async::exception
 
 			\return экземпляр события
@@ -194,6 +200,8 @@ namespace async
 				}
 			\endcode
 
+			\pre \ref wait вернул true
+ 
 			если перед вызовом этого метода wait вернул ложь или вообще не вызывался - 
 			будет выброшено исключение \ref async::exception
 
