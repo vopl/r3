@@ -1,4 +1,4 @@
-#ifndef _ASYNC_ASIOBRIDGE_HPP_
+﻿#ifndef _ASYNC_ASIOBRIDGE_HPP_
 #define _ASYNC_ASIOBRIDGE_HPP_
 
 #include <boost/bind.hpp>
@@ -6,6 +6,19 @@
 namespace async
 {
 	//////////////////////////////////////////////////////////////////////////
+	/*!	\ingroup async
+		\brief Обертка для вызова клиентского функктора в асинхронном режиме.
+
+		Наличие данной обертки продиктовано boost::asio, которая исполняет completition handler 
+		в контексте потока, под которым запущен io_service::run.
+
+		Данный класс оборачивает клиентский функтор и при вызове пробрасывает вызов через
+		\ref async::exec
+		
+		Предлагается не использовать этот класс напрямую а использовать \ref async::bridge
+
+		\tparam Handler тип пользовательского функтора, объект этого типа будет хранится по значению
+	*/
 	template <typename Handler>
 	class AsioBridge
 	{
@@ -14,21 +27,26 @@ namespace async
 		this_type& operator=(const this_type&);
 
 	public:
+		/// тип возващаемого значения при вызове объекта этого класса как функтора, необходимо для  boost::bind
 		typedef void result_type;
 
-
+		/// \param handler пользовательский функтор, от него будет произведена копия, которая будет уничтожена при разрушении AsioBridge
 		AsioBridge(const Handler& handler)
 			: _handler(handler)
 		{
 		}
 
-
-
+		/// объект пользовательского функтора будет уничтожен
 		~AsioBridge()
 		{
 		}
 
-
+		
+		///	@name вызовы с раличным количеством аргументов (0-5) и константностью
+		/*!	вызовы инициируются в недрах boost::asio, эти методы пробрасывают 
+			вызов в \ref async::exec, который исполняет функтор в асинхронном режиме
+		*/
+		//@{
 		void operator()()
 		{
 			async::exec(_handler);
@@ -104,11 +122,13 @@ namespace async
 		{
 			async::exec(boost::bind(_handler, boost::cref(arg1), boost::cref(arg2), boost::cref(arg3), boost::cref(arg4), boost::cref(arg5)));
 		}
+		//@}
 
 	private:
 
+		/// копия пользовательского функтора
 		Handler _handler;
-	}; //class AsioBridge
+	};
 }
 
 #endif

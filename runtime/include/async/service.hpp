@@ -1,4 +1,4 @@
-#ifndef _ASYNC_SERVICE_HPP_
+п»ї#ifndef _ASYNC_SERVICE_HPP_
 #define _ASYNC_SERVICE_HPP_
 
 #include "async/api.h"
@@ -24,7 +24,7 @@ namespace async
 		Service(ServiceImplPtr impl);
 		~Service();
 
-		//конструктор копирования и оператор присваивания встроенные
+		//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ Рё РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ РІСЃС‚СЂРѕРµРЅРЅС‹Рµ
 
 		operator bool() const;
 		bool operator!() const;
@@ -48,31 +48,35 @@ namespace async
 	};
 
 
-	//выполнить кусок кода асинхронно
+	/// РІС‹РїРѕР»РЅРёС‚СЊ РєСѓСЃРѕРє РєРѕРґР° Р°СЃРёРЅС…СЂРѕРЅРЅРѕ
 	ASYNC_API void spawn(const boost::function<void ()> &code);
 
+	/// РїСЂРёРѕСЃС‚Р°РЅРѕРІРєР° С„РёР±РµСЂР° РЅР° Р·Р°РґР°РЅРЅРѕРµ РІСЂРµРјСЏ
 	ASYNC_API Future<boost::system::error_code> timeout(size_t millisec);
 
-	//выполнить кусок кода синхронно
+	/// РІС‹РїРѕР»РЅРёС‚СЊ РєСѓСЃРѕРє РєРѕРґР° СЃРёРЅС…СЂРѕРЅРЅРѕ
 	ASYNC_API void exec(const boost::function<void ()> &code);
 
-	//прервать текущий фибер в пользу других, исполнение будет продолжено по очереди шедулера
+	/// РїСЂРµСЂРІР°С‚СЊ С‚РµРєСѓС‰РёР№ С„РёР±РµСЂ РІ РїРѕР»СЊР·Сѓ РґСЂСѓРіРёС…, РёСЃРїРѕР»РЅРµРЅРёРµ Р±СѓРґРµС‚ РїСЂРѕРґРѕР»Р¶РµРЅРѕ РїРѕ РѕС‡РµСЂРµРґРё С€РµРґСѓР»РµСЂР°
 	ASYNC_API void yield();
 
-	//текущий экземпляр проактора
+	/// С‚РµРєСѓС‰РёР№ СЌРєР·РµРјРїР»СЏСЂ РїСЂРѕР°РєС‚РѕСЂР°
 	ASYNC_API boost::asio::io_service &io();
 
-	//текущий экземпляр службы
+	/// РїСЂРёР·РЅР°Рє РЅР°Р»РёС‡РёСЏ СЃР»СѓР¶Р±С‹ РґР»СЏ С‚РµРєСѓС‰РµРіРѕ РїРѕС‚РѕРєР°
 	ASYNC_API bool serviceExists();
+
+	/// С‚РµРєСѓС‰РёР№ СЌРєР·РµРјРїР»СЏСЂ СЃР»СѓР¶Р±С‹
 	ASYNC_API Service service();
 }
 
 #include "async/asioBridge.hpp"
 
 //////////////////////////////////////////////////////////////////////////
-//для asio мост в фиберы
+//РґР»СЏ asio РјРѕСЃС‚ РІ С„РёР±РµСЂС‹
 namespace async
 {
+	/// TODO add comments
     template <class Handler>
     AsioBridge<Handler> bridge(const Handler &handler)
     {

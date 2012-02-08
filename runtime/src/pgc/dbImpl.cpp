@@ -171,7 +171,12 @@ namespace pgc
 						async::timeout(2000));
 					w.wait();
 
-					if(w.current().data())
+					if(w.currentIndex() == 1)
+					{
+						//сработал таймаут, как отменить send0?
+						//ILOG("poll timeout");
+					}
+					else if(w.current().data())
 					{
 						ILOG("poll with bad ec: "<<w.current().data()<<")");
 						es = esBad;
@@ -185,7 +190,12 @@ namespace pgc
 						async::timeout(2000));
 					w.wait();
 
-					if(w.current().data())
+					if(w.currentIndex() == 1)
+					{
+						//сработал таймаут, как отменить send0?
+						//ILOG("poll timeout");
+					}
+					else if(w.current().data())
 					{
 						ILOG("poll with bad ec: "<<w.current().data()<<")");
 						es = esBad;
