@@ -11,7 +11,7 @@ namespace async
 	/*!	\ingroup async
 		\brief Групповое ожидание Future
 
-		Поведение аналогично \ref EventWaiter, тип события Future<Data>
+		Поведение аналогично async::EventWaiter, тип события async::Future<Data>
 	*/
 	template <class Data>
 	class FutureWaiter

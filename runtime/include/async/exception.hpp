@@ -11,8 +11,8 @@ namespace async
 		\brief Тип исключения для нештатных ситуаций
 
 		выбрасываеется в различных нештатных ситуациях, например
-			- вызван Mutex::unlock без предварительного Mutex::lock
-			- вызван EventWaiter::current без вызова EventWaiter::wait
+			- вызван async::Mutex::unlock без предварительного async::Mutex::lock
+			- вызван async::EventWaiter::current без вызова async::EventWaiter::wait
 			- вызван exec в чужом потоке
 			- провален какой либо системный вызов (например swapcontext)
 

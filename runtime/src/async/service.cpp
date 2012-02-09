@@ -15,8 +15,8 @@ namespace async
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Service::Service(ServiceImplPtr impl)
-		: _impl(impl)
+	Service::Service(const Service &from)
+		: _impl(from._impl)
 	{
 
 	}

@@ -13,14 +13,14 @@ namespace async
 	/*!	\ingroup async
 		\brief Групповое ожидание событий
 
-		Это надстройка над \ref Event::waitAny, предоставляющая следующие возможности:
+		Это надстройка над async::Event::waitAny, предоставляющая следующие возможности:
 			-	удобное формирование набора событий к ожиданию\n
 				можно до 10 штук сразу в конструктор передать или добавить любое количество событий 
-				уже после создания объекта через EventWaiter::operator<<\n
+				уже после создания объекта через async::EventWaiter::operator<<\n
 				пример
 				\code
 					async::EventWaiter<Future<error_code> > myWaiter(
-						service->send(),		// send возвращает Future<error_code>
+						myService->send(),		// send возвращает Future<error_code>
 						async::timeout(2000));
 
 					myWaiter.wait();//либо send либо timeout
@@ -73,9 +73,9 @@ namespace async
 					}
 				\endcode
 
-		\tparam CustomEvent тип ожидаемых событий. Это может быть сам \ref Event 
-			или любые его производные (\ref Future, ...), главное чтобы они 
-			приводились к Event
+			\tparam CustomEvent тип ожидаемых событий. Это может быть сам async::Event 
+			или любые его производные (async::Future, ...), главное чтобы они 
+			приводились к async::Event
 	*/
 	template <class CustomEvent=Event>
 	class EventWaiter
@@ -111,21 +111,21 @@ namespace async
 		*/
 		EventWaiter &operator <<(const CustomEvent &event);
 
-		/*!	\brief Ожидание очередного события из набора, заданного через конструктор и/или EventWaiter::operator<<
+		/*!	\brief Ожидание очередного события из набора, заданного через конструктор и/или async::EventWaiter::operator<<
 
 			\retval true если произошло одно из событий
 			\retval false если набор событий пуст или уже переработаны все события
 
 			после того как wait вернул истину - сработавшее событие помечается как "текущее"
-			его можно получить через метод \ref current, а его индекс - через \ref currentIndex
+			его можно получить через метод async::EventWaiter::current, а его индекс - через async::EventWaiter::currentIndex
 
-			\post текущее событие может быть получено вызовом \ref current
-			\post индекс текущего события может быть получен вызовом \ref currentIndex
+			\post текущее событие может быть получено вызовом async::EventWaiter::current
+			\post индекс текущего события может быть получен вызовом async::EventWaiter::currentIndex
 		*/
 		bool wait();
 
-		/*! \brief Оператор приведения к bool, просто сахар, вызывает \ref wait
-			\copydoc wait
+		/*! \brief Оператор приведения к bool, просто сахар, вызывает async::EventWaiter::wait
+			\copydoc async::EventWaiter::wait
 			
 			пример использования
 			\code
@@ -143,17 +143,17 @@ namespace async
 			текущее событие - это то, которое произошло на момент последнего wait
 			существует только если wait вернул истину
 
-			\pre \ref wait вернул true
+			\pre async::EventWaiter::wait вернул true
 
-			если \ref wait вернул ложь или вообще не вызывался - то при вызове этого метода будет выброшено исключение 
-			\ref async::exception
+			если async::EventWaiter::wait вернул ложь или вообще не вызывался - то при вызове этого метода будет выброшено исключение 
+			async::exception
 
 			\return экземпляр события
 		*/
 		CustomEvent &current();
 
-		/*! \brief Оператор приведения к пользовательскому событию, просто сахар, вызывает \ref current
-			\copydoc current
+		/*! \brief Оператор приведения к пользовательскому событию, просто сахар, вызывает async::EventWaiter::current
+			\copydoc async::EventWaiter::current
 			
 			пример использования
 			\code
@@ -169,7 +169,7 @@ namespace async
 
 		/*! \brief Индекс текущего события
 			
-			работает аналогично \ref current, но возвращает не само событие а его индекс
+			работает аналогично async::EventWaiter::current, но возвращает не само событие а его индекс
 
 			индекс отсчитывается от 0 и наращивается на 1 при каждом добавлении нового события
 			например, тут индексы как в именах
@@ -180,12 +180,12 @@ namespace async
 			\endcode
 
 			этот метод удобно использовать для идентификации события которое произошло 
-			при \ref wait
+			при async::EventWaiter::wait
 
 			пример
 			\code
 				async::EventWaiter<Future<error_code> > myWaiter(
-					service->send(),		// send возвращает Future<error_code>
+					myService->send(),		// send возвращает Future<error_code>
 					async::timeout(2000));
 
 				myWaiter.wait();//либо send либо timeout
@@ -200,10 +200,10 @@ namespace async
 				}
 			\endcode
 
-			\pre \ref wait вернул true
+			\pre async::EventWaiter::wait вернул true
  
 			если перед вызовом этого метода wait вернул ложь или вообще не вызывался - 
-			будет выброшено исключение \ref async::exception
+			будет выброшено исключение async::exception
 
 			\return индекс текущего события
 
