@@ -41,17 +41,17 @@ namespace utils
 		namespace convertor
 		{
 
-			//////////////////////////////////////////////////////////////////////////
-			//identity, except VariantPtr
-			template <class T>
-				typename boost::enable_if<
-					boost::mpl::not_<boost::is_same<Variant::VariantPtr, T> >
-					, bool>::type
-				exec(T &dst, const T &src)
-			{
-				dst = src;
-				return true;
-			}
+// 			//////////////////////////////////////////////////////////////////////////
+// 			//identity, except VariantPtr
+// 			template <class T>
+// 				typename boost::enable_if<
+// 					boost::mpl::not_<boost::is_same<Variant::VariantPtr, T> >
+// 					, bool>::type
+// 				exec(T &dst, const T &src)
+// 			{
+// 				dst = src;
+// 				return true;
+// 			}
 
 			//warning C4244: '=' : conversion from 'const utils::Variant::UInt16' to 'utils::Variant::UInt8', possible loss of data
 #pragma warning (disable: 4244)
