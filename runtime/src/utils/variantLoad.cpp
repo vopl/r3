@@ -51,11 +51,14 @@ namespace utils
 			}
 
 			VariantLoadScope scope(fileName, first, last, errors);
+			VariantLoadGrammar vlg(scope);
+			SkipGrammar sg;
+
 			parseResult = qi::phrase_parse(
 				first,
 				last,
-				VariantLoadGrammar(scope),
-				SkipGrammar());
+				vlg,
+				sg);
 
 			if(parseResult)
 			{
