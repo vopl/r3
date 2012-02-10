@@ -71,7 +71,7 @@ namespace async
 			return false;
 		}
 		_context.uc_link = NULL;
-		_context.uc_stack.ss_sp = malloc(_stacksize);
+		_context.uc_stack.ss_sp = (char *)malloc(_stacksize);
 		_context.uc_stack.ss_size = _stacksize;
 
 #if PVOID_SIZE == INT_SIZE
