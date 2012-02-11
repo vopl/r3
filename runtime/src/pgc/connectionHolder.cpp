@@ -293,6 +293,8 @@ namespace pgc
 		case PQTRANS_INERROR:
 			inTrans = true;
 			break;
+		default:
+			break;
 		}
 
 		for(;;)
@@ -608,6 +610,8 @@ namespace pgc
 		case CONNECTION_OK:
 		case CONNECTION_MADE:
 			return ecsOk;
+		default:
+			break;
 		}
 		return ecsLost;
 	}
