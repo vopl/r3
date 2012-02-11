@@ -51,18 +51,17 @@ SET(SRC_HDR
 	${SRC_DIR}/async/mutexImpl.hpp
 
 	${SRC_DIR}/async/cmaHandler.hpp
-	${SRC_DIR}/async/pch.h
+	${SRC_DIR}/async/pch.hpp
 
 #	${SRC_DIR}/async/ucontext.h
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
 
-SET(SRC_PCH
-	${SRC_DIR}/async/pch.cpp
-)
-SOURCE_GROUP(src FILES ${SRC_PCH})
-
+IF(MSVC)
+	SET(SRC_PCH ${SRC_DIR}/async/pch.cpp)
+	SOURCE_GROUP(src FILES ${SRC_PCH})
+ENDIF()
 
 
 
@@ -100,8 +99,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ADD_LIBRARY(libasync SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 SET_TARGET_PROPERTIES(libasync PROPERTIES PREFIX "" IMPORT_PREFIX "")
 
-CREATE_PCH(libasync ${SRC_DIR}/async/pch.h ${SRC_PCH})
-USE_PCH(libasync ${SRC_DIR}/async/pch.h ${SRC})
+CREATE_PCH(libasync ${SRC_DIR}/async/pch.hpp ${SRC_PCH})
+USE_PCH(libasync ${SRC_DIR}/async/pch.hpp ${SRC})
 
 SETUP_BIN_OUT(libasync server)
 SETUP_BIN_OUT(libasync client)

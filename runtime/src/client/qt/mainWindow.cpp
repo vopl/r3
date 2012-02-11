@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "pch.hpp"
 #include "mainWindow.hpp"
 #include <boost/bind.hpp>
 #include <QtDeclarative/qdeclarative.h>

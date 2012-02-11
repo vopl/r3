@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "pch.hpp"
 #include "resultImpl.hpp"
 #include "statementImpl.hpp"
 #include "pgc/connectionHolder.hpp"

@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "pch.hpp"
 #include "mainWindow.hpp"
 #include <QtGui/QApplication>
 #include <QtDeclarative/qdeclarative.h>

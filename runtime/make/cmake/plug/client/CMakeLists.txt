@@ -25,22 +25,22 @@ SET(SRC_HDR
 	${SRC_DIR}/client/client.hpp
 	${SRC_DIR}/client/session.hpp
 	${SRC_DIR}/client/agent.hpp
-	${SRC_DIR}/client/pch.h
+	${SRC_DIR}/client/pch.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
 
-SET(SRC_PCH
-	${SRC_DIR}/client/pch.cpp
-)
-SOURCE_GROUP(src FILES ${SRC_PCH})
+IF(MSVC)
+	SET(SRC_PCH ${SRC_DIR}/client/pch.cpp)
+	SOURCE_GROUP(src FILES ${SRC_PCH})
+ENDIF()
 
 
 ADD_LIBRARY(plugclient SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 SET_TARGET_PROPERTIES(plugclient PROPERTIES PREFIX "" IMPORT_PREFIX "")
 
-CREATE_PCH(plugclient ${SRC_DIR}/client/pch.h ${SRC_PCH})
-USE_PCH(plugclient ${SRC_DIR}/client/pch.h ${SRC})
+CREATE_PCH(plugclient ${SRC_DIR}/client/pch.hpp ${SRC_PCH})
+USE_PCH(plugclient ${SRC_DIR}/client/pch.hpp ${SRC})
 
 SETUP_BIN_OUT(plugclient plug)
 

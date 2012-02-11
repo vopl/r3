@@ -20,7 +20,7 @@ SOURCE_GROUP(src\\qt FILES ${SRC})
 QT4_AUTOMOC(${SRC})
 
 SET(SRC_HDR
-	${SRC_DIR}/client/qt/pch.h
+	${SRC_DIR}/client/qt/pch.hpp
 	${SRC_DIR}/client/qt/networkAccessManagerFactory.hpp
 )
 SOURCE_GROUP(src\\qt FILES ${SRC_HDR})
@@ -74,12 +74,10 @@ SET(SRC_QT_RES_DATA
 )
 SOURCE_GROUP(src\\qt\\res FILES ${SRC_QT_RES_DATA})
 
-
-SET(SRC_PCH
-	${SRC_DIR}/client/qt/pch.cpp
-)
-SOURCE_GROUP(src\\qt FILES ${SRC_PCH})
-
+IF(MSVC)
+	SET(SRC_PCH ${SRC_DIR}/client/qt/pch.cpp)
+	SOURCE_GROUP(src\\qt FILES ${SRC_PCH})
+ENDIF()
 
 
 
@@ -98,9 +96,9 @@ ADD_EXECUTABLE(clientqt
 	${UI_HEADERS}
 	${SRC_QT_RES_SRC} ${SRC_QT_RES_DATA})
 
-CREATE_PCH(clientqt ${SRC_DIR}/client/qt/pch.h ${SRC_PCH})
-USE_PCH(clientqt ${SRC_DIR}/client/qt/pch.h ${SRC})
-USE_PCH(clientqt ${SRC_DIR}/client/qt/pch.h ${SRC_QT})
+CREATE_PCH(clientqt ${SRC_DIR}/client/qt/pch.hpp ${SRC_PCH})
+USE_PCH(clientqt ${SRC_DIR}/client/qt/pch.hpp ${SRC})
+USE_PCH(clientqt ${SRC_DIR}/client/qt/pch.hpp ${SRC_QT})
 
 SETUP_BIN_OUT(clientqt client)
 

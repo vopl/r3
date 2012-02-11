@@ -32,21 +32,21 @@ SET(SRC_HDR
 	${SRC_DIR}/utils/variantLoadScope.hpp
 	${SRC_DIR}/utils/variantLoadGrammar.hpp
 	${SRC_DIR}/utils/variantConvertMatrix.hpp
-	${SRC_DIR}/utils/pch.h
+	${SRC_DIR}/utils/pch.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
 
-SET(SRC_PCH
-	${SRC_DIR}/utils/pch.cpp
-)
-SOURCE_GROUP(src FILES ${SRC_PCH})
+IF(MSVC)
+	SET(SRC_PCH ${SRC_DIR}/utils/pch.cpp)
+	SOURCE_GROUP(src FILES ${SRC_PCH})
+ENDIF()
 
 INCLUDE_DIRECTORIES("${SRC_DIR}/utils")
 
 ADD_LIBRARY(libutils STATIC ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_HDR} ${SRC_PCH})
 SET_TARGET_PROPERTIES(libutils PROPERTIES PREFIX "" IMPORT_PREFIX "")
 
-CREATE_PCH(libutils ${SRC_DIR}/utils/pch.h ${SRC_PCH})
-USE_PCH(libutils ${SRC_DIR}/utils/pch.h ${SRC})
+CREATE_PCH(libutils ${SRC_DIR}/utils/pch.hpp ${SRC_PCH})
+USE_PCH(libutils ${SRC_DIR}/utils/pch.hpp ${SRC})
 

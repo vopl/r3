@@ -41,7 +41,7 @@ SET(SRC_HDR
 	${SRC_DIR}/server/session.hpp
 	${SRC_DIR}/server/sessionManager.hpp
 	${SRC_DIR}/server/nodeManager.hpp
-	${SRC_DIR}/server/pch.h
+	${SRC_DIR}/server/pch.hpp
 	
 	${SRC_DIR}/server/serviceEcho.hpp
 	${SRC_DIR}/server/serviceStatics.hpp
@@ -50,17 +50,17 @@ SET(SRC_HDR
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
 
-SET(SRC_PCH
-	${SRC_DIR}/server/pch.cpp
-)
-SOURCE_GROUP(src FILES ${SRC_PCH})
+IF(MSVC)
+	SET(SRC_PCH ${SRC_DIR}/server/pch.cpp)
+	SOURCE_GROUP(src FILES ${SRC_PCH})
+ENDIF()
 
 
 ADD_LIBRARY(plugserver SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 SET_TARGET_PROPERTIES(plugserver PROPERTIES PREFIX "" IMPORT_PREFIX "")
 
-CREATE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC_PCH})
-USE_PCH(plugserver ${SRC_DIR}/server/pch.h ${SRC})
+CREATE_PCH(plugserver ${SRC_DIR}/server/pch.hpp ${SRC_PCH})
+USE_PCH(plugserver ${SRC_DIR}/server/pch.hpp ${SRC})
 
 SETUP_BIN_OUT(plugserver plug)
 

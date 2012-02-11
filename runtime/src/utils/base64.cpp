@@ -24,7 +24,7 @@ misrepresented as being the original source code.
 Rene Nyffenegger rene.nyffenegger@adp-gmbh.ch
 
 */
-#include "pch.h"
+#include "pch.hpp"
 #include "utils/base64.h"
 #include <iostream>
 

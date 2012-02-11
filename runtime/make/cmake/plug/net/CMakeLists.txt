@@ -25,16 +25,15 @@ SET(SRC_HDR
 	${SRC_DIR}/net/connector.hpp
 	${SRC_DIR}/net/acceptor.hpp
 	${SRC_DIR}/net/channelSocket.hpp
-	${SRC_DIR}/net/pch.h
+	${SRC_DIR}/net/pch.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
 
-SET(SRC_PCH
-	${SRC_DIR}/net/pch.cpp
-)
-SOURCE_GROUP(src FILES ${SRC_PCH})
-
+IF(MSVC)
+	SET(SRC_PCH ${SRC_DIR}/net/pch.cpp)
+	SOURCE_GROUP(src FILES ${SRC_PCH})
+ENDIF()
 
 
 
@@ -51,8 +50,8 @@ INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
 ADD_LIBRARY(plugnet SHARED ${SRC_STUB} ${INCLUDE} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 SET_TARGET_PROPERTIES(plugnet PROPERTIES PREFIX "" IMPORT_PREFIX "")
 
-CREATE_PCH(plugnet ${SRC_DIR}/net/pch.h ${SRC_PCH})
-USE_PCH(plugnet ${SRC_DIR}/net/pch.h ${SRC})
+CREATE_PCH(plugnet ${SRC_DIR}/net/pch.hpp ${SRC_PCH})
+USE_PCH(plugnet ${SRC_DIR}/net/pch.hpp ${SRC})
 
 SETUP_BIN_OUT(plugnet plug)
 

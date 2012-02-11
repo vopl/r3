@@ -24,7 +24,7 @@ SET(PGC_SRC
 SOURCE_GROUP(pgc\\src FILES ${PGC_SRC})
 
 SET(SRC_NOPCH
-	${SRC_DIR}/pgc/pch.h
+	${SRC_DIR}/pgc/pch.hpp
 	${SRC_DIR}/heapNewDelete.cpp
 )
 SOURCE_GROUP(src FILES ${SRC_NOPCH})
@@ -40,11 +40,10 @@ SET(PGC_SRC_HDR
 SOURCE_GROUP(pgc\\src FILES ${PGC_SRC_HDR})
 
 
-SET(SRC_PCH
-	${SRC_DIR}/pgc/pch.cpp
-)
-SOURCE_GROUP(src FILES ${SRC_PCH})
-
+IF(MSVC)
+	SET(SRC_PCH ${SRC_DIR}/pgc/pch.cpp)
+	SOURCE_GROUP(src FILES ${SRC_PCH})
+ENDIF()
 
 INCLUDE_DIRECTORIES(${SRC_DIR}/pgc)
 
@@ -195,10 +194,10 @@ ADD_LIBRARY(libpg SHARED
 	${PGS_SRC_META_HDR})
 SET_TARGET_PROPERTIES(libpg PROPERTIES PREFIX "" IMPORT_PREFIX "")
 	
-CREATE_PCH(libpg ${SRC_DIR}/pgc/pch.h ${SRC_PCH})
-USE_PCH(libpg ${SRC_DIR}/pgc/pch.h ${PGC_SRC})
-USE_PCH(libpg ${SRC_DIR}/pgc/pch.h ${PGS_SRC})
-USE_PCH(libpg ${SRC_DIR}/pgc/pch.h ${PGS_SRC_META})
+CREATE_PCH(libpg ${SRC_DIR}/pgc/pch.hpp ${SRC_PCH})
+USE_PCH(libpg ${SRC_DIR}/pgc/pch.hpp ${PGC_SRC})
+USE_PCH(libpg ${SRC_DIR}/pgc/pch.hpp ${PGS_SRC})
+USE_PCH(libpg ${SRC_DIR}/pgc/pch.hpp ${PGS_SRC_META})
 
 
 SETUP_BIN_OUT(libpg server)
