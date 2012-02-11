@@ -66,7 +66,7 @@ SETUP_BIN_OUT(plugserver plug)
 
 TARGET_LINK_LIBRARIES(plugserver libheap libpluma libutils liblog libasync libpg)
 
-IF(LINUX)
+IF(UNIX)
 	SET(CMAKE_THREAD_PREFER_PTHREAD ON)
 	INCLUDE(FindThreads)
 	TARGET_LINK_LIBRARIES(plugserver ${CMAKE_THREAD_LIBS_INIT})

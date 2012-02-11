@@ -23,7 +23,7 @@ namespace net
 			if(!_sslContext)
 			{
 				ILOG("create ssl context");
-				sslContext.reset(new TSslContext(io(), ssl::context::sslv23));
+				sslContext.reset(new TSslContext(async::io(), ssl::context::sslv23));
 
 				error_code ec;
 				sslContext->set_options(
@@ -75,7 +75,7 @@ namespace net
 
 		error_code ec;
 		//резолвить адрес
-		ip::tcp::resolver resolver(io());
+		ip::tcp::resolver resolver(async::io());
 
 		Future2<error_code, ip::tcp::resolver::iterator> resolveRes;
 		resolver.async_resolve(
@@ -99,11 +99,11 @@ namespace net
 
 		if(sslContext)
 		{
-			sockSsl.reset(new TSocketSsl(io(), *sslContext));
+			sockSsl.reset(new TSocketSsl(async::io(), *sslContext));
 		}
 		else
 		{
-			sock.reset(new TSocket(io()));
+			sock.reset(new TSocket(async::io()));
 		}
 
 		//подключать
