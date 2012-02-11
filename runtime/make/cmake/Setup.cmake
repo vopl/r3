@@ -67,6 +67,10 @@ ELSE(WINDOWS OR SOLARIS OR FREEBSD)
 ENDIF(WINDOWS OR SOLARIS OR FREEBSD OR LINUX)
 
 
+IF(CMAKE_CXX_COMPILER MATCHES "clang")
+	SET(CMAKE_COMPILER_IS_CLANG 1)
+ENDIF()
+
 INCLUDE(Local.cmake OPTIONAL)
 
 
@@ -111,26 +115,26 @@ ENDIF(MSVC)
 
 
 #######################################################################################
-#IF(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
+#IF((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG) AND UNIX)
 #	#need for correct resolving symbols with dlsym
 #	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -symbolic")
 #ENDIF(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
 
 
 #######################################################################################
-IF(CMAKE_COMPILER_IS_GNUCXX AND NOT WINDOWS)
+IF((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG) AND UNIX)
 	#need for correct resolving symbols with dlsym
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-ENDIF(CMAKE_COMPILER_IS_GNUCXX AND NOT WINDOWS)
+ENDIF()
 
 
 
 #######################################################################################
-IF(CMAKE_COMPILER_IS_GNUCXX)
+IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
  	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Xlinker --no-undefined")
  	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Xlinker --no-undefined")
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+ENDIF()
 
 
 
