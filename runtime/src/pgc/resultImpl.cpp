@@ -278,6 +278,8 @@ namespace pgc
 			return ersCommandOk;
 		case PGRES_TUPLES_OK:
 			return ersTuplesOk;
+		default:
+			break;
 		}
 		return ersError;
 	}
@@ -594,7 +596,7 @@ namespace pgc
 		case 1114://timestamp
 		case 1184://timestamptz
 			{
-				boost::uint64_t time;
+				boost::int64_t time;
 				if(_integerDatetimes)
 				{
 					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
@@ -790,6 +792,8 @@ namespace pgc
 			return fetchRowList_(v.as<Variant::ListVariant>(), rowIdx);
 		case Variant::etVectorVariant:
 			return fetchRowList_(v.as<Variant::VectorVariant>(), rowIdx);
+		default:
+			break;
 		}
 		return fetchRowList_(v.as<Variant::DequeVariant>(true), rowIdx);
 	}
@@ -811,6 +815,8 @@ namespace pgc
 			return fetchRowsList_(v.as<Variant::ListVariant>(), rowBeginIdx, rowEndIdx);
 		case Variant::etVectorVariant:
 			return fetchRowsList_(v.as<Variant::VectorVariant>(), rowBeginIdx, rowEndIdx);
+		default:
+			break;
 		}
 		return fetchRowsList_(v.as<Variant::DequeVariant>(true), rowBeginIdx, rowEndIdx);
 	}
@@ -826,6 +832,8 @@ namespace pgc
 			return fetchRowsMap_(v.as<Variant::ListVariant>(), rowBeginIdx, rowEndIdx);
 		case Variant::etVectorVariant:
 			return fetchRowsMap_(v.as<Variant::VectorVariant>(), rowBeginIdx, rowEndIdx);
+		default:
+			break;
 		}
 		return fetchRowsMap_(v.as<Variant::DequeVariant>(true), rowBeginIdx, rowEndIdx);
 	}
@@ -841,6 +849,8 @@ namespace pgc
 			return fetchRowList_(v.as<Variant::ListVariant>(), colIndices, rowIdx);
 		case Variant::etVectorVariant:
 			return fetchRowList_(v.as<Variant::VectorVariant>(), colIndices, rowIdx);
+		default:
+			break;
 		}
 		return fetchRowList_(v.as<Variant::DequeVariant>(true), colIndices, rowIdx);
 	}
@@ -862,6 +872,8 @@ namespace pgc
 			return fetchRowsList_(v.as<Variant::ListVariant>(), colIndices, rowBeginIdx, rowEndIdx);
 		case Variant::etVectorVariant:
 			return fetchRowsList_(v.as<Variant::VectorVariant>(), colIndices, rowBeginIdx, rowEndIdx);
+		default:
+			break;
 		}
 		return fetchRowsList_(v.as<Variant::DequeVariant>(true), colIndices, rowBeginIdx, rowEndIdx);
 	}
@@ -877,6 +889,8 @@ namespace pgc
 			return fetchRowsMap_(v.as<Variant::ListVariant>(), colIndices, rowBeginIdx, rowEndIdx);
 		case Variant::etVectorVariant:
 			return fetchRowsMap_(v.as<Variant::VectorVariant>(), colIndices, rowBeginIdx, rowEndIdx);
+		default:
+			break;
 		}
 		return fetchRowsMap_(v.as<Variant::DequeVariant>(true), colIndices, rowBeginIdx, rowEndIdx);
 	}
@@ -892,6 +906,8 @@ namespace pgc
 			return fetchColumn_(v.as<Variant::ListVariant>(), rowBeginIdx, rowEndIdx);
 		case Variant::etVectorVariant:
 			return fetchColumn_(v.as<Variant::VectorVariant>(), rowBeginIdx, rowEndIdx);
+		default:
+			break;
 		}
 		return fetchColumn_(v.as<Variant::DequeVariant>(true), rowBeginIdx, rowEndIdx);
 	}

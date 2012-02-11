@@ -253,6 +253,8 @@ namespace pgc
 					}
 				}
 				break;
+			default:
+				break;
 			}
 		}
 	}

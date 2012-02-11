@@ -229,6 +229,8 @@ template void Variant::forceType<Variant::Void>();
 		case etMultimapStringVariant:
 		case etMultimapVariantVariant:
 			return true;
+		default:
+			break;
 		}
 		return false;
 	}
@@ -241,6 +243,8 @@ template void Variant::forceType<Variant::Void>();
 		case etVectorVariant:
 		case etDequeVariant:
 			return true;
+		default:
+			break;
 		}
 		return false;
 	}
@@ -279,6 +283,8 @@ template void Variant::forceType<Variant::Void>();
 		case etChar:
 		case etUuid:
 			return true;
+		default:
+			break;
 		}
 		return false;
 	}

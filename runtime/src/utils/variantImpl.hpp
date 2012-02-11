@@ -431,7 +431,7 @@ namespace utils
 					}
 				}
 				break;
-				case etMultimapStringVariant:
+			case etMultimapStringVariant:
 				{
 					const MultimapStringVariant &m = as<MultimapStringVariant>();
 					MultimapStringVariant::const_iterator iter = m.find(key);
@@ -442,7 +442,7 @@ namespace utils
 					}
 				}
 				break;
-				case etMultimapVariantVariant:
+			case etMultimapVariantVariant:
 				{
 					const MultimapVariantVariant &m = as<MultimapVariantVariant>();
 					MultimapVariantVariant::const_iterator iter = m.find(key);
@@ -453,6 +453,8 @@ namespace utils
 					}
 				}
 				break;
+			default:
+				assert(0);
 			}
 			dst.setNull();
 		}
@@ -533,6 +535,8 @@ namespace utils
 					}
 				}
 				break;
+			default:
+				assert(0);
 			}
 			dst.setNull();
 		}
@@ -567,6 +571,9 @@ namespace utils
 						return;
 					}
 				}
+				break;
+			default:
+				assert(0);
 				break;
 			}
 			dst.setNull();
