@@ -1,0 +1,14 @@
+SET(CMAKE_BUILD_TYPE "Debug")
+#SET(CMAKE_BUILD_TYPE "RelWithDebInfo")
+SET(CMAKE_VERBOSE_MAKEFILE ON)
+
+	INCLUDE_DIRECTORIES("/usr/local/include/boost-1_49")
+	INCLUDE_DIRECTORIES("/usr/local/include")
+
+	SET(Boost_COMPILER "-clang30")
+	SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/include/boost_1_49")
+
+	SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/lib")
+	SET(Boost_ADDITIONAL_VERSIONS "1.49.0" "1.49" "1.46.0" "1.46.1")
+
+
