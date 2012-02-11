@@ -171,7 +171,7 @@ namespace client
 		//////////////////////////////////////////////////////////////////////////
 		MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 			: QMainWindow(parent, flags)
-			, _nd(false)
+			, _nd(NULL)
 			, _networkAccessManagerFactory(NULL)
 			, _view(NULL)
 			, _numChannels(0)
