@@ -31,12 +31,7 @@ IF(MSVC)
 #			MESSAGE("precompiled ${key} used in ${i}")
 		ENDFOREACH(i)
 	ENDMACRO(USE_PCH)
-ENDIF()
-
-
-
-#######################################################################################
-IF(CMAKE_COMPILER_IS_GNUCXX)
+ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
 
 
 	MACRO(PCH_KEY2FILENAME pchfile key header)
@@ -124,6 +119,10 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 	
 	
 	
-	
-	
+ELSE()
+	MACRO(CREATE_PCH target header srcfile)
+	ENDMACRO(CREATE_PCH)
+
+	MACRO(USE_PCH target header)
+	ENDMACRO(USE_PCH)
 ENDIF()
