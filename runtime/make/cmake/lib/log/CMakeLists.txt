@@ -2,6 +2,7 @@ PROJECT (log)
 
 
 set (INCLUDE
+	${INC_DIR}/log/api.h
 	${INC_DIR}/log/client.hpp
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
