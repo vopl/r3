@@ -4,15 +4,24 @@
 
 
 //////////////////////////////////////////////////////////////////////////
+/*!	\ingroup heap
+	\brief Удаление массива
+*/
 void operator delete[](void *p) throw()
 {
 	heap::free(p);
 }
+/*!	\ingroup heap
+	\brief Удаление объекта
+*/
 void operator delete(void *p) throw()
 {
 	heap::free(p);
 }
 
+/*!	\ingroup heap
+	\brief Создание массива
+*/
 #ifdef _MSC_VER
 void *operator new[](size_t s) throw(...)
 #else
@@ -21,6 +30,11 @@ void *operator new[](std::size_t s) throw(std::bad_alloc)
 {
 	return heap::alloc((unsigned int)s);
 }
+
+
+/*!	\ingroup heap
+	\brief Создание объекта
+*/
 #ifdef _MSC_VER
 void *operator new(size_t s) throw(...)
 #else
