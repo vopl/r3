@@ -96,14 +96,23 @@ namespace async
 		Service(const Service &from);
 
 		/*!	\brief Разрушение
-			\pre если impl уникален - то он будет разрушатся тоже, тогда служба должна быть остановлена заранее
+			\pre если impl уникален - то он будет разрушатся тоже, тогда служба должна 
+				быть остановлена заранее вызовом async::Service::stop
 		*/
 		~Service();
 
-		//! Проверка на пустую службу
+		/*! \brief Проверка на пустую службу
+
+			\retval true если службы не пустая
+			\retval false если службы пустая
+		*/
 		operator bool() const;
 
-		//! Проверка на пустую службу
+		/*! \brief Проверка на пустую службу
+
+			\retval true если службы пустая
+			\retval false если службы не пустая
+		*/
 		bool operator!() const;
 
 		//! сброс службы в пустую
@@ -120,29 +129,112 @@ namespace async
 			const boost::function<void ()> &onThreadStart = boost::function<void ()>(),
 			const boost::function<void ()> &onThreadStop = boost::function<void ()>());
 
+		/*! \brief Балансировка количества рабочих потоков
+			
+			\param numThreads новое количество рабочих потоков
+		*/
 		void balance(size_t numThreads);
+
+		/*! \brief Останов запущенной службы
+
+			\pre на момент вызова служба должна быть запущена
+		*/
 		void stop();
 
+		/*!	\brief Запуск пользовательского функтора в контексте фибера
+
+			\param code пользовательский функтор к исполнению
+
+			\pre вызов должен производится в рабочем потоке этого экземпляром службы
+		*/
 		void spawn(const boost::function<void ()> &code);
 
+		/*!	\brief Таймаут
+
+			\param millisec количество времени в миллисекундах
+			
+			\retval Future с кодом ошибки, он сработает по истечении времени 
+				millisec (error_code будет OK) или при вызове 
+				async::Service::cancelAllTimeouts (error_code будет не OK)
+
+			\pre вызов должен производится в рабочем потоке этого экземпляром службы
+			\pre ожидание Future должно производится в рабочем потоке этого экземпляром службы
+		*/
 		Future<boost::system::error_code> timeout(size_t millisec);
+
+		/*!	\brief Отмена всех таймаутов
+
+			Эту функцию удобно вызывать перед остановом службы
+		*/
 		void cancelAllTimeouts();
 
+		/*! Доступ к внутреннему экземпляру службы asio
+			
+			\retval экземпляр службы asio
+		*/
 		boost::asio::io_service &io();
+
+		/*!	\brief Установка данного экземпляра службы как "глобального"
+			
+			Это может быть полезно если служба всего одна на приложение и 
+			необходимо иметь доступ к ней из любого потока.
+
+			При вызове service() из потока, который не принадлежит asio - будет 
+			возвращен глобальный экземпляр.
+
+			\param force если ранее глобальный экземпляр уже был установлен - то вызов 
+			async::Service::setAsGlobal(false) ничего не сделает, вернет false и глобальным останется старый
+			экземпляр. Вызов async::Service::setAsGlobal(true) переустановит глобальный экземпляр на данный.
+
+			\retval true если глобальный экземпляр успешно установлен
+			\retval false если глобальный экземпляр не установлен, такое может быть если 
+				ранее уже был зарегистрирован глобальный экземпляр и производится 
+				вызов async::Service::setAsGlobal(false)
+		*/
 		bool setAsGlobal(bool force);
 	};
 
 
-	/// выполнить кусок кода асинхронно
+	/*! \ingroup async
+		\brief Запуск пользовательского функтора в контексте фибера
+
+		Получает экземпляр службы для текущего потока аналогично async::service и вызывает 
+		на нем async::Service::spawn
+
+		\copydetails async::Service::spawn
+	*/
 	ASYNC_API void spawn(const boost::function<void ()> &code);
 
-	/// приостановка фибера на заданное время
+	/*! \ingroup async
+		\brief Таймаут
+
+		Получает экземпляр службы для текущего потока аналогично async::service и вызывает 
+		на нем async::Service::timeout
+
+		\copydetails async::Service::timeout
+	*/
 	ASYNC_API Future<boost::system::error_code> timeout(size_t millisec);
 
-	/// выполнить кусок кода синхронно
+	/*!	\ingroup async
+		\brief Dыполнить кусок кода синхронно
+
+		\param code пользовательский функтор к исполнению
+
+		Функтор code будет выполнен в контексте фибера.
+
+		\pre вызов должен производится в рабочем потоке службы async::Service или в контексте фибера
+
+		Если вызов производится в 
+	*/
 	ASYNC_API void exec(const boost::function<void ()> &code);
 
-	/// прервать текущий фибер в пользу других, исполнение будет продолжено по очереди шедулера
+	/*!	\ingroup async
+		\brief Прервать текущий фибер в пользу других
+		
+		Исполнение прерванного фибера будет продолжено по очереди шедулера
+
+		\pre вызов должен производится в контексте фибера
+	*/
 	ASYNC_API void yield();
 
 	/// текущий экземпляр проактора
