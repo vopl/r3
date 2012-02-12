@@ -48,7 +48,7 @@
 
 
 /*!	\ingroup heap
-	\brief Головное пространство имен
+	\brief Головное пространство имен модуля heap
 */
 namespace heap
 {

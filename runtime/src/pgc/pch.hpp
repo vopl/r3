@@ -7,7 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
@@ -24,10 +24,24 @@
 #include <set>
 #include <deque>
 #include <iostream>
+#include <vector>
+#include <string>
+#include <map>
+#include <algorithm>
 
 #include <libpq-fe.h>
 
 #include "utils/variant.hpp"
+#include "utils/fixEndian.hpp"
+#include "utils/ntoa.hpp"
+#include "utils/julian.h"
+#include "utils/implAccess.hpp"
+#include "utils/aton.hpp"
+
 #include "async/service.hpp"
+#include "async/future.hpp"
+#include "async/mutex.hpp"
+#include "async/futureWaiter.hpp"
+
 
 #endif
