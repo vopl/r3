@@ -1,4 +1,4 @@
-#ifndef _PGC_CONNECTIONHOLDER_HPP_
+﻿#ifndef _PGC_CONNECTIONHOLDER_HPP_
 #define _PGC_CONNECTIONHOLDER_HPP_
 
 #include <boost/asio.hpp>
@@ -169,7 +169,7 @@ namespace pgc
 		//ограничение на количество одновременно хранимых запросов
 		static const size_t	_max = 1000;
 		//таймаут удаления по бездействию
-		static const size_t	_timeout = 1000*60*5;//millisec
+		static const size_t	_timeout = 1000*60*60;//millisec, проверь доку по pgc::Connection, там эта цифра фигурирует как "1 час"
 		//время на момент начала работы
 		posix_time::ptime	_now;
 		//контейнер с запросами

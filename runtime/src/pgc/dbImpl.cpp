@@ -46,7 +46,10 @@ namespace pgc
 				ILOG("close connection");
 				(*_readyConnections.begin())->close();
 				_readyConnections.erase(_readyConnections.begin());
-				async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+				if(_onConnectionLost)
+				{
+					async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+				}
 			}
 
 			//распределение и открытие
@@ -226,7 +229,11 @@ namespace pgc
 						assert(_startConnections.end() != _startConnections.find(pch));
 						_startConnections.erase(pch);
 						_readyConnections.insert(pch);
-						async::spawn(bind(_onConnectionMade, _readyConnections.size() + _workConnections.size()));
+
+						if(_onConnectionMade)
+						{
+							async::spawn(bind(_onConnectionMade, _readyConnections.size() + _workConnections.size()));
+						}
 					}
 					async::spawn(bind(&DbImpl::balanceConnections, shared_from_this()));
 				}
@@ -291,7 +298,10 @@ namespace pgc
 				mutex::scoped_lock sl(_mtx);
 				assert(_workConnections.end() != _workConnections.find(pch));
 				_workConnections.erase(pch);
-				async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+				if(_onConnectionLost)
+				{
+					async::spawn(bind(_onConnectionLost, _readyConnections.size() + _workConnections.size()));
+				}
 			}
 		}
 

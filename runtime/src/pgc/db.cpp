@@ -15,7 +15,7 @@ namespace pgc
 		size_t maxConnections,
 		boost::function<void (size_t)> connectionMade,
 		boost::function<void (size_t)> connectionLost)
-		: _impl(new DbImpl(conninfo, maxConnections, connectionMade, connectionLost))
+		: _impl(new DbImpl(conninfo, maxConnections<5?5:maxConnections, connectionMade, connectionLost))
 	{
 
 	}
@@ -44,8 +44,8 @@ namespace pgc
 		if(_impl)
 		{
 			_impl->reset();
+			_impl.reset();
 		}
-		_impl.reset();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
