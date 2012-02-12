@@ -216,34 +216,65 @@ namespace async
 	ASYNC_API Future<boost::system::error_code> timeout(size_t millisec);
 
 	/*!	\ingroup async
-		\brief Dыполнить кусок кода синхронно
+		\brief Выполнить кусок кода синхронно
 
 		\param code пользовательский функтор к исполнению
 
 		Функтор code будет выполнен в контексте фибера.
 
-		\pre вызов должен производится в рабочем потоке службы async::Service или в контексте фибера
+		\pre вызов должен производится в рабочем потоке службы async::Service или 
+		в контексте фибера
 
-		Если вызов производится в 
+		Если вызов производится в контексте фибера - то функтор будет просто вызван 
+		без всяких дополнительных действий.
+
+		Если вызов производится вне контекста фибера - то будет организован фибер и код
+		будет выполнен в нем.
+
+		Этот способ навязан особенностями asio, используется при проведении вызовов 
+		completition handlers в контекст фибера, смотри async::bridge, async::AsioBridge
 	*/
 	ASYNC_API void exec(const boost::function<void ()> &code);
 
 	/*!	\ingroup async
-		\brief Прервать текущий фибер в пользу других
+		\brief Приостановить текущий фибер в пользу других
 		
-		Исполнение прерванного фибера будет продолжено по очереди шедулера
+		Исполнение приостановленного фибера будет продолжено по очереди шедулера
 
 		\pre вызов должен производится в контексте фибера
 	*/
 	ASYNC_API void yield();
 
-	/// текущий экземпляр проактора
+	/*! \ingroup async
+		\brief Доступ к экземпляру службы asio
+
+		\retval экземпляр службы asio, используемый в службе async
+
+		Экземпляр службы, из которого будет предоставлено asio получается 
+		аналогично async::service.
+	*/
 	ASYNC_API boost::asio::io_service &io();
 
-	/// признак наличия службы для текущего потока
+	/*!	\ingroup async
+		\brief Признак наличия службы для текущего потока
+
+		\retval true если текущий поток находится под управлением службы asio или 
+			зарегистрирован глобальный экземпляр (async::Service::setAsGlobal)
+		\retval false если текущий поток не находится под управлением службы asio и
+			не зарегистрирован глобальный экземпляр (async::Service::setAsGlobal)
+	*/
 	ASYNC_API bool serviceExists();
 
-	/// текущий экземпляр службы
+	/*!	\ingroup async
+		\brief Доступ к текущему экземпляру службы
+
+		\retval экземпляр службы, если текущий поток находится под управлением службы asio или 
+			зарегистрирован глобальный экземпляр (async::Service::setAsGlobal)
+
+		Если текущий поток не находится под управлением службы asio и не зарегистрирован 
+		глобальный экземпляр (async::Service::setAsGlobal) - будет выброшено исключение
+		async::exception.
+	*/
 	ASYNC_API Service service();
 }
 
@@ -253,9 +284,18 @@ namespace async
 //для asio мост в фиберы
 namespace async
 {
-	/// TODO add comments
+	/*!	\ingroup async
+		\brief Обертка для вызова пользовательского функутора в контексте фибера
+
+		\param handler пользовательский функтор, который будет обернут
+
+		\return обернутый функтор, при его вызове будет произведен вызов клиентского 
+			функтора через async::exec
+
+		Эту обертку необходимо использовать при формировании completition handlers для asio
+	*/
     template <class Handler>
-    AsioBridge<Handler> bridge(const Handler &handler)
+	async::AsioBridge<Handler> bridge(const Handler &handler)
     {
 		return AsioBridge<Handler>(handler);
     }
