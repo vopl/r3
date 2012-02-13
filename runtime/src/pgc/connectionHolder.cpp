@@ -55,7 +55,8 @@ namespace pgc
 		{
 			pridGenerator(),
 			p,
-			_now
+			_now,
+			_now,
 		};
 		_prepareds.insert(sps);
 		return sps._prid;
@@ -76,7 +77,8 @@ namespace pgc
 		{
 			pridGenerator(),
 			p,
-			_now
+			_now,
+			_now,
 		};
 		_prepareds.insert(sps);
 	}
@@ -490,41 +492,64 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	bool ConnectionHolder::deallocateOne(const std::string &prid, async::Future<Result> res)
+	{
+		async::Future<Result> r;
+		runQuery_f(r, "DEALLOCATE "+prid);
+		if(ersCommandOk != r.data().status())
+		{
+			const char * errCode = r.data().errorCode();
+			if(errCode && !strcmp("26000", errCode))
+			{
+				//ERROR:  prepared statement "XXX" does not exist
+			}
+			else
+			{
+				//другая ошибка - фатально
+				ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
+				_prepareds.clear();
+				setResult(res);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 	void ConnectionHolder::runEndWork_f(async::Future<Result> res)
 	{
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
 
-		posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
-
-		TPrepareds::nth_index<1>::type &timedIndex = _prepareds.get<1>();
+		//удаление по устареванию
+		TPrepareds::nth_index<1>::type &accessIndex = _prepareds.get<1>();
 		while(
-			!timedIndex.empty() &&
+			!accessIndex.empty() &&
 			(
-				timedIndex.size() > _max ||
-				boundATime > timedIndex.begin()->_accessTime)		)
+				accessIndex.size() > _max)		)
 		{
-			std::string prid = timedIndex.begin()->_prid;
-			timedIndex.erase(timedIndex.begin());
-
-			async::Future<Result> r;
-			runQuery_f(r, "DEALLOCATE "+prid);
-			if(ersCommandOk != r.data().status())
+			if(!deallocateOne(accessIndex.begin()->_prid, res))
 			{
-				const char * errCode = r.data().errorCode();
-				if(errCode && !strcmp("26000", errCode))
-				{
-					//ERROR:  prepared statement "XXX" does not exist
-				}
-				else
-				{
-					//другая ошибка - фатально
-					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
-					_prepareds.clear();
-					setResult(res);
-					return;
-				}
+				return;
 			}
+			accessIndex.erase(accessIndex.begin());
+		}
+
+		//удаление по времени жизни
+		posix_time::ptime boundATime = _now - posix_time::milliseconds(_timeout);
+		TPrepareds::nth_index<2>::type &createIndex = _prepareds.get<2>();
+		while(
+			!createIndex.empty() &&
+			(
+				boundATime > createIndex.begin()->_createTime)		)
+		{
+			if(!deallocateOne(createIndex.begin()->_prid, res))
+			{
+				return;
+			}
+			createIndex.erase(createIndex.begin());
 		}
 
 		_now = posix_time::ptime();

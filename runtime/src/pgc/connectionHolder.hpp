@@ -60,9 +60,11 @@ namespace pgc
 			StatementImplWtr			_stm;
 			//время последнего доступа
 			posix_time::ptime			_accessTime;
+			//время создания
+			posix_time::ptime			_createTime;
 		};
 
-		//контейнер, индексирован по таймауту и адресу запроса
+		//контейнер, индексирован по адресу запроса, по времени последнего доступа и повремени создания
 		typedef multi_index_container<
 			StatementPrepareState,
 			indexed_by<
@@ -78,6 +80,13 @@ namespace pgc
 						StatementPrepareState,
 						posix_time::ptime,
 						&StatementPrepareState::_accessTime
+					>
+				>,
+				ordered_non_unique<
+					member<
+						StatementPrepareState,
+						posix_time::ptime,
+						&StatementPrepareState::_createTime
 					>
 				>
 			>
@@ -223,6 +232,7 @@ namespace pgc
 		void runQueryWithPrepare_f(async::Future<Result> res, StatementImplPtr s, BindDataPtr bindData);
 
 	private:
+		bool deallocateOne(const std::string &prid, async::Future<Result> res);
 		void runEndWork_f(async::Future<Result> res);
 
 	public:

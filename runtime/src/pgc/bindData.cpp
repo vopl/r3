@@ -93,6 +93,9 @@ namespace pgc
 		case Variant::etSetVariant:
 			bindSeq(data.as<Variant::SetVariant>());
 			break;
+		case Variant::etMultisetVariant:
+			bindSeq(data.as<Variant::MultisetVariant>());
+			break;
 		case Variant::etDequeVariant:
 			bindSeq(data.as<Variant::DequeVariant>());
 			break;
@@ -115,9 +118,6 @@ namespace pgc
 			break;
 		case Variant::etMultimapStringVariant:
 			bindAssoc(data.as<Variant::MultimapStringVariant>());
-			break;
-		case Variant::etMultisetVariant:
-			bindAssoc(data.as<Variant::MultisetVariant>());
 			break;
 
 
