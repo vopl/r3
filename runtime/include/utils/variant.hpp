@@ -2,7 +2,7 @@
 #define _UTILS_VARIANT_HPP_
 
 
-//для autoexp.dat
+//РґР»СЏ autoexp.dat
 #if !defined NDEBUG && defined _MSC_VER
 #	define UTILS_VARIANT_DBGDATA
 #endif
@@ -84,7 +84,7 @@ namespace utils
 	class Variant
 	{
 	public:
-		//енум с числовыми значениями для типов
+		//РµРЅСѓРј СЃ С‡РёСЃР»РѕРІС‹РјРё Р·РЅР°С‡РµРЅРёСЏРјРё РґР»СЏ С‚РёРїРѕРІ
 		enum EType
 		{
 			etUnknown					=0,//ub
@@ -130,7 +130,7 @@ namespace utils
 		};
 
 	public:
-		//короткие алиасы для типов, иена синхронно с EType
+		//РєРѕСЂРѕС‚РєРёРµ Р°Р»РёР°СЃС‹ РґР»СЏ С‚РёРїРѕРІ, РёРµРЅР° СЃРёРЅС…СЂРѕРЅРЅРѕ СЃ EType
 		typedef void								Void;
 		typedef std::string 						String;
 		typedef float 								Float;
@@ -179,7 +179,7 @@ namespace utils
 		~Variant();
 
 		//////////////////////////////////////////////////////////////////////////
-		//конструкторы
+		//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 		Variant();
 		Variant(const Variant &v);
 		Variant(const char *v);//String
@@ -191,7 +191,7 @@ namespace utils
 
 
 		//////////////////////////////////////////////////////////////////////////
-		//присваивание
+		//РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 		Variant &operator=(const Variant &v);
 		Variant &operator=(const char *v);//String
 #define ENUM_VARIANT_TYPE(T) Variant &operator=(const T &v);
@@ -202,47 +202,47 @@ namespace utils
 		void swap(Variant &);
 
 		//////////////////////////////////////////////////////////////////////////
-		//проверки
+		//РїСЂРѕРІРµСЂРєРё
 
-		//на NULL
+		//РЅР° NULL
 		bool isNull() const;
-		//на внутренний тип
+		//РЅР° РІРЅСѓС‚СЂРµРЅРЅРёР№ С‚РёРї
 		template<typename T> bool is() const;
-		//на возможность использования operator[](string)
+		//РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ operator[](string)
 		bool isMap() const;
-		//на возможность использования operator[](size_t)
+		//РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ operator[](size_t)
 		bool isArray() const;
-		//на скаляр
+		//РЅР° СЃРєР°Р»СЏСЂ
 		bool isScalar() const;
 
 		//////////////////////////////////////////////////////////////////////////
-		//внутренние преобразования
-		//установить нул/ненул для текущего типа
+		//РІРЅСѓС‚СЂРµРЅРЅРёРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+		//СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РЅСѓР»/РЅРµРЅСѓР» РґР»СЏ С‚РµРєСѓС‰РµРіРѕ С‚РёРїР°
 		void setNull(bool n=true);
 
-		//установить нул/ненул для заданного типа, старое значение сохраняется если не нул и тип не изменился
+		//СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РЅСѓР»/РЅРµРЅСѓР» РґР»СЏ Р·Р°РґР°РЅРЅРѕРіРѕ С‚РёРїР°, СЃС‚Р°СЂРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РµСЃР»Рё РЅРµ РЅСѓР» Рё С‚РёРї РЅРµ РёР·РјРµРЅРёР»СЃСЏ
 		template<typename T> void setNull(bool n=true);
 
-		//установить заданный тип, старое значение сохраняется если не нул и тип не изменился
+		//СѓСЃС‚Р°РЅРѕРІРёС‚СЊ Р·Р°РґР°РЅРЅС‹Р№ С‚РёРї, СЃС‚Р°СЂРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РµСЃР»Рё РЅРµ РЅСѓР» Рё С‚РёРї РЅРµ РёР·РјРµРЅРёР»СЃСЏ
 		template<typename T> void forceType();
-		//установить заданный тип, старое значение сохраняется если не нул и тип не изменился
+		//СѓСЃС‚Р°РЅРѕРІРёС‚СЊ Р·Р°РґР°РЅРЅС‹Р№ С‚РёРї, СЃС‚Р°СЂРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РµСЃР»Рё РЅРµ РЅСѓР» Рё С‚РёРї РЅРµ РёР·РјРµРЅРёР»СЃСЏ
 		void forceType(EType et);
 
 		//////////////////////////////////////////////////////////////////////////
-		//доступ к сырым данным
-		//тип
+		//РґРѕСЃС‚СѓРї Рє СЃС‹СЂС‹Рј РґР°РЅРЅС‹Рј
+		//С‚РёРї
 		EType type() const;
-		//адрес хранимого объекта
+		//Р°РґСЂРµСЃ С…СЂР°РЅРёРјРѕРіРѕ РѕР±СЉРµРєС‚Р°
 		void *data();
 		void const *data() const;
 
-		//доступ ко ссылке на хранимый объект
+		//РґРѕСЃС‚СѓРї РєРѕ СЃСЃС‹Р»РєРµ РЅР° С…СЂР°РЅРёРјС‹Р№ РѕР±СЉРµРєС‚
 		template<typename T> T &as(bool forceType);
 		template<typename T> T const &as() const;
 		template<typename T> T &as();
 
 		//////////////////////////////////////////////////////////////////////////
-		//матричное преобразование
+		//РјР°С‚СЂРёС‡РЅРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ
 		template<typename T> T to() const;
 		template<typename T> void to(T &dst) const;
 		template<typename T> void convert();
@@ -257,7 +257,7 @@ namespace utils
 		ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 
-	public://интерфейс ассоциативной карты и индексируемого массива
+	public://РёРЅС‚РµСЂС„РµР№СЃ Р°СЃСЃРѕС†РёР°С‚РёРІРЅРѕР№ РєР°СЂС‚С‹ Рё РёРЅРґРµРєСЃРёСЂСѓРµРјРѕРіРѕ РјР°СЃСЃРёРІР°
 		Variant operator[](const std::string &key);
 		Variant operator[](const char *key);
 		Variant operator[](const Variant &key);
@@ -265,30 +265,30 @@ namespace utils
 		Variant operator[](int idx);
 
 	public:
-		//для упорядоченного контейнера
+		//РґР»СЏ СѓРїРѕСЂСЏРґРѕС‡РµРЅРЅРѕРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР°
 		bool operator <(const Variant &v) const;
-		//на всякий случай
+		//РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№
 		bool operator ==(const Variant &v) const;
 		bool operator !=(const Variant &v) const;
 
 	public:
-		//сериализация в портабельный бинарник
+		//СЃРµСЂРёР°Р»РёР·Р°С†РёСЏ РІ РїРѕСЂС‚Р°Р±РµР»СЊРЅС‹Р№ Р±РёРЅР°СЂРЅРёРє
 		boost::shared_array<char> serialize(boost::uint32_t &size) const;
 		bool deserialize(boost::shared_array<char> data, boost::uint32_t size);
 
-		//загрузка из текстового файла (JSON-подобного)
+		//Р·Р°РіСЂСѓР·РєР° РёР· С‚РµРєСЃС‚РѕРІРѕРіРѕ С„Р°Р№Р»Р° (JSON-РїРѕРґРѕР±РЅРѕРіРѕ)
 		bool load(const char *fileName, std::string *errors=NULL);
 
 	protected:
-		//буфер
+		//Р±СѓС„РµСЂ
 		static const size_t _dataSize = sizeof(void *)<=4?12:24;
 		char _data[_dataSize];
 
-		//тип
-		typedef boost::int16_t ETypeStorage;//негативный - null
+		//С‚РёРї
+		typedef boost::int16_t ETypeStorage;//РЅРµРіР°С‚РёРІРЅС‹Р№ - null
 		ETypeStorage _et;
 
-		//для отладчика помогалка
+		//РґР»СЏ РѕС‚Р»Р°РґС‡РёРєР° РїРѕРјРѕРіР°Р»РєР°
 #ifdef UTILS_VARIANT_DBGDATA
 		void *_dbgData;
 #endif
@@ -296,7 +296,7 @@ namespace utils
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//тип в число
+	//С‚РёРї РІ С‡РёСЃР»Рѕ
 	template <> struct Variant::Type2Enum<Variant::Void> { static const EType et = Variant::etVoid;	};
 #define ENUM_VARIANT_TYPE(T) template <> struct Variant::Type2Enum<Variant::T> { static const EType et = Variant::et##T;	};
 	ENUM_VARIANT_TYPES
@@ -304,7 +304,7 @@ namespace utils
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// дампер
+	// РґР°РјРїРµСЂ
 	std::ostream &operator <<(std::ostream &ostr, const Variant &v);
 	std::ostream &operator <<(std::ostream &ostr, const Variant::VectorVariant &v);
 	std::ostream &operator <<(std::ostream &ostr, const Variant::MapStringVariant &v);
@@ -327,22 +327,22 @@ namespace utils
 
 
 //////////////////////////////////////////////////////////////////////////
-//генераторы вектора и карты
+//РіРµРЅРµСЂР°С‚РѕСЂС‹ РІРµРєС‚РѕСЂР° Рё РєР°СЂС‚С‹
 /*
-	вектор использовать так:
-	MVA();//сформирует вариант типа etVectorVariant, не нул, пустой
-	MVA(220);//с одним элементом типа int
-	MVA(220, "elem2", MVA(2,3));//вектор из трех элементов, последний сам вектор из двух
+	РІРµРєС‚РѕСЂ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚Р°Рє:
+	MVA();//СЃС„РѕСЂРјРёСЂСѓРµС‚ РІР°СЂРёР°РЅС‚ С‚РёРїР° etVectorVariant, РЅРµ РЅСѓР», РїСѓСЃС‚РѕР№
+	MVA(220);//СЃ РѕРґРЅРёРј СЌР»РµРјРµРЅС‚РѕРј С‚РёРїР° int
+	MVA(220, "elem2", MVA(2,3));//РІРµРєС‚РѕСЂ РёР· С‚СЂРµС… СЌР»РµРјРµРЅС‚РѕРІ, РїРѕСЃР»РµРґРЅРёР№ СЃР°Рј РІРµРєС‚РѕСЂ РёР· РґРІСѓС…
 
-	MVA может принять до MVX_MAXELEMS аргументов
+	MVA РјРѕР¶РµС‚ РїСЂРёРЅСЏС‚СЊ РґРѕ MVX_MAXELEMS Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
 
-	карту:
-	MVM();//сформирует вариант типа etMapStringVariant, не нул, пустой
-	MVM("220", 220);//с одной парой ключ "220", значение 220
+	РєР°СЂС‚Сѓ:
+	MVM();//СЃС„РѕСЂРјРёСЂСѓРµС‚ РІР°СЂРёР°РЅС‚ С‚РёРїР° etMapStringVariant, РЅРµ РЅСѓР», РїСѓСЃС‚РѕР№
+	MVM("220", 220);//СЃ РѕРґРЅРѕР№ РїР°СЂРѕР№ РєР»СЋС‡ "220", Р·РЅР°С‡РµРЅРёРµ 220
 	MVM("elem2", 220, "complex", MVA(2,3));//
 
-	MVM может принять до MVX_MAXELEMS пар ключ-значение
+	MVM РјРѕР¶РµС‚ РїСЂРёРЅСЏС‚СЊ РґРѕ MVX_MAXELEMS РїР°СЂ РєР»СЋС‡-Р·РЅР°С‡РµРЅРёРµ
 */
 #ifndef MVX_MAXELEMS
 #	define MVX_MAXELEMS 20
