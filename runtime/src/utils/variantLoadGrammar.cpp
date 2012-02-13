@@ -177,7 +177,7 @@ namespace utils
 		_integer.name("integer");
 		_integer =
 			(
-				ascii::string("0x") > //РЅРµРїРѕРЅСЏС‚РЅС‹Р№ Р±Р°Рі РІ РЅРµРґСЂР°С… СЃРїРёСЂРёС‚Р° (ubuntu64 10, gcc 4.6, boost 1.42)
+				ascii::string("0x") > //Р Р…Р ВµР С—Р С•Р Р…РЎРЏРЎвЂљР Р…РЎвЂ№Р в„– Р В±Р В°Р С– Р Р† Р Р…Р ВµР Т‘РЎР‚Р В°РЎвЂ¦ РЎРѓР С—Р С‘РЎР‚Р С‘РЎвЂљР В° (ubuntu64 10, gcc 4.6, boost 1.42)
                 //ascii::string("0x") >>
 				+_hexDigit >>
 				-(char_('u') >>

@@ -145,7 +145,7 @@ namespace pgs
 			res =  "DOUBLE PRECISION";
 			break;
 		case pgs::meta::eftSet:
-			assert(!"размер");
+			assert(!"СЂР°Р·РјРµСЂ");
 			res =  "BITS(8)";
 			break;
 		case pgs::meta::eftString:
@@ -251,7 +251,7 @@ namespace pgs
 			}
 			else
 			{
-				//без схемы куда?
+				//Р±РµР· СЃС…РµРјС‹ РєСѓРґР°?
 				return false;
 			}
 		}
@@ -270,7 +270,7 @@ namespace pgs
 		_schema2oid[s] = oid;
 		_oid2schema[oid] = s;
 
-		//генератор идентификаторов объектов
+		//РіРµРЅРµСЂР°С‚РѕСЂ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РѕР±СЉРµРєС‚РѕРІ
 		pgr = con.query(
 			"SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema=$1 AND sequence_name=$2",
 			MVA(schemaName(s, false, false), idGenName(s, false, false)));
@@ -466,7 +466,7 @@ namespace pgs
 				//log.push_back(SyncLogLine("cross table created", schemaName(r->_schema, false, false), tableName(r, false, false)));
 				ILOG("cross table created: "<<schemaName(r->_schema, false, false)<<", "<<tableName(r, false, false));
 
-				//тригер на добавление в кросс
+				//С‚СЂРёРіРµСЂ РЅР° РґРѕР±Р°РІР»РµРЅРёРµ РІ РєСЂРѕСЃСЃ
 				pgr = con.query(
 					"CREATE OR REPLACE FUNCTION "+triggerFuncName(r, "ins_upd")+"()\n"
 					"	RETURNS trigger AS\n"
@@ -535,7 +535,7 @@ namespace pgs
 	//////////////////////////////////////////////////////////////////////////
 	bool ClusterImpl::sync_tableInherits(pgc::Connection con, pgs::meta::CategoryCPtr c, bool allowCreate)
 	{
-		//todo: withPrepare срезать
+		//todo: withPrepare СЃСЂРµР·Р°С‚СЊ
 		pgc::Result pgr = con.query(
 			"SELECT inhparent FROM pg_catalog.pg_inherits WHERE inhrelid=$1",
 			Variant(_cat2oid[c]));
@@ -582,7 +582,7 @@ namespace pgs
 	bool ClusterImpl::createTable2CrossTrigger(pgc::Connection con, pgs::meta::RelationEndCPtr re, const std::string &who)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		//тригер на удаление
+		//С‚СЂРёРіРµСЂ РЅР° СѓРґР°Р»РµРЅРёРµ
 		pgc::Result pgr = con.query(
 			"CREATE OR REPLACE FUNCTION "+triggerFuncName(re->_category, re->_name+"_del")+"()\n"
 			"	RETURNS trigger AS\n"
@@ -614,7 +614,7 @@ namespace pgs
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		//на обновление
+		//РЅР° РѕР±РЅРѕРІР»РµРЅРёРµ
 		pgr = con.query(
 			"CREATE OR REPLACE FUNCTION "+triggerFuncName(re->_category, re->_name+"_upd")+"()\n"
 			"	RETURNS trigger AS\n"
@@ -696,7 +696,7 @@ namespace pgs
 			return;
 		}
 
-		//наличие схем
+		//РЅР°Р»РёС‡РёРµ СЃС…РµРј
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
 			if(!sync_schemaExistence(con, s, allowCreate))
@@ -706,7 +706,7 @@ namespace pgs
 			}
 		}
 
-		//наличие таблиц
+		//РЅР°Р»РёС‡РёРµ С‚Р°Р±Р»РёС†
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
 			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
@@ -719,7 +719,7 @@ namespace pgs
 			}
 		}
 
-		//наличие полей
+		//РЅР°Р»РёС‡РёРµ РїРѕР»РµР№
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
 			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
@@ -735,7 +735,7 @@ namespace pgs
 			}
 		}
 
-		//наличие индексов
+		//РЅР°Р»РёС‡РёРµ РёРЅРґРµРєСЃРѕРІ
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
 			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
@@ -751,7 +751,7 @@ namespace pgs
 			}
 		}
 
-		//наличие таблиц связей
+		//РЅР°Р»РёС‡РёРµ С‚Р°Р±Р»РёС† СЃРІСЏР·РµР№
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
 			BOOST_FOREACH(pgs::meta::RelationCPtr r, s->_relations)
@@ -764,7 +764,7 @@ namespace pgs
 			}
 		}
 
-		//наследование
+		//РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
 			BOOST_FOREACH(pgs::meta::CategoryCPtr c, s->_categories)
@@ -795,7 +795,7 @@ namespace pgs
 			return;
 		}
 
-		//схемы
+		//СЃС…РµРјС‹
 		BOOST_FOREACH(pgs::meta::SchemaCPtr s, _metaCluster.getSchemas())
 		{
 			if(!drop_schemaExistence(con, s))

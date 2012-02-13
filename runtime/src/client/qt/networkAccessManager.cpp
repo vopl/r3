@@ -17,7 +17,7 @@ namespace client
 
 			if(url.scheme() == "client")
 			{
-				//url.host() - служба
+				//url.host() - СЃР»СѓР¶Р±Р°
 				return new NetworkReply(this, url, _session);
 			}
 

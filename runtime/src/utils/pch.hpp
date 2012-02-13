@@ -19,7 +19,7 @@
 
 
 /*
-// mingw g++ падает на слишком больших gch
+// mingw g++ РїР°РґР°РµС‚ РЅР° СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РёС… gch
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/repository/include/qi_confix.hpp>
 #include <boost/spirit/include/phoenix.hpp>

@@ -61,7 +61,7 @@ namespace pgs
 		}
 		res.push_back(idx);
 
-		//перебрать все поля
+		//РїРµСЂРµР±СЂР°С‚СЊ РІСЃРµ РїРѕР»СЏ
 		BOOST_FOREACH(meta::FieldCPtr mf, cat->meta()->_fields)
 		{
 			fldName = categoryAlias + "." + _cluster->escapeName(mf->_name);

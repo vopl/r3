@@ -9,14 +9,14 @@ namespace async
 	class FiberPool
 	{
 	public:
-		//фиберы без задачи
+		//С„РёР±РµСЂС‹ Р±РµР· Р·Р°РґР°С‡Рё
 		std::set<FiberImplPtr>			_fibersIdle;
-		//рабочие фиберы с задачей и готовые к исполнению
+		//СЂР°Р±РѕС‡РёРµ С„РёР±РµСЂС‹ СЃ Р·Р°РґР°С‡РµР№ Рё РіРѕС‚РѕРІС‹Рµ Рє РёСЃРїРѕР»РЅРµРЅРёСЋ
 		std::deque<FiberImplPtr>		_fibersReady;
 		mutex							_mtxFibers;
 
 
-		//очередь задач на которые не хватило фиберов
+		//РѕС‡РµСЂРµРґСЊ Р·Р°РґР°С‡ РЅР° РєРѕС‚РѕСЂС‹Рµ РЅРµ С…РІР°С‚РёР»Рѕ С„РёР±РµСЂРѕРІ
 		std::deque<function<void()> >	_tasks;
 		mutex							_mtxTasks;
 

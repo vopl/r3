@@ -48,7 +48,7 @@ namespace client
 		v = rres.data2();
 		if(!v["badSid"].isNull())
 		{
-			//сессия устарела
+			//СЃРµСЃСЃРёСЏ СѓСЃС‚Р°СЂРµР»Р°
 			res(make_error_code(errc::owner_dead), session);
 			return;
 		}

@@ -14,7 +14,7 @@ namespace server
 		assert(esStop == _state);
 
 		//////////////////////////////////////////////////////////////////////////
-		//поднять коннектор базы
+		//РїРѕРґРЅСЏС‚СЊ РєРѕРЅРЅРµРєС‚РѕСЂ Р±Р°Р·С‹
 		assert(!_db);
 		_db = pgc::Db(
 			"host=localhost port=5432 dbname=test user=test password=test",
@@ -23,7 +23,7 @@ namespace server
 			bind(&Server::onDbConnectionLost, shared_from_this(), _1));
 
 		//////////////////////////////////////////////////////////////////////////
-		//поднять сетевой акцептор
+		//РїРѕРґРЅСЏС‚СЊ СЃРµС‚РµРІРѕР№ Р°РєС†РµРїС‚РѕСЂ
 		net::IAcceptorPtr acceptor = _plugs->create<net::IAcceptorProvider>();
 		assert(acceptor);
 		if(!acceptor)
@@ -35,7 +35,7 @@ namespace server
 
 
 		//////////////////////////////////////////////////////////////////////////
-		//поднять менеджер сессий
+		//РїРѕРґРЅСЏС‚СЊ РјРµРЅРµРґР¶РµСЂ СЃРµСЃСЃРёР№
 		assert(!_sessionManager);
 		_sessionManager = _plugs->create<ISessionManagerProvider>();
 		assert(_sessionManager);
@@ -50,7 +50,7 @@ namespace server
 			bind(&Server::onSessionStop, shared_from_this(), _1));
 
 		//////////////////////////////////////////////////////////////////////////
-		//поднять хаб служб
+		//РїРѕРґРЅСЏС‚СЊ С…Р°Р± СЃР»СѓР¶Р±
 		assert(!_nodeManager);
 		_nodeManager = _plugs->create<INodeManagerProvider>();
 		assert(_nodeManager);
@@ -63,7 +63,7 @@ namespace server
 		_nodeManager->setServer(shared_from_this());
 
 		//////////////////////////////////////////////////////////////////////////
-		//набавить службы
+		//РЅР°Р±Р°РІРёС‚СЊ СЃР»СѓР¶Р±С‹
 		std::vector<INodePtr> nodes;
 		_plugs->createAll<INodeProvider>(nodes);
 		BOOST_FOREACH(INodePtr &n, nodes)
@@ -170,7 +170,7 @@ namespace server
 		_plugs = plugs;
 
 		//////////////////////////////////////////////////////////////////////////
-		//поднять асинхронный двиг
+		//РїРѕРґРЅСЏС‚СЊ Р°СЃРёРЅС…СЂРѕРЅРЅС‹Р№ РґРІРёРі
 		_asrv = async::Service(false);
 		assert(_asrv);
 		if(!_asrv)
@@ -179,15 +179,15 @@ namespace server
 			return false;
 		}
 
-		//запускать асинхронный двиг
+		//Р·Р°РїСѓСЃРєР°С‚СЊ Р°СЃРёРЅС…СЂРѕРЅРЅС‹Р№ РґРІРёРі
 		_asrv.start(
 			//1);
 			1+boost::thread::hardware_concurrency());
 
-		//родить запускалку в асинхронной среде
+		//СЂРѕРґРёС‚СЊ Р·Р°РїСѓСЃРєР°Р»РєСѓ РІ Р°СЃРёРЅС…СЂРѕРЅРЅРѕР№ СЃСЂРµРґРµ
 		_asrv.spawn(bind(&Server::startup, shared_from_this(), host, service));
 
-		//ждать когда запускалка отработает
+		//Р¶РґР°С‚СЊ РєРѕРіРґР° Р·Р°РїСѓСЃРєР°Р»РєР° РѕС‚СЂР°Р±РѕС‚Р°РµС‚
 		while(esStop == _state)
 		{
 			_isStartedCvar.wait(sl);

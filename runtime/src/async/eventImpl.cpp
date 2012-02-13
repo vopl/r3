@@ -147,7 +147,7 @@ namespace async
 		pmn->_readyKey = NULL;
 		pmn->_initiator = FiberImpl::current()->shared_from_this();
 
-		//старт
+		//СЃС‚Р°СЂС‚
 		pmn->_mtx.lock();
 		Event *iter = begin;
 		for(; iter!=end; iter++)
@@ -156,7 +156,7 @@ namespace async
 			{
 				pmn->_readyKey = iter->_impl.get();
 				pmn->_mtx.unlock();
-				//готов, откатить установленные
+				//РіРѕС‚РѕРІ, РѕС‚РєР°С‚РёС‚СЊ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Рµ
 				for(Event *iterBack = begin; iterBack!=iter; iterBack++)
 				{
 					iterBack->_impl->mnCancel(pmn);
@@ -167,10 +167,10 @@ namespace async
 		}
 		pmn->_mtx.unlock();
 
-		//никто не сработал при старте, ждать
+		//РЅРёРєС‚Рѕ РЅРµ СЃСЂР°Р±РѕС‚Р°Р» РїСЂРё СЃС‚Р°СЂС‚Рµ, Р¶РґР°С‚СЊ
 		WorkerImpl::current()->fiberYield();
 
-		//один сработал, отменить остальные
+		//РѕРґРёРЅ СЃСЂР°Р±РѕС‚Р°Р», РѕС‚РјРµРЅРёС‚СЊ РѕСЃС‚Р°Р»СЊРЅС‹Рµ
 		assert(pmn->_readyKey);
 		{
 			for(Event *iterBack = begin; iterBack!=end; iterBack++)

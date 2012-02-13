@@ -39,7 +39,7 @@ namespace pgc
 		{
 			mutex::scoped_lock sl(_mtx);
 
-			//закрытие лишних
+			//Р·Р°РєСЂС‹С‚РёРµ Р»РёС€РЅРёС…
 			while(	!_readyConnections.empty() &&
 				_readyConnections.size() + _workConnections.size() + _startConnections.size() > _maxConnections)
 			{
@@ -52,12 +52,12 @@ namespace pgc
 				}
 			}
 
-			//распределение и открытие
+			//СЂР°СЃРїСЂРµРґРµР»РµРЅРёРµ Рё РѕС‚РєСЂС‹С‚РёРµ
 			while(!_waiters.empty())
 			{
 				if(!_readyConnections.empty())
 				{
-					//есть готовые соединения
+					//РµСЃС‚СЊ РіРѕС‚РѕРІС‹Рµ СЃРѕРµРґРёРЅРµРЅРёСЏ
 
 					ConnectionHolderPtr ch = *_readyConnections.begin();
 					ConnectionImplPtr ci(new ConnectionImpl(ch));
@@ -73,7 +73,7 @@ namespace pgc
 
 				if(!_maxConnections)
 				{
-					//больше выделять нельзя, освободить всех ожидающих нулями
+					//Р±РѕР»СЊС€Рµ РІС‹РґРµР»СЏС‚СЊ РЅРµР»СЊР·СЏ, РѕСЃРІРѕР±РѕРґРёС‚СЊ РІСЃРµС… РѕР¶РёРґР°СЋС‰РёС… РЅСѓР»СЏРјРё
 
 					BOOST_FOREACH(async::Future<Connection> &res, _waiters)
 					{
@@ -87,7 +87,7 @@ namespace pgc
 				if(	_startConnections.empty() &&
 					_readyConnections.size() + _workConnections.size() < _maxConnections)
 				{
-					//готовых нет, стартующих нет, можно подключать новое
+					//РіРѕС‚РѕРІС‹С… РЅРµС‚, СЃС‚Р°СЂС‚СѓСЋС‰РёС… РЅРµС‚, РјРѕР¶РЅРѕ РїРѕРґРєР»СЋС‡Р°С‚СЊ РЅРѕРІРѕРµ
 					async::spawn(bind(&DbImpl::makeConnection, shared_from_this()));
 				}
 				break;
@@ -104,7 +104,7 @@ namespace pgc
 
 			if(!_startConnections.empty())
 			{
-				//уже происходит подключение, ничего не делать
+				//СѓР¶Рµ РїСЂРѕРёСЃС…РѕРґРёС‚ РїРѕРґРєР»СЋС‡РµРЅРёРµ, РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°С‚СЊ
 				return;
 			}
 			ILOG("start connection");
@@ -176,7 +176,7 @@ namespace pgc
 
 					if(w.currentIndex() == 1)
 					{
-						//сработал таймаут, как отменить send0?
+						//СЃСЂР°Р±РѕС‚Р°Р» С‚Р°Р№РјР°СѓС‚, РєР°Рє РѕС‚РјРµРЅРёС‚СЊ send0?
 						//ILOG("poll timeout");
 					}
 					else if(w.current().data())
@@ -195,7 +195,7 @@ namespace pgc
 
 					if(w.currentIndex() == 1)
 					{
-						//сработал таймаут, как отменить send0?
+						//СЃСЂР°Р±РѕС‚Р°Р» С‚Р°Р№РјР°СѓС‚, РєР°Рє РѕС‚РјРµРЅРёС‚СЊ send0?
 						//ILOG("poll timeout");
 					}
 					else if(w.current().data())
@@ -315,7 +315,7 @@ namespace pgc
 
 		async::Future<Connection> res;
 
-		//небольшая оптимизация - если есть готовые то отдать сразу, без балансировки
+		//РЅРµР±РѕР»СЊС€Р°СЏ РѕРїС‚РёРјРёР·Р°С†РёСЏ - РµСЃР»Рё РµСЃС‚СЊ РіРѕС‚РѕРІС‹Рµ С‚Рѕ РѕС‚РґР°С‚СЊ СЃСЂР°Р·Сѓ, Р±РµР· Р±Р°Р»Р°РЅСЃРёСЂРѕРІРєРё
 		if(!_readyConnections.empty())
 		{
 			ConnectionHolderPtr ch = *_readyConnections.begin();
@@ -331,7 +331,7 @@ namespace pgc
 			}
 		}
 
-		//не повезло, делать балансировку
+		//РЅРµ РїРѕРІРµР·Р»Рѕ, РґРµР»Р°С‚СЊ Р±Р°Р»Р°РЅСЃРёСЂРѕРІРєСѓ
 		_waiters.push_back(res);
 		async::spawn(bind(&DbImpl::balanceConnections, shared_from_this()));
 

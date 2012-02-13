@@ -5,14 +5,14 @@
 
 //////////////////////////////////////////////////////////////////////////
 /*!	\ingroup heap
-	\brief Удаление массива
+	\brief РЈРґР°Р»РµРЅРёРµ РјР°СЃСЃРёРІР°
 */
 void operator delete[](void *p) throw()
 {
 	heap::free(p);
 }
 /*!	\ingroup heap
-	\brief Удаление объекта
+	\brief РЈРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚Р°
 */
 void operator delete(void *p) throw()
 {
@@ -20,7 +20,7 @@ void operator delete(void *p) throw()
 }
 
 /*!	\ingroup heap
-	\brief Создание массива
+	\brief РЎРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР°
 */
 #ifdef _MSC_VER
 void *operator new[](size_t s) throw(...)
@@ -33,7 +33,7 @@ void *operator new[](std::size_t s) throw(std::bad_alloc)
 
 
 /*!	\ingroup heap
-	\brief Создание объекта
+	\brief РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р°
 */
 #ifdef _MSC_VER
 void *operator new(size_t s) throw(...)

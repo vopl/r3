@@ -75,7 +75,7 @@ namespace net
 			acceptor = _acceptor;
 		}
 
-		//резолвить адрес
+		//СЂРµР·РѕР»РІРёС‚СЊ Р°РґСЂРµСЃ
 		ip::tcp::resolver resolver(async::io());
 
 		Future2<error_code, ip::tcp::resolver::iterator> resolveRes;
@@ -86,7 +86,7 @@ namespace net
 
 		if(resolveRes.data1())
 		{
-			//неудача, вернуть ее
+			//РЅРµСѓРґР°С‡Р°, РІРµСЂРЅСѓС‚СЊ РµРµ
 			{
 				mutex::scoped_lock sl(_mtx);
 				_inProcess = false;
@@ -96,7 +96,7 @@ namespace net
 			return;
 		}
 
-		//зарядить акцептор asio
+		//Р·Р°СЂСЏРґРёС‚СЊ Р°РєС†РµРїС‚РѕСЂ asio
 		acceptor->open(resolveRes.data2()->endpoint().protocol());
 		acceptor->set_option(ip::tcp::acceptor::reuse_address(true));
 		acceptor->set_option(socket_base::enable_connection_aborted(true));
@@ -170,7 +170,7 @@ namespace net
 
 		if(sockSsl)
 		{
-			//делать handshake
+			//РґРµР»Р°С‚СЊ handshake
 			ecRes.reset();
 			sockSsl->async_handshake(ssl::stream_base::server, async::bridge(ecRes));
 			ec = ecRes;

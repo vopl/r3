@@ -74,7 +74,7 @@ namespace net
 		}
 
 		error_code ec;
-		//резолвить адрес
+		//СЂРµР·РѕР»РІРёС‚СЊ Р°РґСЂРµСЃ
 		ip::tcp::resolver resolver(async::io());
 
 		Future2<error_code, ip::tcp::resolver::iterator> resolveRes;
@@ -85,7 +85,7 @@ namespace net
 
 		if(ec)
 		{
-			//неудача, вернуть ее
+			//РЅРµСѓРґР°С‡Р°, РІРµСЂРЅСѓС‚СЊ РµРµ
 			WLOG("async_resolve failed: "<<ec.message()<<"("<<ec.value()<<")");
 			res(ec, IChannelPtr());
 			return;
@@ -93,7 +93,7 @@ namespace net
 		ip::tcp::resolver::iterator riter = resolveRes.data2();
 		ip::tcp::resolver::iterator rend = ip::tcp::resolver::iterator();
 
-		//создать сокет
+		//СЃРѕР·РґР°С‚СЊ СЃРѕРєРµС‚
 		TSocketSslPtr sockSsl;
 		TSocketPtr sock;
 
@@ -106,7 +106,7 @@ namespace net
 			sock.reset(new TSocket(async::io()));
 		}
 
-		//подключать
+		//РїРѕРґРєР»СЋС‡Р°С‚СЊ
 		ec = error_code();
 		for(;;)
 		{
@@ -133,7 +133,7 @@ namespace net
 
 			if(ec || riter==rend)
 			{
-				//неудача, вернуть ее
+				//РЅРµСѓРґР°С‡Р°, РІРµСЂРЅСѓС‚СЊ РµРµ
 				res(ec, IChannelPtr());
 				return;
 			}
@@ -149,14 +149,14 @@ namespace net
 					WLOG("handshake failed: "<<ec.message()<<"("<<ec.value()<<")");
 					continue;
 				}
-				//успех
+				//СѓСЃРїРµС…
 				//ILOG("success");
 				res(error_code(), IChannelPtr(new ChannelSocket(sockSsl, sslContext)));
 				return;
 			}
 			else
 			{
-				//успех
+				//СѓСЃРїРµС…
 				//ILOG("success");
 				res(error_code(), IChannelPtr(new ChannelSocket(sock)));
 				return;
