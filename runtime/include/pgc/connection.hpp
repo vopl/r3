@@ -101,10 +101,10 @@ namespace pgc
 				- utils::Variant::etInt16 (21 => int2)
 				- utils::Variant::etInt32 (23 => int4)
 				- utils::Variant::etInt64 (20 => int8)
-				- utils::Variant::etUInt8 (21 => int2)
-				- utils::Variant::etUInt16 (23 => int4)
-				- utils::Variant::etUInt32 (20 => int8)
-				- utils::Variant::etUInt64 (20 => int8)
+				- utils::Variant::etUInt8 (21 => int2) \warning postgres не имеет беззнаковых целых типов, используются знаковые!
+				- utils::Variant::etUInt16 (21 => int2) \warning postgres не имеет беззнаковых целых типов, используются знаковые!
+				- utils::Variant::etUInt32 (23 => int4) \warning postgres не имеет беззнаковых целых типов, используются знаковые!
+				- utils::Variant::etUInt64 (20 => int8) \warning postgres не имеет беззнаковых целых типов, используются знаковые!
 				- utils::Variant::etTm (1114 => timestamp)
 				- utils::Variant::etDate (1082 => date)
 				- utils::Variant::etDatetime (1114 => timestamp)

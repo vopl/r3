@@ -278,24 +278,24 @@ namespace pgc
 			}
 			break;
 		case Variant::etUInt16:
+			typ = 21;//int2
+			fmt = 1;
+			if(!v.isNull())
+			{
+				len = 2;
+				val = new char[len];
+				*(Variant::UInt16 *)val = bigEndian(v.as<Variant::UInt16>());
+				own = true;
+			}
+			break;
+		case Variant::etUInt32:
 			typ = 23;//int4
 			fmt = 1;
 			if(!v.isNull())
 			{
 				len = 4;
 				val = new char[len];
-				*(Variant::UInt32 *)val = bigEndian((Variant::UInt32)v.as<Variant::UInt16>());
-				own = true;
-			}
-			break;
-		case Variant::etUInt32:
-			typ = 20;//int8
-			fmt = 1;
-			if(!v.isNull())
-			{
-				len = 8;
-				val = new char[len];
-				*(Variant::UInt64 *)val = bigEndian((Variant::UInt64)v.as<Variant::UInt32>());
+				*(Variant::UInt32 *)val = bigEndian(v.as<Variant::UInt32>());
 				own = true;
 			}
 			break;
@@ -305,23 +305,10 @@ namespace pgc
 				fmt = 1;
 				if(!v.isNull())
 				{
-					const boost::uint64_t &ui64 = v.as<Variant::UInt64>();
-					if(ui64 & 0x8000000000000000ULL)
-					{
-						typ = 0;
-						fmt = 0;
-						val = new char[32];
-						_ntoa(ui64, val);
-						len = 0;
-						own = true;
-					}
-					else
-					{
-						len = 8;
-						val = new char[len];
-						*(boost::uint64_t *)val = bigEndian(ui64);
-						own = true;
-					}
+					len = 8;
+					val = new char[len];
+					*(Variant::UInt64 *)val = bigEndian(v.as<Variant::UInt64>());
+					own = true;
 				}
 			}
 			break;
