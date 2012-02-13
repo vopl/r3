@@ -1,4 +1,4 @@
-﻿#ifndef _ASYNC_FUTURE_HPP_
+#ifndef _ASYNC_FUTURE_HPP_
 #define _ASYNC_FUTURE_HPP_
 
 #include "async/event.hpp"

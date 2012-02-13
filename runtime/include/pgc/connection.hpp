@@ -1,4 +1,4 @@
-﻿#ifndef _PGC_CONNECTION_HPP_
+#ifndef _PGC_CONNECTION_HPP_
 #define _PGC_CONNECTION_HPP_
 
 #include "pgc/statement.hpp"

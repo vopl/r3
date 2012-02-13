@@ -1,4 +1,4 @@
-﻿#ifndef _ASYNC_EVENTWAITER_HPP_
+#ifndef _ASYNC_EVENTWAITER_HPP_
 #define _ASYNC_EVENTWAITER_HPP_
 
 #include "async/event.hpp"

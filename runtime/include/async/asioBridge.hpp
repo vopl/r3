@@ -1,4 +1,4 @@
-﻿#ifndef _ASYNC_ASIOBRIDGE_HPP_
+#ifndef _ASYNC_ASIOBRIDGE_HPP_
 #define _ASYNC_ASIOBRIDGE_HPP_
 
 #include <boost/bind.hpp>

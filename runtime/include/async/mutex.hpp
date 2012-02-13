@@ -1,4 +1,4 @@
-﻿#ifndef _ASYNC_MUTEX_HPP_
+#ifndef _ASYNC_MUTEX_HPP_
 #define _ASYNC_MUTEX_HPP_
 
 #include "async/api.h"

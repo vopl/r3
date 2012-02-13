@@ -1,4 +1,4 @@
-﻿#ifndef _ASYNC_FUTUREWAITER_HPP_
+#ifndef _ASYNC_FUTUREWAITER_HPP_
 #define _ASYNC_FUTUREWAITER_HPP_
 
 #include "async/future.hpp"
