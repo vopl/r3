@@ -34,9 +34,9 @@ int main(int argc, char* argv[])
 
 
 	signal(SIGINT, onSignal);
-	signal(SIGILL, onSignal);
-	signal(SIGFPE, onSignal);
-	signal(SIGSEGV, onSignal);
+	//signal(SIGILL, onSignal);
+	//signal(SIGFPE, onSignal);
+	//signal(SIGSEGV, onSignal);
 	signal(SIGTERM, onSignal);
 	signal(SIGABRT, onSignal);
 #ifdef WIN32
