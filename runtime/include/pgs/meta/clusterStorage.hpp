@@ -12,7 +12,7 @@ namespace pgs
 		class ClusterStorage
 		{
 		public:
-			//объекты из кучи
+			//РѕР±СЉРµРєС‚С‹ РёР· РєСѓС‡Рё
 			std::vector<boost::shared_ptr<Schema> >				_schemas_heap;
 			std::vector<boost::shared_ptr<Category> >			_categories_heap;
 			std::vector<boost::shared_ptr<Relation> >			_relations_heap;
@@ -21,7 +21,7 @@ namespace pgs
 			std::vector<boost::shared_ptr<FieldScantyValue> >	_fieldScantyValues_heap;
 			std::vector<boost::shared_ptr<Index> >				_indices_heap;
 
-			//точка входа для схем после инициализации
+			//С‚РѕС‡РєР° РІС…РѕРґР° РґР»СЏ СЃС…РµРј РїРѕСЃР»Рµ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 			SchemaPtrs _schemas;
 		};
 	}

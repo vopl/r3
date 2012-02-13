@@ -18,16 +18,16 @@ namespace pgs
 		class Index
 		{
 		public:
-			//наименование
+			//РЅР°РёРјРµРЅРѕРІР°РЅРёРµ
 			std::string		_name;
 
-			//тип индекса
+			//С‚РёРї РёРЅРґРµРєСЃР°
 			EIndexType		_type;
 
-			//задействованные поля
+			//Р·Р°РґРµР№СЃС‚РІРѕРІР°РЅРЅС‹Рµ РїРѕР»СЏ
 			FieldPtrs		_fields;
 
-			//объемлющая категория
+			//РѕР±СЉРµРјР»СЋС‰Р°СЏ РєР°С‚РµРіРѕСЂРёСЏ
 			CategoryPtr		_category;
 			CategoryPtrs	_categories;
 		};

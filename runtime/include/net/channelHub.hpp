@@ -20,7 +20,7 @@ namespace net
 
 		volatile bool	_work;
 		mutex			_mtxChannels;
-		TChannels		_channels;//все
+		TChannels		_channels;//РІСЃРµ
 
 		boost::function<void(boost::system::error_code, size_t)> _onStateChanged;
 
@@ -109,7 +109,7 @@ namespace net
 			mutex::scoped_lock sl(_mtxReceive);
 			if(_receives.empty())
 			{
-				//остановлен
+				//РѕСЃС‚Р°РЅРѕРІР»РµРЅ
 				return;
 			}
 
@@ -143,13 +143,13 @@ namespace net
 
 				if(_sends.empty())
 				{
-					//нечего слать
+					//РЅРµС‡РµРіРѕ СЃР»Р°С‚СЊ
 					return;
 				}
 
 				if(_channelsNotSend.empty())
 				{
-					//нечем делать
+					//РЅРµС‡РµРј РґРµР»Р°С‚СЊ
 					return;
 				}
 

@@ -12,16 +12,16 @@ namespace pgs
 		class Schema
 		{
 		public:
-			//наименование
+			//РЅР°РёРјРµРЅРѕРІР°РЅРёРµ
 			std::string			_name;
 
-			//все категории
+			//РІСЃРµ РєР°С‚РµРіРѕСЂРёРё
 			CategoryPtrs		_categories;
 
-			//все связи
+			//РІСЃРµ СЃРІСЏР·Рё
 			RelationPtrs		_relations;
 
-			//объемлющий менеджер
+			//РѕР±СЉРµРјР»СЋС‰РёР№ РјРµРЅРµРґР¶РµСЂ
 			ClusterStoragePtr	_storage;
 		};
 	}

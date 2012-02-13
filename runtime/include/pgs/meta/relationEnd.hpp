@@ -17,23 +17,23 @@ namespace pgs
 		class RelationEnd
 		{
 		public:
-			//наименование
+			//РЅР°РёРјРµРЅРѕРІР°РЅРёРµ
 			std::string		_name;
 
-			//признак первого конца
+			//РїСЂРёР·РЅР°Рє РїРµСЂРІРѕРіРѕ РєРѕРЅС†Р°
 			bool			_isInput;
 
-			//множитель
+			//РјРЅРѕР¶РёС‚РµР»СЊ
 			ERelationMult	_mult;
 
-			//связанная категория
+			//СЃРІСЏР·Р°РЅРЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ
 			CategoryPtr		_category;
 			CategoryPtrs	_categories;
 
-			//второй край
+			//РІС‚РѕСЂРѕР№ РєСЂР°Р№
 			RelationEndPtr	_anotherEnd;
 
-			//объемлющая связь
+			//РѕР±СЉРµРјР»СЋС‰Р°СЏ СЃРІСЏР·СЊ
 			RelationPtr		_relation;
 
 		};

@@ -25,7 +25,7 @@ namespace pgs
 			: public Field
 		{
 		public:
-			//значения
+			//Р·РЅР°С‡РµРЅРёСЏ
 			FieldScantyValuePtrs _values;
 		};
 

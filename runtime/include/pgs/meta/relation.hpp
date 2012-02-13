@@ -12,16 +12,16 @@ namespace pgs
 		class Relation
 		{
 		public:
-			//наименование
+			//РЅР°РёРјРµРЅРѕРІР°РЅРёРµ
 			std::string		_name;
 
-			//входящий край
+			//РІС…РѕРґСЏС‰РёР№ РєСЂР°Р№
 			RelationEndPtr	_inputEnd;
 
-			//исходящий край
+			//РёСЃС…РѕРґСЏС‰РёР№ РєСЂР°Р№
 			RelationEndPtr	_outputEnd;
 
-			//объемлющая схема
+			//РѕР±СЉРµРјР»СЋС‰Р°СЏ СЃС…РµРјР°
 			SchemaPtr		_schema;
 		};
 	}
