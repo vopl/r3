@@ -1,4 +1,4 @@
-п»ї#ifndef _PGC_CONNECTIONHOLDER_HPP_
+﻿#ifndef _PGC_CONNECTIONHOLDER_HPP_
 #define _PGC_CONNECTIONHOLDER_HPP_
 
 #include <boost/asio.hpp>
@@ -35,7 +35,7 @@ namespace pgc
 		: public enable_shared_from_this<ConnectionHolder>
 	{
 	private:
-		//С‚РёРї РїСЂРѕС‚РѕРєРѕР»Р° РїРѕСЃС‚РіСЂРµСЃРѕРІРѕРіРѕ СЃРѕРєРµС‚Р° РґР»СЏ asio
+		//тип протокола постгресового сокета для asio
 		struct PGSockProtocol
 		{
 			int _family; int _type; int _protocol;
@@ -51,18 +51,18 @@ namespace pgc
 			};
 		};
 
-		//СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґРіРѕС‚РѕРІР»РµРЅРЅРѕРіРѕ Р·Р°РїСЂРѕСЃР°
+		//состояние подготовленного запроса
 		struct StatementPrepareState
 		{
-			//РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+			//идентификатор
 			std::string					_prid;
-			//СЌРєР·РµРјРїР»СЏСЂ, Сѓ РЅРµРіРѕ СѓРЅРёРєР°Р»СЊРЅС‹Р№ Р°РґСЂРµСЃ, sql
+			//экземпляр, у него уникальный адрес, sql
 			StatementImplWtr			_stm;
-			//РІСЂРµРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ РґРѕСЃС‚СѓРїР°
+			//время последнего доступа
 			posix_time::ptime			_accessTime;
 		};
 
-		//РєРѕРЅС‚РµР№РЅРµСЂ, РёРЅРґРµРєСЃРёСЂРѕРІР°РЅ РїРѕ С‚Р°Р№РјР°СѓС‚Сѓ Рё Р°РґСЂРµСЃСѓ Р·Р°РїСЂРѕСЃР°
+		//контейнер, индексирован по таймауту и адресу запроса
 		typedef multi_index_container<
 			StatementPrepareState,
 			indexed_by<
@@ -83,7 +83,7 @@ namespace pgc
 			>
 		> TPrepareds;
 
-		//РїРѕРјРѕРіР°Р»РєР° РґР»СЏ РјРѕРґРёС„РёРєР°С†РёРё 'РІСЂРµРјРµРЅРё РґРѕСЃС‚СѓРїР°' РІРЅСѓС‚СЂРё РјСѓР»СЊС‚РёРёРЅРґРµРєСЃР°
+		//помогалка для модификации 'времени доступа' внутри мультииндекса
 		struct ChangeAccessTime
 		{
 			ChangeAccessTime(const posix_time::ptime& accessTime):_accessTime(accessTime){}
@@ -97,7 +97,7 @@ namespace pgc
 			posix_time::ptime _accessTime;
 		};
 
-		//РїРѕРјРѕРіР°Р»РєР° РґР»СЏ РјРѕРґРёС„РёРєР°С†РёРё 'РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РїРѕРґРіРѕС‚РѕРІР»РµРЅРЅРѕРіРѕ Р·Р°РїСЂРѕСЃР°' РІРЅСѓС‚СЂРё РјСѓР»СЊС‚РёРёРЅРґРµРєСЃР°
+		//помогалка для модификации 'идентификатора подготовленного запроса' внутри мультииндекса
 		struct ChangePrid
 		{
 			ChangePrid(const std::string& prid):_prid(prid){}
@@ -111,7 +111,7 @@ namespace pgc
 			std::string _prid;
 		};
 
-		//РѕС‡РµСЂРµРґСЊ РІС…РѕРґСЏС‰РёС… Р·Р°РїСЂРѕСЃРѕРІ
+		//очередь входящих запросов
 		enum ERequestType
 		{
 			ertQuery,
@@ -166,13 +166,13 @@ namespace pgc
 		bool						_integerDatetimes;
 
 	private:
-		//РѕРіСЂР°РЅРёС‡РµРЅРёРµ РЅР° РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ С…СЂР°РЅРёРјС‹С… Р·Р°РїСЂРѕСЃРѕРІ
+		//ограничение на количество одновременно хранимых запросов
 		static const size_t	_max = 1000;
-		//С‚Р°Р№РјР°СѓС‚ СѓРґР°Р»РµРЅРёСЏ РїРѕ Р±РµР·РґРµР№СЃС‚РІРёСЋ
-		static const size_t	_timeout = 1000*60*60;//millisec, РїСЂРѕРІРµСЂСЊ РґРѕРєСѓ РїРѕ pgc::Connection, С‚Р°Рј СЌС‚Р° С†РёС„СЂР° С„РёРіСѓСЂРёСЂСѓРµС‚ РєР°Рє "1 С‡Р°СЃ"
-		//РІСЂРµРјСЏ РЅР° РјРѕРјРµРЅС‚ РЅР°С‡Р°Р»Р° СЂР°Р±РѕС‚С‹
+		//таймаут удаления по бездействию
+		static const size_t	_timeout = 1000*60*60;//millisec, проверь доку по pgc::Connection, там эта цифра фигурирует как "1 час"
+		//время на момент начала работы
 		posix_time::ptime	_now;
-		//РєРѕРЅС‚РµР№РЅРµСЂ СЃ Р·Р°РїСЂРѕСЃР°РјРё
+		//контейнер с запросами
 		TPrepareds			_prepareds;
 
 		TRequests			_requests;
@@ -187,7 +187,7 @@ namespace pgc
 		void delPrepared(StatementImplWtr p);
 
 	private:
-		//РїРѕРјРѕРіР°Р»РєРё РґР»СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РїРѕСЃС‚РіСЂРµСЃРѕРІРѕРіРѕ СЃРѕРєРµС‚Р° РІ asio
+		//помогалки для инициализации постгресового сокета в asio
 		static int sockFamily(int sock);
 		static int sockType(int sock);
 
@@ -215,7 +215,7 @@ namespace pgc
 			const std::string &prid,
 			BindDataPtr bindData);
 
-		//Р° С‚Р°Рє Р¶Рµ РІСЃСЏРєРёРµ describe
+		//а так же всякие describe
 		//void runDescribePrepared...
 		//void runDescribePortal...
 

@@ -73,7 +73,7 @@ namespace async
 			return;
 		}
 
-		//РЅРµ РІР°Р¶РЅРѕ, С‡С‚Рѕ С‚РµРєСѓС‰РёР№ С„РёР±РµСЂ РЅРµ СЏРІР»СЏРµС‚СЃСЏ РІР»Р°РґРµР»СЊС†РµРј
+		//не важно, что текущий фибер не является владельцем
 // 		if(_owners.front().get() != FiberImpl::current())
 // 		{
 // 			ELOG("unlockStrict mutex which from alien fiber");

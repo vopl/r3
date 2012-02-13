@@ -32,7 +32,7 @@ namespace server
 		typedef std::map<TServerSid, SessionPtr> TMSessions;
 		TMSessions	_sessions;
 
-		//РєР°РЅР°Р»С‹ РІ РїСЂРѕС†РµСЃСЃРµ РёРЅРёС†РёР°С†РёРё
+		//каналы в процессе инициации
 		typedef std::set<IChannelPtr> TSChannels;
 		TSChannels	_channels;
 

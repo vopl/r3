@@ -40,7 +40,7 @@ namespace pgs
 			break;
 		case ecmSelectWhat:
 			{
-				//РїСЂРѕРІРµСЂРёС‚СЊ РЅР°Р»РёС‡РёРµ alias РІРѕ from РёР»Рё links
+				//проверить наличие alias во from или links
 				state.checkAliasExistence(_alias, true);
 
 				std::string categoryAlias = state._cluster->escapeName(_alias);
@@ -51,7 +51,7 @@ namespace pgs
 
 				res += fldName;
 
-				//РїРµСЂРµР±СЂР°С‚СЊ РІСЃРµ РїРѕР»СЏ
+				//перебрать все поля
 				BOOST_FOREACH(meta::FieldCPtr mf, _metaCategory->_fields)
 				{
 					fldName = categoryAlias + "." + state._cluster->escapeName(mf->_name);

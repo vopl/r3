@@ -12,7 +12,7 @@
 namespace pgc
 {
 	//////////////////////////////////////////////////////////////////////////
-	//СЂР°Р·Р»РёС‡РЅС‹Рµ РїРѕРјРѕРіР°С‚РѕСЂС‹
+	//различные помогаторы
 	namespace
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -210,7 +210,7 @@ namespace pgc
 		assert(_mtxProcess.isLocked());
 		assert(!_now.is_not_a_date_time());
 
-		//СЃР»Р°С‚СЊ
+		//слать
 		while(PQflush(_pgcon))
 		{
 			system::error_code ec = send0();
@@ -222,7 +222,7 @@ namespace pgc
 			}
 		}
 
-		//РїСЂРёРЅРёРјР°С‚СЊ
+		//принимать
 		PGresult *pgr = NULL;
 		for(;;)
 		{
@@ -518,7 +518,7 @@ namespace pgc
 				}
 				else
 				{
-					//РґСЂСѓРіР°СЏ РѕС€РёР±РєР° - С„Р°С‚Р°Р»СЊРЅРѕ
+					//другая ошибка - фатально
 					ELOG(__FUNCTION__<<", "<<PQerrorMessage(_pgcon));
 					_prepareds.clear();
 					setResult(res);
@@ -679,7 +679,7 @@ namespace pgc
 	void ConnectionHolder::beginWork()
 	{
 		assert(_pgcon);
-		//assert(!_mtxProcess.isLocked());//РјРѕР¶РµС‚ Р±С‹С‚СЊ РІ С…РѕР»РѕСЃС‚РѕРј РїСЂРѕС†РµСЃСЃРµ
+		//assert(!_mtxProcess.isLocked());//может быть в холостом процессе
 		assert(_now.is_not_a_date_time());
 		_now = posix_time::microsec_clock::local_time();
 	}

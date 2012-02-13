@@ -16,16 +16,16 @@ namespace pgs
 	class ClusterImpl
 		: public boost::enable_shared_from_this<ClusterImpl>
 	{
-		//РјРµС‚Р° РґР°РЅРЅС‹Рµ СЌС‚РѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР°
+		//мета данные этого экземпляра
 		pgs::meta::Cluster _metaCluster;
 
-		//СѓРЅРёРєР°С‚РѕСЂС‹
+		//уникаторы
 		std::string _prefix;
 		std::string _suffix;
 
 		typedef boost::uint32_t TOid;
 
-		//СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РјРµС‚Р° Рё СЃС…РµРј Р±Р°Р·С‹
+		//соответствия мета и схем базы
 		//schema oid -> schema
 		typedef std::map<TOid, pgs::meta::SchemaCPtr> TMOid2Schema;
 		TMOid2Schema _oid2schema;
@@ -34,7 +34,7 @@ namespace pgs
 		typedef std::map<pgs::meta::SchemaCPtr, TOid> TMSchema2Oid;
 		TMSchema2Oid _schema2oid;
 
-		//СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РјРµС‚Р° Рё С‚Р°Р±Р»РёС† Р±Р°Р·С‹
+		//соответствия мета и таблиц базы
 		//table oid -> category
 		typedef std::map<TOid, pgs::meta::CategoryCPtr> TMOid2Cat;
 		TMOid2Cat _oid2cat;
@@ -44,7 +44,7 @@ namespace pgs
 		TMCat2Oid _cat2oid;
 
 
-		//РїСЂРёР·РЅР°Рє РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅРѕСЃС‚Рё
+		//признак инициализированности
 		bool _isSynced;
 
 		async::Mutex _mtx;

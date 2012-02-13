@@ -20,9 +20,9 @@ namespace utils
 #pragma pack (push, 1)
 			struct Header
 			{
-				uint16_t	_signature;//РЅРµРєР°СЏ РјР°РіРёС‡РµСЃРєР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°
-				uint16_t	_crc;//РїРѕРєСЂС‹РІР°РµС‚ _size Рё РІСЃРµ РґР°РЅРЅС‹Рµ
-				uint32_t	_size;//СЂР°Р·РјРµСЂ РґР°РЅРЅС‹С…
+				uint16_t	_signature;//некая магическая константа
+				uint16_t	_crc;//покрывает _size и все данные
+				uint32_t	_size;//размер данных
 			};
 #pragma pack (pop)
 
@@ -47,7 +47,7 @@ namespace utils
 			//////////////////////////////////////////////////////////////////////////
 			shared_array<char> serialize(const Variant &v, uint32_t &size)
 			{
-				//РїРµСЂРІС‹Р№ РїСЂРѕС…РѕРґ, РІС‹С‡РёСЃР»РёС‚СЊ РґР»РёРЅСѓ
+				//первый проход, вычислить длину
 				uint32_t vsize = calcSize(v);
 				_mPtrKey.clear();
 
@@ -128,12 +128,12 @@ namespace utils
 				//_et
 				uint32_t size = 2;
 
-				//СЂР°Р·РјРµСЂ Р·Р°Р·РјРµСЂР°
+				//размер зазмера
 				static const uint32_t S = sizeof(uint32_t);
 
 				if(v.isNull())
 				{
-					//РЅРёС‡РµРіРѕ
+					//ничего
 				}
 				else
 				{
@@ -316,13 +316,13 @@ namespace utils
 								TMPtrKey::iterator iter = _mPtrKey.find(p);
 								if(_mPtrKey.end() == iter)
 								{
-									//СЃС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РЅРѕРІС‹Р№ РєР»СЋС‡ Рё Р·Р°РїРѕРјРЅРёС‚СЊ РµРіРѕ РІ РєР°СЂС‚Рµ
+									//сформировать новый ключ и запомнить его в карте
 									_mPtrKey.insert(std::make_pair(p, (uint32_t)_mPtrKey.size()+1));
 									size += calcSize(*p);
 								}
 								else
 								{
-									//СѓР¶Рµ Р±С‹Р»
+									//уже был
 								}
 							}
 						}
@@ -597,7 +597,7 @@ namespace utils
 								TMPtrKey::iterator iter = _mPtrKey.find(p);
 								if(_mPtrKey.end() == iter)
 								{
-									//СЃС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РЅРѕРІС‹Р№ РєР»СЋС‡ Рё Р·Р°РїРѕРјРЅРёС‚СЊ РµРіРѕ РІ РєР°СЂС‚Рµ
+									//сформировать новый ключ и запомнить его в карте
 									uint32_t key = (uint32_t)_mPtrKey.size()+1;
 									_mPtrKey.insert(std::make_pair(p,key));
 
@@ -606,7 +606,7 @@ namespace utils
 								}
 								else
 								{
-									//СѓР¶Рµ Р±С‹Р»
+									//уже был
 									writeIntegral(iter->second);
 								}
 							}

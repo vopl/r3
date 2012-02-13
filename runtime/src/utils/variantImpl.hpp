@@ -50,19 +50,19 @@ namespace utils
 		: public Variant
 	{
 		//////////////////////////////////////////////////////////////////////////
-		//РІС‹РґРµР»РµРЅРёРµ Р±Р»РѕРєР° РїР°РјСЏС‚Рё РїРѕРґ РґР°РЅРЅС‹Рµ
+		//выделение блока памяти под данные
 		template <class T> void alloc()
 		{
 			if(sizeof(T) <= sizeof(_data))
 			{
-				//РґР»СЏ autoexp.dat
+				//для autoexp.dat
 #ifdef UTILS_VARIANT_DBGDATA
 				_dbgData = &as<T>();
 #endif
 				return;
 			}
 			as<T*>() = (T*)new char[sizeof(T)];
-			//РґР»СЏ autoexp.dat
+			//для autoexp.dat
 #ifdef UTILS_VARIANT_DBGDATA
 			_dbgData = &as<T>();
 #endif
@@ -71,7 +71,7 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		template <class T> void free()
 		{
-			//РґР»СЏ autoexp.dat
+			//для autoexp.dat
 #ifdef UTILS_VARIANT_DBGDATA
 			_dbgData = NULL;
 #endif

@@ -9,13 +9,13 @@ namespace server
 		TMNodes::iterator iter = _nodes.find(endpoint);
 		if(_nodes.end() == iter)
 		{
-			//Р·Р°РїСЂРѕС€РµРЅС‹Р№ РїСѓС‚СЊ РЅРµ РЅР°Р№РґРµРЅ СЃСЂРµРґРё РЅРѕРґРѕРІ
+			//запрошеный путь не найден среди нодов
 			return ITaskPtr();
 		}
 		INodePtr node = iter->second;
 		if(!(enfTask & node->getFlags()))
 		{
-			//РЅРѕРґР° РЅРµ СЃРѕРґРµСЂР¶РёС‚ Р·Р°РґР°С‡Сѓ
+			//нода не содержит задачу
 			return ITaskPtr();
 		}
 		return node->getTask();
@@ -45,7 +45,7 @@ namespace server
 		bool dataExists = false;
 
 		{
-			//СЂР°СЃРїР°СЂСЃРёС‚СЊ РїР°РєРµС‚, РЅР°Р№С‚Рё СЃР»СѓР¶Р±Сѓ Рё РїРµСЂРµРґР°С‚СЊ РµР№
+			//распарсить пакет, найти службу и передать ей
 			utils::Variant v;
 			if(	v.deserialize(p._data, p._size) &&
 				v.is<utils::Variant::MapStringVariant>())
@@ -94,7 +94,7 @@ namespace server
 
 			if(clientEndpointExists && serverEndpointExists)
 			{
-				//Р·Р°РїР°РєРѕРІР°С‚СЊ РґР°РЅРЅС‹Рµ
+				//запаковать данные
 				utils::Variant v;
 				utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>(true);
 				m["server::endpoint"] = serverEndpoint_;
@@ -104,7 +104,7 @@ namespace server
 				net::SPacket p;
 				p._data = v.serialize(p._size);
 
-				//РѕС‚РѕСЃР»Р°С‚СЊ Р±РµР· РєРѕРЅС‚СЂРѕР»СЏ
+				//отослать без контроля
 				session->send(p);
 			}
 		}
@@ -185,7 +185,7 @@ namespace server
 		{
 			mutex::scoped_lock sl(_mtx);
 
-			//РѕРїРѕРІРµСЃС‚РёС‚СЊ СЃР»СѓР¶Р±С‹
+			//оповестить службы
 			BOOST_FOREACH(TMNodes::value_type &pair, _nodes)
 			{
 				if(enfService & pair.second->getFlags())
@@ -205,7 +205,7 @@ namespace server
 		{
 			mutex::scoped_lock sl(_mtx);
 
-			//РѕРїРѕРІРµСЃС‚РёС‚СЊ СЃР»СѓР¶Р±С‹
+			//оповестить службы
 			BOOST_FOREACH(TMNodes::value_type &pair, _nodes)
 			{
 				if(enfService & pair.second->getFlags())
@@ -214,7 +214,7 @@ namespace server
 				}
 			}
 		}
-		//РЅР°РґРѕ РѕС‚РјРµРЅРёС‚СЊ РїСЂРѕСЃР»СѓС€РёРІР°РЅРёРµ, Р° РєР°Рє? РґР° РІРѕС‚ С‚Р°Рє
+		//надо отменить прослушивание, а как? да вот так
 		session->close();
 	}
 
@@ -252,7 +252,7 @@ namespace server
 		const client::TEndpoint &endpoint,
 		utils::VariantPtr data)
 	{
-		//Р·Р°РїР°РєРѕРІР°С‚СЊ РґР°РЅРЅС‹Рµ
+		//запаковать данные
 		utils::Variant v;
 		utils::Variant::MapStringVariant &m = v.as<utils::Variant::MapStringVariant>(true);
 		{
@@ -266,7 +266,7 @@ namespace server
 		net::SPacket p;
 		p._data = v.serialize(p._size);
 
-		//РѕС‚РѕСЃР»Р°С‚СЊ
+		//отослать
 		return session->send(p);
 	}
 }

@@ -14,7 +14,7 @@ namespace async
 	{
 		_current = this;
 
-		//РЅР°Р±РѕР»С‚Р°С‚СЊ РіРѕР»РѕРІРЅРѕР№ С„РёР±РµСЂ
+		//наболтать головной фибер
 		_fiberRoot.reset(new FiberRootImpl());
 		_fiberRoot->initialize();
 
@@ -131,11 +131,11 @@ namespace async
 		}
 		assert(FiberImpl::current() == _fiberRoot.get());
 
-		//СЃРЅР°С‡Р°Р»Р° РѕС‚СЂР°Р±РѕС‚Р°С‚СЊ РІСЃРµ РіРѕС‚РѕРІС‹Рµ
+		//сначала отработать все готовые
 		processReadyFibers();
 
-		//РїРѕС‚РѕРј РѕС‚Р»РѕР¶РµРЅРЅС‹Рµ Р·Р°РґР°С‡Рё
-		//РїРѕС‚РѕРј РІС…РѕРґСЏС‰СѓСЋ Р·Р°РґР°С‡Сѓ
+		//потом отложенные задачи
+		//потом входящую задачу
 		std::set<FiberImplPtr>	fibersNotActavated;
 		for(;;)
 		{
@@ -215,7 +215,7 @@ namespace async
 			_fiberPool->_fibersIdle.insert(fibersNotActavated.begin(), fibersNotActavated.end());
 		}
 
-		//С‚РµРїРµСЂСЊ СЃРЅРѕРІР° РіРѕС‚РѕРІС‹Рµ
+		//теперь снова готовые
 		processReadyFibers();
 	}
 

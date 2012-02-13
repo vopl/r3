@@ -1,4 +1,4 @@
-п»ї#include "log/api.h"
+#include "log/api.h"
 
 #include <log4cplus/logger.h>
 #include <log4cplus/layout.h>
