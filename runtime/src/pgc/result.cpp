@@ -53,27 +53,27 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	const char *Result::colName(size_t colIdx)
+	const char *Result::colName(size_t columnIdx)
 	{
-		return _impl->colName(colIdx);
+		return _impl->colName(columnIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	utils::Variant::EType Result::colType(size_t colIdx)
+	utils::Variant::EType Result::colType(size_t columnIdx)
 	{
-		return _impl->colType(colIdx);
+		return _impl->colType(columnIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::isNull(size_t colIdx, size_t rowIdx)
+	bool Result::isNull(size_t columnIdx, size_t rowIdx)
 	{
-		return _impl->isNull(colIdx, rowIdx);
+		return _impl->isNull(columnIdx, rowIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetch(utils::Variant &v, size_t colIdx, size_t rowIdx)
+	bool Result::fetch(utils::Variant &v, size_t columnIdx, size_t rowIdx)
 	{
-		return _impl->fetch(v, colIdx, rowIdx);
+		return _impl->fetch(v, columnIdx, rowIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -125,26 +125,26 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool Result::fetchColumn(utils::Variant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
+	bool Result::fetchColumn(utils::Variant &v, size_t columnIdx, size_t rowBeginIdx, size_t rowEndIdx)
 	{
-		return _impl->fetchColumn(v, colIdx, rowBeginIdx, rowEndIdx);
+		return _impl->fetchColumn(v, columnIdx, rowBeginIdx, rowEndIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::int32_t Result::fetchInt32(size_t colIdx, size_t rowIdx)
+	boost::int32_t Result::fetchInt32(size_t columnIdx, size_t rowIdx)
 	{
-		return _impl->fetchInt32(colIdx, rowIdx);
+		return _impl->fetchInt32(columnIdx, rowIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::uint32_t Result::fetchUInt32(size_t colIdx, size_t rowIdx)
+	boost::uint32_t Result::fetchUInt32(size_t columnIdx, size_t rowIdx)
 	{
-		return _impl->fetchUInt32(colIdx, rowIdx);
+		return _impl->fetchUInt32(columnIdx, rowIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string Result::fetchString(size_t colIdx, size_t rowIdx)
+	std::string Result::fetchString(size_t columnIdx, size_t rowIdx)
 	{
-		return _impl->fetchString(colIdx, rowIdx);
+		return _impl->fetchString(columnIdx, rowIdx);
 	}
 }

@@ -22,10 +22,10 @@ namespace pgc
 		v.resize(columns);
 
 		typename SequenceVariant::iterator iter = v.begin();
-		for(size_t colIdx(0); colIdx<columns; colIdx++)
+		for(size_t columnIdx(0); columnIdx<columns; columnIdx++)
 		{
 			utils::Variant &rv = *iter;
-			if(!fetch(rv, colIdx, rowIdx))
+			if(!fetch(rv, columnIdx, rowIdx))
 			{
 				return false;
 			}
@@ -41,9 +41,9 @@ namespace pgc
 		size_t columns = ResultImpl::cols();
 		v.clear();
 
-		for(size_t colIdx(0); colIdx<columns; colIdx++)
+		for(size_t columnIdx(0); columnIdx<columns; columnIdx++)
 		{
-			if(!fetch(v[colName(colIdx)], colIdx, rowIdx))
+			if(!fetch(v[colName(columnIdx)], columnIdx, rowIdx))
 			{
 				return false;
 			}
@@ -132,11 +132,11 @@ namespace pgc
 		v.resize(columns);
 
 		typename SequenceVariant::iterator iter = v.begin();
-		for(size_t colIdx(0); colIdx<columns; colIdx++)
+		for(size_t columnIdx(0); columnIdx<columns; columnIdx++)
 		{
-			assert(colIndices[colIdx] < ResultImpl::cols());
+			assert(colIndices[columnIdx] < ResultImpl::cols());
 			utils::Variant &rv = *iter;
-			if(!fetch(rv, colIndices[colIdx], rowIdx))
+			if(!fetch(rv, colIndices[columnIdx], rowIdx))
 			{
 				return false;
 			}
@@ -152,10 +152,10 @@ namespace pgc
 		size_t columns = colIndices.size();
 		v.clear();
 
-		for(size_t colIdx(0); colIdx<columns; colIdx++)
+		for(size_t columnIdx(0); columnIdx<columns; columnIdx++)
 		{
-			assert(colIndices[colIdx] < ResultImpl::cols());
-			if(!fetch(v[colName(colIndices[colIdx])], colIndices[colIdx], rowIdx))
+			assert(colIndices[columnIdx] < ResultImpl::cols());
+			if(!fetch(v[colName(colIndices[columnIdx])], colIndices[columnIdx], rowIdx))
 			{
 				return false;
 			}
@@ -226,7 +226,7 @@ namespace pgc
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class SequenceVariant>
-	bool ResultImpl::fetchColumn_(SequenceVariant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
+	bool ResultImpl::fetchColumn_(SequenceVariant &v, size_t columnIdx, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		size_t rows = this->rows();
 		if(rowEndIdx > rows)
@@ -245,7 +245,7 @@ namespace pgc
 		for(size_t rowIdx(rowBeginIdx); rowIdx<rowEndIdx; rowIdx++)
 		{
 			utils::Variant &rv = *iter;
-			if(!fetch(rv, colIdx, rowIdx))
+			if(!fetch(rv, columnIdx, rowIdx))
 			{
 				return false;
 			}
@@ -323,27 +323,27 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	const char *ResultImpl::colName(size_t colIdx)
+	const char *ResultImpl::colName(size_t columnIdx)
 	{
-		return PQfname(_pgr, (int)colIdx);
+		return PQfname(_pgr, (int)columnIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ResultImpl::isNull(size_t colIdx, size_t rowIdx)
+	bool ResultImpl::isNull(size_t columnIdx, size_t rowIdx)
 	{
-		return PQgetisnull(_pgr, (int)rowIdx, (int)colIdx)?true:false;
+		return PQgetisnull(_pgr, (int)rowIdx, (int)columnIdx)?true:false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Variant::EType ResultImpl::colType(size_t colIdx)
+	Variant::EType ResultImpl::colType(size_t columnIdx)
 	{
-		if(colIdx >= (size_t)PQnfields(_pgr))
+		if(columnIdx >= (size_t)PQnfields(_pgr))
 		{
 			return Variant::etUnknown;
 		}
 
-		assert(1 == PQfformat(_pgr, (int)colIdx));
-		switch(PQftype(_pgr, (int)colIdx))
+		assert(1 == PQfformat(_pgr, (int)columnIdx));
+		switch(PQftype(_pgr, (int)columnIdx))
 		{
 		case 21://int2
 			return Variant::etInt16;
@@ -489,37 +489,37 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ResultImpl::fetch(Variant &v, size_t colIdx, size_t rowIdx)
+	bool ResultImpl::fetch(Variant &v, size_t columnIdx, size_t rowIdx)
 	{
-		if(colIdx >= (size_t)PQnfields(_pgr))
+		if(columnIdx >= (size_t)PQnfields(_pgr))
 		{
 			return false;
 		}
 
-		assert(1 == PQfformat(_pgr, (int)colIdx));
-		if(PQgetisnull(_pgr, (int)rowIdx, (int)colIdx))
+		assert(1 == PQfformat(_pgr, (int)columnIdx));
+		if(PQgetisnull(_pgr, (int)rowIdx, (int)columnIdx))
 		{
-			v.forceType(colType(colIdx));
+			v.forceType(colType(columnIdx));
 			v.setNull(true);
 			return true;
 		}
-		Oid type = PQftype(_pgr, (int)colIdx);
+		Oid type = PQftype(_pgr, (int)columnIdx);
 		switch(type)
 		{
 		case 21://int2
-			v = bigEndian(*(boost::int16_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+			v = bigEndian(*(boost::int16_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 			break;
 		case 23://int4
-			v = bigEndian(*(boost::int32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+			v = bigEndian(*(boost::int32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 			break;
 		case 20://int8
-			v = bigEndian(*(boost::int64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+			v = bigEndian(*(boost::int64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 			break;
 		case 1700://numeric
 			{
-				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)columnIdx);
 				std::vector<unsigned char> buf(lenDb);
-				memcpy(&buf.front(), PQgetvalue(_pgr, (int)rowIdx, (int)colIdx), lenDb);
+				memcpy(&buf.front(), PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx), lenDb);
 				PG_NumericData &nd = *(PG_NumericData *)&buf.front();
 
 				nd.ndigits = bigEndian(nd.ndigits);
@@ -568,28 +568,28 @@ namespace pgc
 			}
 			break;
 		case 700://float4
-			v = bigEndian(*(float *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+			v = bigEndian(*(float *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 			break;
 		case 701://float8
-			v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+			v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 			break;
 		case 790://money
-			v = bigEndian(*(boost::int64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+			v = bigEndian(*(boost::int64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 			break;
 		case 705://unknown
 		case 1043://varchar
 		case 1042://bpchar
 		case 25://text
 			{
-				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
-				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)columnIdx);
+				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx);
 				v.as<Variant::String>(true).assign(valDb, valDb+lenDb);
 			}
 			break;
 		case 17://bytea
 			{
-				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
-				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)columnIdx);
+				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx);
 				v.as<Variant::VectorChar>(true).assign(valDb, valDb+lenDb);
 			}
 			break;
@@ -599,11 +599,11 @@ namespace pgc
 				boost::int64_t time;
 				if(_integerDatetimes)
 				{
-					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 				}
 				else
 				{
-					double v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+					double v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 					time = (boost::int64_t)v;
 					v -= time;
 					time *= 1000000;
@@ -639,7 +639,7 @@ namespace pgc
 		case 1186://interval
 			{
 				unsigned char buf[sizeof(PG_Interval)];
-				memcpy(buf, PQgetvalue(_pgr, (int)rowIdx, (int)colIdx), sizeof(PG_Interval));
+				memcpy(buf, PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx), sizeof(PG_Interval));
 				PG_Interval &i = *(PG_Interval *)buf;
 
 				//v.time = bigEndian(v.time);
@@ -673,7 +673,7 @@ namespace pgc
 			break;
 		case 1082://date
 			{
-				boost::int32_t jd = bigEndian(*(boost::int32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx)) + POSTGRES_EPOCH_JDATE;
+				boost::int32_t jd = bigEndian(*(boost::int32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx)) + POSTGRES_EPOCH_JDATE;
 				int year, month, day;
 				j2date(jd, &year, &month, &day);
 
@@ -686,11 +686,11 @@ namespace pgc
 				boost::uint64_t time;
 				if(_integerDatetimes)
 				{
-					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+					time = bigEndian(*(boost::uint64_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 				}
 				else
 				{
-					double v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+					double v = bigEndian(*(double *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 					time = (boost::int64_t)v;
 					v -= time;
 					time *= 1000000;
@@ -708,15 +708,15 @@ namespace pgc
 			}
 			break;
 		case 16://bool
-			v = (*(boost::int8_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx))?true:false;
+			v = (*(boost::int8_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx))?true:false;
 			break;
 		case 1560://bit
 		case 1562://varbit
 			{
 
-				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)columnIdx);
 				std::vector<unsigned char> buf(lenDb);
-				memcpy(&buf.front(), PQgetvalue(_pgr, (int)rowIdx, (int)colIdx), lenDb);
+				memcpy(&buf.front(), PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx), lenDb);
 				PG_VarBit &vb = *(PG_VarBit *)&buf.front();
 
 				boost::uint32_t amount = bigEndian(vb.amount);
@@ -752,17 +752,17 @@ namespace pgc
 			}
 			break;
 		case 26://oid
-			v = bigEndian(*(boost::uint32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx));
+			v = bigEndian(*(boost::uint32_t *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx));
 			break;
 		case 2950://uuid
 			{
-				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)colIdx);
+				int lenDb = PQgetlength(_pgr, (int)rowIdx, (int)columnIdx);
 				boost::uuids::uuid &u = v.as<Variant::Uuid>(true);
 				if(lenDb > (int)u.size())
 				{
 					lenDb = (int)u.size();
 				}
-				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
+				char *valDb = PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx);
 				std::copy((char *)valDb, (char *)valDb+lenDb, u.begin());
 
 				*(boost::uint32_t *)(u.begin()+0) = fixEndian(*(boost::uint32_t *)(u.begin()+0));
@@ -771,11 +771,12 @@ namespace pgc
 			}
 			break;
 		case 18://char
-			v = *(char *)PQgetvalue(_pgr, (int)rowIdx, (int)colIdx);
+			v = *(char *)PQgetvalue(_pgr, (int)rowIdx, (int)columnIdx);
 			break;
 		default:
-			v.setNull<Variant::Void>();
-			break;
+			//v.setNull<Variant::Void>();
+			WLOG("unsupported data type in query result: "<<type);
+			return false;
 		}
 
 		return true;
@@ -896,28 +897,28 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	bool ResultImpl::fetchColumn(Variant &v, size_t colIdx, size_t rowBeginIdx, size_t rowEndIdx)
+	bool ResultImpl::fetchColumn(Variant &v, size_t columnIdx, size_t rowBeginIdx, size_t rowEndIdx)
 	{
 		switch(v.type())
 		{
 		case Variant::etDequeVariant:
-			return fetchColumn_(v.as<Variant::DequeVariant>(), rowBeginIdx, rowEndIdx);
+			return fetchColumn_(v.as<Variant::DequeVariant>(), columnIdx, rowBeginIdx, rowEndIdx);
 		case Variant::etListVariant:
-			return fetchColumn_(v.as<Variant::ListVariant>(), rowBeginIdx, rowEndIdx);
+			return fetchColumn_(v.as<Variant::ListVariant>(), columnIdx, rowBeginIdx, rowEndIdx);
 		case Variant::etVectorVariant:
-			return fetchColumn_(v.as<Variant::VectorVariant>(), rowBeginIdx, rowEndIdx);
+			return fetchColumn_(v.as<Variant::VectorVariant>(), columnIdx, rowBeginIdx, rowEndIdx);
 		default:
 			break;
 		}
-		return fetchColumn_(v.as<Variant::DequeVariant>(true), rowBeginIdx, rowEndIdx);
+		return fetchColumn_(v.as<Variant::DequeVariant>(true), columnIdx, rowBeginIdx, rowEndIdx);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::int32_t ResultImpl::fetchInt32(size_t colIdx, size_t rowIdx)
+	boost::int32_t ResultImpl::fetchInt32(size_t columnIdx, size_t rowIdx)
 	{
 		Variant v;
 		v.as<boost::int32_t>(true);
-		if(!fetch(v, colIdx, rowIdx))
+		if(!fetch(v, columnIdx, rowIdx))
 		{
 			return 0;
 		}
@@ -925,11 +926,11 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	boost::uint32_t ResultImpl::fetchUInt32(size_t colIdx, size_t rowIdx)
+	boost::uint32_t ResultImpl::fetchUInt32(size_t columnIdx, size_t rowIdx)
 	{
 		Variant v;
 		v.as<boost::uint32_t>(true);
-		if(!fetch(v, colIdx, rowIdx))
+		if(!fetch(v, columnIdx, rowIdx))
 		{
 			return 0;
 		}
@@ -937,11 +938,11 @@ namespace pgc
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	std::string ResultImpl::fetchString(size_t colIdx, size_t rowIdx)
+	std::string ResultImpl::fetchString(size_t columnIdx, size_t rowIdx)
 	{
 		Variant v;
 		v.as<std::string>(true);
-		if(!fetch(v, colIdx, rowIdx))
+		if(!fetch(v, columnIdx, rowIdx))
 		{
 			return 0;
 		}

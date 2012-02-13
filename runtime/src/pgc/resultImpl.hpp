@@ -28,12 +28,12 @@ namespace pgc
 		size_t cols();
 
 		size_t colIdx(const char *colName);
-		const char *colName(size_t colIdx);
+		const char *colName(size_t columnIdx);
 
-		bool isNull(size_t colIdx, size_t rowIdx);
-		Variant::EType colType(size_t colIdx);
+		bool isNull(size_t columnIdx, size_t rowIdx);
+		Variant::EType colType(size_t columnIdx);
 
-		bool fetch(Variant &v, size_t colIdx, size_t rowIdx);
+		bool fetch(Variant &v, size_t columnIdx, size_t rowIdx);
 
 		//////////////////////////////////////////////////////////////////////////
 		bool fetchRowList(Variant &v, size_t rowIdx=0);
@@ -49,12 +49,12 @@ namespace pgc
 		bool fetchRowsList(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 		bool fetchRowsMap(Variant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 
-		bool fetchColumn(Variant &v, size_t colIdx, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchColumn(Variant &v, size_t columnIdx, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 
 		//////////////////////////////////////////////////////////////////////////
-		boost::int32_t fetchInt32(size_t colIdx, size_t rowIdx);
-		boost::uint32_t fetchUInt32(size_t colIdx, size_t rowIdx);
-		std::string fetchString(size_t colIdx, size_t rowIdx);
+		boost::int32_t fetchInt32(size_t columnIdx, size_t rowIdx);
+		boost::uint32_t fetchUInt32(size_t columnIdx, size_t rowIdx);
+		std::string fetchString(size_t columnIdx, size_t rowIdx);
 
 	private:
 		//////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ namespace pgc
 		bool fetchRowsMap_(SequenceVariant &v, const std::deque<size_t> &colIndices, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 
 		template <class SequenceVariant>
-		bool fetchColumn_(SequenceVariant &v, size_t colIdx, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
+		bool fetchColumn_(SequenceVariant &v, size_t columnIdx, size_t rowBeginIdx=0, size_t rowEndIdx=(size_t)-1);
 
 	};
 }
