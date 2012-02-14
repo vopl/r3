@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 		else
 		{
 			//std::cout<<"sleep"<<std::endl;
-			boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
+			boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(200));
 		}
 	} while(!bStop);
 

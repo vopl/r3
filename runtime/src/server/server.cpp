@@ -182,7 +182,7 @@ namespace server
 		//запускать асинхронный двиг
 		_asrv.start(
 			//1);
-			1+boost::thread::hardware_concurrency());
+			boost::thread::hardware_concurrency());
 
 		//родить запускалку в асинхронной среде
 		_asrv.spawn(bind(&Server::startup, shared_from_this(), host, service));

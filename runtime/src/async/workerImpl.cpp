@@ -93,30 +93,41 @@ namespace async
 	//////////////////////////////////////////////////////////////////////////
 	void WorkerImpl::processReadyFibers()
 	{
-		bool doWork = true;
-		while(doWork)
+		std::deque<FiberImplPtr> fibersNotActivated;
+
+
+		for(;;)
 		{
-			std::deque<FiberImplPtr> fibersReady;
+			FiberImplPtr fiber;
 			{
 				mutex::scoped_lock sl(_fiberPool->_mtxFibers);
-				fibersReady.swap(_fiberPool->_fibersReady);
+				if(!_fiberPool->_fibersReady.empty())
+				{
+					fiber = _fiberPool->_fibersReady.front();
+					_fiberPool->_fibersReady.pop_front();
+				}
 			}
 
-			size_t activatedAmount = 0;
-			BOOST_FOREACH(const FiberImplPtr &fiber, fibersReady)
+			if(fiber)
 			{
-				if(fiber->activate())
+				if(!fiber->activate())
 				{
-					activatedAmount++;
-				}
-				else
-				{
-					mutex::scoped_lock sl(_fiberPool->_mtxFibers);
-					_fiberPool->_fibersReady.push_back(fiber);
+					fibersNotActivated.push_back(fiber);
 				}
 			}
+			else
+			{
+				break;
+			}
+		}
 
-			doWork = activatedAmount?true:false;
+		if(!fibersNotActivated.empty())
+		{
+			mutex::scoped_lock sl(_fiberPool->_mtxFibers);
+			_fiberPool->_fibersReady.insert(
+				_fiberPool->_fibersReady.end(),
+				fibersNotActivated.begin(),
+				fibersNotActivated.end());
 		}
 	}
 

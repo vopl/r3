@@ -49,7 +49,7 @@ namespace server
 			async::Future<pgc::Connection> c4=_db.allocConnection();
 
 			//TLOG("connectionLoop1");
-			if(!s || !(rand()%5))
+			if(!s)// || !(rand()%5))
 			{
 				s = pgc::Statement("SELECT $1");
 			}
