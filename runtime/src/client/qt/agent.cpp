@@ -14,7 +14,7 @@ namespace client
 		{
 			if(!src.isValid())
 			{
-				dst.forceType<void>();
+				dst.setType<void>();
 				return;
 			}
 

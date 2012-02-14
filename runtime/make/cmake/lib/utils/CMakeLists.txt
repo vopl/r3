@@ -1,6 +1,7 @@
 PROJECT (libutils)
 
 SET(INCLUDE
+	${INC_DIR}/utils/api.h
 	${INC_DIR}/utils/aton.hpp
 	${INC_DIR}/utils/xton.hpp
 	${INC_DIR}/utils/base64.h

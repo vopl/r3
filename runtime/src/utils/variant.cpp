@@ -81,6 +81,10 @@ Variant &Variant::operator=(const char * v)
 	Variant::operator n ()const		\
 	{								\
 		CIMPL->validateType<n>();	\
+		if(is<n>())					\
+		{							\
+			return as<n>();			\
+		}							\
 		n res;						\
 		CIMPL->convert<n>(res);		\
 		return res;					\
@@ -120,7 +124,7 @@ ENUM_VARIANT_TYPES
 	template<typename T> void Variant::setNull(bool n)
 	{
 		IMPL->validateType<T>();
-		IMPL->forceType<T>();
+		IMPL->setType<T>();
 		return IMPL->setNull(n);
 	}
 #define ENUM_VARIANT_TYPE(n) template void Variant::setNull<Variant::n>(bool n);
@@ -153,7 +157,7 @@ template void Variant::setNull<Variant::Void>(bool n);
 
 		if(forceType)
 		{
-			IMPL->forceType<T>();
+			IMPL->setType<T>();
 			IMPL->setNull(false);
 		}
 		else
@@ -163,7 +167,7 @@ template void Variant::setNull<Variant::Void>(bool n);
 
 		return IMPL->as<T>();
 	}
-#define ENUM_VARIANT_TYPE(n) template Variant::n &Variant::as<Variant::n>(bool forceType);
+#define ENUM_VARIANT_TYPE(n) template Variant::n &Variant::as<Variant::n>(bool setType);
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
 
@@ -203,20 +207,20 @@ ENUM_VARIANT_TYPES
 template bool Variant::is<Variant::Void>() const;
 
 	//////////////////////////////////////////////////////////////////////////
-	template<typename T> void Variant::forceType()
+	template<typename T> void Variant::setType()
 	{
 		IMPL->validateType<T>();
-		return IMPL->forceType<T>();
+		return IMPL->setType<T>();
 	}
-#define ENUM_VARIANT_TYPE(n) template void Variant::forceType<Variant::n>();
+#define ENUM_VARIANT_TYPE(n) template void Variant::setType<Variant::n>();
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
-template void Variant::forceType<Variant::Void>();
+template void Variant::setType<Variant::Void>();
 
 	//////////////////////////////////////////////////////////////////////////
-	void Variant::forceType(EType et)
+	void Variant::setType(EType et)
 	{
-		return IMPL->forceType(et);
+		return IMPL->setType(et);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -329,7 +333,7 @@ ENUM_VARIANT_TYPES
 	}
 	template<> void Variant::convert<Variant::Void>()
 	{
-		forceType<Variant::Void>();
+		setType<Variant::Void>();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

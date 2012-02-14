@@ -499,7 +499,7 @@ namespace pgc
 		assert(1 == PQfformat(_pgr, (int)columnIdx));
 		if(PQgetisnull(_pgr, (int)rowIdx, (int)columnIdx))
 		{
-			v.forceType(colType(columnIdx));
+			v.setType(colType(columnIdx));
 			v.setNull(true);
 			return true;
 		}

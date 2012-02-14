@@ -120,9 +120,16 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		void construct(const char *v)
 		{
-			_et = Type2Enum<String>::et;
-			alloc<String>();
-			new (&as<String>()) String(v);
+			if(v)
+			{
+				_et = Type2Enum<String>::et;
+				alloc<String>();
+				new (&as<String>()) String(v);
+			}
+			else
+			{
+				_et = -(ETypeStorage)Type2Enum<String>::et;
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -272,7 +279,7 @@ namespace utils
 
 		//////////////////////////////////////////////////////////////////////////
 		template<typename T> 
-		void forceType()
+		void setType()
 		{
 			if(is<T>())
 			{
@@ -284,7 +291,7 @@ namespace utils
 		}
 		
 		//////////////////////////////////////////////////////////////////////////
-		void forceType(EType et)
+		void setType(EType et)
 		{
 			if(et == type())
 			{
@@ -683,7 +690,7 @@ namespace utils
 	}		
 	//////////////////////////////////////////////////////////////////////////
 	template<> 
-	void VariantImpl::forceType<Variant::Void>()
+	void VariantImpl::setType<Variant::Void>()
 	{
 		if(is<Void>())
 		{

@@ -18,7 +18,7 @@ namespace utils
 			template <class Dst, class Src>
 			bool exec(Dst &dst, const Src &src)
 			{
-			    assert(0);
+			    //assert(0);
 				return false;
 			}
 		}
@@ -773,9 +773,35 @@ namespace utils
 
 
 
+			//vectorChar
+			template <> bool exec(Variant::String &dst, const Variant::VectorChar &src)
+			{
+				dst.assign(src.begin(), src.end());
+				return true;
+			}
+
+			template <> bool exec(Variant::VectorChar &dst, const Variant::String &src)
+			{
+				dst.assign(src.begin(), src.end());
+				return true;
+			}
 
 
 
+
+
+
+
+#define CNVTIDENTITY(T) template <> bool exec(Variant::T &dst, const Variant::T &src){dst=src;return true;}
+	CNVTIDENTITY(String)
+	CNVTIDENTITY(VectorChar)
+	CNVTIDENTITY(Date)
+	CNVTIDENTITY(Datetime)
+	CNVTIDENTITY(DateDuration)
+	CNVTIDENTITY(TimeDuration)
+	CNVTIDENTITY(DateTimeDuration)
+	CNVTIDENTITY(Tm)
+	CNVTIDENTITY(Uuid)
 		}
 	}
 }
