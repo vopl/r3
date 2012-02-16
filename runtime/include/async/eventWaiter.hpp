@@ -121,6 +121,9 @@ namespace async
 
 			\post текущее событие может быть получено вызовом async::EventWaiter::current
 			\post индекс текущего события может быть получен вызовом async::EventWaiter::currentIndex
+
+			\warning Поток (thread) может изменится во время исполнения этого метода.
+				Смотри так же async::Event::wait
 		*/
 		bool wait();
 
