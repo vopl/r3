@@ -80,9 +80,21 @@ QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine)
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
-	QStringList paths = QStringList() << QCoreApplication::applicationDirPath() + "/../../plugins";
+
+	QDir dir = QDir::current();
+	dir.cdUp();
+	if(!dir.cd("plug"))
+	{
+		fprintf(stderr, "plug folder does not exist\n");
+		return EXIT_FAILURE;
+	}
+	QStringList paths = app.libraryPaths();
+	paths <<  dir.absolutePath();
 	app.setLibraryPaths(paths);
 
+
+
+	//////////////////////////////////////////////////////////////////////////
 	QScriptEngine *engine = new QScriptEngine();
 
 #ifndef NDEBUG
@@ -100,6 +112,8 @@ int main(int argc, char *argv[])
 	QScriptValue system = engine->newObject();
 	global.property("qs").setProperty("system", system);
 
+	global.property("qs").setProperty("extensions", engine->toScriptValue(engine->availableExtensions()));
+
 	// add os information to qt.system.os
 #ifdef Q_OS_WIN32
 	QScriptValue osName = engine->toScriptValue(QString("windows"));
@@ -112,6 +126,7 @@ int main(int argc, char *argv[])
 #endif
 	system.setProperty("os", osName);
 
+	//////////////////////////////////////////////////////////////////////////
 	// add environment variables to qt.system.env
 	QMap<QString,QVariant> envMap;
 	QStringList envList = QProcess::systemEnvironment();
@@ -129,9 +144,10 @@ int main(int argc, char *argv[])
 	// add the importExtension functionality to qt.script.importExtension
 	script.setProperty("importExtension", engine->newFunction(importExtension));
 
-	QStringList args = QCoreApplication::arguments();
-	args.takeFirst();
-	
+	//QStringList args = QCoreApplication::arguments();
+	//args.takeFirst();
+
+
 	{ // read script file and execute
 
 		QString fileName = ":/main.js";
