@@ -71,14 +71,6 @@ AnalogClock.prototype.paintEvent = function() {
     painter.drawConvexPolygon(AnalogClock.secondHand);
     painter.restore();
 
-    painter.setPen(AnalogClock.secondColor);
-
-    for (var j = 0; j < 60; ++j) {
-        if ((j % 5) != 0)
-	        painter.drawLine(92, 0, 96, 0);
-        painter.rotate(6.0);
-    }
-    
     painter.end();
 };
 

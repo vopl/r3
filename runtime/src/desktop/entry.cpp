@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 
+	//пути к расширениям
 	QDir dir = QDir::current();
 	dir.cdUp();
 	if(!dir.cd("plug"))
@@ -103,6 +104,8 @@ int main(int argc, char *argv[])
 #endif
 
 	QScriptValue global = engine->globalObject();
+	global.setProperty("global", global);
+
 	// add the qt object
 	global.setProperty("qs", engine->newObject());
 	// add a 'script' object
@@ -114,30 +117,6 @@ int main(int argc, char *argv[])
 
 	global.property("qs").setProperty("extensions", engine->toScriptValue(engine->availableExtensions()));
 
-	// add os information to qt.system.os
-#ifdef Q_OS_WIN32
-	QScriptValue osName = engine->toScriptValue(QString("windows"));
-#elif defined(Q_OS_LINUX)
-	QScriptValue osName = engine->toScriptValue(QString("linux"));
-#elif defined(Q_OS_MAC)
-	QScriptValue osName = engine->toScriptValue(QString("mac"));
-#elif defined(Q_OS_UNIX)
-	QScriptValue osName = engine->toScriptValue(QString("unix"));
-#endif
-	system.setProperty("os", osName);
-
-	//////////////////////////////////////////////////////////////////////////
-	// add environment variables to qt.system.env
-	QMap<QString,QVariant> envMap;
-	QStringList envList = QProcess::systemEnvironment();
-	foreach (const QString &entry, envList) {
-		QStringList keyVal = entry.split('=');
-		if (keyVal.size() == 1)
-			envMap.insert(keyVal.at(0), QString());
-		else
-			envMap.insert(keyVal.at(0), keyVal.at(1));
-	}
-	system.setProperty("env", engine->toScriptValue(envMap));
 
 	// add the include functionality to qt.script.include
 	script.setProperty("include", engine->newFunction(includeScript));
