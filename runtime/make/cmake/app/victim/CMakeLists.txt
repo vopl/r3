@@ -20,7 +20,7 @@ IF(MSVC)
 	SOURCE_GROUP(src FILES ${SRC_PCH})
 ENDIF()
 
-ADD_EXECUTABLE(victim ${SRC_STUB} ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
+ADD_EXECUTABLE(victim ${SRC} ${SRC_NOPCH} ${SRC_HDR} ${SRC_PCH})
 CREATE_PCH(victim ${SRC_DIR}/victim/pch.hpp ${SRC_PCH})
 USE_PCH(victim ${SRC_DIR}/victim/pch.hpp ${SRC})
 

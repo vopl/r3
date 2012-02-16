@@ -7,7 +7,7 @@ SET(SRC
 )
 SOURCE_GROUP(src FILES ${SRC})
 
-ADD_EXECUTABLE(server ${SRC_STUB} ${SRC})
+ADD_EXECUTABLE(server ${SRC})
 
 SETUP_BIN_OUT(server server)
 
