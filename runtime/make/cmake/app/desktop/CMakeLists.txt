@@ -1,6 +1,6 @@
 PROJECT (desktop)
 
-FIND_PACKAGE(Qt4 4.7.4 REQUIRED QtCore QtScript)
+FIND_PACKAGE(Qt4 4.7.4 REQUIRED QtCore QtScript QtScriptTools QtGui)
 INCLUDE(${QT_USE_FILE})
 
 #MESSAGE("defs: ${QT_DEFINITIONS}")	

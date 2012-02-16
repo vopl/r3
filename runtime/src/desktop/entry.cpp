@@ -79,11 +79,16 @@ QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine)
 //////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
-	QCoreApplication app(argc, argv);
+	QApplication app(argc, argv);
 	QStringList paths = QStringList() << QCoreApplication::applicationDirPath() + "/../../plugins";
 	app.setLibraryPaths(paths);
 
 	QScriptEngine *engine = new QScriptEngine();
+
+#ifndef NDEBUG
+	QScriptEngineDebugger *debugger = new QScriptEngineDebugger();
+	debugger->attachTo(engine);
+#endif
 
 	QScriptValue global = engine->globalObject();
 	// add the qt object
@@ -127,9 +132,6 @@ int main(int argc, char *argv[])
 	QStringList args = QCoreApplication::arguments();
 	args.takeFirst();
 	
-	//QAbstractFileEngineHandler
-	//QAbstractFileEngine
-
 	{ // read script file and execute
 
 		QString fileName = ":/main.js";
@@ -141,6 +143,11 @@ int main(int argc, char *argv[])
 	}
 
 	delete engine;
+
+#ifndef NDEBUG
+	delete debugger;
+#endif
+
 	return EXIT_SUCCESS;
 }
 

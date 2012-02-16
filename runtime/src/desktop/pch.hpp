@@ -10,6 +10,7 @@
 
 #include <QtCore>
 #include <QtScript>
+#include <QtScriptTools>
 
 #include <string>
 #include <vector>
