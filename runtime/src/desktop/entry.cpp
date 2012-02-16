@@ -1,73 +1,55 @@
 #include "pch.hpp"
 
 //////////////////////////////////////////////////////////////////////////
-bool loadFile(QString fileName, QScriptEngine *engine)
+QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 {
+	QScriptValue res;
+
 	// avoid loading files more than once
-	static QSet<QString> loadedFiles;
 	QFileInfo fileInfo(fileName);
 	QString absoluteFileName = fileInfo.absoluteFilePath();
 	QString absolutePath = fileInfo.absolutePath();
 	QString canonicalFileName = fileInfo.canonicalFilePath();
-	if (loadedFiles.contains(canonicalFileName)) {
-		return true;
-	}
-	loadedFiles.insert(canonicalFileName);
+
 	QString path = fileInfo.path();
 
 	// load the file
 	QFile file(fileName);
-	if (file.open(QFile::ReadOnly)) {
+	if (file.open(QFile::ReadOnly))
+	{
 		QTextStream stream(&file);
 		QString contents = stream.readAll();
 		file.close();
 
-		int endlineIndex = contents.indexOf('\n');
-		QString line = contents.left(endlineIndex);
-		int lineNumber = 1;
+		QScriptValue  newScript = engine->newObject();
 
-		// strip off #!/usr/bin/env qscript line
-		if (line.startsWith("#!")) {
-			contents.remove(0, endlineIndex+1);
-			++lineNumber;
-		}
+		newScript.setProperty("filePath", engine->toScriptValue(absoluteFileName));
+		newScript.setProperty("path", engine->toScriptValue(absolutePath));
 
-		// set qt.script.absoluteFilePath
-		QScriptValue script = engine->globalObject().property("qs").property("script");
-		QScriptValue oldFilePathValue = script.property("absoluteFilePath");
-		QScriptValue oldPathValue = script.property("absolutePath");
-		script.setProperty("absoluteFilePath", engine->toScriptValue(absoluteFileName));
-		script.setProperty("absolutePath", engine->toScriptValue(absolutePath));
-
-		QScriptValue r = engine->evaluate(contents, fileName, lineNumber);
-		if (engine->hasUncaughtException()) {
-			QStringList backtrace = engine->uncaughtExceptionBacktrace();
-			qDebug() << QString("    %1\n%2\n\n").arg(r.toString()).arg(backtrace.join("\n"));
-			return true;
-		}
-		script.setProperty("absoluteFilePath", oldFilePathValue); // if we come from includeScript(), or whereever
-		script.setProperty("absolutePath", oldPathValue); // if we come from includeScript(), or whereever
-	} else {
-		return false;
+		engine->currentContext()->activationObject().setProperty("script", newScript);
+		res = engine->evaluate(contents, fileName);
 	}
-	return true;
+	else
+	{
+		return engine->currentContext()->throwError(QString("File not found: %1").arg(fileName));
+	}
+	return res;
 }
 
 //////////////////////////////////////////////////////////////////////////
-QScriptValue includeScript(QScriptContext *context, QScriptEngine *engine)
+QScriptValue include(QScriptContext *context, QScriptEngine *engine)
 {
-	QString currentFileName = engine->globalObject().property("qs").property("script").property("absoluteFilePath").toString();
+	QString currentFileName = engine->globalObject().property("script").property("filePath").toString();
 	QFileInfo currentFileInfo(currentFileName);
 	QString path = currentFileInfo.path();
 	QString importFile = context->argument(0).toString();
 	QFileInfo importInfo(importFile);
-	if (importInfo.isRelative()) {
+	if(importInfo.isRelative())
+	{
 		importFile =  path + "/" + importInfo.filePath();
 	}
-	if (!loadFile(importFile, engine)) {
-		return context->throwError(QString("Failed to resolve include: %1").arg(importFile));
-	}
-	return engine->toScriptValue(true);
+
+	return loadFile(importFile, engine);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -77,23 +59,49 @@ QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine)
 }
 
 //////////////////////////////////////////////////////////////////////////
+QScriptValue print(QScriptContext *context, QScriptEngine *engine)
+{
+	int argumentCount = context->argumentCount();
+	for(int i(0); i<argumentCount; i++)
+	{
+		QByteArray ba = context->argument(i).toString().toUtf8();
+		std::cout.write(ba.constData(), ba.size());
+	}
+	std::cout<<std::endl;
+
+	return QScriptValue();
+}
+
+//////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 
-	//пути к расширениям
-	QDir dir = QDir::current();
-	dir.cdUp();
-	if(!dir.cd("plug"))
-	{
-		fprintf(stderr, "plug folder does not exist\n");
-		return EXIT_FAILURE;
-	}
-	QStringList paths = app.libraryPaths();
-	paths <<  dir.absolutePath();
-	app.setLibraryPaths(paths);
+// 	//пути к расширениям
+// 	QDir dir = QDir::current();
+// 	dir.cdUp();
+// 	if(!dir.cd("plug"))
+// 	{
+// 		fprintf(stderr, "plug folder does not exist\n");
+// 		return EXIT_FAILURE;
+// 	}
+// 	QStringList paths = app.libraryPaths();
+// 	paths <<  dir.absolutePath();
+// 	app.setLibraryPaths(paths);
 
 
+	/*
+		global
+			extensions
+			importExtension
+			include
+
+
+		script
+			filePath
+			directoryPath
+			parent
+	*/
 
 	//////////////////////////////////////////////////////////////////////////
 	QScriptEngine *engine = new QScriptEngine();
@@ -106,34 +114,21 @@ int main(int argc, char *argv[])
 	QScriptValue global = engine->globalObject();
 	global.setProperty("global", global);
 
-	// add the qt object
-	global.setProperty("qs", engine->newObject());
-	// add a 'script' object
-	QScriptValue script = engine->newObject();
-	global.property("qs").setProperty("script", script);
-	// add a 'system' object
-	QScriptValue system = engine->newObject();
-	global.property("qs").setProperty("system", system);
-
-	global.property("qs").setProperty("extensions", engine->toScriptValue(engine->availableExtensions()));
-
-
-	// add the include functionality to qt.script.include
-	script.setProperty("include", engine->newFunction(includeScript));
-	// add the importExtension functionality to qt.script.importExtension
-	script.setProperty("importExtension", engine->newFunction(importExtension));
-
-	//QStringList args = QCoreApplication::arguments();
-	//args.takeFirst();
+	global.setProperty("extensions", engine->toScriptValue(engine->availableExtensions()));
+	global.setProperty("importExtension", engine->newFunction(importExtension));
+	global.setProperty("include", engine->newFunction(include));
+	global.setProperty("print", engine->newFunction(print));
 
 
 	{ // read script file and execute
 
 		QString fileName = ":/main.js";
-		if (!loadFile(fileName, engine))
+		QScriptValue res = loadFile(fileName, engine);
+
+		if(engine->hasUncaughtException())
 		{
-			qDebug() << "Failed:" << fileName;
-			return EXIT_FAILURE;
+			QStringList backtrace = engine->uncaughtExceptionBacktrace();
+			qDebug() << QString("    %1\n%2\n\n").arg(res.toString()).arg(backtrace.join("\n"));
 		}
 	}
 

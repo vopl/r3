@@ -1,18 +1,22 @@
 
+// var res = include("P:/projects/r3/repo/runtime/Debug/client/test.js");
+// print("from main2: ", script.filePath, ", ", res);
 
-qs.script.importExtension('qt');
-qs.script.importExtension('qt.core');
-qs.script.importExtension('qt.gui');
-qs.script.importExtension('qt.uitools');
-qs.script.importExtension('qt.sql');
+
+importExtension('qt');
+importExtension('qt.core');
+importExtension('qt.gui');
+importExtension('qt.uitools');
+importExtension('qt.sql');
 
 
 function AnalogClock(parent) {
+
     QWidget.call(this, parent);
 
     var timer = new QTimer(this);
     timer.timeout.connect(this, "update()");
-    timer.start(200);
+    timer.start(1000);
 
     this.setWindowTitle("Analog Clock");
     this.resize(200, 200);
@@ -67,7 +71,7 @@ AnalogClock.prototype.paintEvent = function() {
     painter.setBrush(new QBrush(AnalogClock.secondColor));
 
     painter.save();
-    painter.rotate(6.0 * (time.getSeconds() + 0.001*time.getMilliseconds()));
+    painter.rotate(6.0 * (time.getSeconds()));
     painter.drawConvexPolygon(AnalogClock.secondHand);
     painter.restore();
 
@@ -88,9 +92,9 @@ AnalogClock.minuteHand = new QPolygon([new QPoint(7, 8),
                                        new QPoint(-7, 8),
                                        new QPoint(0, -70)]);
 
-AnalogClock.secondHand = new QPolygon([new QPoint(3, 4),
-                                       new QPoint(-3, 4),
-                                       new QPoint(0, -80)]);
+AnalogClock.secondHand = new QPolygon([new QPoint(3, 3),
+                                       new QPoint(-3, 3),
+                                       new QPoint(0, -90)]);
 
 var clock = new AnalogClock();
 clock.show();
