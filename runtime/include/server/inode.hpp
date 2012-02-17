@@ -55,6 +55,6 @@ namespace server
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_PROVIDER_HEADER(INode, 1, 1);
+	PLUMA_PROVIDER_HEADER(INode, 1, 1)
 }
 #endif

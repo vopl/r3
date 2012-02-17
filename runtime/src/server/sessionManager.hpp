@@ -55,6 +55,6 @@ namespace server
 		virtual bool stop();
 	};
 
-	PLUMA_INHERIT_PROVIDER(SessionManager, ISessionManager);
+	PLUMA_INHERIT_PROVIDER(SessionManager, ISessionManager)
 }
 #endif

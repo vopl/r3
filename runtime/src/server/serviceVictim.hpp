@@ -40,6 +40,6 @@ namespace server
 	typedef boost::shared_ptr<ServiceVictim> ServiceVictimPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_INHERIT_PROVIDER(ServiceVictim, INode);
+	PLUMA_INHERIT_PROVIDER(ServiceVictim, INode)
 }
 #endif

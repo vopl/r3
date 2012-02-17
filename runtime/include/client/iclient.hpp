@@ -20,7 +20,7 @@ namespace client
 	typedef boost::shared_ptr<IClient> IClientPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_PROVIDER_HEADER(IClient, 1, 1);
+	PLUMA_PROVIDER_HEADER(IClient, 1, 1)
 
 }
 #endif

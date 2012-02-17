@@ -54,6 +54,6 @@ namespace server
 		virtual pluma::Pluma * getPlugs();
 		virtual pgc::Db getDb();
 	};
-	PLUMA_INHERIT_PROVIDER(Server, IServer);
+	PLUMA_INHERIT_PROVIDER(Server, IServer)
 }
 #endif

@@ -25,6 +25,6 @@ namespace server
 	typedef boost::shared_ptr<ServiceEcho> ServiceEchoPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_INHERIT_PROVIDER(ServiceEcho, INode);
+	PLUMA_INHERIT_PROVIDER(ServiceEcho, INode)
 }
 #endif

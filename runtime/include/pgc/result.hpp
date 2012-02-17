@@ -31,7 +31,7 @@ namespace pgc
 
 			Детали ошибки можно получить через pgc::Result::errorMsg, pgc::Result::errorCode
 		*/
-		ersError,
+		ersError
 	};
 
 	//////////////////////////////////////////////////////////////////////////

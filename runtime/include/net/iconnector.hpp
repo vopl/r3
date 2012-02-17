@@ -14,7 +14,7 @@ namespace net
 	};
 	typedef boost::shared_ptr<IConnector> IConnectorPtr;
 
-	PLUMA_PROVIDER_HEADER(IConnector, 1, 1);
+	PLUMA_PROVIDER_HEADER(IConnector, 1, 1)
 
 }
 #endif

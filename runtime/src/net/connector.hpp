@@ -34,6 +34,6 @@ namespace net
 		virtual Future2<error_code, IChannelPtr> connect(const char *host, const char *service, bool useSsl);
 	};
 
-	PLUMA_INHERIT_PROVIDER(Connector, IConnector);
+	PLUMA_INHERIT_PROVIDER(Connector, IConnector)
 }
 #endif

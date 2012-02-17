@@ -156,7 +156,7 @@ namespace pgc
 		{
 			esContinue,
 			esOk,
-			esBad,
+			esBad
 		} es(esContinue);
 
 		while(esContinue == es)

@@ -59,7 +59,7 @@ namespace server
 	typedef boost::shared_ptr<NodeManager> NodeManagerPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_INHERIT_PROVIDER(NodeManager, INodeManager);
+	PLUMA_INHERIT_PROVIDER(NodeManager, INodeManager)
 
 }
 #endif

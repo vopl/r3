@@ -20,7 +20,7 @@ namespace server
 	typedef boost::shared_ptr<IServer> IServerPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_PROVIDER_HEADER(IServer, 1, 1);
+	PLUMA_PROVIDER_HEADER(IServer, 1, 1)
 
 }
 #endif

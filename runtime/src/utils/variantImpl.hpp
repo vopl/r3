@@ -2,9 +2,11 @@
 #include "variantConvertMatrix.hpp"
 #include <boost/exception/all.hpp>
 
+#ifdef _MSC_VER
 //warning C4127: conditional expression is constant
-#pragma warning (push)
-#pragma warning (disable: 4127)
+#	pragma warning (push)
+#	pragma warning (disable: 4127)
+#endif
 
 namespace utils
 {
@@ -771,4 +773,6 @@ namespace utils
 	
 }
 
-#pragma warning (pop)
+#ifdef _MSC_VER
+#	pragma warning (pop)
+#endif

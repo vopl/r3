@@ -21,6 +21,6 @@ namespace server
 	};
 	typedef boost::shared_ptr<ISessionManager> ISessionManagerPtr;
 
-	PLUMA_PROVIDER_HEADER(ISessionManager, 1, 1);
+	PLUMA_PROVIDER_HEADER(ISessionManager, 1, 1)
 }
 #endif

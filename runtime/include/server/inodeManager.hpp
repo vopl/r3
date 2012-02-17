@@ -41,7 +41,7 @@ namespace server
 	typedef boost::shared_ptr<INodeManager> INodeManagerPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_PROVIDER_HEADER(INodeManager, 1, 1);
+	PLUMA_PROVIDER_HEADER(INodeManager, 1, 1)
 
 }
 #endif

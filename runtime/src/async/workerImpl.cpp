@@ -54,6 +54,7 @@ namespace async
 		}
 		bool b = _fiberRoot->activate();
 		assert(b);
+		(void)b;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -87,6 +88,7 @@ namespace async
 		assert(FiberImpl::current() != _fiberRoot.get());
 		bool b = _fiberRoot->activate();
 		assert(b);
+		(void)b;
 	}
 
 

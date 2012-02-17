@@ -19,7 +19,7 @@ namespace async
 		assert(_waiters.empty());
 		BOOST_FOREACH(FiberImplPtr &fiber, _waiters)
 		{
-			WorkerImpl::current()->fiberReady(_waiters.front());
+			WorkerImpl::current()->fiberReady(fiber);
 		}
 	}
 

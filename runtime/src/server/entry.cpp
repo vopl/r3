@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 	//////////////////////////////////////////////////////////////////////////
 #ifdef WIN32
 #else
-	pollfd stdin_pfd[1]={0, POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI,0};
+	pollfd stdin_pfd[1]={{0, POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI,0}};
 #endif
 	do
 	{

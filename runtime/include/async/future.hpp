@@ -94,8 +94,8 @@ namespace async
 			состояние события не-сигнальное
 		*/
 		Future()
-			: _state(new State)
-			, Event(false)
+			: Event(false)
+			, _state(new State)
 		{
 		}
 
@@ -191,8 +191,8 @@ namespace async
 
 	public:
 		Future2()
-			: _state(new State)
-			, Event(false)
+			: Event(false)
+			, _state(new State)
 		{
 		}
 
@@ -273,8 +273,8 @@ namespace async
 
 	public:
 		Future3()
-			: _state(new State)
-			, Event(false)
+			: Event(false)
+			, _state(new State)
 		{
 		}
 

@@ -25,6 +25,8 @@ namespace async
 			m_key = TlsAlloc();
 #else
 			int rc = pthread_key_create(&m_key, NULL);
+			assert(!rc);
+			(void)rc;
 #endif
 			assert(m_key);
 		}
@@ -88,6 +90,6 @@ namespace async
 		T * operator->() { return ThreadLocalStorageBase<T *>::get(); }
 	};
 
-};
+}
 
 #endif

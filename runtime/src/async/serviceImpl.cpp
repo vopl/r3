@@ -23,9 +23,9 @@ namespace async
 	ServiceImpl::ServiceImpl()
 		: _io()
 		, _work()
+		, _fiberPool(new FiberPool)
 		, _threadStart()
 		, _threadStop()
-		, _fiberPool(new FiberPool)
 	{
 		ILOG("create");
 	}

@@ -44,6 +44,6 @@ namespace client
 		Future2<error_code, ISessionPtr> 
 			connectSession(SessionPtr session, const std::string &host, const std::string &service);
 	};
-	PLUMA_INHERIT_PROVIDER(Client, IClient);
+	PLUMA_INHERIT_PROVIDER(Client, IClient)
 }
 #endif

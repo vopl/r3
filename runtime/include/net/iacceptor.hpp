@@ -19,6 +19,6 @@ namespace net
 	};
 	typedef boost::shared_ptr<IAcceptor> IAcceptorPtr;
 
-	PLUMA_PROVIDER_HEADER(IAcceptor, 1, 1);
+	PLUMA_PROVIDER_HEADER(IAcceptor, 1, 1)
 }
 #endif

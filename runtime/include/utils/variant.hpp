@@ -175,7 +175,7 @@ namespace utils
 			etListVariant 				=36,//!<	Список вариантов
 			etChar 						=37,//!<	Символ
 			etUuid 						=38,//!<	UUID
-			etVariantPtr 				=39,//!<	Указатель на вариант
+			etVariantPtr 				=39 //!<	Указатель на вариант
 		};
 
 	public:

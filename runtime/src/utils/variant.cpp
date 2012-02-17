@@ -40,7 +40,7 @@ namespace utils
 	{								\
 			IMPL->validateType<n>();\
 			IMPL->construct(v);		\
-	}								//\
+	}								\
 
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
@@ -60,7 +60,7 @@ ENUM_VARIANT_TYPES
 		IMPL->validateType<n>();			\
 		IMPL->assign(v);					\
 		return *this;						\
-	}										//\
+	}										\
 
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE
@@ -88,7 +88,7 @@ Variant &Variant::operator=(const char * v)
 		n res;						\
 		CIMPL->convert<n>(res);		\
 		return res;					\
-	}								//\
+	}								\
 
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE

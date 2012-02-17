@@ -53,13 +53,14 @@ namespace utils
 // 				return true;
 // 			}
 
+#ifdef _MSC_VER
 			//warning C4244: '=' : conversion from 'const utils::Variant::UInt16' to 'utils::Variant::UInt8', possible loss of data
-#pragma warning (disable: 4244)
+#	pragma warning (disable: 4244)
 			//warning C4267: '=' : conversion from 'size_t' to 'utils::Variant::Int8', possible loss of data
-#pragma warning (disable: 4267)
+#	pragma warning (disable: 4267)
 			//warning C4800: 'const utils::Variant::Char' : forcing value to bool 'true' or 'false' (performance warning)
-#pragma warning (disable: 4800)
-
+#	pragma warning (disable: 4800)
+#endif
 			//////////////////////////////////////////////////////////////////////////
 			//integer to integer
 			//unsigned <- unsigned

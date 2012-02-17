@@ -125,7 +125,7 @@ namespace pgc
 		{
 			ertQuery,
 			ertQueryWithPrepare,
-			ertQueryEndWork,
+			ertQueryEndWork
 		};
 		struct SRequest
 		{

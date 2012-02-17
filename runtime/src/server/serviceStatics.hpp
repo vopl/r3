@@ -29,6 +29,6 @@ namespace server
 	typedef boost::shared_ptr<ServiceStatics> ServiceStaticsPtr;
 
 	//////////////////////////////////////////////////////////////////////////
-	PLUMA_INHERIT_PROVIDER(ServiceStatics, INode);
+	PLUMA_INHERIT_PROVIDER(ServiceStatics, INode)
 }
 #endif

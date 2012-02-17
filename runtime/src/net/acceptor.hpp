@@ -47,6 +47,6 @@ namespace net
 
 	};
 
-	PLUMA_INHERIT_PROVIDER(Acceptor, IAcceptor);
+	PLUMA_INHERIT_PROVIDER(Acceptor, IAcceptor)
 }
 #endif
