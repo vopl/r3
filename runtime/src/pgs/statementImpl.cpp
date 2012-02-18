@@ -22,8 +22,8 @@ namespace pgs
 									pgs::ClusterImplPtr cluster, 
 									const TMName2idx &bindName2idx)
  		: pgc::StatementImpl(sql)
-		, _cluster(cluster)
- 		, _bindName2idx(bindName2idx)
+		, _bindName2idx(bindName2idx)
+ 		, _cluster(cluster)
 	{
 		//assert(0);
 	}

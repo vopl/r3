@@ -8,16 +8,16 @@ namespace pgs
 {
 	//////////////////////////////////////////////////////////////////////////
 	LinkImpl::LinkImpl(pgs::meta::RelationEndCPtr re, const std::string &alias)
-		: _srcAlias(re->_category->_name)
-		, _metaRelatioEnd(re)
+		: _metaRelatioEnd(re)
+		, _srcAlias(re->_category->_name)
 		, _alias(alias.empty()?re->_name:alias)
 	{
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	LinkImpl::LinkImpl(const std::string &srcAlias, pgs::meta::RelationEndCPtr re, const std::string &alias)
-		: _srcAlias(srcAlias.empty()?re->_category->_name:srcAlias)
-		, _metaRelatioEnd(re)
+		: _metaRelatioEnd(re)
+		, _srcAlias(srcAlias.empty()?re->_category->_name:srcAlias)
 		, _alias(alias.empty()?re->_name:alias)
 	{
 	}

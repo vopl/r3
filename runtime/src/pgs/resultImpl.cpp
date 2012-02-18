@@ -11,8 +11,8 @@ namespace pgs
 		ClusterImplPtr cluster,
 		const TMName2idx &fetchName2idx)
 		: pgc::ResultImpl(pgres, integerDatetime)
-		, _cluster(cluster)
 		, _fetchName2idx(fetchName2idx)
+		, _cluster(cluster)
 	{
 	}
 

@@ -31,7 +31,7 @@ namespace server
 		{
 			esStop,
 			esStart,
-			esError,
+			esError
 		}					_state;
 		condition_variable	_isStartedCvar;
 
