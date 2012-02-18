@@ -69,8 +69,8 @@ namespace async
 #   error Unknown context type for fibers
 #endif
 
-#if defined(VALGRIND)
-		int m_valgrindStackId;
+#if defined(HAVE_VALGRIND_H)
+		int _valgrindStackId;
 #endif
 
 		function<void()>	_code;

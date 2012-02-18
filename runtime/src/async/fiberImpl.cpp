@@ -4,7 +4,7 @@
 #include "workerImpl.hpp"
 #include "async/exception.hpp"
 
-#if defined(VALGRIND)
+#if defined(HAVE_VALGRIND_H)
 #include <valgrind/valgrind.h>
 #endif
 
@@ -44,8 +44,8 @@ namespace async
 #elif defined(HAVE_UCONTEXT_H)
 		if(_context.uc_stack.ss_sp)
 		{
-#if defined(VALGRIND)
-			VALGRIND_STACK_DEREGISTER(m_valgrindStackId);
+#if defined(HAVE_VALGRIND_H)
+			VALGRIND_STACK_DEREGISTER(_valgrindStackId);
 #endif
 			free(_context.uc_stack.ss_sp);
 		}
@@ -81,8 +81,8 @@ namespace async
 		_context.uc_stack.ss_sp = (char *)malloc(_stacksize);
 		_context.uc_stack.ss_size = _stacksize;
 
-#if defined(VALGRIND)
-		m_valgrindStackId = VALGRIND_STACK_REGISTER(_context.uc_stack.ss_sp, (char *)_context.uc_stack.ss_sp + _context.uc_stack.ss_size);
+#if defined(HAVE_VALGRIND_H)
+		_valgrindStackId = VALGRIND_STACK_REGISTER(_context.uc_stack.ss_sp, (char *)_context.uc_stack.ss_sp + _context.uc_stack.ss_size);
 #endif
 
 

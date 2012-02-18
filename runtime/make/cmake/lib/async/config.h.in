@@ -1,4 +1,5 @@
 
+#cmakedefine HAVE_VALGRIND_H 1
 #cmakedefine HAVE_UCONTEXT_H 1
 #cmakedefine HAVE_WINFIBER 1
 
