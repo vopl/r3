@@ -17,7 +17,7 @@ namespace pgs
 		ecmSelectWhere,
 		ecmSelectOrder,
 		ecmSelectLimit,
-		ecmSelectOffset,
+		ecmSelectOffset
 	};
 
 	//////////////////////////////////////////////////////////////////////////

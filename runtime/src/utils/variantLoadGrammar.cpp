@@ -17,7 +17,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(unsigned, _year)
 	(unsigned, _month)
 	(unsigned, _day)
-);
+)
 
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -26,7 +26,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(unsigned, _minute)
 	(unsigned, _second)
 	(unsigned, _microsec)
-);
+)
 
 namespace utils
 {
@@ -111,6 +111,8 @@ namespace utils
 		{
 			pass = _scope.do_include(path);
 		}
+
+		void operator=(const CheckerInclude &);//no implemented
 	};
 
 
@@ -213,7 +215,7 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		_dateScope.name("dateScope");
 		_dateScope =
-			_dateTemplate[_val = _1] >
+			_dateTemplate[(_val = _1)] >
 			_validDate(_val)[Checker()];
 
 		_dateTemplate.name("dateTemplate");
@@ -237,7 +239,7 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		_timeScope.name("timeScope");
 		_timeScope =
-			_timeTemplate[_val = _1] >
+			_timeTemplate[(_val = _1)] >
 			_validTime(_val)[Checker()];
 
 		//////////////////////////////////////////////////////////////////////////
@@ -264,7 +266,7 @@ namespace utils
 		//////////////////////////////////////////////////////////////////////////
 		_dateTimeScope.name("dateTimeScope");
 		_dateTimeScope =
-			_dateTimeTemplate[_val = _1] >
+			_dateTimeTemplate[(_val = _1)] >
 			_validDateTime(_val)[Checker()];
 
 

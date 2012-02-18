@@ -128,6 +128,7 @@ SET(PGS_SRC
 	${SRC_DIR}/pgs/orderImpl.cpp
 	${SRC_DIR}/pgs/result.cpp
 	${SRC_DIR}/pgs/resultImpl.cpp
+	${SRC_DIR}/pgs/sdHelpers.cpp
 	${SRC_DIR}/pgs/select.cpp
 	${SRC_DIR}/pgs/selectImpl.cpp
 	${SRC_DIR}/pgs/value.cpp

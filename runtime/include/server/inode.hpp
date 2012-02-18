@@ -13,7 +13,7 @@ namespace server
 	{
 		enfNull		= 0x0,
 		enfService	= 0x1,
-		enfTask		= 0x2,
+		enfTask		= 0x2
 	};
 
 	//////////////////////////////////////////////////////////////////////////

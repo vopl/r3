@@ -35,7 +35,7 @@ namespace pgs
 			eftBitset64,
 			eftBitset128,
 			eftBitset256,
-			eftBitset512,
+			eftBitset512
 		};
 
 		//////////////////////////////////////////////////////////////////////////

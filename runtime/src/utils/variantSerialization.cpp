@@ -416,7 +416,7 @@ namespace utils
 			//////////////////////////////////////////////////////////////////////////
 			void write(const Variant &v)
 			{
-				int16_t et = v.type();
+				int16_t et = (int16_t)v.type();
 				if(v.isNull())
 				{
 					et = -et;
@@ -877,11 +877,11 @@ namespace utils
 						}
 
 						uint16_t y,m,d;
-						y = ui4/10000;
+						y = (uint16_t)(ui4/10000);
 						ui4 %= 10000;
-						m = ui4/100;
+						m = (uint16_t)(ui4/100);
 						ui4 %= 100;
-						d = ui4;
+						d = (uint16_t)(ui4);
 
 						try
 						{
@@ -903,11 +903,11 @@ namespace utils
 						}
 
 						uint16_t y,m,d;
-						y = ui4_d/10000;
+						y = (uint16_t)(ui4_d/10000);
 						ui4_d %= 10000;
-						m = ui4_d/100;
+						m = (uint16_t)(ui4_d/100);
 						ui4_d %= 100;
-						d = ui4_d;
+						d = (uint16_t)(ui4_d);
 
 						try
 						{

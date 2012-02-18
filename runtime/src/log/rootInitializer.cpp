@@ -46,7 +46,7 @@ namespace
 
 namespace log_
 {
-	LOG_API void instanceInitialized(log4cplus::Logger &instance)
+	LOG_API void instanceInitialized(log4cplus::Logger &/*instance*/)
 	{
 	}
 }

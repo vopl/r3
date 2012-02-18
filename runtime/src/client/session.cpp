@@ -113,10 +113,10 @@ namespace client
 		const std::string &host,
 		const std::string &service)
 		: _sid(sid)
-		, _needNumChannels(1)
 		, _client(client)
 		, _host(host)
 		, _service(service)
+		, _needNumChannels(1)
 		, _connectInProgress(false)
 	{
 	}
