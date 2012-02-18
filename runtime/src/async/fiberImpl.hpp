@@ -65,13 +65,13 @@ namespace async
 		LPVOID	_context;
 #elif defined(HAVE_UCONTEXT_H)
 		ucontext_t	_context;
+#	if defined(HAVE_VALGRIND_H)
+		int _valgrindStackId;
+#	endif
 #else
 #   error Unknown context type for fibers
 #endif
 
-#if defined(HAVE_VALGRIND_H)
-		int _valgrindStackId;
-#endif
 
 		function<void()>	_code;
 		boost::mutex		_mtx;

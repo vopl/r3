@@ -4,8 +4,10 @@
 #include "workerImpl.hpp"
 #include "async/exception.hpp"
 
-#if defined(HAVE_VALGRIND_H)
-#include <valgrind/valgrind.h>
+#if defined(HAVE_UCONTEXT_H)
+#	if defined(HAVE_VALGRIND_H)
+#		include <valgrind/valgrind.h>
+#	endif
 #endif
 
 
