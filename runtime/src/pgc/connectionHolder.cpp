@@ -455,7 +455,7 @@ namespace pgc
 		assert(!_now.is_not_a_date_time());
 
 		int nParams = bindData?(int)bindData->typ.size():0;
-		const Oid *paramTypes = nParams?&bindData->typ[0]:NULL;
+		//const Oid *paramTypes = nParams?&bindData->typ[0]:NULL;
 		const char * const *paramValues = nParams?&bindData->val[0]:NULL;
 		const int *paramLengths = nParams?&bindData->len[0]:NULL;
 		const int *paramFormats = nParams?&bindData->fmt[0]:NULL;
