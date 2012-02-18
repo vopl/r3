@@ -4,6 +4,10 @@
 #include "workerImpl.hpp"
 #include "async/exception.hpp"
 
+#if defined(VALGRIND)
+#include <valgrind/valgrind.h>
+#endif
+
 
 namespace async
 {
@@ -40,6 +44,9 @@ namespace async
 #elif defined(HAVE_UCONTEXT_H)
 		if(_context.uc_stack.ss_sp)
 		{
+#if defined(VALGRIND)
+			VALGRIND_STACK_DEREGISTER(m_valgrindStackId);
+#endif
 			free(_context.uc_stack.ss_sp);
 		}
 #else
@@ -73,6 +80,11 @@ namespace async
 		_context.uc_link = NULL;
 		_context.uc_stack.ss_sp = (char *)malloc(_stacksize);
 		_context.uc_stack.ss_size = _stacksize;
+
+#if defined(VALGRIND)
+		m_valgrindStackId = VALGRIND_STACK_REGISTER(_context.uc_stack.ss_sp, (char *)_context.uc_stack.ss_sp + _context.uc_stack.ss_size);
+#endif
+
 
 #if PVOID_SIZE == INT_SIZE
 		int ithis = (int)(this);

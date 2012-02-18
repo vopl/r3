@@ -69,6 +69,10 @@ namespace async
 #   error Unknown context type for fibers
 #endif
 
+#if defined(VALGRIND)
+		int m_valgrindStackId;
+#endif
+
 		function<void()>	_code;
 		boost::mutex		_mtx;
 		bool				_isLocked;
