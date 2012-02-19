@@ -11,7 +11,7 @@ importExtension('qt.sql');
 
 
 
-global.uiLoader = include('uiLoader.js');
+global.uiLoader = include(':/uiLoader.js');
 
 
 
