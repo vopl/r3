@@ -4,5 +4,6 @@
         <file>mainWindow.ui</file>
         <file>mainWindowIcon.png</file>
         <file>uiLoader.js</file>
+        <file>networkDialog.ui</file>
     </qresource>
 </RCC>
