@@ -49,6 +49,9 @@ SOURCE_GROUP(genarated FILES ${SRC_QT_RES_GEN})
 IF(MSVC)
 	SET(SRC_QT_RES_FILES
 		${SRC_DIR}/desktop/res/main.js
+		${SRC_DIR}/desktop/res/mainWindow.ui
+		${SRC_DIR}/desktop/res/mainWindowIcon.png
+		${SRC_DIR}/desktop/res/uiLoader.js
 	)
 	SOURCE_GROUP(src\\res FILES ${SRC_QT_RES_FILES})
 	SET_SOURCE_FILES_PROPERTIES(${SRC_QT_RES_FILES} PROPERTIES LANGUAGE "")
