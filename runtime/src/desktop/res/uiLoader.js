@@ -1,60 +1,69 @@
 
-var uiLoader = new QUiLoader;
-uiLoader.creator = new QUiLoader;
-
-
-uiLoader.createAction = function(parent, name)
+function UiLoader(parent)
 {
-    var res = this.creator.createAction(parent, name);
-    if(name && this.ui && res)
+    QUiLoader.call(this, parent);
+
+    var uiStack = [];
+    //////////////////////////////////////////////////////////////////////////
+    this.load = function(device, parentWidget)
     {
-        this.ui[name] = res;
-    }
-    return res;
-}
+        uiStack.unshift({});
+        var res = this.__proto__.load.call(this, device, parentWidget);
+        if(res instanceof Object)
+        {
+            res.ui = uiStack[0];
+        }
+        uiStack.shift();
 
-uiLoader.createActionGroup = function(parent, name)
-{
-    var res = this.creator.createActionGroup(parent, name);
-    if(name && this.ui && res)
+        return res;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    this.createAction = function(parent, name)
     {
-        this.ui[name] = res;
+        var res = this.__proto__.createAction(parent, name);
+        if(name && uiStack[0] && res)
+        {
+            uiStack[0][name] = res;
+        }
+        return res;
     }
-    return res;
-}
 
-uiLoader.createLayout = function(className, parent, name)
-{
-    var res = this.creator.createLayout(className, parent, name)
-    if(name && this.ui && res)
+    this.createActionGroup = function(parent, name)
     {
-        this.ui[name] = res;
+        var res = this.__proto__.createActionGroup(parent, name);
+        if(name && uiStack[0] && res)
+        {
+            uiStack[0][name] = res;
+        }
+        return res;
     }
-    return res;
-}
 
-uiLoader.createWidget = function(className, parent, name)
-{
-    var res = this.creator.createWidget(className, parent, name)
-    if(name && this.ui && res)
+    this.createLayout = function(className, parent, name)
     {
-        this.ui[name] = res;
+        var res = this.__proto__.createLayout(className, parent, name)
+        if(name && uiStack[0] && res)
+        {
+            uiStack[0][name] = res;
+        }
+        return res;
     }
-    return res;
-}
 
-uiLoader.create = function(device, parentWidget)
-{
-    this.ui = {};
+    this.createWidget = function(className, parent, name)
+    {
+        var res = this.__proto__.createWidget(className, parent, name)
+        if(name && uiStack[0] && res)
+        {
+            uiStack[0][name] = res;
+        }
+        return res;
+    }
     
-    var res = this.load(device, parentWidget);
-    if(res instanceof Object)
-    {
-        res.ui = this.ui;
-    }
-    delete this.ui;
-
-    return res;
 }
+
+UiLoader.prototype = new QUiLoader();
+
+
+var uiLoader = new UiLoader();
 
 uiLoader;

@@ -26,10 +26,10 @@ global.uiLoader = include('uiLoader.js');
 
 
 
-global.mainWindow = uiLoader.create(new QFile(':/mainWindow.ui'));
+global.mainWindow = uiLoader.load(new QFile(':/mainWindow.ui'));
 mainWindow.windowIcon = new QIcon(":/mainWindowIcon.png");
 
-mainWindow.ui.networkDialog = uiLoader.create(new QFile(':/networkDialog.ui'));
+mainWindow.ui.networkDialog = uiLoader.load(new QFile(':/networkDialog.ui'));
 
 mainWindow.ui.actionNetwork.activated.connect(function()
 {
