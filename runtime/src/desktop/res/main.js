@@ -33,7 +33,7 @@ mainWindow.ui.networkDialog = uiLoader.create(new QFile(':/networkDialog.ui'));
 
 mainWindow.ui.actionNetwork.activated.connect(function()
 {
-    mainWindow.ui.networkDialog.visible = true;
+    mainWindow.ui.networkDialog.visible = !mainWindow.ui.networkDialog.visible;
 });
 
 mainWindow.show();
