@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "client.hpp"
+#include "signal.hpp"
 
 //////////////////////////////////////////////////////////////////////////
 QScriptValue loadFile(QString fileName, QScriptEngine *engine)
@@ -158,6 +159,7 @@ int main(int argc, char *argv[])
 		&qtscript_fromScriptValue<ErrorCode>);
 
 	global.setProperty("Client", engine->newFunction(&Client::qtscript_ctor));
+	global.setProperty("Signal", engine->newFunction(&Signal::qtscript_ctor));
 
 	//////////////////////////////////////////////////////////////////////////
 	

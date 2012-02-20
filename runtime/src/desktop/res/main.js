@@ -13,6 +13,22 @@ importExtension('qt.sql');
 
 global.uiLoader = include(':/uiLoader.js');
 
-include(':/client.js');
+//include(':/client.js');
+var network = include(':/network.js');
+print(network);
+
+network.onStateChanged.connect(function(ec,numChannels){
+	print('s1', ec, numChannels);
+})
+
+function f22(ec,numChannels){
+	print('s2', ec, numChannels);
+}
+network.onStateChanged.connect(f22);
+//network.onStateChanged.disconnect(f22)
+
+print(network.onStateChanged);
+network.onStateChanged('_myec__', 221);
+
 
 QCoreApplication.exec();

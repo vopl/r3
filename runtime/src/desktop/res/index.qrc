@@ -6,5 +6,6 @@
         <file>uiLoader.js</file>
         <file>networkDialog.ui</file>
         <file>client.js</file>
+        <file>network.js</file>
     </qresource>
 </RCC>

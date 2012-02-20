@@ -19,6 +19,7 @@ SET(SRC_QT
 	${SRC_DIR}/desktop/client.cpp
 	${SRC_DIR}/desktop/session.cpp
 	${SRC_DIR}/desktop/agent.cpp
+	${SRC_DIR}/desktop/signal.cpp
 )
 SOURCE_GROUP(src FILES ${SRC_QT})
 
@@ -39,6 +40,7 @@ SET(SRC_QT_HDR
 	${SRC_DIR}/desktop/client.hpp
 	${SRC_DIR}/desktop/session.hpp
 	${SRC_DIR}/desktop/agent.hpp
+	${SRC_DIR}/desktop/signal.hpp
 )
 SOURCE_GROUP(src FILES ${SRC_QT_HDR})
 QT4_WRAP_CPP(MOC_SOURCES ${SRC_QT_HDR})
@@ -69,6 +71,7 @@ IF(MSVC AND FALSE)
 		${SRC_DIR}/desktop/res/main.js
 		${SRC_DIR}/desktop/res/uiLoader.js
 		${SRC_DIR}/desktop/res/client.js
+		${SRC_DIR}/desktop/res/network.js
 
 		${SRC_DIR}/desktop/res/mainWindow.ui
 		${SRC_DIR}/desktop/res/mainWindowIcon.png
