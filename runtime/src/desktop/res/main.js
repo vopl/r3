@@ -13,28 +13,6 @@ importExtension('qt.sql');
 
 global.uiLoader = include(':/uiLoader.js');
 
+include(':/client.js');
 
-
-
-
-
-
-
-
-
-
-
-
-
-global.mainWindow = uiLoader.load(new QFile(':/mainWindow.ui'));
-mainWindow.windowIcon = new QIcon(":/mainWindowIcon.png");
-
-mainWindow.ui.networkDialog = uiLoader.load(new QFile(':/networkDialog.ui'));
-
-mainWindow.ui.actionNetwork.activated.connect(function()
-{
-    mainWindow.ui.networkDialog.visible = !mainWindow.ui.networkDialog.visible;
-});
-
-mainWindow.show();
 QCoreApplication.exec();

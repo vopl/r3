@@ -11,29 +11,16 @@
 #include <QtCore>
 #include <QtScript>
 #include <QtScriptTools>
+#include <QScriptable>
 
-#include <string>
-#include <vector>
-#include <deque>
-#include <set>
-#include <iostream>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
+#include <QtCore/QUuid>
 
-
-
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/nil_generator.hpp>
-#include <boost/uuid/random_generator.hpp>
-
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
-#include <boost/foreach.hpp>
-
-#include <boost/shared_array.hpp>
-#include <boost/date_time/gregorian_calendar.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/cstdint.hpp>
+#include <QPointer>
 
 #include "utils/variant.hpp"
+
+#include <boost/bind.hpp>
 
 #endif

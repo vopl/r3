@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "client.hpp"
 
 //////////////////////////////////////////////////////////////////////////
 QScriptValue loadFile(QString fileName, QScriptEngine *engine)
@@ -73,6 +74,21 @@ QScriptValue print(QScriptContext *context, QScriptEngine *engine)
 }
 
 //////////////////////////////////////////////////////////////////////////
+template <class T>
+QScriptValue qtscript_toScriptValue(QScriptEngine *engine, T* const &in)
+{
+	return engine->newQObject(in, QScriptEngine::QtOwnership, QScriptEngine::PreferExistingWrapperObject);
+}
+
+//////////////////////////////////////////////////////////////////////////
+template <class T>
+void qtscript_fromScriptValue(const QScriptValue &value, T* &out)
+{
+	out = qobject_cast<T*>(value.toQObject());
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
@@ -119,6 +135,32 @@ int main(int argc, char *argv[])
 	global.setProperty("include", engine->newFunction(include));
 	global.setProperty("print", engine->newFunction(print));
 
+	//////////////////////////////////////////////////////////////////////////
+	// register client
+	qScriptRegisterMetaType<Client*>(
+		engine, 
+		&qtscript_toScriptValue<Client>, 
+		&qtscript_fromScriptValue<Client>);
+
+	qScriptRegisterMetaType<Session*>(
+		engine, 
+		&qtscript_toScriptValue<Session>, 
+		&qtscript_fromScriptValue<Session>);
+
+	qScriptRegisterMetaType<Agent*>(
+		engine, 
+		&qtscript_toScriptValue<Agent>, 
+		&qtscript_fromScriptValue<Agent>);
+
+	qScriptRegisterMetaType<ErrorCode*>(
+		engine, 
+		&qtscript_toScriptValue<ErrorCode>, 
+		&qtscript_fromScriptValue<ErrorCode>);
+
+	global.setProperty("Client", engine->newFunction(&Client::qtscript_ctor));
+
+	//////////////////////////////////////////////////////////////////////////
+	
 
 	{ // read script file and execute
 
