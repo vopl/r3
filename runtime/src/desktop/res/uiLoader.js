@@ -8,14 +8,13 @@ function UiLoader(parent)
     this.load = function(device, parentWidget)
     {
         uiStack.unshift({});
-        var proto = this.__proto__.load.call(this, device, parentWidget);
 
-		var obj = proto;
-		
-        obj.ui = uiStack[0];
+        var res = this.__proto__.load.call(this, device, parentWidget);
+        res.ui = uiStack[0];
+        
         uiStack.shift();
 		
-        return obj;
+        return res;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -39,9 +38,33 @@ function UiLoader(parent)
         return res;
     }
 
+    var createAsClass = function(className, parent, name)
+    {
+    	var ProtoCtor = global[className];
+    	if(ProtoCtor)
+    	{
+    		var Ctor = function(parent)
+    		{
+    			ProtoCtor.call(this, parent);
+    		}
+    		Ctor.prototype = new ProtoCtor();
+
+    		var res = new Ctor(parent);
+    		res.objectName = name;
+
+    		return res;
+    	}
+    	return null;
+    }
+
     this.createLayout = function(className, parent, name)
     {
-        var res = this.__proto__.createLayout(className, parent, name)
+    	var res = createAsClass(className, parent, name);
+
+    	if(!res)
+        {
+        	res = this.__proto__.createLayout(className, parent, name)
+        }
         if(name && uiStack[0] && res)
         {
             uiStack[0][name] = res;
@@ -51,12 +74,19 @@ function UiLoader(parent)
 
     this.createWidget = function(className, parent, name)
     {
-        var res = this.__proto__.createWidget(className, parent, name)
+    	var res = createAsClass(className, parent, name);
+
+    	if(!res)
+    	{
+		res = this.__proto__.createWidget(className, parent, name)
+    	}
+
         if(name && uiStack[0] && res)
         {
             uiStack[0][name] = res;
         }
-        return res;
+
+	return res;
     }
     
 }

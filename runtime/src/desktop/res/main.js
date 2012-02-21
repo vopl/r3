@@ -31,9 +31,9 @@ mainWindow.ui.actionNetwork.activated.connect(function()
 
 mainWindow.show();
 
-mainWindow.closeEvent = function(evt)
+mainWindow.__proto__.closeEvent = function(evt)
 {
-	print('mainWindow.closeEvent');
+	print('mainWindow.closeEvent: ',evt.type());
 };
 
 QCoreApplication.exec();
