@@ -27,7 +27,6 @@ namespace client
 		: public ISession
 		, public enable_shared_from_this<Session>
 	{
-		typedef ChannelHub<ISession> Base;
 		TClientSid _sid;
 
 		typedef std::map<TEndpoint, Agent *> TMAgents;
