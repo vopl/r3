@@ -103,6 +103,15 @@ namespace net
 		TReceive receive;
 		receive.second = 0;
 
+		{
+			mutex::scoped_lock sl(_mtxReceive);
+			if(_receiveLoopInProgress)
+			{
+				return;
+			}
+			_receiveLoopInProgress = true;
+		}
+
 		for(;;)
 		{
 			while(!receive.second)
@@ -110,6 +119,7 @@ namespace net
 				mutex::scoped_lock sl(_mtxReceive);
 				if(_receives.empty())
 				{
+					_receiveLoopInProgress = false;
 					return;
 				}
 
@@ -136,9 +146,14 @@ namespace net
 				{
 					if(asio::error::operation_aborted == ec)
 					{
+						mutex::scoped_lock sl(_mtxReceive);
+						_receiveLoopInProgress = false;
 						return;
 					}
 					spawn(bind(receive.first, ec, SPacket()));
+
+					mutex::scoped_lock sl(_mtxReceive);
+					_receiveLoopInProgress = false;
 					return;
 				}
 				transferedSize += readRes.data2();
@@ -164,9 +179,14 @@ namespace net
 					{
 						if(asio::error::operation_aborted == ec.value())
 						{
+							mutex::scoped_lock sl(_mtxReceive);
+							_receiveLoopInProgress = false;
 							return;
 						}
 						spawn(bind(receive.first, ec, SPacket()));
+
+						mutex::scoped_lock sl(_mtxReceive);
+						_receiveLoopInProgress = false;
 						return;
 					}
 					transferedSize += readRes.data2();
@@ -262,6 +282,7 @@ namespace net
 	ChannelSocket::ChannelSocket(TSocketPtr socket)
 		: _sock(socket)
 		, _sendInProcess(false)
+		, _receiveLoopInProgress(false)
 	{
 	}
 
@@ -269,6 +290,7 @@ namespace net
 	ChannelSocket::ChannelSocket(TSocketSslPtr socket, TSslContextPtr sslContext)
 		: _sock(socket, sslContext)
 		, _sendInProcess(false)
+		, _receiveLoopInProgress(false)
 	{
 	}
 
@@ -284,10 +306,7 @@ namespace net
 	{
 		mutex::scoped_lock sl(_mtxReceive);
 		_receives.push_back(std::make_pair(onReceive, amount));
-		if(_receives.size() < 2)
-		{
-			spawn(bind(&ChannelSocket::receiveLoop_f, shared_from_this()));
-		}
+		spawn(bind(&ChannelSocket::receiveLoop_f, shared_from_this()));
 	}
 
 	//////////////////////////////////////////////////////////////////////////

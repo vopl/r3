@@ -194,6 +194,7 @@ namespace server
 						channel->close();
 						return;
 					}
+					session->attachChannel(channel);
 					_sessions[session->sid()] = session;
 				}
 			}

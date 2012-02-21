@@ -65,6 +65,7 @@ namespace net
 		void receiveLoop_f();
 		mutex		_mtxReceive;
 		TReceives	_receives;
+		bool		_receiveLoopInProgress;
 
 		mutex		_mtxSends;
 		TSends		_sends;

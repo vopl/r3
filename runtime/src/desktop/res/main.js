@@ -19,17 +19,26 @@ var network = include(':/network.js');
 network.onStateChanged.connect(function(ec,numChannels){
 	print('network state changed: ', ec, ", ", numChannels);
 	
-	if(numChannels)
+	if(numChannels == 1)
 	{
+		print('start ping pong');
+		
 		var agent = network.allocAgent();
 		agent.onSendComplete.connect(function(ec, data, service){
-			//print('onSendComplete: ', data);
+			//print('onSendComplete: ', ec);
 		});
 		agent.onReceive.connect(function(data, service){
-			//print('onReceive: ', data);
+			//print('onReceive');
+			//print('onReceive: ',data.cnt, ", ", service);
+			data.cnt++;
+			if(!(data.cnt %1000))
+			{
+				print('pingpong: ', data.cnt);
+			}
 			agent.send(data, "echo");
 		});
-		agent.send("data", "echo");
+		var data = {cnt:0};
+		agent.send(data, "echo");
 	}
 })
 
