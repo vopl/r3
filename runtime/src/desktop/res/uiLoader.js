@@ -8,14 +8,14 @@ function UiLoader(parent)
     this.load = function(device, parentWidget)
     {
         uiStack.unshift({});
-        var res = this.__proto__.load.call(this, device, parentWidget);
-        if(res instanceof Object)
-        {
-            res.ui = uiStack[0];
-        }
-        uiStack.shift();
+        var proto = this.__proto__.load.call(this, device, parentWidget);
 
-        return res;
+		var obj = proto;
+		
+        obj.ui = uiStack[0];
+        uiStack.shift();
+		
+        return obj;
     }
 
     //////////////////////////////////////////////////////////////////////////

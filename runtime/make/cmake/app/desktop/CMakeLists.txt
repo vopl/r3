@@ -70,7 +70,6 @@ IF(MSVC AND FALSE)
 	SET(SRC_QT_RES_FILES
 		${SRC_DIR}/desktop/res/main.js
 		${SRC_DIR}/desktop/res/uiLoader.js
-		${SRC_DIR}/desktop/res/client.js
 		${SRC_DIR}/desktop/res/network.js
 
 		${SRC_DIR}/desktop/res/mainWindow.ui

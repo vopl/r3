@@ -9,26 +9,31 @@ importExtension('qt.gui');
 importExtension('qt.uitools');
 importExtension('qt.sql');
 
+var prot = {a:1};
 
 
 global.uiLoader = include(':/uiLoader.js');
 
-//include(':/client.js');
 var network = include(':/network.js');
-print(network);
 
 network.onStateChanged.connect(function(ec,numChannels){
-	print('s1', ec, numChannels);
+	print('network state changed: ', ec, ", ", numChannels);
 })
 
-function f22(ec,numChannels){
-	print('s2', ec, numChannels);
-}
-network.onStateChanged.connect(f22);
-//network.onStateChanged.disconnect(f22)
 
-print(network.onStateChanged);
-network.onStateChanged('_myec__', 221);
+global.mainWindow = uiLoader.load(new QFile(':/mainWindow.ui'));
+mainWindow.windowIcon = new QIcon(":/mainWindowIcon.png");
 
+mainWindow.ui.actionNetwork.activated.connect(function()
+{
+   network.showDialog();
+});
+
+mainWindow.show();
+
+mainWindow.closeEvent = function(evt)
+{
+	print('mainWindow.closeEvent');
+};
 
 QCoreApplication.exec();
