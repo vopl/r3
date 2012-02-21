@@ -1,11 +1,12 @@
 #include "pch.hpp"
 #include "session.hpp"
 #include "client.hpp"
+#include "agent.hpp"
 
 //////////////////////////////////////////////////////////////////////////
-void Session::onState(QPointer<Session> thisKeeper, const boost::system::error_code &ec, size_t numChannels)
+void Session::onStateChangedInternal(QPointer<Session> thisKeeper, const boost::system::error_code &ec, size_t numChannels)
 {
-	emit stateChanged(new ErrorCode(ec), (quint32)numChannels);
+	emit onStateChanged(new ErrorCode(ec), (quint32)numChannels);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -35,7 +36,7 @@ Session::Session(QPointer<Client> client, client::ISessionPtr session)
 	, _session(session)
 {
 	_session->watchState(boost::bind(
-		&Session::onState, 
+		&Session::onStateChangedInternal, 
 		this,
 		QPointer<Session>(this),
 		_1, _2));
@@ -60,4 +61,10 @@ void Session::balance(quint32 numChannels)
 void Session::close()
 {
 	_session->close();
+}
+
+//////////////////////////////////////////////////////////////////////////
+Agent *Session::allocAgent()
+{
+	return new Agent(this, _session->allocAgent());
 }

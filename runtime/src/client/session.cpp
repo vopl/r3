@@ -237,7 +237,6 @@ namespace client
 			return res;
 		}
 
-
 		return res;
 	}
 
@@ -246,7 +245,7 @@ namespace client
 	{
 		mutex::scoped_lock sl(_mtx);
 		TMAgents::iterator iter = _agents.find(endpoint);
-		assert(_agents.end() != iter);
+		assert(_agents.end() != iter || !_channelHub);
 
 		if(_agents.end() != iter)
 		{
@@ -257,7 +256,14 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	Future<error_code> Session::send(net::SPacket p)
 	{
-		return _channelHub->send(p);
+		if(_channelHub)
+		{
+			return _channelHub->send(p);
+		}
+
+		Future<error_code> res;
+		res(make_error_code(errc::operation_canceled));
+		return res;
 	}
 
 

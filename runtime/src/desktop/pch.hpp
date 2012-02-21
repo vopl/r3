@@ -22,5 +22,8 @@
 #include "utils/variant.hpp"
 
 #include <boost/bind.hpp>
+#include <boost/date_time/gregorian_calendar.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #endif

@@ -1,13 +1,13 @@
 #ifndef _SESSION_HPP_
 #define _SESSION_HPP_
 
-#include "agent.hpp"
 #include "errorCode.hpp"
 #include <client/isession.hpp>
 #include <QtCore/QUuid>
 #include <QPointer>
 
 class Client;
+class Agent;
 
 //////////////////////////////////////////////////////////////////////////
 class Session
@@ -20,7 +20,7 @@ class Session
 	client::ISessionPtr	_session;
 
 private:
-	void onState(QPointer<Session> thisKeeper, const boost::system::error_code &ec, size_t numChannels);
+	void onStateChangedInternal(QPointer<Session> thisKeeper, const boost::system::error_code &ec, size_t numChannels);
 
 private:
  	Client *getClient();
@@ -38,10 +38,10 @@ public:
 
 	Q_INVOKABLE void balance(quint32 numChannels);
 	Q_INVOKABLE void close();
-	//Q_INVOKABLE Agent *allocAgent();
+	Q_INVOKABLE Agent *allocAgent();
 
 signals:
-	void stateChanged(ErrorCode *, quint32);
+	void onStateChanged(ErrorCode *, quint32);
 };
 
 Q_DECLARE_METATYPE(Session *)

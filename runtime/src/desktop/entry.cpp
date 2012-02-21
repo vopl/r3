@@ -1,5 +1,7 @@
 #include "pch.hpp"
 #include "client.hpp"
+#include "agent.hpp"
+#include "session.hpp"
 #include "signal.hpp"
 
 //////////////////////////////////////////////////////////////////////////
@@ -78,7 +80,7 @@ QScriptValue print(QScriptContext *context, QScriptEngine *engine)
 template <class T>
 QScriptValue qtscript_toScriptValue(QScriptEngine *engine, T* const &in)
 {
-	return engine->newQObject(in, QScriptEngine::QtOwnership, QScriptEngine::PreferExistingWrapperObject);
+	return engine->newQObject(in, QScriptEngine::AutoOwnership);
 }
 
 //////////////////////////////////////////////////////////////////////////

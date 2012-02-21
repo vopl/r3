@@ -18,6 +18,11 @@ function Network()
 	{
 		dialog.visible = false;
 		checkConnectionTimer.stop();
+		if(session)
+		{
+			session.close();
+			session = undefined;
+		}
 	}
 	
 	this.showDialog = function()
@@ -31,6 +36,16 @@ function Network()
 		return "Network";
 	};
 	
+	this.allocAgent = function()
+	{
+		if(!session)
+		{
+			throw "unable to allocate agent, connection in down";
+		}
+		
+		return session.allocAgent();
+	}
+	
 	function checkConnection()
 	{
 		updateStatus();
@@ -43,6 +58,7 @@ function Network()
 		}
 	}
 	
+	var network = this;
 	client.onSession.connect(function(s, ec)
 	{
 		connectionInProgress = false;
@@ -55,14 +71,21 @@ function Network()
 		if(s)
 		{
 			session = s;
-			session.stateChanged.connect(function(ec, numChannels)
+			session.onStateChanged.connect(function(ec, numChannels)
 			{
 				if(ec.fail)
 				{
 					log(ec);
 				}
 				updateStatus();
+				network.onStateChanged(ec, numChannels);
 			});
+
+			network.onStateChanged(ec, session.numChannels);
+		}
+		else
+		{
+			network.onStateChanged(ec, 0);
 		}
 		updateStatus();
 	})

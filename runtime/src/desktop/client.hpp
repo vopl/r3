@@ -15,15 +15,17 @@ class Client
 {
 	Q_OBJECT
 
-	pluma::Pluma		_plugins;
+	pluma::Pluma		*_plugins;
 	client::IClientPtr	_client;
 
 private:
 	void createSession_f(QPointer<Client> thisKeeper, QString host, QString service);
 
 public:
-	Client();
+	Client(pluma::Pluma *plugins);
 	~Client();
+
+	client::IClientPtr	getRawClient();
 
 public:
 	static QScriptValue qtscript_ctor(QScriptContext *context, QScriptEngine *engine);

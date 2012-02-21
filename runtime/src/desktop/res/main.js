@@ -18,6 +18,19 @@ var network = include(':/network.js');
 
 network.onStateChanged.connect(function(ec,numChannels){
 	print('network state changed: ', ec, ", ", numChannels);
+	
+	if(numChannels)
+	{
+		var agent = network.allocAgent();
+		agent.onSendComplete.connect(function(ec, data, service){
+			//print('onSendComplete: ', data);
+		});
+		agent.onReceive.connect(function(data, service){
+			//print('onReceive: ', data);
+			agent.send(data, "echo");
+		});
+		agent.send("data", "echo");
+	}
 })
 
 

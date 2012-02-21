@@ -2,6 +2,8 @@
 #include "client.hpp"
 #include <boost/bind.hpp>
 
+static pluma::Pluma *g_plugins = NULL;
+
 //////////////////////////////////////////////////////////////////////////
 void Client::createSession_f(QPointer<Client> thisKeeper, QString host, QString service)
 {
@@ -24,12 +26,12 @@ void Client::createSession_f(QPointer<Client> thisKeeper, QString host, QString 
 
 
 //////////////////////////////////////////////////////////////////////////
-Client::Client()
+Client::Client(pluma::Pluma *plugins)
 	: QObject()
+	, _plugins(plugins)
 	, _client()
 {
-	_plugins.loadFromFolder("../plug");
-	_client = _plugins.create<client::IClientProvider>();
+	_client = _plugins->create<client::IClientProvider>();
 
 	//assert(_client);
 	if(!_client)
@@ -37,7 +39,7 @@ Client::Client()
 		return;
 	}
 
-	if(!_client->start(&_plugins))
+	if(!_client->start(_plugins))
 	{
 		_client.reset();
 		return;
@@ -64,7 +66,14 @@ QScriptValue Client::qtscript_ctor(QScriptContext *context, QScriptEngine *engin
 		return context->throwError(QString::fromLatin1("Client(): Did you forget to construct with 'new'?"));
 	}
 
-	Client* cpp = new Client();
+	if(!g_plugins)
+	{
+		//удален не будет
+		g_plugins = new pluma::Pluma();
+		g_plugins->loadFromFolder("../plug");
+	}
+
+	Client* cpp = new Client(g_plugins);
 	QScriptValue qs = context->engine()->newQObject(
 		context->thisObject(), 
 		cpp, 
