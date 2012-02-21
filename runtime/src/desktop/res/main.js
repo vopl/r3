@@ -34,6 +34,8 @@ mainWindow.show();
 mainWindow.__proto__.closeEvent = function(evt)
 {
 	print('mainWindow.closeEvent: ',evt.type());
+
+	network.stop();
 };
 
 QCoreApplication.exec();
