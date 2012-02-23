@@ -37,23 +37,21 @@ void FileEngineHandler::popCurrentPath()
 //////////////////////////////////////////////////////////////////////////
 QAbstractFileEngine *FileEngineHandler::create(const QString &name) const
 {
+	if(name.isEmpty() || name[0] == ':' || _stack.back()[0] == ':')
+	{
+		return NULL;
+	}
+
 	if(boost::filesystem::path(name.toUtf8().data()).is_relative())
 	{
 		QString res = name;
-		if(res.isEmpty())
+		if(res[0] == '/')
 		{
-			res = _stack.back();
+			res = _stack.back() + res;
 		}
 		else
 		{
-			if(res[0] == '/')
-			{
-				res = _stack.back() + res;
-			}
-			else
-			{
-				res = _stack.back() + '/' + res;
-			}
+			res = _stack.back() + '/' + res;
 		}
 
 		if(boost::filesystem::exists(res.toUtf8().data()))
