@@ -77,6 +77,62 @@ QScriptValue print(QScriptContext *context, QScriptEngine *engine)
 }
 
 //////////////////////////////////////////////////////////////////////////
+#define XLOG(x,X)\
+QScriptValue x##log(QScriptContext *context, QScriptEngine *engine)\
+{\
+	int argumentCount = context->argumentCount();\
+	QStringList sl;\
+	for(int i(0); i<argumentCount; i++)\
+	{\
+		sl.push_back(context->argument(i).toString());\
+	}\
+	X##LOG(sl.join(" ").toUtf8().data());\
+	return QScriptValue();\
+}\
+
+#define NLOG(x,X)\
+QScriptValue x##log(QScriptContext *context, QScriptEngine *engine)\
+{\
+	return QScriptValue();\
+}\
+
+#if !defined(LOG4CPLUS_DISABLE_FATAL)
+XLOG(f,F)
+#else
+NLOG(f,F)
+#endif
+
+#if !defined(LOG4CPLUS_DISABLE_ERROR)
+XLOG(e,E)
+#else
+NLOG(e,E)
+#endif
+
+#if !defined(LOG4CPLUS_DISABLE_WARN)
+XLOG(w,W)
+#else
+NLOG(w,W)
+#endif
+
+#if !defined(LOG4CPLUS_DISABLE_INFO)
+XLOG(i,I)
+#else
+NLOG(i,I)
+#endif
+
+#if !defined(LOG4CPLUS_DISABLE_DEBUG)
+XLOG(d,D)
+#else
+NLOG(d,D)
+#endif
+
+#if !defined(LOG4CPLUS_DISABLE_TRACE)
+XLOG(t,T)
+#else
+NLOG(t,T)
+#endif
+
+//////////////////////////////////////////////////////////////////////////
 template <class T>
 QScriptValue qtscript_toScriptValue(QScriptEngine *engine, T* const &in)
 {
@@ -138,6 +194,14 @@ int main(int argc, char *argv[])
 	global.setProperty("include", engine->newFunction(include));
 	global.setProperty("print", engine->newFunction(print));
 
+	global.setProperty("flog", engine->newFunction(flog));
+	global.setProperty("elog", engine->newFunction(elog));
+	global.setProperty("wlog", engine->newFunction(wlog));
+	global.setProperty("ilog", engine->newFunction(ilog));
+	global.setProperty("dlog", engine->newFunction(dlog));
+	global.setProperty("tlog", engine->newFunction(tlog));
+	global.setProperty("log", engine->newFunction(tlog));
+
 	//////////////////////////////////////////////////////////////////////////
 	// register client
 	qScriptRegisterMetaType<Client*>(
@@ -174,7 +238,7 @@ int main(int argc, char *argv[])
 		if(engine->hasUncaughtException())
 		{
 			QStringList backtrace = engine->uncaughtExceptionBacktrace();
-			qDebug() << QString("    %1\n%2\n\n").arg(res.toString()).arg(backtrace.join("\n"));
+			ELOG(res.toString().toUtf8().data()<<"\n"<<backtrace.join("\n").toUtf8().data());
 		}
 	}
 
