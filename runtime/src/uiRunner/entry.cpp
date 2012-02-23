@@ -13,9 +13,6 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 	QFileInfo fileInfo(fileName);
 	QString absoluteFileName = fileInfo.absoluteFilePath();
 	QString absolutePath = fileInfo.absolutePath();
-	QString canonicalFileName = fileInfo.canonicalFilePath();
-
-	QString path = fileInfo.path();
 
 	// load the file
 	QFile file(fileName);
@@ -56,13 +53,11 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 //////////////////////////////////////////////////////////////////////////
 QScriptValue include(QScriptContext *context, QScriptEngine *engine)
 {
-	QString currentFileName = engine->globalObject().property("script").property("filePath").toString();
-	QFileInfo currentFileInfo(currentFileName);
-	QString path = currentFileInfo.path();
 	QString importFile = context->argument(0).toString();
 	QFileInfo importInfo(importFile);
 	if(importInfo.isRelative())
 	{
+		QString path = engine->globalObject().property("script").property("path").toString();
 		importFile =  path + "/" + importInfo.filePath();
 	}
 
