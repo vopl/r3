@@ -10,7 +10,7 @@ function Network()
 		connect:true,
 	};
 	var connectionInProgress = false;
-	var dialog = uiLoader.load(new QFile(':/networkDialog.ui'));
+	var dialog = uiLoader.load(':/networkDialog.ui');
 	var client = new Client();
 	var session = undefined;
 
@@ -176,6 +176,10 @@ function Network()
 		cancelAddr();
 		dialog.visible = false;
 	});
+	dialog.__proto__.closeEvent = function()
+	{
+		cancelAddr();
+	}
 	
 	
 	function log(str)

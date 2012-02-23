@@ -5,11 +5,16 @@ function UiLoader(parent)
 
     var uiStack = [];
     //////////////////////////////////////////////////////////////////////////
-    this.load = function(device, parentWidget)
+    this.load = function(src, parentWidget)
     {
         uiStack.unshift({});
 
-        var res = this.__proto__.load.call(this, device, parentWidget);
+        if(!(src instanceof QIODevice))
+        {
+        	src = new QFile(src);
+        }
+
+        var res = this.__proto__.load.call(this, src, parentWidget);
         res.ui = uiStack[0];
         
         uiStack.shift();
