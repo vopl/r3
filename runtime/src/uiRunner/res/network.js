@@ -25,9 +25,10 @@ function Network()
 		}
 	}
 	
-	this.showDialog = function()
+	this.showDialog = function(show)
 	{
-		dialog.visible = true;
+		if(undefined == show) show = true;
+		dialog.visible = show;
 	}
 	this.onStateChanged = new Signal();
 

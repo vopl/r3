@@ -1,8 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.js</file>
-        <file>mainWindow.ui</file>
-        <file>mainWindowIcon.png</file>
         <file>uiLoader.js</file>
         <file>networkDialog.ui</file>
         <file>network.js</file>
