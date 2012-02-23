@@ -1,7 +1,7 @@
-var f = new QFile(script.path+'/mainWindow.ui');
+var f = new QFile('mainWindow.ui');
 
 global.mainWindow = uiLoader.load(f);
-mainWindow.windowIcon = new QIcon(script.path+"/mainWindowIcon.png");
+mainWindow.windowIcon = new QIcon('mainWindowIcon.png');
 
 mainWindow.ui.actionNetwork.activated.connect(function()
 {

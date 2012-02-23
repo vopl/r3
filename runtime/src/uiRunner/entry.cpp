@@ -1,9 +1,11 @@
 #include "pch.hpp"
+#include "fileEngineHandler.hpp"
 #include "client.hpp"
 #include "agent.hpp"
 #include "session.hpp"
 #include "signal.hpp"
 
+FileEngineHandler *g_feh = NULL;
 //////////////////////////////////////////////////////////////////////////
 QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 {
@@ -11,8 +13,8 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 
 	// avoid loading files more than once
 	QFileInfo fileInfo(fileName);
-	QString absoluteFileName = fileInfo.absoluteFilePath();
-	QString absolutePath = fileInfo.absolutePath();
+	QString absoluteFileName = fileInfo.canonicalFilePath();
+	QString absolutePath = fileInfo.canonicalPath();
 
 	// load the file
 	QFile file(fileName);
@@ -32,6 +34,11 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 		newScript.setProperty("filePath", engine->toScriptValue(absoluteFileName));
 		newScript.setProperty("path", engine->toScriptValue(absolutePath));
 
+		if(g_feh)
+		{
+			g_feh->pushCurrentPath(absolutePath);
+		}
+
 		QScriptValue activationObject = engine->currentContext()->activationObject();
 		activationObject.setProperty("script", newScript);
 		activationObject.setProperty("global", oldGlobal);
@@ -42,6 +49,12 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 
 		engine->currentContext()->setThisObject(oldThis);
 		engine->setGlobalObject(oldGlobal);
+
+		if(g_feh)
+		{
+			g_feh->popCurrentPath();
+		}
+
 	}
 	else
 	{
@@ -236,18 +249,19 @@ int main(int argc, char *argv[])
 	global.setProperty("Signal", engine->newFunction(&Signal::qtscript_ctor));
 
 	//////////////////////////////////////////////////////////////////////////
-	
+	//////////////////////////////////////////////////////////////////////////
+	{
+		FileEngineHandler feh;
+		g_feh = &feh;
 
-	{ // read script file and execute
-
-		QString fileName = ":/main.js";
-		QScriptValue res = loadFile(fileName, engine);
+		QScriptValue res = loadFile(":/main.js", engine);
 
 		if(engine->hasUncaughtException())
 		{
 			QStringList backtrace = engine->uncaughtExceptionBacktrace();
 			ELOG(res.toString().toUtf8().data()<<"\n"<<backtrace.join("\n").toUtf8().data());
 		}
+		g_feh = NULL;
 	}
 
 	delete engine;

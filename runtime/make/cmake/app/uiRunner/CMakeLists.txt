@@ -15,6 +15,7 @@ SET(SRC
 SOURCE_GROUP(src FILES ${SRC})
 
 SET(SRC_QT
+	${SRC_DIR}/uiRunner/fileEngineHandler.cpp
 	${SRC_DIR}/uiRunner/errorCode.cpp
 	${SRC_DIR}/uiRunner/client.cpp
 	${SRC_DIR}/uiRunner/session.cpp
@@ -45,6 +46,11 @@ SET(SRC_QT_HDR
 SOURCE_GROUP(src FILES ${SRC_QT_HDR})
 QT4_WRAP_CPP(MOC_SOURCES ${SRC_QT_HDR})
 SOURCE_GROUP(genarated FILES ${MOC_SOURCES})
+
+SET(SRC_QT_HDR_NOMOC
+	${SRC_DIR}/uiRunner/fileEngineHandler.hpp
+)
+SOURCE_GROUP(src FILES ${SRC_QT_HDR_NOMOC})
 
 IF(MSVC)
 	SET(SRC_PCH ${SRC_DIR}/uiRunner/pch.cpp)
@@ -92,7 +98,7 @@ ENDIF()
 ADD_EXECUTABLE(uiRunner 
 	${SRC_PCH} 
 	${SRC} ${SRC_NOPCH} ${SRC_HDR} 
-	${SRC_QT} ${SRC_QT_HDR} ${MOC_SOURCES} 
+	${SRC_QT} ${SRC_QT_HDR_NOMOC} ${SRC_QT_HDR} ${MOC_SOURCES} 
 	${SRC_QT_RES} ${SRC_QT_RES_GEN} ${SRC_QT_RES_FILES})
 CREATE_PCH(uiRunner ${SRC_DIR}/uiRunner/pch.hpp ${SRC_PCH})
 USE_PCH(uiRunner ${SRC_DIR}/uiRunner/pch.hpp ${SRC})
