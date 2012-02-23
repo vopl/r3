@@ -25,13 +25,22 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 		QString contents = stream.readAll();
 		file.close();
 
-		QScriptValue  newScript = engine->newObject();
+		QScriptValue  global = engine->globalObject();
+		QScriptValue  newGlobal = engine->newObject();
+		newGlobal.setPrototype(global);
 
+		QScriptValue  newScript = engine->newObject();
 		newScript.setProperty("filePath", engine->toScriptValue(absoluteFileName));
 		newScript.setProperty("path", engine->toScriptValue(absolutePath));
 
-		engine->currentContext()->activationObject().setProperty("script", newScript);
+		QScriptValue activationObject = engine->currentContext()->activationObject();
+		activationObject.setProperty("script", newScript);
+		activationObject.setProperty("global", global);
+		engine->setGlobalObject(newGlobal);
+
 		res = engine->evaluate(contents, fileName);
+
+		engine->setGlobalObject(global);
 	}
 	else
 	{
