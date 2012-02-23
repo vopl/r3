@@ -38,8 +38,8 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 		QScriptValue activationObject = engine->currentContext()->activationObject();
 		activationObject.setProperty("script", newScript);
 		activationObject.setProperty("global", oldGlobal);
+		engine->currentContext()->setThisObject(newScript);
 		engine->setGlobalObject(newGlobal);
-		engine->currentContext()->setThisObject(newGlobal);
 
 		res = engine->evaluate(contents, fileName);
 
