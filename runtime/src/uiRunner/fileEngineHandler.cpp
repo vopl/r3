@@ -20,11 +20,11 @@ void FileEngineHandler::pushCurrentPath(const QString &path)
 {
 	if(path.endsWith('/'))
 	{
-		_stack.push_back(path);
+		_stack.push_back(path.left(path.size()-1));
 	}
 	else
 	{
-		_stack.push_back(path+"/");
+		_stack.push_back(path);
 	}
 }
 
@@ -40,13 +40,23 @@ QAbstractFileEngine *FileEngineHandler::create(const QString &name) const
 	if(boost::filesystem::path(name.toUtf8().data()).is_relative())
 	{
 		QString res = name;
-		if(res[0] == '/')
+		if(res.isEmpty())
 		{
-			res = res.right(res.size()-1);
+			res = _stack.back();
 		}
-		res = _stack.back() + res;
+		else
+		{
+			if(res[0] == '/')
+			{
+				res = _stack.back() + res;
+			}
+			else
+			{
+				res = _stack.back() + '/' + res;
+			}
+		}
 
-		if(boost::filesystem::exists(boost::filesystem::path(res.toUtf8().data())))
+		if(boost::filesystem::exists(res.toUtf8().data()))
 		{
 			return new QFSFileEngine(res);
 		}
