@@ -1,4 +1,4 @@
-PROJECT (platform1)
+PROJECT (desktop)
 
 SET(SRC
 	main.js
@@ -12,7 +12,7 @@ FOREACH(f ${SRC})
 	GET_FILENAME_COMPONENT(lpath ${f} PATH)
 	GET_FILENAME_COMPONENT(ext ${f} EXT)
 
-	SET(in ${UI_DIR}/platform1/${f})
+	SET(in ${UI_DIR}/desktop/${f})
 	GET_FILENAME_COMPONENT(in ${in} ABSOLUTE)
 
 	SOURCE_GROUP(src\\${lpath} FILES ${in})
@@ -40,6 +40,6 @@ FOREACH(f ${SRC})
 	#MESSAGE("${in}, ${out}")
 ENDFOREACH()
 
-ADD_CUSTOM_TARGET(platform1
-	COMMAND echo  build platform1
+ADD_CUSTOM_TARGET(desktop
+	COMMAND echo  build desktop
 	SOURCES ${SRC_PREP})

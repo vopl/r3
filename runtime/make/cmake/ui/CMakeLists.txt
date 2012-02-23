@@ -1,2 +1,2 @@
-ADD_SUBDIRECTORY(platform1)
+ADD_SUBDIRECTORY(desktop)
 
