@@ -29,32 +29,36 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 		QScriptValue  newGlobal = engine->newObject();
 		newGlobal.setPrototype(oldGlobal);
 
-		QScriptValue oldThis = engine->currentContext()->thisObject();
+		QScriptValue  oldThis = engine->currentContext()->thisObject();
 
-		QScriptValue  newScript = engine->newObject();
-		newScript.setProperty("filePath", engine->toScriptValue(absoluteFileName));
-		newScript.setProperty("path", engine->toScriptValue(absolutePath));
-
-		if(g_feh)
-		{
-			g_feh->pushCurrentPath(absolutePath);
-		}
+		QScriptValue  script = engine->newObject();
+		script.setProperty("filePath", engine->toScriptValue(absoluteFileName));
+		script.setProperty("path", engine->toScriptValue(absolutePath));
 
 		QScriptValue activationObject = engine->currentContext()->activationObject();
-		activationObject.setProperty("script", newScript);
-		activationObject.setProperty("global", oldGlobal);
-		engine->currentContext()->setThisObject(newScript);
-		engine->setGlobalObject(newGlobal);
+		activationObject.setProperty("script", script);
 
-		res = engine->evaluate(contents, fileName);
-
-		engine->currentContext()->setThisObject(oldThis);
-		engine->setGlobalObject(oldGlobal);
-
-		if(g_feh)
 		{
-			g_feh->popCurrentPath();
+			engine->setGlobalObject(newGlobal);
+			engine->currentContext()->setThisObject(newGlobal);
+
+
+			{
+				if(g_feh)
+				{
+					g_feh->pushCurrentPath(absolutePath);
+				}
+				res = engine->evaluate(contents, fileName);
+				if(g_feh)
+				{
+					g_feh->popCurrentPath();
+				}
+			}
+
+			engine->currentContext()->setThisObject(oldThis);
+			engine->setGlobalObject(oldGlobal);
 		}
+
 
 	}
 	else

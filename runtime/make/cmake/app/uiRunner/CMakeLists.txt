@@ -1,6 +1,6 @@
 PROJECT (uiRunner)
 
-FIND_PACKAGE(Qt4 4.7.4 REQUIRED QtCore QtScript QtScriptTools QtGui)
+FIND_PACKAGE(Qt4 4.6.0 REQUIRED QtCore QtScript QtScriptTools QtGui)
 INCLUDE(${QT_USE_FILE})
 
 #MESSAGE("defs: ${QT_DEFINITIONS}")	

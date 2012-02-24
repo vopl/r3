@@ -578,7 +578,9 @@ void Agent::variantCnvt(QVariant &dst, const utils::Variant &src)
 			const utils::Variant::VectorVariant &vv = src.as<utils::Variant::VectorVariant>();
 
 			QList<QVariant> qlv;
+#if QT_VERSION >= 0x040700
 			qlv.reserve((int)vv.size());
+#endif
 			for(size_t i(0); i<vv.size(); i++)
 			{
 				QVariant qv;
@@ -857,7 +859,9 @@ void Agent::variantCnvt(QVariant &dst, const utils::Variant &src)
 			const utils::Variant::DequeVariant &dv = src.as<utils::Variant::DequeVariant>();
 
 			QList<QVariant> qlv;
+#if QT_VERSION >= 0x040700
 			qlv.reserve((int)dv.size());
+#endif
 			for(size_t i(0); i<dv.size(); i++)
 			{
 				QVariant qv;
@@ -878,7 +882,9 @@ void Agent::variantCnvt(QVariant &dst, const utils::Variant &src)
 			const utils::Variant::ListVariant &lv = src.as<utils::Variant::ListVariant>();
 
 			QList<QVariant> qlv;
+#if QT_VERSION >= 0x040700
 			qlv.reserve((int)lv.size());
+#endif
 			utils::Variant::ListVariant::const_iterator iter = lv.begin();
 			for(size_t i(0); i<lv.size(); i++)
 			{
