@@ -35,15 +35,15 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 
 		{
 
-#if QT_VERSION >= 0x040700
-			QScriptValue  oldGlobal = engine->globalObject();
-			QScriptValue  newGlobal = engine->newObject();
-			newGlobal.setPrototype(oldGlobal);
-			engine->setGlobalObject(newGlobal);
-
-			QScriptValue  oldThis = engine->currentContext()->thisObject();
-			engine->currentContext()->setThisObject(newGlobal);
-#endif
+// #if QT_VERSION >= 0x040700
+// 			QScriptValue  oldGlobal = engine->globalObject();
+// 			QScriptValue  newGlobal = engine->newObject();
+// 			newGlobal.setPrototype(oldGlobal);
+// 			engine->setGlobalObject(newGlobal);
+// 
+// 			QScriptValue  oldThis = engine->currentContext()->thisObject();
+// 			engine->currentContext()->setThisObject(newGlobal);
+// #endif
 			{
 				if(g_feh)
 				{
@@ -56,10 +56,10 @@ QScriptValue loadFile(QString fileName, QScriptEngine *engine)
 				}
 			}
 
-#if QT_VERSION >= 0x040700
-			engine->currentContext()->setThisObject(oldThis);
-			engine->setGlobalObject(oldGlobal);
-#endif
+// #if QT_VERSION >= 0x040700
+// 			engine->currentContext()->setThisObject(oldThis);
+// 			engine->setGlobalObject(oldGlobal);
+// #endif
 		}
 
 

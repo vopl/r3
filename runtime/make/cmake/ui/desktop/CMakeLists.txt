@@ -2,11 +2,10 @@ PROJECT (desktop)
 
 SET(SRC
 	main.js
-	mainWindow.ui
-	mainWindowIcon.png
-
-	comp1/main.js
-	comp1/main.ui
+	
+	mainWindow/main.js
+	mainWindow/main.ui
+	mainWindow/icon.png
 )
 
 SET(SRC_PREP)
