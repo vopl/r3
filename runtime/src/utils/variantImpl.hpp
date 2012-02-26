@@ -464,6 +464,7 @@ namespace utils
 				break;
 			default:
 				assert(0);
+				break;
 			}
 			dst.setNull();
 		}
@@ -546,6 +547,7 @@ namespace utils
 				break;
 			default:
 				assert(0);
+				break;
 			}
 			dst.setNull();
 		}

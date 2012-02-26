@@ -341,7 +341,7 @@ ENUM_VARIANT_TYPES
 	{
 		switch(et)
 		{
-		case etVoid: convert<Void>();
+		case etVoid: convert<Void>(); break;
 #define ENUM_VARIANT_TYPE(n) case et##n: convert<n>(); break;
 ENUM_VARIANT_TYPES
 #undef ENUM_VARIANT_TYPE

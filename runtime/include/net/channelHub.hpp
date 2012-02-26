@@ -48,6 +48,7 @@ namespace net
 	public:
 		//////////////////////////////////////////////////////////////////////////
 		ChannelHub();
+		virtual ~ChannelHub();
 
 		virtual void listen(
 			const boost::function<void(const boost::system::error_code &ec, const SPacket &p)> &onReceive,
@@ -204,6 +205,11 @@ namespace net
 	{
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	template <class Base>
+	ChannelHub<Base>::~ChannelHub()
+	{
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	template <class Base>

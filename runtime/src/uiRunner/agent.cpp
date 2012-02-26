@@ -934,6 +934,7 @@ void Agent::variantCnvt(QVariant &dst, const utils::Variant &src)
 	default:
 		qDebug()<<__FUNCTION__<<": unknown utils::Variant type";
 		dst.clear();
+		break;
 	}
 }
 

@@ -61,7 +61,7 @@ namespace client
 			ClientPtr client, 
 			const std::string &host, 
 			const std::string &service);
-		~Session();
+		virtual ~Session();
 
 		virtual void watchState(const function<void(error_code, size_t)> &onStateChanged);
 		virtual void balance(size_t numChannels);

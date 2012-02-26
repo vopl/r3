@@ -14,6 +14,7 @@ namespace client
 	//////////////////////////////////////////////////////////////////////////
 	struct ISession
 	{
+		virtual ~ISession(){}
 		virtual void watchState(const boost::function<void(boost::system::error_code, size_t)> &onStateChanged) =0;
 		virtual void balance(size_t numChannels) =0;
 		virtual size_t getNumChannels() =0;

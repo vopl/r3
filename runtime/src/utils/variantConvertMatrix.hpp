@@ -731,6 +731,7 @@ namespace utils
 						case 8:
 						case 10:
 							si++;
+							break;
 						}
 
 						boost::uint8_t &b = *(u.begin()+i);

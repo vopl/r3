@@ -329,6 +329,7 @@ namespace utils
 						break;
 					default:
 						assert(0);
+						break;
 					}
 				}
 				return size;
@@ -619,6 +620,7 @@ namespace utils
 						break;
 					default:
 						assert(0);
+						break;
 					}
 				}
 			}

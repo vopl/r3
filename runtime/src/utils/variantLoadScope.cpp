@@ -189,6 +189,7 @@ namespace utils
 				{
 				case 'u':
 					unsigned_ = true;
+					break;
 				case 'i':
 					break;
 				case '8':
@@ -211,6 +212,7 @@ namespace utils
 					break;
 				default:
 					assert(0);
+					break;
 				}
 				pos++;
 				continue;
