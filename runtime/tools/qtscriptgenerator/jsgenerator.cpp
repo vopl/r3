@@ -43,6 +43,7 @@
 #include "fileout.h"
 #include <iostream>
 
+
 JsGenerator::JsGenerator()
 {
 }
@@ -57,6 +58,151 @@ QString JsGenerator::subDirectoryForClass(const AbstractMetaClass *) const
     return QString::fromLatin1("js");
 }
 
+// in classgenerator.cpp
+void findPrototypeAndStaticFunctions(
+									 const AbstractMetaClass *meta_class,
+									 QMap<QString, AbstractMetaFunctionList> &nameToPrototypeFunctions,
+									 QMap<QString, AbstractMetaFunctionList> &nameToStaticFunctions);
+QList<int> uniqueEnumValueIndexes(const AbstractMetaEnumValueList &values);
+
+static bool shouldIgnoreEnum(const AbstractMetaEnum *enom)
+{
+	return !enom->wasPublic() || (enom->name() == "enum_1");
+}
+
+//////////////////////////////////////////////////////////////////////////
+static QString memberDeref(QString name)
+{
+	QRegExp re("(_|\\w|\\$)([_\\d\\w_\\$]*)");
+
+	if(name != "default" && re.exactMatch(name))
+	{
+		return "."+name;
+	}
+
+	return "['"+name+"']";
+}
+//////////////////////////////////////////////////////////////////////////
+static QMap<QString, QString> members;
+static void registerMember(QString name, QString cls)
+{
+	members[name] = cls;
+}
+
+static QSet<QString> classes;
+static void registerClass(QString cls)
+{
+	classes.insert(cls);
+}
+
+//////////////////////////////////////////////////////////////////////////
+static QString typeCnvt(QString name)
+{
+	if(name.isEmpty())
+	{
+		return "undefined";
+	}
+
+	//
+	static QMap<QString, QString> map;
+
+	map["bool"] = "Boolean";
+
+	map["int"] = "Numeric";
+	map["unsigned int"] = "Numeric";
+	map["signed int"] = "Numeric";
+	map["uint"] = "Numeric";
+
+	map["long"] = "Numeric";
+	map["unsigned long"] = "Numeric";
+	map["signed long"] = "Numeric";
+	map["ulong"] = "Numeric";
+
+	map["short"] = "Numeric";
+	map["unsigned short"] = "Numeric";
+	map["signed short"] = "Numeric";
+	map["ushort"] = "Numeric";
+
+	map["long long"] = "Numeric";
+	map["unsigned long long"] = "Numeric";
+	map["signed long long"] = "Numeric";
+
+	map["double"] = "Numeric";
+	map["float"] = "Numeric";
+
+	map["char"] = "String";
+	map["unsigned char"] = "Numeric";
+	map["signed char"] = "Numeric";
+	map["uchar"] = "Numeric";
+
+	map["qreal"] = "Numeric";
+	map["qdouble"] = "Numeric";
+
+	map["qint8"] = "Numeric";
+	map["quint8"] = "Numeric";
+	map["qint16"] = "Numeric";
+	map["quint16"] = "Numeric";
+	map["qint32"] = "Numeric";
+	map["quint32"] = "Numeric";
+	map["qint64"] = "Numeric";
+	map["quint64"] = "Numeric";
+
+	map["quintptr"] = "Numeric";
+
+	map["qlonglong"] = "Numeric";
+	map["qulonglong"] = "Numeric";
+
+	map["String"] = "String";
+	map["List"] = "Array";
+	map["Object"] = "Object";
+	map["Set"] = "Array";
+	map["HashMap"] = "Object";
+	
+	map["void"] = "undefined";
+
+	map["SortedMap"] = "Object";
+	map["WrapMode"] = "Numeric";
+	map["Thread"] = "Object";
+	map["WId"] = "String";
+	map["WritingSystem"] = "String";
+
+	map["QBool"] = "Boolean";
+
+	if(map.find(name) != map.end())
+	{
+		return map[name];
+	}
+
+	if(classes.find(name) != classes.end())
+	{
+		return name;
+	}
+
+	if(members.find(name) != members.end())
+	{
+		return members[name] + memberDeref(name);
+	}
+
+	if(name[0] == 'Q')
+	{
+		return "Object";
+	}
+
+	std::cout<<"WARNING type not projected correctly: "<<name.toUtf8().data()<<std::endl;
+	return name;
+
+}
+//////////////////////////////////////////////////////////////////////////
+static QString typeCnvt(const AbstractMetaType *amt)
+{
+	return amt?typeCnvt(amt->name()):"undefined";
+}
+
+static QString typeCnvt(const TypeEntry *te)
+{
+	return te?typeCnvt(te->targetLangName()):"undefined";
+}
+
 static void writeDocumentHeader(QTextStream &s, const QString &title)
 {
     s << "/*" << endl;
@@ -66,7 +212,7 @@ static void writeDocumentHeader(QTextStream &s, const QString &title)
     s << endl;
 }
 
-static void writeDocumentFooter(QTextStream &s)
+static void writeDocumentFooter(QTextStream & /*s*/)
 {
 }
 
@@ -83,73 +229,130 @@ bool JsGenerator::shouldGenerate(const AbstractMetaClass *meta_class) const
 
 void JsGenerator::generate()
 {
+	for (int i = 0; i < m_classes.size(); ++i)
+	{
+		const AbstractMetaClass *meta_class = m_classes.at(i);
+
+		registerClass(meta_class->name());
+
+        AbstractMetaEnumList enums = meta_class->enums();
+        for (int i = 0; i < enums.size(); ++i)
+        {
+            const AbstractMetaEnum *enom = enums.at(i);
+            if (shouldIgnoreEnum(enom))
+                continue;
+
+            FlagsTypeEntry *flags = enom->typeEntry()->flags();
+
+            AbstractMetaEnumValueList values = enom->values();
+            QList<int> indexes = uniqueEnumValueIndexes(values);
+            for (int j = 0; j < indexes.size(); ++j)
+            {
+                AbstractMetaEnumValue *val = values.at(indexes.at(j));
+				registerMember(val->name(), meta_class->name());
+            }
+
+			registerMember(enom->name(), meta_class->name());
+
+            if (flags)
+            {
+				registerMember(flags->flagsName(), meta_class->name());
+            }
+        }
+	}
+
     Generator::generate();
 }
 
-static bool shouldIgnoreEnum(const AbstractMetaEnum *enom)
+
+
+QString escArgName(QString name)
 {
-    return !enom->wasPublic() || (enom->name() == "enum_1");
+	if(name == "in")
+	{
+		return "_in";
+	}
+	if(name == "var")
+	{
+		return "_var";
+	}
+
+	return name;
 }
-
-// in classgenerator.cpp
-void findPrototypeAndStaticFunctions(
-    const AbstractMetaClass *meta_class,
-    QMap<QString, AbstractMetaFunctionList> &nameToPrototypeFunctions,
-    QMap<QString, AbstractMetaFunctionList> &nameToStaticFunctions);
-QList<int> uniqueEnumValueIndexes(const AbstractMetaEnumValueList &values);
-
-static void writeFunction(QTextStream &s, const AbstractMetaFunction *fun, int idx, bool isCtor, QString scope="")
+static void writeFunction(QTextStream &s, const AbstractMetaFunction *fun, int idx, bool isCtor, QString scope="", QString extraDoc="")
 {
     //s << "<li><div class=\"fn\"/><b>" << fun->targetLangSignature() << "</b></li>" << endl;
 
     //name
     s << "/**" << endl;
-    s << "* @name " << fun->name(); if(idx) s << "^" << idx; s << endl;
+    s << "  * @name " << fun->name(); if(idx) s << "^" << idx; s << endl;
 
     //ctor or func
-    s << "* @" << (isCtor?"constructor":"function") << endl;
+    s << "  * @" << (isCtor?"constructor":"function") << endl;
 
     if(!scope.isEmpty())
     {
-        s << "* @memberOf " << scope << endl;
+        s << "  * @memberOf " << scope << endl;
     }
+
+
+	if(!extraDoc.isEmpty())
+	{
+		s << extraDoc;
+	}
 
     //params
     AbstractMetaArgumentList al = fun->arguments();
     for(int i(0); i<al.size(); i++)
     {
         AbstractMetaArgument *a = al[i];
-        s << "* @param {" << a->type()->name() << "} " << a->argumentName() << endl;
+        s << "  * @param {" << typeCnvt(a->type()) << "} " << escArgName(a->argumentName()) << endl;
     }
 
     //retval
     if(!isCtor)
     {
-        s << "* @returns {" << (fun->type()?fun->type()->name():"void") << "}" << endl;
+        s << "  * @returns {" << typeCnvt(fun->type()) << "}" << endl;
     }
 
-    s << "*/" << endl;
+    s << "  */" << endl;
 
     //js
     if(scope.isEmpty())
     {
-        s << "var " << fun->name() << " = function(";
+        s << "function " << fun->name() << "(";
     }
     else
     {
-        s << scope << "." << fun->name() << " = function(";
+        s << scope << memberDeref(fun->name()) << " = function(";
     }
     for(int i(0); i<al.size(); i++)
     {
         AbstractMetaArgument *a = al[i];
-        if(i) s << ", ";
-        s << a->argumentName();
+        if(i)
+		{
+			s << ", ";
+		}
+
+		s << escArgName(a->argumentName());
     }
-    s << "){};" << endl;
+    s << "){";
+	if(typeCnvt(fun->type()) == "undefined")
+	{
+		s << "return undefined;";
+	}
+	else
+	{
+		s << "return new " << typeCnvt(fun->type()) << "();";
+	}
+
+	s << "};" << endl;
 
     s << endl;
 }
 
+
+//////////////////////////////////////////////////////////////////////////
 void JsGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
 {
 /*
@@ -170,10 +373,22 @@ void JsGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
     s << meta_class->package();
     s << "</a> package]</h3>" << endl;
 */
-    s << "/**" << endl;
-    s << "* @" << (meta_class->isNamespace()?"namespace":"class") << " " << meta_class->name() << " from package " << meta_class->package() << endl;
 
 
+	QString inheritance = "";
+	if (meta_class->baseClass())
+	{
+		inheritance += "  * @extends " + meta_class->baseClass()->name() + "\n";
+	}
+	else if (!meta_class->interfaces().isEmpty())
+	{
+		AbstractMetaClass *iface = meta_class->interfaces().first();
+		AbstractMetaClass *impl = iface->primaryInterfaceImplementor();
+		if (impl != meta_class)
+		{
+			inheritance += "  * @extends " + impl->name() + "\n";
+		}
+	}
 
 
 
@@ -191,18 +406,6 @@ void JsGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
         }
     }
 */
-    if (meta_class->baseClass()) {
-        s << "* @inherits " << meta_class->baseClass()->name() << endl;
-    } else if (!meta_class->interfaces().isEmpty()) {
-        AbstractMetaClass *iface = meta_class->interfaces().first();
-        AbstractMetaClass *impl = iface->primaryInterfaceImplementor();
-        if (impl != meta_class) {
-            s << "* @inherits " << impl->name() << endl;
-        }
-    }
-    s << "*/" << endl;
-    s << "var " << meta_class->name() << " = {};" << endl;
-    s << endl;
 
 
     AbstractMetaFunctionList ctors;
@@ -225,13 +428,31 @@ void JsGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
         s << "<p>This class has no public constructors. Calling the constructor function will cause a TypeError.</p>";
     }
 */
-    if (!ctors.isEmpty()) {
-        for (int i = 0; i < ctors.size(); ++i) {
-            writeFunction(s, ctors.at(i), i, true);
+    if (!ctors.isEmpty())
+	{
+        for (int i = 0; i < ctors.size(); ++i)
+		{
+            writeFunction(s, ctors.at(i), i, true, "", inheritance);
         }
-    } else {
+    }
+	else
+	{
+		s << "/**" << endl;
+		s << "  * @" << (meta_class->isNamespace()?"namespace":"class") << " " << meta_class->name() << " from package " << meta_class->package() << endl;
+		s << inheritance;
+		s << "  */" << endl;
+		s << "var " << meta_class->name() << " = {};" << endl;
+		s << endl;
     }
 
+	if(!nameToPrototypeFunctions.isEmpty() || !meta_class->isNamespace())
+	{
+		if (meta_class->baseClass())
+		{
+			s << meta_class->name() << ".prototype = new " << meta_class->baseClass()->name() << "();" << endl;
+			s << endl;
+		}
+	}
 
 
 
@@ -250,10 +471,12 @@ void JsGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
 
 
 
-    if (!nameToStaticFunctions.isEmpty()) {
+    if (!nameToStaticFunctions.isEmpty())
+	{
         QMap<QString, AbstractMetaFunctionList>::const_iterator it;
         int i(0);
-        for (it = nameToStaticFunctions.constBegin(); it != nameToStaticFunctions.constEnd(); ++it,i++) {
+        for (it = nameToStaticFunctions.constBegin(); it != nameToStaticFunctions.constEnd(); ++it,i++)
+		{
             writeFunction(s, it.value().first(), 0, false, meta_class->name());
         }
     }
@@ -299,43 +522,40 @@ void JsGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
             {
                 AbstractMetaEnumValue *val = values.at(indexes.at(j));
                 s << "/**" << endl;
-                s << "* @constant" << endl;
-                s << "* @memberOf " << meta_class->name() << endl;
-                s << "* @name " << val->name() << endl;
+				s << "  * @default " << (val->stringValue().isEmpty()?QString().sprintf("0x%x", val->value()):val->stringValue()) << endl;
+                s << "  * @constant" << endl;
+                s << "  * @memberOf " << meta_class->name() << endl;
+                s << "  * @name " << val->name() << endl;
 
                 if(flags)
                 {
-                    s << "* @see " << meta_class->name() << "#" << flags->flagsName() << endl;
+                    s << "  * @see " << meta_class->name() << "#" << flags->flagsName() << endl;
                 }
-                s << "* @see " << meta_class->name() << "#" << enom->name() << endl;
-                s << "*/" << endl;
+                s << "  * @see " << meta_class->name() << "#" << enom->name() << endl;
+				s << "  * @type Number" << endl;
+                s << "  */" << endl;
 
-                s << meta_class->name() << "." << val->name();
-                if (!val->stringValue().isEmpty())
-                    s << " = " << val->stringValue();
-                s << ";" << endl;
-            }
-            if(indexes.size())
-            {
-                s << endl;
+                s << meta_class->name() << memberDeref(val->name());
+				s << " = " << QString().sprintf("0x%x", val->value()) << ";" << endl;
+				s << endl;
             }
 
             s << "/**" << endl;
-            s << "* @constructor " << endl;
-            s << "* @memberOf " << meta_class->name() << endl;
-            s << "* @name " << enom->name() << endl;
-            s << "*/" << endl;
-            s << meta_class->name() << "." << enom->name() << " = function(value){};" << endl;
+            s << "  * @constructor " << endl;
+            s << "  * @memberOf " << meta_class->name() << endl;
+            s << "  * @name " << enom->name() << endl;
+            s << "  */" << endl;
+            s << meta_class->name() << memberDeref(enom->name()) << " = function(value){;};" << endl;
             s << endl;
 
             if (flags)
             {
                 s << "/**" << endl;
-                s << "* @constructor " << endl;
-                s << "* @memberOf " << meta_class->name() << endl;
-                s << "* @name " << flags->flagsName() << endl;
-                s << "*/" << endl;
-                s << meta_class->name() << "." <<  flags->flagsName() << " = function(value1, value2 /*, ...*/){};" << endl;
+                s << "  * @constructor " << endl;
+                s << "  * @memberOf " << meta_class->name() << endl;
+                s << "  * @name " << flags->flagsName() << endl;
+                s << "  */" << endl;
+                s << meta_class->name() << memberDeref(flags->flagsName()) << " = function(value1, value2 /*, ...*/){;};" << endl;
             }
             s << endl;
 
@@ -343,18 +563,6 @@ void JsGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
         }
     }
 
-
-//     s << "/**" << endl;
-//     s << "* @type {Object} " << endl;
-//     s << "* @memberOf " << meta_class->name() << endl;
-//     if (!nameToPrototypeFunctions.isEmpty() && meta_class->baseClass())
-//     {
-//         s << "* @inherits " << meta_class->baseClass()->name() << ".prototype" << endl;
-//     }
-//     s << "* @name prototype" << endl;
-//     s << "*/" << endl;
-//     s << meta_class->name() << ".prototype = {};" << endl;
-//     s << endl;
 
     if (!nameToPrototypeFunctions.isEmpty()) {
 
@@ -411,12 +619,12 @@ void JsGenerator::write(QTextStream &s, const AbstractMetaClass *meta_class)
             for (int i = 0; i < props.size(); ++i)
             {
                 s << "/**" << endl;
-                s << "* @name " << props.at(i)->name() << endl;
-                s << "* @memberOf " << meta_class->name() << ".prototype" << endl;
-                s << "* @type " << props.at(i)->type()->targetLangName() << endl;
-                s << "*/" << endl;
+                s << "  * @name " << props.at(i)->name() << endl;
+                s << "  * @memberOf " << meta_class->name() << ".prototype" << endl;
+                s << "  * @type " << typeCnvt(props.at(i)->type()) << endl;
+                s << "  */" << endl;
 
-                s << meta_class->name() << ".prototype." << props.at(i)->name() << ";" << endl;
+                s << meta_class->name() << ".prototype" << memberDeref(props.at(i)->name()) << " = new " << typeCnvt(props.at(i)->type()) << "();" << endl;
                 s << endl;
             }
             s << endl;
