@@ -7,7 +7,7 @@ import org.eclipse.wst.jsdt.core.infer.IInferEngine;
 import org.eclipse.wst.jsdt.core.infer.IInferenceFile;
 import org.eclipse.wst.jsdt.core.infer.RefactoringSupport;
 import org.eclipse.wst.jsdt.core.infer.ResolutionConfiguration;
-
+import org.eclipse.wst.jsdt.core.dom.*;
 /**
  * @author rekunkov
  *
@@ -15,7 +15,7 @@ import org.eclipse.wst.jsdt.core.infer.ResolutionConfiguration;
 public class InferrenceProvider implements
 		org.eclipse.wst.jsdt.core.infer.InferrenceProvider {
 
-	IInferenceFile _scriptFile;
+	IInferenceFile _inferenceFile;
 	
 	/**
 	 * 
@@ -31,7 +31,7 @@ public class InferrenceProvider implements
 	@Override
 	public IInferEngine getInferEngine() {
 		//
-		return new InferEngine(this);
+		return new InferEngine(this, _inferenceFile);
 	}
 
 	/* (non-Javadoc)
@@ -39,10 +39,14 @@ public class InferrenceProvider implements
 	 */
 	@Override
 	public int applysTo(IInferenceFile scriptFile) {
+		
 		String fname = new String(scriptFile.getFileName());
+		
+		//JavaScriptUnit jsu = scriptFile.
 		
 		if(fname.endsWith(".js"))
 		{
+			_inferenceFile = scriptFile;
 			return ONLY_THIS;
 		}
 		return NOT_THIS;
