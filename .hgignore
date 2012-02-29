@@ -40,6 +40,7 @@ syntax: regexp
 ^meta/.*\.mta$
 ^meta/.*\.log$
 
+^eclipse/com.csf.qtassist/bin/
 
 syntax: glob
 runtime/make/cmake/excludeDefBuild.txt
