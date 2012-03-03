@@ -102,10 +102,29 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 	
 	InferredType makeUiType(IInferenceFile inferenceFile, IExpression uiName)
 	{
-		char[] clsName = {'U','i','C','l','a','s','s','N','a','m','e'};
-		InferredType res = this.addType(clsName);
+		InferredType res = this.addType((new String("UiClassName")).toCharArray(), true);
 		
-		InferredAttribute a = new InferredAttribute(clsName, res, uiName.sourceStart(), uiName.sourceEnd());
+		res.isAnonymous=true;
+		res.isObjectLiteral=true;
+		res.superClass = ObjectType;
+
+		res.sourceStart = uiName.sourceStart();
+		res.sourceEnd = uiName.sourceEnd();
+
+		//populateType( anonType, objLit , false);
+		
+		InferredAttribute a = new InferredAttribute(
+				(new String("prop1")).toCharArray(), 
+				StringType, 
+				uiName.sourceStart(), 
+				uiName.sourceEnd());
+		res.addAttribute(a);
+		
+		a = new InferredAttribute(
+				(new String("prop2")).toCharArray(), 
+				BooleanType, 
+				uiName.sourceStart(), 
+				uiName.sourceEnd());
 		res.addAttribute(a);
 		
 		return res;
