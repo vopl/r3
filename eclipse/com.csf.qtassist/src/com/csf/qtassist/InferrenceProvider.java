@@ -7,7 +7,7 @@ import org.eclipse.wst.jsdt.core.infer.IInferEngine;
 import org.eclipse.wst.jsdt.core.infer.IInferenceFile;
 import org.eclipse.wst.jsdt.core.infer.RefactoringSupport;
 import org.eclipse.wst.jsdt.core.infer.ResolutionConfiguration;
-import org.eclipse.wst.jsdt.core.dom.*;
+
 /**
  * @author rekunkov
  *

@@ -107,9 +107,8 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 		//res.isAnonymous=true;
 		//res.isObjectLiteral=true;
 		//res.superClass = ObjectType;
-
-		res.sourceStart = uiName.sourceStart();
-		res.sourceEnd = uiName.sourceEnd();
+		
+		res.updatePositions(uiName.sourceStart(), uiName.sourceEnd());
 
 		//populateType( anonType, objLit , false);
 		
