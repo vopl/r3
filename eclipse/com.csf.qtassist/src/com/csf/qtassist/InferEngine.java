@@ -104,9 +104,9 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 	{
 		InferredType res = this.addType((new String("UiClassName")).toCharArray(), true);
 		
-		res.isAnonymous=true;
-		res.isObjectLiteral=true;
-		res.superClass = ObjectType;
+		//res.isAnonymous=true;
+		//res.isObjectLiteral=true;
+		//res.superClass = ObjectType;
 
 		res.sourceStart = uiName.sourceStart();
 		res.sourceEnd = uiName.sourceEnd();
@@ -115,9 +115,10 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 		
 		InferredAttribute a = new InferredAttribute(
 				(new String("prop1")).toCharArray(), 
-				StringType, 
+				addType((new String("MyClass")).toCharArray(), true), 
 				uiName.sourceStart(), 
 				uiName.sourceEnd());
+		a.type = a.inType;
 		res.addAttribute(a);
 		
 		a = new InferredAttribute(
@@ -125,6 +126,7 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 				BooleanType, 
 				uiName.sourceStart(), 
 				uiName.sourceEnd());
+		a.type = a.inType;
 		res.addAttribute(a);
 		
 		return res;
