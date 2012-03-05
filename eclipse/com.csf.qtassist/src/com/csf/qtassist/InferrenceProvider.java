@@ -6,7 +6,6 @@ package com.csf.qtassist;
 import org.eclipse.wst.jsdt.core.infer.IInferEngine;
 import org.eclipse.wst.jsdt.core.infer.IInferenceFile;
 import org.eclipse.wst.jsdt.core.infer.RefactoringSupport;
-import org.eclipse.wst.jsdt.core.infer.ResolutionConfiguration;
 
 /**
  * @author rekunkov
@@ -22,7 +21,7 @@ public class InferrenceProvider implements
 	 */
 	public InferrenceProvider() {
 		//
-		System.out.print("ctor\n");
+//		System.out.print("ctor\n");
 	}
 
 	/* (non-Javadoc)
@@ -31,7 +30,9 @@ public class InferrenceProvider implements
 	@Override
 	public IInferEngine getInferEngine() {
 		//
-		return new InferEngine(this, _inferenceFile);
+		InferEngine inferEngine = new InferEngine(this);
+		inferEngine._inferenceFile = _inferenceFile;
+		return inferEngine;
 	}
 
 	/* (non-Javadoc)
@@ -49,7 +50,7 @@ public class InferrenceProvider implements
 			_inferenceFile = scriptFile;
 			return ONLY_THIS;
 		}
-		return NOT_THIS;
+		return MAYBE_THIS;
 	}
 
 	/* (non-Javadoc)
