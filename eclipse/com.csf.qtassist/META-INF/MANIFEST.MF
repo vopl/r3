@@ -6,6 +6,7 @@ Bundle-Version: 0.1.0.qualifier
 Bundle-Activator: com.csf.qtassist.Activator
 Bundle-Vendor: CSF
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.wst.jsdt.core;bundle-version="1.1.102"
+ org.eclipse.wst.jsdt.core;bundle-version="1.1.102",
+ org.eclipse.core.resources;bundle-version="3.7.101"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

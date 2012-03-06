@@ -26,7 +26,7 @@ public class Activator extends Plugin implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
 	    _plugin = this;
-
+	    
 		_logListener = new ILogListener() {
 
 			private Logger logger = Logger.getLogger(PLUGIN_ID);
