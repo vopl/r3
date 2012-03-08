@@ -76,9 +76,11 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 							localDeclaration.setInferredType(makeUiType(
 									_inferenceFile, arguments[0]));
 						} catch (SAXException e) {
-							e.printStackTrace();
+							localDeclaration.setInferredType(addType("SAXException".toCharArray(), false));
+							//e.printStackTrace();
 						} catch (IOException e) {
-							e.printStackTrace();
+							localDeclaration.setInferredType(addType("IOException".toCharArray(), false));
+							//e.printStackTrace();
 						}
 					}
 				}
@@ -162,6 +164,15 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 			}
 			String name = el.getAttribute("name");
 			String cls = el.getAttribute("class");
+			
+			if(tagName == "action")
+			{
+				cls = "QAction";
+			}
+			else if(tagName == "actiongroup")
+			{
+				cls = "QActionGroup";
+			}
 
 			if (name != null && cls != null) {
 				InferredAttribute a = new InferredAttribute(

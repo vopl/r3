@@ -49,9 +49,9 @@ public class InferrenceProvider implements
 		if(fname.endsWith(".js"))
 		{
 			_inferenceFile = scriptFile;
-			return MAYBE_THIS;
+			return ONLY_THIS;
 		}
-		return MAYBE_THIS;
+		return NOT_THIS;
 	}
 
 	/* (non-Javadoc)
