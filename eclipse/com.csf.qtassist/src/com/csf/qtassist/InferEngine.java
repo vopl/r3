@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.Path;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 /**
@@ -101,6 +100,9 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 		if (!(_inferenceFile instanceof IScriptFileDeclaration)) {
 			return VoidType;
 		}
+		
+		int srcStart = uiNameExpression.sourceStart();
+		int srcEnd = uiNameExpression.sourceEnd();
 
 		IPath ctxPath = new Path(new String(
 				((IScriptFileDeclaration) _inferenceFile).getFileName()));
@@ -130,17 +132,14 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 
 		// класс компилируемого ui шаблона
 		InferredType res = this.addType(s.toCharArray(), true);
-		res.updatePositions(uiNameExpression.sourceStart(),
-				uiNameExpression.sourceEnd());
-
-		InferredType resUi = this.addType(InferredType.OBJECT_LITERAL_NAME, true);
-		//resUi.isAnonymous=true;
-		//resUi.isObjectLiteral=true;
-		//resUi.superClass = ObjectType;
+		//InferredType res = createAnonymousType(s.toCharArray(), null);
 		
-		// resUi.isAnonymous = true;
-		resUi.updatePositions(uiNameExpression.sourceStart(),
-				uiNameExpression.sourceEnd());
+		res.updatePositions(srcStart, srcEnd);
+
+		InferredType resUi = this.addType((s+"_ui").toCharArray(), true);
+		//InferredType resUi = createAnonymousType((s+"_ui").toCharArray(), null);
+		
+		resUi.updatePositions(srcStart, srcEnd);
 
 		// прототип
 		nodes = doc.getElementsByTagName("widget");
@@ -148,30 +147,43 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 			return res;
 		}
 		Element el = (Element) nodes.item(0);
-		res.superClass = this.addType(el.getAttribute("class").toCharArray(),
-				false);
+		res.superClass = this.addType(el.getAttribute("class").toCharArray(), false);
 
-		// дочерние виджеты
-		// уже nodes = doc.getElementsByTagName("widget");
+		// дочерние виджеты, лайауты, экшины, экшн группы
+		nodes = doc.getElementsByTagName("*");
 		for (int i = 0; i < nodes.getLength(); i++) {
 			el = (Element) nodes.item(i);
 
+			String tagName = el.getTagName();
+			if(	tagName == null || 
+					(tagName != "widget" && tagName != "layout" && tagName != "action" && tagName != "actiongroup"))
+			{
+				continue;
+			}
 			String name = el.getAttribute("name");
 			String cls = el.getAttribute("class");
 
 			if (name != null && cls != null) {
-				InferredAttribute a = new InferredAttribute(name.toCharArray(),
+				InferredAttribute a = new InferredAttribute(
+						name.toCharArray(),
 						addType(cls.toCharArray(), false),
 						uiNameExpression.sourceStart(),
 						uiNameExpression.sourceEnd());
 				a.type = a.inType;
+				a.nameStart = srcStart;
+				a.initializationStart = srcStart;
 				resUi.addAttribute(a);
 			}
 		}
 
-		InferredAttribute ui = new InferredAttribute("ui".toCharArray(), resUi,
-				uiNameExpression.sourceStart(), uiNameExpression.sourceEnd());
+		InferredAttribute ui = new InferredAttribute(
+				"ui".toCharArray(), 
+				resUi,
+				uiNameExpression.sourceStart(), 
+				uiNameExpression.sourceEnd());
 		ui.type = ui.inType;
+		ui.nameStart = srcStart;
+		ui.initializationStart = srcStart;
 		res.addAttribute(ui);
 
 		return res;

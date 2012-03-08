@@ -3,7 +3,6 @@
  */
 package com.csf.qtassist;
 
-import org.eclipse.wst.jsdt.core.ast.IScriptFileDeclaration;
 import org.eclipse.wst.jsdt.core.infer.IInferEngine;
 import org.eclipse.wst.jsdt.core.infer.IInferenceFile;
 import org.eclipse.wst.jsdt.core.infer.RefactoringSupport;
@@ -50,7 +49,7 @@ public class InferrenceProvider implements
 		if(fname.endsWith(".js"))
 		{
 			_inferenceFile = scriptFile;
-			return ONLY_THIS;
+			return MAYBE_THIS;
 		}
 		return MAYBE_THIS;
 	}
