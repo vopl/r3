@@ -19,6 +19,8 @@ syntax: regexp
 
 ^runtime/make/cmake/.*\.kdev4$
 
+^runtime/ui/\.
+
 ^comps/.*\.obj$
 ^comps/.*\.pdb$
 ^comps/.*\.exp$

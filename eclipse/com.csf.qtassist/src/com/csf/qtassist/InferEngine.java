@@ -19,6 +19,8 @@ import org.eclipse.wst.jsdt.core.infer.IInferenceFile;
 import org.eclipse.wst.jsdt.core.infer.InferOptions;
 import org.eclipse.wst.jsdt.core.infer.InferredAttribute;
 import org.eclipse.wst.jsdt.core.infer.InferredType;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -108,8 +110,20 @@ public class InferEngine extends org.eclipse.wst.jsdt.core.infer.InferEngine {
 
 		IPath ctxPath = new Path(new String(
 				((IScriptFileDeclaration) _inferenceFile).getFileName()));
+		
+		if(2 > ctxPath.segmentCount())
+		{
+			return VoidType;
+		}
 
-		IPath pw = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+		IProject proj = ResourcesPlugin.getWorkspace().getRoot().getProject(ctxPath.segment(0));
+		if(proj == null)
+		{
+			return VoidType;
+		}
+		ctxPath = ctxPath.removeFirstSegments(1);
+		
+		IPath pw = proj.getLocation();
 		ctxPath = pw.append(ctxPath);
 
 		IPath uiPath = new Path(uiName);
