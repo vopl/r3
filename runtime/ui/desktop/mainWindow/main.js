@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
 var w = uiLoader.load('main.ui');
 w.windowIcon = new QIcon('icon.png');
-w.ui.taskPanel.setTitleBarWidget(new QWidget(w));
 
 
 w.ui.actionNetwork.activated.connect(function() {
@@ -24,5 +23,7 @@ w.__proto__.closeEvent = function(evt) {
     network.stop();
 };
 
+var auth = include('../authorize/main.js');
+w.ui.centrallayout.addWidget(auth, 0,0);
 
 w;

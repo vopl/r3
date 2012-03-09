@@ -17,6 +17,7 @@ function onFirstConnect(ec,numChannels)
 		//первое соединение установлено, грузить клиентские скрипты
 		network.onStateChanged.disconnect(onFirstConnect);
 		network.showDialog(false);
+		network.isFirstConnection = false;
 
 		include(QDir.currentPath()+'/../../ui/desktop/main.js');
 	}

@@ -13,6 +13,8 @@ function Network()
 	var dialog = uiLoader.load(':/networkDialog.ui');
 	var client = new Client();
 	var session = undefined;
+	
+	this.isFirstConnection = true;
 
 	this.stop = function()
 	{
@@ -178,6 +180,12 @@ function Network()
 	});
 	dialog.__proto__.closeEvent = function()
 	{
+		//tlog('dialog.__proto__.closeEvent');
+		if(network.isFirstConnection)
+		{
+			network.stop();
+			return;
+		}
 		cancelAddr();
 	}
 	
