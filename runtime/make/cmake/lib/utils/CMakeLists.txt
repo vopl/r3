@@ -21,7 +21,9 @@ SET(SRC
 	${SRC_DIR}/utils/crc32.cpp
 	${SRC_DIR}/utils/variant.cpp
 	${SRC_DIR}/utils/variantLoad.cpp
+	${SRC_DIR}/utils/variantLoad2.cpp
 	${SRC_DIR}/utils/variantLoadScope.cpp
+	${SRC_DIR}/utils/variantLoadScope2.cpp
 	${SRC_DIR}/utils/variantLoadGrammar.cpp
 	${SRC_DIR}/utils/variantSerialization.cpp
 )
@@ -31,6 +33,7 @@ SET(SRC_HDR
 	${SRC_DIR}/utils/variantDumper.hpp
 	${SRC_DIR}/utils/variantImpl.hpp
 	${SRC_DIR}/utils/variantLoadScope.hpp
+	${SRC_DIR}/utils/variantLoadScope2.hpp
 	${SRC_DIR}/utils/variantLoadGrammar.hpp
 	${SRC_DIR}/utils/variantConvertMatrix.hpp
 	${SRC_DIR}/utils/pch.hpp

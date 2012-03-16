@@ -884,6 +884,7 @@ namespace utils
 			\endverbatim
 		*/
 		bool load(const char *fileName, std::string *errors=NULL);
+		bool load2(const char *fileName, std::string *errors=NULL);
 
 	protected:
 		//буфер
