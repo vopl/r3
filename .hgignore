@@ -21,6 +21,12 @@ syntax: regexp
 
 ^runtime/ui/\.
 
+^runtime/src/utils/Variant.tokens
+^runtime/src/utils/VariantLexer.hpp
+^runtime/src/utils/VariantLexer.cpp
+^runtime/src/utils/VariantParser.hpp
+^runtime/src/utils/VariantParser.cpp
+
 ^comps/.*\.obj$
 ^comps/.*\.pdb$
 ^comps/.*\.exp$

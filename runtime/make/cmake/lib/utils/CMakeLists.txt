@@ -16,6 +16,36 @@ SET(INCLUDE
 )
 SOURCE_GROUP(include FILES ${INCLUDE})
 
+FIND_PROGRAM(ANTLR NAMES antlr antlr.sh antlr.com antlr.exe antlr.bat antlr3 antlr3.sh antlr3.com antlr3.exe antlr3.bat)
+IF("${ANTLR}" STREQUAL "ANTLR-NOTFOUND")
+	MESSAGE(FATAL_ERROR "antlr 3 required, see http://www.antlr.org/")
+ENDIF()
+MESSAGE(STATUS "Found antlr: ${ANTLR}")
+
+
+INCLUDE(CheckIncludeFileCXX)
+CHECK_INCLUDE_FILE_CXX(antlr3.hpp HAVE_ANTLR3_HPP)
+
+IF("${HAVE_ANTLR3_HPP}" STREQUAL "")
+	MESSAGE(FATAL_ERROR "antlr 3 c++ runtime required, see http://www.antlr.org/")
+ENDIF()
+
+
+
+ADD_CUSTOM_COMMAND(
+	OUTPUT 
+		${SRC_DIR}/utils/VariantParser.cpp 
+		${SRC_DIR}/utils/VariantParser.hpp 
+		${SRC_DIR}/utils/VariantLexer.cpp 
+		${SRC_DIR}/utils/VariantLexer.hpp 
+	COMMAND 
+		${ANTLR} 
+	ARGS 
+		${SRC_DIR}/utils/Variant.g -o ${SRC_DIR}/utils
+	MAIN_DEPENDENCY 
+		${SRC_DIR}/utils/Variant.g
+	VERBATIM)
+
 SET(SRC
 	${SRC_DIR}/utils/base64.cpp
 	${SRC_DIR}/utils/crc32.cpp
@@ -26,6 +56,10 @@ SET(SRC
 	${SRC_DIR}/utils/variantLoadScope2.cpp
 	${SRC_DIR}/utils/variantLoadGrammar.cpp
 	${SRC_DIR}/utils/variantSerialization.cpp
+	
+	
+	${SRC_DIR}/utils/VariantLexer.cpp
+	${SRC_DIR}/utils/VariantParser.cpp
 )
 SOURCE_GROUP(src FILES ${SRC})
 
@@ -37,6 +71,12 @@ SET(SRC_HDR
 	${SRC_DIR}/utils/variantLoadGrammar.hpp
 	${SRC_DIR}/utils/variantConvertMatrix.hpp
 	${SRC_DIR}/utils/pch.hpp
+
+	${SRC_DIR}/utils/VariantLexer.hpp
+	${SRC_DIR}/utils/VariantParser.hpp
+	
+	${SRC_DIR}/utils/Variant.g
+	
 )
 SOURCE_GROUP(src FILES ${SRC_HDR})
 
