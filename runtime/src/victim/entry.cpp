@@ -12,7 +12,7 @@ void testOne(TLoad load)
 	bool b = true;
 	size_t s(0);
 
-	for(size_t i(0); i<10; i++)
+	for(size_t i(0); i<1; i++)
 	{
 		utils::Variant v;
 		std::string errors;
@@ -43,9 +43,9 @@ int main(int argc, char* argv[])
 	for(size_t i(0); i<100; i++)
 	{
 
-		testOne(&utils::Variant::load);
-		std::cout<<" ";
 		testOne(&utils::Variant::load2);
+		std::cout<<" ";
+		testOne(&utils::Variant::load);
 		std::cout<<std::endl;
 	}
 

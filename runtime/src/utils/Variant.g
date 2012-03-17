@@ -3,7 +3,9 @@ grammar Variant;
 options
 {
     language = Cpp;
+    k=10;
 }
+
 
 @parser::header
 {
@@ -48,121 +50,208 @@ options
 	typedef antlr3::Traits< VariantLexer, VariantParser, UserTraits > VariantLexerTraits;
 	typedef VariantLexerTraits VariantParserTraits;
 
-	/* If you don't want the override it is like this.
-	   class VariantLexer;
-	   class VariantParser;
-	   typedef antlr3::Traits< VariantLexer, VariantParser > VariantLexerTraits;
-	   typedef VariantLexerTraits VariantParserTraits;
-	 */
 }
+
 
 
 start
 	: variant EOF;
 
 variant
-	: include
+	: Include
 	| map
 	| array
 	| scalar
 	;
 
-include
-	:	KW_INCLUDE  INCLUDE_STRING
-	;
 
-KW_INCLUDE
-	:	'include'
-	;
-	
-INCLUDE_STRING
-	:	'"' INCLUDE_STRING_VALUE '"'
+Include
+	:	'include' WS* INCLUDE_STRING
 	;
 
 fragment
+INCLUDE_STRING
+	:	'"' INCLUDE_STRING_VALUE '"'
+	;
+	
+fragment
 INCLUDE_STRING_VALUE
-	:	~'"'*
+	:	(~'"')*
 	;
 
 map
-	scope 
-	{
-		std::string _key; 
-		//Variant	_value;
-	}
 	: 
 	'{' (mapPair (',' mapPair)* ','?)? '}'
 	;
 	
 mapPair
 	: 
-	key=mapPairKey (':' | '=' ) value=variant {$map::_key=$key.text; }
+		(String|Ident|Null|Bool) (':' | '=' ) variant
 	;
 
-mapPairKey
-	:	IDENT|string
-	;
-	
 array
 	: 
 	'[' (variant (',' variant)* ','?)? ']'
 	;
 
 scalar
-	: null
-	| string
-	| uuid
-	| bool_
-	| dateTimeScope
-	| dateScope
-	| timeScope
-	| float_
-	| double_
-	| integer
-	;
+	: Null
+	| String
+	| Uuid
+	| Bool
+	| Date
+	| Time
+	| DateTime
+	| Float
+	| Double
+	| Integer;
 
-IDENT
-	: 
-	(('a'..'z'|'A'..'Z'|'_'|'$') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'$')*)
+Null	:	'null';
+
+String
+    : '"' ( ESC_SEQ | ~('\\'|'"') )* '"'
+    | '\'' ( ESC_SEQ | ~('\\'|'\'') )* '\''
     ;
 
+Uuid
+	: '{' UuidValue '}'
+	| UuidValue;
+
+fragment
+UuidValue :		
+	HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT 
+	'-'
+	HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT 
+	'-'
+	HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT 
+	'-'
+	HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT 
+	'-'
+	HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT 
+	;
 	
+Bool
+	: T R U E | T | O N | F A L S E | F | O F F;
 
-null
-	: 'null';
 
-string
-	: '2STUB';
+Date
+	: DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT;
 
-uuid
-	: '3STUB';
+Time
+	: DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)?;
 
-bool_
-	: 'sdfgsdf';
+DateTime
+	: Date (' '|'T') Time;
 
-dateTimeScope
-	: '5STUB';
+Float
+	: REAL 'f';
 
-dateScope
-	: '6STUB';
+Double
+	: REAL;
 
-timeScope
-	: '7STUB';
+Integer
+	: ('0x' HEX_DIGIT+ ('u' IntegerSize?)?)
+	| (DIGIT+ (('ui'|'u'|'i') IntegerSize?)?)
+	| ('-' DIGIT+ ('i' IntegerSize?)?)
+	;
 
-float_
-	: '8STUB';
+fragment
+IntegerSize
+	: '8'|'16'|'32'|'64'
+	;
 
-double_
-	: '9STUB';
 
-integer
-	: '10STUB';
+Ident
+	: ('a'..'z'|'A'..'Z'|'_'|'$') ('a'..'z'|'A'..'Z'|'_'|'$'|'0'..'9')*;
 
 //--------------------------
-CMT
-	: '/*' .* '*/'
-	| '//' .* ('\r'|'\n')
+COMMENT
+	: ('/*' .* '*/'
+		| ('//'|'#') .* ('\r'|'\n')
+	)
 	{$channel=HIDDEN;}
 	;
 	
-WS  :   (' '|'\n'|'\r'|'\t')+ {$channel=HIDDEN;} ;
+WHITESPACES  :   WS+ {$channel=HIDDEN;} ;
+
+fragment
+WS  :   (' '|'\n'|'\r'|'\t');
+
+
+fragment
+ESC_SEQ
+    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
+    |   UNICODE_ESC
+    |   OCTAL_ESC
+    ;
+
+fragment
+OCTAL_ESC
+    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
+    |   '\\' ('0'..'7') ('0'..'7')
+    |   '\\' ('0'..'7')
+    ;
+
+fragment
+UNICODE_ESC
+    :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    ;
+
+fragment
+HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
+
+fragment
+DIGIT : '0'..'9' ;
+
+fragment
+REAL
+    :   DIGIT+ '.' DIGIT* EXPONENT?
+    |   '.' DIGIT+ EXPONENT?
+    |   DIGIT+ EXPONENT
+    ;
+
+fragment
+EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+
+//--------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');
