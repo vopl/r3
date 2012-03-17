@@ -3,7 +3,9 @@ grammar Variant;
 options
 {
     language = Cpp;
-    k=10;
+//    k=10;
+    backtrack=true;
+    memoize=true;
 }
 
 
@@ -86,7 +88,7 @@ map
 	
 mapPair
 	: 
-		(String|Ident|Null|Bool) (':' | '=' ) variant
+		(String|Ident) (':' | '=' ) variant
 	;
 
 array
@@ -166,8 +168,9 @@ Ident
 
 //--------------------------
 COMMENT
-	: ('/*' .* '*/'
-		| ('//'|'#') .* ('\r'|'\n')
+	: (
+		'/*' (options {greedy=false;} : .)* '*/'
+		| ('//'|'#')  ~('\r'|'\n')*
 	)
 	{$channel=HIDDEN;}
 	;
@@ -175,7 +178,7 @@ COMMENT
 WHITESPACES  :   WS+ {$channel=HIDDEN;} ;
 
 fragment
-WS  :   (' '|'\n'|'\r'|'\t');
+WS  :   (' '|'\n'|'\r'|'\t'|'\v'|'\f');
 
 
 fragment

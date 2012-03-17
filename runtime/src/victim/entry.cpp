@@ -2,8 +2,9 @@
 #include "utils/variant.hpp"
 
 typedef bool (utils::Variant::*TLoad)(const char *fileName, std::string *errors);
-void testOne(TLoad load)
+bool testOne(TLoad load)
 {
+	bool res = true;
 
 	FILETIME stub, kt, ut;
 	GetThreadTimes(GetCurrentThread(), &stub, &stub, &kt, &ut);
@@ -17,6 +18,7 @@ void testOne(TLoad load)
 		utils::Variant v;
 		std::string errors;
 		bool b = (v.*load)("P:\\projects\\r3\\repo\\runtime\\make\\vs9_x64\\test.js", &errors);
+		res &= b;
 
 		//std::cout<<(b?"success":"failure")<<std::endl;
 		if(!b)
@@ -34,21 +36,24 @@ void testOne(TLoad load)
 
 
 	std::cout<<double(stop-start)/1e7;
+
+	return res;
 }
 
 //////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+	bool b = true;;
 
 	for(size_t i(0); i<100; i++)
 	{
 
-		testOne(&utils::Variant::load2);
+		b &= testOne(&utils::Variant::load);
 		std::cout<<" ";
-		testOne(&utils::Variant::load);
+		b &= testOne(&utils::Variant::load2);
 		std::cout<<std::endl;
 	}
 
-	return EXIT_SUCCESS;
+	return b?EXIT_SUCCESS:EXIT_FAILURE;
 }
 
